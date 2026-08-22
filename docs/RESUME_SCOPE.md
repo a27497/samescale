@@ -22,10 +22,11 @@ This file separates repository evidence from intended design. A capability moves
 - Baseline-fail/oracle-pass validation and tamper-resistance tests
 - Controlled Python, Java 21, and TypeScript/Node task fixtures
 - `harnesslab task validate` and the authoritative local Gate B runner
+- Remote GitHub Actions Gate A + Gate B for the Phase B implementation baseline
+  `238613d5140d34e20ee1136cf48bbc32f7abe831` (run `32575558448`, result `success`)
 
-Evidence date: 2026-08-22. Evidence is local Gate A and Gate B output plus the named baseline
-remote CI run. Phase B remote evidence is recorded only after its new main commit completes CI.
-This does not imply any model/harness evaluation capability or untrusted-code isolation.
+Evidence date: 2026-08-22. Evidence is local Gate A and Gate B output plus the named remote CI
+runs. This does not imply any model/harness evaluation capability or untrusted-code isolation.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
 
@@ -48,6 +49,5 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-Remote CI for the Phase B head remains `NOT_VERIFIED` until that head is published and its Gate A
-and Gate B workflow succeeds. Future capabilities remain `DESIGN_ONLY` until their own
-implementation and verification gates exist.
+None recorded for the Phase A or Phase B gates. Future capabilities remain `DESIGN_ONLY` until
+their own implementation and verification gates exist.
