@@ -10,6 +10,12 @@ from dataclasses import dataclass
 from enum import IntEnum
 from pathlib import Path
 
+from harnesslab.contracts.common import EvaluationLane
+from harnesslab.contracts.task import ExpectedToolContract
+from harnesslab.harness_lane.toolchains import extract_tool_version, unsatisfied_tools
+from harnesslab.sandbox.runner import SANDBOX_IMAGE
+from harnesslab.tasks.package import TaskPackage
+
 
 class ExitCode(IntEnum):
     PASS = 0
@@ -38,7 +44,7 @@ CRITICAL_TESTS = {
     "test_codex_profile_and_prompt_hashes_are_deterministic",
     "test_codex_runtime_doctor_verifies_pinned_version_and_flags",
     "test_codex_self_report_cannot_override_hidden_verifier",
-    "test_exact_run_credentials_are_redacted_from_harness_artifacts",
+    "test_backend_credentials_automatically_redact_all_harness_artifacts",
     "test_failed_intermediate_command_does_not_fail_completed_turn",
     "test_filesystem_diff_is_authoritative_over_native_file_change",
     "test_harness_codex_doctor_reports_pinned_runtime",
@@ -50,8 +56,10 @@ CRITICAL_TESTS = {
     "test_harness_failure_taxonomy_is_structurally_distinct[protocol]",
     "test_harness_failure_taxonomy_is_structurally_distinct[timeout]",
     "test_requested_model_is_not_fabricated_as_observed_model",
+    "test_real_codex_cleanup_query_failure_is_unverified",
     "test_sanitized_jsonl_maps_trace_order_unknown_and_private_reasoning",
     "test_structured_authentication_error_is_not_guessed_from_free_text",
+    "test_task_expected_tools_reject_old_python_and_java",
     "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[java]",
     "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[python]",
     "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[typescript]",
@@ -136,7 +144,10 @@ def verify_test_evidence() -> ExitCode:
         "remove the workspace mutation while retaining agent success + turn.completed + exit 0 -> "
         "test_codex_self_report_cannot_override_hidden_verifier produces VERIFIED_FAIL; inject "
         "private reasoning sentinel -> sanitizer exclusion assertions remain green; claim a native "
-        "file_change without filesystem mutation -> authoritative changed_paths stays empty"
+        "file_change without filesystem mutation -> authoritative changed_paths stays empty; "
+        "Docker query nonzero + empty stdout -> outer cleanup is unverified; Python 3.11 and "
+        "Java/Javac 17 -> expected_tools compatibility fails; backend credential in native output "
+        "-> every published artifact excludes the exact value"
     )
     print("FAKE_CODEX_RESULTS=python:PASS/1.0,java:PASS/1.0,typescript:PASS/1.0")
     print(
@@ -148,9 +159,16 @@ def verify_test_evidence() -> ExitCode:
 
 def verify_image() -> bool:
     dockerfile = (ROOT / "docker" / "codex" / "Dockerfile").read_text(encoding="utf-8")
-    first_line = dockerfile.splitlines()[0]
+    verifier_dockerfile = (ROOT / "docker" / "sandbox" / "Dockerfile").read_text(encoding="utf-8")
+    base_lines = tuple(line for line in dockerfile.splitlines() if line.startswith("FROM "))
+    verifier_base_lines = tuple(
+        line for line in verifier_dockerfile.splitlines() if line.startswith("FROM ")
+    )
     required = (
-        "@sha256:" in first_line,
+        len(base_lines) == 3,
+        all("@sha256:" in line for line in base_lines),
+        len(verifier_base_lines) == 3,
+        all("@sha256:" in line for line in verifier_base_lines),
         "@openai/codex@${CODEX_VERSION}" in dockerfile,
         "ARG CODEX_VERSION=0.149.0" in dockerfile,
         "USER 10001:10001" in dockerfile,
@@ -211,8 +229,116 @@ def verify_image() -> bool:
         return False
     print(f"CODEX_IMAGE={CODEX_IMAGE}")
     print(f"CODEX_IMAGE_ID={image_id}")
-    print(f"CODEX_BASE={first_line.removeprefix('FROM ')}")
+    print(f"CODEX_BASES={';'.join(line.removeprefix('FROM ') for line in base_lines)}")
+    print("VERIFIER_BASES=" + ";".join(line.removeprefix("FROM ") for line in verifier_base_lines))
     print(f"CODEX_IMAGE_USER={user}")
+    return True
+
+
+def _h_lane_requirements() -> dict[str, tuple[ExpectedToolContract, ...]]:
+    requirements: dict[str, tuple[ExpectedToolContract, ...]] = {}
+    for manifest in sorted((ROOT / "tasks").glob("*/*/task.yaml")):
+        package = TaskPackage.load(manifest.parent)
+        if EvaluationLane.HARNESS in package.definition.lane_support:
+            requirements[package.definition.id] = package.definition.expected_tools
+    if not requirements or any(not tools for tools in requirements.values()):
+        raise RuntimeError("H-Lane task expected_tools are missing")
+    return requirements
+
+
+def _probe_tool_versions(image: str) -> dict[str, str]:
+    commands = {
+        "python": ("python3", "--version"),
+        "java": ("java", "-version"),
+        "javac": ("javac", "-version"),
+        "node": ("node", "--version"),
+    }
+    versions: dict[str, str] = {}
+    for tool, command in commands.items():
+        completed = subprocess.run(
+            (
+                "docker",
+                "run",
+                "--rm",
+                "--network",
+                "none",
+                "--entrypoint",
+                command[0],
+                image,
+                *command[1:],
+            ),
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if completed.returncode != 0:
+            raise RuntimeError(f"{image} {tool} version query failed")
+        versions[tool] = extract_tool_version(tool, completed.stdout + completed.stderr)
+    return versions
+
+
+def _image_id(image: str) -> str:
+    completed = subprocess.run(
+        ("docker", "image", "inspect", image, "--format", "{{json .Id}}"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(f"image identity unavailable: {image}")
+    image_id = json.loads(completed.stdout.strip())
+    if not isinstance(image_id, str) or not image_id.startswith("sha256:"):
+        raise RuntimeError(f"image lacks immutable identity: {image}")
+    return image_id
+
+
+def verify_task_toolchains() -> bool:
+    try:
+        requirements = _h_lane_requirements()
+        subject_versions = _probe_tool_versions(CODEX_IMAGE)
+        verifier_versions = _probe_tool_versions(SANDBOX_IMAGE)
+        subject_id = _image_id(CODEX_IMAGE)
+        verifier_id = _image_id(SANDBOX_IMAGE)
+    except (OSError, RuntimeError, ValueError) as exc:
+        print(f"FAIL: H-Lane toolchain verification error: {exc}")
+        return False
+    failures: list[str] = []
+    for task_id, task_requirements in requirements.items():
+        failures.extend(
+            f"subject {task_id}: {failure}"
+            for failure in unsatisfied_tools(task_requirements, subject_versions)
+        )
+        failures.extend(
+            f"verifier {task_id}: {failure}"
+            for failure in unsatisfied_tools(task_requirements, verifier_versions)
+        )
+    all_requirements = tuple(tool for tools in requirements.values() for tool in tools)
+    old_runtime_failures = unsatisfied_tools(
+        all_requirements,
+        {"python": "3.11.13", "java": "17.0.16", "javac": "17.0.16", "node": "24.4.1"},
+    )
+    sensitivity = (
+        any(failure.startswith("python expected 3.12") for failure in old_runtime_failures),
+        any(failure.startswith("java expected 21") for failure in old_runtime_failures),
+        any(failure.startswith("javac expected 21") for failure in old_runtime_failures),
+    )
+    if not all(sensitivity):
+        print("FAIL: old Python 3.11 / Java 17 sensitivity control did not fail")
+        return False
+    if failures:
+        print(f"FAIL: H-Lane task toolchain mismatches: {failures}")
+        return False
+    print(f"CODEX_SUBJECT_IMAGE_ID={subject_id}")
+    print(f"VERIFIER_IMAGE={SANDBOX_IMAGE}")
+    print(f"VERIFIER_IMAGE_ID={verifier_id}")
+    for tool, version in subject_versions.items():
+        print(f"CODEX_SUBJECT_{tool.upper()}={version}")
+    for tool, version in verifier_versions.items():
+        print(f"VERIFIER_{tool.upper()}={version}")
+    print("PASS: every H-Lane task expected_tools contract matches both isolated runtimes")
+    print("SENSITIVITY: Python 3.11 and Java/Javac 17 are rejected by current task contracts")
     return True
 
 
@@ -311,48 +437,6 @@ def main() -> int:
             ("uv", "run", "--locked", "harnesslab", "harness", "codex", "doctor"),
         ),
         Check(
-            "Codex image Python toolchain",
-            (
-                "docker",
-                "run",
-                "--rm",
-                "--network",
-                "none",
-                "--entrypoint",
-                "python3",
-                CODEX_IMAGE,
-                "--version",
-            ),
-        ),
-        Check(
-            "Codex image Java toolchain",
-            (
-                "docker",
-                "run",
-                "--rm",
-                "--network",
-                "none",
-                "--entrypoint",
-                "java",
-                CODEX_IMAGE,
-                "-version",
-            ),
-        ),
-        Check(
-            "Codex image Node toolchain",
-            (
-                "docker",
-                "run",
-                "--rm",
-                "--network",
-                "none",
-                "--entrypoint",
-                "node",
-                CODEX_IMAGE,
-                "--version",
-            ),
-        ),
-        Check(
             "Phase E pytest",
             (
                 "uv",
@@ -377,6 +461,8 @@ def main() -> int:
     if evidence is ExitCode.NOT_VERIFIED:
         return ExitCode.NOT_VERIFIED
     if not verify_image():
+        failed = True
+    if not verify_task_toolchains():
         failed = True
     if not verify_source_and_scope():
         failed = True

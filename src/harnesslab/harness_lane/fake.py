@@ -63,6 +63,10 @@ class FakeCodexBackend:
         self.scenario = scenario
         self.plans: list[CodexExecutionPlan] = []
 
+    @property
+    def artifact_secret_values(self) -> tuple[str, ...]:
+        return ()
+
     async def run(self, plan: CodexExecutionPlan) -> CodexProcessCapture:
         self.plans.append(plan)
         thread: dict[str, object] = {"type": "thread.started", "thread_id": "fake-thread-1"}

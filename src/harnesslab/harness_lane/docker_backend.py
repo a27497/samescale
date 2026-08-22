@@ -35,6 +35,10 @@ class DockerCodexBackend:
         self.explicitly_enabled = explicitly_enabled
         self.credentials = dict(credentials or {})
 
+    @property
+    def artifact_secret_values(self) -> tuple[str, ...]:
+        return tuple(dict.fromkeys(value for value in self.credentials.values() if value))
+
     def create_argv(self, plan: CodexExecutionPlan, container_name: str) -> tuple[str, ...]:
         workspace_mount = f"type=bind,src={plan.workspace.resolve()},dst=/workspace"
         arguments = [
@@ -164,18 +168,7 @@ class DockerCodexBackend:
                 exit_code = int(json.loads(state.stdout.decode("utf-8")))
         finally:
             if create_attempted:
-                await cli.run("kill", name, check=False)
-                await cli.run("rm", "--force", name, check=False)
-                absent = await cli.run(
-                    "ps",
-                    "--all",
-                    "--quiet",
-                    "--filter",
-                    f"name=^/{name}$",
-                    check=False,
-                )
-                if absent.stdout.strip():
-                    raise HarnessAdapterError("real Codex outer container cleanup was not verified")
+                await self._cleanup_outer_container(cli, name)
         return CodexProcessCapture(
             lines=tuple(lines),
             exit_code=exit_code,
@@ -183,6 +176,21 @@ class DockerCodexBackend:
             timed_out=timed_out,
             cancelled=cancelled,
         )
+
+    async def _cleanup_outer_container(self, cli: _DockerCLI, name: str) -> None:
+        await cli.run("kill", name, check=False)
+        await cli.run("rm", "--force", name, check=False)
+        absent = await cli.run(
+            "ps",
+            "--all",
+            "--quiet",
+            "--no-trunc",
+            "--filter",
+            f"name=^/{name}$",
+            check=False,
+        )
+        if absent.returncode != 0 or absent.stdout.strip():
+            raise HarnessAdapterError("real Codex outer container cleanup was not verified")
 
     async def _verify_effective_security(self, cli: _DockerCLI, name: str) -> None:
         template = (

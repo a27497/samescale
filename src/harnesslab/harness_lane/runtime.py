@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from harnesslab.harness_lane.profile import CODEX_CLI_VERSION, CODEX_IMAGE
+from harnesslab.harness_lane.toolchains import extract_tool_version
 from harnesslab.sandbox.docker_cli import _DockerCLI
 from harnesslab.sandbox.models import ImageIdentity
 from harnesslab.sandbox.preflight import _docker_runtime_preflight
@@ -12,6 +13,7 @@ from harnesslab.sandbox.subprocess_loop import run_on_subprocess_loop
 
 REQUIRED_EXEC_HELP = (
     "--json",
+    "--strict-config",
     "--ephemeral",
     "--ignore-user-config",
     "--ignore-rules",
@@ -28,6 +30,7 @@ class CodexRuntimeDoctor:
     image: ImageIdentity
     version: str
     required_flags: tuple[str, ...]
+    tool_versions: dict[str, str]
 
 
 class CodexRuntime:
@@ -98,4 +101,29 @@ class CodexRuntime:
         missing = tuple(flag for flag in REQUIRED_EXEC_HELP if flag not in help_text)
         if missing:
             raise RuntimeError(f"Codex exec lacks required pinned flags: {missing}")
-        return CodexRuntimeDoctor(image=image, version=version, required_flags=REQUIRED_EXEC_HELP)
+        commands = {
+            "python": ("python3", "--version"),
+            "java": ("java", "-version"),
+            "javac": ("javac", "-version"),
+            "node": ("node", "--version"),
+        }
+        tool_versions: dict[str, str] = {}
+        for tool, command in commands.items():
+            result = await cli.run(
+                "run",
+                "--rm",
+                "--network",
+                "none",
+                "--entrypoint",
+                command[0],
+                CODEX_IMAGE,
+                *command[1:],
+            )
+            output = (result.stdout + result.stderr).decode("utf-8", errors="strict")
+            tool_versions[tool] = extract_tool_version(tool, output)
+        return CodexRuntimeDoctor(
+            image=image,
+            version=version,
+            required_flags=REQUIRED_EXEC_HELP,
+            tool_versions=tool_versions,
+        )

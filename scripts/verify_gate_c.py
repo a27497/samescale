@@ -52,7 +52,7 @@ CRITICAL_TESTS = {
     "test_workspace_secret_content_and_filename_are_withheld",
     "test_workspace_secret_scan_detects_chunk_boundary_match",
 }
-IMAGE = "harnesslab-phase-c:0.2.0"
+IMAGE = "harnesslab-phase-c:0.3.0"
 RUN_LABEL = "com.harnesslab.phase=C"
 
 

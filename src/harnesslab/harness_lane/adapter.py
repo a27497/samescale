@@ -10,7 +10,10 @@ from harnesslab.harness_lane.models import (
     CodexProcessCapture,
     NormalizedTrace,
 )
-from harnesslab.harness_lane.profile import CODEX_CLI_VERSION
+from harnesslab.harness_lane.profile import (
+    CODEX_CLI_VERSION,
+    SHELL_TOOL_ENVIRONMENT_POLICY,
+)
 from harnesslab.harness_lane.prompt import CodexHarnessPrompt
 from harnesslab.harness_lane.trace import collect_codex_jsonl
 
@@ -30,6 +33,9 @@ class CodexExecutionPlan:
 
 
 class CodexBackend(Protocol):
+    @property
+    def artifact_secret_values(self) -> tuple[str, ...]: ...
+
     async def run(self, plan: CodexExecutionPlan) -> CodexProcessCapture: ...
 
 
@@ -68,6 +74,8 @@ class CodexHarnessAdapter:
             )
         if profile.codex_image.image_id == "sha256:" + "0" * 64:
             raise HarnessAdapterError("Codex image identity must come from an inspected image")
+        if profile.shell_tool_environment_policy != SHELL_TOOL_ENVIRONMENT_POLICY:
+            raise HarnessAdapterError("Codex shell-tool environment policy is not canonical")
 
     def prepare(
         self,
@@ -86,6 +94,7 @@ class CodexHarnessAdapter:
             "codex",
             "exec",
             "--json",
+            "--strict-config",
             "--ephemeral",
             "--ignore-user-config",
             "--ignore-rules",
@@ -108,6 +117,14 @@ class CodexHarnessAdapter:
             f'model_reasoning_effort="{profile.reasoning_effort}"',
             "-c",
             "mcp_servers={}",
+            "-c",
+            'shell_environment_policy.inherit="core"',
+            "-c",
+            "shell_environment_policy.ignore_default_excludes=false",
+            "-c",
+            'shell_environment_policy.exclude=["*KEY*","*SECRET*","*TOKEN*","*PASSWORD*"]',
+            "-c",
+            "allow_login_shell=false",
             "-",
         )
         return CodexExecutionPlan(

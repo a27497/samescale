@@ -119,8 +119,8 @@ class CodexHarnessRunner:
         *,
         backend: CodexBackend,
         run_id: str | None = None,
-        secret_values: tuple[str, ...] = (),
     ) -> HarnessLaneRunResult:
+        secret_values = backend.artifact_secret_values
         package = TaskPackage.load(task_path)
         if EvaluationLane.HARNESS not in package.definition.lane_support:
             raise CodexHarnessRunError("task package does not declare H-Lane support")

@@ -197,6 +197,10 @@ def codex_harness_doctor() -> None:
     typer.echo(f"PASS version={result.version}")
     typer.echo(f"PASS image={result.image.reference} id={result.image.image_id}")
     typer.echo(f"PASS exec_flags={','.join(result.required_flags)}")
+    typer.echo(
+        "PASS toolchain="
+        + ",".join(f"{name}={version}" for name, version in result.tool_versions.items())
+    )
     typer.echo(f"PASS profile_hash={profile.fingerprint}")
     typer.echo("REAL_CODEX_SMOKE=NOT_RUN")
 

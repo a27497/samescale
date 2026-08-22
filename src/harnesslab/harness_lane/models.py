@@ -179,6 +179,7 @@ class CodexHarnessProfile(BaseModel):
     execution_timeout_seconds: float = Field(gt=0, le=3600)
     codex_image: ImageIdentity
     subject_toolchain_profile: str = Field(min_length=1, max_length=200)
+    shell_tool_environment_policy: str = Field(min_length=1, max_length=300)
     attempt_count: Literal[1] = 1
 
     @model_validator(mode="after")
