@@ -13,12 +13,15 @@ from pydantic import ValidationError
 from harnesslab import __version__
 from harnesslab.core.config import Settings
 from harnesslab.db.health import check_database
+from harnesslab.sandbox.preflight import DockerPreflightError, docker_preflight
 from harnesslab.tasks.package import TaskPackageError
 from harnesslab.tasks.validation import validate_task_package
 
 app = typer.Typer(no_args_is_help=True, help="HarnessLab AI control CLI.")
 task_app = typer.Typer(no_args_is_help=True, help="Inspect and validate versioned task packages.")
+sandbox_app = typer.Typer(no_args_is_help=True, help="Inspect the Phase C Docker sandbox boundary.")
 app.add_typer(task_app, name="task")
+app.add_typer(sandbox_app, name="sandbox")
 
 
 class CheckStatus(StrEnum):
@@ -143,3 +146,23 @@ def validate_task(
             typer.echo(f"FAIL {error}")
         raise typer.Exit(code=1)
     typer.echo("validation: PASS")
+
+
+@sandbox_app.command("doctor")
+def sandbox_doctor() -> None:
+    """Verify local Docker can provide the Linux-container sandbox boundary."""
+
+    try:
+        result = asyncio.run(docker_preflight())
+    except DockerPreflightError as exc:
+        typer.echo(f"NOT_VERIFIED docker sandbox: {exc}")
+        raise typer.Exit(code=2) from exc
+    except Exception as exc:
+        typer.echo(f"FAIL docker sandbox: {type(exc).__name__}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"PASS docker_cli={result.cli_path}")
+    typer.echo(
+        f"PASS context={result.context} endpoint={result.endpoint_scheme} "
+        f"server={result.server_version} os={result.server_os}/{result.server_arch}"
+    )
+    typer.echo(f"PASS default_seccomp={result.default_seccomp}")

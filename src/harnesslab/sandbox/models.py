@@ -1,0 +1,165 @@
+from __future__ import annotations
+
+import json
+from dataclasses import dataclass
+from enum import StrEnum
+from pathlib import Path
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from harnesslab.contracts.common import Sha256Digest
+
+
+class SandboxStatus(StrEnum):
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+    TIMEOUT = "timeout"
+    CANCELLED = "cancelled"
+    ARTIFACT_ERROR = "artifact_error"
+
+
+class DockerPreflight(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    ready: bool
+    cli_path: str
+    client_version: str
+    server_version: str
+    context: str
+    endpoint_scheme: str
+    server_os: str
+    server_arch: str
+    operating_system: str
+    default_seccomp: bool
+
+
+class ImageIdentity(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    reference: str
+    image_id: Sha256Digest
+    repo_digests: tuple[str, ...] = ()
+
+
+class MountEvidence(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    destination: str
+    read_write: bool
+    mount_type: str
+
+
+class SecurityEvidence(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    privileged: bool
+    read_only_rootfs: bool
+    cap_drop: tuple[str, ...]
+    security_options: tuple[str, ...]
+    network_mode: str
+    memory_bytes: int = Field(gt=0)
+    nano_cpus: int = Field(gt=0)
+    pids_limit: int = Field(gt=0)
+    restart_policy: str
+    user: str
+    pid_mode: str
+    published_ports: bool
+    device_count: int = Field(ge=0)
+    mounts: tuple[MountEvidence, ...]
+    tmpfs_destinations: tuple[str, ...]
+    docker_socket_mounted: bool
+    seccomp_unconfined: bool
+
+    @model_validator(mode="after")
+    def hardened_profile(self) -> SecurityEvidence:
+        required = (
+            not self.privileged,
+            self.read_only_rootfs,
+            "ALL" in self.cap_drop,
+            "no-new-privileges=true" in self.security_options,
+            self.network_mode == "none",
+            self.restart_policy == "no",
+            self.user not in {"", "0", "0:0", "root"},
+            self.pid_mode in {"", "private"},
+            not self.published_ports,
+            self.device_count == 0,
+            self.tmpfs_destinations == ("/tmp",),
+            not self.docker_socket_mounted,
+            not self.seccomp_unconfined,
+        )
+        if not all(required):
+            raise ValueError("effective Docker configuration is not hardened")
+        return self
+
+
+class ArtifactDigest(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    path: str
+    digest: Sha256Digest
+
+
+class SandboxArtifactManifest(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: int = 1
+    run_id: str
+    role: str
+    task_id: str
+    task_version: str
+    task_digest: Sha256Digest
+    workspace_input_digest: Sha256Digest
+    workspace_output_digest: Sha256Digest | None
+    image: ImageIdentity
+    security: SecurityEvidence
+    status: SandboxStatus
+    exit_code: int | None
+    duration_ms: int = Field(ge=0)
+    timed_out: bool
+    cancelled: bool
+    cleanup_verified: bool
+    stdout_stream_digest: Sha256Digest
+    stderr_stream_digest: Sha256Digest
+    stdout_truncated: bool
+    stderr_truncated: bool
+    stdout: ArtifactDigest
+    stderr: ArtifactDigest
+    workspace_snapshot: ArtifactDigest | None
+    summary: str
+
+    def canonical_json(self) -> str:
+        return json.dumps(
+            self.model_dump(mode="json"), sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        )
+
+
+@dataclass(frozen=True)
+class SandboxRunResult:
+    run_id: str
+    container_name: str
+    artifact_directory: Path
+    manifest: SandboxArtifactManifest
+    stdout: str
+    stderr: str
+
+
+class FakeSubjectRequest(BaseModel):
+    """Narrow trusted Phase C fixture behavior; never accepts raw Docker arguments."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    solve_python_clamp: bool = True
+    write_marker: bool = False
+    require_marker_absent: bool = False
+    sleep_seconds: float = Field(default=0.0, ge=0.0, le=60.0)
+    echo_secret_name: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{0,63}$")
+    create_unsafe_symlink: bool = False
+    output_bytes: int = Field(default=0, ge=0, le=200_000)
+
+
+class IsolatedVerifierResult(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
+
+    run: SandboxRunResult
+    passed: bool
+    score: float = Field(ge=0.0, le=1.0)

@@ -22,11 +22,20 @@ This file separates repository evidence from intended design. A capability moves
 - Baseline-fail/oracle-pass validation and tamper-resistance tests
 - Controlled Python, Java 21, and TypeScript/Node task fixtures
 - `harnesslab task validate` and the authoritative local Gate B runner
-- Remote GitHub Actions Gate A + Gate B for the Phase B implementation baseline
-  `238613d5140d34e20ee1136cf48bbc32f7abe831` (run `32575558448`, result `success`)
+- Remote GitHub Actions Gate A + Gate B for the approved Phase B head
+  `99edecc8c09aedece35ad847c319fbe3fb722b5c` (run `32576411069`, result `success`)
+- Local Docker/Docker Desktop Linux-container preflight with remote TCP/SSH context rejection
+- Fresh hardened subject and isolated-verifier containers with inspect-derived security evidence
+- Timeout and cancellation cleanup, fresh-workspace isolation, bounded redacted output, immutable
+  image identity, and symlink-safe local artifact bundles
+- Containerized Fake Subject solving the Python micro task followed by isolated hidden verification
+- Minimal PostgreSQL execution lease with owner heartbeat, expiry recovery, attempt count, and
+  cancellation request
+- `harnesslab sandbox doctor` and the authoritative local Gate C runner
 
-Evidence date: 2026-08-22. Evidence is local Gate A and Gate B output plus the named remote CI
-runs. This does not imply any model/harness evaluation capability or untrusted-code isolation.
+Evidence date: 2026-08-22. Evidence is local Gate A, Gate B, and Gate C output plus the named remote
+Phase A/B CI runs. Phase C creates an untrusted-workspace Docker boundary but does not imply any
+model/provider/harness execution capability or VM-level isolation.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
 
@@ -35,10 +44,9 @@ not yet been demonstrated.
 
 ## DESIGN_ONLY
 
-- Docker sandbox execution
 - Model provider and harness adapters
 - Normalized traces and the experiment execution engine
-- PostgreSQL queue/lease/worker lifecycle
+- Full PostgreSQL queue, scheduler, and worker lifecycle
 - Statistical intervals and pass@k
 - JudgeLab and judge calibration implementation
 - Matrix UI and analyst workbench
@@ -49,5 +57,6 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-None recorded for the Phase A or Phase B gates. Future capabilities remain `DESIGN_ONLY` until
-their own implementation and verification gates exist.
+Remote CI for the Phase C head remains `NOT_VERIFIED` until the published head completes Gate A,
+Gate B, and Gate C. Future capabilities remain `DESIGN_ONLY` until their own implementation and
+verification gates exist.

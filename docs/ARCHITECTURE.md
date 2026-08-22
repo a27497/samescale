@@ -37,18 +37,43 @@ Versioned task package ── strict load + digest ──┬─ fresh workspace/
 The subject-facing workspace never contains the package's hidden verifier or oracle. Package
 validation requires the untouched baseline to fail and a separately materialized oracle overlay
 to pass. The repository's Python, Java, and TypeScript fixtures execute trusted verifier code on
-the host solely to validate this contract. This is not a security boundary for arbitrary or
-untrusted task code; process/container isolation belongs to the planned Docker sandbox phase.
+the host solely to validate this contract.
+
+## Phase C native Docker boundary
+
+Phase C adds the first boundary for an untrusted subject workspace. Trusted HarnessLab code owns
+all Docker CLI argv construction; callers cannot supply raw Docker flags, mount destinations, or
+host paths. Each run materializes the same Phase B package into a new managed directory and then
+uses a fresh, labeled container.
+
+```text
+Phase B package ─ fresh managed workspace ─ subject container ─ safe artifact snapshot
+                                                │                       │
+                                                └─ destroyed ───────────┘
+
+artifact workspace (read-only) ─┬─ isolated verifier container ─ deterministic report
+hidden verifier (read-only) ─────┘
+```
+
+The subject container never sees `verifier/` or `oracle/`. The verifier is a separate hardened
+container whose subject workspace and hidden verifier mounts are read-only. Both roles use no
+network, no Docker socket, no added capabilities, a read-only root filesystem, non-root identity,
+resource limits, bounded output, and finally-style cleanup. Local artifacts remain filesystem
+bundles rather than database blobs.
+
+Phase C also persists only a minimal execution lease: ownership, heartbeat, expiry, recovery
+attempt, cancellation request, and status. It is not the planned experiment queue or worker
+scheduler. Docker subprocess work on Windows runs on an isolated Proactor thread so the existing
+psycopg/Uvicorn selector-loop boundary remains unchanged.
 
 ## Planned Core boundaries
 
 The following are **PLANNED**, not implemented:
 
 - Provider and harness adapters at explicit external-system boundaries
-- A Docker sandbox that produces reproducible execution artifacts
 - Normalized execution traces and aggregate scoring/statistics
-- A PostgreSQL-backed durable experiment queue and worker lifecycle
-- A local artifact store for immutable task, run, and trace evidence
+- A PostgreSQL-backed durable experiment queue and full worker lifecycle
+- Remote/cloud artifact storage and worker execution
 
 ## Deliberate exclusions
 

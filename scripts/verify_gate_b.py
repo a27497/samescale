@@ -105,22 +105,23 @@ def verify_test_evidence() -> ExitCode:
     return ExitCode.PASS
 
 
-def verify_no_phase_c() -> bool:
+def verify_phase_boundary() -> bool:
     forbidden = (
-        ROOT / "src" / "harnesslab" / "sandbox",
         ROOT / "src" / "harnesslab" / "providers",
         ROOT / "src" / "harnesslab" / "workers",
+        ROOT / "src" / "harnesslab" / "traces",
     )
     existing = [str(path.relative_to(ROOT)) for path in forbidden if path.exists()]
     if existing:
-        print(f"FAIL: Phase C/later implementation paths exist: {existing}")
+        print(f"FAIL: Phase D/later implementation paths exist: {existing}")
         return False
-    source_files = list((ROOT / "src" / "harnesslab").rglob("*.py"))
+    source_files = list((ROOT / "src" / "harnesslab" / "tasks").rglob("*.py"))
     if not source_files:
-        print("FAIL: source corpus is empty")
+        print("FAIL: Phase B task source corpus is empty")
         return False
     print(
-        f"PASS: no Phase C/later implementation paths; inspected {len(source_files)} source files"
+        f"PASS: Phase B task sources present and no Phase D/later paths; "
+        f"inspected {len(source_files)} source files"
     )
     return True
 
@@ -172,7 +173,7 @@ def main() -> int:
     evidence = verify_test_evidence()
     if evidence is ExitCode.NOT_VERIFIED:
         return ExitCode.NOT_VERIFIED
-    if not verify_no_phase_c():
+    if not verify_phase_boundary():
         failed = True
     return ExitCode.FAIL if failed else ExitCode.PASS
 

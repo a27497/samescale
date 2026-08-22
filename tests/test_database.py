@@ -43,9 +43,10 @@ def test_migration_from_empty_database(database_url: str, monkeypatch: pytest.Mo
         with psycopg.connect(temporary_psycopg_url) as connection:
             row = connection.execute(
                 "SELECT to_regclass('public.schema_metadata'), "
+                "to_regclass('public.execution_lease'), "
                 "(SELECT version_num FROM alembic_version)"
             ).fetchone()
-        assert row == ("schema_metadata", "20260822_0001")
+        assert row == ("schema_metadata", "execution_lease", "20260822_0002")
     finally:
         get_settings.cache_clear()
         os.environ["DATABASE_URL"] = database_url
