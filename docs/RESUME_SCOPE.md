@@ -41,9 +41,11 @@ This file separates repository evidence from intended design. A capability moves
 - M-Lane fake-provider execution from fresh Phase B workspace through the Phase C isolated hidden
   verifier, with immutable direct-model evidence and requested/observed model separation
 - `harnesslab model run`, model profile validation, and the authoritative no-key Gate D runner
+- Remote GitHub Actions Gate A + Gate B + Gate C + Gate D for the Phase D implementation head
+  `ce2e58e44fb1c8e60cbd6cfb14aebe116fae236f` (run `32586930103`, result `success`)
 
 Evidence date: 2026-08-23. Evidence is local Gate A, Gate B, Gate C, and Gate D output plus the
-named remote Phase A/B/C CI runs. Phase D provider contracts are MockTransport/fake-provider
+named remote Phase A/B/C/D CI runs. Phase D provider contracts are MockTransport/fake-provider
 verified; this does not imply a real OpenAI/Anthropic call, coding-harness execution, or VM-level
 isolation.
 
