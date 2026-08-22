@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import importlib
 import sys
 import threading
 from collections.abc import Coroutine
+from typing import cast
 
 
 class _WindowsSubprocessLoop:
@@ -21,9 +23,9 @@ class _WindowsSubprocessLoop:
     def _run(self) -> None:
         if sys.platform != "win32":
             raise RuntimeError("Proactor loop is available only on Windows")
-        from asyncio.windows_events import ProactorEventLoop
-
-        self._loop = ProactorEventLoop()
+        windows_events = importlib.import_module("asyncio.windows_events")
+        loop_type = cast(type[asyncio.AbstractEventLoop], vars(windows_events)["ProactorEventLoop"])
+        self._loop = loop_type()
         asyncio.set_event_loop(self._loop)
         self._ready.set()
         self._loop.run_forever()
