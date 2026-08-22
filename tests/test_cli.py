@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from typer.testing import CliRunner
 
@@ -15,6 +17,7 @@ def test_help_lists_phase_a_commands() -> None:
     assert result.exit_code == 0
     assert "doctor" in result.stdout
     assert "serve" in result.stdout
+    assert "model" in result.stdout
 
 
 def test_version_uses_package_version() -> None:
@@ -58,3 +61,75 @@ def test_doctor_reports_pass_with_database(database_url: str) -> None:
     assert result.exit_code == 0
     assert "PASS" in result.stdout
     assert "SELECT 1 succeeded" in result.stdout
+
+
+def test_model_profile_validate_does_not_read_credential() -> None:
+    profile = Path(__file__).resolve().parents[1] / "profiles" / "openai-responses.example.yaml"
+
+    result = runner.invoke(app, ["model", "profile", "validate", str(profile)], env={})
+
+    assert result.exit_code == 0
+    assert "PASS provider=openai" in result.stdout
+    assert "credential_reference=OPENAI_API_KEY" in result.stdout
+
+
+def test_invalid_model_profile_does_not_echo_rejected_credential(tmp_path: Path) -> None:
+    literal_secret = "literal-private-credential-value-must-not-be-echoed"
+    profile = tmp_path / "invalid-profile.yaml"
+    profile.write_text(
+        f"""requested_model: fake-model
+provider: fake-provider
+base_url: https://provider.invalid/v1
+route: /responses
+protocol: responses
+reasoning:
+  max_output_tokens: 1000
+credential_reference: {literal_secret}
+""",
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["model", "profile", "validate", str(profile)])
+
+    assert result.exit_code == 1
+    assert "field validation error" in result.stdout
+    assert literal_secret not in result.stdout
+
+
+def test_model_run_missing_credential_is_not_configured(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    profile = tmp_path / "profile.yaml"
+    profile.write_text(
+        """requested_model: fake-model
+provider: fake-provider
+base_url: https://provider.invalid/v1
+route: /responses
+protocol: responses
+reasoning:
+  max_output_tokens: 1000
+credential_reference: GATE_D_CLI_MISSING_KEY
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("GATE_D_CLI_MISSING_KEY", raising=False)
+    task = Path(__file__).resolve().parents[1] / "tasks" / "micro-python-clamp" / "1.0.0"
+
+    result = runner.invoke(
+        app,
+        [
+            "model",
+            "run",
+            str(task),
+            "--profile",
+            str(profile),
+            "--artifact-root",
+            str(tmp_path / "artifacts"),
+            "--allow-custom-endpoint",
+        ],
+        env={"GATE_D_CLI_MISSING_KEY": ""},
+    )
+
+    assert result.exit_code == 2
+    assert "outcome=provider_error" in result.stdout
+    assert (tmp_path / "artifacts").is_dir()

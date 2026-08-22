@@ -57,6 +57,11 @@ def sha256_bytes(content: bytes) -> str:
     return f"sha256:{hashlib.sha256(content).hexdigest()}"
 
 
+def is_link_like(path: Path) -> bool:
+    is_junction = getattr(path, "is_junction", None)
+    return path.is_symlink() or (is_junction is not None and is_junction())
+
+
 def _package_files(root: Path) -> list[Path]:
     if not root.is_dir():
         raise TaskPackageError(f"directory does not exist: {root}")
@@ -65,8 +70,10 @@ def _package_files(root: Path) -> list[Path]:
         current_path = Path(current)
         for name in [*directory_names, *file_names]:
             candidate = current_path / name
-            if candidate.is_symlink():
-                raise TaskPackageError(f"symlinks are not allowed: {candidate.relative_to(root)}")
+            if is_link_like(candidate):
+                raise TaskPackageError(
+                    f"links and junctions are not allowed: {candidate.relative_to(root)}"
+                )
         for name in file_names:
             files.append(current_path / name)
     return sorted(files, key=lambda path: path.relative_to(root).as_posix())

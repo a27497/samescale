@@ -2,7 +2,7 @@ schema_version: 1
 id: micro-python-clamp
 version: 1.0.0
 domain: software-engineering
-lane_support: [H]
+lane_support: [M, H]
 instruction_path: instruction.md
 workspace_path: workspace
 verifier:

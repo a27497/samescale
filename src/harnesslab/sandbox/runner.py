@@ -15,6 +15,7 @@ from harnesslab.sandbox.artifacts import (
     ArtifactError,
     ArtifactWriter,
     assert_managed_path,
+    assert_tree_has_no_run_secrets,
     make_tree_writable,
     redact_exact,
 )
@@ -235,6 +236,47 @@ class DockerSandbox:
         assert_managed_path(self.artifact_root, workspace)
         if not workspace.is_dir():
             raise ArtifactError("subject workspace artifact is unavailable")
+        return await self._run_hidden_verifier_workspace(
+            package,
+            workspace,
+            timeout_seconds=timeout_seconds,
+            run_id=run_id,
+            secret_values=(),
+        )
+
+    async def run_hidden_verifier_workspace(
+        self,
+        package: TaskPackage,
+        workspace: Path,
+        *,
+        timeout_seconds: float = 15,
+        run_id: str | None = None,
+        secret_values: tuple[str, ...] = (),
+    ) -> IsolatedVerifierResult:
+        """Verify a trusted-runner workspace through the existing isolated boundary."""
+
+        return await run_on_subprocess_loop(
+            self._run_hidden_verifier_workspace(
+                package,
+                workspace.resolve(),
+                timeout_seconds=timeout_seconds,
+                run_id=run_id or uuid4().hex,
+                secret_values=secret_values,
+            )
+        )
+
+    async def _run_hidden_verifier_workspace(
+        self,
+        package: TaskPackage,
+        workspace: Path,
+        *,
+        timeout_seconds: float,
+        run_id: str,
+        secret_values: tuple[str, ...],
+    ) -> IsolatedVerifierResult:
+        if not workspace.is_dir() or workspace.is_symlink():
+            raise ArtifactError("verifier workspace is unavailable or unsafe")
+        assert_tree_has_no_run_secrets(workspace, secret_values)
         verifier_root = package.root / "verifier"
         entrypoint = package.verifier_entrypoint.relative_to(verifier_root).as_posix()
         writer = ArtifactWriter(self.artifact_root, run_id)

@@ -1,0 +1,10 @@
+requested_model: gpt-5.4
+provider: openai
+base_url: https://api.openai.com/v1
+route: /responses
+protocol: responses
+reasoning:
+  effort: medium
+  max_output_tokens: 4000
+request_timeout_seconds: 60
+credential_reference: OPENAI_API_KEY

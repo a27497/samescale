@@ -71,7 +71,22 @@ def test_package_rejects_symlinks_without_platform_dependency(
         return path == target or original(path)
 
     monkeypatch.setattr(Path, "is_symlink", reports_target_as_symlink)
-    with pytest.raises(TaskPackageError, match="symlinks are not allowed"):
+    with pytest.raises(TaskPackageError, match="links and junctions are not allowed"):
+        TaskPackage.load(task_path)
+
+
+def test_package_rejects_junctions_without_platform_dependency(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    task_path = copy_task(PYTHON_TASK, tmp_path)
+    target = task_path / "workspace"
+    original = Path.is_junction
+
+    def reports_target_as_junction(path: Path) -> bool:
+        return path == target or original(path)
+
+    monkeypatch.setattr(Path, "is_junction", reports_target_as_junction)
+    with pytest.raises(TaskPackageError, match="links and junctions are not allowed"):
         TaskPackage.load(task_path)
 
 

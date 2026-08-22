@@ -32,12 +32,20 @@ This file separates repository evidence from intended design. A capability moves
 - Minimal PostgreSQL execution lease with owner heartbeat, expiry recovery, attempt count, and
   cancellation request
 - `harnesslab sandbox doctor` and the authoritative local Gate C runner
-- Remote GitHub Actions Gate A + Gate B + Gate C for the Phase C implementation head
-  `7ec4c13f745d5671e048588f63a670c763e0c140` (run `32579476607`, result `success`)
+- Remote GitHub Actions Gate A + Gate B + Gate C for the final approved Phase C head
+  `cdf37c6b5c21a712194120b1d2d96a8d37a49f76` (run `32582365570`, result `success`)
+- Credential-reference-only profiles and async httpx adapters for OpenAI Responses, Anthropic
+  Messages, and generic OpenAI-compatible Chat Completions
+- Versioned deterministic `direct-patch-v1` prompt identity and bounded strict write/delete patch
+  application with traversal, symlink, protected-file, and exact-secret defenses
+- M-Lane fake-provider execution from fresh Phase B workspace through the Phase C isolated hidden
+  verifier, with immutable direct-model evidence and requested/observed model separation
+- `harnesslab model run`, model profile validation, and the authoritative no-key Gate D runner
 
-Evidence date: 2026-08-22. Evidence is local Gate A, Gate B, and Gate C output plus the named remote
-Phase A/B/C CI runs. Phase C creates an untrusted-workspace Docker boundary but does not imply any
-model/provider/harness execution capability or VM-level isolation.
+Evidence date: 2026-08-23. Evidence is local Gate A, Gate B, Gate C, and Gate D output plus the
+named remote Phase A/B/C CI runs. Phase D provider contracts are MockTransport/fake-provider
+verified; this does not imply a real OpenAI/Anthropic call, coding-harness execution, or VM-level
+isolation.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
 
@@ -46,7 +54,7 @@ not yet been demonstrated.
 
 ## DESIGN_ONLY
 
-- Model provider and harness adapters
+- Harness adapters
 - Normalized traces and the experiment execution engine
 - Full PostgreSQL queue, scheduler, and worker lifecycle
 - Statistical intervals and pass@k
@@ -59,5 +67,6 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-Future capabilities remain `DESIGN_ONLY` until their own implementation and verification gates
-exist.
+`REAL_PROVIDER_SMOKE = NOT_RUN`. No real OpenAI, Anthropic, or custom-provider credential is
+required for Gate D, and no real-provider invocation is claimed. Future capabilities remain
+`DESIGN_ONLY` until their own implementation and verification gates exist.

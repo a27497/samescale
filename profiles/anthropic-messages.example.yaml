@@ -1,0 +1,10 @@
+requested_model: claude-sonnet-5
+provider: anthropic
+base_url: https://api.anthropic.com
+route: /v1/messages
+protocol: messages
+reasoning:
+  effort: medium
+  max_output_tokens: 4000
+request_timeout_seconds: 60
+credential_reference: ANTHROPIC_API_KEY

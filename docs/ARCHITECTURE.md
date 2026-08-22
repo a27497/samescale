@@ -66,11 +66,38 @@ attempt, cancellation request, and status. It is not the planned experiment queu
 scheduler. Docker subprocess work on Windows runs on an isolated Proactor thread so the existing
 psycopg/Uvicorn selector-loop boundary remains unchanged.
 
+## Phase D M-Lane direct model
+
+Phase D adds one direct-model path without a coding harness. A versioned logical prompt contains
+only task instructions, the subject-visible fresh workspace, optional subject-visible context,
+and the strict patch output contract. Provider adapters receive no tools. Trusted HarnessLab code
+validates and applies the returned JSON patch; model-generated code is evaluated only when the
+existing Phase C hidden-verifier container reads the final workspace.
+
+```text
+Phase B package ─ fresh workspace ─ direct-patch-v1 prompt ─ Provider API (no tools)
+                                           │                       │
+                                           │                public JSON patch
+                                           │                       │
+                                           └─ trusted safe apply ──┘
+                                                       │
+                                      Phase C isolated hidden verifier
+                                                       │
+                                   immutable direct-model evidence + score
+```
+
+The async httpx provider boundary implements OpenAI Responses, Anthropic Messages, and generic
+OpenAI-compatible Chat Completions. It normalizes only public text, route/model identity, safe
+request identifiers, usage counts, stop/status, latency, and attempt count. Raw responses,
+headers, reasoning items, and thinking blocks are not evidence. Profiles contain credential
+environment-variable names only. Gate D uses fake and MockTransport providers; real-provider
+execution is not required or claimed.
+
 ## Planned Core boundaries
 
 The following are **PLANNED**, not implemented:
 
-- Provider and harness adapters at explicit external-system boundaries
+- Harness adapters at explicit external-system boundaries
 - Normalized execution traces and aggregate scoring/statistics
 - A PostgreSQL-backed durable experiment queue and full worker lifecycle
 - Remote/cloud artifact storage and worker execution

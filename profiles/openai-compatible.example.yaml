@@ -1,0 +1,9 @@
+requested_model: vendor-model-id
+provider: custom-openai-compatible
+base_url: https://provider.example/v1
+route: /chat/completions
+protocol: chat_completions
+reasoning:
+  max_output_tokens: 4000
+request_timeout_seconds: 60
+credential_reference: CUSTOM_PROVIDER_API_KEY

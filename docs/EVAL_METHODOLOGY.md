@@ -1,14 +1,16 @@
 # Evaluation methodology
 
-Phase A establishes vocabulary and contracts. Phase B implements deterministic validation of
-controlled task packages, but not model or harness execution. None of the evaluation lanes,
-comparability engine, experiment execution engine, or judges described below should be read as
-implemented.
+Phase A establishes vocabulary and contracts. Phase B implements deterministic task validation,
+Phase C isolates untrusted workspace verification, and Phase D implements the first M-Lane direct
+model path. H/P/J lanes, the comparability engine, experiment execution engine, and judges remain
+design-only.
 
 ## Evaluation lanes
 
 - **M-Lane (Model-only Evaluation):** evaluate model capability through direct model execution,
-  without a coding harness, while holding task conditions stable.
+  without a coding harness, while holding task conditions stable. Phase D supplies deterministic
+  subject-visible text and accepts only a strict JSON patch; the model receives no tools, hidden
+  verifier, or oracle.
 - **H-Lane (Harness):** compare harness behavior while holding requested model and task stable.
 - **P-Lane (Paired Model-vs-Harness Evaluation):** compare direct-model execution with harness
   execution on controlled micro tasks where the necessary context and verifier are equivalent, in
@@ -51,6 +53,10 @@ facts but do not implement a comparability engine.
 Requested model is the model identifier sent by the experiment definition. Observed model is the
 identity reported or otherwise evidenced during the run. They can differ because aliases,
 routing, fallbacks, or provider changes exist, so the Run contract stores them separately.
+
+Phase D preserves both identities in direct-model evidence. A missing observed identity does not
+invalidate an otherwise completed invocation; a mismatch remains explicit evidence for later
+comparability analysis.
 
 ## Repeated experiments and failure attribution
 

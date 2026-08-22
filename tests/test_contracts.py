@@ -43,6 +43,7 @@ def make_model() -> ModelProfile:
     return ModelProfile(
         requested_model="example-model-2026",
         provider="example-provider",
+        base_url="https://provider.example/v1",
         route="/v1/responses",
         protocol=Protocol.RESPONSES,
         reasoning=ReasoningProfile(effort="high", max_output_tokens=4096),
@@ -165,10 +166,63 @@ def test_model_rejects_credential_value_in_reference_field() -> None:
         ModelProfile(
             requested_model="model",
             provider="provider",
+            base_url="https://provider.example/v1",
             route="/responses",
             protocol=Protocol.RESPONSES,
             credential_reference="not-a-reference-value",
         )
+
+
+def test_model_route_rejects_embedded_credentials_and_cross_origin_route() -> None:
+    with pytest.raises(ValidationError, match="credentials"):
+        ModelProfile(
+            requested_model="model",
+            provider="provider",
+            base_url="https://user:secret@provider.example/v1",
+            route="/responses",
+            protocol=Protocol.RESPONSES,
+        )
+    with pytest.raises(ValidationError, match="route"):
+        ModelProfile(
+            requested_model="model",
+            provider="provider",
+            base_url="https://provider.example/v1",
+            route="//attacker.example/responses",
+            protocol=Protocol.RESPONSES,
+        )
+
+
+@pytest.mark.parametrize(
+    ("base_url", "route"),
+    [
+        pytest.param("http://provider.example/v1", "/responses", id="cleartext"),
+        pytest.param("https://provider.example/v1/..", "/responses", id="base-dot-segment"),
+        pytest.param("https://provider.example/v1", "/v1/../responses", id="route-dot-segment"),
+        pytest.param("https://provider.example/v1", "/v1/%2e%2e/responses", id="encoded-dot"),
+    ],
+)
+def test_model_endpoint_requires_tls_and_canonical_route(base_url: str, route: str) -> None:
+    with pytest.raises(ValidationError):
+        ModelProfile(
+            requested_model="model",
+            provider="provider",
+            base_url=base_url,
+            route=route,
+            protocol=Protocol.RESPONSES,
+        )
+
+
+def test_model_endpoint_identity_canonicalizes_hostname_case() -> None:
+    profile = ModelProfile(
+        requested_model="model",
+        provider="provider",
+        base_url="https://PROVIDER.Example/v1/",
+        route="/responses",
+        protocol=Protocol.RESPONSES,
+    )
+
+    assert profile.base_url == "https://provider.example/v1"
+    assert f"{profile.base_url}{profile.route}" == "https://provider.example/v1/responses"
 
 
 def test_completed_run_with_observed_model_keeps_identities_distinct() -> None:
