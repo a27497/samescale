@@ -93,6 +93,32 @@ def test_digest_is_stable_and_content_sensitive(tmp_path: Path) -> None:
     assert mutated.definition.workspace.digest != first.definition.workspace.digest
 
 
+def test_complete_verifier_tree_defines_verifier_identity(tmp_path: Path) -> None:
+    task_path = copy_task(PYTHON_TASK, tmp_path)
+    verifier_root = task_path / "verifier"
+    entrypoint_directory = verifier_root / "entrypoints"
+    entrypoint_directory.mkdir()
+    (verifier_root / "verify.py").replace(entrypoint_directory / "verify.py")
+    supporting_asset = verifier_root / "support" / "cases.json"
+    supporting_asset.parent.mkdir()
+    supporting_asset.write_text('{"revision":1}\n', encoding="utf-8")
+    manifest = task_path / "task.yaml"
+    manifest.write_text(
+        manifest.read_text(encoding="utf-8").replace(
+            "entrypoint: verifier/verify.py",
+            "entrypoint: verifier/entrypoints/verify.py",
+        ),
+        encoding="utf-8",
+    )
+
+    first = TaskPackage.load(task_path)
+    supporting_asset.write_text('{"revision":2}\n', encoding="utf-8")
+    second = TaskPackage.load(task_path)
+
+    assert second.verifier_digest != first.verifier_digest
+    assert second.definition.content_digest != first.definition.content_digest
+
+
 def test_fresh_materialization_isolated_and_hides_trusted_assets(tmp_path: Path) -> None:
     package = TaskPackage.load(TYPESCRIPT_TASK)
     first = package.materialize(tmp_path)
@@ -122,3 +148,34 @@ def test_evidence_manifest_is_frozen_and_deterministic() -> None:
     assert len(evidence.verifier.digest) == 71
     with pytest.raises(ValidationError, match="frozen"):
         evidence.task_id = "changed"  # type: ignore[misc]
+
+
+def test_evidence_workspace_digest_precedes_verifier_side_effects(tmp_path: Path) -> None:
+    task_path = copy_task(PYTHON_TASK, tmp_path)
+    verifier = task_path / "verifier" / "verify.py"
+    verifier.write_text(
+        verifier.read_text(encoding="utf-8").replace(
+            "    workspace = Path(sys.argv[1])\n",
+            "    workspace = Path(sys.argv[1])\n"
+            '    (workspace / ".verifier-cache").write_text("generated", encoding="utf-8")\n',
+        ),
+        encoding="utf-8",
+    )
+    package = TaskPackage.load(task_path)
+    baseline_workspace = package.materialize()
+    oracle_workspace = package.materialize()
+    try:
+        expected_baseline_digest = package.workspace_digest(baseline_workspace)
+        package.apply_oracle(oracle_workspace)
+        expected_oracle_digest = package.workspace_digest(oracle_workspace)
+    finally:
+        baseline_workspace.cleanup()
+        oracle_workspace.cleanup()
+
+    first = validate_task_package(task_path)
+    second = validate_task_package(task_path)
+
+    assert first.baseline.workspace_digest == expected_baseline_digest
+    assert first.oracle.workspace_digest == expected_oracle_digest
+    assert second.baseline.workspace_digest == expected_baseline_digest
+    assert second.oracle.workspace_digest == expected_oracle_digest

@@ -29,8 +29,10 @@ PHASE_B_TESTS = (
     "tests/test_task_fixtures.py",
 )
 CRITICAL_TESTS = {
+    "test_complete_verifier_tree_defines_verifier_identity",
     "test_digest_is_stable_and_content_sensitive",
     "test_digest_reproducibility_check_fails_closed",
+    "test_evidence_workspace_digest_precedes_verifier_side_effects",
     "test_fake_subject_runner_only_receives_subject_workspace",
     "test_fresh_materialization_isolated_and_hides_trusted_assets",
     "test_malformed_verifier_output_fails_closed",
@@ -96,9 +98,9 @@ def verify_test_evidence() -> ExitCode:
         return ExitCode.NOT_VERIFIED
     print(f"PASS: {len(cases)} Gate B tests recorded; all critical tests present; zero skipped")
     print(
-        "SENSITIVITY EVIDENCE: task content mutation changes digest; baseline/oracle polarity "
-        "inversions fail validation; hidden verifier remains authoritative after exposed-test "
-        "tamper"
+        "SENSITIVITY EVIDENCE: task content and complete verifier-tree mutations change identity; "
+        "workspace identity precedes verifier side effects; baseline/oracle polarity inversions "
+        "fail validation; hidden verifier remains authoritative after exposed-test tamper"
     )
     return ExitCode.PASS
 

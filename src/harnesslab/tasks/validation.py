@@ -15,7 +15,7 @@ from harnesslab.tasks.verifier import execute_verifier
 
 def _evidence(
     package: TaskPackage,
-    materialized: MaterializedTask,
+    workspace_digest: str,
     result: VerifierExecutionResult,
     run_kind: str,
 ) -> EvidenceManifest:
@@ -23,7 +23,7 @@ def _evidence(
         task_id=package.definition.id,
         task_version=package.definition.version,
         task_digest=package.definition.content_digest,
-        workspace_digest=package.workspace_digest(materialized),
+        workspace_digest=workspace_digest,
         verifier=EvidenceAsset(
             kind="hidden_verifier",
             path=package.manifest.verifier.entrypoint,
@@ -50,8 +50,10 @@ def validate_task_package(path: Path) -> TaskValidationResult:
     try:
         if not _trusted_assets_are_hidden(baseline_workspace):
             errors.append("trusted verifier/oracle assets leaked into the subject materialization")
+        baseline_workspace_digest = package.workspace_digest(baseline_workspace)
         baseline_result = execute_verifier(package, baseline_workspace)
         package.apply_oracle(oracle_workspace)
+        oracle_workspace_digest = package.workspace_digest(oracle_workspace)
         oracle_result = execute_verifier(package, oracle_workspace)
 
         if baseline_result.category is not OutcomeCategory.SUBJECT_RESULT:
@@ -64,9 +66,11 @@ def validate_task_package(path: Path) -> TaskValidationResult:
             errors.append("oracle overlay did not pass")
 
         baseline_evidence = _evidence(
-            package, baseline_workspace, baseline_result, run_kind="baseline"
+            package, baseline_workspace_digest, baseline_result, run_kind="baseline"
         )
-        oracle_evidence = _evidence(package, oracle_workspace, oracle_result, run_kind="oracle")
+        oracle_evidence = _evidence(
+            package, oracle_workspace_digest, oracle_result, run_kind="oracle"
+        )
     finally:
         baseline_workspace.cleanup()
         oracle_workspace.cleanup()

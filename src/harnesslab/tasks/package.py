@@ -150,11 +150,10 @@ class TaskPackage:
         context_path = (
             resolve_package_path(root, manifest.context_path) if manifest.context_path else None
         )
-        verifier_entrypoint = resolve_package_path(root, manifest.verifier.entrypoint)
         oracle_path = resolve_package_path(root, manifest.oracle.path)
 
         workspace_digest = digest_tree(workspace_path)
-        verifier_digest = digest_tree(verifier_entrypoint.parent)
+        verifier_digest = digest_tree(root / "verifier")
         oracle_digest = digest_tree(oracle_path)
         context_reference = (
             ContextBundleReference(uri=manifest.context_path, digest=digest_tree(context_path))

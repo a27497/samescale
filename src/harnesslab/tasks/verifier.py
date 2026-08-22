@@ -51,7 +51,9 @@ def _captured_output(stream: CapturedStream) -> tuple[str, str, bool]:
 
 def _sanitized_environment() -> dict[str, str]:
     allowed = ("PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "HOME", "TMP", "TEMP", "LANG")
-    return {name: os.environ[name] for name in allowed if name in os.environ}
+    environment = {name: os.environ[name] for name in allowed if name in os.environ}
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    return environment
 
 
 def _closed_failure(
