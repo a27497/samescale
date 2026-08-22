@@ -14,7 +14,7 @@ Sha256Digest = Annotated[str, Field(pattern=r"^sha256:[0-9a-f]{64}$")]
 class EvaluationLane(StrEnum):
     MODEL = "M"
     HARNESS = "H"
-    PRODUCT = "P"
+    PAIRED = "P"
     JUDGE = "J"
 
 

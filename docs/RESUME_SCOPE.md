@@ -12,9 +12,11 @@ This file separates repository evidence from intended design. A capability moves
 - Alembic upgrade from a newly created empty PostgreSQL database
 - Pydantic v2 contracts for Task, Model, Harness, Experiment, and Run comparability facts
 - Local pytest, Ruff, mypy, and working-tree checks through the authoritative Gate A runner
+- Remote GitHub Actions Gate A for baseline commit
+  `f97f5218cfd898a349f1237505b2e5731a65452e` (run `32572916235`, result `success`)
 
-Evidence date: 2026-08-22. Evidence is local Gate A output and does not imply a remote CI run or any
-model/harness evaluation capability.
+Evidence date: 2026-08-22. Evidence is local Gate A output plus the named remote CI run. It does not
+imply any model/harness evaluation capability.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
 
@@ -38,4 +40,5 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-- Remote GitHub Actions execution (workflow exists, but a remote run requires a pushed repository)
+None recorded for the Phase A foundation gate. Future capabilities remain `DESIGN_ONLY` until
+their own implementation and verification gates exist.

@@ -12,6 +12,7 @@ from harnesslab.contracts.harness import HarnessProfile
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
 from harnesslab.contracts.run import RunRecord, RunStatus
 from harnesslab.contracts.task import (
+    ContextBundleReference,
     ResourceBudget,
     TaskDefinition,
     VerifierReference,
@@ -31,6 +32,7 @@ def make_task() -> TaskDefinition:
         lane_support={EvaluationLane.MODEL, EvaluationLane.HARNESS},
         instruction="Refactor the supplied module without changing behavior.",
         workspace=WorkspaceReference(uri="artifact://workspaces/example", digest=DIGEST_A),
+        context_bundle=ContextBundleReference(uri="artifact://context/example", digest=DIGEST_C),
         verifier=VerifierReference(kind="hidden-tests", version="tests-v1"),
         budget=ResourceBudget(timeout_seconds=600, network_policy=NetworkPolicy.DENY),
         content_digest=DIGEST_B,
@@ -62,6 +64,49 @@ def make_harness() -> HarnessProfile:
     )
 
 
+def make_run(
+    *,
+    status: RunStatus = RunStatus.COMPLETED,
+    observed_model: str | None = "provider-model-2026-08-01",
+    started_at: datetime | None = None,
+    finished_at: datetime | None = None,
+) -> RunRecord:
+    return RunRecord(
+        id=uuid4(),
+        experiment_id="experiment-a",
+        status=status,
+        task_id="task.python.refactor",
+        task_version="1.0.0",
+        workspace_digest=DIGEST_A,
+        prompt_hash=DIGEST_B,
+        verifier_version="tests-v1",
+        requested_model="friendly-alias",
+        observed_model=observed_model,
+        provider="example-provider",
+        route="/v1/responses",
+        protocol=Protocol.RESPONSES,
+        harness_id="reference-cli",
+        harness_version="0.1.0",
+        harness_config_digest=DIGEST_C,
+        reasoning_budget="high/4096",
+        network_policy=NetworkPolicy.DENY,
+        sandbox_image="harnesslab/sandbox@sha256:placeholder",
+        judge_definition=None,
+        started_at=started_at,
+        finished_at=finished_at,
+    )
+
+
+def test_evaluation_lanes_use_paired_not_product() -> None:
+    assert {lane.name: lane.value for lane in EvaluationLane} == {
+        "MODEL": "M",
+        "HARNESS": "H",
+        "PAIRED": "P",
+        "JUDGE": "J",
+    }
+    assert not hasattr(EvaluationLane, "PRODUCT")
+
+
 def test_experiment_serializes_task_model_harness_and_config() -> None:
     experiment = ExperimentDefinition(
         id="experiment-a",
@@ -80,6 +125,10 @@ def test_experiment_serializes_task_model_harness_and_config() -> None:
 
     payload = experiment.model_dump(mode="json")
     assert payload["task"]["version"] == "1.0.0"
+    assert payload["task"]["context_bundle"] == {
+        "uri": "artifact://context/example",
+        "digest": DIGEST_C,
+    }
     assert payload["model"]["requested_model"] == "example-model-2026"
     assert payload["harness"]["trace_parser_version"] == "trace-v1"
     assert payload["config"]["repetitions"] == 3
@@ -100,6 +149,17 @@ def test_task_rejects_empty_lane_support() -> None:
         )
 
 
+def test_context_bundle_remains_optional_for_paired_lane() -> None:
+    payload = make_task().model_dump(mode="json")
+    payload["lane_support"] = ["P"]
+    payload["context_bundle"] = None
+
+    task = TaskDefinition.model_validate(payload)
+
+    assert task.lane_support == frozenset({EvaluationLane.PAIRED})
+    assert task.context_bundle is None
+
+
 def test_model_rejects_credential_value_in_reference_field() -> None:
     with pytest.raises(ValidationError, match="credential_reference"):
         ModelProfile(
@@ -111,55 +171,45 @@ def test_model_rejects_credential_value_in_reference_field() -> None:
         )
 
 
-def test_succeeded_run_keeps_requested_and_observed_models_distinct() -> None:
+def test_completed_run_with_observed_model_keeps_identities_distinct() -> None:
     now = datetime.now(UTC)
-    run = RunRecord(
-        id=uuid4(),
-        experiment_id="experiment-a",
-        status=RunStatus.SUCCEEDED,
-        task_id="task.python.refactor",
-        task_version="1.0.0",
-        workspace_digest=DIGEST_A,
-        prompt_hash=DIGEST_B,
-        verifier_version="tests-v1",
-        requested_model="friendly-alias",
-        observed_model="provider-model-2026-08-01",
-        provider="example-provider",
-        route="/v1/responses",
-        protocol=Protocol.RESPONSES,
-        harness_id="reference-cli",
-        harness_version="0.1.0",
-        harness_config_digest=DIGEST_C,
-        reasoning_budget="high/4096",
-        network_policy=NetworkPolicy.DENY,
-        sandbox_image="harnesslab/sandbox@sha256:placeholder",
-        judge_definition=None,
+    run = make_run(
         started_at=now,
         finished_at=now + timedelta(seconds=1),
     )
 
     assert run.requested_model != run.observed_model
-    assert run.model_dump(mode="json")["status"] == "succeeded"
+    assert run.requested_model == "friendly-alias"
+    assert run.observed_model == "provider-model-2026-08-01"
+    assert run.model_dump(mode="json")["status"] == "completed"
 
 
-def test_succeeded_run_requires_observed_model() -> None:
-    with pytest.raises(ValidationError, match="observed_model"):
-        RunRecord(
-            id=uuid4(),
-            experiment_id="experiment-a",
-            status=RunStatus.SUCCEEDED,
-            task_id="task-a",
-            task_version="1",
-            workspace_digest=DIGEST_A,
-            prompt_hash=DIGEST_B,
-            verifier_version="v1",
-            requested_model="alias",
-            provider="provider",
-            route="/responses",
-            protocol=Protocol.RESPONSES,
-            harness_id="harness-a",
-            harness_version="1",
-            harness_config_digest=DIGEST_C,
-            network_policy=NetworkPolicy.DENY,
-            sandbox_image="sandbox:planned",
-        )
+def test_completed_run_without_observed_model_is_valid() -> None:
+    run = make_run(observed_model=None)
+
+    assert run.status is RunStatus.COMPLETED
+    assert run.requested_model == "friendly-alias"
+    assert run.observed_model is None
+
+
+def test_run_status_taxonomy_distinguishes_infra_and_subject_failures() -> None:
+    assert {status.value for status in RunStatus} == {
+        "planned",
+        "queued",
+        "claimed",
+        "preparing",
+        "running",
+        "verifying",
+        "scoring",
+        "completed",
+        "failed_infra",
+        "failed_subject",
+        "cancelled",
+    }
+    assert len({RunStatus.FAILED_INFRA, RunStatus.FAILED_SUBJECT}) == 2
+
+
+def test_run_rejects_finished_time_before_started_time() -> None:
+    now = datetime.now(UTC)
+    with pytest.raises(ValidationError, match="finished_at must not precede started_at"):
+        make_run(started_at=now, finished_at=now - timedelta(seconds=1))

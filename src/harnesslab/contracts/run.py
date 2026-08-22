@@ -10,11 +10,16 @@ from harnesslab.contracts.common import Identifier, NetworkPolicy, Protocol, Sha
 
 
 class RunStatus(StrEnum):
-    PENDING = "pending"
+    PLANNED = "planned"
+    QUEUED = "queued"
+    CLAIMED = "claimed"
+    PREPARING = "preparing"
     RUNNING = "running"
-    SUCCEEDED = "succeeded"
-    FAILED = "failed"
-    INFRA_FAILED = "infra_failed"
+    VERIFYING = "verifying"
+    SCORING = "scoring"
+    COMPLETED = "completed"
+    FAILED_INFRA = "failed_infra"
+    FAILED_SUBJECT = "failed_subject"
     CANCELLED = "cancelled"
 
 
@@ -47,9 +52,7 @@ class RunRecord(BaseModel):
     finished_at: datetime | None = None
 
     @model_validator(mode="after")
-    def succeeded_runs_have_observed_identity(self) -> RunRecord:
-        if self.status is RunStatus.SUCCEEDED and not self.observed_model:
-            raise ValueError("a succeeded run must record observed_model")
+    def timestamps_are_ordered(self) -> RunRecord:
         if self.started_at and self.finished_at and self.finished_at < self.started_at:
             raise ValueError("finished_at must not precede started_at")
         return self

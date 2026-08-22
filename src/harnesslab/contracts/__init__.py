@@ -2,9 +2,10 @@ from harnesslab.contracts.experiment import ExperimentConfig, ExperimentDefiniti
 from harnesslab.contracts.harness import HarnessProfile
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
 from harnesslab.contracts.run import RunRecord, RunStatus
-from harnesslab.contracts.task import TaskDefinition
+from harnesslab.contracts.task import ContextBundleReference, TaskDefinition
 
 __all__ = [
+    "ContextBundleReference",
     "ExperimentConfig",
     "ExperimentDefinition",
     "HarnessProfile",

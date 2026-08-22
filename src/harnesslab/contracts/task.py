@@ -12,6 +12,15 @@ class WorkspaceReference(BaseModel):
     digest: Sha256Digest
 
 
+class ContextBundleReference(BaseModel):
+    """Immutable identity for context supplied to model-only or paired evaluations."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    uri: str = Field(min_length=1, max_length=500)
+    digest: Sha256Digest
+
+
 class VerifierReference(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -38,6 +47,7 @@ class TaskDefinition(BaseModel):
     lane_support: frozenset[EvaluationLane] = Field(min_length=1)
     instruction: str = Field(min_length=1)
     workspace: WorkspaceReference
+    context_bundle: ContextBundleReference | None = None
     verifier: VerifierReference
     budget: ResourceBudget
     content_digest: Sha256Digest

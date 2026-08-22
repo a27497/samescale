@@ -5,10 +5,13 @@ or judges described below should be read as implemented.
 
 ## Evaluation lanes
 
-- **M-Lane (Model):** compare model capability while holding harness and task conditions stable.
+- **M-Lane (Model-only Evaluation):** evaluate model capability through direct model execution,
+  without a coding harness, while holding task conditions stable.
 - **H-Lane (Harness):** compare harness behavior while holding requested model and task stable.
-- **P-Lane (Product):** evaluate the combined user-facing product system.
-- **J-Lane (Judge):** calibrate and compare judging methods against stronger references.
+- **P-Lane (Paired Model-vs-Harness Evaluation):** compare direct-model execution with harness
+  execution on controlled micro tasks where the necessary context and verifier are equivalent, in
+  order to measure harness uplift.
+- **J-Lane (JudgeLab):** calibrate and compare judging methods against stronger references.
 
 ## Evidence hierarchy
 

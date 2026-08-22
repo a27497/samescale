@@ -12,6 +12,6 @@
   must not report success.
 - Never store or print secrets. Configuration examples must contain development-only placeholders.
 - Do not overwrite unexplained user changes or use destructive Git operations autonomously.
-- At the end of every HarnessLab phase task, attempt the requested Gmail completion/stop message to
-  `2749736405@qq.com` if a Gmail connector is available. Report `EMAIL_TOOL_UNAVAILABLE` or
-  `EMAIL_SEND_FAILED` truthfully when it cannot be sent.
+- If the current task explicitly requires an external completion notification, attempt it through
+  the available connector. Report `EMAIL_TOOL_UNAVAILABLE` or `EMAIL_SEND_FAILED` truthfully when
+  delivery cannot be completed.
