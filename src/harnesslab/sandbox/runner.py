@@ -263,7 +263,6 @@ class DockerSandbox:
         image = await self._ensure_image()
         cli = _DockerCLI(output_limit=OUTPUT_LIMIT_BYTES)
         container_name = f"harnesslab-{role}-{run_id}"
-        container_id: str | None = None
         security: SecurityEvidence | None = None
         stdout = b""
         stderr = b""
@@ -280,6 +279,7 @@ class DockerSandbox:
         timed_out = False
         cancelled = False
         cleanup_verified = False
+        create_attempted = False
         started = time.monotonic()
         cancellation: asyncio.CancelledError | None = None
         try:
@@ -293,11 +293,11 @@ class DockerSandbox:
                 secret_names=tuple(secrets),
                 command=command,
             )
-            created = await cli.run(
+            create_attempted = True
+            await cli.run(
                 *create_arguments,
                 environment=docker_environment(secrets),
             )
-            container_id = created.stdout.decode("utf-8").strip()
             security = await self._inspect_security(cli, container_name)
             try:
                 attached = await cli.run(
@@ -337,13 +337,19 @@ class DockerSandbox:
             cancelled = True
             summary = "container execution cancelled"
             cancellation = exc
-            if container_id is not None and security is None:
+            if security is None and await self._is_owned_container(
+                cli, container_name, run_id=run_id, role=role
+            ):
                 security = await self._inspect_security(cli, container_name)
         finally:
-            if container_id is not None:
-                cleanup_verified = await self._remove_and_verify(cli, container_name)
+            if create_attempted:
+                cleanup_verified = await self._remove_and_verify(
+                    cli, container_name, run_id=run_id, role=role
+                )
 
         if security is None:
+            if cancellation is not None:
+                raise cancellation
             raise SandboxExecutionError(redact_exact(summary, secrets.values()))
         duration_ms = int((time.monotonic() - started) * 1000)
         result = writer.finalize(
@@ -490,7 +496,41 @@ class DockerSandbox:
         result = await cli.run("inspect", container_name, "--format", "{{json .State.ExitCode}}")
         return int(json.loads(result.stdout.decode("utf-8")))
 
-    async def _remove_and_verify(self, cli: _DockerCLI, container_name: str) -> bool:
+    async def _is_owned_container(
+        self,
+        cli: _DockerCLI,
+        container_name: str,
+        *,
+        run_id: str,
+        role: str,
+    ) -> bool:
+        inspected = await cli.run(
+            "inspect",
+            container_name,
+            "--format",
+            "{{json .Config.Labels}}",
+            check=False,
+        )
+        if inspected.returncode != 0:
+            return False
+        labels = json.loads(inspected.stdout.decode("utf-8")) or {}
+        return (
+            labels.get("com.harnesslab.phase") == "C"
+            and labels.get("com.harnesslab.run_id") == run_id
+            and labels.get("com.harnesslab.role") == role
+        )
+
+    async def _remove_and_verify(
+        self,
+        cli: _DockerCLI,
+        container_name: str,
+        *,
+        run_id: str,
+        role: str,
+    ) -> bool:
+        if not await self._is_owned_container(cli, container_name, run_id=run_id, role=role):
+            inspected = await cli.run("inspect", container_name, check=False)
+            return inspected.returncode != 0
         await cli.run("kill", container_name, check=False)
         await cli.run("rm", "--force", container_name, check=False)
         inspected = await cli.run("inspect", container_name, check=False)

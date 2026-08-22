@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import subprocess
+from collections.abc import Mapping
 from pathlib import Path
 from uuid import uuid4
 
@@ -11,6 +12,7 @@ import pytest
 from pydantic import ValidationError
 
 from harnesslab.sandbox.artifacts import ArtifactError, assert_managed_path, sha256_file
+from harnesslab.sandbox.docker_cli import CommandResult, _DockerCLI
 from harnesslab.sandbox.models import FakeSubjectRequest, SandboxStatus, SecurityEvidence
 from harnesslab.sandbox.preflight import (
     DockerPreflightError,
@@ -188,11 +190,36 @@ async def test_timeout_kills_and_removes_container(tmp_path: Path) -> None:
 
 
 @pytest.mark.integration
-async def test_explicit_cancellation_kills_and_removes_container(tmp_path: Path) -> None:
+async def test_explicit_cancellation_kills_and_removes_container(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     package = TaskPackage.load(PYTHON_TASK)
     runner = sandbox(tmp_path)
     run_id = f"cancel-{uuid4().hex}"
     container_name = f"harnesslab-subject-{run_id}"
+    create_completed = asyncio.Event()
+    original_run = _DockerCLI.run
+
+    async def pause_after_create(
+        self: _DockerCLI,
+        *arguments: str,
+        timeout: float = 60,
+        environment: Mapping[str, str] | None = None,
+        check: bool = True,
+    ) -> CommandResult:
+        result = await original_run(
+            self,
+            *arguments,
+            timeout=timeout,
+            environment=environment,
+            check=check,
+        )
+        if arguments[0] == "create":
+            create_completed.set()
+            await asyncio.sleep(30)
+        return result
+
+    monkeypatch.setattr(_DockerCLI, "run", pause_after_create)
     task = asyncio.create_task(
         runner.run_fake_subject(
             package,
@@ -201,10 +228,7 @@ async def test_explicit_cancellation_kills_and_removes_container(tmp_path: Path)
             run_id=run_id,
         )
     )
-    for _ in range(100):
-        if container_exists(container_name):
-            break
-        await asyncio.sleep(0.05)
+    await asyncio.wait_for(create_completed.wait(), timeout=10)
     assert container_exists(container_name)
 
     task.cancel()
