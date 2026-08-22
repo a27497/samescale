@@ -135,6 +135,71 @@ async def test_openai_responses_adapter_contract_and_private_reasoning_exclusion
 
 
 @pytest.mark.asyncio
+async def test_openai_responses_supports_max_reasoning_effort() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content)
+        assert payload["reasoning"] == {"effort": "max"}
+        return httpx.Response(
+            200,
+            json={
+                "status": "completed",
+                "output": [
+                    {
+                        "type": "message",
+                        "content": [{"type": "output_text", "text": "{}"}],
+                    }
+                ],
+            },
+        )
+
+    async with await client_for(handler) as client:
+        result = await OpenAIResponsesAdapter(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(provider_request(Protocol.RESPONSES, effort="max"))
+
+    assert not result.refused
+
+
+@pytest.mark.asyncio
+async def test_openai_responses_refusal_is_successful_public_result() -> None:
+    body = {
+        "id": "resp-refusal-id",
+        "status": "completed",
+        "model": "observed-refusing-model",
+        "output": [
+            {"type": "reasoning", "summary": "PRIVATE_REFUSAL_REASONING"},
+            {
+                "type": "message",
+                "content": [
+                    {"type": "refusal", "refusal": "PUBLIC_OPENAI_REFUSAL"},
+                ],
+            },
+        ],
+        "usage": {
+            "input_tokens": 9,
+            "output_tokens": 4,
+            "total_tokens": 13,
+            "output_tokens_details": {"reasoning_tokens": 2},
+        },
+    }
+    async with await client_for(lambda request: httpx.Response(200, json=body)) as client:
+        result = await OpenAIResponsesAdapter(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(provider_request(Protocol.RESPONSES))
+
+    serialized = result.model_dump_json()
+    assert result.refused
+    assert result.public_output_text == "PUBLIC_OPENAI_REFUSAL"
+    assert result.request_id == "resp-refusal-id"
+    assert result.observed_model == "observed-refusing-model"
+    assert result.usage.total_tokens == 13
+    assert result.usage.reasoning_tokens == 2
+    assert result.response_status == "completed"
+    assert result.latency_ms >= 0
+    assert "PRIVATE_REFUSAL_REASONING" not in serialized
+
+
+@pytest.mark.asyncio
 async def test_anthropic_messages_adapter_contract_and_thinking_exclusion() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.url == "https://api.anthropic.test/v1/messages"
@@ -174,6 +239,35 @@ async def test_anthropic_messages_adapter_contract_and_thinking_exclusion() -> N
     assert result.usage.total_tokens == 20
     assert "PRIVATE_ANTHROPIC_THINKING" not in serialized
     assert FAKE_KEY not in serialized
+
+
+@pytest.mark.asyncio
+async def test_anthropic_refusal_is_successful_public_result() -> None:
+    body = {
+        "id": "msg-refusal-id",
+        "model": "observed-refusing-claude",
+        "content": [
+            {"type": "thinking", "thinking": "PRIVATE_REFUSAL_THINKING"},
+            {"type": "text", "text": "PUBLIC_ANTHROPIC_REFUSAL"},
+        ],
+        "stop_reason": "refusal",
+        "usage": {"input_tokens": 8, "output_tokens": 3},
+    }
+    async with await client_for(lambda request: httpx.Response(200, json=body)) as client:
+        result = await AnthropicMessagesAdapter(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(provider_request(Protocol.MESSAGES))
+
+    serialized = result.model_dump_json()
+    assert result.refused
+    assert result.public_output_text == "PUBLIC_ANTHROPIC_REFUSAL"
+    assert result.request_id == "msg-refusal-id"
+    assert result.observed_model == "observed-refusing-claude"
+    assert result.stop_reason == "refusal"
+    assert result.usage.total_tokens == 11
+    assert result.response_status == "completed"
+    assert result.latency_ms >= 0
+    assert "PRIVATE_REFUSAL_THINKING" not in serialized
 
 
 @pytest.mark.asyncio
@@ -220,6 +314,41 @@ async def test_openai_compatible_chat_completions_core_contract() -> None:
     assert result.request_id == "chatcmpl-safe-id"
     assert result.stop_reason == "stop"
     assert result.usage.total_tokens == 15
+
+
+@pytest.mark.asyncio
+async def test_generic_chat_refusal_is_successful_public_result() -> None:
+    body = {
+        "id": "chat-refusal-id",
+        "model": "observed-compatible-refusal-model",
+        "choices": [
+            {
+                "message": {
+                    "role": "assistant",
+                    "content": None,
+                    "refusal": "PUBLIC_CHAT_REFUSAL",
+                    "reasoning": "PRIVATE_CHAT_REASONING",
+                },
+                "finish_reason": "stop",
+            }
+        ],
+        "usage": {"prompt_tokens": 7, "completion_tokens": 2, "total_tokens": 9},
+    }
+    async with await client_for(lambda request: httpx.Response(200, json=body)) as client:
+        result = await OpenAICompatibleChatAdapter(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(provider_request(Protocol.CHAT_COMPLETIONS, effort=None))
+
+    serialized = result.model_dump_json()
+    assert result.refused
+    assert result.public_output_text == "PUBLIC_CHAT_REFUSAL"
+    assert result.request_id == "chat-refusal-id"
+    assert result.observed_model == "observed-compatible-refusal-model"
+    assert result.stop_reason == "stop"
+    assert result.usage.total_tokens == 9
+    assert result.response_status == "completed"
+    assert result.latency_ms >= 0
+    assert "PRIVATE_CHAT_REASONING" not in serialized
 
 
 @pytest.mark.asyncio

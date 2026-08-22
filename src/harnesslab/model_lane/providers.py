@@ -232,6 +232,7 @@ class OpenAIResponsesAdapter(_HTTPProviderAdapter):
             "medium",
             "high",
             "xhigh",
+            "max",
         }:
             raise ProviderInvocationError(
                 ProviderFailureCategory.CONFIGURATION,
@@ -275,24 +276,32 @@ class OpenAIResponsesAdapter(_HTTPProviderAdapter):
             raise ProviderInvocationError(
                 ProviderFailureCategory.MALFORMED_RESPONSE, "provider output must be a list"
             )
-        texts: list[str] = []
+        public_parts: list[str] = []
+        refused = False
         for item in output:
-            if not isinstance(item, dict) or item.get("type") != "message":
+            if not isinstance(item, dict):
+                continue
+            if item.get("type") == "refusal" and isinstance(item.get("refusal"), str):
+                public_parts.append(item["refusal"])
+                refused = True
+                continue
+            if item.get("type") != "message":
                 continue
             content = item.get("content")
             if not isinstance(content, list):
                 continue
             for block in content:
-                if (
-                    isinstance(block, dict)
-                    and block.get("type") == "output_text"
-                    and isinstance(block.get("text"), str)
-                ):
-                    texts.append(block["text"])
-        if not texts:
+                if not isinstance(block, dict):
+                    continue
+                if block.get("type") == "output_text" and isinstance(block.get("text"), str):
+                    public_parts.append(block["text"])
+                elif block.get("type") == "refusal" and isinstance(block.get("refusal"), str):
+                    public_parts.append(block["refusal"])
+                    refused = True
+        if not public_parts and not refused:
             raise ProviderInvocationError(
                 ProviderFailureCategory.MALFORMED_RESPONSE,
-                "provider response contains no public output text",
+                "provider response contains no public output or refusal text",
             )
         usage_raw = body.get("usage")
         usage = _object(usage_raw, "usage") if usage_raw is not None else {}
@@ -305,7 +314,8 @@ class OpenAIResponsesAdapter(_HTTPProviderAdapter):
             endpoint=f"{request.profile.base_url}{request.profile.route}",
             protocol=self.protocol,
             request_id=body.get("id") if isinstance(body.get("id"), str) else None,
-            public_output_text="".join(texts),
+            public_output_text="".join(public_parts),
+            refused=refused,
             usage=ProviderUsage(
                 input_tokens=_optional_nonnegative(usage.get("input_tokens"), "input tokens"),
                 output_tokens=_optional_nonnegative(usage.get("output_tokens"), "output tokens"),
@@ -379,7 +389,8 @@ class AnthropicMessagesAdapter(_HTTPProviderAdapter):
                 ProviderFailureCategory.INCOMPLETE_RESPONSE,
                 "provider response reached a configured or context token limit",
             )
-        if stop_reason not in {"end_turn", "stop_sequence"}:
+        refused = stop_reason == "refusal"
+        if stop_reason not in {"end_turn", "stop_sequence", "refusal"}:
             raise ProviderInvocationError(
                 ProviderFailureCategory.PROVIDER_ERROR,
                 "provider response did not end with terminal public text",
@@ -399,6 +410,7 @@ class AnthropicMessagesAdapter(_HTTPProviderAdapter):
             protocol=self.protocol,
             request_id=request_id,
             public_output_text="".join(texts),
+            refused=refused,
             usage=ProviderUsage(
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
@@ -456,7 +468,14 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
         choice = choices[0]
         message = _object(choice.get("message"), "choice message")
         content = message.get("content")
-        if not isinstance(content, str):
+        refusal = message.get("refusal")
+        if refusal is not None and not isinstance(refusal, str):
+            raise ProviderInvocationError(
+                ProviderFailureCategory.MALFORMED_RESPONSE,
+                "choice message refusal must be public text",
+            )
+        refused = isinstance(refusal, str)
+        if not refused and not isinstance(content, str):
             raise ProviderInvocationError(
                 ProviderFailureCategory.MALFORMED_RESPONSE,
                 "choice message content must be public text",
@@ -467,7 +486,7 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
                 ProviderFailureCategory.INCOMPLETE_RESPONSE,
                 "provider response reached the configured token limit",
             )
-        if finish_reason != "stop":
+        if not refused and finish_reason != "stop":
             raise ProviderInvocationError(
                 ProviderFailureCategory.PROVIDER_ERROR,
                 "provider response did not end with terminal public text",
@@ -484,7 +503,8 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
             endpoint=f"{request.profile.base_url}{request.profile.route}",
             protocol=self.protocol,
             request_id=request_id,
-            public_output_text=content,
+            public_output_text=refusal if refused else content,
+            refused=refused,
             usage=ProviderUsage(
                 input_tokens=_optional_nonnegative(usage.get("prompt_tokens"), "prompt tokens"),
                 output_tokens=_optional_nonnegative(

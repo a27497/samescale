@@ -160,6 +160,19 @@ class DirectModelRunner:
 
             public_digest = sha256_bytes(provider_result.public_output_text.encode("utf-8"))
             _assert_text_has_no_run_secrets(provider_result.public_output_text, credential_values)
+            if provider_result.refused:
+                evidence = self._base_evidence(
+                    effective_run_id,
+                    package,
+                    profile,
+                    prompt,
+                    outcome=DirectModelOutcome.SUBJECT_REFUSAL,
+                    summary="model declined the task",
+                    provider_result=provider_result,
+                    public_response_digest=public_digest,
+                    public_response_text=provider_result.public_output_text,
+                )
+                return self._persist(evidence, None, credential_values)
             try:
                 assert_prompt_matches_task_identity(prompt, materialized.workspace)
                 patch = parse_direct_patch(provider_result.public_output_text)

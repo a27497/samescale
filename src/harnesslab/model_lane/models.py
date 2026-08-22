@@ -100,6 +100,7 @@ class ProviderResult(BaseModel):
     protocol: Protocol
     request_id: str | None = Field(default=None, max_length=300)
     public_output_text: str
+    refused: bool = False
     usage: ProviderUsage = Field(default_factory=ProviderUsage)
     stop_reason: str | None = Field(default=None, max_length=200)
     response_status: str | None = Field(default=None, max_length=200)
@@ -125,6 +126,7 @@ class ProviderAdapter(TypingProtocol):
 class DirectModelOutcome(StrEnum):
     VERIFIED_PASS = "verified_pass"
     VERIFIED_FAIL = "verified_fail"
+    SUBJECT_REFUSAL = "subject_refusal"
     SUBJECT_OUTPUT_ERROR = "subject_output_error"
     PROVIDER_ERROR = "provider_error"
     INFRA_ERROR = "infra_error"
@@ -196,6 +198,24 @@ class DirectModelEvidence(BaseModel):
                 raise ValueError("provider_error outcome requires normalized failure evidence")
             if self.provider_error.category is not self.provider_failure:
                 raise ValueError("provider failure category mismatch")
+        if self.outcome is DirectModelOutcome.SUBJECT_REFUSAL:
+            if self.provider_result is None or not self.provider_result.refused:
+                raise ValueError("subject_refusal outcome requires a refused provider result")
+            refusal_forbidden_fields = (
+                self.workspace_output_digest,
+                self.parsed_patch_digest,
+                self.verifier_sandbox_manifest,
+                self.verifier_artifact_namespace,
+                self.verifier_artifact_digest,
+                self.verifier_passed,
+                self.verifier_score,
+            )
+            if any(value is not None for value in refusal_forbidden_fields):
+                raise ValueError(
+                    "subject_refusal outcome cannot contain subject execution evidence"
+                )
+        elif self.provider_result is not None and self.provider_result.refused:
+            raise ValueError("refused provider result requires subject_refusal outcome")
         verifier_artifact_fields = (
             self.verifier_sandbox_manifest,
             self.verifier_artifact_namespace,

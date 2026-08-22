@@ -240,6 +240,63 @@ async def test_malformed_patch_fails_closed_without_workspace_snapshot(tmp_path:
 
 
 @pytest.mark.asyncio
+async def test_model_refusal_bypasses_patch_workspace_and_verifier(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def reject_patch_parsing(public_output: str) -> None:
+        raise AssertionError(f"refusal reached patch parsing: {public_output}")
+
+    monkeypatch.setattr(runner_contract, "parse_direct_patch", reject_patch_parsing)
+    provider = FakeDirectProvider("PUBLIC_MODEL_REFUSAL", refused=True)
+    runner = DirectModelRunner(
+        artifact_root=tmp_path / "artifacts",
+        runtime_root=tmp_path / "runtime",
+        sandbox=ExplodingSandbox(),
+        environment={"GATE_D_FAKE_API_KEY": FAKE_KEY},
+    )
+
+    result = await runner.run(
+        TASK_ROOT,
+        fake_profile(),
+        adapter=provider,
+        run_id="subject-refusal",
+    )
+
+    evidence = result.evidence
+    assert evidence.outcome is DirectModelOutcome.SUBJECT_REFUSAL
+    assert evidence.provider_result is not None
+    assert evidence.provider_result.refused
+    assert evidence.provider_result.attempt_count == 1
+    assert evidence.provider_failure is None
+    assert evidence.provider_error is None
+    assert evidence.public_response_text == "PUBLIC_MODEL_REFUSAL"
+    assert evidence.public_response_digest == sha256_bytes(b"PUBLIC_MODEL_REFUSAL")
+    assert evidence.parsed_patch_digest is None
+    assert evidence.workspace_output_digest is None
+    assert evidence.verifier_sandbox_manifest is None
+    assert evidence.verifier_artifact_namespace is None
+    assert evidence.verifier_artifact_digest is None
+    assert evidence.verifier_passed is None
+    assert evidence.verifier_score is None
+    assert len(provider.requests) == 1
+    assert not (result.artifact_directory / "workspace").exists()
+    assert not (result.artifact_directory / "verifier").exists()
+
+    execution_payload = evidence.model_dump(mode="json")
+    execution_payload["workspace_output_digest"] = evidence.workspace_input_digest
+    with pytest.raises(ValidationError, match="subject execution evidence"):
+        type(evidence).model_validate(execution_payload)
+
+    misattributed_payload = evidence.model_dump(mode="json")
+    misattributed_payload["outcome"] = DirectModelOutcome.SUBJECT_OUTPUT_ERROR
+    with pytest.raises(ValidationError, match="requires subject_refusal outcome"):
+        type(evidence).model_validate(misattributed_payload)
+
+    with pytest.raises(ValidationError, match="frozen"):
+        evidence.outcome = DirectModelOutcome.SUBJECT_OUTPUT_ERROR  # type: ignore[misc]
+
+
+@pytest.mark.asyncio
 async def test_provider_failure_category_is_preserved_in_evidence(tmp_path: Path) -> None:
     runner = DirectModelRunner(
         artifact_root=tmp_path / "artifacts",

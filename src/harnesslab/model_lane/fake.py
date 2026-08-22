@@ -18,10 +18,12 @@ class FakeDirectProvider:
         *,
         observed_model: str | None = "fake-observed-model",
         failure: ProviderFailureCategory | None = None,
+        refused: bool = False,
     ) -> None:
         self.public_output_text = public_output_text
         self.observed_model = observed_model
         self.failure = failure
+        self.refused = refused
         self.requests: list[ProviderRequest] = []
 
     async def invoke(self, request: ProviderRequest) -> ProviderResult:
@@ -36,6 +38,7 @@ class FakeDirectProvider:
             protocol=request.profile.protocol,
             request_id="fake-response-1",
             public_output_text=self.public_output_text,
+            refused=self.refused,
             usage=ProviderUsage(input_tokens=100, output_tokens=25, total_tokens=125),
             stop_reason="stop",
             response_status="completed",

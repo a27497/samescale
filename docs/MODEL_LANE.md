@@ -14,8 +14,9 @@ POSIX relative path and the logical prompt is hashed with its template version.
 
 ## Provider protocols
 
-- OpenAI Responses: `POST /responses`, `instructions` plus `input`, no tools, `store=false`, and
-  public text collected from all valid `output_text` message blocks.
+- OpenAI Responses: `POST /responses`, `instructions` plus `input`, no tools, `store=false`,
+  protocol-compatible reasoning efforts including GPT-5.6 `max`, and public content collected from
+  valid `output_text` and `refusal` blocks.
 - Anthropic Messages: `POST /v1/messages`, top-level `system`, one user message, explicit
   `max_tokens`, and optional `output_config.effort` only when configured.
 - Generic OpenAI-compatible: configured `POST .../chat/completions`, system/user messages, and
@@ -24,9 +25,11 @@ POSIX relative path and the logical prompt is hashed with its template version.
 
 All adapters use async httpx with one attempt. They preserve requested and observed model identity,
 safe request ID, public output, usage counts, status/stop reason, endpoint/protocol, and latency.
-Only 2xx responses with protocol-defined terminal public-text reasons complete an attempt; redirects,
-tool continuations, truncation, filtering, malformed UTF-8 text, and provider failures are normalized
-without persisting response bodies.
+Only 2xx responses with protocol-defined terminal public-text or refusal signals complete an
+attempt; redirects, tool continuations, truncation, filtering without a refusal signal, malformed
+UTF-8 text, and provider failures are normalized without persisting response bodies. OpenAI
+Responses refusal content, Anthropic `stop_reason=refusal`, and a generic compatible
+`message.refusal` are successful model refusals, not provider or infrastructure failures.
 They never persist raw response bodies, authorization headers, OpenAI reasoning items, or Anthropic
 thinking blocks. Profiles store only the credential environment-variable name.
 
@@ -46,6 +49,10 @@ Application is staged on the same filesystem, checked against the exact prompt w
 and switched into place only after the complete patch and protected-file identities validate.
 Storage, staging, rollback, or verifier-boundary failures remain infrastructure failures rather than
 being blame-assigned to the model.
+
+A normalized model refusal produces `subject_refusal` evidence after one provider attempt. It
+retains provider/model/request/usage/stop/latency and public-refusal identity, but it is never parsed
+as a patch, never mutates the workspace, never invokes the verifier, and never retries or falls back.
 
 Before evidence is published, the final workspace and staged artifact tree are scanned for exact
 credential values in both relative paths and regular-file bytes. A match withholds the artifact.

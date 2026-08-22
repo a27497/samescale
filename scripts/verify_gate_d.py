@@ -34,6 +34,7 @@ PHASE_D_TESTS = (
 )
 CRITICAL_TESTS = {
     "test_anthropic_messages_adapter_contract_and_thinking_exclusion",
+    "test_anthropic_refusal_is_successful_public_result",
     "test_anthropic_empty_terminal_response_reaches_subject_output_boundary",
     "test_anthropic_requires_explicit_max_tokens",
     "test_cleanup_reporting_cannot_be_promoted_to_run_failure",
@@ -71,6 +72,7 @@ CRITICAL_TESTS = {
     "test_injected_client_uses_profile_timeout",
     "test_invalid_model_profile_does_not_echo_rejected_credential",
     "test_malformed_patch_fails_closed_without_workspace_snapshot",
+    "test_model_refusal_bypasses_patch_workspace_and_verifier",
     "test_missing_credential_fails_before_http_request",
     "test_non_utf8_provider_text_is_normalized_as_malformed",
     "test_nonterminal_provider_stop_reasons_do_not_complete[chat-content-filter]",
@@ -83,7 +85,10 @@ CRITICAL_TESTS = {
     "test_model_endpoint_requires_tls_and_canonical_route[route-dot-segment]",
     "test_model_endpoint_identity_canonicalizes_hostname_case",
     "test_openai_compatible_chat_completions_core_contract",
+    "test_generic_chat_refusal_is_successful_public_result",
     "test_openai_responses_adapter_contract_and_private_reasoning_exclusion",
+    "test_openai_responses_refusal_is_successful_public_result",
+    "test_openai_responses_supports_max_reasoning_effort",
     "test_provider_failure_category_is_preserved_in_evidence",
     "test_prompt_template_version_in_evidence_comes_from_rendered_prompt",
     "test_prompt_containing_exact_credential_is_not_sent_to_provider",
