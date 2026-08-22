@@ -140,6 +140,7 @@ def main() -> int:
         Check("CLI help", ("uv", "run", "--locked", "harnesslab", "--help")),
         Check("CLI version", ("uv", "run", "--locked", "harnesslab", "--version")),
         Check("CLI doctor", ("uv", "run", "--locked", "harnesslab", "doctor")),
+        Check("Alembic current head", ("uv", "run", "--locked", "alembic", "upgrade", "head")),
         Check(
             "pytest",
             (
@@ -154,7 +155,6 @@ def main() -> int:
         Check("Ruff check", ("uv", "run", "--locked", "ruff", "check", ".")),
         Check("Ruff format", ("uv", "run", "--locked", "ruff", "format", "--check", ".")),
         Check("mypy", ("uv", "run", "--locked", "mypy", "src", "tests", "scripts")),
-        Check("Alembic current head", ("uv", "run", "--locked", "alembic", "upgrade", "head")),
         Check("git whitespace", ("git", "diff", "--check")),
     ]
 
