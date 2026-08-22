@@ -1,9 +1,13 @@
 # Phase C sandbox security
 
 Phase C is HarnessLab's first execution boundary for an untrusted subject workspace. It targets a
-local Docker Engine or Docker Desktop using Linux containers. Preflight rejects remote TCP and SSH
-contexts because their host-path and ownership semantics are not equivalent to the managed local
-runtime root.
+local Docker Engine or Docker Desktop using Linux containers. Preflight resolves the effective
+endpoint using Docker CLI precedence: `DOCKER_CONTEXT` overrides `DOCKER_HOST` and the configured
+context, while `DOCKER_HOST` overrides the configured context when no explicit context is set.
+Remote TCP and SSH endpoints are rejected because their host-path and ownership semantics are not
+equivalent to the managed local runtime root. After preflight, the resolved local endpoint is
+pinned for image and container lifecycle commands; run-secret names cannot replace Docker CLI
+transport controls.
 
 ## Container profile
 
@@ -31,14 +35,20 @@ mounts the hidden verifier read-only at `/verifier`. The subject container never
 
 Timeout and explicit task cancellation both kill and remove the labeled container before control
 returns. Phase C creates no run-scoped Docker volume or network; `/tmp` is container tmpfs and is
-destroyed with the container. Gate C checks for zero remaining Phase C containers and volumes.
+destroyed with the container. If removal cannot be verified, the run is a cleanup failure, cannot
+be successful, and receives no normal workspace snapshot. Gate C checks for zero remaining Phase C
+containers and volumes. A Docker query failure is not treated as proof of absence, and an isolated
+verifier cleanup failure cannot return a passing verifier result.
 
 Explicit run secrets are transferred through named environment variables, never embedded as
 Docker argument values. Exact values are redacted from bounded stdout, stderr, summaries, and the
-persisted manifest. Artifacts are created in a new run-ID directory and never overwrite an
-existing bundle. They contain a safe workspace snapshot, input/output digests, immutable image
-identity, selected security evidence, status/timing, redacted logs, and artifact hashes. Symlinks
-or path escapes fail artifact collection; they are never followed into unrelated host files.
+persisted manifest. Before a workspace snapshot is persisted, its relative paths and regular-file
+bytes are scanned for exact supplied secret values. A match withholds the complete snapshot rather
+than rewriting subject files. Artifacts are created in a new run-ID directory and never overwrite
+an existing bundle. Safe bundles contain input/output digests, immutable image identity, selected
+security evidence, status/timing, redacted logs, artifact hashes, and—only when safe—a workspace
+snapshot. Symlinks or path escapes fail artifact collection; they are never followed into unrelated
+host files.
 
 ## Boundary limits
 

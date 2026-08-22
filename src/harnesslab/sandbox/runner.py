@@ -34,7 +34,7 @@ from harnesslab.sandbox.models import (
     SandboxStatus,
     SecurityEvidence,
 )
-from harnesslab.sandbox.preflight import _docker_preflight
+from harnesslab.sandbox.preflight import _docker_runtime_preflight
 from harnesslab.sandbox.subprocess_loop import run_on_subprocess_loop
 from harnesslab.tasks.models import VerifierReport
 from harnesslab.tasks.package import TaskPackage, digest_tree
@@ -77,6 +77,12 @@ def _trusted_subject_script(request: FakeSubjectRequest) -> str:
                 "print('stderr-secret=' + secret, file=sys.stderr)",
             )
         )
+        if request.write_secret_file:
+            operations.append(
+                "(workspace / 'subject-secret.txt').write_text(secret, encoding='utf-8')"
+            )
+        if request.write_secret_filename:
+            operations.append("(workspace / secret).write_text('fixture', encoding='utf-8')")
     if request.create_unsafe_symlink:
         operations.append("os.symlink('/etc/passwd', workspace / 'unsafe-link')")
     if request.output_bytes:
@@ -104,8 +110,15 @@ class DockerSandbox:
         return await run_on_subprocess_loop(self._ensure_image())
 
     async def _ensure_image(self) -> ImageIdentity:
-        await _docker_preflight()
-        cli = _DockerCLI(output_limit=OUTPUT_LIMIT_BYTES)
+        image, _ = await self._prepare_image()
+        return image
+
+    async def _prepare_image(self) -> tuple[ImageIdentity, dict[str, str]]:
+        _, docker_cli_environment = await _docker_runtime_preflight()
+        cli = _DockerCLI(
+            output_limit=OUTPUT_LIMIT_BYTES,
+            environment=docker_cli_environment,
+        )
         inspected = await cli.run("image", "inspect", SANDBOX_IMAGE, check=False)
         if inspected.returncode != 0:
             repository_root = Path(__file__).resolve().parents[3]
@@ -117,7 +130,7 @@ class DockerSandbox:
                 str(docker_context),
                 timeout=300,
             )
-        return await self._image_identity(cli)
+        return await self._image_identity(cli), docker_cli_environment
 
     async def _image_identity(self, cli: _DockerCLI) -> ImageIdentity:
         result = await cli.run(
@@ -239,6 +252,10 @@ class DockerSandbox:
             workspace_input_digest=workspace_input_digest,
             writer=writer,
         )
+        if run.manifest.status is not SandboxStatus.SUCCEEDED:
+            raise SandboxExecutionError(
+                f"isolated verifier sandbox did not succeed: {run.manifest.status.value}"
+            )
         try:
             report = VerifierReport.model_validate_json(run.stdout)
         except ValidationError as exc:
@@ -260,8 +277,15 @@ class DockerSandbox:
         workspace_input_digest: str,
         writer: ArtifactWriter,
     ) -> SandboxRunResult:
-        image = await self._ensure_image()
-        cli = _DockerCLI(output_limit=OUTPUT_LIMIT_BYTES)
+        image, docker_cli_environment = await self._prepare_image()
+        cli = _DockerCLI(
+            output_limit=OUTPUT_LIMIT_BYTES,
+            environment=docker_cli_environment,
+        )
+        try:
+            create_environment = docker_environment(docker_cli_environment, secrets)
+        except ValueError as exc:
+            raise SandboxExecutionError(str(exc)) from exc
         container_name = f"harnesslab-{role}-{run_id}"
         security: SecurityEvidence | None = None
         stdout = b""
@@ -296,7 +320,7 @@ class DockerSandbox:
             create_attempted = True
             await cli.run(
                 *create_arguments,
-                environment=docker_environment(secrets),
+                environment=create_environment,
             )
             security = await self._inspect_security(cli, container_name)
             try:
@@ -349,6 +373,10 @@ class DockerSandbox:
 
         if security is None:
             if cancellation is not None:
+                if not cleanup_verified:
+                    raise SandboxExecutionError(
+                        "container cleanup could not be verified after cancellation"
+                    )
                 raise cancellation
             raise SandboxExecutionError(redact_exact(summary, secrets.values()))
         duration_ms = int((time.monotonic() - started) * 1000)
@@ -376,6 +404,10 @@ class DockerSandbox:
             secrets=secrets.values(),
         )
         if cancellation is not None:
+            if not cleanup_verified:
+                raise SandboxExecutionError(
+                    "container cleanup could not be verified after cancellation"
+                )
             raise cancellation
         return result
 
@@ -529,12 +561,22 @@ class DockerSandbox:
         role: str,
     ) -> bool:
         if not await self._is_owned_container(cli, container_name, run_id=run_id, role=role):
-            inspected = await cli.run("inspect", container_name, check=False)
-            return inspected.returncode != 0
+            return await self._container_absent(cli, container_name)
         await cli.run("kill", container_name, check=False)
         await cli.run("rm", "--force", container_name, check=False)
-        inspected = await cli.run("inspect", container_name, check=False)
-        return inspected.returncode != 0
+        return await self._container_absent(cli, container_name)
+
+    async def _container_absent(self, cli: _DockerCLI, container_name: str) -> bool:
+        listed = await cli.run(
+            "ps",
+            "--all",
+            "--quiet",
+            "--no-trunc",
+            "--filter",
+            f"name=^/{container_name}$",
+            check=False,
+        )
+        return listed.returncode == 0 and not listed.stdout.strip()
 
     def _reserve_run_root(self, run_id: str) -> Path:
         if not run_id or any(

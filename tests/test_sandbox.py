@@ -3,7 +3,10 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import os
+import shutil
 import subprocess
+import sys
 from collections.abc import Mapping
 from pathlib import Path
 from uuid import uuid4
@@ -11,15 +14,30 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from harnesslab.sandbox.artifacts import ArtifactError, assert_managed_path, sha256_file
-from harnesslab.sandbox.docker_cli import CommandResult, _DockerCLI
-from harnesslab.sandbox.models import FakeSubjectRequest, SandboxStatus, SecurityEvidence
+import harnesslab.sandbox.preflight as preflight_module
+from harnesslab.sandbox.artifacts import (
+    ArtifactError,
+    assert_managed_path,
+    assert_tree_has_no_run_secrets,
+    sha256_file,
+)
+from harnesslab.sandbox.docker_cli import CommandResult, _DockerCLI, docker_environment
+from harnesslab.sandbox.models import (
+    FakeSubjectRequest,
+    SandboxArtifactManifest,
+    SandboxStatus,
+    SecurityEvidence,
+)
 from harnesslab.sandbox.preflight import (
     DockerPreflightError,
+    _docker_preflight,
+    _docker_runtime_preflight,
     docker_preflight,
+    resolve_effective_endpoint,
     validate_local_endpoint,
 )
-from harnesslab.sandbox.runner import DockerSandbox, no_harnesslab_containers
+from harnesslab.sandbox.runner import DockerSandbox, SandboxExecutionError, no_harnesslab_containers
+from harnesslab.sandbox.subprocess_loop import run_on_subprocess_loop
 from harnesslab.tasks.package import TaskPackage, digest_tree
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -70,6 +88,157 @@ def test_security_model_rejects_privileged_inspect_mutation() -> None:
 
     with pytest.raises(ValidationError, match="effective Docker configuration is not hardened"):
         SecurityEvidence.model_validate(effective)
+
+
+def test_effective_docker_endpoint_precedence_rejects_remote_overrides() -> None:
+    local_unix = "unix:///var/run/docker.sock"
+    local_npipe = "npipe:////./pipe/docker_engine"
+
+    assert resolve_effective_endpoint(local_unix, {}) == local_unix
+    assert validate_local_endpoint(resolve_effective_endpoint(local_unix, {})) == "unix"
+    assert (
+        validate_local_endpoint(
+            resolve_effective_endpoint(local_npipe, {"DOCKER_HOST": local_npipe})
+        )
+        == "npipe"
+    )
+    with pytest.raises(DockerPreflightError, match="local unix/npipe required"):
+        validate_local_endpoint(
+            resolve_effective_endpoint(local_unix, {"DOCKER_HOST": "ssh://remote-builder"})
+        )
+    with pytest.raises(DockerPreflightError, match="local unix/npipe required"):
+        validate_local_endpoint(
+            resolve_effective_endpoint(local_unix, {"DOCKER_HOST": "tcp://192.0.2.10:2376"})
+        )
+
+    explicit_context = {
+        "DOCKER_CONTEXT": "local-explicit",
+        "DOCKER_HOST": "ssh://ignored-by-docker-context",
+    }
+    assert resolve_effective_endpoint(local_unix, explicit_context) == local_unix
+    assert validate_local_endpoint(resolve_effective_endpoint(local_unix, explicit_context)) == (
+        "unix"
+    )
+
+
+async def test_docker_preflight_rejects_remote_host_before_connection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, ...]] = []
+    empty_digest = "sha256:" + hashlib.sha256(b"").hexdigest()
+
+    class FakeDockerCLI:
+        def __init__(
+            self,
+            executable: str,
+            *,
+            environment: Mapping[str, str] | None = None,
+        ) -> None:
+            assert executable == "docker"
+            assert environment is not None
+
+        async def run(self, *arguments: str) -> CommandResult:
+            calls.append(arguments)
+            if arguments == ("context", "show"):
+                stdout = b"local-current\n"
+            elif arguments[:3] == ("context", "inspect", "local-current"):
+                stdout = b'"unix:///var/run/docker.sock"\n'
+            else:
+                pytest.fail(f"preflight attempted a daemon connection: {arguments[0]}")
+            return CommandResult(0, stdout, b"", empty_digest, empty_digest, False, False)
+
+    monkeypatch.delenv("DOCKER_CONTEXT", raising=False)
+    monkeypatch.setattr(shutil, "which", lambda _: "docker")
+    monkeypatch.setattr(preflight_module, "_DockerCLI", FakeDockerCLI)
+
+    for remote_host in ("ssh://remote-builder", "tcp://192.0.2.10:2376"):
+        calls.clear()
+        monkeypatch.setenv("DOCKER_HOST", remote_host)
+        with pytest.raises(DockerPreflightError, match="local unix/npipe required"):
+            await _docker_preflight()
+        assert calls == [
+            ("context", "show"),
+            (
+                "context",
+                "inspect",
+                "local-current",
+                "--format",
+                "{{json .Endpoints.docker.Host}}",
+            ),
+        ]
+
+
+async def test_explicit_local_context_is_pinned_over_remote_host(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    environments: list[dict[str, str]] = []
+    empty_digest = "sha256:" + hashlib.sha256(b"").hexdigest()
+
+    class FakeDockerCLI:
+        def __init__(
+            self,
+            executable: str,
+            *,
+            environment: Mapping[str, str] | None = None,
+        ) -> None:
+            assert executable == "docker"
+            environments.append(dict(environment or {}))
+
+        async def run(self, *arguments: str) -> CommandResult:
+            if arguments == ("context", "show"):
+                stdout = b"local-explicit\n"
+            elif arguments[:3] == ("context", "inspect", "local-explicit"):
+                stdout = b'"unix:///var/run/docker.sock"\n'
+            elif arguments[:2] == ("version", "--format"):
+                stdout = b'{"Client":{"Version":"test"},"Server":{"Version":"test","Os":"linux"}}'
+            elif arguments[:2] == ("info", "--format"):
+                stdout = b'"Docker Test"|"linux"|"amd64"|["name=seccomp,profile=default"]'
+            else:
+                pytest.fail(f"unexpected Docker command: {arguments}")
+            return CommandResult(0, stdout, b"", empty_digest, empty_digest, False, False)
+
+    monkeypatch.setattr(shutil, "which", lambda _: "docker")
+    monkeypatch.setattr(preflight_module, "_DockerCLI", FakeDockerCLI)
+    preflight, pinned = await _docker_runtime_preflight(
+        {
+            "PATH": "fixture",
+            "DOCKER_CONTEXT": "local-explicit",
+            "DOCKER_HOST": "ssh://remote-builder",
+        }
+    )
+
+    assert preflight.context == "local-explicit"
+    assert preflight.endpoint_scheme == "unix"
+    assert environments[0]["DOCKER_CONTEXT"] == "local-explicit"
+    assert "DOCKER_HOST" not in environments[0]
+    assert pinned["DOCKER_HOST"] == "unix:///var/run/docker.sock"
+    assert "DOCKER_CONTEXT" not in pinned
+    assert environments[1] == pinned
+    for secret_name in (
+        "DOCKER_HOST",
+        "docker_host",
+        "Docker_Context",
+        "DOCKER_API_VERSION",
+    ):
+        with pytest.raises(ValueError, match="must not control Docker CLI transport"):
+            docker_environment(pinned, {secret_name: "fake-run-secret"})
+
+
+async def test_docker_cli_subprocess_uses_pinned_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pinned = dict(os.environ)
+    pinned["DOCKER_HOST"] = "unix:///pinned-local.sock"
+    monkeypatch.setenv("DOCKER_HOST", "ssh://ambient-remote")
+    cli = _DockerCLI(executable=sys.executable, environment=pinned)
+
+    result = await run_on_subprocess_loop(
+        cli.run(
+            "-c",
+            "import os; print(os.environ['DOCKER_HOST'])",
+        )
+    )
+    assert result.stdout.decode("utf-8").strip() == "unix:///pinned-local.sock"
 
 
 @pytest.mark.integration
@@ -278,6 +447,144 @@ async def test_fake_secret_is_redacted_and_artifacts_are_consistent(tmp_path: Pa
 
 
 @pytest.mark.integration
+async def test_workspace_secret_content_and_filename_are_withheld(tmp_path: Path) -> None:
+    package = TaskPackage.load(PYTHON_TASK)
+    runner = sandbox(tmp_path)
+    cases = (
+        ("phase-c-fake-workspace-credential-12345", True, False),
+        ("phase-c-fake-filename-credential-67890", False, True),
+    )
+
+    for fake_secret, write_file, write_filename in cases:
+        result = await runner.run_fake_subject(
+            package,
+            FakeSubjectRequest(
+                echo_secret_name="FAKE_CREDENTIAL",
+                write_secret_file=write_file,
+                write_secret_filename=write_filename,
+            ),
+            run_id=f"workspace-secret-{uuid4().hex}",
+            secrets={"FAKE_CREDENTIAL": fake_secret},
+        )
+
+        assert result.manifest.status is SandboxStatus.ARTIFACT_ERROR
+        assert result.manifest.workspace_output_digest is None
+        assert result.manifest.workspace_snapshot is None
+        assert result.manifest.cleanup_verified
+        assert not container_exists(result.container_name)
+        for persisted in result.artifact_directory.rglob("*"):
+            relative = persisted.relative_to(result.artifact_directory).as_posix()
+            assert fake_secret not in relative
+            if persisted.is_file() and not persisted.is_symlink():
+                assert fake_secret.encode("utf-8") not in persisted.read_bytes()
+    assert await no_harnesslab_containers()
+
+
+@pytest.mark.integration
+async def test_cleanup_verification_failure_cannot_report_success(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package = TaskPackage.load(PYTHON_TASK)
+    runner = sandbox(tmp_path)
+    original_cleanup = runner._remove_and_verify
+
+    async def cleanup_but_report_unverified(
+        cli: _DockerCLI,
+        container_name: str,
+        *,
+        run_id: str,
+        role: str,
+    ) -> bool:
+        assert await original_cleanup(cli, container_name, run_id=run_id, role=role)
+        return False
+
+    monkeypatch.setattr(runner, "_remove_and_verify", cleanup_but_report_unverified)
+    result = await runner.run_fake_subject(
+        package,
+        FakeSubjectRequest(),
+        run_id=f"cleanup-unverified-{uuid4().hex}",
+    )
+
+    assert result.manifest.status is SandboxStatus.CLEANUP_ERROR
+    assert not result.manifest.cleanup_verified
+    assert result.manifest.workspace_output_digest is None
+    assert result.manifest.workspace_snapshot is None
+    assert not container_exists(result.container_name)
+    invalid = result.manifest.model_dump(mode="json")
+    invalid["status"] = SandboxStatus.SUCCEEDED
+    with pytest.raises(ValidationError, match="success is forbidden"):
+        SandboxArtifactManifest.model_validate(invalid)
+    assert await no_harnesslab_containers()
+
+
+async def test_cleanup_daemon_error_is_not_verified(tmp_path: Path) -> None:
+    empty_digest = "sha256:" + hashlib.sha256(b"").hexdigest()
+
+    class UnreachableDockerCLI(_DockerCLI):
+        async def run(
+            self,
+            *arguments: str,
+            timeout: float = 60,
+            environment: Mapping[str, str] | None = None,
+            check: bool = True,
+        ) -> CommandResult:
+            return CommandResult(
+                1,
+                b"",
+                b"Cannot connect to the Docker daemon",
+                empty_digest,
+                empty_digest,
+                False,
+                False,
+            )
+
+    verified = await sandbox(tmp_path)._remove_and_verify(
+        UnreachableDockerCLI(),
+        "harnesslab-subject-unreachable",
+        run_id="unreachable",
+        role="subject",
+    )
+    assert not verified
+
+
+@pytest.mark.integration
+async def test_verifier_cleanup_failure_cannot_return_passed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package = TaskPackage.load(PYTHON_TASK)
+    runner = sandbox(tmp_path)
+    subject = await runner.run_fake_subject(
+        package,
+        FakeSubjectRequest(),
+        run_id=f"verifier-cleanup-subject-{uuid4().hex}",
+    )
+    original_cleanup = runner._remove_and_verify
+
+    async def cleanup_but_report_unverified(
+        cli: _DockerCLI,
+        container_name: str,
+        *,
+        run_id: str,
+        role: str,
+    ) -> bool:
+        assert await original_cleanup(cli, container_name, run_id=run_id, role=role)
+        return False
+
+    monkeypatch.setattr(runner, "_remove_and_verify", cleanup_but_report_unverified)
+    verifier_run_id = f"verifier-cleanup-{uuid4().hex}"
+    with pytest.raises(SandboxExecutionError, match="cleanup_error"):
+        await runner.run_hidden_verifier(package, subject, run_id=verifier_run_id)
+
+    manifest = json.loads(
+        (runner.artifact_root / verifier_run_id / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert manifest["status"] == "cleanup_error"
+    assert not manifest["cleanup_verified"]
+    assert manifest["workspace_snapshot"] is None
+    assert await no_harnesslab_containers()
+
+
+@pytest.mark.integration
 async def test_container_output_capture_is_bounded(tmp_path: Path) -> None:
     package = TaskPackage.load(PYTHON_TASK)
     result = await sandbox(tmp_path).run_fake_subject(
@@ -325,3 +632,15 @@ def test_artifact_digest_function_is_sensitive(tmp_path: Path) -> None:
 
     assert before != after
     assert before == "sha256:" + hashlib.sha256(b"before").hexdigest()
+
+
+def test_workspace_secret_scan_detects_chunk_boundary_match(tmp_path: Path) -> None:
+    fake_secret = "phase-c-fake-boundary-credential"
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "large.bin").write_bytes(
+        b"x" * (65_536 - 3) + fake_secret.encode("utf-8") + b"suffix"
+    )
+
+    with pytest.raises(ArtifactError, match="regular file contains an exact run secret"):
+        assert_tree_has_no_run_secrets(workspace, (fake_secret,))

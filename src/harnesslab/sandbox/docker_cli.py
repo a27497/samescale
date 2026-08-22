@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-import os
 from collections.abc import Mapping
 from dataclasses import dataclass
 
@@ -47,9 +46,15 @@ async def _capture(stream: asyncio.StreamReader | None, limit: int) -> tuple[byt
 
 
 class _DockerCLI:
-    def __init__(self, executable: str = "docker", output_limit: int = 65_536) -> None:
+    def __init__(
+        self,
+        executable: str = "docker",
+        output_limit: int = 65_536,
+        environment: Mapping[str, str] | None = None,
+    ) -> None:
         self.executable = executable
         self.output_limit = output_limit
+        self.environment = dict(environment) if environment is not None else None
 
     async def run(
         self,
@@ -64,7 +69,13 @@ class _DockerCLI:
             stdin=asyncio.subprocess.DEVNULL,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            env=dict(environment) if environment is not None else None,
+            env=(
+                dict(environment)
+                if environment is not None
+                else dict(self.environment)
+                if self.environment is not None
+                else None
+            ),
         )
         stdout_task = asyncio.create_task(_capture(process.stdout, self.output_limit))
         stderr_task = asyncio.create_task(_capture(process.stderr, self.output_limit))
@@ -107,7 +118,13 @@ class _DockerCLI:
         return result
 
 
-def docker_environment(secrets: Mapping[str, str]) -> dict[str, str]:
-    environment = os.environ.copy()
+def docker_environment(
+    base: Mapping[str, str],
+    secrets: Mapping[str, str],
+) -> dict[str, str]:
+    forbidden = {name for name in secrets if name.upper().startswith("DOCKER_")}
+    if forbidden:
+        raise ValueError("run secret names must not control Docker CLI transport")
+    environment = dict(base)
     environment.update(secrets)
     return environment

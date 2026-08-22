@@ -68,5 +68,5 @@ async def run_on_subprocess_loop[T](coroutine: Coroutine[object, object, T]) -> 
         return await asyncio.wrap_future(future)
     except asyncio.CancelledError:
         future.cancel()
-        await asyncio.to_thread(completed.wait, 30)
+        await asyncio.to_thread(completed.wait)
         raise

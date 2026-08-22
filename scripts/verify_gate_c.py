@@ -31,17 +31,26 @@ PHASE_C_TESTS = (
 )
 CRITICAL_TESTS = {
     "test_artifact_digest_function_is_sensitive",
+    "test_cleanup_daemon_error_is_not_verified",
+    "test_cleanup_verification_failure_cannot_report_success",
     "test_container_output_capture_is_bounded",
     "test_declared_context_is_subject_visible_read_only",
+    "test_docker_cli_subprocess_uses_pinned_environment",
     "test_docker_preflight_rejects_remote_and_records_immutable_image",
+    "test_docker_preflight_rejects_remote_host_before_connection",
+    "test_effective_docker_endpoint_precedence_rejects_remote_overrides",
     "test_effective_inspect_profile_and_isolated_verifier_e2e",
     "test_execution_lease_heartbeat_and_expiry_recovery",
+    "test_explicit_local_context_is_pinned_over_remote_host",
     "test_explicit_cancellation_kills_and_removes_container",
     "test_fake_secret_is_redacted_and_artifacts_are_consistent",
     "test_fresh_workspace_isolation_uses_same_task_definition",
     "test_host_escape_and_subject_symlink_artifact_are_rejected",
     "test_security_model_rejects_privileged_inspect_mutation",
     "test_timeout_kills_and_removes_container",
+    "test_verifier_cleanup_failure_cannot_return_passed",
+    "test_workspace_secret_content_and_filename_are_withheld",
+    "test_workspace_secret_scan_detects_chunk_boundary_match",
 }
 IMAGE = "harnesslab-phase-c:0.1.0"
 RUN_LABEL = "com.harnesslab.phase=C"
@@ -105,8 +114,11 @@ def verify_test_evidence() -> ExitCode:
         return ExitCode.NOT_VERIFIED
     print(f"PASS: {len(cases)} Gate C tests recorded; all critical tests present; zero skipped")
     print(
-        "SENSITIVITY EVIDENCE: insecure inspect fields fail the security model; output truncation "
-        "and artifact content mutations are observable; expired timestamp enables lease reclaim"
+        "SENSITIVITY EVIDENCE: remote effective endpoint overrides fail preflight; "
+        "insecure inspect fields fail the security model; exact workspace secret "
+        "content/path withholds the snapshot; unverified cleanup cannot report success; "
+        "output truncation and artifact content mutations are observable; expired timestamp "
+        "enables lease reclaim"
     )
     return ExitCode.PASS
 
@@ -166,13 +178,31 @@ def verify_source_and_scope() -> bool:
     import harnesslab
 
     module_path = Path(harnesslab.__file__).resolve()
+    expected_package = (ROOT / "src" / "harnesslab").resolve()
     print(f"REPOSITORY_ROOT={ROOT}")
     print(f"HARNESSLAB_SOURCE={module_path}")
-    try:
-        module_path.relative_to(ROOT)
-    except ValueError:
-        print("FAIL: imported HarnessLab is outside the working tree")
+    if module_path.parent != expected_package:
+        print(f"FAIL: imported HarnessLab is not the working-tree package at {expected_package}")
         return False
+    identity = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    worktree = subprocess.run(
+        ("git", "status", "--porcelain"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if identity.returncode != 0 or worktree.returncode != 0:
+        print("FAIL: unable to record Git source identity")
+        return False
+    print(f"GIT_HEAD={identity.stdout.strip()}")
+    print(f"GIT_DIRTY={bool(worktree.stdout.strip())}")
     forbidden = (
         ROOT / "src" / "harnesslab" / "providers",
         ROOT / "src" / "harnesslab" / "workers",

@@ -16,6 +16,7 @@ class SandboxStatus(StrEnum):
     TIMEOUT = "timeout"
     CANCELLED = "cancelled"
     ARTIFACT_ERROR = "artifact_error"
+    CLEANUP_ERROR = "cleanup_error"
 
 
 class DockerPreflight(BaseModel):
@@ -127,6 +128,16 @@ class SandboxArtifactManifest(BaseModel):
     workspace_snapshot: ArtifactDigest | None
     summary: str
 
+    @model_validator(mode="after")
+    def cleanup_status_matches_evidence(self) -> SandboxArtifactManifest:
+        if not self.cleanup_verified and self.status is not SandboxStatus.CLEANUP_ERROR:
+            raise ValueError(
+                "unverified cleanup requires cleanup_error status; success is forbidden"
+            )
+        if self.cleanup_verified and self.status is SandboxStatus.CLEANUP_ERROR:
+            raise ValueError("cleanup_error status requires unverified cleanup")
+        return self
+
     def canonical_json(self) -> str:
         return json.dumps(
             self.model_dump(mode="json"), sort_keys=True, separators=(",", ":"), ensure_ascii=False
@@ -153,8 +164,16 @@ class FakeSubjectRequest(BaseModel):
     require_marker_absent: bool = False
     sleep_seconds: float = Field(default=0.0, ge=0.0, le=60.0)
     echo_secret_name: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{0,63}$")
+    write_secret_file: bool = False
+    write_secret_filename: bool = False
     create_unsafe_symlink: bool = False
     output_bytes: int = Field(default=0, ge=0, le=200_000)
+
+    @model_validator(mode="after")
+    def secret_workspace_fixture_requires_secret_name(self) -> FakeSubjectRequest:
+        if (self.write_secret_file or self.write_secret_filename) and self.echo_secret_name is None:
+            raise ValueError("secret workspace fixture requires echo_secret_name")
+        return self
 
 
 class IsolatedVerifierResult(BaseModel):

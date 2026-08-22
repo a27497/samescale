@@ -44,6 +44,31 @@ def sha256_file(path: Path) -> str:
     return f"sha256:{digest.hexdigest()}"
 
 
+def assert_tree_has_no_run_secrets(root: Path, secrets: Iterable[str]) -> None:
+    secret_text = tuple({value for value in secrets if value})
+    if not secret_text:
+        return
+    secret_bytes = tuple(value.encode("utf-8") for value in secret_text)
+    longest = max(len(value) for value in secret_bytes)
+    for directory, directory_names, file_names in os.walk(root, followlinks=False):
+        directory_path = Path(directory)
+        for name in (*directory_names, *file_names):
+            relative = (directory_path / name).relative_to(root).as_posix()
+            if any(value in relative for value in secret_text):
+                raise ArtifactError("workspace relative path contains an exact run secret")
+        for name in file_names:
+            path = directory_path / name
+            if path.is_symlink() or not path.is_file():
+                continue
+            tail = b""
+            with path.open("rb") as stream:
+                while chunk := stream.read(65_536):
+                    candidate = tail + chunk
+                    if any(value in candidate for value in secret_bytes):
+                        raise ArtifactError("workspace regular file contains an exact run secret")
+                    tail = candidate[-(longest - 1) :] if longest > 1 else b""
+
+
 def make_tree_writable(root: Path) -> None:
     digest_tree(root)
     if os.name == "nt":
@@ -102,20 +127,25 @@ class ArtifactWriter:
         workspace_output_digest: str | None = None
         workspace_artifact: ArtifactDigest | None = None
         snapshot = self.directory / "workspace"
-        try:
-            workspace_output_digest = digest_tree(workspace)
-            shutil.copytree(workspace, snapshot)
-            copied_digest = digest_tree(snapshot)
-            if copied_digest != workspace_output_digest:
-                raise ArtifactError("workspace snapshot digest changed during collection")
-            workspace_artifact = ArtifactDigest(path="workspace", digest=copied_digest)
-        except (TaskPackageError, ArtifactError, OSError) as exc:
-            status = SandboxStatus.ARTIFACT_ERROR
-            safe_summary = redact_exact(
-                f"unsafe workspace artifact: {type(exc).__name__}", secret_values
-            )
-            if snapshot.exists():
-                shutil.rmtree(snapshot)
+        if not cleanup_verified:
+            status = SandboxStatus.CLEANUP_ERROR
+            safe_summary = "container cleanup could not be verified"
+        else:
+            try:
+                assert_tree_has_no_run_secrets(workspace, secret_values)
+                workspace_output_digest = digest_tree(workspace)
+                shutil.copytree(workspace, snapshot)
+                copied_digest = digest_tree(snapshot)
+                if copied_digest != workspace_output_digest:
+                    raise ArtifactError("workspace snapshot digest changed during collection")
+                workspace_artifact = ArtifactDigest(path="workspace", digest=copied_digest)
+            except (TaskPackageError, ArtifactError, OSError) as exc:
+                status = SandboxStatus.ARTIFACT_ERROR
+                safe_summary = redact_exact(
+                    f"unsafe workspace artifact: {type(exc).__name__}", secret_values
+                )
+                if snapshot.exists():
+                    shutil.rmtree(snapshot)
 
         manifest = SandboxArtifactManifest(
             run_id=self.directory.name,
