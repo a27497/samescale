@@ -32,9 +32,11 @@ This file separates repository evidence from intended design. A capability moves
 - Minimal PostgreSQL execution lease with owner heartbeat, expiry recovery, attempt count, and
   cancellation request
 - `harnesslab sandbox doctor` and the authoritative local Gate C runner
+- Remote GitHub Actions Gate A + Gate B + Gate C for the Phase C implementation head
+  `7ec4c13f745d5671e048588f63a670c763e0c140` (run `32579476607`, result `success`)
 
 Evidence date: 2026-08-22. Evidence is local Gate A, Gate B, and Gate C output plus the named remote
-Phase A/B CI runs. Phase C creates an untrusted-workspace Docker boundary but does not imply any
+Phase A/B/C CI runs. Phase C creates an untrusted-workspace Docker boundary but does not imply any
 model/provider/harness execution capability or VM-level isolation.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
@@ -57,6 +59,5 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-Remote CI for the Phase C head remains `NOT_VERIFIED` until the published head completes Gate A,
-Gate B, and Gate C. Future capabilities remain `DESIGN_ONLY` until their own implementation and
-verification gates exist.
+Future capabilities remain `DESIGN_ONLY` until their own implementation and verification gates
+exist.
