@@ -1,9 +1,9 @@
 # Evaluation methodology
 
 Phase A establishes vocabulary and contracts. Phase B implements deterministic task validation,
-Phase C isolates untrusted workspace verification, and Phase D implements the first M-Lane direct
-model path. H/P/J lanes, the comparability engine, experiment execution engine, and judges remain
-design-only.
+Phase C isolates untrusted workspace verification, Phase D implements the first M-Lane direct
+model path, and Phase E implements the Codex H-Lane. P/J lanes, the comparability engine,
+experiment execution engine, and judges remain design-only.
 
 ## Evaluation lanes
 
@@ -11,7 +11,10 @@ design-only.
   without a coding harness, while holding task conditions stable. Phase D supplies deterministic
   subject-visible text and accepts only a strict JSON patch; the model receives no tools, hidden
   verifier, or oracle.
-- **H-Lane (Harness):** compare harness behavior while holding requested model and task stable.
+- **H-Lane (Harness Evaluation):** evaluate a coding harness through its tools and workspace while
+  holding the requested model, task, and verifier facts stable. Phase E records the Codex runtime,
+  frozen profile, safe trajectory, and final workspace, then delegates correctness exclusively to
+  the isolated hidden verifier.
 - **P-Lane (Paired Model-vs-Harness Evaluation):** compare direct-model execution with harness
   execution on controlled micro tasks where the necessary context and verifier are equivalent, in
   order to measure harness uplift.
@@ -57,6 +60,18 @@ routing, fallbacks, or provider changes exist, so the Run contract stores them s
 Phase D preserves both identities in direct-model evidence. A missing observed identity does not
 invalidate an otherwise completed invocation; a mismatch remains explicit evidence for later
 comparability analysis.
+
+Phase E applies the same separation to Codex. If native JSONL does not expose the routed model,
+`observed_model` remains null with `not_exposed` status; HarnessLab never copies the requested
+identity into an observed field. This is evidence collection, not the Phase F comparability engine.
+
+## H-Lane outcome authority
+
+Codex public messages, native file-change events, and process exit status describe trajectory, not
+task correctness. HarnessLab hashes the real workspace before and after Codex, scans artifacts for
+run credentials, and sends the final workspace to the isolated deterministic verifier. Thus an
+agent message claiming success followed by `turn.completed` and exit zero can still produce
+`VERIFIED_FAIL`. Harness failures remain separate from verifier failures.
 
 ## Repeated experiments and failure attribution
 

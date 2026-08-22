@@ -93,12 +93,43 @@ headers, reasoning items, and thinking blocks are not evidence. Profiles contain
 environment-variable names only. Gate D uses fake and MockTransport providers; real-provider
 execution is not required or claimed.
 
+## Phase E Codex H-Lane
+
+Phase E adds one coding-harness path. The pinned Codex CLI receives a fresh writable subject
+workspace and the small `codex-harness-v1` prompt. It never receives the hidden verifier, oracle,
+operator home, host repository, or Docker socket. The adapter reports execution and artifact facts;
+it never decides task correctness.
+
+```text
+Phase B package -> fresh workspace -> Codex adapter -> sanitized JSONL -> Normalized Trace v1
+                                            |                                  |
+                                            +-> final filesystem identity -----+
+                                                               |
+                                             Phase C isolated hidden verifier
+                                                               |
+                                                  immutable H-Lane evidence
+```
+
+The project-owned image pins Node by digest and `@openai/codex` at 0.149.0, runs non-root, and
+contains only the Python, Java, and Node toolchains needed by the three controlled tasks. The
+canonical profile disables approvals, tool network access, web search, external MCP, plugins,
+ambient user config, and rules. The optional real backend constructs an argv-only hardened outer
+container, but Phase E does not claim a safely separated provider control plane; real smoke is
+therefore opt-in and `NOT_RUN` by default.
+
+Native events are sanitized in memory before persistence. Private reasoning becomes only a
+`REASONING_PRESENT` marker; malformed/raw authorization data and credentials are never artifacts.
+Normalized Trace v1 preserves accepted order and maps unfamiliar safe events to `UNKNOWN`.
+Native file-change claims and agent success messages are trajectory evidence only. Workspace
+digests and changed-path inventory come from the actual filesystem, and the isolated hidden
+verifier alone produces the pass/score outcome.
+
 ## Planned Core boundaries
 
 The following are **PLANNED**, not implemented:
 
-- Harness adapters at explicit external-system boundaries
-- Normalized execution traces and aggregate scoring/statistics
+- Additional harness adapters at explicit external-system boundaries
+- Aggregate scoring/statistics and the Phase F comparability engine
 - A PostgreSQL-backed durable experiment queue and full worker lifecycle
 - Remote/cloud artifact storage and worker execution
 

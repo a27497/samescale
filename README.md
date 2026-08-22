@@ -3,7 +3,7 @@
 HarnessLab AI is a reproducible **Model × Harness × Judge** evaluation and attribution
 platform. The repository currently contains **Phase A — Foundation & Contracts** and
 **Phase B — Task Contract + Deterministic Verifier**, **Phase C — Native Docker Sandbox**, and
-**Phase D — M-Lane Direct Model**.
+**Phase D — M-Lane Direct Model**, and **Phase E — Codex H-Lane**.
 
 ## Implemented now
 
@@ -34,14 +34,20 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 - An M-Lane runner that applies model patches in a fresh Phase B workspace and evaluates the
   result through the Phase C isolated hidden verifier
 - `harnesslab model run`, model-profile validation, and an authoritative no-key Gate D runner
+- A pinned non-root Codex 0.149.0 runtime, deterministic `codex-harness-v1` prompt, and minimal
+  `HarnessAdapter` boundary for `codex exec --json`
+- Sanitized native JSONL and Normalized Trace v1 without private reasoning content, plus
+  filesystem-authoritative workspace changes and immutable H-Lane evidence
+- Fake Codex end-to-end runs for the Python, Java, and TypeScript tasks through the isolated
+  hidden verifier, and an authoritative no-key Gate E runner
 - pytest integration/unit coverage, Ruff, mypy, and one authoritative Gate A runner
 - GitHub Actions using PostgreSQL 18 without model-provider credentials
 
 ## Planned Core
 
-Harness adapters, normalized traces, experiment execution, the full durable queue and worker
-scheduler, aggregate scoring/statistics, and judge calibration are **PLANNED**. Phase D contains
-direct provider protocols only; it is not a coding-harness adapter or a comparability engine.
+Additional harness families, the P-Lane/comparability and experiment engines, the full durable
+queue and worker scheduler, aggregate scoring/statistics, and judge calibration are **PLANNED**.
+Phase E implements only the Codex H-Lane; it does not implement Phase F capabilities.
 
 ## Workbench later
 
@@ -53,7 +59,8 @@ LangGraph analyst, RAG, or multi-agent framework is present.
 Gate A prerequisites are Docker and [uv](https://docs.astral.sh/uv/). Gate B additionally requires
 Java 21 (`java` and `javac`) and Node.js 24 or newer on `PATH`. Gate C requires a reachable local
 Docker Engine, or Docker Desktop using Linux containers; remote TCP/SSH contexts are unsupported.
-Gate D uses deterministic fake/MockTransport providers and requires no model API key.
+Gate D uses deterministic fake/MockTransport providers and requires no model API key. Gate E
+builds the pinned Codex image and uses deterministic Fake Codex runs; it also requires no key.
 
 ```powershell
 Copy-Item .env.example .env
@@ -63,6 +70,7 @@ uv run alembic upgrade head
 uv run harnesslab doctor
 uv run harnesslab sandbox doctor
 uv run harnesslab model profile validate profiles/openai-responses.example.yaml
+uv run harnesslab harness codex doctor
 ```
 
 Start the API and query its health endpoint:
@@ -122,6 +130,17 @@ uv run --locked python scripts/verify_gate_d.py
 Real provider calls are optional and were not used as Gate D evidence. See the safe example
 profiles under `profiles/`; they contain environment-variable names, never credential values.
 
+The Phase E gate independently checks the pinned runtime, profile and prompt fingerprints,
+sanitization/trace mapping, failure taxonomy, workspace authority, and all three H-Lane fixtures:
+
+```powershell
+uv run --locked python scripts/verify_gate_e.py
+```
+
+Real Codex execution is opt-in and is not Gate E evidence. The default result is
+`REAL_CODEX_SMOKE=NOT_RUN`; HarnessLab does not consume ambient Codex login state or credentials.
+
 See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_METHODOLOGY.md), and
 [Task Format](docs/TASK_FORMAT.md), [Sandbox Security](docs/SANDBOX_SECURITY.md), and
-[M-Lane Direct Model](docs/MODEL_LANE.md), and [Resume Scope](docs/RESUME_SCOPE.md).
+[M-Lane Direct Model](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md), and
+[Resume Scope](docs/RESUME_SCOPE.md).

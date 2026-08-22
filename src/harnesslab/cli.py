@@ -13,6 +13,8 @@ from pydantic import ValidationError
 from harnesslab import __version__
 from harnesslab.core.config import Settings
 from harnesslab.db.health import check_database
+from harnesslab.harness_lane.profile import canonical_codex_profile
+from harnesslab.harness_lane.runtime import CodexRuntime
 from harnesslab.model_lane.models import DirectModelOutcome, ProviderFailureCategory
 from harnesslab.model_lane.profiles import ModelProfileError, load_model_profile
 from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
@@ -25,10 +27,14 @@ task_app = typer.Typer(no_args_is_help=True, help="Inspect and validate versione
 sandbox_app = typer.Typer(no_args_is_help=True, help="Inspect the Phase C Docker sandbox boundary.")
 model_app = typer.Typer(no_args_is_help=True, help="Run Phase D direct-model evaluations.")
 model_profile_app = typer.Typer(no_args_is_help=True, help="Validate direct-model profiles.")
+harness_app = typer.Typer(no_args_is_help=True, help="Inspect Phase E coding harnesses.")
+codex_harness_app = typer.Typer(no_args_is_help=True, help="Inspect the pinned Codex harness.")
 app.add_typer(task_app, name="task")
 app.add_typer(sandbox_app, name="sandbox")
 app.add_typer(model_app, name="model")
+app.add_typer(harness_app, name="harness")
 model_app.add_typer(model_profile_app, name="profile")
+harness_app.add_typer(codex_harness_app, name="codex")
 
 
 class CheckStatus(StrEnum):
@@ -173,6 +179,26 @@ def sandbox_doctor() -> None:
         f"server={result.server_version} os={result.server_os}/{result.server_arch}"
     )
     typer.echo(f"PASS default_seccomp={result.default_seccomp}")
+
+
+@codex_harness_app.command("doctor")
+def codex_harness_doctor() -> None:
+    """Verify the pinned Codex image, CLI version, exec flags, and profile fingerprint."""
+
+    try:
+        result = asyncio.run(CodexRuntime().doctor())
+        profile = canonical_codex_profile(result.image)
+    except DockerPreflightError as exc:
+        typer.echo(f"NOT_VERIFIED Codex Harness: {exc}")
+        raise typer.Exit(code=2) from exc
+    except Exception as exc:
+        typer.echo(f"FAIL Codex Harness: {type(exc).__name__}: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"PASS version={result.version}")
+    typer.echo(f"PASS image={result.image.reference} id={result.image.image_id}")
+    typer.echo(f"PASS exec_flags={','.join(result.required_flags)}")
+    typer.echo(f"PASS profile_hash={profile.fingerprint}")
+    typer.echo("REAL_CODEX_SMOKE=NOT_RUN")
 
 
 @model_profile_app.command("validate")

@@ -18,6 +18,7 @@ def test_help_lists_phase_a_commands() -> None:
     assert "doctor" in result.stdout
     assert "serve" in result.stdout
     assert "model" in result.stdout
+    assert "harness" in result.stdout
 
 
 def test_version_uses_package_version() -> None:
@@ -133,3 +134,13 @@ credential_reference: GATE_D_CLI_MISSING_KEY
     assert result.exit_code == 2
     assert "outcome=provider_error" in result.stdout
     assert (tmp_path / "artifacts").is_dir()
+
+
+@pytest.mark.integration
+def test_harness_codex_doctor_reports_pinned_runtime() -> None:
+    result = runner.invoke(app, ["harness", "codex", "doctor"])
+
+    assert result.exit_code == 0
+    assert "PASS version=codex-cli 0.149.0" in result.stdout
+    assert "harnesslab-phase-e-codex:0.149.0" in result.stdout
+    assert "REAL_CODEX_SMOKE=NOT_RUN" in result.stdout

@@ -2,7 +2,7 @@ schema_version: 1
 id: micro-typescript-clamp
 version: 1.0.0
 domain: software-engineering
-lane_support: [P]
+lane_support: [H, P]
 instruction_path: instruction.md
 workspace_path: workspace
 context_path: context

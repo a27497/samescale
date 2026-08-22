@@ -52,7 +52,7 @@ CRITICAL_TESTS = {
     "test_workspace_secret_content_and_filename_are_withheld",
     "test_workspace_secret_scan_detects_chunk_boundary_match",
 }
-IMAGE = "harnesslab-phase-c:0.1.0"
+IMAGE = "harnesslab-phase-c:0.2.0"
 RUN_LABEL = "com.harnesslab.phase=C"
 
 
@@ -204,15 +204,17 @@ def verify_source_and_scope() -> bool:
     print(f"GIT_HEAD={identity.stdout.strip()}")
     print(f"GIT_DIRTY={bool(worktree.stdout.strip())}")
     forbidden = (
-        ROOT / "src" / "harnesslab" / "harness_adapters",
         ROOT / "src" / "harnesslab" / "workers",
-        ROOT / "src" / "harnesslab" / "traces",
+        ROOT / "src" / "harnesslab" / "comparability",
+        ROOT / "src" / "harnesslab" / "statistics",
+        ROOT / "src" / "harnesslab" / "judges",
+        ROOT / "frontend",
     )
     existing = [str(path.relative_to(ROOT)) for path in forbidden if path.exists()]
     if existing:
-        print(f"FAIL: Phase E/later implementation paths exist: {existing}")
+        print(f"FAIL: Phase F/later implementation paths exist: {existing}")
         return False
-    print("PASS: no Phase E/later harness adapter, worker, or trace implementation paths")
+    print("PASS: no Phase F comparability, worker, judge, statistics, or frontend paths")
     return True
 
 

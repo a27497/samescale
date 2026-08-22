@@ -42,12 +42,18 @@ This file separates repository evidence from intended design. A capability moves
   verifier, with immutable direct-model evidence and requested/observed model separation
 - `harnesslab model run`, model profile validation, and the authoritative no-key Gate D runner
 - Remote GitHub Actions Gate A + Gate B + Gate C + Gate D for the Phase D implementation head
-  `ce2e58e44fb1c8e60cbd6cfb14aebe116fae236f` (run `32586930103`, result `success`)
+  `efacc13397f3f12d3eff6c120c50809fea6d6a5d` (run `32588389612`, result `success`)
+- A pinned, project-owned Codex 0.149.0 image/profile and the minimal Codex HarnessAdapter contract
+- `codex-harness-v1`, sanitized native JSONL, Normalized Trace v1, filesystem-authoritative
+  workspace diffs, explicit Harness failure taxonomy, and immutable H-Lane evidence
+- Deterministic Fake Codex execution of all three controlled tasks through the Phase C isolated
+  hidden verifier, including fail-closed protocol/profile/artifact and self-report-negative cases
+- `harnesslab harness codex doctor` and the authoritative no-key Gate E runner
 
-Evidence date: 2026-08-23. Evidence is local Gate A, Gate B, Gate C, and Gate D output plus the
-named remote Phase A/B/C/D CI runs. Phase D provider contracts are MockTransport/fake-provider
-verified; this does not imply a real OpenAI/Anthropic call, coding-harness execution, or VM-level
-isolation.
+Evidence date: 2026-08-23. Phase E entries above are local Gate E evidence pending this change's
+named remote CI run. Phase D provider contracts are MockTransport/fake-provider verified; Phase E
+Codex behavior is deterministic Fake Codex verified. Neither implies a real provider/model call or
+VM-level isolation.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
 
@@ -56,8 +62,8 @@ not yet been demonstrated.
 
 ## DESIGN_ONLY
 
-- Harness adapters
-- Normalized traces and the experiment execution engine
+- Additional Harness adapters
+- P-Lane comparability and the experiment execution engine
 - Full PostgreSQL queue, scheduler, and worker lifecycle
 - Statistical intervals and pass@k
 - JudgeLab and judge calibration implementation
@@ -69,6 +75,7 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-`REAL_PROVIDER_SMOKE = NOT_RUN`. No real OpenAI, Anthropic, or custom-provider credential is
-required for Gate D, and no real-provider invocation is claimed. Future capabilities remain
-`DESIGN_ONLY` until their own implementation and verification gates exist.
+`REAL_PROVIDER_SMOKE = NOT_RUN` and `REAL_CODEX_SMOKE = NOT_RUN`. No real provider credential is
+required for Gate D or Gate E, no ambient Codex login is consumed, and no real-provider/model
+invocation is claimed. The provider-control-plane versus subject-network separation is not yet
+operationally verified. Future capabilities remain `DESIGN_ONLY` until their own gates exist.

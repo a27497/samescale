@@ -107,20 +107,22 @@ def verify_test_evidence() -> ExitCode:
 
 def verify_phase_boundary() -> bool:
     forbidden = (
-        ROOT / "src" / "harnesslab" / "harness_adapters",
         ROOT / "src" / "harnesslab" / "workers",
-        ROOT / "src" / "harnesslab" / "traces",
+        ROOT / "src" / "harnesslab" / "comparability",
+        ROOT / "src" / "harnesslab" / "statistics",
+        ROOT / "src" / "harnesslab" / "judges",
+        ROOT / "frontend",
     )
     existing = [str(path.relative_to(ROOT)) for path in forbidden if path.exists()]
     if existing:
-        print(f"FAIL: Phase E/later implementation paths exist: {existing}")
+        print(f"FAIL: Phase F/later implementation paths exist: {existing}")
         return False
     source_files = list((ROOT / "src" / "harnesslab" / "tasks").rglob("*.py"))
     if not source_files:
         print("FAIL: Phase B task source corpus is empty")
         return False
     print(
-        f"PASS: Phase B task sources present and no Phase E/later paths; "
+        f"PASS: Phase B task sources present and no Phase F/later paths; "
         f"inspected {len(source_files)} source files"
     )
     return True

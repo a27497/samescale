@@ -1,0 +1,390 @@
+from __future__ import annotations
+
+import json
+import os
+import re
+import shutil
+import subprocess
+import xml.etree.ElementTree as ET
+from dataclasses import dataclass
+from enum import IntEnum
+from pathlib import Path
+
+
+class ExitCode(IntEnum):
+    PASS = 0
+    FAIL = 1
+    NOT_VERIFIED = 2
+
+
+@dataclass(frozen=True)
+class Check:
+    name: str
+    command: tuple[str, ...]
+    timeout_seconds: int = 900
+
+
+ROOT = Path(__file__).resolve().parents[1]
+JUNIT = ROOT / "gate-e-results.xml"
+CODEX_IMAGE = "harnesslab-phase-e-codex:0.149.0"
+PHASE_E_TESTS = (
+    "tests/test_codex_harness.py",
+    "tests/test_cli.py::test_harness_codex_doctor_reports_pinned_runtime",
+)
+CRITICAL_TESTS = {
+    "test_real_codex_backend_outer_docker_argv_is_hardened_and_secret_free",
+    "test_codex_exec_plan_uses_stdin_and_canonical_isolation_flags",
+    "test_codex_harness_prompt_excludes_verifier_and_oracle",
+    "test_codex_profile_and_prompt_hashes_are_deterministic",
+    "test_codex_runtime_doctor_verifies_pinned_version_and_flags",
+    "test_codex_self_report_cannot_override_hidden_verifier",
+    "test_exact_run_credentials_are_redacted_from_harness_artifacts",
+    "test_failed_intermediate_command_does_not_fail_completed_turn",
+    "test_filesystem_diff_is_authoritative_over_native_file_change",
+    "test_harness_codex_doctor_reports_pinned_runtime",
+    "test_harness_failure_taxonomy_is_structurally_distinct[cancelled]",
+    "test_harness_failure_taxonomy_is_structurally_distinct[model-turn]",
+    "test_harness_failure_taxonomy_is_structurally_distinct[process]",
+    "test_harness_failure_taxonomy_is_structurally_distinct[profile-mcp]",
+    "test_harness_failure_taxonomy_is_structurally_distinct[profile-web]",
+    "test_harness_failure_taxonomy_is_structurally_distinct[protocol]",
+    "test_harness_failure_taxonomy_is_structurally_distinct[timeout]",
+    "test_requested_model_is_not_fabricated_as_observed_model",
+    "test_sanitized_jsonl_maps_trace_order_unknown_and_private_reasoning",
+    "test_structured_authentication_error_is_not_guessed_from_free_text",
+    "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[java]",
+    "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[python]",
+    "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[typescript]",
+}
+PHASE_F_MODULE_NAMES = {
+    "claude.py",
+    "claude_code.py",
+    "deepseek.py",
+    "comparability.py",
+    "judgelab.py",
+    "statistics.py",
+    "worker.py",
+}
+PHASE_F_PATTERNS = tuple(
+    re.compile(pattern)
+    for pattern in (
+        r"\bclass\s+ClaudeCodeAdapter\b",
+        r"\bclass\s+DeepSeekHarnessAdapter\b",
+        r"\bclass\s+ComparabilityEngine\b",
+        r"\bclass\s+JudgeLab\b",
+        r"\b(?:from|import)\s+langgraph\b",
+    )
+)
+
+
+def run(check: Check) -> bool:
+    print(f"\n=== {check.name} ===", flush=True)
+    print("COMMAND:", subprocess.list2cmdline(check.command), flush=True)
+    try:
+        completed = subprocess.run(
+            check.command,
+            cwd=ROOT,
+            check=False,
+            timeout=check.timeout_seconds,
+        )
+    except subprocess.TimeoutExpired:
+        print(f"FAIL: command exceeded {check.timeout_seconds}s")
+        return False
+    passed = completed.returncode == 0
+    print(f"{'PASS' if passed else 'FAIL'}: exit={completed.returncode}")
+    return passed
+
+
+def verify_environment() -> ExitCode:
+    missing = [tool for tool in ("uv", "docker", "git") if shutil.which(tool) is None]
+    if missing:
+        print(f"NOT_VERIFIED: required Gate E tools unavailable: {missing}")
+        return ExitCode.NOT_VERIFIED
+    preflight = subprocess.run(
+        ("uv", "run", "--locked", "harnesslab", "sandbox", "doctor"),
+        cwd=ROOT,
+        check=False,
+    )
+    if preflight.returncode == ExitCode.NOT_VERIFIED:
+        print("NOT_VERIFIED: Docker preflight cannot establish the outer Harness boundary")
+        return ExitCode.NOT_VERIFIED
+    if preflight.returncode != 0:
+        print("FAIL: Docker preflight implementation failed")
+        return ExitCode.FAIL
+    return ExitCode.PASS
+
+
+def verify_test_evidence() -> ExitCode:
+    if not JUNIT.exists():
+        print("NOT_VERIFIED: pytest did not create Gate E JUnit evidence")
+        return ExitCode.NOT_VERIFIED
+    cases = ET.parse(JUNIT).getroot().findall(".//testcase")
+    if not cases:
+        print("NOT_VERIFIED: Gate E collected zero tests")
+        return ExitCode.NOT_VERIFIED
+    skipped = [
+        case.attrib.get("name", "unknown") for case in cases if case.find("skipped") is not None
+    ]
+    present = {case.attrib.get("name", "") for case in cases}
+    missing = CRITICAL_TESTS - present
+    if skipped or missing:
+        print(f"NOT_VERIFIED: skipped={skipped}; missing_critical={sorted(missing)}")
+        return ExitCode.NOT_VERIFIED
+    print(f"PASS: {len(cases)} Gate E tests recorded; all critical tests present; zero skipped")
+    print(
+        "SENSITIVITY EVIDENCE: correct workspace mutation -> all three Hidden Verifiers PASS; "
+        "remove the workspace mutation while retaining agent success + turn.completed + exit 0 -> "
+        "test_codex_self_report_cannot_override_hidden_verifier produces VERIFIED_FAIL; inject "
+        "private reasoning sentinel -> sanitizer exclusion assertions remain green; claim a native "
+        "file_change without filesystem mutation -> authoritative changed_paths stays empty"
+    )
+    print("FAKE_CODEX_RESULTS=python:PASS/1.0,java:PASS/1.0,typescript:PASS/1.0")
+    print(
+        "NORMALIZED_TRACE_SOLVE=6 events: THREAD_STARTED,TURN_STARTED,REASONING_PRESENT,"
+        "FILE_CHANGE,AGENT_MESSAGE,TURN_COMPLETED"
+    )
+    return ExitCode.PASS
+
+
+def verify_image() -> bool:
+    dockerfile = (ROOT / "docker" / "codex" / "Dockerfile").read_text(encoding="utf-8")
+    first_line = dockerfile.splitlines()[0]
+    required = (
+        "@sha256:" in first_line,
+        "@openai/codex@${CODEX_VERSION}" in dockerfile,
+        "ARG CODEX_VERSION=0.149.0" in dockerfile,
+        "USER 10001:10001" in dockerfile,
+    )
+    if not all(required) or "@openai/codex@latest" in dockerfile:
+        print("FAIL: Codex Dockerfile lacks an immutable base, pinned CLI, or non-root user")
+        return False
+    inspected = subprocess.run(
+        (
+            "docker",
+            "image",
+            "inspect",
+            CODEX_IMAGE,
+            "--format",
+            "{{json .Id}}|{{json .Config.User}}|{{json .Config.Env}}",
+        ),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if inspected.returncode != 0:
+        print("FAIL: pinned Codex image is unavailable after doctor/tests")
+        return False
+    image_id_raw, user_raw, environment_raw = inspected.stdout.strip().split("|", 2)
+    image_id = json.loads(image_id_raw)
+    user = json.loads(user_raw)
+    environment = tuple(json.loads(environment_raw) or ())
+    if not isinstance(image_id, str) or not image_id.startswith("sha256:"):
+        print("FAIL: Codex image lacks an immutable image ID")
+        return False
+    if user in {"", "0", "0:0", "root"}:
+        print("FAIL: Codex image runs as root")
+        return False
+    sensitive_names = ("API_KEY", "TOKEN=", "PASSWORD=", "AUTH=")
+    if any(any(name in value.upper() for name in sensitive_names) for value in environment):
+        print("FAIL: Codex image environment contains credential-like configuration")
+        return False
+    docker_check = subprocess.run(
+        (
+            "docker",
+            "run",
+            "--rm",
+            "--network",
+            "none",
+            "--entrypoint",
+            "sh",
+            CODEX_IMAGE,
+            "-c",
+            "command -v docker",
+        ),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+    )
+    if docker_check.returncode == 0:
+        print("FAIL: Codex image unexpectedly contains a Docker client")
+        return False
+    print(f"CODEX_IMAGE={CODEX_IMAGE}")
+    print(f"CODEX_IMAGE_ID={image_id}")
+    print(f"CODEX_BASE={first_line.removeprefix('FROM ')}")
+    print(f"CODEX_IMAGE_USER={user}")
+    return True
+
+
+def _phase_f_violation(relative: str, content: str) -> bool:
+    return Path(relative).name in PHASE_F_MODULE_NAMES or any(
+        pattern.search(content) for pattern in PHASE_F_PATTERNS
+    )
+
+
+def verify_source_and_scope() -> bool:
+    import harnesslab
+
+    module_path = Path(harnesslab.__file__).resolve()
+    expected = (ROOT / "src" / "harnesslab").resolve()
+    print(f"REPOSITORY_ROOT={ROOT}")
+    print(f"HARNESSLAB_SOURCE={module_path}")
+    if module_path.parent != expected:
+        print("FAIL: Gate E imported HarnessLab outside the current working tree")
+        return False
+    identity = subprocess.run(
+        ("git", "rev-parse", "HEAD"), cwd=ROOT, check=False, capture_output=True, text=True
+    )
+    worktree = subprocess.run(
+        ("git", "status", "--porcelain"), cwd=ROOT, check=False, capture_output=True, text=True
+    )
+    if identity.returncode != 0 or worktree.returncode != 0:
+        print("FAIL: Gate E cannot record Git source identity")
+        return False
+    print(f"GIT_HEAD={identity.stdout.strip()}")
+    print(f"GIT_DIRTY={bool(worktree.stdout.strip())}")
+    sensitivity = (
+        _phase_f_violation("src/harnesslab/claude.py", ""),
+        _phase_f_violation("src/harnesslab/other.py", "class ComparabilityEngine: pass"),
+        not _phase_f_violation(
+            "src/harnesslab/harness_lane/adapter.py", "class HarnessAdapter: pass"
+        ),
+    )
+    if not all(sensitivity):
+        print("FAIL: Phase F source detector failed its sensitivity control")
+        return False
+    violations: list[str] = []
+    for path in (ROOT / "src" / "harnesslab").rglob("*.py"):
+        relative = path.relative_to(ROOT).as_posix()
+        content = path.read_text(encoding="utf-8")
+        if _phase_f_violation(relative, content):
+            violations.append(relative)
+    if violations:
+        print(f"FAIL: Phase F implementation detected: {violations}")
+        return False
+    print("PASS: no Phase F Claude, DeepSeek, Comparability, JudgeLab, worker, or frontend code")
+    return True
+
+
+def verify_repository_secrets() -> bool:
+    listed = subprocess.run(
+        ("git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+    )
+    if listed.returncode != 0:
+        print("FAIL: unable to enumerate repository files for Gate E secret hygiene")
+        return False
+    patterns = (
+        re.compile(rb"sk-[A-Za-z0-9_-]{20,}"),
+        re.compile(rb"gh[opsu]_[A-Za-z0-9]{20,}"),
+    )
+    matches: list[str] = []
+    for raw in listed.stdout.split(b"\0"):
+        if not raw:
+            continue
+        path = ROOT / os.fsdecode(raw)
+        if path.is_file() and any(pattern.search(path.read_bytes()) for pattern in patterns):
+            matches.append(os.fsdecode(raw))
+    if matches:
+        print(f"FAIL: credential-like content detected: {matches}")
+        return False
+    print("PASS: tracked/untracked files contain no recognized provider or GitHub credentials")
+    return True
+
+
+def main() -> int:
+    environment = verify_environment()
+    if environment is not ExitCode.PASS:
+        return environment
+    if os.environ.get("HARNESSLAB_ENABLE_REAL_CODEX") == "1":
+        print(
+            "NOT_VERIFIED: safe provider-control-plane versus subject-tool-network separation "
+            "has not been established for a real Codex smoke"
+        )
+        return ExitCode.NOT_VERIFIED
+    checks = (
+        Check("locked dependency sync", ("uv", "sync", "--locked")),
+        Check(
+            "pinned Codex runtime doctor",
+            ("uv", "run", "--locked", "harnesslab", "harness", "codex", "doctor"),
+        ),
+        Check(
+            "Codex image Python toolchain",
+            (
+                "docker",
+                "run",
+                "--rm",
+                "--network",
+                "none",
+                "--entrypoint",
+                "python3",
+                CODEX_IMAGE,
+                "--version",
+            ),
+        ),
+        Check(
+            "Codex image Java toolchain",
+            (
+                "docker",
+                "run",
+                "--rm",
+                "--network",
+                "none",
+                "--entrypoint",
+                "java",
+                CODEX_IMAGE,
+                "-version",
+            ),
+        ),
+        Check(
+            "Codex image Node toolchain",
+            (
+                "docker",
+                "run",
+                "--rm",
+                "--network",
+                "none",
+                "--entrypoint",
+                "node",
+                CODEX_IMAGE,
+                "--version",
+            ),
+        ),
+        Check(
+            "Phase E pytest",
+            (
+                "uv",
+                "run",
+                "--locked",
+                "pytest",
+                "-q",
+                *PHASE_E_TESTS,
+                f"--junitxml={JUNIT}",
+            ),
+        ),
+        Check("Ruff check", ("uv", "run", "--locked", "ruff", "check", ".")),
+        Check("Ruff format", ("uv", "run", "--locked", "ruff", "format", "--check", ".")),
+        Check("mypy", ("uv", "run", "--locked", "mypy", "src", "tests", "scripts")),
+        Check("git whitespace", ("git", "diff", "--check")),
+    )
+    failed = False
+    for check in checks:
+        if not run(check):
+            failed = True
+    evidence = verify_test_evidence()
+    if evidence is ExitCode.NOT_VERIFIED:
+        return ExitCode.NOT_VERIFIED
+    if not verify_image():
+        failed = True
+    if not verify_source_and_scope():
+        failed = True
+    if not verify_repository_secrets():
+        failed = True
+    print("REAL_CODEX_SMOKE=NOT_RUN")
+    return ExitCode.FAIL if failed else ExitCode.PASS
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

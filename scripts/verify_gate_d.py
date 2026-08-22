@@ -111,35 +111,34 @@ CRITICAL_TESTS = {
     "test_unset_optional_generation_controls_are_not_invented[responses]",
     "test_workspace_staging_failure_is_not_blame_assigned_to_model",
 }
-PHASE_E_MODULE_NAMES = {
+PHASE_F_MODULE_NAMES = {
+    "claude.py",
+    "deepseek.py",
     "comparability.py",
-    "harness.py",
-    "harness_adapter.py",
     "judgelab.py",
     "queue.py",
     "scheduler.py",
     "statistics.py",
-    "traces.py",
     "worker.py",
 }
-PHASE_E_SYMBOLS = tuple(
+PHASE_F_SYMBOLS = tuple(
     re.compile(pattern)
     for pattern in (
-        r"\bclass\s+HarnessAdapter\b",
+        r"\bclass\s+ClaudeCodeAdapter\b",
+        r"\bclass\s+DeepSeekHarnessAdapter\b",
         r"\bclass\s+ComparabilityEngine\b",
         r"\bclass\s+JudgeLab\b",
-        r"\bclass\s+NormalizedTrace\b",
         r"\b(?:from|import)\s+langgraph\b",
     )
 )
 
 
-def phase_e_violation(relative: str, content: str) -> str | None:
+def phase_f_violation(relative: str, content: str) -> str | None:
     path = Path(relative)
-    if path.name in PHASE_E_MODULE_NAMES and relative != "src/harnesslab/contracts/harness.py":
-        return f"forbidden Phase E/later module name: {relative}"
-    if any(pattern.search(content) for pattern in PHASE_E_SYMBOLS):
-        return f"forbidden Phase E/later source symbol: {relative}"
+    if path.name in PHASE_F_MODULE_NAMES:
+        return f"forbidden Phase F/later module name: {relative}"
+    if any(pattern.search(content) for pattern in PHASE_F_SYMBOLS):
+        return f"forbidden Phase F/later source symbol: {relative}"
     return None
 
 
@@ -231,8 +230,6 @@ def verify_source_and_scope() -> bool:
     print(f"GIT_HEAD={identity.stdout.strip()}")
     print(f"GIT_DIRTY={bool(worktree.stdout.strip())}")
     forbidden = (
-        ROOT / "src" / "harnesslab" / "harness_adapters",
-        ROOT / "src" / "harnesslab" / "traces",
         ROOT / "src" / "harnesslab" / "comparability",
         ROOT / "src" / "harnesslab" / "statistics",
         ROOT / "src" / "harnesslab" / "judges",
@@ -240,18 +237,19 @@ def verify_source_and_scope() -> bool:
     )
     existing = [str(path.relative_to(ROOT)) for path in forbidden if path.exists()]
     if existing:
-        print(f"FAIL: Phase E/later implementation paths exist: {existing}")
+        print(f"FAIL: Phase F/later implementation paths exist: {existing}")
         return False
     sensitivity_cases = (
-        ("src/harnesslab/harness.py", "", True),
-        ("src/harnesslab/other.py", "class HarnessAdapter: pass", True),
-        ("src/harnesslab/model_lane/runner.py", "class DirectModelRunner: pass", False),
+        ("src/harnesslab/claude.py", "", True),
+        ("src/harnesslab/other.py", "class ComparabilityEngine: pass", True),
+        ("src/harnesslab/harness_lane/adapter.py", "class HarnessAdapter: pass", False),
+        ("src/harnesslab/harness_lane/models.py", "class NormalizedTrace: pass", False),
     )
     if any(
-        (phase_e_violation(relative, content) is not None) is not expected
+        (phase_f_violation(relative, content) is not None) is not expected
         for relative, content, expected in sensitivity_cases
     ):
-        print("FAIL: Phase E source detector failed its sensitivity control")
+        print("FAIL: Phase F source detector failed its sensitivity control")
         return False
     source_violations: list[str] = []
     for path in (ROOT / "src" / "harnesslab").rglob("*.py"):
@@ -261,13 +259,13 @@ def verify_source_and_scope() -> bool:
         except (OSError, UnicodeDecodeError):
             source_violations.append(f"unreadable source: {relative}")
             continue
-        violation = phase_e_violation(relative, content)
+        violation = phase_f_violation(relative, content)
         if violation is not None:
             source_violations.append(violation)
     if source_violations:
-        print(f"FAIL: Phase E/later source detected: {source_violations}")
+        print(f"FAIL: Phase F/later source detected: {source_violations}")
         return False
-    print("PASS: no Phase E harness, trace, comparability, statistics, judge, or frontend paths")
+    print("PASS: no Phase F Claude, DeepSeek, comparability, statistics, judge, or frontend paths")
     return True
 
 
