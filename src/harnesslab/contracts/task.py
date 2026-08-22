@@ -26,6 +26,22 @@ class VerifierReference(BaseModel):
 
     kind: str = Field(min_length=1, max_length=100)
     version: str = Field(min_length=1, max_length=100)
+    entrypoint: str | None = Field(default=None, max_length=500)
+    digest: Sha256Digest | None = None
+
+
+class OracleReference(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    uri: str = Field(min_length=1, max_length=500)
+    digest: Sha256Digest
+
+
+class ExpectedToolContract(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    name: str = Field(min_length=1, max_length=100, pattern=r"^[a-zA-Z0-9._-]+$")
+    version: str = Field(min_length=1, max_length=100)
 
 
 class ResourceBudget(BaseModel):
@@ -49,5 +65,8 @@ class TaskDefinition(BaseModel):
     workspace: WorkspaceReference
     context_bundle: ContextBundleReference | None = None
     verifier: VerifierReference
+    oracle: OracleReference | None = None
     budget: ResourceBudget
+    expected_tools: tuple[ExpectedToolContract, ...] = ()
+    metadata: dict[str, str] = Field(default_factory=dict)
     content_digest: Sha256Digest

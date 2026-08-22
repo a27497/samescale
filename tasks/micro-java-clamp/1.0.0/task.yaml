@@ -1,0 +1,26 @@
+schema_version: 1
+id: micro-java-clamp
+version: 1.0.0
+domain: software-engineering
+lane_support: [H]
+instruction_path: instruction.md
+workspace_path: workspace
+verifier:
+  kind: python
+  version: "1"
+  entrypoint: verifier/verify.py
+  timeout_seconds: 30
+oracle:
+  path: oracle
+budget:
+  timeout_seconds: 90
+  max_output_tokens: 2000
+  network_policy: deny
+expected_tools:
+  - name: java
+    version: "21"
+  - name: javac
+    version: "21"
+metadata:
+  language: java
+  difficulty: micro

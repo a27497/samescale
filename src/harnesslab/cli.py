@@ -4,6 +4,7 @@ import asyncio
 import sys
 from dataclasses import dataclass
 from enum import StrEnum
+from pathlib import Path
 
 import typer
 import uvicorn
@@ -12,8 +13,12 @@ from pydantic import ValidationError
 from harnesslab import __version__
 from harnesslab.core.config import Settings
 from harnesslab.db.health import check_database
+from harnesslab.tasks.package import TaskPackageError
+from harnesslab.tasks.validation import validate_task_package
 
 app = typer.Typer(no_args_is_help=True, help="HarnessLab AI control CLI.")
+task_app = typer.Typer(no_args_is_help=True, help="Inspect and validate versioned task packages.")
+app.add_typer(task_app, name="task")
 
 
 class CheckStatus(StrEnum):
@@ -112,3 +117,29 @@ def serve(
         port=port,
         loop="harnesslab.core.runtime:selector_loop_factory",
     )
+
+
+@task_app.command("validate")
+def validate_task(
+    task_path: str = typer.Argument(help="Path to a versioned task package."),
+) -> None:
+    """Validate manifest, digest, hidden verifier, and baseline/oracle polarity."""
+
+    try:
+        result = validate_task_package(Path(task_path))
+    except (TaskPackageError, OSError) as exc:
+        typer.echo(f"FAIL task package: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"task: {result.task_id}@{result.task_version}")
+    typer.echo(f"task digest: {result.task_digest}")
+    typer.echo(
+        f"baseline: passed={result.baseline.result.passed} score={result.baseline.result.score:.3f}"
+    )
+    typer.echo(
+        f"oracle: passed={result.oracle.result.passed} score={result.oracle.result.score:.3f}"
+    )
+    if not result.valid:
+        for error in result.errors:
+            typer.echo(f"FAIL {error}")
+        raise typer.Exit(code=1)
+    typer.echo("validation: PASS")

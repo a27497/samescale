@@ -13,3 +13,4 @@ dist/
 .idea/
 .vscode/
 gate-a-results.xml
+gate-b-results.xml

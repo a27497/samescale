@@ -36,5 +36,17 @@ jobs:
           enable-cache: true
       - name: Install pinned Python
         run: uv python install 3.12.14
+      - name: Install Java 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
       - name: Run authoritative Gate A verification
         run: uv run --locked python scripts/verify_gate_a.py
+      - name: Run authoritative Gate B verification
+        run: uv run --locked python scripts/verify_gate_b.py

@@ -14,9 +14,18 @@ This file separates repository evidence from intended design. A capability moves
 - Local pytest, Ruff, mypy, and working-tree checks through the authoritative Gate A runner
 - Remote GitHub Actions Gate A for baseline commit
   `f97f5218cfd898a349f1237505b2e5731a65452e` (run `32572916235`, result `success`)
+- Versioned task packages with strict YAML loading, duplicate/unknown-field rejection, safe paths,
+  symlink rejection, and deterministic task/workspace digests
+- Fresh subject-workspace materialization that excludes hidden verifier and oracle assets
+- Hidden deterministic verification with fail-closed malformed-output, timeout, and protected-file
+  handling; bounded partial scores; and immutable evidence manifests
+- Baseline-fail/oracle-pass validation and tamper-resistance tests
+- Controlled Python, Java 21, and TypeScript/Node task fixtures
+- `harnesslab task validate` and the authoritative local Gate B runner
 
-Evidence date: 2026-08-22. Evidence is local Gate A output plus the named remote CI run. It does not
-imply any model/harness evaluation capability.
+Evidence date: 2026-08-22. Evidence is local Gate A and Gate B output plus the named baseline
+remote CI run. Phase B remote evidence is recorded only after its new main commit completes CI.
+This does not imply any model/harness evaluation capability or untrusted-code isolation.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
 
@@ -25,7 +34,6 @@ not yet been demonstrated.
 
 ## DESIGN_ONLY
 
-- Task directory format, hidden verifier/oracle, and reward-hacking detection
 - Docker sandbox execution
 - Model provider and harness adapters
 - Normalized traces and the experiment execution engine
@@ -40,5 +48,6 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-None recorded for the Phase A foundation gate. Future capabilities remain `DESIGN_ONLY` until
-their own implementation and verification gates exist.
+Remote CI for the Phase B head remains `NOT_VERIFIED` until that head is published and its Gate A
+and Gate B workflow succeeds. Future capabilities remain `DESIGN_ONLY` until their own
+implementation and verification gates exist.

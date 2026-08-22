@@ -1,7 +1,9 @@
 # Evaluation methodology
 
-Phase A establishes vocabulary and contracts only. None of the lanes, verifiers, execution engine,
-or judges described below should be read as implemented.
+Phase A establishes vocabulary and contracts. Phase B implements deterministic validation of
+controlled task packages, but not model or harness execution. None of the evaluation lanes,
+comparability engine, experiment execution engine, or judges described below should be read as
+implemented.
 
 ## Evaluation lanes
 
@@ -19,6 +21,18 @@ or judges described below should be read as implemented.
 explicit rules, and protected-file checks must not be overridden by an LLM's preference. Human
 gold labels cover questions deterministic checks cannot settle. LLM judges are calibrated aids,
 not an authority over reproducible facts.
+
+## Deterministic task polarity
+
+A Phase B task package is accepted only when the untouched baseline fails its hidden verifier and
+a separately materialized oracle overlay passes. This baseline-fail/oracle-pass rule detects
+vacuous tests and broken reference solutions before the task can become evaluation evidence.
+Verifier reports may contain bounded partial scores and per-check outcomes; a score is evidence,
+not permission to reinterpret a failing verifier as a pass.
+
+Malformed verifier output, timeout, non-zero verifier exit, or protected-file mutation fails
+closed and remains distinguishable from an ordinary subject result. Phase B executes only trusted
+repository fixtures on the host. It does not claim sandbox isolation for untrusted code.
 
 ## Outcome and trajectory
 

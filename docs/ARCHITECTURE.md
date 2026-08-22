@@ -1,6 +1,6 @@
 # Architecture
 
-## Phase A system
+## Foundation and deterministic task verification
 
 HarnessLab is CLI-first. The `harnesslab` Typer CLI is the operator entry point, while the FastAPI
 application is a small control API. Both use one Pydantic Settings model and the same database
@@ -20,13 +20,33 @@ Typer CLI ─┬─ doctor ───────────┐
 Pydantic contracts: Task × Model × Harness × Experiment Config → Run facts
 ```
 
+Phase B adds a versioned task-package boundary without adding an execution engine. A strict
+manifest names the subject workspace, optional context bundle, hidden verifier, optional oracle,
+toolchain expectations, and execution policy. Deterministic digests bind the task package and the
+materialized subject workspace independently.
+
+```text
+Versioned task package ── strict load + digest ──┬─ fresh workspace/context ─ subject edits
+                                                │                                │
+                                                ├─ hidden verifier ───────────────┤
+                                                └─ oracle overlay (validation) ───┘
+                                                                                 │
+                                                   bounded result + immutable evidence
+```
+
+The subject-facing workspace never contains the package's hidden verifier or oracle. Package
+validation requires the untouched baseline to fail and a separately materialized oracle overlay
+to pass. The repository's Python, Java, and TypeScript fixtures execute trusted verifier code on
+the host solely to validate this contract. This is not a security boundary for arbitrary or
+untrusted task code; process/container isolation belongs to the planned Docker sandbox phase.
+
 ## Planned Core boundaries
 
 The following are **PLANNED**, not implemented:
 
 - Provider and harness adapters at explicit external-system boundaries
 - A Docker sandbox that produces reproducible execution artifacts
-- Deterministic verifiers/scorers and normalized traces
+- Normalized execution traces and aggregate scoring/statistics
 - A PostgreSQL-backed durable experiment queue and worker lifecycle
 - A local artifact store for immutable task, run, and trace evidence
 
