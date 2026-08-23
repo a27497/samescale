@@ -154,12 +154,9 @@ def verify_scope_and_contracts() -> bool:
         ROOT / "alembic/versions/20260823_0004_phase_h_judgelab.py",
         ROOT / "docs/JUDGELAB.md",
     )
-    forbidden = (
-        ROOT / "src/harnesslab/analyst",
-        ROOT / "src/harnesslab/langgraph",
-    )
+    forbidden = (ROOT / "src/harnesslab/langgraph",)
     if any(not path.is_file() for path in required) or any(path.exists() for path in forbidden):
-        print("FAIL: required Phase H surface missing or Phase J scope detected")
+        print("FAIL: required Phase H surface missing or LangGraph isolation failed")
         return False
     source = "\n".join(
         path.read_text(encoding="utf-8") for path in (ROOT / "src/harnesslab/judgelab").glob("*.py")
@@ -174,10 +171,10 @@ def verify_scope_and_contracts() -> bool:
     if any(token not in source for token in required_tokens):
         print("FAIL: JudgeLab provider/evidence/qualification contract is incomplete")
         return False
-    if "langgraph" in source.casefold():
-        print("FAIL: out-of-scope LangGraph dependency detected")
+    if "langgraph" in source.casefold() or "harnesslab.analyst" in source.casefold():
+        print("FAIL: Phase H runtime depends on the isolated Analyst package")
         return False
-    print("PASS: Phase I allowed; Phase H contracts intact; no Phase J analyst or LangGraph")
+    print("PASS: Phase H contracts intact and isolated from the Phase J Analyst package")
     return True
 
 

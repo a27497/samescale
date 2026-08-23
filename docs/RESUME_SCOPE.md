@@ -121,9 +121,21 @@ This file separates repository evidence from intended design. A capability moves
   Matrix comparability; explicit Judge report integrity state; and 15-25 task readiness threshold
 - An authoritative non-recursive Gate I with 15 backend persisted-evidence tests, 14 focused
   frontend tests, strict TypeScript, Vite production build, Ruff, mypy, and scope/secret checks
+- LangGraph 1.2.11 confined to an explicit bounded Attribution Analyst `StateGraph`, with strict
+  request/action/report contracts and no checkpoint, RAG, or multi-agent expansion
+- Exactly six experiment-scoped read tools, trusted manifest/normalized-trace reopening, safe task
+  contract resolution, approved Phase G report/statistics reuse, and persisted ablation evidence
+- Deterministic non-path citations, fabricated-reference rejection, enforced
+  `VERIFIED_FACT`/`HYPOTHESIS` separation, and causal factual-claim rejection
+- Canonical timestamp-free report JSON/digest plus Markdown, atomically persisted only after
+  validation under a controlled Analyst artifact root
+- A keyless production-path Gate J fixture using ExperimentSpec/Plan, queue, executor, fake Codex,
+  persisted manifests/report/AblationSpec; 19 focused tests with zero skips
+- Before/after proof that analysis leaves experiment/cell/pair/ablation/run rows, outcomes,
+  artifact digests/mtimes, Judge state, and fake execution-backend call counts unchanged
 
 Evidence date: 2026-08-24. Phase H remote evidence is approved at the exact head/run above. Phase I
-entries have current local Gate I evidence pending this change's named remote CI run. Phase D
+and Phase J entries have current local gate evidence pending this change's named remote CI run. Phase D
 provider contracts are MockTransport/fake-provider verified; Phase E/F harness behavior is
 deterministic fake verified. None implies a real provider/model call or VM-level isolation.
 
@@ -135,7 +147,7 @@ not yet been demonstrated.
 ## DESIGN_ONLY
 
 - Additional Harness adapters beyond Codex, Claude Code, and DeepSeek E1
-- Phase J Analyst Agent, controlled attribution assistance, RAG, and multi-agent workflows
+- Provider-backed Analyst execution, RAG, and multi-agent attribution workflows
 
 ## WORKBENCH_ONLY
 

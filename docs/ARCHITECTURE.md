@@ -256,7 +256,39 @@ or infer causality.
 The only Workbench POST is the computation-only Regression compare request. There are no browser
 routes for model, Harness, or Judge execution, cancellation, deletion, scoring, or task/gold
 mutation. The Core readiness view is derived from structured persisted evidence and remains
-`NOT_READY` while real evidence, Phase J, or release artifacts are unverified.
+`NOT_READY` while real Matrix evidence or release artifacts are unverified.
+
+## Phase J read-only Attribution Analyst
+
+Phase J adds the repository's one confined use of LangGraph 1.2.11. A local `StateGraph` has
+explicit decide, validated-tool, and deterministic-finalize nodes, no checkpoint service, and hard
+limits of 8 decisions and 12 tool calls. State contains only the public request and scope,
+validated actions, safe evidence catalog, counters, and report—not private chain-of-thought.
+
+```text
+AnalysisRequest + bound experiment ─ decide ─ strict six-action union
+                                      ^                    │
+                                      └── safe evidence ───┤
+                                                           v
+                              experiment-scoped read repository
+                                                           │
+                                  citation + claim validation ─ report
+```
+
+The repository starts PostgreSQL work read-only and exposes no mutation method. Run, cell, task,
+and ablation identities are checked against the bound ExperimentPlan. Artifact reads use trusted
+root confinement plus manifest and normalized-trace digests. Native transcripts are never read,
+`REASONING_PRESENT` remains content-withheld, and paths never enter the report.
+
+`compare_cells` calls the Phase G report/statistics path; it copies no formulas and creates no new
+significance claim. `get_ablation` returns declared treatment and persisted paired statistics with
+evidence tier and Comparability limitations. Every `VERIFIED_FACT` requires catalog citations;
+unknown references and causal factual wording fail validation. Unsupported interpretation remains
+`HYPOTHESIS` and names evidence needed to verify or falsify it.
+
+`FakeAnalystBackend` is the only operational Phase J backend. No implicit credential/provider path
+or Workbench Analyst route exists. Trusted host code alone atomically persists a validated report;
+source experiment and Judge evidence remains unchanged.
 
 ## Planned Core boundaries
 
@@ -265,7 +297,7 @@ The following are **PLANNED**, not implemented:
 - Additional harness adapters at explicit external-system boundaries
 - Remote/cloud artifact storage and worker execution
 - Remote/cloud Judge artifact storage and distributed Judge workers
-- Phase J Analyst workflows and controlled attribution assistance
+- Provider-backed Analyst execution, RAG, and multi-agent attribution
 
 ## Deliberate exclusions
 

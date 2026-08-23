@@ -193,12 +193,9 @@ def verify_dependencies_and_scope() -> bool:
     if any(dependency in installed_project for dependency in forbidden_dependencies):
         print("FAIL: unapproved quantitative dependency detected")
         return False
-    forbidden_paths = (
-        ROOT / "src" / "harnesslab" / "analyst",
-        ROOT / "src" / "harnesslab" / "langgraph",
-    )
+    forbidden_paths = (ROOT / "src" / "harnesslab" / "langgraph",)
     if any(path.exists() for path in forbidden_paths):
-        print("FAIL: Phase J analyst/LangGraph path detected")
+        print("FAIL: LangGraph escaped the isolated Analyst package")
         return False
     violations: list[str] = []
     patterns = (
@@ -206,13 +203,15 @@ def verify_dependencies_and_scope() -> bool:
         r"\b(?:from|import)\s+langgraph\b",
     )
     for path in (ROOT / "src" / "harnesslab").rglob("*.py"):
+        if "analyst" in path.parts:
+            continue
         content = path.read_text(encoding="utf-8")
         if any(re.search(pattern, content) for pattern in patterns):
             violations.append(path.relative_to(ROOT).as_posix())
     if violations:
         print(f"FAIL: Phase J analyst implementation detected: {violations}")
         return False
-    print("PASS: Phase I allowed; no Phase J analyst, RAG, or multi-agent stack")
+    print("PASS: Phase G runtime remains isolated from the Phase J Analyst package")
     return True
 
 

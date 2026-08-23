@@ -279,10 +279,14 @@ def _phase_j_violation(relative: str, content: str) -> bool:
     patterns = (
         r"\bclass\s+AnalystAgent\b",
         r"\b(?:from|import)\s+langgraph\b",
+        r"\b(?:from|import)\s+harnesslab\.analyst\b",
     )
+    if "analyst" in path.parts:
+        return False
+    if path.as_posix() == "src/harnesslab/cli.py":
+        return False
     return (
-        "analyst" in path.parts
-        or "langgraph" in path.parts
+        "langgraph" in path.parts
         or path.name in forbidden_names
         or any(re.search(pattern, content) for pattern in patterns)
     )
@@ -311,7 +315,11 @@ def verify_source_scope_and_identity() -> bool:
     print(f"GIT_DIRTY={bool(dirty.stdout.strip())}")
     sensitivity = (
         not _phase_j_violation("src/harnesslab/judgelab.py", ""),
-        _phase_j_violation("src/harnesslab/analyst/graph.py", "from langgraph import Graph"),
+        not _phase_j_violation("src/harnesslab/analyst/graph.py", "from langgraph import Graph"),
+        _phase_j_violation(
+            "src/harnesslab/comparability/bridge.py",
+            "from harnesslab.analyst import AnalystService",
+        ),
         not _phase_j_violation(
             "src/harnesslab/experiment/queue.py", "class ExperimentWorker: pass"
         ),
@@ -336,7 +344,7 @@ def verify_source_scope_and_identity() -> bool:
     if DeepSeekSessionExtraction.DEFERRED_NOT_VERIFIED.value != "DEFERRED_NOT_VERIFIED":
         print("FAIL: DeepSeek E2 is not explicitly deferred")
         return False
-    print("PASS: Phase I allowed; no Phase J or private DeepSeek test-driver dependency")
+    print("PASS: Phase F runtime is isolated from Phase J and private DeepSeek test drivers")
     print("DEEPSEEK_E2=DEFERRED_NOT_VERIFIED")
     return True
 

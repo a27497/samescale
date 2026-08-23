@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import hashlib
-import json
 from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -48,6 +46,12 @@ from harnesslab.comparability.models import ComparabilityIntent
 from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
 from harnesslab.db.models.judgelab import JudgeCalibrationRecord
+from harnesslab.evidence.reader import (
+    EvidenceReadError,
+    load_normalized_trace,
+    load_verified_manifest,
+    trusted_artifact_path,
+)
 from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.plan import ExperimentPlan
 from harnesslab.experiment.report import (
@@ -57,9 +61,7 @@ from harnesslab.experiment.report import (
     load_verified_experiment_evidence,
 )
 from harnesslab.experiment.statistics import summarize_cell
-from harnesslab.harness_lane.models import NormalizedTrace
 from harnesslab.judgelab.report import JudgeCalibrationReport
-from harnesslab.sandbox.artifacts import sha256_file
 
 TERMINAL_RUN_STATUSES = {
     RunStatus.COMPLETED.value,
@@ -122,17 +124,11 @@ def _trusted_artifact_path(raw_path: str | Path, roots: tuple[Path, ...]) -> Pat
     """Resolve an existing artifact and reject symlink or absolute-path root escapes."""
 
     try:
-        resolved = Path(raw_path).resolve(strict=True)
-    except OSError as exc:
+        return trusted_artifact_path(raw_path, roots)
+    except EvidenceReadError as exc:
         raise WorkbenchAPIError(
             409, "ARTIFACT_INTEGRITY_ERROR", "artifact location cannot be verified"
         ) from exc
-    trusted = tuple(root.resolve() for root in roots)
-    if not any(resolved == root or root in resolved.parents for root in trusted):
-        raise WorkbenchAPIError(
-            409, "ARTIFACT_INTEGRITY_ERROR", "artifact is outside trusted storage"
-        )
-    return resolved
 
 
 async def _confine_experiment_artifacts(
@@ -492,30 +488,21 @@ async def list_runs(
 def _safe_manifest(
     run: ExperimentRunRecord, roots: tuple[Path, ...]
 ) -> tuple[dict[str, Any], Path]:
-    if run.artifact_manifest_path is None or run.evidence_digest is None:
-        raise WorkbenchAPIError(409, "ARTIFACT_UNAVAILABLE", "run artifact is not reported")
-    manifest_path = _trusted_artifact_path(run.artifact_manifest_path, roots)
     try:
-        if not manifest_path.is_file() or sha256_file(manifest_path) != run.evidence_digest:
+        manifest = load_verified_manifest(run, roots)
+    except EvidenceReadError as exc:
+        if "not reported" in str(exc):
             raise WorkbenchAPIError(
-                409, "ARTIFACT_INTEGRITY_ERROR", "run artifact digest does not match"
-            )
-        raw = json.loads(manifest_path.read_text(encoding="utf-8"))
-    except WorkbenchAPIError:
-        raise
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+                409, "ARTIFACT_UNAVAILABLE", "run artifact is not reported"
+            ) from exc
+        if "outside trusted storage" in str(exc):
+            raise WorkbenchAPIError(
+                409, "ARTIFACT_INTEGRITY_ERROR", "artifact is outside trusted storage"
+            ) from exc
         raise WorkbenchAPIError(
             409, "ARTIFACT_INTEGRITY_ERROR", "run artifact cannot be verified"
         ) from exc
-    suffix = f"-a{run.attempt}"
-    expected_run_id = f"{run.run_id}{suffix}"
-    if len(expected_run_id) > 100:
-        identity_digest = hashlib.sha256(expected_run_id.encode()).hexdigest()[:16]
-        prefix_length = 100 - len(suffix) - len(identity_digest) - 1
-        expected_run_id = f"{run.run_id[:prefix_length]}-{identity_digest}{suffix}"
-    if not isinstance(raw, dict) or raw.get("run_id") != expected_run_id:
-        raise WorkbenchAPIError(409, "ARTIFACT_INTEGRITY_ERROR", "run artifact identity mismatch")
-    return raw, manifest_path
+    return manifest.raw, manifest.path
 
 
 async def run_detail(session: AsyncSession, run_id: str, roots: tuple[Path, ...]) -> RunDetail:
@@ -603,7 +590,7 @@ async def trace_detail(
             trace_digest=None,
             events=(),
         )
-    raw, manifest_path = _safe_manifest(run, roots)
+    raw, _ = _safe_manifest(run, roots)
     trace_digest = raw.get("normalized_trace_digest")
     coverage = raw.get("trace_coverage")
     if not isinstance(trace_digest, str):
@@ -614,28 +601,20 @@ async def trace_detail(
             trace_digest=None,
             events=(),
         )
-    root = manifest_path.parent
-    trace_path = (root / "trace" / "normalized.json").resolve()
-    if root not in trace_path.parents:
-        raise WorkbenchAPIError(
-            409, "ARTIFACT_INTEGRITY_ERROR", "normalized trace escapes its run artifact"
-        )
     try:
-        if not trace_path.is_file() or sha256_file(trace_path) != trace_digest:
-            raise WorkbenchAPIError(
-                409, "ARTIFACT_INTEGRITY_ERROR", "normalized trace digest does not match"
-            )
-        trace = NormalizedTrace.model_validate_json(trace_path.read_text(encoding="utf-8"))
-    except WorkbenchAPIError:
-        raise
-    except (OSError, UnicodeDecodeError, ValidationError) as exc:
+        trace, verified_trace_digest, verified_coverage = load_normalized_trace(run, roots)
+    except EvidenceReadError as exc:
         raise WorkbenchAPIError(
             409, "ARTIFACT_INTEGRITY_ERROR", "normalized trace cannot be verified"
         ) from exc
+    if verified_trace_digest != trace_digest:
+        raise WorkbenchAPIError(
+            409, "ARTIFACT_INTEGRITY_ERROR", "normalized trace identity does not match"
+        )
     return TraceResponse(
         run_id=run_id,
         status="REPORTED",
-        coverage=coverage if isinstance(coverage, str) else None,
+        coverage=verified_coverage,
         trace_digest=trace_digest,
         events=tuple(
             TraceEvent(

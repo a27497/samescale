@@ -73,6 +73,7 @@ PHASE_J_PATTERNS = tuple(
     for pattern in (
         r"\bclass\s+AnalystAgent\b",
         r"\b(?:from|import)\s+langgraph\b",
+        r"\b(?:from|import)\s+harnesslab\.analyst\b",
     )
 )
 
@@ -336,9 +337,12 @@ def verify_task_toolchains() -> bool:
 
 def _phase_j_violation(relative: str, content: str) -> bool:
     path = Path(relative)
+    if "analyst" in path.parts:
+        return False
+    if path.as_posix() == "src/harnesslab/cli.py":
+        return False
     return (
-        "analyst" in path.parts
-        or "langgraph" in path.parts
+        "langgraph" in path.parts
         or path.name in PHASE_J_MODULE_NAMES
         or any(pattern.search(content) for pattern in PHASE_J_PATTERNS)
     )
@@ -367,7 +371,11 @@ def verify_source_and_scope() -> bool:
     print(f"GIT_DIRTY={bool(worktree.stdout.strip())}")
     sensitivity = (
         not _phase_j_violation("src/harnesslab/judgelab.py", ""),
-        _phase_j_violation("src/harnesslab/analyst/graph.py", "from langgraph import Graph"),
+        not _phase_j_violation("src/harnesslab/analyst/graph.py", "from langgraph import Graph"),
+        _phase_j_violation(
+            "src/harnesslab/harness_lane/bridge.py",
+            "from harnesslab.analyst import AnalystService",
+        ),
         not _phase_j_violation(
             "src/harnesslab/experiment/queue.py", "class ExperimentWorker: pass"
         ),
@@ -387,7 +395,7 @@ def verify_source_and_scope() -> bool:
     if violations:
         print(f"FAIL: Phase J implementation detected: {violations}")
         return False
-    print("PASS: Phase I allowed; no Phase J analyst or LangGraph code")
+    print("PASS: Phase E runtime remains isolated from the Phase J Analyst package")
     return True
 
 

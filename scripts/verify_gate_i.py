@@ -239,12 +239,9 @@ def verify_frontend_graph() -> bool:
 
 
 def verify_scope_and_safety() -> bool:
-    forbidden_paths = (
-        ROOT / "src/harnesslab/analyst",
-        ROOT / "src/harnesslab/langgraph",
-    )
+    forbidden_paths = (ROOT / "src/harnesslab/langgraph",)
     if any(path.exists() for path in forbidden_paths):
-        print("FAIL: Phase J Analyst or LangGraph scope detected")
+        print("FAIL: LangGraph escaped the isolated Phase J Analyst package")
         return False
     workbench_sources = "\n".join(
         path.read_text(encoding="utf-8")
@@ -286,7 +283,7 @@ def verify_scope_and_safety() -> bool:
     ):
         print("FAIL: production frontend contains forbidden private/path material")
         return False
-    print("SCOPE=Phase I only; no Analyst/LangGraph/provider trigger/tag/auth/SaaS surface PASS")
+    print("SCOPE=Phase I Workbench unchanged; no Analyst route/provider trigger/tag/auth/SaaS PASS")
     print("API_SAFETY=no credential, absolute path, private CoT, or arbitrary artifact path PASS")
     return True
 

@@ -7,7 +7,8 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 **Phase F — Multi-Harness + Comparability**, and
 **Phase G — Experiment Matrix + Repeated Runs + P-Lane + Statistics**, and
 **Phase H — JudgeLab + Judge Calibration**, and
-**Phase I — Read-only Workbench UI + Regression Compare**.
+**Phase I — Read-only Workbench UI + Regression Compare**, and
+**Phase J — Read-only Attribution Analyst**.
 
 ## Implemented now
 
@@ -78,6 +79,12 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 - Explicit `NOT_REPORTED` versus zero and `NOT_COMPARABLE` versus missing evidence semantics,
   with no browser-triggered model, Harness, or Judge execution
 - An authoritative non-recursive, fully keyless Gate I using real persisted Phase G/H fixtures
+- A LangGraph 1.2.11 `StateGraph` confined to a read-only Attribution Analyst package, with an
+  explicit 8-decision/12-tool-call bound and no generic Agent, RAG, or multi-agent runtime
+- Exactly six experiment-scoped evidence tools: `query_runs`, `compare_cells`, `inspect_trace`,
+  `inspect_failure`, `get_task_contract`, and `get_ablation`
+- Deterministic evidence citations, enforced `VERIFIED_FACT` versus `HYPOTHESIS`, canonical
+  JSON/Markdown reports, and a production-path keyless Gate J read-only proof
 - pytest integration/unit coverage, Ruff, mypy, and one authoritative Gate A runner
 - GitHub Actions using PostgreSQL 18 without model-provider credentials
 
@@ -90,8 +97,15 @@ JudgeLab is an L2 annotation and comparison layer. Evidence authority is
 
 Phase I implements a read-only evidence Workbench. Experiment and Judge execution remains in the
 approved CLI/operator paths. The browser cannot mutate outcomes, cancel runs, change task/gold
-data, or trigger provider execution. Analyst workflows, LangGraph, RAG, and multi-agent behavior
-remain out of scope.
+data, or trigger provider execution. Phase J does not add an Analyst browser route.
+
+## Analyst boundary
+
+Phase J is a read-only attribution layer over approved Phase G/H/I evidence. It uses LangGraph
+only for a bounded local decision/tool/finalize graph. Trace and task text are untrusted evidence,
+not instructions. The Analyst cannot execute subjects, enqueue or cancel work, invoke a provider,
+Harness, Judge, shell, browser, SQL, filesystem, or code tool, and cannot alter authoritative
+evaluation evidence. Trusted host code writes only a validated Analyst report after completion.
 
 ## Local setup
 
@@ -108,6 +122,8 @@ Gate I adds a keyless persisted two-task Matrix, Judge calibration fixture, trea
 manifest Regression proofs, trusted artifact-root escape tests, typed Workbench API tests, and
 frontend type/test/build checks. The frontend accepts compatible Node releases in
 `>=24.18.1 <25`.
+Gate J adds a keyless production queue/executor/manifest/report fixture, controlled ablation,
+strict citations, safe normalized-trace reads, no-ablation hypothesis proof, and source snapshots.
 
 ```powershell
 Copy-Item .env.example .env
@@ -123,6 +139,7 @@ uv run harnesslab harness deepseek doctor
 uv run harnesslab experiment --help
 uv run harnesslab judge suite validate judge_suites/core-calibration/1.0.0
 uv run harnesslab judge plan judge_suites/core-calibration/1.0.0/calibration.yaml
+uv run harnesslab analyst --help
 ```
 
 Start the frontend development server in a second shell:
@@ -241,6 +258,16 @@ uv run --locked python scripts/verify_gate_i.py
 
 All `REAL_*` evidence remains `NOT_RUN`; Gate I never uses provider or ambient Harness credentials.
 
+The non-recursive Phase J gate verifies the bounded graph, exact tool surface, persisted evidence
+reads, citations, fact/hypothesis boundary, controlled ablation, injection resistance,
+deterministic reports, and source immutability:
+
+```powershell
+uv run --locked python scripts/verify_gate_j.py
+```
+
+Gate J uses only `FakeAnalystBackend`; real external calls are not performed during analysis.
+
 See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_METHODOLOGY.md), and
 [Task Format](docs/TASK_FORMAT.md), [Sandbox Security](docs/SANDBOX_SECURITY.md), and
 [M-Lane Direct Model](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md),
@@ -248,3 +275,4 @@ See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_MET
 [Experiment Statistics](docs/EXPERIMENT_STATISTICS.md), and [Resume Scope](docs/RESUME_SCOPE.md).
 [JudgeLab](docs/JUDGELAB.md) documents the Phase H authority and calibration boundary, and
 [Workbench](docs/WORKBENCH.md) documents the Phase I read API and Vue evidence surface.
+[Attribution Analyst](docs/ANALYST.md) documents Phase J citations and read-only graph boundary.

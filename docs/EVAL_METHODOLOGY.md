@@ -170,3 +170,23 @@ hard-control drift. The page makes no causal or new significance claim and never
 
 Polling refreshes only durable PostgreSQL lifecycle state and stops at a terminal experiment.
 Route reconstruction triggers a new API fetch; Pinia is not persisted as authoritative evidence.
+
+## Attribution Analyst evidence claims
+
+Phase J adds no evidence authority. The hierarchy remains
+`L0 deterministic > L1 repository-curated human gold > L2 LLM Judge`; Analyst prose is a
+read-only explanation layer over persisted facts.
+
+Every factual conclusion is a `VERIFIED_FACT` with deterministic logical citations to returned
+run, trace-event, task-version, cell, pair, or ablation catalog entries. Digest bindings connect
+entries to plans, reports, manifests, or normalized traces where applicable. An invented citation
+rejects the draft.
+
+A `HYPOTHESIS` is interpretation not deterministically established by available evidence and must
+name evidence needed to verify or falsify it. Natural-language confidence never upgrades a
+hypothesis. Without a declared controlled ablation, causal attribution remains a hypothesis.
+
+A controlled ablation supports facts about its observed paired result, treatment, evidence tier,
+and Comparability limitations. It does not erase `PARTIALLY_COMPARABLE`, `NOT_COMPARABLE`, small-n,
+or informal-evidence limits. The Analyst introduces no statistics formula or significance result,
+and the approved infrastructure denominator remains unchanged.

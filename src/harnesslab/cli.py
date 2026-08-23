@@ -11,6 +11,7 @@ import uvicorn
 from pydantic import ValidationError
 
 from harnesslab import __version__
+from harnesslab.analyst.cli import analyst_app
 from harnesslab.comparability.engine import ComparabilityEngine
 from harnesslab.comparability.manifest import ComparabilityInputError, load_manifest_facts
 from harnesslab.comparability.models import ComparabilityIntent
@@ -51,6 +52,7 @@ app.add_typer(experiment_app, name="experiment")
 app.add_typer(run_app, name="run")
 app.add_typer(report_app, name="report")
 app.add_typer(judge_app, name="judge")
+app.add_typer(analyst_app, name="analyst")
 model_app.add_typer(model_profile_app, name="profile")
 harness_app.add_typer(codex_harness_app, name="codex")
 harness_app.add_typer(claude_harness_app, name="claude")
