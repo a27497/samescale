@@ -3,8 +3,13 @@ from __future__ import annotations
 import pytest
 
 from harnesslab.comparability.models import ComparabilityStatus
-from harnesslab.experiment.outcomes import StatisticalOutcome, normalize_lane_evidence
+from harnesslab.experiment.outcomes import (
+    StatisticalOutcome,
+    normalize_lane_evidence,
+    normalize_manifest_evidence,
+)
 from harnesslab.experiment.statistics import (
+    CellStatistics,
     EvidenceTier,
     PairObservation,
     RunObservation,
@@ -75,7 +80,7 @@ def test_lane_outcome_normalization_separates_subject_infra_and_cancellation() -
         normalize_lane_evidence(
             _Evidence(HarnessLaneOutcome.HARNESS_ERROR, HarnessFailureCategory.PROFILE_VIOLATION)
         )
-        is StatisticalOutcome.CAPABILITY_FAIL
+        is StatisticalOutcome.INFRA_FAILURE
     )
     assert (
         normalize_lane_evidence(
@@ -83,6 +88,31 @@ def test_lane_outcome_normalization_separates_subject_infra_and_cancellation() -
         )
         is StatisticalOutcome.CANCELLED
     )
+
+
+@pytest.mark.parametrize(
+    ("failure", "expected"),
+    [
+        (HarnessFailureCategory.MODEL_TURN_FAILED, StatisticalOutcome.CAPABILITY_FAIL),
+        (HarnessFailureCategory.PROCESS_ERROR, StatisticalOutcome.INFRA_FAILURE),
+        (HarnessFailureCategory.TIMEOUT, StatisticalOutcome.INFRA_FAILURE),
+        (HarnessFailureCategory.PROFILE_VIOLATION, StatisticalOutcome.INFRA_FAILURE),
+        (HarnessFailureCategory.CANCELLED, StatisticalOutcome.CANCELLED),
+    ],
+)
+def test_typed_and_persisted_harness_normalization_are_identical(
+    failure: HarnessFailureCategory, expected: StatisticalOutcome
+) -> None:
+    typed = _Evidence(HarnessLaneOutcome.HARNESS_ERROR, failure)
+    persisted = {
+        "outcome": HarnessLaneOutcome.HARNESS_ERROR.value,
+        "harness_failure": failure.value,
+    }
+
+    assert normalize_lane_evidence(typed) is expected
+    normalized = normalize_manifest_evidence(persisted)
+    assert normalized.outcome is expected
+    assert normalized.source_taxonomy == f"harness_error:{failure.value}"
 
 
 def test_infrastructure_failures_are_not_capability_failures_or_denominator_members() -> None:
@@ -184,3 +214,66 @@ def test_exact_mcnemar_and_comparability_gating() -> None:
     assert summary.binary is not None
     assert summary.binary.paired_count == 5
     assert summary.excluded_reason_counts == {"HARD_CONTROL_MISMATCH": 1}
+
+
+def test_repetition_eligibility_is_per_task_and_never_pooled() -> None:
+    def cell_summary(task_counts: dict[str, int]) -> CellStatistics:
+        items = tuple(
+            observation(index, StatisticalOutcome.CAPABILITY_PASS, task_id)
+            for task_id, count in task_counts.items()
+            for index in range(count)
+        )
+        return summarize_cell(
+            "per-task",
+            sum(task_counts.values()),
+            items,
+            intended_task_ids=tuple(task_counts),
+            bootstrap_resamples=99,
+        )
+
+    pooled_smoke = cell_summary({f"task-{index}": 1 for index in range(5)})
+    assert pooled_smoke.evidence_tier is EvidenceTier.SMOKE
+    assert not pooled_smoke.formal_eligible
+    assert cell_summary({"a": 3, "b": 3}).evidence_tier is EvidenceTier.INFORMAL
+    assert cell_summary({"a": 5, "b": 5}).evidence_tier is EvidenceTier.FORMAL
+    uneven = cell_summary({"a": 5, "b": 4})
+    assert uneven.evidence_tier is EvidenceTier.INFORMAL
+    assert not uneven.formal_eligible
+
+
+def test_pair_repetition_eligibility_requires_comparable_pairs_per_task() -> None:
+    def pair_item(task_id: str, index: int, status: ComparabilityStatus) -> PairObservation:
+        return PairObservation(
+            pair_id="per-task-pair",
+            task_id=task_id,
+            repeat_index=index,
+            paired_slot_identity=f"{task_id}-{index}",
+            left_pass=True,
+            right_pass=True,
+            comparability=status,
+            reason_codes=() if status is ComparabilityStatus.COMPARABLE else ("LIMITATION",),
+        )
+
+    pooled = tuple(
+        pair_item(f"task-{index}", 0, ComparabilityStatus.COMPARABLE) for index in range(5)
+    )
+    pooled_summary = summarize_pair(
+        "pooled", pooled, intended_task_ids=tuple(f"task-{index}" for index in range(5))
+    )
+    assert pooled_summary.evidence_tier is EvidenceTier.SMOKE
+    assert not pooled_summary.formal_eligible
+
+    formal = tuple(
+        pair_item(task_id, index, ComparabilityStatus.COMPARABLE)
+        for task_id in ("a", "b")
+        for index in range(5)
+    )
+    assert summarize_pair("formal", formal, intended_task_ids=("a", "b")).formal_eligible
+
+    lost_pair = (
+        *formal[:-1],
+        pair_item("b", 4, ComparabilityStatus.PARTIALLY_COMPARABLE),
+    )
+    lost_summary = summarize_pair("lost", lost_pair, intended_task_ids=("a", "b"))
+    assert not lost_summary.formal_eligible
+    assert [item.comparable_pairs for item in lost_summary.per_task_evidence] == [5, 4]

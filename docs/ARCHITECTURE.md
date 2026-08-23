@@ -177,17 +177,20 @@ ExperimentSpec -> ExperimentPlan -> PostgreSQL experiment/cell/run rows
 Claims record owner, heartbeat, expiry, and observable attempt count. Expired active work is
 reclaimable, non-owners cannot heartbeat or release it, and cancellation is durable. Planning is
 idempotent through immutable plan checks plus database logical-slot uniqueness. The worker is a
-bounded in-process loop and dispatches to approved lane runners through injected bindings.
+bounded in-process loop and dispatches to approved lane runners through injected bindings. It
+heartbeats throughout active runner execution, gives every attempt a distinct artifact identity,
+and fails closed after lease loss or cancellation.
 
 Reports re-open each persisted manifest, verify its digest, extract Phase F ComparisonFacts, and
-derive metrics from those bytes. P-Lane pairs exact task/repeat slots and always invokes
+derive metrics from those bytes. The executor applies the same manifest-vs-slot control validator
+before attaching capability evidence. P-Lane pairs exact task/repeat slots and always invokes
 ComparabilityEngine. Ablations declare one treatment dimension; undeclared hard-control drift is
 rejected. JSON and Markdown reports omit timestamps from identity.
 
 NumPy, pandas, and SciPy supply Wilson, pass@k, descriptive, deterministic bootstrap, and exact
 paired statistics. Infrastructure failures remain outside capability denominators. Formal claims
-require sufficient repetition and `COMPARABLE`; smoke, insufficient, and `NOT_COMPARABLE`
-evidence cannot enter formal ordering.
+require sufficient repetition per intended task and `COMPARABLE` pairs per intended task; pooled
+smoke, insufficient, and `NOT_COMPARABLE` evidence cannot enter formal ordering.
 
 ## Planned Core boundaries
 

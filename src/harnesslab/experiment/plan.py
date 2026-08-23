@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
@@ -107,7 +108,13 @@ class ExperimentPlan(BaseModel):
         return "sha256:" + hashlib.sha256(self.canonical_json().encode()).hexdigest()
 
 
-def _resolve_task(repository_root: Path, package_path: str) -> PlannedTask:
+@dataclass(frozen=True)
+class _ResolvedTask:
+    task: PlannedTask
+    lane_support: frozenset[EvaluationLane]
+
+
+def _resolve_task(repository_root: Path, package_path: str) -> _ResolvedTask:
     candidate = (repository_root / package_path).resolve()
     tasks_root = (repository_root / "tasks").resolve()
     if tasks_root not in candidate.parents:
@@ -117,32 +124,49 @@ def _resolve_task(repository_root: Path, package_path: str) -> PlannedTask:
     except TaskPackageError as exc:
         raise ExperimentSpecError(f"cannot resolve task package {package_path}: {exc}") from exc
     definition = package.definition
-    return PlannedTask(
-        package_path=package_path,
-        task_id=definition.id,
-        task_version=definition.version,
-        task_digest=definition.content_digest,
-        workspace_input_digest=definition.workspace.digest,
-        context_identity=definition.context_bundle.digest if definition.context_bundle else None,
-        verifier_identity=package.verifier_digest,
-        budget_identity=canonical_digest(definition.budget.model_dump(mode="json")),
-        network_policy=definition.budget.network_policy,
+    return _ResolvedTask(
+        task=PlannedTask(
+            package_path=package_path,
+            task_id=definition.id,
+            task_version=definition.version,
+            task_digest=definition.content_digest,
+            workspace_input_digest=definition.workspace.digest,
+            context_identity=(
+                definition.context_bundle.digest if definition.context_bundle else None
+            ),
+            verifier_identity=package.verifier_digest,
+            budget_identity=canonical_digest(definition.budget.model_dump(mode="json")),
+            network_policy=definition.budget.network_policy,
+        ),
+        lane_support=definition.lane_support,
     )
 
 
 def build_experiment_plan(spec: ExperimentSpec, repository_root: Path) -> ExperimentPlan:
-    tasks = tuple(
+    resolved_tasks = tuple(
         sorted(
             (_resolve_task(repository_root, path) for path in spec.task_packages),
-            key=lambda task: (task.task_id, task.task_version, task.task_digest),
+            key=lambda resolved: (
+                resolved.task.task_id,
+                resolved.task.task_version,
+                resolved.task.task_digest,
+            ),
         )
     )
+    tasks = tuple(resolved.task for resolved in resolved_tasks)
+    lane_support = {
+        resolved.task.package_path: resolved.lane_support for resolved in resolved_tasks
+    }
     cells = tuple(
         sorted((PlannedCell.from_spec(cell) for cell in spec.cells), key=lambda cell: cell.id)
     )
     slots: list[ExperimentRunSlot] = []
     for cell in cells:
         for task in tasks:
+            if cell.lane not in lane_support[task.package_path]:
+                raise ExperimentSpecError(
+                    f"task {task.task_id} does not support cell {cell.id} lane {cell.lane.value}"
+                )
             if cell.resource_budget_identity != task.budget_identity:
                 raise ExperimentSpecError(
                     f"cell {cell.id} budget identity does not match task {task.task_id}"

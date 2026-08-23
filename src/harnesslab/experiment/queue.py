@@ -248,8 +248,17 @@ async def heartbeat_run(
     _require_active_owner(run, owner, now)
     if run.status not in ACTIVE_STATUSES:
         raise ExperimentConflict("terminal or queued run cannot heartbeat")
-    run.heartbeat_at = now
-    run.lease_expires_at = now + ttl
+    if run.cancellation_requested:
+        run.status = RunStatus.CANCELLED.value
+        run.normalized_outcome = StatisticalOutcome.CANCELLED.value
+        run.source_outcome = "cancellation_requested"
+        run.finished_at = now
+        run.lease_owner = None
+        run.lease_expires_at = None
+        run.heartbeat_at = now
+    else:
+        run.heartbeat_at = now
+        run.lease_expires_at = now + ttl
     await session.flush()
     return _snapshot(run)
 
@@ -330,9 +339,15 @@ async def finish_run(
     _require_active_owner(run, owner, now)
     if run.status != RunStatus.SCORING.value:
         raise ExperimentConflict("a run may finish only after scoring")
-    if run.cancellation_requested or normalized_outcome is StatisticalOutcome.CANCELLED:
+    if run.cancellation_requested:
         terminal = RunStatus.CANCELLED
         normalized_outcome = StatisticalOutcome.CANCELLED
+        source_outcome = "cancellation_requested"
+        artifact_manifest_path = None
+        evidence_digest = None
+        failure_detail = None
+    elif normalized_outcome is StatisticalOutcome.CANCELLED:
+        terminal = RunStatus.CANCELLED
     elif normalized_outcome is StatisticalOutcome.INFRA_FAILURE:
         terminal = RunStatus.FAILED_INFRA
     elif normalized_outcome is StatisticalOutcome.CAPABILITY_FAIL:

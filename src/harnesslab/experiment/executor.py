@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import asyncio
+import hashlib
+import json
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -14,11 +17,21 @@ from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.model import ModelProfile
 from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
-from harnesslab.experiment.outcomes import StatisticalOutcome, normalize_lane_evidence
+from harnesslab.experiment.evidence import (
+    ManifestControlMismatch,
+    validate_manifest_against_slot,
+)
+from harnesslab.experiment.outcomes import (
+    StatisticalOutcome,
+    normalize_lane_evidence,
+    source_taxonomy_from_lane_evidence,
+)
 from harnesslab.experiment.queue import (
     RunSnapshot,
     claim_next_run,
     finish_run,
+    heartbeat_run,
+    inspect_run,
     transition_run,
 )
 from harnesslab.harness_lane.adapter import CodexBackend
@@ -155,6 +168,20 @@ def _now() -> datetime:
     return datetime.now(UTC)
 
 
+def attempt_execution_id(claimed: RunSnapshot) -> str:
+    """Keep logical queue identity stable while isolating each physical attempt artifact."""
+
+    if claimed.attempt < 1:
+        raise ValueError("claimed run must have a positive attempt number")
+    suffix = f"-a{claimed.attempt}"
+    candidate = f"{claimed.run_id}{suffix}"
+    if len(candidate) <= 100:
+        return candidate
+    digest = hashlib.sha256(candidate.encode()).hexdigest()[:16]
+    prefix_length = 100 - len(suffix) - len(digest) - 1
+    return f"{claimed.run_id[:prefix_length]}-{digest}{suffix}"
+
+
 class ExperimentRunExecutor:
     """Dispatch durable slots through existing lane runners; never reimplements a runner."""
 
@@ -166,6 +193,7 @@ class ExperimentRunExecutor:
         bindings: Mapping[str, ExperimentLaneBinding],
         owner: str,
         lease_ttl: timedelta = timedelta(minutes=15),
+        heartbeat_cadence: timedelta | None = None,
         clock: Callable[[], datetime] = _now,
     ) -> None:
         self.repository_root = repository_root.resolve()
@@ -173,6 +201,11 @@ class ExperimentRunExecutor:
         self.bindings = dict(bindings)
         self.owner = owner
         self.lease_ttl = lease_ttl
+        self.heartbeat_cadence = heartbeat_cadence or lease_ttl / 3
+        if self.heartbeat_cadence <= timedelta(0):
+            raise ValueError("heartbeat cadence must be positive")
+        if self.heartbeat_cadence > lease_ttl / 3:
+            raise ValueError("heartbeat cadence must not exceed one third of the lease ttl")
         self.clock = clock
 
     async def claim(self, experiment_id: str) -> RunSnapshot | None:
@@ -189,36 +222,114 @@ class ExperimentRunExecutor:
         async with self.session_factory() as session, session.begin():
             return await transition_run(session, run_id, self.owner, status, now=self.clock())
 
+    async def _heartbeat(self, run_id: str) -> RunSnapshot:
+        async with self.session_factory() as session, session.begin():
+            return await heartbeat_run(
+                session,
+                run_id,
+                self.owner,
+                now=self.clock(),
+                ttl=self.lease_ttl,
+            )
+
+    async def _inspect(self, run_id: str) -> RunSnapshot:
+        async with self.session_factory() as session:
+            return await inspect_run(session, run_id)
+
+    async def _maintain_heartbeat(
+        self,
+        run_id: str,
+        stop: asyncio.Event,
+        lost: asyncio.Event,
+        cancelled: asyncio.Event,
+    ) -> None:
+        while not stop.is_set():
+            try:
+                await asyncio.wait_for(stop.wait(), timeout=self.heartbeat_cadence.total_seconds())
+                return
+            except TimeoutError:
+                pass
+            try:
+                snapshot = await self._heartbeat(run_id)
+            except Exception:
+                lost.set()
+                return
+            if snapshot.status is RunStatus.CANCELLED:
+                cancelled.set()
+                return
+            if snapshot.lease_owner != self.owner:
+                lost.set()
+                return
+
     async def execute(self, claimed: RunSnapshot) -> RunSnapshot:
         if claimed.status is not RunStatus.CLAIMED or claimed.lease_owner != self.owner:
             raise ValueError("executor requires a run claimed by its own worker identity")
         binding = self.bindings.get(claimed.cell_id)
-        await self._transition(claimed.run_id, RunStatus.PREPARING)
-        await self._transition(claimed.run_id, RunStatus.RUNNING)
+        preparing = await self._transition(claimed.run_id, RunStatus.PREPARING)
+        if preparing.status is RunStatus.CANCELLED:
+            return preparing
+        running = await self._transition(claimed.run_id, RunStatus.RUNNING)
+        if running.status is RunStatus.CANCELLED:
+            return running
         result: LaneRunResult | None = None
         error: Exception | None = None
+        heartbeat_stop = asyncio.Event()
+        heartbeat_lost = asyncio.Event()
+        heartbeat_cancelled = asyncio.Event()
+        heartbeat_task = asyncio.create_task(
+            self._maintain_heartbeat(
+                claimed.run_id,
+                heartbeat_stop,
+                heartbeat_lost,
+                heartbeat_cancelled,
+            )
+        )
         try:
             if binding is None:
                 raise RuntimeError(f"no runner binding for cell {claimed.cell_id}")
             task_path = (self.repository_root / claimed.slot.task.package_path).resolve()
-            result = await binding.run(task_path, claimed.run_id)
+            result = await binding.run(task_path, attempt_execution_id(claimed))
         except Exception as exc:  # durable worker boundary normalizes unexpected infrastructure
             error = exc
+        finally:
+            heartbeat_stop.set()
+            await heartbeat_task
 
-        await self._transition(claimed.run_id, RunStatus.VERIFYING)
-        await self._transition(claimed.run_id, RunStatus.SCORING)
+        if heartbeat_lost.is_set() or heartbeat_cancelled.is_set():
+            return await self._inspect(claimed.run_id)
+
+        verifying = await self._transition(claimed.run_id, RunStatus.VERIFYING)
+        if verifying.status is RunStatus.CANCELLED:
+            return verifying
+        scoring = await self._transition(claimed.run_id, RunStatus.SCORING)
+        if scoring.status is RunStatus.CANCELLED:
+            return scoring
         if result is None:
             return await self._finish_infra(claimed.run_id, error)
 
         evidence = result.evidence
         manifest = result.artifact_directory / "manifest.json"
         outcome = normalize_lane_evidence(evidence)
+        source_outcome = source_taxonomy_from_lane_evidence(evidence)
         failure_detail: str | None = None
+        authoritative_manifest: str | None = str(manifest)
         try:
-            load_manifest_facts(manifest)
+            raw = json.loads(manifest.read_text(encoding="utf-8"))
+            if not isinstance(raw, dict):
+                raise ValueError("persisted manifest must contain an object")
+            facts = load_manifest_facts(manifest)
+            validate_manifest_against_slot(raw, facts, claimed.slot)
             digest = sha256_file(manifest)
+        except ManifestControlMismatch as exc:
+            outcome = StatisticalOutcome.INFRA_FAILURE
+            source_outcome = "control_identity_mismatch"
+            authoritative_manifest = None
+            digest = None
+            failure_detail = f"CONTROL_IDENTITY_MISMATCH: {','.join(exc.mismatches)}"
         except Exception as exc:
             outcome = StatisticalOutcome.INFRA_FAILURE
+            source_outcome = "artifact_validation_error"
+            authoritative_manifest = None
             digest = None
             failure_detail = f"persisted manifest validation failed: {type(exc).__name__}"
         metrics = _metrics(evidence)
@@ -229,8 +340,8 @@ class ExperimentRunExecutor:
                 self.owner,
                 now=self.clock(),
                 normalized_outcome=outcome,
-                source_outcome=evidence.outcome.value,
-                artifact_manifest_path=str(manifest),
+                source_outcome=source_outcome,
+                artifact_manifest_path=authoritative_manifest,
                 evidence_digest=digest,
                 failure_detail=failure_detail,
                 duration_ms=metrics.duration_ms,

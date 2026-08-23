@@ -18,7 +18,14 @@ from harnesslab.comparability.models import (
     ComparisonFacts,
 )
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
-from harnesslab.experiment.outcomes import StatisticalOutcome
+from harnesslab.experiment.evidence import (
+    ManifestControlMismatch,
+    validate_manifest_against_slot,
+)
+from harnesslab.experiment.outcomes import (
+    StatisticalOutcome,
+    normalize_manifest_evidence,
+)
 from harnesslab.experiment.plan import ExperimentPlan, ExperimentRunSlot
 from harnesslab.experiment.statistics import (
     CellStatistics,
@@ -162,22 +169,6 @@ class ExperimentReport(BaseModel):
         return "\n".join(lines)
 
 
-def _normalized_from_manifest(raw: dict[str, Any]) -> StatisticalOutcome:
-    outcome = raw.get("outcome")
-    if outcome == "verified_pass":
-        return StatisticalOutcome.CAPABILITY_PASS
-    if outcome in {
-        "verified_fail",
-        "subject_refusal",
-        "subject_output_error",
-        "harness_error",
-    }:
-        return StatisticalOutcome.CAPABILITY_FAIL
-    if outcome in {"provider_error", "infra_error", "artifact_error"}:
-        return StatisticalOutcome.INFRA_FAILURE
-    raise ExperimentReportError(f"unsupported persisted source outcome: {outcome!r}")
-
-
 def _number(value: object) -> float | None:
     if isinstance(value, int | float) and not isinstance(value, bool):
         return float(value)
@@ -231,43 +222,6 @@ def _load_persisted_manifest(
     return raw, load_manifest_facts(path)
 
 
-def _validate_manifest_against_slot(
-    raw: dict[str, Any], facts: ComparisonFacts, slot: ExperimentRunSlot
-) -> None:
-    expected: dict[str, str | None] = {
-        "task_id": slot.task.task_id,
-        "task_version": slot.task.task_version,
-        "task_digest": slot.task.task_digest,
-        "workspace_input_digest": slot.task.workspace_input_digest,
-        "context_identity": slot.task.context_identity or "NONE",
-        "requested_model": slot.requested_model,
-        "provider_route": slot.provider_route,
-        "budget_identity": slot.task.budget_identity,
-        "network_policy": slot.task.network_policy.value,
-        "harness": slot.harness,
-        "harness_version": slot.harness_version,
-        "harness_profile_identity": slot.profile_identity,
-    }
-    mismatches = [name for name, value in expected.items() if getattr(facts, name) != value]
-    profile_hash = raw.get("profile_hash")
-    if profile_hash is not None and profile_hash != slot.harness_config_identity:
-        mismatches.append("harness_config_identity")
-    generation = raw.get("generation_settings")
-    profile = raw.get("profile")
-    actual_effort: object = None
-    if isinstance(generation, dict):
-        actual_effort = generation.get("effort")
-    elif isinstance(profile, dict):
-        actual_effort = profile.get("reasoning_effort")
-    if actual_effort != slot.reasoning_effort:
-        mismatches.append("reasoning_effort")
-    if mismatches:
-        raise ExperimentReportError(
-            "persisted manifest disagrees with immutable plan controls: "
-            + ",".join(sorted(set(mismatches)))
-        )
-
-
 async def build_experiment_report(
     session: AsyncSession,
     experiment_id: str,
@@ -311,13 +265,21 @@ async def build_experiment_report(
         if has_artifact:
             raw, facts = _load_persisted_manifest(run)
             slot = ExperimentRunSlot.model_validate(run.slot_json)
-            _validate_manifest_against_slot(raw, facts, slot)
-            manifest_outcome = _normalized_from_manifest(raw)
-            if normalized is not manifest_outcome:
+            try:
+                validate_manifest_against_slot(raw, facts, slot)
+            except ManifestControlMismatch as exc:
+                raise ExperimentReportError(str(exc)) from exc
+            try:
+                manifest_evidence = normalize_manifest_evidence(raw)
+            except ValueError as exc:
+                raise ExperimentReportError(
+                    f"unsupported persisted source outcome: {raw.get('outcome')!r}"
+                ) from exc
+            if normalized is not manifest_evidence.outcome:
                 raise ExperimentReportError(
                     f"run {run.run_id} normalized outcome disagrees with immutable evidence"
                 )
-            if raw.get("outcome") != run.source_outcome:
+            if manifest_evidence.source_taxonomy != run.source_outcome:
                 raise ExperimentReportError(
                     f"run {run.run_id} source outcome disagrees with immutable evidence"
                 )
@@ -353,6 +315,7 @@ async def build_experiment_report(
             cell.id,
             sum(slot.cell_id == cell.id for slot in plan.run_slots),
             tuple(observations_by_cell[cell.id]),
+            intended_task_ids=tuple(task.task_id for task in plan.tasks),
             seed=plan.execution_seed,
             bootstrap_resamples=bootstrap_resamples,
         )
@@ -435,6 +398,7 @@ async def build_experiment_report(
             summarize_pair(
                 pair.id,
                 observations,
+                intended_task_ids=tuple(task.task_id for task in plan.tasks),
                 seed=plan.execution_seed,
                 bootstrap_resamples=bootstrap_resamples,
             )
@@ -458,6 +422,7 @@ async def build_experiment_report(
                 comparison=summarize_pair(
                     pair_id,
                     observations,
+                    intended_task_ids=tuple(task.task_id for task in plan.tasks),
                     seed=plan.execution_seed,
                     bootstrap_resamples=bootstrap_resamples,
                 ),

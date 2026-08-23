@@ -62,6 +62,14 @@ class RunObservation(BaseModel):
     explicit_cost: float | None = Field(default=None, ge=0)
 
 
+class TaskEvidenceStatistics(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    task_id: str
+    capability_observations: int = Field(ge=0)
+    evidence_tier: EvidenceTier
+
+
 class CellStatistics(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -83,6 +91,7 @@ class CellStatistics(BaseModel):
     steps: ContinuousStatistics
     infra_failure_rate: float = Field(ge=0.0, le=1.0)
     failure_taxonomy_counts: dict[str, int]
+    per_task_evidence: tuple[TaskEvidenceStatistics, ...]
     evidence_tier: EvidenceTier
     controls_valid: bool
     formal_eligible: bool
@@ -126,6 +135,14 @@ class PairObservation(BaseModel):
     reason_codes: tuple[str, ...] = ()
 
 
+class TaskPairEvidenceStatistics(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    task_id: str
+    comparable_pairs: int = Field(ge=0)
+    evidence_tier: EvidenceTier
+
+
 class PairStatistics(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -135,6 +152,7 @@ class PairStatistics(BaseModel):
     partially_comparable_pairs: int = Field(ge=0)
     not_comparable_pairs: int = Field(ge=0)
     excluded_reason_counts: dict[str, int]
+    per_task_evidence: tuple[TaskPairEvidenceStatistics, ...]
     evidence_tier: EvidenceTier
     formal_eligible: bool
     binary: PairedBinaryStatistics | None
@@ -149,6 +167,20 @@ def evidence_tier(
     if valid_capability_observations >= 3:
         return EvidenceTier.INFORMAL
     if valid_capability_observations == 1:
+        return EvidenceTier.SMOKE
+    return EvidenceTier.INSUFFICIENT
+
+
+def aggregate_evidence_tier(
+    per_task_counts: tuple[int, ...], *, controls_valid: bool = True
+) -> EvidenceTier:
+    """Conservatively tier a matrix without pooling repetitions across tasks."""
+
+    if per_task_counts and controls_valid and all(count >= 5 for count in per_task_counts):
+        return EvidenceTier.FORMAL
+    if per_task_counts and all(count >= 3 for count in per_task_counts):
+        return EvidenceTier.INFORMAL
+    if per_task_counts and all(count == 1 for count in per_task_counts):
         return EvidenceTier.SMOKE
     return EvidenceTier.INSUFFICIENT
 
@@ -248,6 +280,7 @@ def summarize_cell(
     planned_runs: int,
     observations: tuple[RunObservation, ...],
     *,
+    intended_task_ids: tuple[str, ...] | None = None,
     controls_valid: bool = True,
     seed: int = 0,
     bootstrap_resamples: int = 9_999,
@@ -273,7 +306,24 @@ def summarize_cell(
             resamples=bootstrap_resamples,
         )
 
-    tier = evidence_tier(capability_total, controls_valid=controls_valid)
+    task_ids = intended_task_ids or tuple(sorted({item.task_id for item in observations}))
+    capability_by_task = Counter(
+        item.task_id
+        for item in observations
+        if item.outcome in {StatisticalOutcome.CAPABILITY_PASS, StatisticalOutcome.CAPABILITY_FAIL}
+    )
+    per_task = tuple(
+        TaskEvidenceStatistics(
+            task_id=task_id,
+            capability_observations=capability_by_task[task_id],
+            evidence_tier=evidence_tier(capability_by_task[task_id], controls_valid=controls_valid),
+        )
+        for task_id in task_ids
+    )
+    tier = aggregate_evidence_tier(
+        tuple(item.capability_observations for item in per_task),
+        controls_valid=controls_valid,
+    )
     costs = tuple(item.explicit_cost for item in observations)
     cost_available = bool(costs) and all(value is not None for value in costs)
     return CellStatistics(
@@ -294,6 +344,7 @@ def summarize_cell(
         steps=continuous("steps"),
         infra_failure_rate=infra / planned_runs if planned_runs else 0.0,
         failure_taxonomy_counts=dict(sorted(taxonomy.items())),
+        per_task_evidence=per_task,
         evidence_tier=tier,
         controls_valid=controls_valid,
         formal_eligible=tier is EvidenceTier.FORMAL,
@@ -356,6 +407,7 @@ def summarize_pair(
     pair_id: str,
     observations: tuple[PairObservation, ...],
     *,
+    intended_task_ids: tuple[str, ...] | None = None,
     seed: int = 0,
     bootstrap_resamples: int = 9_999,
 ) -> PairStatistics:
@@ -372,7 +424,17 @@ def summarize_pair(
         if item.comparability is not ComparabilityStatus.COMPARABLE
         for reason in item.reason_codes
     )
-    tier = evidence_tier(len(comparable))
+    task_ids = intended_task_ids or tuple(sorted({item.task_id for item in observations}))
+    comparable_by_task = Counter(item.task_id for item in comparable)
+    per_task = tuple(
+        TaskPairEvidenceStatistics(
+            task_id=task_id,
+            comparable_pairs=comparable_by_task[task_id],
+            evidence_tier=evidence_tier(comparable_by_task[task_id]),
+        )
+        for task_id in task_ids
+    )
+    tier = aggregate_evidence_tier(tuple(item.comparable_pairs for item in per_task))
     latency_pairs = tuple(
         (item.left_duration_ms, item.right_duration_ms)
         for item in comparable
@@ -386,6 +448,7 @@ def summarize_pair(
         partially_comparable_pairs=partial,
         not_comparable_pairs=blocked,
         excluded_reason_counts=dict(sorted(reasons.items())),
+        per_task_evidence=per_task,
         evidence_tier=tier,
         formal_eligible=tier is EvidenceTier.FORMAL,
         binary=paired_binary_statistics(

@@ -85,14 +85,21 @@ agent message claiming success followed by `turn.completed` and exit zero can st
 ## Repeated experiments and failure attribution
 
 Single runs are samples, not stable rankings. Phase G labels one valid capability observation
-`SMOKE`, at least three `INFORMAL`, and at least five `FORMAL` when controls are valid. An n=1 smoke
-cannot enter formal ranking, paired claims, or confidence-interval conclusions.
+per intended task `SMOKE`, at least three per task `INFORMAL`, and at least five per task `FORMAL`
+when controls are valid. Observations from unrelated tasks are never pooled to upgrade this tier.
+An n=1-per-task smoke cannot enter formal ranking, paired claims, or confidence-interval
+conclusions. Formal paired evidence similarly requires five `COMPARABLE` pairs per intended task.
 
 Infrastructure failures (service outage, sandbox startup, credential routing, worker, verifier,
 or artifact failure) are classified separately from capability failures. The capability success
 rate denominator is capability passes plus capability failures, never all planned slots. A
 five-slot cell with one infrastructure failure reports planned=5, capability n=4, and infra=1
 without a replacement run.
+
+Harness configuration, authentication, timeout, process, protocol, profile-violation, and artifact
+failures are infrastructure/control failures rather than subject capability failures. Only a
+Harness model-turn failure enters the capability-failure denominator; cancellation remains its own
+disclosed outcome.
 
 Phase G reports Wilson 95% intervals for binary capability outcomes. The standard pass@k estimator
 is calculated per task and macro-aggregated; n<k is `NOT_AVAILABLE`. Continuous latency, token,

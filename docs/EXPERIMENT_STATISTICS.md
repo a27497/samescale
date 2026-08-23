@@ -17,25 +17,35 @@ mutate an existing experiment id.
 
 Workers claim eligible rows transactionally with `SELECT ... FOR UPDATE SKIP LOCKED`. A claim
 records owner, expiry, heartbeat, and attempt. Only the active owner can heartbeat or release;
-expired work can be reclaimed, and cancellation is durable. The lifecycle is:
+expired work can be reclaimed, and cancellation is durable. While a runner is active, the worker
+automatically renews the lease at no more than one third of its TTL. A worker that loses ownership
+cannot transition or terminalize the durable row. Each physical attempt receives a distinct
+attempt-scoped artifact run id while the logical PostgreSQL run id remains stable. The lifecycle is:
 
 `QUEUED -> CLAIMED -> PREPARING -> RUNNING -> VERIFYING -> SCORING -> COMPLETED`
 
 Terminal alternatives are `FAILED_INFRA`, `FAILED_SUBJECT`, and `CANCELLED`. The bounded local
 worker calls existing lane runners; it does not duplicate workspace or Hidden Verifier logic.
 PostgreSQL stores manifest references/digests, not transcripts, workspaces, credentials, or private
-reasoning.
+reasoning. Cancellation short-circuits later transitions and never promotes a cancelled physical
+attempt into authoritative capability evidence.
 
 ## Repetition and denominators
 
-- n=1 valid capability observation is `SMOKE` only.
-- n>=3 but below the formal target is `INFORMAL`.
-- n>=5 with valid controls is `FORMAL`.
+- n=1 valid capability observation per intended task is `SMOKE` only.
+- n>=3 per intended task, but below the formal target, is `INFORMAL`.
+- n>=5 per intended task with valid controls is `FORMAL`.
 - Other sample counts are `INSUFFICIENT`.
+
+Counts are never pooled across unrelated tasks to upgrade a cell or pair. Formal paired evidence
+likewise requires five `COMPARABLE` capability pairs for every intended task.
 
 Infrastructure failure is not model-capability failure. Capability success rate and Wilson 95%
 use `capability_passes + capability_failures`. Planned slots, infrastructure failures, and
 cancellations are separately disclosed. There is no default replacement run.
+Harness `MODEL_TURN_FAILED` is capability failure; configuration, authentication, timeout,
+process, protocol, profile-violation, and artifact failures are infrastructure. Cancellation is
+reported separately.
 
 ## Statistical evidence
 
@@ -62,10 +72,13 @@ Comparability limitations prevent causal interpretation.
 
 ## Reports and boundaries
 
-The authoritative report path is runner -> persisted manifest -> persisted run reference/digest ->
-manifest loader -> statistics/report. Canonical JSON and concise Markdown are deterministic for
-the same persisted state. Formal ordering includes only sufficiently repeated cells participating
-in a formal `COMPARABLE` pair.
+The authoritative report path is runner -> persisted manifest -> control validation against the
+immutable slot -> persisted run reference/digest -> manifest loader -> statistics/report. Execution
+and report reopening use the same validator and outcome normalization policy. Mismatched evidence
+is an infrastructure/control-identity failure and is not attached as authoritative experiment
+evidence. Canonical JSON and concise Markdown are deterministic for the same persisted state.
+Formal ordering includes only sufficiently repeated cells participating in a formal `COMPARABLE`
+pair. Plan construction also rejects any task/cell combination whose declared lane is unsupported.
 
 `REAL_MATRIX_EVIDENCE=NOT_RUN` is the default. Gate G is keyless and deterministic. JudgeLab,
 judge calibration, UI, analyst agents, RAG, multi-agent frameworks, Redis, Celery, Kafka, and

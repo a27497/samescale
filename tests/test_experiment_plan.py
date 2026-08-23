@@ -5,9 +5,11 @@ import json
 import pytest
 from pydantic import ValidationError
 
+from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.common import EvaluationLane
 from harnesslab.experiment.plan import build_experiment_plan
 from harnesslab.experiment.spec import ExperimentSpec, ExperimentSpecError
+from harnesslab.tasks.package import TaskPackage
 from tests.phase_g_helpers import ROOT, basic_spec, cell, identity
 
 
@@ -124,3 +126,25 @@ def test_controlled_ablation_accepts_one_treatment_and_rejects_hard_drift() -> N
     raw["cells"][1] = json.loads(drifted.model_dump_json())
     with pytest.raises(ValidationError, match="undeclared hard-control drift: provider_route"):
         ExperimentSpec.model_validate(raw)
+
+
+def test_plan_rejects_cell_lane_unsupported_by_real_task() -> None:
+    task_path = "tasks/micro-java-clamp/1.0.0"
+    package = TaskPackage.load(ROOT / task_path)
+    model_cell = cell("model", EvaluationLane.MODEL).model_copy(
+        update={
+            "resource_budget_identity": canonical_digest(
+                package.definition.budget.model_dump(mode="json")
+            ),
+            "network_policy": package.definition.budget.network_policy,
+        }
+    )
+    spec = ExperimentSpec(
+        experiment_id="unsupported-lane",
+        name="Reject unsupported task lane",
+        task_packages=(task_path,),
+        cells=(model_cell,),
+    )
+
+    with pytest.raises(ExperimentSpecError, match=r"does not support.*lane M"):
+        build_experiment_plan(spec, ROOT)

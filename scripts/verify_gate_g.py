@@ -40,6 +40,7 @@ PHASE_G_TESTS = (
     "tests/test_experiment_statistics.py",
     "tests/test_experiment_comparability.py",
     "tests/test_experiment_queue.py",
+    "tests/test_experiment_executor_safety.py",
     "tests/test_experiment_e2e.py",
     "tests/test_experiment_cli.py",
 )
@@ -47,16 +48,24 @@ CRITICAL_TESTS = {
     "test_strict_experiment_spec_and_deterministic_matrix_plan",
     "test_plan_digest_changes_with_resolved_control_identity",
     "test_controlled_ablation_accepts_one_treatment_and_rejects_hard_drift",
+    "test_plan_rejects_cell_lane_unsupported_by_real_task",
     "test_repeated_run_tiers_are_conservative",
     "test_lane_outcome_normalization_separates_subject_infra_and_cancellation",
     "test_infrastructure_failures_are_not_capability_failures_or_denominator_members",
     "test_pass_at_k_boundaries_and_macro_per_task",
     "test_continuous_bootstrap_is_deterministic_and_paired",
     "test_exact_mcnemar_and_comparability_gating",
+    "test_repetition_eligibility_is_per_task_and_never_pooled",
+    "test_pair_repetition_eligibility_requires_comparable_pairs_per_task",
     "test_controlled_keyless_p_lane_and_negative_comparability_sensitivity",
     "test_postgresql_durable_queue_skip_locked_lease_and_idempotency",
     "test_phase_f_to_phase_g_migration_preserves_execution_lease",
+    "test_executor_heartbeat_protects_active_run_and_lost_owner_cannot_write",
+    "test_executor_cancellation_short_circuits_after_active_binding_returns",
+    "test_reclaimed_attempt_passes_unique_attempt_artifact_identity",
     "test_keyless_experiment_e2e_uses_queue_runners_manifests_and_report",
+    "test_harness_infra_profile_and_cancel_manifests_reopen_consistently",
+    "test_executor_rejects_successful_binding_that_disagrees_with_slot",
     "test_phase_g_cli_surface_and_canonical_plan_output",
     "test_phase_g_nested_cli_help",
 }
@@ -140,7 +149,12 @@ def verify_test_evidence(evidence_path: Path) -> ExitCode:
     print(f"REPORT_DIGEST={evidence['report_digest']}")
     print("QUEUE=PostgreSQL SELECT FOR UPDATE SKIP LOCKED two-worker PASS")
     print("LEASE=heartbeat+owner-check+expiry-reclaim+attempt+cancellation PASS")
-    print("REPEATED_POLICY=n1:SMOKE;n3:INFORMAL;n5:FORMAL PASS")
+    print("WORKER_LEASE=automatic-heartbeat+stale-write-block+attempt-artifact-identity PASS")
+    print("EXECUTOR_CANCEL=active-cancellation-short-circuit PASS")
+    print("OUTCOME_NORMALIZATION=typed+persisted-harness-infra-profile-cancel PASS")
+    print("REPETITION=per-task-n1:SMOKE;n3:INFORMAL;n5:FORMAL PASS")
+    print("LANE_SUPPORT=incompatible-lane-rejected-before-enqueue PASS")
+    print("SLOT_BINDING=mismatched-successful-binding-is-infra-without-authoritative-artifact PASS")
     print("DENOMINATOR=capability_passes+capability_failures;infra disclosed separately PASS")
     print("P_LANE=controlled-keyless COMPARABLE;actual-route-mismatch NOT_COMPARABLE PASS")
     print("ABLATION=reasoning_effort declared;observed-model limitation surfaced PASS")

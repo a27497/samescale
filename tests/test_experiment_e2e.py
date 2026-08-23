@@ -10,6 +10,7 @@ from sqlalchemy import delete, select
 from harnesslab.comparability.models import ComparabilityStatus, canonical_digest
 from harnesslab.contracts.common import EvaluationLane, Protocol
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
+from harnesslab.contracts.run import RunStatus
 from harnesslab.core.config import Settings
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
 from harnesslab.db.session import create_engine, create_session_factory
@@ -20,11 +21,12 @@ from harnesslab.experiment.executor import (
     ExperimentRunExecutor,
     resolved_comparison_profile_identity,
 )
+from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.plan import build_experiment_plan
 from harnesslab.experiment.queue import enqueue_plan
 from harnesslab.experiment.report import ExperimentReportError, build_experiment_report
 from harnesslab.experiment.spec import ExperimentCellSpec, ExperimentSpec
-from harnesslab.harness_lane.fake import FakeCodexBackend
+from harnesslab.harness_lane.fake import FakeCodexBackend, FakeCodexScenario
 from harnesslab.harness_lane.profile import canonical_codex_profile
 from harnesslab.harness_lane.runner import CodexHarnessRunner
 from harnesslab.model_lane.fake import FakeDirectProvider
@@ -281,6 +283,187 @@ async def test_keyless_experiment_e2e_uses_queue_runners_manifests_and_report(
         async with factory() as session:
             with pytest.raises(ExperimentReportError, match="immutable plan controls"):
                 await build_experiment_report(session, experiment_id, bootstrap_resamples=99)
+    finally:
+        async with factory() as cleanup, cleanup.begin():
+            await cleanup.execute(
+                delete(ExperimentRecord).where(ExperimentRecord.id == experiment_id)
+            )
+        await engine.dispose()
+
+
+@pytest.mark.integration
+async def test_harness_infra_profile_and_cancel_manifests_reopen_consistently(
+    database_url: str, tmp_path: Path
+) -> None:
+    profile = canonical_codex_profile(
+        _image(), requested_model="fake-shared-model", reasoning_effort="low"
+    )
+    scenarios = {
+        "process": FakeCodexScenario.PROCESS_ERROR,
+        "timeout": FakeCodexScenario.TIMEOUT,
+        "profile": FakeCodexScenario.PROFILE_VIOLATION_WEB,
+        "cancelled": FakeCodexScenario.CANCELLED,
+    }
+    cells = tuple(
+        _cell(
+            cell_id,
+            EvaluationLane.HARNESS,
+            provider_route=profile.provider_route,
+            profile_identity=resolved_comparison_profile_identity(profile),
+            harness_config_identity=profile.fingerprint,
+            reasoning_effort="low",
+            harness="codex",
+            harness_version=profile.codex_cli_version,
+            runner_contract="codex-harness-v1",
+        )
+        for cell_id in scenarios
+    )
+    experiment_id = f"phase-g-harness-normalization-{os.getpid()}"
+    plan = build_experiment_plan(
+        ExperimentSpec(
+            experiment_id=experiment_id,
+            name="Harness normalization report regression",
+            task_packages=(PYTHON_TASK_PATH,),
+            cells=cells,
+            repeat_count=1,
+        ),
+        ROOT,
+    )
+    engine = create_engine(Settings.without_dotenv(database_url=database_url))
+    factory = create_session_factory(engine)
+    bindings: dict[str, ExperimentLaneBinding] = {
+        cell_id: CodexHarnessBinding(
+            CodexHarnessRunner(
+                artifact_root=tmp_path / "artifacts",
+                runtime_root=tmp_path / "runtime" / cell_id,
+            ),
+            profile,
+            FakeCodexBackend(scenario),
+        )
+        for cell_id, scenario in scenarios.items()
+    }
+    try:
+        async with factory() as cleanup, cleanup.begin():
+            await cleanup.execute(
+                delete(ExperimentRecord).where(ExperimentRecord.id == experiment_id)
+            )
+        async with factory() as session, session.begin():
+            await enqueue_plan(session, plan)
+        executor = ExperimentRunExecutor(
+            repository_root=ROOT,
+            session_factory=factory,
+            bindings=bindings,
+            owner="normalization-worker",
+        )
+        completed = await executor.run_until_idle(experiment_id)
+        assert len(completed) == 4
+        async with factory() as session:
+            report = await build_experiment_report(session, experiment_id, bootstrap_resamples=99)
+            runs = tuple(
+                (
+                    await session.scalars(
+                        select(ExperimentRunRecord).where(
+                            ExperimentRunRecord.experiment_id == experiment_id
+                        )
+                    )
+                ).all()
+            )
+
+        by_cell = {run.cell_id: run for run in runs}
+        for cell_id in ("process", "timeout", "profile"):
+            assert by_cell[cell_id].normalized_outcome == StatisticalOutcome.INFRA_FAILURE.value
+            assert by_cell[cell_id].status == RunStatus.FAILED_INFRA.value
+        assert by_cell["cancelled"].normalized_outcome == StatisticalOutcome.CANCELLED.value
+        assert by_cell["cancelled"].status == RunStatus.CANCELLED.value
+        assert all(run.artifact_manifest_path for run in runs)
+        assert sum(cell.infra_failures for cell in report.cells) == 3
+        assert sum(cell.cancelled_runs for cell in report.cells) == 1
+        assert sum(cell.completed_capability_runs for cell in report.cells) == 0
+        assert "harness_error:profile_violation" in {
+            outcome for cell in report.cells for outcome in cell.failure_taxonomy_counts
+        }
+    finally:
+        async with factory() as cleanup, cleanup.begin():
+            await cleanup.execute(
+                delete(ExperimentRecord).where(ExperimentRecord.id == experiment_id)
+            )
+        await engine.dispose()
+
+
+@pytest.mark.integration
+async def test_executor_rejects_successful_binding_that_disagrees_with_slot(
+    database_url: str, tmp_path: Path
+) -> None:
+    planned_profile = ModelProfile(
+        requested_model="planned-model",
+        provider="fake-provider",
+        base_url="https://fake.invalid/v1",
+        route="/responses",
+        protocol=Protocol.RESPONSES,
+        reasoning=ReasoningProfile(effort="low", max_output_tokens=2048),
+    )
+    actual_profile = planned_profile.model_copy(update={"requested_model": "wrong-model"})
+    planned_cell = _cell(
+        "direct",
+        EvaluationLane.MODEL,
+        provider_route="fake-provider|responses|https://fake.invalid/v1/responses",
+        profile_identity=resolved_comparison_profile_identity(planned_profile),
+        harness_config_identity=canonical_digest(planned_profile.model_dump(mode="json")),
+        reasoning_effort="low",
+        harness="direct-model",
+        harness_version="evidence-schema-1",
+        runner_contract="direct-model-v1",
+    ).model_copy(update={"requested_model": "planned-model"})
+    experiment_id = f"phase-g-binding-mismatch-{os.getpid()}"
+    plan = build_experiment_plan(
+        ExperimentSpec(
+            experiment_id=experiment_id,
+            name="Binding mismatch must fail closed",
+            task_packages=(PYTHON_TASK_PATH,),
+            cells=(planned_cell,),
+            repeat_count=1,
+        ),
+        ROOT,
+    )
+    engine = create_engine(Settings.without_dotenv(database_url=database_url))
+    factory = create_session_factory(engine)
+    artifacts = tmp_path / "mismatch-artifacts"
+    try:
+        async with factory() as cleanup, cleanup.begin():
+            await cleanup.execute(
+                delete(ExperimentRecord).where(ExperimentRecord.id == experiment_id)
+            )
+        async with factory() as session, session.begin():
+            await enqueue_plan(session, plan)
+        executor = ExperimentRunExecutor(
+            repository_root=ROOT,
+            session_factory=factory,
+            bindings={
+                "direct": DirectModelBinding(
+                    DirectModelRunner(
+                        artifact_root=artifacts,
+                        runtime_root=tmp_path / "mismatch-runtime",
+                        allow_custom_endpoint=True,
+                    ),
+                    actual_profile,
+                    FakeDirectProvider(PATCH, observed_model="wrong-model"),
+                )
+            },
+            owner="mismatch-worker",
+        )
+        completed = await executor.run_until_idle(experiment_id)
+        assert len(completed) == 1
+        failed = completed[0]
+        assert failed.status is RunStatus.FAILED_INFRA
+        assert failed.normalized_outcome is StatisticalOutcome.INFRA_FAILURE
+        assert failed.source_outcome == "control_identity_mismatch"
+        assert failed.artifact_manifest_path is None
+        assert failed.evidence_digest is None
+        assert tuple(artifacts.rglob("manifest.json"))
+        async with factory() as session:
+            report = await build_experiment_report(session, experiment_id, bootstrap_resamples=99)
+        assert report.cells[0].infra_failures == 1
+        assert report.cells[0].completed_capability_runs == 0
     finally:
         async with factory() as cleanup, cleanup.begin():
             await cleanup.execute(
