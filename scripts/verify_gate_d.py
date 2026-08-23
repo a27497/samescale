@@ -111,29 +111,25 @@ CRITICAL_TESTS = {
     "test_unset_optional_generation_controls_are_not_invented[responses]",
     "test_workspace_staging_failure_is_not_blame_assigned_to_model",
 }
-PHASE_G_MODULE_NAMES = {
+PHASE_H_MODULE_NAMES = {
     "judgelab.py",
-    "queue.py",
-    "scheduler.py",
-    "statistics.py",
-    "worker.py",
+    "judge.py",
 }
-PHASE_G_SYMBOLS = tuple(
+PHASE_H_SYMBOLS = tuple(
     re.compile(pattern)
     for pattern in (
         r"\bclass\s+JudgeLab\b",
-        r"\bclass\s+(?:WorkerPool|ExperimentWorker)\b",
         r"\b(?:from|import)\s+langgraph\b",
     )
 )
 
 
-def phase_g_violation(relative: str, content: str) -> str | None:
+def phase_h_violation(relative: str, content: str) -> str | None:
     path = Path(relative)
-    if path.name in PHASE_G_MODULE_NAMES:
-        return f"forbidden Phase G/later module name: {relative}"
-    if any(pattern.search(content) for pattern in PHASE_G_SYMBOLS):
-        return f"forbidden Phase G/later source symbol: {relative}"
+    if path.name in PHASE_H_MODULE_NAMES:
+        return f"forbidden Phase H/later module name: {relative}"
+    if any(pattern.search(content) for pattern in PHASE_H_SYMBOLS):
+        return f"forbidden Phase H/later source symbol: {relative}"
     return None
 
 
@@ -225,25 +221,25 @@ def verify_source_and_scope() -> bool:
     print(f"GIT_HEAD={identity.stdout.strip()}")
     print(f"GIT_DIRTY={bool(worktree.stdout.strip())}")
     forbidden = (
-        ROOT / "src" / "harnesslab" / "statistics",
         ROOT / "src" / "harnesslab" / "judges",
         ROOT / "frontend",
     )
     existing = [str(path.relative_to(ROOT)) for path in forbidden if path.exists()]
     if existing:
-        print(f"FAIL: Phase G/later implementation paths exist: {existing}")
+        print(f"FAIL: Phase H/later implementation paths exist: {existing}")
         return False
     sensitivity_cases = (
-        ("src/harnesslab/worker.py", "", True),
-        ("src/harnesslab/other.py", "class WorkerPool: pass", True),
+        ("src/harnesslab/judgelab.py", "", True),
+        ("src/harnesslab/other.py", "class JudgeLab: pass", True),
+        ("src/harnesslab/experiment/queue.py", "class ExperimentWorker: pass", False),
         ("src/harnesslab/harness_lane/adapter.py", "class HarnessAdapter: pass", False),
         ("src/harnesslab/harness_lane/models.py", "class NormalizedTrace: pass", False),
     )
     if any(
-        (phase_g_violation(relative, content) is not None) is not expected
+        (phase_h_violation(relative, content) is not None) is not expected
         for relative, content, expected in sensitivity_cases
     ):
-        print("FAIL: Phase G source detector failed its sensitivity control")
+        print("FAIL: Phase H source detector failed its sensitivity control")
         return False
     source_violations: list[str] = []
     for path in (ROOT / "src" / "harnesslab").rglob("*.py"):
@@ -253,13 +249,13 @@ def verify_source_and_scope() -> bool:
         except (OSError, UnicodeDecodeError):
             source_violations.append(f"unreadable source: {relative}")
             continue
-        violation = phase_g_violation(relative, content)
+        violation = phase_h_violation(relative, content)
         if violation is not None:
             source_violations.append(violation)
     if source_violations:
-        print(f"FAIL: Phase G/later source detected: {source_violations}")
+        print(f"FAIL: Phase H/later source detected: {source_violations}")
         return False
-    print("PASS: no Phase G statistics, judge, worker, scheduler, or frontend paths")
+    print("PASS: no Phase H JudgeLab, analyst, or frontend paths")
     return True
 
 

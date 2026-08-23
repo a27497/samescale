@@ -44,9 +44,21 @@ def test_migration_from_empty_database(database_url: str, monkeypatch: pytest.Mo
             row = connection.execute(
                 "SELECT to_regclass('public.schema_metadata'), "
                 "to_regclass('public.execution_lease'), "
+                "to_regclass('public.experiment'), "
+                "to_regclass('public.experiment_cell'), "
+                "to_regclass('public.experiment_run'), "
+                "to_regclass('public.experiment_pair'), "
                 "(SELECT version_num FROM alembic_version)"
             ).fetchone()
-        assert row == ("schema_metadata", "execution_lease", "20260822_0002")
+        assert row == (
+            "schema_metadata",
+            "execution_lease",
+            "experiment",
+            "experiment_cell",
+            "experiment_run",
+            "experiment_pair",
+            "20260823_0003",
+        )
     finally:
         get_settings.cache_clear()
         os.environ["DATABASE_URL"] = database_url

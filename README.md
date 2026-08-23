@@ -4,7 +4,8 @@ HarnessLab AI is a reproducible **Model × Harness × Judge** evaluation and att
 platform. The repository currently contains **Phase A — Foundation & Contracts** and
 **Phase B — Task Contract + Deterministic Verifier**, **Phase C — Native Docker Sandbox**, and
 **Phase D — M-Lane Direct Model**, **Phase E — Codex H-Lane**, and
-**Phase F — Multi-Harness + Comparability**.
+**Phase F — Multi-Harness + Comparability**, and
+**Phase G — Experiment Matrix + Repeated Runs + P-Lane + Statistics**.
 
 ## Implemented now
 
@@ -48,13 +49,23 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 - A deterministic Comparability Engine with three claim intents, field-level reasons, and
   `COMPARABLE`, `PARTIALLY_COMPARABLE`, or `NOT_COMPARABLE` outcomes
 - An authoritative, keyless, non-recursive Gate F with critical-test and sensitivity enforcement
+- Strict ExperimentSpec validation and timestamp-free deterministic ExperimentPlan expansion
+- PostgreSQL experiment/cell/pair/ablation/run storage with idempotent enqueue, transactional
+  `FOR UPDATE SKIP LOCKED` claiming, heartbeat, expiry reclaim, attempts, and cancellation
+- A bounded worker that dispatches through existing M/H runners and persists manifest identity
+- Formal n=5, informal n>=3, and smoke n=1 tiers with infrastructure failures outside the
+  capability denominator
+- Wilson 95%, per-task macro pass@k, p50/p95, deterministic bootstrap, exact paired binary tests,
+  and paired continuous statistics using NumPy, pandas, and SciPy
+- Comparability-gated P-Lane and controlled ablation reporting in deterministic JSON/Markdown
+- `harnesslab experiment plan/run`, `harnesslab run inspect`, `harnesslab report compare`, and an
+  authoritative non-recursive, keyless Gate G
 - pytest integration/unit coverage, Ruff, mypy, and one authoritative Gate A runner
 - GitHub Actions using PostgreSQL 18 without model-provider credentials
 
 ## Planned Core
 
-The experiment execution engine, full durable queue and worker scheduler, aggregate
-scoring/statistics, and judge calibration are **PLANNED**. Phase F does not implement Phase G.
+JudgeLab and judge calibration are **PLANNED** for Phase H. Phase G does not implement them.
 
 ## Workbench later
 
@@ -69,6 +80,8 @@ Docker Engine, or Docker Desktop using Linux containers; remote TCP/SSH contexts
 Gate D uses deterministic fake/MockTransport providers and requires no model API key. Gate E
 builds the pinned Codex image and uses deterministic Fake Codex runs. Gate F builds pinned Claude
 and DeepSeek images and uses deterministic fake harness runs; none requires a key.
+Gate G adds real PostgreSQL queue concurrency and actual keyless runner execution without
+consuming provider or ambient harness credentials.
 
 ```powershell
 Copy-Item .env.example .env
@@ -81,6 +94,7 @@ uv run harnesslab model profile validate profiles/openai-responses.example.yaml
 uv run harnesslab harness codex doctor
 uv run harnesslab harness claude doctor
 uv run harnesslab harness deepseek doctor
+uv run harnesslab experiment --help
 ```
 
 Start the API and query its health endpoint:
@@ -160,8 +174,19 @@ Real Claude and DeepSeek calls are optional and are not Gate F evidence. DeepSee
 `FINAL_OUTPUT_ONLY`; E2 is `DEFERRED_NOT_VERIFIED` because no sufficiently documented public
 persistent-session extractor seam was established.
 
+The non-recursive Phase G gate verifies planning, PostgreSQL queue concurrency, keyless runner
+execution, immutable manifest reload, repeated-run policy, P-Lane, ablation, statistics, reports,
+and CLI contracts:
+
+```powershell
+uv run --locked python scripts/verify_gate_g.py
+```
+
+`REAL_MATRIX_EVIDENCE=NOT_RUN` remains separate from deterministic Gate G. A real Matrix Evidence
+run is still required before the final Core hard stop and is never synthesized from ambient login.
+
 See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_METHODOLOGY.md), and
 [Task Format](docs/TASK_FORMAT.md), [Sandbox Security](docs/SANDBOX_SECURITY.md), and
 [M-Lane Direct Model](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md),
-[Harness Comparability](docs/HARNESS_COMPARABILITY.md), and
-[Resume Scope](docs/RESUME_SCOPE.md).
+[Harness Comparability](docs/HARNESS_COMPARABILITY.md),
+[Experiment Statistics](docs/EXPERIMENT_STATISTICS.md), and [Resume Scope](docs/RESUME_SCOPE.md).

@@ -69,9 +69,28 @@ This file separates repository evidence from intended design. A capability moves
   DeepSeek `FINAL_OUTPUT_ONLY`, without changing the approved Phase E Codex profile fingerprint
 - `harnesslab harness claude doctor`, `harnesslab harness deepseek doctor`, and the authoritative
   non-recursive, keyless Gate F runner
+- Actual Phase D, Phase E Codex, Phase F Claude, and Phase F DeepSeek deterministic runners each
+  persisting `manifest.json`, followed by disk-based `load_manifest_facts` and Comparability
+- Remote GitHub Actions Gate A + B + C + D + E + F for the final approved Phase F head
+  `370559665a1ed38c727ec12493906ff35db6f332` (run `32633994665`, result `success`)
+- Strict Phase G ExperimentSpec validation, deterministic task/cell/repeat expansion, canonical
+  plan JSON, stable logical slot identities, and SHA-256 plan identity
+- PostgreSQL experiment/cell/pair/ablation/run persistence, additive Alembic head
+  `20260823_0003`, idempotent enqueue, real `FOR UPDATE SKIP LOCKED` two-worker claiming,
+  heartbeat, owner enforcement, expiry reclaim, attempts, cancellation, and lifecycle checks
+- Existing M/H runner dispatch through a bounded local worker, with persisted manifest paths and
+  evidence digests reloaded for statistics and reporting
+- Capability/infra/cancellation normalization, n=1 smoke, n>=3 informal, n>=5 formal, and the
+  infrastructure-denominator rule
+- Comparability-gated exact-slot P-Lane, controlled reasoning-effort ablation, Wilson 95%,
+  per-task macro pass@k, p50/p95, deterministic bootstrap, exact McNemar-style tests, and paired
+  bootstrap statistics
+- Deterministic JSON/Markdown reports and the Phase G experiment/run/report CLI
+- An authoritative non-recursive, keyless Gate G with real PostgreSQL queue evidence and an
+  actual nine-slot runner-to-manifest-to-loader-to-report experiment E2E
 
-Evidence date: 2026-08-23. Phase E remote evidence is approved at the exact head/run above. Phase F
-entries are current local Gate F evidence pending this change's named remote CI run. Phase D
+Evidence date: 2026-08-23. Phase F remote evidence is approved at the exact head/run above. Phase G
+entries have current local Gate G evidence pending this change's named remote CI run. Phase D
 provider contracts are MockTransport/fake-provider verified; Phase E/F harness behavior is
 deterministic fake verified. None implies a real provider/model call or VM-level isolation.
 
@@ -83,9 +102,6 @@ not yet been demonstrated.
 ## DESIGN_ONLY
 
 - Additional Harness adapters beyond Codex, Claude Code, and DeepSeek E1
-- Experiment matrix/execution engine
-- Full PostgreSQL queue, scheduler, and worker lifecycle
-- Statistical intervals and pass@k
 - JudgeLab and judge calibration implementation
 - Matrix UI and analyst workbench
 
@@ -95,9 +111,11 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-`REAL_PROVIDER_SMOKE = NOT_RUN`, `REAL_CODEX_SMOKE = NOT_RUN`,
+`REAL_MATRIX_EVIDENCE = NOT_RUN`, `REAL_PROVIDER_SMOKE = NOT_RUN`,
+`REAL_CODEX_SMOKE = NOT_RUN`,
 `REAL_CLAUDE_SMOKE = NOT_RUN`, and `REAL_DEEPSEEK_SMOKE = NOT_RUN`. DeepSeek persistent-session E2
 is `DEFERRED_NOT_VERIFIED`. No real provider credential is required for Gates D-F, no ambient
-harness login is consumed, and no real-provider/model invocation is claimed. The provider control
+harness login is consumed, and no real-provider/model invocation is claimed. Deterministic Gate G
+does not replace the required pre-Core-hard-stop real Matrix Evidence. The provider control
 plane versus subject network separation is not operationally verified. Future capabilities remain
 `DESIGN_ONLY` until their own gates exist.

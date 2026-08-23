@@ -157,14 +157,45 @@ controls and treatments. It emits every field comparison, reason codes/severitie
 identities, and `COMPARABLE`, `PARTIALLY_COMPARABLE`, or `NOT_COMPARABLE`. It does not schedule
 experiments, calculate statistics, or judge output quality.
 
+## Phase G experiment matrix and statistics
+
+Phase G turns immutable lane runs into a deterministic plan and PostgreSQL queue. A strict
+ExperimentSpec resolves task packages and frozen cell identities, then expands cells x tasks x
+repeat index in canonical order. The plan contains no timestamp or random UUID; canonical JSON
+produces its stable digest.
+
+```text
+ExperimentSpec -> ExperimentPlan -> PostgreSQL experiment/cell/run rows
+                                           |
+                        FOR UPDATE SKIP LOCKED claim
+                                           |
+              existing M/H runner -> persisted manifest + digest
+                                           |
+                  manifest loader -> statistics/report
+```
+
+Claims record owner, heartbeat, expiry, and observable attempt count. Expired active work is
+reclaimable, non-owners cannot heartbeat or release it, and cancellation is durable. Planning is
+idempotent through immutable plan checks plus database logical-slot uniqueness. The worker is a
+bounded in-process loop and dispatches to approved lane runners through injected bindings.
+
+Reports re-open each persisted manifest, verify its digest, extract Phase F ComparisonFacts, and
+derive metrics from those bytes. P-Lane pairs exact task/repeat slots and always invokes
+ComparabilityEngine. Ablations declare one treatment dimension; undeclared hard-control drift is
+rejected. JSON and Markdown reports omit timestamps from identity.
+
+NumPy, pandas, and SciPy supply Wilson, pass@k, descriptive, deterministic bootstrap, and exact
+paired statistics. Infrastructure failures remain outside capability denominators. Formal claims
+require sufficient repetition and `COMPARABLE`; smoke, insufficient, and `NOT_COMPARABLE`
+evidence cannot enter formal ordering.
+
 ## Planned Core boundaries
 
 The following are **PLANNED**, not implemented:
 
 - Additional harness adapters at explicit external-system boundaries
-- Aggregate scoring/statistics and the Phase G experiment engine
-- A PostgreSQL-backed durable experiment queue and full worker lifecycle
 - Remote/cloud artifact storage and worker execution
+- JudgeLab and judge calibration
 
 ## Deliberate exclusions
 

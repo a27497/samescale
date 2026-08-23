@@ -3,8 +3,8 @@
 Phase A establishes vocabulary and contracts. Phase B implements deterministic task validation,
 Phase C isolates untrusted workspace verification, Phase D implements the first M-Lane direct
 model path, Phase E implements the Codex H-Lane, and Phase F adds Claude/DeepSeek H-Lanes plus
-deterministic evidence comparability. The experiment execution engine, repeated-run statistics,
-and judges remain design-only.
+deterministic evidence comparability. Phase G implements the experiment engine, repeated-run
+statistics, P-Lane pairing, and controlled ablation. Judges remain design-only.
 
 ## Evaluation lanes
 
@@ -18,7 +18,8 @@ and judges remain design-only.
   to the isolated hidden verifier.
 - **P-Lane (Paired Model-vs-Harness Evaluation):** compare direct-model execution with harness
   execution on controlled micro tasks where the necessary context and verifier are equivalent, in
-  order to measure harness uplift.
+  order to measure harness uplift. Phase G pairs exact task/repeat slots and requires the Phase F
+  Comparability result before a pair can enter formal statistics.
 - **J-Lane (JudgeLab):** calibrate and compare judging methods against stronger references.
 
 ## Evidence hierarchy
@@ -83,10 +84,25 @@ agent message claiming success followed by `turn.completed` and exit zero can st
 
 ## Repeated experiments and failure attribution
 
-Single runs are samples, not stable rankings. Planned evaluation will repeat comparable cells and
-report uncertainty. Infrastructure failures (service outage, sandbox startup, credential routing)
-must be classified separately from model failures; otherwise platform reliability contaminates
-model attribution.
+Single runs are samples, not stable rankings. Phase G labels one valid capability observation
+`SMOKE`, at least three `INFORMAL`, and at least five `FORMAL` when controls are valid. An n=1 smoke
+cannot enter formal ranking, paired claims, or confidence-interval conclusions.
+
+Infrastructure failures (service outage, sandbox startup, credential routing, worker, verifier,
+or artifact failure) are classified separately from capability failures. The capability success
+rate denominator is capability passes plus capability failures, never all planned slots. A
+five-slot cell with one infrastructure failure reports planned=5, capability n=4, and infra=1
+without a replacement run.
+
+Phase G reports Wilson 95% intervals for binary capability outcomes. The standard pass@k estimator
+is calculated per task and macro-aggregated; n<k is `NOT_AVAILABLE`. Continuous latency, token,
+tool, and step evidence includes count, p50, p95, and deterministic bootstrap intervals when
+meaningful. Paired binary evidence uses the exact two-sided binomial test over McNemar
+discordances; paired continuous evidence resamples exact task/repeat differences.
+
+`NOT_COMPARABLE` pairs remain execution evidence but are excluded from formal uplift, causal, and
+ranking claims. `PARTIALLY_COMPARABLE` pairs remain explicitly limited exploratory evidence. Cost
+is `NOT_AVAILABLE`, not zero, unless immutable evidence provides a trustworthy explicit value.
 
 ## Judge calibration
 
