@@ -14,7 +14,7 @@ from harnesslab.judgelab.persistence import (
     pending_slots,
     persist_evidence_reference,
 )
-from harnesslab.judgelab.plan import validate_plan_definitions
+from harnesslab.judgelab.plan import JudgePlanError, validate_plan_definitions
 from harnesslab.judgelab.report import JudgeCalibrationReport, build_judge_report
 from harnesslab.judgelab.runner import JudgeRunner
 from harnesslab.model_lane.models import ProviderAdapter, ProviderRequest, ProviderResult
@@ -40,6 +40,24 @@ def adapters_for_plan(plan: JudgeCalibrationPlan) -> dict[str, ProviderAdapter]:
     return adapters
 
 
+def validate_real_judge_authorization(
+    plan: JudgeCalibrationPlan, *, allow_real_judge: bool = False
+) -> None:
+    real_cells = [
+        cell for cell in plan.judge_cells if cell.runner_contract == "provider-adapter-v1"
+    ]
+    if real_cells and not allow_real_judge:
+        raise JudgePlanError("real Judge execution requires explicit service authorization")
+    missing_references = [
+        cell.id for cell in real_cells if not cell.model_profile.credential_reference
+    ]
+    if missing_references:
+        raise JudgePlanError(
+            "real Judge cells require explicit credential_reference: "
+            + ",".join(sorted(missing_references))
+        )
+
+
 async def execute_calibration(
     session: AsyncSession,
     *,
@@ -48,7 +66,9 @@ async def execute_calibration(
     definitions: Mapping[str, JudgeDefinition],
     artifact_root: Path,
     adapters: Mapping[str, ProviderAdapter] | None = None,
+    allow_real_judge: bool = False,
 ) -> JudgeCalibrationReport:
+    validate_real_judge_authorization(plan, allow_real_judge=allow_real_judge)
     validate_plan_definitions(plan, suite, dict(definitions))
     await enqueue_calibration(session, plan)
     await session.commit()

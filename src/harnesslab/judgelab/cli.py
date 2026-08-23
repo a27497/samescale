@@ -104,11 +104,6 @@ def plan_calibration(
 
 async def _calibrate(path: Path, artifact_root: Path) -> JudgeCalibrationReport:
     plan, suite, definitions = _load_plan_and_dependencies(path)
-    if (
-        any(cell.runner_contract == "provider-adapter-v1" for cell in plan.judge_cells)
-        and os.environ.get("HARNESSLAB_ENABLE_REAL_JUDGE") != "1"
-    ):
-        raise JudgePlanError("real Judge cells require HARNESSLAB_ENABLE_REAL_JUDGE=1")
     settings = Settings()
     engine = create_engine(settings)
     factory = create_session_factory(engine)
@@ -120,6 +115,7 @@ async def _calibrate(path: Path, artifact_root: Path) -> JudgeCalibrationReport:
                 suite=suite,
                 definitions=definitions,
                 artifact_root=artifact_root,
+                allow_real_judge=os.environ.get("HARNESSLAB_ENABLE_REAL_JUDGE") == "1",
             )
     finally:
         await engine.dispose()

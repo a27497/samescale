@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from typing import Literal
 from uuid import uuid4
 
 import psycopg
@@ -23,12 +24,13 @@ from harnesslab.db.models.judgelab import JudgeCalibrationRecord, JudgeEvaluatio
 from harnesslab.db.session import create_engine, create_session_factory
 from harnesslab.judgelab.calibration import execute_calibration
 from harnesslab.judgelab.fake import FakeJudgeProvider
-from harnesslab.judgelab.models import QualificationStatus
+from harnesslab.judgelab.models import JudgeCalibrationPlan, QualificationStatus, digest
 from harnesslab.judgelab.persistence import enqueue_calibration, evaluation_records
-from harnesslab.judgelab.plan import build_calibration_plan, load_calibration_spec
+from harnesslab.judgelab.plan import JudgePlanError, build_calibration_plan, load_calibration_spec
 from harnesslab.judgelab.report import build_judge_report
 from harnesslab.judgelab.runner import JudgeArtifactError, load_and_verify_evidence
 from harnesslab.judgelab.suite import load_judge_definition, load_judge_suite
+from harnesslab.model_lane.models import ProviderRequest, ProviderResult
 
 ROOT = Path(__file__).resolve().parents[1]
 SUITE_ROOT = ROOT / "judge_suites/core-calibration/1.0.0"
@@ -416,6 +418,176 @@ async def test_provider_infra_only_lowers_coverage_and_cannot_dilute_capability_
             await session.execute(
                 delete(JudgeCalibrationRecord).where(
                     JudgeCalibrationRecord.id == plan.calibration_id
+                )
+            )
+        await engine.dispose()
+
+
+@pytest.mark.integration
+async def test_real_judge_requires_explicit_opt_in_before_enqueue_or_provider_call(
+    database_url: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class BombAdapter:
+        def __init__(self) -> None:
+            self.invoke_count = 0
+
+        async def invoke(self, request: ProviderRequest) -> ProviderResult:
+            self.invoke_count += 1
+            raise AssertionError(
+                f"provider invocation was not authorized: {request.profile.provider}"
+            )
+
+    settings = Settings.without_dotenv(database_url=database_url)
+    engine = create_engine(settings)
+    factory = create_session_factory(engine)
+    suite = load_judge_suite(SUITE_ROOT)
+    definition = load_judge_definition(SUITE_ROOT / "definition.yaml")
+    loaded = load_calibration_spec(SUITE_ROOT / "calibration.yaml")
+
+    def plan_for(
+        calibration_id: str,
+        *,
+        runner_contract: Literal[
+            "phase-h-fake-good-v1", "phase-h-fake-biased-v1", "provider-adapter-v1"
+        ],
+        credential_reference: str | None,
+        source_cell_index: int = 0,
+    ) -> JudgeCalibrationPlan:
+        source_cell = loaded.judge_cells[source_cell_index]
+        profile = source_cell.model_profile.model_copy(
+            update={"credential_reference": credential_reference}
+        )
+        cell = source_cell.model_copy(
+            update={
+                "model_profile": profile,
+                "profile_identity": digest(profile),
+                "runner_contract": runner_contract,
+            }
+        )
+        spec = loaded.model_copy(update={"calibration_id": calibration_id, "judge_cells": (cell,)})
+        return build_calibration_plan(spec, suite, {cell.id: definition})
+
+    async def assert_not_persisted(calibration_id: str) -> None:
+        async with factory() as session:
+            assert await session.get(JudgeCalibrationRecord, calibration_id) is None
+            rows = (
+                await session.scalars(
+                    select(JudgeEvaluationRecord).where(
+                        JudgeEvaluationRecord.calibration_id == calibration_id
+                    )
+                )
+            ).all()
+            assert not rows
+
+    monkeypatch.setenv("PHASE_H_AMBIENT_CREDENTIAL", "test-value-that-must-not-authorize")
+    denied_plan = plan_for(
+        "phase-h-real-denied",
+        runner_contract="provider-adapter-v1",
+        credential_reference="PHASE_H_AMBIENT_CREDENTIAL",
+    )
+    denied_adapter = BombAdapter()
+    async with factory() as session:
+        with pytest.raises(JudgePlanError, match="explicit service authorization"):
+            await execute_calibration(
+                session,
+                plan=denied_plan,
+                suite=suite,
+                definitions={denied_plan.judge_cells[0].id: definition},
+                artifact_root=tmp_path / "denied",
+                adapters={denied_plan.judge_cells[0].id: denied_adapter},
+            )
+    assert denied_adapter.invoke_count == 0
+    await assert_not_persisted(denied_plan.calibration_id)
+
+    missing_plan = plan_for(
+        "phase-h-real-missing-reference",
+        runner_contract="provider-adapter-v1",
+        credential_reference=None,
+    )
+    missing_adapter = BombAdapter()
+    async with factory() as session:
+        with pytest.raises(JudgePlanError, match="explicit credential_reference"):
+            await execute_calibration(
+                session,
+                plan=missing_plan,
+                suite=suite,
+                definitions={missing_plan.judge_cells[0].id: definition},
+                artifact_root=tmp_path / "missing",
+                adapters={missing_plan.judge_cells[0].id: missing_adapter},
+                allow_real_judge=True,
+            )
+    assert missing_adapter.invoke_count == 0
+    await assert_not_persisted(missing_plan.calibration_id)
+
+    allowed_plan = plan_for(
+        "phase-h-real-authorized-keyless",
+        runner_contract="provider-adapter-v1",
+        credential_reference="PHASE_H_FAKE_CREDENTIAL_REFERENCE",
+    )
+    allowed_adapter = FakeJudgeProvider("GOOD")
+    fake_plan = plan_for(
+        "phase-h-fake-default-deny-safe",
+        runner_contract="phase-h-fake-good-v1",
+        credential_reference=None,
+    )
+    fake_adapter = FakeJudgeProvider("GOOD")
+    biased_plan = plan_for(
+        "phase-h-fake-biased-default-deny-safe",
+        runner_contract="phase-h-fake-biased-v1",
+        credential_reference=None,
+        source_cell_index=1,
+    )
+    biased_adapter = FakeJudgeProvider("BIASED")
+    try:
+        async with factory() as session:
+            allowed_report = await execute_calibration(
+                session,
+                plan=allowed_plan,
+                suite=suite,
+                definitions={allowed_plan.judge_cells[0].id: definition},
+                artifact_root=tmp_path / "allowed",
+                adapters={allowed_plan.judge_cells[0].id: allowed_adapter},
+                allow_real_judge=True,
+            )
+        assert (
+            allowed_report.cells[0].qualification_status is QualificationStatus.QUALIFIED_FOR_SUITE
+        )
+        assert len(allowed_adapter.requests) == 63
+
+        async with factory() as session:
+            fake_report = await execute_calibration(
+                session,
+                plan=fake_plan,
+                suite=suite,
+                definitions={fake_plan.judge_cells[0].id: definition},
+                artifact_root=tmp_path / "fake",
+                adapters={fake_plan.judge_cells[0].id: fake_adapter},
+            )
+        assert fake_report.cells[0].qualification_status is QualificationStatus.QUALIFIED_FOR_SUITE
+        assert len(fake_adapter.requests) == 63
+
+        async with factory() as session:
+            biased_report = await execute_calibration(
+                session,
+                plan=biased_plan,
+                suite=suite,
+                definitions={biased_plan.judge_cells[0].id: definition},
+                artifact_root=tmp_path / "fake-biased",
+                adapters={biased_plan.judge_cells[0].id: biased_adapter},
+            )
+        assert biased_report.cells[0].qualification_status is QualificationStatus.NOT_QUALIFIED
+        assert len(biased_adapter.requests) == 63
+    finally:
+        async with factory() as session, session.begin():
+            await session.execute(
+                delete(JudgeCalibrationRecord).where(
+                    JudgeCalibrationRecord.id.in_(
+                        (
+                            allowed_plan.calibration_id,
+                            fake_plan.calibration_id,
+                            biased_plan.calibration_id,
+                        )
+                    )
                 )
             )
         await engine.dispose()

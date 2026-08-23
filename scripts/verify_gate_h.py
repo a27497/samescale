@@ -50,6 +50,7 @@ CRITICAL_TESTS = {
     "test_persisted_good_vs_biased_judge_e2e_and_phase_g_read_only",
     "test_judge_artifact_reload_digest_and_slot_identity_fail_closed",
     "test_provider_infra_only_lowers_coverage_and_cannot_dilute_capability_errors",
+    "test_real_judge_requires_explicit_opt_in_before_enqueue_or_provider_call",
     "test_phase_g_to_phase_h_migration_preserves_experiment_evidence",
 }
 
@@ -137,6 +138,10 @@ def verify_test_evidence() -> ExitCode:
     print("L0_AUTHORITY=FAIL+JudgePASS->FAIL;PASS+JudgeFAIL->PASS;overrides=0 PASS")
     print("PAIRWISE=original+swapped canonicalized as one logical trial PASS")
     print("LEAKAGE=answer-keys+gold+oracle+verifier+identity+private-reasoning absent PASS")
+    print(
+        "REAL_JUDGE_OPT_IN=service authorization+credential reference required before enqueue; "
+        "fake cells keyless PASS"
+    )
     print("REAL_JUDGE_SMOKE=NOT_RUN")
     return ExitCode.PASS
 

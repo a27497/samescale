@@ -101,6 +101,8 @@ metrics, qualification, and report code with no network. FakeJudge is explicitly
 its deterministic behavior uses public fixture identity/configuration and never reads hidden gold.
 
 `REAL_JUDGE_SMOKE=NOT_RUN` by default. A real call requires
-`HARNESSLAB_ENABLE_REAL_JUDGE=1`, an explicit ModelProfile, and credential reference. Ambient
-Codex/Claude/DSH login and unrelated keys are never used. Existing real Matrix/provider/harness
-smoke statuses remain separate.
+`allow_real_judge=True` at the production execution boundary and an explicit ModelProfile
+`credential_reference`. The CLI translates `HARNESSLAB_ENABLE_REAL_JUDGE=1` into that explicit
+authorization; the service never infers authorization from ambient environment state. Injecting an
+adapter cannot bypass the plan's real-provider intent. Ambient Codex/Claude/DSH login and unrelated
+keys are never used. Existing real Matrix/provider/harness smoke statuses remain separate.
