@@ -257,6 +257,7 @@ class HarnessLaneEvidence(BaseModel):
     native_transcript_digest: Sha256Digest
     normalized_trace_version: Literal[1] = 1
     normalized_trace_digest: Sha256Digest
+    trace_coverage: Literal["FULL_STREAM"] = "FULL_STREAM"
     trace_event_count: int = Field(ge=0)
     trace_event_types: tuple[TraceEventType, ...]
     thread_id: str | None = None

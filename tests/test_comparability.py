@@ -202,6 +202,12 @@ def test_manifest_loader_consumes_phase_f_and_older_lane_shapes_without_inferenc
     assert load_manifest_facts(path).verifier_identity is not None
 
 
+def test_new_codex_manifest_trace_coverage_is_consumed_without_inference() -> None:
+    manifest = phase_f_manifest("codex")
+    manifest["trace_coverage"] = "FULL_STREAM"
+    assert facts_from_manifest(manifest).trace_coverage == "FULL_STREAM"
+
+
 def test_compare_cli_emits_deterministic_json_and_text(tmp_path: Path) -> None:
     left = tmp_path / "left.json"
     right = tmp_path / "right.json"

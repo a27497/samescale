@@ -77,6 +77,7 @@ CRITICAL_TESTS = {
     "test_trace_coverage_mismatch_is_partial_not_automatic_invalidation",
     "test_model_comparison_treats_model_identity_difference_as_intended",
     "test_manifest_loader_consumes_phase_f_and_older_lane_shapes_without_inference",
+    "test_new_codex_manifest_trace_coverage_is_consumed_without_inference",
     "test_compare_cli_emits_deterministic_json_and_text",
 }
 

@@ -44,6 +44,10 @@ and Node 24, and receive no verifier, oracle, Docker socket, or ambient home. Fi
 not harness file-change claims, determine changed paths. The Phase C isolated Hidden Verifier alone
 determines pass and score.
 
+Phase F also makes the existing Codex evidence contract explicit: its accepted native JSONL stream
+declares `FULL_STREAM`. This preserves the Phase E profile fingerprint while allowing new Codex
+manifests to participate in trace-coverage assessment without inference.
+
 ## Comparability assessment
 
 `harnesslab compare assess LEFT RIGHT --intent harness-uplift` loads immutable M-Lane or H-Lane

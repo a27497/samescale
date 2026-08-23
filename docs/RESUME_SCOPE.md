@@ -65,6 +65,8 @@ This file separates repository evidence from intended design. A capability moves
   secret/reasoning controls
 - Comparability contracts, manifest fact extraction, deterministic intent-aware assessment, and
   `harnesslab compare assess` text/JSON output with field-level reasons and evidence identities
+- Explicit `FULL_STREAM` coverage on new Codex evidence, alongside Claude `FULL_STREAM` and
+  DeepSeek `FINAL_OUTPUT_ONLY`, without changing the approved Phase E Codex profile fingerprint
 - `harnesslab harness claude doctor`, `harnesslab harness deepseek doctor`, and the authoritative
   non-recursive, keyless Gate F runner
 
