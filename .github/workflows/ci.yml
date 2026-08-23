@@ -1,4 +1,4 @@
-name: Gate A + Gate B + Gate C + Gate D + Gate E + Gate F + Gate G + Gate H
+name: Gate A + Gate B + Gate C + Gate D + Gate E + Gate F + Gate G + Gate H + Gate I
 
 on:
   push:
@@ -62,3 +62,5 @@ jobs:
         run: uv run --locked python scripts/verify_gate_g.py
       - name: Run authoritative Gate H verification
         run: uv run --locked python scripts/verify_gate_h.py
+      - name: Run authoritative Gate I verification
+        run: uv run --locked python scripts/verify_gate_i.py

@@ -102,9 +102,25 @@ This file separates repository evidence from intended design. A capability moves
   artifact reload, Phase G read-only regression, and deterministic JSON/Markdown reports
 - Actual keyless 126-slot Good-vs-Biased Judge E2E and non-recursive Gate H coverage across
   leakage, hierarchy, strict output, bias, repetition, persistence, qualification, CLI, and scope
+- Approved Phase H head `f8f6ecdf644cb01e73afb039a4a503a394a51fe5`, remote CI run
+  `32651571933` (`success`), proving public-suite answer-key exclusion, JudgeDefinition-owned order
+  swap, versioned qualification, provider-infra separation, persisted L0 authority resolution,
+  byte-exact JudgeEvidence integrity, service-level real-Judge opt-in, and that ambient credentials
+  alone cannot trigger a real Judge
+- Typed read-only `/api/workbench` DTO/routes for experiments, Matrix, runs, safe trace, JudgeLab,
+  deterministic Regression compare, durable status polling, and Core readiness
+- Vue 3/Vite/TypeScript frontend with pinned npm graph, Pinia query state, Vue Router routes,
+  focused Element Plus affordances, modular ECharts, Axios, Vitest, and production build
+- Real keyless Phase G queue/runner/manifest/report and Phase H fake-Judge persisted fixtures read
+  end-to-end through Workbench API contracts, including digest/path/private-reasoning sensitivity
+- Explicit `NOT_REPORTED`, `PARTIALLY_COMPARABLE`, and `NOT_COMPARABLE` UI/API semantics; suite-
+  scoped Judge qualification; directional non-causal Regression comparison; `NOT_READY` evidence-
+  driven Core dashboard; and no browser execution endpoint
+- An authoritative non-recursive Gate I with 12 backend persisted-evidence tests, 13 focused
+  frontend tests, strict TypeScript, Vite production build, Ruff, mypy, and scope/secret checks
 
-Evidence date: 2026-08-23. Phase G remote evidence is approved at the exact head/run above. Phase H
-entries have current local Gate H evidence pending this change's named remote CI run. Phase D
+Evidence date: 2026-08-24. Phase H remote evidence is approved at the exact head/run above. Phase I
+entries have current local Gate I evidence pending this change's named remote CI run. Phase D
 provider contracts are MockTransport/fake-provider verified; Phase E/F harness behavior is
 deterministic fake verified. None implies a real provider/model call or VM-level isolation.
 
@@ -116,11 +132,12 @@ not yet been demonstrated.
 ## DESIGN_ONLY
 
 - Additional Harness adapters beyond Codex, Claude Code, and DeepSeek E1
-- Matrix UI and analyst workbench
+- Phase J Analyst Agent, controlled attribution assistance, RAG, and multi-agent workflows
 
 ## WORKBENCH_ONLY
 
-None implemented. Future UI or analyst conveniences belong here and are not Core evidence.
+- Phase I read-only evidence Workbench, Matrix visualization, deterministic Regression compare,
+  safe trace presentation, Judge calibration browser, polling, and Core readiness dashboard
 
 ## NOT_VERIFIED
 

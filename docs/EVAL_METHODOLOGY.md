@@ -142,3 +142,25 @@ does, while L2 annotates. A Judge PASS cannot change L0 FAIL and a Judge FAIL ca
 PASS. Reports derive these facts through `resolve_authority`; the L0 override count is zero by
 construction, and JudgeLab never updates Phase G outcomes,
 verifier results, or capability denominators.
+
+## Workbench evidence presentation and Regression compare
+
+Phase I presents approved Phase G/H evidence; it does not create another statistics authority.
+Every displayed numeric value originates in a typed API response backed by PostgreSQL and the
+existing immutable report/statistics contracts. Vue may format or select a dimension but does not
+recalculate success rate, Wilson intervals, pass@k, latency percentiles, infra rate, Judge metrics,
+qualification, evidence tier, or comparability.
+
+Missing evidence uses `NOT_REPORTED` with a null value. It is distinct from a reported numeric
+zero and from `NOT_COMPARABLE`. A direct-model run without Normalized Trace reports
+`TRACE=NOT_REPORTED`; a missing explicit cost reports `COST=NOT_REPORTED`. Provider pricing is not
+estimated from model names.
+
+Regression compare aligns common or explicitly mapped persisted cells, returns baseline and
+candidate report identities, directional success-rate delta when both values are reported,
+evidence tiers, infra counts, and comparability limitations. A critical configuration mismatch is
+`NOT_COMPARABLE` even if the numeric values look favorable. The page makes no causal or new
+statistical-significance claim and never reruns either experiment.
+
+Polling refreshes only durable PostgreSQL lifecycle state and stops at a terminal experiment.
+Route reconstruction triggers a new API fetch; Pinia is not persisted as authoritative evidence.

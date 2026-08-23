@@ -20,5 +20,12 @@ gate-e-results.xml
 gate-f-results.xml
 gate-g-results.xml
 gate-h-results.xml
+gate-i-results.xml
+gate-i-frontend-results.xml
+gate-i-evidence.json
 harnesslab-runtime/
 harnesslab-artifacts/
+frontend/node_modules/
+frontend/dist/
+.phase-i-test-artifacts/
+.phase-i-test-runtime/

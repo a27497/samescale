@@ -221,6 +221,39 @@ and verbosity probes. Reports reopen each artifact and verify slot, suite, case,
 profile identities. PostgreSQL stores durable calibration/slot state and artifact references;
 the immutable Judge evidence remains on disk.
 
+## Phase I read-only Workbench
+
+Phase I adds a presentation boundary without adding an execution boundary. FastAPI resolves
+persisted experiment, run, and calibration identities from PostgreSQL, reopens immutable artifacts,
+verifies their digests and logical identities, and maps selected safe fields into strict Pydantic
+DTOs. SQLAlchemy records and server paths never cross the API boundary.
+
+```text
+PostgreSQL identity ──┬─ ExperimentPlan + verified lane manifests ─ ExperimentReport ─┐
+                     ├─ run id ─ verified normalized trace sibling ─ safe events ────┤
+                     └─ Judge calibration ─ verified Judge report ─ suite metrics ───┤
+                                                                                     v
+                                               /api/workbench typed read DTOs ─ Vue 3
+                                                                                     │
+                                        Pinia query state + route reconstruction + polling
+```
+
+The Vue client uses one typed Axios boundary, Pinia only for query/UI state, Vue Router for durable
+URLs, Element Plus for focused interaction affordances, and modular ECharts heatmaps/bars. Numeric
+values come from backend report contracts. Missing evidence is status-bearing `NOT_REPORTED`, not
+zero. Comparison eligibility remains `COMPARABLE`, `PARTIALLY_COMPARABLE`, or `NOT_COMPARABLE`.
+
+The trace route accepts a run id only. It verifies the persisted manifest, deterministic physical
+attempt identity, normalized trace sibling containment, and trace digest. It never opens native
+private transcripts; `REASONING_PRESENT` becomes a content-withheld marker. Regression compare
+reopens two persisted reports and compares mapped cells directionally. It does not rerun subjects,
+claim significance, or infer causality.
+
+The only Workbench POST is the computation-only Regression compare request. There are no browser
+routes for model, Harness, or Judge execution, cancellation, deletion, scoring, or task/gold
+mutation. The Core readiness view is derived from structured persisted evidence and remains
+`NOT_READY` while real evidence, Phase J, or release artifacts are unverified.
+
 ## Planned Core boundaries
 
 The following are **PLANNED**, not implemented:
@@ -228,6 +261,7 @@ The following are **PLANNED**, not implemented:
 - Additional harness adapters at explicit external-system boundaries
 - Remote/cloud artifact storage and worker execution
 - Remote/cloud Judge artifact storage and distributed Judge workers
+- Phase J Analyst workflows and controlled attribution assistance
 
 ## Deliberate exclusions
 

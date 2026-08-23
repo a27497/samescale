@@ -273,14 +273,18 @@ def verify_images_and_toolchains() -> bool:
     return True
 
 
-def _phase_h_violation(relative: str, content: str) -> bool:
-    forbidden_names = {"frontend.py", "matrix_ui.py", "regression_workbench.py", "analyst.py"}
+def _phase_j_violation(relative: str, content: str) -> bool:
+    path = Path(relative)
+    forbidden_names = {"analyst.py", "analyst_agent.py"}
     patterns = (
-        r"\bclass\s+(?:MatrixUI|RegressionWorkbench|AnalystAgent)\b",
+        r"\bclass\s+AnalystAgent\b",
         r"\b(?:from|import)\s+langgraph\b",
     )
-    return Path(relative).name in forbidden_names or any(
-        re.search(pattern, content) for pattern in patterns
+    return (
+        "analyst" in path.parts
+        or "langgraph" in path.parts
+        or path.name in forbidden_names
+        or any(re.search(pattern, content) for pattern in patterns)
     )
 
 
@@ -306,23 +310,23 @@ def verify_source_scope_and_identity() -> bool:
     print(f"GIT_HEAD={identity.stdout.strip()}")
     print(f"GIT_DIRTY={bool(dirty.stdout.strip())}")
     sensitivity = (
-        not _phase_h_violation("src/harnesslab/judgelab.py", ""),
-        _phase_h_violation("src/harnesslab/frontend.py", "class MatrixUI: pass"),
-        not _phase_h_violation(
+        not _phase_j_violation("src/harnesslab/judgelab.py", ""),
+        _phase_j_violation("src/harnesslab/analyst/graph.py", "from langgraph import Graph"),
+        not _phase_j_violation(
             "src/harnesslab/experiment/queue.py", "class ExperimentWorker: pass"
         ),
-        not _phase_h_violation(
+        not _phase_j_violation(
             "src/harnesslab/comparability/engine.py", "class ComparabilityEngine: pass"
         ),
     )
     if not all(sensitivity):
-        print("FAIL: Phase I detector sensitivity control failed")
+        print("FAIL: Phase J detector sensitivity control failed")
         return False
     violations: list[str] = []
     for path in (ROOT / "src" / "harnesslab").rglob("*.py"):
         relative = path.relative_to(ROOT).as_posix()
         content = path.read_text(encoding="utf-8")
-        if _phase_h_violation(relative, content):
+        if _phase_j_violation(relative, content):
             violations.append(relative)
         if re.search(r"headless-driver|tests/fixtures/.+jsonl|private.+jsonl", content, re.I):
             violations.append(relative + ":private-deepseek-driver")
@@ -332,7 +336,7 @@ def verify_source_scope_and_identity() -> bool:
     if DeepSeekSessionExtraction.DEFERRED_NOT_VERIFIED.value != "DEFERRED_NOT_VERIFIED":
         print("FAIL: DeepSeek E2 is not explicitly deferred")
         return False
-    print("PASS: Phase H allowed; no Phase I or private DeepSeek test-driver dependency")
+    print("PASS: Phase I allowed; no Phase J or private DeepSeek test-driver dependency")
     print("DEEPSEEK_E2=DEFERRED_NOT_VERIFIED")
     return True
 

@@ -155,12 +155,11 @@ def verify_scope_and_contracts() -> bool:
         ROOT / "docs/JUDGELAB.md",
     )
     forbidden = (
-        ROOT / "frontend",
         ROOT / "src/harnesslab/analyst",
-        ROOT / "src/harnesslab/regression_workbench",
+        ROOT / "src/harnesslab/langgraph",
     )
     if any(not path.is_file() for path in required) or any(path.exists() for path in forbidden):
-        print("FAIL: required Phase H surface missing or Phase I/analyst scope detected")
+        print("FAIL: required Phase H surface missing or Phase J scope detected")
         return False
     source = "\n".join(
         path.read_text(encoding="utf-8") for path in (ROOT / "src/harnesslab/judgelab").glob("*.py")
@@ -178,7 +177,7 @@ def verify_scope_and_contracts() -> bool:
     if "langgraph" in source.casefold():
         print("FAIL: out-of-scope LangGraph dependency detected")
         return False
-    print("PASS: Phase H scope has no frontend, Regression Workbench, analyst, or LangGraph")
+    print("PASS: Phase I allowed; Phase H contracts intact; no Phase J analyst or LangGraph")
     return True
 
 

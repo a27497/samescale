@@ -6,13 +6,14 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 **Phase D — M-Lane Direct Model**, **Phase E — Codex H-Lane**, and
 **Phase F — Multi-Harness + Comparability**, and
 **Phase G — Experiment Matrix + Repeated Runs + P-Lane + Statistics**, and
-**Phase H — JudgeLab + Judge Calibration**.
+**Phase H — JudgeLab + Judge Calibration**, and
+**Phase I — Read-only Workbench UI + Regression Compare**.
 
 ## Implemented now
 
 - An exact Python 3.12.14 runtime and uv lockfile
 - A Typer CLI with `--help`, `--version`, `doctor`, and `serve`
-- A FastAPI control API with a database-aware `GET /api/health`
+- A FastAPI control API with a database-aware `GET /api/health` and typed read-only Workbench API
 - Secret-safe settings loaded with Pydantic Settings
 - PostgreSQL 18 development service, SQLAlchemy 2 async access, psycopg 3, and Alembic
 - Pydantic v2 contracts for Task, Model, Harness, Experiment, and Run
@@ -69,6 +70,13 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
   artifact reload, deterministic reports, and a keyless Good-vs-Biased E2E
 - `harnesslab judge suite validate/plan/calibrate/report` and an authoritative non-recursive,
   keyless Gate H
+- A Vue 3/Vite/TypeScript analytical Workbench with Pinia, Vue Router, Element Plus, ECharts,
+  Axios, Vitest, and a pinned npm dependency graph
+- Read-only experiment, Matrix, run/trace, JudgeLab, deterministic Regression compare, polling,
+  and Core readiness views over PostgreSQL plus digest-verified immutable evidence
+- Explicit `NOT_REPORTED` versus zero and `NOT_COMPARABLE` versus missing evidence semantics,
+  with no browser-triggered model, Harness, or Judge execution
+- An authoritative non-recursive, fully keyless Gate I using real persisted Phase G/H fixtures
 - pytest integration/unit coverage, Ruff, mypy, and one authoritative Gate A runner
 - GitHub Actions using PostgreSQL 18 without model-provider credentials
 
@@ -77,10 +85,12 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 JudgeLab is an L2 annotation and comparison layer. Evidence authority is
 `L0 deterministic > L1 repository-curated human gold > L2 LLM Judge`.
 
-## Workbench later
+## Workbench boundary
 
-Matrix UI, visual analysis, and analyst workflows are future **WORKBENCH** concerns. No frontend,
-LangGraph analyst, RAG, or multi-agent framework is present.
+Phase I implements a read-only evidence Workbench. Experiment and Judge execution remains in the
+approved CLI/operator paths. The browser cannot mutate outcomes, cancel runs, change task/gold
+data, or trigger provider execution. Analyst workflows, LangGraph, RAG, and multi-agent behavior
+remain out of scope.
 
 ## Local setup
 
@@ -93,6 +103,8 @@ and DeepSeek images and uses deterministic fake harness runs; none requires a ke
 Gate G adds real PostgreSQL queue concurrency and actual keyless runner execution without
 consuming provider or ambient harness credentials.
 Gate H adds a 15-case keyless suite and 126 persisted Judge slots without real model calls.
+Gate I adds a keyless persisted Matrix and Judge calibration fixture, typed Workbench API tests,
+and frontend type/test/build checks.
 
 ```powershell
 Copy-Item .env.example .env
@@ -108,6 +120,14 @@ uv run harnesslab harness deepseek doctor
 uv run harnesslab experiment --help
 uv run harnesslab judge suite validate judge_suites/core-calibration/1.0.0
 uv run harnesslab judge plan judge_suites/core-calibration/1.0.0/calibration.yaml
+```
+
+Start the frontend development server in a second shell:
+
+```powershell
+Set-Location frontend
+npm ci
+npm run dev
 ```
 
 Start the API and query its health endpoint:
@@ -208,9 +228,20 @@ uv run --locked python scripts/verify_gate_h.py
 Gate H is keyless. `REAL_JUDGE_SMOKE=NOT_RUN` unless explicitly enabled with a
 credential-reference-only ModelProfile.
 
+The non-recursive Phase I gate generates actual deterministic Phase G and Phase H persisted
+evidence, reads it through the Workbench API, verifies trace/artifact safety and Regression
+semantics, and runs the pinned frontend type-check, Vitest suite, and production build:
+
+```powershell
+uv run --locked python scripts/verify_gate_i.py
+```
+
+All `REAL_*` evidence remains `NOT_RUN`; Gate I never uses provider or ambient Harness credentials.
+
 See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_METHODOLOGY.md), and
 [Task Format](docs/TASK_FORMAT.md), [Sandbox Security](docs/SANDBOX_SECURITY.md), and
 [M-Lane Direct Model](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md),
 [Harness Comparability](docs/HARNESS_COMPARABILITY.md),
 [Experiment Statistics](docs/EXPERIMENT_STATISTICS.md), and [Resume Scope](docs/RESUME_SCOPE.md).
-[JudgeLab](docs/JUDGELAB.md) documents the Phase H authority and calibration boundary.
+[JudgeLab](docs/JUDGELAB.md) documents the Phase H authority and calibration boundary, and
+[Workbench](docs/WORKBENCH.md) documents the Phase I read API and Vue evidence surface.

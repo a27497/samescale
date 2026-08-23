@@ -64,16 +64,14 @@ CRITICAL_TESTS = {
     "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[python]",
     "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[typescript]",
 }
-PHASE_H_MODULE_NAMES = {
-    "frontend.py",
-    "matrix_ui.py",
-    "regression_workbench.py",
+PHASE_J_MODULE_NAMES = {
     "analyst.py",
+    "analyst_agent.py",
 }
-PHASE_H_PATTERNS = tuple(
+PHASE_J_PATTERNS = tuple(
     re.compile(pattern)
     for pattern in (
-        r"\bclass\s+(?:MatrixUI|RegressionWorkbench|AnalystAgent)\b",
+        r"\bclass\s+AnalystAgent\b",
         r"\b(?:from|import)\s+langgraph\b",
     )
 )
@@ -336,9 +334,13 @@ def verify_task_toolchains() -> bool:
     return True
 
 
-def _phase_h_violation(relative: str, content: str) -> bool:
-    return Path(relative).name in PHASE_H_MODULE_NAMES or any(
-        pattern.search(content) for pattern in PHASE_H_PATTERNS
+def _phase_j_violation(relative: str, content: str) -> bool:
+    path = Path(relative)
+    return (
+        "analyst" in path.parts
+        or "langgraph" in path.parts
+        or path.name in PHASE_J_MODULE_NAMES
+        or any(pattern.search(content) for pattern in PHASE_J_PATTERNS)
     )
 
 
@@ -364,28 +366,28 @@ def verify_source_and_scope() -> bool:
     print(f"GIT_HEAD={identity.stdout.strip()}")
     print(f"GIT_DIRTY={bool(worktree.stdout.strip())}")
     sensitivity = (
-        not _phase_h_violation("src/harnesslab/judgelab.py", ""),
-        _phase_h_violation("src/harnesslab/frontend.py", "class MatrixUI: pass"),
-        not _phase_h_violation(
+        not _phase_j_violation("src/harnesslab/judgelab.py", ""),
+        _phase_j_violation("src/harnesslab/analyst/graph.py", "from langgraph import Graph"),
+        not _phase_j_violation(
             "src/harnesslab/experiment/queue.py", "class ExperimentWorker: pass"
         ),
-        not _phase_h_violation(
+        not _phase_j_violation(
             "src/harnesslab/harness_lane/adapter.py", "class HarnessAdapter: pass"
         ),
     )
     if not all(sensitivity):
-        print("FAIL: Phase I source detector failed its sensitivity control")
+        print("FAIL: Phase J source detector failed its sensitivity control")
         return False
     violations: list[str] = []
     for path in (ROOT / "src" / "harnesslab").rglob("*.py"):
         relative = path.relative_to(ROOT).as_posix()
         content = path.read_text(encoding="utf-8")
-        if _phase_h_violation(relative, content):
+        if _phase_j_violation(relative, content):
             violations.append(relative)
     if violations:
-        print(f"FAIL: Phase I implementation detected: {violations}")
+        print(f"FAIL: Phase J implementation detected: {violations}")
         return False
-    print("PASS: Phase H allowed; no Phase I Matrix UI, analyst, or frontend code")
+    print("PASS: Phase I allowed; no Phase J analyst or LangGraph code")
     return True
 
 
