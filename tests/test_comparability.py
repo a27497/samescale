@@ -17,6 +17,24 @@ from harnesslab.comparability.models import (
     ReasonCode,
     canonical_digest,
 )
+from harnesslab.contracts.common import Protocol
+from harnesslab.contracts.model import ModelProfile, ReasoningProfile
+from harnesslab.harness_lane.fake import FakeCodexBackend
+from harnesslab.harness_lane.profile import canonical_codex_profile
+from harnesslab.harness_lane.runner import CodexHarnessRunner
+from harnesslab.model_lane.fake import FakeDirectProvider
+from harnesslab.model_lane.runner import DirectModelRunner
+from harnesslab.multi_harness.adapter import ClaudeCodeAdapter, DeepSeekHarnessAdapter
+from harnesslab.multi_harness.fake import FakeMultiHarnessBackend
+from harnesslab.multi_harness.profile import canonical_claude_profile, canonical_deepseek_profile
+from harnesslab.multi_harness.runner import MultiHarnessRunner
+from harnesslab.sandbox.models import ImageIdentity
+from harnesslab.sandbox.runner import DockerSandbox
+from harnesslab.tasks.package import TaskPackage
+
+ROOT = Path(__file__).resolve().parents[1]
+PYTHON_TASK = ROOT / "tasks" / "micro-python-clamp" / "1.0.0"
+SHARED_REQUESTED_MODEL = "deterministic-comparison-model"
 
 
 def facts(**changes: str | None) -> ComparisonFacts:
@@ -226,64 +244,179 @@ def test_new_codex_manifest_trace_coverage_is_consumed_without_inference() -> No
     assert facts_from_manifest(manifest).trace_coverage == "FULL_STREAM"
 
 
-def test_actual_phase_d_e_f_shapes_supply_comparability_controls() -> None:
-    shared = {
-        "schema_version": 1,
-        "task_id": "micro-python-clamp",
-        "task_version": "1.0.0",
-        "task_digest": "sha256:" + "2" * 64,
-        "verifier_definition_digest": "sha256:" + "3" * 64,
-        "resource_budget": {
-            "timeout_seconds": 60,
-            "max_output_tokens": 1000,
-            "network_policy": "deny",
+@pytest.mark.asyncio
+async def test_real_runner_persisted_manifests_supply_comparability_controls(
+    tmp_path: Path,
+) -> None:
+    package = TaskPackage.load(PYTHON_TASK)
+    sandbox = DockerSandbox(
+        artifact_root=tmp_path / "sandbox-artifacts",
+        runtime_root=tmp_path / "sandbox-runtime",
+    )
+    direct_patch = json.dumps(
+        {
+            "schema_version": 1,
+            "operations": [
+                {
+                    "op": "write",
+                    "path": "calculator.py",
+                    "content": (
+                        "def clamp(value: int, lower: int, upper: int) -> int:\n"
+                        "    return max(lower, min(value, upper))\n"
+                    ),
+                }
+            ],
         },
-        "workspace_input_digest": "sha256:" + "4" * 64,
-        "context_digest": None,
-        "prompt_hash": "sha256:" + "5" * 64,
-        "requested_model": "same-model",
-        "observed_model": "same-model",
-        "verifier_sandbox_manifest": {
-            "role": "verifier",
-            "image": {"image_id": "sha256:" + "9" * 64},
-        },
-    }
-    phase_d = {
-        **shared,
-        "provider": "openai",
-        "endpoint": "https://api.openai.invalid/v1/responses",
-        "protocol": "responses",
-        "generation_settings": {"request_timeout_seconds": 30, "attempt_count": 1},
-    }
-    phase_e = {
-        **shared,
-        "harness": "codex",
-        "provider_route": "codex-cli-default",
-        "profile": {
-            "codex_cli_version": "0.149.0",
-            "requested_model": "same-model",
-            "provider_route": "codex-cli-default",
-            "tool_network_policy": "deny",
-        },
-        "profile_hash": "sha256:" + "7" * 64,
-        "trace_coverage": "FULL_STREAM",
-    }
-    phase_f = phase_f_manifest("left")
+        separators=(",", ":"),
+    )
+    direct_profile = ModelProfile(
+        requested_model=SHARED_REQUESTED_MODEL,
+        provider="fake-direct-provider",
+        base_url="https://fake-provider.invalid/v1",
+        route="/responses",
+        protocol=Protocol.RESPONSES,
+        reasoning=ReasoningProfile(effort="low", max_output_tokens=1000),
+    )
+    phase_d = await DirectModelRunner(
+        artifact_root=tmp_path / "phase-d-artifacts",
+        runtime_root=tmp_path / "phase-d-runtime",
+        sandbox=sandbox,
+        environment={},
+    ).run(
+        PYTHON_TASK,
+        direct_profile,
+        adapter=FakeDirectProvider(direct_patch, observed_model=SHARED_REQUESTED_MODEL),
+        run_id="comparability-phase-d",
+    )
 
-    for manifest in (phase_d, phase_e, phase_f):
-        parsed = facts_from_manifest(manifest)
-        assert all(
-            getattr(parsed, field) is not None
-            for field in (
-                "verifier_identity",
-                "budget_identity",
-                "network_policy",
-                "harness",
-                "harness_version",
-                "harness_profile_identity",
-                "provider_route",
-            )
+    phase_e = await CodexHarnessRunner(
+        artifact_root=tmp_path / "phase-e-artifacts",
+        runtime_root=tmp_path / "phase-e-runtime",
+        sandbox=sandbox,
+    ).run(
+        PYTHON_TASK,
+        canonical_codex_profile(
+            ImageIdentity(
+                reference="fake-codex:phase-e",
+                image_id="sha256:" + "1" * 64,
+            ),
+            requested_model=SHARED_REQUESTED_MODEL,
+            execution_timeout_seconds=30,
+        ),
+        backend=FakeCodexBackend(),
+        run_id="comparability-phase-e-codex",
+    )
+
+    phase_f_runner = MultiHarnessRunner(
+        artifact_root=tmp_path / "phase-f-artifacts",
+        runtime_root=tmp_path / "phase-f-runtime",
+        sandbox=sandbox,
+    )
+    claude_profile = canonical_claude_profile(
+        ImageIdentity(
+            reference="fake-claude:phase-f",
+            image_id="sha256:" + "2" * 64,
+        ),
+        requested_model=SHARED_REQUESTED_MODEL,
+        execution_timeout_seconds=30,
+    )
+    phase_f_claude = await phase_f_runner.run(
+        PYTHON_TASK,
+        claude_profile,
+        adapter=ClaudeCodeAdapter(),
+        backend=FakeMultiHarnessBackend(),
+        run_id="comparability-phase-f-claude",
+    )
+    deepseek_config_digest = "sha256:" + "4" * 64
+    deepseek_profile = canonical_deepseek_profile(
+        ImageIdentity(
+            reference="fake-deepseek:phase-f",
+            image_id="sha256:" + "3" * 64,
+        ),
+        deepseek_config_digest,
+        requested_model=SHARED_REQUESTED_MODEL,
+        execution_timeout_seconds=30,
+    )
+    phase_f_deepseek = await phase_f_runner.run(
+        PYTHON_TASK,
+        deepseek_profile,
+        adapter=DeepSeekHarnessAdapter(observed_config_digest=deepseek_config_digest),
+        backend=FakeMultiHarnessBackend(),
+        run_id="comparability-phase-f-deepseek",
+    )
+
+    assert phase_d.evidence.verifier_passed is True
+    assert phase_e.evidence.verifier_passed is True
+    assert phase_f_claude.evidence.verifier_passed is True
+    assert phase_f_deepseek.evidence.verifier_passed is True
+    manifest_paths = {
+        "phase-d": phase_d.artifact_directory / "manifest.json",
+        "phase-e-codex": phase_e.artifact_directory / "manifest.json",
+        "phase-f-claude": phase_f_claude.artifact_directory / "manifest.json",
+        "phase-f-deepseek": phase_f_deepseek.artifact_directory / "manifest.json",
+    }
+    loaded: dict[str, ComparisonFacts] = {}
+    for name, manifest_path in manifest_paths.items():
+        assert manifest_path.is_file(), name
+        loaded[name] = load_manifest_facts(manifest_path)
+
+    common_fields = (
+        "task_id",
+        "task_version",
+        "task_digest",
+        "workspace_input_digest",
+        "context_identity",
+        "verifier_identity",
+        "budget_identity",
+        "network_policy",
+        "requested_model",
+    )
+    for field in common_fields:
+        values = {getattr(item, field) for item in loaded.values()}
+        assert None not in values, field
+        assert len(values) == 1, (field, values)
+    assert loaded["phase-d"].task_id == package.definition.id
+    assert loaded["phase-d"].task_version == package.definition.version
+    assert loaded["phase-d"].task_digest == package.definition.content_digest
+    assert loaded["phase-d"].requested_model == SHARED_REQUESTED_MODEL
+
+    pairs = (
+        ("phase-d", "phase-e-codex"),
+        ("phase-d", "phase-f-claude"),
+        ("phase-e-codex", "phase-f-claude"),
+        ("phase-f-claude", "phase-f-deepseek"),
+    )
+    for left, right in pairs:
+        report = ComparabilityEngine().assess(
+            loaded[left], loaded[right], intent=ComparabilityIntent.HARNESS_UPLIFT
         )
+        assert report.status is ComparabilityStatus.NOT_COMPARABLE
+        assert not any(reason.code is ReasonCode.HARD_CONTROL_MISSING for reason in report.reasons)
+        assert any(
+            reason.code is ReasonCode.HARD_CONTROL_MISMATCH and reason.field == "provider_route"
+            for reason in report.reasons
+        )
+
+    assert any(
+        reason.code is ReasonCode.OBSERVED_MODEL_MISMATCH
+        for reason in ComparabilityEngine()
+        .assess(
+            loaded["phase-d"],
+            loaded["phase-f-claude"],
+            intent=ComparabilityIntent.HARNESS_UPLIFT,
+        )
+        .reasons
+    )
+    assert any(
+        reason.code is ReasonCode.OBSERVED_MODEL_MISSING
+        for reason in ComparabilityEngine()
+        .assess(
+            loaded["phase-e-codex"],
+            loaded["phase-f-claude"],
+            intent=ComparabilityIntent.HARNESS_UPLIFT,
+        )
+        .reasons
+    )
 
 
 def test_actual_profile_requested_model_is_not_double_counted_as_a_control() -> None:

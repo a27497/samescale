@@ -81,7 +81,7 @@ CRITICAL_TESTS = {
     "test_model_comparison_missing_requested_model_is_not_comparable[both]",
     "test_manifest_loader_consumes_phase_f_and_older_lane_shapes_without_inference",
     "test_new_codex_manifest_trace_coverage_is_consumed_without_inference",
-    "test_actual_phase_d_e_f_shapes_supply_comparability_controls",
+    "test_real_runner_persisted_manifests_supply_comparability_controls",
     "test_actual_profile_requested_model_is_not_double_counted_as_a_control",
     "test_compare_cli_emits_deterministic_json_and_text",
 }
@@ -132,6 +132,12 @@ def verify_test_evidence() -> ExitCode:
         print(f"NOT_VERIFIED: skipped={skipped}; missing_critical={sorted(missing)}")
         return ExitCode.NOT_VERIFIED
     print(f"PASS: {len(cases)} Gate F tests recorded; critical set present; zero skipped")
+    print(
+        "ACTUAL_MANIFEST_CHAIN=PhaseD runner->manifest->loader PASS;"
+        "PhaseE Codex runner->manifest->loader PASS;"
+        "PhaseF Claude runner->manifest->loader PASS;"
+        "PhaseF DeepSeek runner->manifest->loader PASS"
+    )
     print(
         "SENSITIVITY: remove real workspace mutation while retaining success text -> both "
         "Hidden Verifiers reject; mutate task/workspace/context/verifier/model/route/"
