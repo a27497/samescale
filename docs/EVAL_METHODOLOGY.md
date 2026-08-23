@@ -126,15 +126,19 @@ PAIRWISE report categorical repeat agreement; SCORE reports within-case dispersi
 
 LABEL reports accuracy, confusion, macro F1, and failure counts. SCORE uses median aggregation and
 reports coverage, MAE, Spearman, dispersion, and explicit reasons when correlation is undefined.
-PAIRWISE reports logical gold/tie accuracy, position consistency, abstention/output/provider
-counts, repeat consistency, and verbosity probe results. Abstentions and output errors hurt Judge
-capability; provider infrastructure failures remain disclosed separately.
+PAIRWISE reports planned/evaluable logical trials, coverage, position-evaluable count and
+consistency, abstention/output/provider counts, repeat consistency, and verbosity probe results.
+Provider infrastructure reduces coverage and is excluded from accuracy, F1, repeat, position, and
+capability-error denominators. Abstentions and output errors remain Judge capability failures.
 
-Qualification is versioned and suite-scoped: `QUALIFIED_FOR_SUITE`, `LIMITED`, or
-`NOT_QUALIFIED`. Passing this small corpus is not universal Judge reliability, a population-level
-claim, an expert panel, an inter-rater study, or external benchmark validation.
+Qualification is versioned and suite-scoped. Phase H Core uses `ALL_REQUIRED_CHECKS_PASS`: every
+required check yields `QUALIFIED_FOR_SUITE`; any failed check yields `NOT_QUALIFIED`. `LIMITED` is
+reserved and is not assigned by an unversioned failed-reason count. Passing this small corpus is not
+universal Judge reliability, a population-level claim, an expert panel, an inter-rater study, or
+external benchmark validation.
 
 Authority is independent of qualification. L0 remains authoritative when present, otherwise L1
 does, while L2 annotates. A Judge PASS cannot change L0 FAIL and a Judge FAIL cannot change L0
-PASS. The L0 override count is zero by construction, and JudgeLab never updates Phase G outcomes,
+PASS. Reports derive these facts through `resolve_authority`; the L0 override count is zero by
+construction, and JudgeLab never updates Phase G outcomes,
 verifier results, or capability denominators.

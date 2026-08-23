@@ -9,13 +9,14 @@ from pydantic import ValidationError
 from harnesslab.judgelab.models import (
     JudgeCalibrationPlan,
     JudgeCalibrationSpec,
+    JudgeDefinition,
     JudgeEvaluationSlot,
     JudgeMode,
     JudgeSuite,
     OrderVariant,
     digest,
 )
-from harnesslab.judgelab.suite import JudgeSuiteError, load_judge_suite
+from harnesslab.judgelab.suite import JudgeSuiteError, load_judge_definition, load_judge_suite
 from harnesslab.tasks.package import UniqueKeyLoader
 
 
@@ -50,15 +51,49 @@ def resolve_suite(spec: JudgeCalibrationSpec, repository_root: Path) -> JudgeSui
     return suite
 
 
-def build_calibration_plan(spec: JudgeCalibrationSpec, suite: JudgeSuite) -> JudgeCalibrationPlan:
+def resolve_definitions(
+    spec: JudgeCalibrationSpec, repository_root: Path
+) -> dict[str, JudgeDefinition]:
+    definitions: dict[str, JudgeDefinition] = {}
+    suites_root = (repository_root / "judge_suites").resolve()
+    for cell in spec.judge_cells:
+        candidate = (repository_root / cell.definition_reference).resolve()
+        if suites_root not in candidate.parents:
+            raise JudgePlanError("definition reference escapes judge_suites")
+        try:
+            definition = load_judge_definition(candidate)
+        except JudgeSuiteError as exc:
+            raise JudgePlanError(str(exc)) from exc
+        if definition.definition_digest != cell.definition_digest:
+            raise JudgePlanError(f"definition digest mismatch for Judge cell {cell.id}")
+        definitions[cell.id] = definition
+    return definitions
+
+
+def build_calibration_plan(
+    spec: JudgeCalibrationSpec,
+    suite: JudgeSuite,
+    definitions: dict[str, JudgeDefinition],
+) -> JudgeCalibrationPlan:
     slots: list[JudgeEvaluationSlot] = []
     public_cases = sorted(suite.public.cases, key=lambda case: case.case_id)
     for cell in sorted(spec.judge_cells, key=lambda item: item.id):
+        definition = definitions.get(cell.id)
+        if definition is None or definition.definition_digest != cell.definition_digest:
+            raise JudgePlanError(f"resolved definition missing or mismatched for cell {cell.id}")
+        unsupported = sorted(
+            case.case_id for case in public_cases if case.mode not in definition.supported_modes
+        )
+        if unsupported:
+            raise JudgePlanError(
+                f"JudgeDefinition for cell {cell.id} does not support cases: "
+                f"{','.join(unsupported)}"
+            )
         for case in public_cases:
             if case.mode is JudgeMode.PAIRWISE:
                 variants = (
                     (OrderVariant.ORIGINAL, OrderVariant.SWAPPED)
-                    if cell.order_swap_policy == "REQUIRED"
+                    if definition.order_swap_policy == "REQUIRED"
                     else (OrderVariant.ORIGINAL,)
                 )
             else:
@@ -91,7 +126,7 @@ def build_calibration_plan(spec: JudgeCalibrationSpec, suite: JudgeSuite) -> Jud
                     )
     if len({slot.slot_id for slot in slots}) != len(slots):
         raise JudgePlanError("plan expansion produced duplicate logical Judge slots")
-    return JudgeCalibrationPlan(
+    plan = JudgeCalibrationPlan(
         calibration_id=spec.calibration_id,
         name=spec.name,
         suite_id=suite.public.suite_id,
@@ -104,3 +139,45 @@ def build_calibration_plan(spec: JudgeCalibrationSpec, suite: JudgeSuite) -> Jud
         qualification_policy=spec.qualification_policy,
         slots=tuple(slots),
     )
+    validate_plan_definitions(plan, suite, definitions)
+    return plan
+
+
+def validate_plan_definitions(
+    plan: JudgeCalibrationPlan,
+    suite: JudgeSuite,
+    definitions: dict[str, JudgeDefinition],
+) -> None:
+    cases = {case.case_id: case for case in suite.public.cases}
+    for cell in plan.judge_cells:
+        definition = definitions.get(cell.id)
+        if definition is None or definition.definition_digest != cell.definition_digest:
+            raise JudgePlanError(f"resolved definition missing or mismatched for cell {cell.id}")
+        unsupported = sorted(
+            case.case_id for case in cases.values() if case.mode not in definition.supported_modes
+        )
+        if unsupported:
+            raise JudgePlanError(
+                f"JudgeDefinition for cell {cell.id} does not support cases: "
+                f"{','.join(unsupported)}"
+            )
+        for case in cases.values():
+            expected = (
+                {OrderVariant.ORIGINAL, OrderVariant.SWAPPED}
+                if case.mode is JudgeMode.PAIRWISE and definition.order_swap_policy == "REQUIRED"
+                else {OrderVariant.ORIGINAL}
+                if case.mode is JudgeMode.PAIRWISE
+                else {OrderVariant.NOT_APPLICABLE}
+            )
+            for repeat_index in range(plan.repeat_count):
+                actual = {
+                    slot.order_variant
+                    for slot in plan.slots
+                    if slot.judge_cell_id == cell.id
+                    and slot.case_id == case.case_id
+                    and slot.repeat_index == repeat_index
+                }
+                if actual != expected:
+                    raise JudgePlanError(
+                        f"plan order variants disagree with JudgeDefinition for cell {cell.id}"
+                    )

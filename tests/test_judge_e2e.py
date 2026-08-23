@@ -22,6 +22,7 @@ from harnesslab.db.models.experiment import (
 from harnesslab.db.models.judgelab import JudgeCalibrationRecord, JudgeEvaluationRecord
 from harnesslab.db.session import create_engine, create_session_factory
 from harnesslab.judgelab.calibration import execute_calibration
+from harnesslab.judgelab.fake import FakeJudgeProvider
 from harnesslab.judgelab.models import QualificationStatus
 from harnesslab.judgelab.persistence import enqueue_calibration, evaluation_records
 from harnesslab.judgelab.plan import build_calibration_plan, load_calibration_spec
@@ -45,7 +46,7 @@ async def test_persisted_good_vs_biased_judge_e2e_and_phase_g_read_only(
     spec = load_calibration_spec(SUITE_ROOT / "calibration.yaml").model_copy(
         update={"calibration_id": "phase-h-gate-e2e"}
     )
-    plan = build_calibration_plan(spec, suite)
+    plan = build_calibration_plan(spec, suite, {cell.id: definition for cell in spec.judge_cells})
     definitions = {cell.id: definition for cell in plan.judge_cells}
     phase_g_id = "phase-h-read-only-regression"
     try:
@@ -135,6 +136,14 @@ async def test_persisted_good_vs_biased_judge_e2e_and_phase_g_read_only(
         assert biased.pairwise_metrics["repeat_consistency"] < 1.0
         assert good.l0_override_count == biased.l0_override_count == 0
         assert biased.l0_judge_disagreement_count > good.l0_judge_disagreement_count
+        biased_l0 = [
+            item
+            for item in biased.authority_resolutions
+            if item.authority_level == "L0" and item.judge_disagreement
+        ]
+        assert biased_l0
+        assert all(item.authoritative_value in {"PASS", "FAIL"} for item in biased_l0)
+        assert all(item.l0_override_count == 0 for item in biased_l0)
         assert good.pairwise_metrics["logical_pair_count"] == 18
         assert good.pairwise_metrics["order_swapped_requests"] == 18
 
@@ -173,6 +182,26 @@ async def test_persisted_good_vs_biased_judge_e2e_and_phase_g_read_only(
             )
             assert rebuilt_a.markdown() == rebuilt_b.markdown() == report.markdown()
             assert rebuilt_a.report_digest == report.report_digest
+            one_failure_plan = plan.model_copy(
+                update={
+                    "qualification_policy": plan.qualification_policy.model_copy(
+                        update={"minimum_label_accuracy": 0.81}
+                    )
+                }
+            )
+            one_failure = build_judge_report(
+                plan=one_failure_plan,
+                suite=suite,
+                definitions={
+                    cell_id: value.model_dump(mode="json") for cell_id, value in definitions.items()
+                },
+                records=records,
+            )
+            one_failure_good = next(
+                cell for cell in one_failure.cells if cell.judge_cell_id == "good-judge"
+            )
+            assert one_failure_good.qualification_status is QualificationStatus.NOT_QUALIFIED
+            assert len(one_failure_good.qualification_reasons) == 1
             private_scan = json.dumps(
                 [
                     {
@@ -252,7 +281,7 @@ async def test_judge_artifact_reload_digest_and_slot_identity_fail_closed(
     spec = load_calibration_spec(SUITE_ROOT / "calibration.yaml").model_copy(
         update={"calibration_id": "phase-h-artifact-integrity"}
     )
-    plan = build_calibration_plan(spec, suite)
+    plan = build_calibration_plan(spec, suite, {cell.id: definition for cell in spec.judge_cells})
     definitions = {cell.id: definition for cell in plan.judge_cells}
     try:
         async with factory() as session, session.begin():
@@ -278,21 +307,110 @@ async def test_judge_artifact_reload_digest_and_slot_identity_fail_closed(
             )
             assert row is not None and row.artifact_manifest_path and row.artifact_digest
             path = Path(row.artifact_manifest_path)
-            content = path.read_text(encoding="utf-8")
-            path.write_text(
-                content.replace('"case_id":"', '"case_id":"tampered-'), encoding="utf-8"
-            )
+            original = path.read_bytes()
             slot = next(item for item in plan.slots if item.slot_id == row.slot_id)
             cell = next(item for item in plan.judge_cells if item.id == row.judge_cell_id)
-            with pytest.raises(JudgeArtifactError, match="digest mismatch"):
-                load_and_verify_evidence(
-                    path,
-                    expected_slot=slot,
-                    suite_digest=plan.suite_digest,
-                    definition_digest=definition.definition_digest,
-                    profile_identity=cell.profile_identity,
-                    expected_artifact_digest=row.artifact_digest,
+            parsed = json.loads(original)
+            mutations = (
+                b" " + original,
+                (
+                    json.dumps(
+                        dict(reversed(list(parsed.items()))),
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    )
+                    + "\n"
+                ).encode(),
+                original.replace(b'"case_id":"', b'"case_id":"tampered-', 1),
+            )
+            for mutation in mutations:
+                path.write_bytes(mutation)
+                with pytest.raises(JudgeArtifactError, match="artifact digest mismatch"):
+                    load_and_verify_evidence(
+                        path,
+                        expected_slot=slot,
+                        suite_digest=plan.suite_digest,
+                        definition_digest=definition.definition_digest,
+                        profile_identity=cell.profile_identity,
+                        expected_artifact_digest=row.artifact_digest,
+                    )
+            path.write_bytes(original)
+    finally:
+        async with factory() as session, session.begin():
+            await session.execute(
+                delete(JudgeCalibrationRecord).where(
+                    JudgeCalibrationRecord.id == plan.calibration_id
                 )
+            )
+        await engine.dispose()
+
+
+@pytest.mark.integration
+async def test_provider_infra_only_lowers_coverage_and_cannot_dilute_capability_errors(
+    database_url: str, tmp_path: Path
+) -> None:
+    settings = Settings.without_dotenv(database_url=database_url)
+    engine = create_engine(settings)
+    factory = create_session_factory(engine)
+    suite = load_judge_suite(SUITE_ROOT)
+    definition = load_judge_definition(SUITE_ROOT / "definition.yaml")
+    loaded = load_calibration_spec(SUITE_ROOT / "calibration.yaml")
+    spec = loaded.model_copy(
+        update={
+            "calibration_id": "phase-h-infra-denominator",
+            "judge_cells": (loaded.judge_cells[0],),
+        }
+    )
+    definitions = {spec.judge_cells[0].id: definition}
+    plan = build_calibration_plan(spec, suite, definitions)
+    timeouts = frozenset(
+        [
+            (case_id, repeat, "NOT_APPLICABLE")
+            for case_id in ("label-l0-pass", "label-l0-fail")
+            for repeat in range(3)
+        ]
+        + [
+            (case_id, repeat, "ORIGINAL")
+            for case_id in ("pair-arithmetic", "pair-adversarial")
+            for repeat in range(3)
+        ]
+    )
+    try:
+        async with factory() as session, session.begin():
+            await session.execute(
+                delete(JudgeCalibrationRecord).where(
+                    JudgeCalibrationRecord.id == plan.calibration_id
+                )
+            )
+        async with factory() as session:
+            report = await execute_calibration(
+                session,
+                plan=plan,
+                suite=suite,
+                definitions=definitions,
+                artifact_root=tmp_path / "infra-artifacts",
+                adapters={
+                    spec.judge_cells[0].id: FakeJudgeProvider(
+                        "GOOD", provider_timeout_slots=timeouts
+                    )
+                },
+            )
+        cell = report.cells[0]
+        assert cell.label_metrics["coverage"] == 0.6
+        assert cell.label_metrics["accuracy"] <= 0.8
+        assert cell.label_metrics["macro_f1"] == 1.0
+        assert cell.pairwise_metrics["planned_logical_pairs"] == 18
+        assert cell.pairwise_metrics["evaluable_logical_pairs"] == 12
+        assert cell.pairwise_metrics["provider_infra_trials"] == 6
+        assert cell.pairwise_metrics["coverage"] == 0.666667
+        assert cell.pairwise_metrics["position_evaluable_count"] == 12
+        assert cell.pairwise_metrics["position_consistency_rate"] == 1.0
+        assert cell.pairwise_metrics["repeat_consistency"] == 1.0
+        assert cell.capability_metrics["evaluable_opportunities"] == 33
+        assert cell.capability_metrics["abstain_output_error_count"] == 6
+        assert cell.capability_metrics["abstain_output_error_rate"] == 0.181818
+        assert cell.qualification_status is QualificationStatus.NOT_QUALIFIED
+        assert any("coverage" in reason for reason in cell.qualification_reasons)
     finally:
         async with factory() as session, session.begin():
             await session.execute(

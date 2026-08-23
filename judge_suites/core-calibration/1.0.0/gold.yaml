@@ -29,53 +29,53 @@ gold:
     gold_source: CURATED_HUMAN_L1
     expected: UNKNOWN
     curator_note: Repository-curated insufficient-information example.
-  - case_id: score-low
+  - case_id: score-arithmetic-fragment
     mode: SCORE
     gold_source: CURATED_HUMAN_L1
     expected: 1
     score_tolerance: 0.25
-  - case_id: score-mid-low
+  - case_id: score-security-caveat
     mode: SCORE
     gold_source: CURATED_HUMAN_L1
     expected: 2
     score_tolerance: 0.25
-  - case_id: score-mid-high
+  - case_id: score-deployment-guide
     mode: SCORE
     gold_source: CURATED_HUMAN_L1
     expected: 4
     score_tolerance: 0.25
-  - case_id: score-high
+  - case_id: score-citation-answer
     mode: SCORE
     gold_source: CURATED_HUMAN_L1
     expected: 5
     score_tolerance: 0.25
-  - case_id: pair-a-wins
+  - case_id: pair-arithmetic
     mode: PAIRWISE
     gold_source: CURATED_HUMAN_L1
     expected: A
     probe: {position_probe: true}
-  - case_id: pair-b-wins-adversarial
+  - case_id: pair-adversarial
     mode: PAIRWISE
     gold_source: CURATED_HUMAN_L1
     expected: B
     probe: {position_probe: true}
-  - case_id: pair-tie
+  - case_id: pair-concurrency
     mode: PAIRWISE
     gold_source: CURATED_HUMAN_L1
     expected: TIE
     probe: {position_probe: true}
-  - case_id: pair-unknown
+  - case_id: pair-unpublished
     mode: PAIRWISE
     gold_source: CURATED_HUMAN_L1
     expected: UNKNOWN
     probe: {position_probe: true}
-  - case_id: pair-verbosity-a
+  - case_id: pair-restatement
     mode: PAIRWISE
     gold_source: CURATED_HUMAN_L1
     expected: TIE
     probe: {position_probe: true, verbosity_probe: true, longer_candidate: A}
     curator_note: Extra words add no substantive quality.
-  - case_id: pair-verbosity-b
+  - case_id: pair-transport
     mode: PAIRWISE
     gold_source: CURATED_HUMAN_L1
     expected: TIE

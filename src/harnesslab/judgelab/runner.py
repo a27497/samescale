@@ -35,11 +35,16 @@ class JudgeArtifactError(RuntimeError):
 @dataclass(frozen=True)
 class JudgeRunResult:
     artifact_path: Path | None
+    artifact_digest: str | None
     evidence: JudgeEvidence
 
 
 def _sha256_text(value: str) -> str:
     return "sha256:" + hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _sha256_bytes(value: bytes) -> str:
+    return "sha256:" + hashlib.sha256(value).hexdigest()
 
 
 def canonical_preference(evidence: JudgeEvidence) -> str | None:
@@ -157,8 +162,8 @@ class JudgeRunner:
             provider_failure=(provider_error.category if provider_error else None),
             provider_error=provider_error,
         )
-        artifact_digest = _sha256_text(evidence.canonical_json(include_artifact_digest=False))
-        evidence = evidence.model_copy(update={"artifact_digest": artifact_digest})
+        content_digest = _sha256_text(evidence.canonical_json(include_content_digest=False))
+        evidence = evidence.model_copy(update={"evidence_content_digest": content_digest})
         path = (
             self.artifact_root
             / slot.calibration_id
@@ -176,10 +181,10 @@ class JudgeRunner:
             os.replace(temporary, path)
         except OSError:
             failed = evidence.model_copy(
-                update={"outcome": JudgeRunOutcome.ARTIFACT_ERROR, "artifact_digest": None}
+                update={"outcome": JudgeRunOutcome.ARTIFACT_ERROR, "evidence_content_digest": None}
             )
-            return JudgeRunResult(None, failed)
-        return JudgeRunResult(path, evidence)
+            return JudgeRunResult(None, None, failed)
+        return JudgeRunResult(path, _sha256_bytes(path.read_bytes()), evidence)
 
 
 def load_and_verify_evidence(
@@ -192,12 +197,18 @@ def load_and_verify_evidence(
     expected_artifact_digest: str,
 ) -> JudgeEvidence:
     try:
-        evidence = JudgeEvidence.model_validate_json(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, ValueError) as exc:
+        file_bytes = path.read_bytes()
+    except OSError as exc:
         raise JudgeArtifactError("JudgeEvidence is unreadable") from exc
-    actual = _sha256_text(evidence.canonical_json(include_artifact_digest=False))
-    if actual != evidence.artifact_digest or actual != expected_artifact_digest:
+    if _sha256_bytes(file_bytes) != expected_artifact_digest:
         raise JudgeArtifactError("JudgeEvidence artifact digest mismatch")
+    try:
+        evidence = JudgeEvidence.model_validate_json(file_bytes)
+    except (UnicodeDecodeError, ValueError) as exc:
+        raise JudgeArtifactError("JudgeEvidence is unreadable") from exc
+    content_digest = _sha256_text(evidence.canonical_json(include_content_digest=False))
+    if content_digest != evidence.evidence_content_digest:
+        raise JudgeArtifactError("JudgeEvidence content digest mismatch")
     expected = {
         "evaluation_id": f"eval-{expected_slot.slot_id.removeprefix('sha256:')}",
         "calibration_id": expected_slot.calibration_id,

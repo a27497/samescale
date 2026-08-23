@@ -11,6 +11,7 @@ from scipy.stats import spearmanr
 
 from harnesslab.db.models.judgelab import JudgeEvaluationRecord
 from harnesslab.judgelab.models import (
+    EvaluationAuthorityResolution,
     GoldSource,
     JudgeCalibrationPlan,
     JudgeEvidence,
@@ -20,6 +21,7 @@ from harnesslab.judgelab.models import (
     QualificationStatus,
     canonical_json,
     digest,
+    resolve_authority,
 )
 from harnesslab.judgelab.runner import canonical_preference, load_and_verify_evidence
 
@@ -37,9 +39,11 @@ class JudgeCellCalibration(BaseModel):
     label_metrics: dict[str, Any]
     score_metrics: dict[str, Any]
     pairwise_metrics: dict[str, Any]
+    capability_metrics: dict[str, Any]
     l0_case_count: int
     l0_judge_disagreement_count: int
     l0_override_count: int
+    authority_resolutions: tuple[EvaluationAuthorityResolution, ...]
     qualification_status: QualificationStatus
     qualification_reasons: tuple[str, ...]
 
@@ -130,27 +134,18 @@ def _categorical_repeat(values: dict[str, list[str]]) -> float | None:
     return round(sum(rates) / len(rates), 6) if rates else None
 
 
-def _pairwise_repeat(values: dict[str, list[str | None]]) -> float | None:
-    rates: list[float] = []
-    for items in values.values():
-        if not items:
-            continue
-        valid = [item for item in items if item is not None]
-        rates.append(max(Counter(valid).values()) / len(items) if valid else 0.0)
-    return round(sum(rates) / len(rates), 6) if rates else None
-
-
 def _label_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[str, Any]:
     gold = {item.case_id: str(item.expected) for item in suite.gold.gold}
     items = [item for item in evidence if item.case_mode is JudgeMode.LABEL]
     counts = _counts(items)
-    valid = [item for item in items if item.outcome is JudgeRunOutcome.JUDGED]
+    evaluable = [item for item in items if item.outcome is not JudgeRunOutcome.PROVIDER_ERROR]
+    valid = [item for item in evaluable if item.outcome is JudgeRunOutcome.JUDGED]
     predictions = {
         item.evaluation_id: str(item.parsed_judgment["label"])
         for item in valid
         if item.parsed_judgment is not None
     }
-    denominator = counts["planned"] - counts["provider_failures"]
+    denominator = len(evaluable)
     correct = sum(predictions.get(item.evaluation_id) == gold[item.case_id] for item in valid)
     classes = sorted({gold[item.case_id] for item in items if gold[item.case_id] != "UNKNOWN"})
     confusion = {
@@ -158,7 +153,7 @@ def _label_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[str
             predicted: sum(
                 gold[item.case_id] == expected
                 and predictions.get(item.evaluation_id, "NO_VALID_JUDGMENT") == predicted
-                for item in items
+                for item in evaluable
             )
             for predicted in [*classes, "UNKNOWN", "NO_VALID_JUDGMENT"]
         }
@@ -168,20 +163,20 @@ def _label_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[str
     for label in classes:
         tp = sum(
             gold[item.case_id] == label and predictions.get(item.evaluation_id) == label
-            for item in items
+            for item in evaluable
         )
         fp = sum(
             gold[item.case_id] != label and predictions.get(item.evaluation_id) == label
-            for item in items
+            for item in evaluable
         )
         fn = sum(
             gold[item.case_id] == label and predictions.get(item.evaluation_id) != label
-            for item in items
+            for item in evaluable
         )
         f1s.append((2 * tp / (2 * tp + fp + fn)) if (2 * tp + fp + fn) else 0.0)
     repeated: dict[str, list[str]] = defaultdict(list)
-    for item in valid:
-        repeated[item.case_id].append(predictions[item.evaluation_id])
+    for item in evaluable:
+        repeated[item.case_id].append(predictions.get(item.evaluation_id, item.outcome.value))
     return {
         "case_count": len({item.case_id for item in items}),
         "planned_judgments": counts["planned"],
@@ -189,7 +184,8 @@ def _label_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[str
         "abstains": counts["abstained"],
         "judge_output_errors": counts["judge_output_errors"],
         "provider_failures": counts["provider_failures"],
-        "coverage": _ratio(counts["judged"], denominator),
+        "evaluable_judgments": denominator,
+        "coverage": _ratio(denominator, counts["planned"]),
         "accuracy": _ratio(correct, denominator),
         "confusion_matrix": confusion,
         "macro_f1": round(sum(f1s) / len(f1s), 6) if f1s else None,
@@ -241,12 +237,13 @@ def _score_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[str
         else:
             rho = round(value, 6)
     dispersions = [statistics.pstdev(values) for values in by_case.values() if values]
-    denominator = counts["planned"] - counts["provider_failures"]
+    evaluable_count = counts["planned"] - counts["provider_failures"]
     return {
         "case_count": len(gold),
         "planned_judgments": counts["planned"],
         "covered_case_count": len(aggregates),
-        "coverage": _ratio(counts["judged"], denominator),
+        "evaluable_judgments": evaluable_count,
+        "coverage": _ratio(evaluable_count, counts["planned"]),
         "mae": mae,
         "spearman_rho": rho,
         "spearman_not_available_reason": rho_reason,
@@ -266,49 +263,80 @@ def _pairwise_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[
     trials: dict[tuple[str, int], list[JudgeEvidence]] = defaultdict(list)
     for item in items:
         trials[(item.case_id, item.logical_repeat_index)].append(item)
-    logical: list[tuple[str, str | None, bool]] = []
-    infra_trials = 0
+    logical: list[dict[str, Any]] = []
     for (case_id, _repeat), pair in sorted(trials.items()):
-        if any(item.outcome is JudgeRunOutcome.PROVIDER_ERROR for item in pair):
-            infra_trials += 1
+        provider_infra = any(item.outcome is JudgeRunOutcome.PROVIDER_ERROR for item in pair)
         values = [canonical_preference(item) for item in pair]
-        consistent = len(values) == 2 and values[0] is not None and values[0] == values[1]
-        logical.append((case_id, values[0] if consistent else None, consistent))
-    denominator = len(logical) - infra_trials
-    correct = sum(
-        consistent and verdict == str(gold_items[case_id].expected)
-        for case_id, verdict, consistent in logical
-    )
-    ties = [row for row in logical if gold_items[row[0]].expected == "TIE"]
-    position_consistent = sum(row[2] for row in logical)
-    unknown_trials = sum(
-        verdict == "UNKNOWN"
-        or any(item.outcome is JudgeRunOutcome.ABSTAINED for item in trials[(case_id, repeat)])
-        for (case_id, repeat), (_logical_case, verdict, _consistent) in zip(
-            sorted(trials), logical, strict=True
+        position_evaluable = len(pair) == 2 and not provider_infra
+        consistent = position_evaluable and values[0] is not None and values[0] == values[1]
+        verdict = (
+            values[0]
+            if (len(values) == 1 and not provider_infra) or (position_evaluable and consistent)
+            else None
         )
+        capability_error = any(
+            item.outcome in {JudgeRunOutcome.ABSTAINED, JudgeRunOutcome.JUDGE_OUTPUT_ERROR}
+            for item in pair
+        )
+        logical.append(
+            {
+                "case_id": case_id,
+                "provider_infra": provider_infra,
+                "position_evaluable": position_evaluable,
+                "position_consistent": consistent,
+                "verdict": verdict,
+                "capability_error": capability_error,
+                "canonical_values": tuple(values),
+            }
+        )
+    evaluable = [row for row in logical if not row["provider_infra"]]
+    correct = sum(row["verdict"] == str(gold_items[row["case_id"]].expected) for row in evaluable)
+    ties = [row for row in evaluable if gold_items[row["case_id"]].expected == "TIE"]
+    position_rows = [row for row in logical if row["position_evaluable"]]
+    position_consistent = sum(row["position_consistent"] for row in position_rows)
+    abstain_trials = sum(
+        any(item.outcome is JudgeRunOutcome.ABSTAINED for item in pair)
+        for pair in trials.values()
+        if not any(item.outcome is JudgeRunOutcome.PROVIDER_ERROR for item in pair)
     )
     output_error_trials = sum(
         any(item.outcome is JudgeRunOutcome.JUDGE_OUTPUT_ERROR for item in pair)
         for pair in trials.values()
+        if not any(item.outcome is JudgeRunOutcome.PROVIDER_ERROR for item in pair)
     )
-    repeated: dict[str, list[str | None]] = defaultdict(list)
-    for case_id, verdict, consistent in logical:
-        repeated[case_id].append(verdict if consistent else None)
-    verbosity = [row for row in logical if gold_items[row[0]].probe.verbosity_probe]
+    repeated: dict[str, list[str]] = defaultdict(list)
+    for row in evaluable:
+        for variant_index, value in enumerate(row["canonical_values"]):
+            state = (
+                str(value)
+                if value is not None
+                else "CAPABILITY_ERROR"
+                if row["capability_error"]
+                else "NO_VALID_JUDGMENT"
+            )
+            repeated[f"{row['case_id']}:{variant_index}"].append(state)
+    verbosity = [row for row in evaluable if gold_items[row["case_id"]].probe.verbosity_probe]
     longer = sum(
-        consistent and verdict == gold_items[case_id].probe.longer_candidate
-        for case_id, verdict, consistent in verbosity
+        row["verdict"] == gold_items[row["case_id"]].probe.longer_candidate for row in verbosity
     )
+    provider_infra_trials = len(logical) - len(evaluable)
+    capability_errors = sum(row["capability_error"] for row in evaluable)
     return {
         "logical_pair_count": len(logical),
-        "gold_accuracy": _ratio(correct, denominator),
-        "position_consistency_rate": _ratio(position_consistent, len(logical)),
-        "tie_accuracy": _ratio(sum(row[1] == "TIE" and row[2] for row in ties), len(ties)),
-        "unknown_abstain_rate": _ratio(unknown_trials, len(logical)),
-        "judge_output_error_rate": _ratio(output_error_trials, len(logical)),
+        "planned_logical_pairs": len(logical),
+        "evaluable_logical_pairs": len(evaluable),
+        "provider_infra_trials": provider_infra_trials,
+        "coverage": _ratio(len(evaluable), len(logical)),
+        "gold_accuracy": _ratio(correct, len(evaluable)),
+        "position_evaluable_count": len(position_rows),
+        "position_consistency_rate": _ratio(position_consistent, len(position_rows)),
+        "tie_accuracy": _ratio(sum(row["verdict"] == "TIE" for row in ties), len(ties)),
+        "unknown_abstain_rate": _ratio(abstain_trials, len(evaluable)),
+        "judge_output_error_rate": _ratio(output_error_trials, len(evaluable)),
         "provider_infra_count": counts["provider_failures"],
-        "repeat_consistency": _pairwise_repeat(repeated),
+        "capability_error_count": capability_errors,
+        "capability_error_opportunities": len(evaluable),
+        "repeat_consistency": _categorical_repeat(repeated),
         "verbosity_probe_count": len(verbosity),
         "longer_candidate_preference_count": longer,
         "verbosity_bias_rate": _ratio(longer, len(verbosity)),
@@ -317,7 +345,11 @@ def _pairwise_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[
 
 
 def _threshold_reasons(
-    label: dict[str, Any], score: dict[str, Any], pairwise: dict[str, Any], policy: object
+    label: dict[str, Any],
+    score: dict[str, Any],
+    pairwise: dict[str, Any],
+    capability: dict[str, Any],
+    policy: object,
 ) -> tuple[str, ...]:
     from harnesslab.judgelab.models import QualificationPolicy
 
@@ -328,6 +360,7 @@ def _threshold_reasons(
         (label["accuracy"], parsed.minimum_label_accuracy, "label accuracy", "min"),
         (label["macro_f1"], parsed.minimum_macro_f1, "label macro F1", "min"),
         (score["coverage"], parsed.minimum_coverage, "score coverage", "min"),
+        (pairwise["coverage"], parsed.minimum_coverage, "pairwise coverage", "min"),
         (score["mae"], parsed.maximum_score_mae, "score MAE", "max"),
         (pairwise["gold_accuracy"], parsed.minimum_pairwise_accuracy, "pairwise accuracy", "min"),
         (
@@ -359,20 +392,34 @@ def _threshold_reasons(
     repeats = [label["repeat_consistency"], pairwise["repeat_consistency"]]
     if any(value is None or value < parsed.minimum_repeat_consistency for value in repeats):
         reasons.append("categorical repeat consistency is below policy")
-    capability_total = (
-        label["planned_judgments"] + score["planned_judgments"] + pairwise["logical_pair_count"]
+    if (
+        capability["abstain_output_error_rate"] is None
+        or capability["abstain_output_error_rate"] > parsed.maximum_abstain_error_rate
+    ):
+        reasons.append("combined abstain/output-error rate exceeds policy")
+    return tuple(reasons)
+
+
+def _capability_metrics(
+    label: dict[str, Any], score: dict[str, Any], pairwise: dict[str, Any]
+) -> dict[str, Any]:
+    opportunities = (
+        label["evaluable_judgments"]
+        + score["evaluable_judgments"]
+        + pairwise["capability_error_opportunities"]
     )
-    bad = (
+    errors = (
         label["abstains"]
         + label["judge_output_errors"]
         + score["abstains"]
         + score["judge_output_errors"]
-        + round(pairwise["unknown_abstain_rate"] * pairwise["logical_pair_count"])
-        + round(pairwise["judge_output_error_rate"] * pairwise["logical_pair_count"])
+        + pairwise["capability_error_count"]
     )
-    if capability_total and bad / capability_total > parsed.maximum_abstain_error_rate:
-        reasons.append("combined abstain/output-error rate exceeds policy")
-    return tuple(reasons)
+    return {
+        "evaluable_opportunities": opportunities,
+        "abstain_output_error_count": errors,
+        "abstain_output_error_rate": _ratio(errors, opportunities),
+    }
 
 
 def build_judge_report(
@@ -422,14 +469,15 @@ def build_judge_report(
         label = _label_metrics(items, suite)
         score = _score_metrics(items, suite)
         pairwise = _pairwise_metrics(items, suite)
+        capability = _capability_metrics(label, score, pairwise)
         l0_case_ids = {
             item.case_id
             for item in suite.gold.gold
             if item.gold_source is GoldSource.DETERMINISTIC_L0
         }
-        disagreements = 0
+        authority_resolutions: list[EvaluationAuthorityResolution] = []
         for item in items:
-            if item.case_id not in l0_case_ids or item.outcome is not JudgeRunOutcome.JUDGED:
+            if item.outcome is not JudgeRunOutcome.JUDGED:
                 continue
             value: str | float | None
             if item.case_mode is JudgeMode.PAIRWISE:
@@ -443,15 +491,37 @@ def build_judge_report(
                 if not isinstance(score_value, int | float) or isinstance(score_value, bool):
                     raise JudgeReportError("persisted SCORE judgment is not numeric")
                 value = float(score_value)
-            if value != gold[item.case_id].expected:
-                disagreements += 1
-        reasons = _threshold_reasons(label, score, pairwise, plan.qualification_policy)
+            if value is None:
+                continue
+            gold_case = gold[item.case_id]
+            resolution = resolve_authority(
+                l0_deterministic=(
+                    gold_case.expected
+                    if gold_case.gold_source is GoldSource.DETERMINISTIC_L0
+                    else None
+                ),
+                l1_human_gold=(
+                    gold_case.expected
+                    if gold_case.gold_source is GoldSource.CURATED_HUMAN_L1
+                    else None
+                ),
+                l2_judge=value,
+            )
+            authority_resolutions.append(
+                EvaluationAuthorityResolution(
+                    evaluation_id=item.evaluation_id,
+                    case_id=item.case_id,
+                    **resolution.model_dump(mode="python"),
+                )
+            )
+        l0_resolutions = [item for item in authority_resolutions if item.authority_level == "L0"]
+        disagreements = sum(item.judge_disagreement for item in l0_resolutions)
+        overrides = sum(item.l0_override_count for item in l0_resolutions)
+        reasons = _threshold_reasons(label, score, pairwise, capability, plan.qualification_policy)
         status = (
             QualificationStatus.QUALIFIED_FOR_SUITE
             if not reasons
             else QualificationStatus.NOT_QUALIFIED
-            if len(reasons) >= 3
-            else QualificationStatus.LIMITED
         )
         reports.append(
             JudgeCellCalibration(
@@ -461,9 +531,11 @@ def build_judge_report(
                 label_metrics=label,
                 score_metrics=score,
                 pairwise_metrics=pairwise,
+                capability_metrics=capability,
                 l0_case_count=len(l0_case_ids),
                 l0_judge_disagreement_count=disagreements,
-                l0_override_count=0,
+                l0_override_count=overrides,
+                authority_resolutions=tuple(authority_resolutions),
                 qualification_status=status,
                 qualification_reasons=reasons,
             )

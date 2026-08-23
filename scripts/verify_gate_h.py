@@ -35,7 +35,7 @@ PHASE_H_TESTS = (
 CRITICAL_TESTS = {
     "test_strict_judge_definition_suite_and_deterministic_digests",
     "test_suite_rejects_invalid_gold_and_probe_metadata",
-    "test_gold_and_identity_sentinels_never_enter_public_judge_request",
+    "test_public_suite_no_answer_key_and_hidden_gold_mutation_preserves_request_bytes",
     "test_adversarial_candidate_remains_delimited_untrusted_data",
     "test_score_parser_rejects_range_and_abstain_invariant",
     "test_refusal_malformed_provider_failure_and_private_reasoning_taxonomy",
@@ -43,10 +43,13 @@ CRITICAL_TESTS = {
     "test_l0_authority_cannot_be_overridden_by_l2_judge",
     "test_plan_is_timestamp_free_deterministic_and_explicitly_repeated",
     "test_pairwise_swap_is_one_logical_trial_with_two_order_variants",
-    "test_definition_policy_can_explicitly_disable_pairwise_swap",
+    "test_judge_definition_is_authoritative_pairwise_order_policy",
+    "test_cell_cannot_override_order_policy_and_unsupported_modes_fail_before_enqueue",
+    "test_qualification_policy_is_versioned_all_required_checks_pass",
     "test_plan_digest_changes_for_every_frozen_calibration_dimension",
     "test_persisted_good_vs_biased_judge_e2e_and_phase_g_read_only",
     "test_judge_artifact_reload_digest_and_slot_identity_fail_closed",
+    "test_provider_infra_only_lowers_coverage_and_cannot_dilute_capability_errors",
     "test_phase_g_to_phase_h_migration_preserves_experiment_evidence",
 }
 
@@ -133,7 +136,7 @@ def verify_test_evidence() -> ExitCode:
     print(f"BIASED_JUDGE_METRICS={json.dumps(biased, sort_keys=True, separators=(',', ':'))}")
     print("L0_AUTHORITY=FAIL+JudgePASS->FAIL;PASS+JudgeFAIL->PASS;overrides=0 PASS")
     print("PAIRWISE=original+swapped canonicalized as one logical trial PASS")
-    print("LEAKAGE=gold+oracle+verifier+identity+private-reasoning sentinels absent PASS")
+    print("LEAKAGE=answer-keys+gold+oracle+verifier+identity+private-reasoning absent PASS")
     print("REAL_JUDGE_SMOKE=NOT_RUN")
     return ExitCode.PASS
 

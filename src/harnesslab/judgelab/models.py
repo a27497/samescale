@@ -315,6 +315,7 @@ class QualificationPolicy(BaseModel):
     minimum_repeat_consistency: float = Field(ge=0, le=1)
     maximum_abstain_error_rate: float = Field(ge=0, le=1)
     maximum_verbosity_bias_rate: float = Field(ge=0, le=1)
+    qualification_rule: Literal["ALL_REQUIRED_CHECKS_PASS"]
 
 
 class JudgeCellSpec(BaseModel):
@@ -325,7 +326,6 @@ class JudgeCellSpec(BaseModel):
     definition_digest: Sha256Digest
     model_profile: ModelProfile
     profile_identity: Sha256Digest
-    order_swap_policy: Literal["REQUIRED", "DISABLED"]
     runner_contract: Literal[
         "phase-h-fake-good-v1", "phase-h-fake-biased-v1", "provider-adapter-v1"
     ]
@@ -416,18 +416,29 @@ class JudgeEvidence(BaseModel):
     outcome: JudgeRunOutcome
     provider_failure: ProviderFailureCategory | None
     provider_error: ProviderError | None
-    artifact_digest: Sha256Digest | None = None
+    evidence_content_digest: Sha256Digest | None = None
 
-    def canonical_json(self, *, include_artifact_digest: bool = True) -> str:
+    def canonical_json(self, *, include_content_digest: bool = True) -> str:
         raw = self.model_dump(mode="json")
-        if not include_artifact_digest:
-            raw["artifact_digest"] = None
+        if not include_content_digest:
+            raw["evidence_content_digest"] = None
         return canonical_json(raw)
 
 
 class AuthorityResolution(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
+    authority_level: Literal["L0", "L1", "L2"]
+    authoritative_value: str | float
+    judge_disagreement: bool
+    l0_override_count: Literal[0] = 0
+
+
+class EvaluationAuthorityResolution(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    evaluation_id: Identifier
+    case_id: Identifier
     authority_level: Literal["L0", "L1", "L2"]
     authoritative_value: str | float
     judge_disagreement: bool

@@ -18,12 +18,12 @@ from harnesslab.judgelab.plan import (
     JudgePlanError,
     build_calibration_plan,
     load_calibration_spec,
+    resolve_definitions,
     resolve_suite,
 )
 from harnesslab.judgelab.report import JudgeCalibrationReport
 from harnesslab.judgelab.suite import (
     JudgeSuiteError,
-    load_judge_definition,
     load_judge_suite,
 )
 
@@ -75,16 +75,8 @@ def validate_suite(
 def _load_plan_and_dependencies(path: Path) -> tuple[JudgeCalibrationPlan, Any, dict[str, Any]]:
     spec = load_calibration_spec(path)
     suite = resolve_suite(spec, _repository_root())
-    plan = build_calibration_plan(spec, suite)
-    definitions: dict[str, Any] = {}
-    for cell in plan.judge_cells:
-        definition_path = (_repository_root() / cell.definition_reference).resolve()
-        definition = load_judge_definition(definition_path)
-        if definition.definition_digest != cell.definition_digest:
-            raise JudgePlanError(f"definition digest mismatch for cell {cell.id}")
-        if definition.order_swap_policy != cell.order_swap_policy:
-            raise JudgePlanError(f"order-swap policy mismatch for cell {cell.id}")
-        definitions[cell.id] = definition
+    definitions = resolve_definitions(spec, _repository_root())
+    plan = build_calibration_plan(spec, suite, definitions)
     return plan, suite, definitions
 
 

@@ -14,6 +14,7 @@ from harnesslab.judgelab.persistence import (
     pending_slots,
     persist_evidence_reference,
 )
+from harnesslab.judgelab.plan import validate_plan_definitions
 from harnesslab.judgelab.report import JudgeCalibrationReport, build_judge_report
 from harnesslab.judgelab.runner import JudgeRunner
 from harnesslab.model_lane.models import ProviderAdapter, ProviderRequest, ProviderResult
@@ -48,6 +49,7 @@ async def execute_calibration(
     artifact_root: Path,
     adapters: Mapping[str, ProviderAdapter] | None = None,
 ) -> JudgeCalibrationReport:
+    validate_plan_definitions(plan, suite, dict(definitions))
     await enqueue_calibration(session, plan)
     await session.commit()
     cases = {case.case_id: case for case in suite.public.cases}
@@ -75,6 +77,7 @@ async def execute_calibration(
             slot=slot,
             path=(str(result.artifact_path.resolve()) if result.artifact_path else None),
             evidence=result.evidence,
+            artifact_digest=result.artifact_digest,
         )
         await session.commit()
         if result.artifact_path is None:

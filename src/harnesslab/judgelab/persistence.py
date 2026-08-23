@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from pathlib import Path
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -92,21 +94,26 @@ async def persist_evidence_reference(
     slot: JudgeEvaluationSlot,
     path: str | None,
     evidence: JudgeEvidence,
+    artifact_digest: str | None,
 ) -> None:
+    if path is not None:
+        try:
+            persisted_digest = "sha256:" + hashlib.sha256(Path(path).read_bytes()).hexdigest()
+        except OSError as exc:
+            raise JudgePersistenceError("JudgeEvidence artifact is unreadable") from exc
+        if persisted_digest != artifact_digest:
+            raise JudgePersistenceError("JudgeEvidence file-byte digest mismatch")
     record = await session.get(JudgeEvaluationRecord, evidence.evaluation_id, with_for_update=True)
     if record is None or record.slot_id != slot.slot_id:
         raise JudgePersistenceError("Judge evaluation slot identity is unavailable")
     if record.status == "completed":
-        if (
-            record.artifact_digest != evidence.artifact_digest
-            or record.artifact_manifest_path != path
-        ):
+        if record.artifact_digest != artifact_digest or record.artifact_manifest_path != path:
             raise JudgePersistenceError("completed Judge evaluation is immutable")
         return
     record.status = "completed"
     record.outcome = evidence.outcome.value
     record.artifact_manifest_path = path
-    record.artifact_digest = evidence.artifact_digest
+    record.artifact_digest = artifact_digest
     record.observed_judge_model = evidence.observed_judge_model
     record.finished_at = datetime.now(UTC)
     await session.flush()
