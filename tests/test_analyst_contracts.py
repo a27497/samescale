@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+from click import unstyle
 from pydantic import ValidationError
 from typer.testing import CliRunner
 
@@ -79,7 +80,7 @@ def test_cli_exposes_focused_fake_only_analyst_surface() -> None:
     runner = CliRunner()
     help_result = runner.invoke(app, ["analyst", "analyze", "--help"])
     assert help_result.exit_code == 0
-    assert "--question" in help_result.stdout
+    assert "--question" in unstyle(help_result.stdout)
     denied = runner.invoke(
         app,
         [
