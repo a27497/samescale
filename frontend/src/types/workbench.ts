@@ -1,5 +1,7 @@
 export type EvidenceStatus = 'REPORTED' | 'NOT_REPORTED'
 export type Comparability = 'COMPARABLE' | 'PARTIALLY_COMPARABLE' | 'NOT_COMPARABLE'
+export type MatrixComparability = Comparability | 'NOT_REPORTED'
+export type RegressionIntent = 'MODEL_COMPARISON' | 'HARNESS_UPLIFT' | 'GENERAL'
 
 export interface EvidenceValue {
   status: EvidenceStatus
@@ -68,7 +70,7 @@ export interface MatrixPoint {
   cell_id: string
   n: number
   tier: string
-  comparability: Comparability
+  comparability: MatrixComparability
   reason_codes: string[]
   metrics: Record<MatrixMetricKey, EvidenceValue>
 }
@@ -156,6 +158,7 @@ export interface JudgeCalibrationSummary {
   plan_digest: string
   report_digest: string | null
   status: string
+  report_evidence_status: 'REPORTED' | 'NOT_REPORTED' | 'INTEGRITY_ERROR'
   judge_cell_count: number
   qualifications: string[]
   created_at: string
@@ -206,6 +209,7 @@ export interface RegressionComparison {
   candidate_tier: string
   comparability: Comparability
   reason_codes: string[]
+  paired_observations: number
   baseline_infra_count: number
   candidate_infra_count: number
 }
@@ -217,6 +221,7 @@ export interface RegressionResponse {
   candidate_plan_digest: string
   baseline_report_digest: string
   candidate_report_digest: string
+  intent: RegressionIntent
   common_tasks: string[]
   comparisons: RegressionComparison[]
   limitation: string

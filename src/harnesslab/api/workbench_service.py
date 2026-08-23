@@ -28,6 +28,7 @@ from harnesslab.api.workbench_models import (
     JudgeCalibrationListResponse,
     JudgeCalibrationSummary,
     JudgeCellDetail,
+    MatrixComparabilityValue,
     MatrixMetricSet,
     MatrixPoint,
     MatrixResponse,
@@ -42,15 +43,20 @@ from harnesslab.api.workbench_models import (
     TraceEvent,
     TraceResponse,
 )
+from harnesslab.comparability.engine import ComparabilityEngine
+from harnesslab.comparability.models import ComparabilityIntent
 from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
 from harnesslab.db.models.judgelab import JudgeCalibrationRecord
+from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.plan import ExperimentPlan
 from harnesslab.experiment.report import (
     ExperimentReport,
     ExperimentReportError,
     build_experiment_report,
+    load_verified_experiment_evidence,
 )
+from harnesslab.experiment.statistics import summarize_cell
 from harnesslab.harness_lane.models import NormalizedTrace
 from harnesslab.judgelab.report import JudgeCalibrationReport
 from harnesslab.sandbox.artifacts import sha256_file
@@ -112,9 +118,51 @@ async def _experiment(session: AsyncSession, experiment_id: str) -> ExperimentRe
     return record
 
 
-async def _report(session: AsyncSession, experiment_id: str) -> ExperimentReport:
+def _trusted_artifact_path(raw_path: str | Path, roots: tuple[Path, ...]) -> Path:
+    """Resolve an existing artifact and reject symlink or absolute-path root escapes."""
+
     try:
-        return await build_experiment_report(session, experiment_id)
+        resolved = Path(raw_path).resolve(strict=True)
+    except OSError as exc:
+        raise WorkbenchAPIError(
+            409, "ARTIFACT_INTEGRITY_ERROR", "artifact location cannot be verified"
+        ) from exc
+    trusted = tuple(root.resolve() for root in roots)
+    if not any(resolved == root or root in resolved.parents for root in trusted):
+        raise WorkbenchAPIError(
+            409, "ARTIFACT_INTEGRITY_ERROR", "artifact is outside trusted storage"
+        )
+    return resolved
+
+
+async def _confine_experiment_artifacts(
+    session: AsyncSession, experiment_id: str, roots: tuple[Path, ...]
+) -> None:
+    paths = tuple(
+        (
+            await session.scalars(
+                select(ExperimentRunRecord.artifact_manifest_path).where(
+                    ExperimentRunRecord.experiment_id == experiment_id,
+                    ExperimentRunRecord.artifact_manifest_path.is_not(None),
+                )
+            )
+        ).all()
+    )
+    for path in paths:
+        if path is not None:
+            _trusted_artifact_path(path, roots)
+
+
+async def _report(
+    session: AsyncSession, experiment_id: str, roots: tuple[Path, ...]
+) -> ExperimentReport:
+    await _confine_experiment_artifacts(session, experiment_id, roots)
+    try:
+        return await build_experiment_report(
+            session,
+            experiment_id,
+            artifact_path_guard=lambda path: _trusted_artifact_path(path, roots),
+        )
     except ExperimentReportError as exc:
         raise WorkbenchAPIError(
             409, "ARTIFACT_INTEGRITY_ERROR", "experiment report evidence is unavailable"
@@ -211,14 +259,16 @@ async def list_experiments(
     )
 
 
-async def experiment_detail(session: AsyncSession, experiment_id: str) -> ExperimentDetail:
+async def experiment_detail(
+    session: AsyncSession, experiment_id: str, roots: tuple[Path, ...]
+) -> ExperimentDetail:
     record = await _experiment(session, experiment_id)
     plan = _plan(record)
     counts = (await _run_counts(session, (record.id,))).get(record.id, Counter())
     summary = _summary(record, plan, counts)
     report: ExperimentReport | None = None
     if record.status in TERMINAL_EXPERIMENT_STATUSES:
-        report = await _report(session, experiment_id)
+        report = await _report(session, experiment_id, roots)
     comparability = Counter[str]()
     if report is not None:
         comparability.update(item.comparability.value for item in report.pair_evidence)
@@ -270,9 +320,9 @@ async def experiment_status(session: AsyncSession, experiment_id: str) -> Experi
     )
 
 
-def _cell_comparability(
+def _task_cell_comparability(
     plan: ExperimentPlan, report: ExperimentReport
-) -> dict[str, tuple[ComparabilityValue, tuple[str, ...]]]:
+) -> dict[tuple[str, str], tuple[MatrixComparabilityValue, tuple[str, ...]]]:
     pair_cells = {
         pair.id: (pair.left_cell_id, pair.right_cell_id) for pair in plan.paired_comparisons
     }
@@ -282,51 +332,74 @@ def _cell_comparability(
             for ablation in plan.ablations
         }
     )
-    statuses: dict[str, list[str]] = defaultdict(list)
-    reasons: dict[str, set[str]] = defaultdict(set)
+    statuses: dict[tuple[str, str], list[str]] = defaultdict(list)
+    reasons: dict[tuple[str, str], set[str]] = defaultdict(set)
     for item in report.pair_evidence:
         for cell_id in pair_cells.get(item.pair_id, ()):
-            statuses[cell_id].append(item.comparability.value)
-            reasons[cell_id].update(item.reason_codes)
-    result: dict[str, tuple[ComparabilityValue, tuple[str, ...]]] = {}
-    for cell in plan.cells:
-        values = statuses.get(cell.id, ["COMPARABLE"])
-        worst = max(values, key=COMPARABILITY_ORDER.__getitem__)
-        result[cell.id] = (cast(ComparabilityValue, worst), tuple(sorted(reasons[cell.id])))
+            key = (item.task_id, cell_id)
+            statuses[key].append(item.comparability.value)
+            reasons[key].update(item.reason_codes)
+    result: dict[tuple[str, str], tuple[MatrixComparabilityValue, tuple[str, ...]]] = {}
+    for task in plan.tasks:
+        for cell in plan.cells:
+            key = (task.task_id, cell.id)
+            values = statuses.get(key)
+            if not values:
+                result[key] = ("NOT_REPORTED", ())
+                continue
+            worst = max(values, key=COMPARABILITY_ORDER.__getitem__)
+            result[key] = (cast(ComparabilityValue, worst), tuple(sorted(reasons[key])))
     return result
 
 
-async def matrix(session: AsyncSession, experiment_id: str) -> MatrixResponse:
+async def matrix(
+    session: AsyncSession, experiment_id: str, roots: tuple[Path, ...]
+) -> MatrixResponse:
     record = await _experiment(session, experiment_id)
     plan = _plan(record)
-    report = await _report(session, experiment_id)
-    by_cell = {cell.cell_id: cell for cell in report.cells}
-    comparability = _cell_comparability(plan, report)
-    single_task = len(plan.tasks) == 1
+    report = await _report(session, experiment_id, roots)
+    evidence = await load_verified_experiment_evidence(
+        session,
+        experiment_id,
+        artifact_path_guard=lambda path: _trusted_artifact_path(path, roots),
+    )
+    observations = evidence.observations
+    comparability = _task_cell_comparability(plan, report)
     points: list[MatrixPoint] = []
     for task in plan.tasks:
         for planned_cell in plan.cells:
-            cell = by_cell[planned_cell.id]
-            task_evidence = next(
-                item for item in cell.per_task_evidence if item.task_id == task.task_id
+            task_observations = tuple(
+                item.observation
+                for item in observations
+                if item.run.task_id == task.task_id and item.run.cell_id == planned_cell.id
             )
-            reported = single_task
+            planned_runs = sum(
+                slot.task.task_id == task.task_id and slot.cell_id == planned_cell.id
+                for slot in plan.run_slots
+            )
+            task_cell = summarize_cell(
+                f"{planned_cell.id}:{task.task_id}",
+                planned_runs,
+                task_observations,
+                intended_task_ids=(task.task_id,),
+                seed=plan.execution_seed,
+            )
             point_metrics = MatrixMetricSet(
-                success_rate=numeric(cell.success_rate if reported else None),
-                latency_p50_ms=numeric(cell.latency_ms.p50 if reported else None),
-                latency_p95_ms=numeric(cell.latency_ms.p95 if reported else None),
-                infra_rate=numeric(cell.infra_failure_rate if reported else None),
-                pass_at_1=numeric(cell.pass_at_k.get("pass@1") if reported else None),
-                pass_at_3=numeric(cell.pass_at_k.get("pass@3") if reported else None),
-                pass_at_5=numeric(cell.pass_at_k.get("pass@5") if reported else None),
+                success_rate=numeric(task_cell.success_rate),
+                latency_p50_ms=numeric(task_cell.latency_ms.p50),
+                latency_p95_ms=numeric(task_cell.latency_ms.p95),
+                infra_rate=numeric(task_cell.infra_failure_rate),
+                pass_at_1=numeric(task_cell.pass_at_k.get("pass@1")),
+                pass_at_3=numeric(task_cell.pass_at_k.get("pass@3")),
+                pass_at_5=numeric(task_cell.pass_at_k.get("pass@5")),
             )
-            status, reasons = comparability[planned_cell.id]
+            status, reasons = comparability[(task.task_id, planned_cell.id)]
             points.append(
                 MatrixPoint(
                     task_id=task.task_id,
                     cell_id=planned_cell.id,
-                    n=task_evidence.capability_observations,
-                    tier=task_evidence.evidence_tier.value,
+                    n=task_cell.completed_capability_runs,
+                    tier=task_cell.evidence_tier.value,
                     comparability=status,
                     reason_codes=reasons,
                     metrics=point_metrics,
@@ -343,8 +416,10 @@ async def matrix(session: AsyncSession, experiment_id: str) -> MatrixResponse:
     )
 
 
-async def experiment_report(session: AsyncSession, experiment_id: str) -> ExperimentReportResponse:
-    report = await _report(session, experiment_id)
+async def experiment_report(
+    session: AsyncSession, experiment_id: str, roots: tuple[Path, ...]
+) -> ExperimentReportResponse:
+    report = await _report(session, experiment_id, roots)
     return ExperimentReportResponse(
         experiment_id=report.experiment_id,
         plan_digest=report.plan_digest,
@@ -414,10 +489,12 @@ async def list_runs(
     )
 
 
-def _safe_manifest(run: ExperimentRunRecord) -> tuple[dict[str, Any], Path]:
+def _safe_manifest(
+    run: ExperimentRunRecord, roots: tuple[Path, ...]
+) -> tuple[dict[str, Any], Path]:
     if run.artifact_manifest_path is None or run.evidence_digest is None:
         raise WorkbenchAPIError(409, "ARTIFACT_UNAVAILABLE", "run artifact is not reported")
-    manifest_path = Path(run.artifact_manifest_path)
+    manifest_path = _trusted_artifact_path(run.artifact_manifest_path, roots)
     try:
         if not manifest_path.is_file() or sha256_file(manifest_path) != run.evidence_digest:
             raise WorkbenchAPIError(
@@ -438,16 +515,16 @@ def _safe_manifest(run: ExperimentRunRecord) -> tuple[dict[str, Any], Path]:
         expected_run_id = f"{run.run_id[:prefix_length]}-{identity_digest}{suffix}"
     if not isinstance(raw, dict) or raw.get("run_id") != expected_run_id:
         raise WorkbenchAPIError(409, "ARTIFACT_INTEGRITY_ERROR", "run artifact identity mismatch")
-    return raw, manifest_path.resolve()
+    return raw, manifest_path
 
 
-async def run_detail(session: AsyncSession, run_id: str) -> RunDetail:
+async def run_detail(session: AsyncSession, run_id: str, roots: tuple[Path, ...]) -> RunDetail:
     run = await session.get(ExperimentRunRecord, run_id)
     if run is None:
         raise WorkbenchAPIError(404, "NOT_FOUND", "run does not exist")
     raw: dict[str, Any] = {}
     if run.artifact_manifest_path is not None or run.evidence_digest is not None:
-        raw, _ = _safe_manifest(run)
+        raw, _ = _safe_manifest(run, roots)
     slot = run.slot_json
     verifier = raw.get("verifier_sandbox_manifest")
     verifier_passed = raw.get("verifier_passed")
@@ -455,7 +532,9 @@ async def run_detail(session: AsyncSession, run_id: str) -> RunDetail:
     if not isinstance(verifier, dict):
         verifier = {}
     report = (
-        await _report(session, run.experiment_id) if run.status in TERMINAL_RUN_STATUSES else None
+        await _report(session, run.experiment_id, roots)
+        if run.status in TERMINAL_RUN_STATUSES
+        else None
     )
     comparison_status: ComparabilityValue | None = None
     reason_codes: set[str] = set()
@@ -510,7 +589,9 @@ def _trace_summary(event: dict[str, Any]) -> str | None:
     return None
 
 
-async def trace_detail(session: AsyncSession, run_id: str) -> TraceResponse:
+async def trace_detail(
+    session: AsyncSession, run_id: str, roots: tuple[Path, ...]
+) -> TraceResponse:
     run = await session.get(ExperimentRunRecord, run_id)
     if run is None:
         raise WorkbenchAPIError(404, "NOT_FOUND", "run does not exist")
@@ -522,7 +603,7 @@ async def trace_detail(session: AsyncSession, run_id: str) -> TraceResponse:
             trace_digest=None,
             events=(),
         )
-    raw, manifest_path = _safe_manifest(run)
+    raw, manifest_path = _safe_manifest(run, roots)
     trace_digest = raw.get("normalized_trace_digest")
     coverage = raw.get("trace_coverage")
     if not isinstance(trace_digest, str):
@@ -569,10 +650,12 @@ async def trace_detail(session: AsyncSession, run_id: str) -> TraceResponse:
     )
 
 
-def _judge_report(record: JudgeCalibrationRecord) -> JudgeCalibrationReport:
+def _judge_report(
+    record: JudgeCalibrationRecord, roots: tuple[Path, ...]
+) -> JudgeCalibrationReport:
     if record.report_json_path is None or record.report_digest is None:
         raise WorkbenchAPIError(409, "ARTIFACT_UNAVAILABLE", "Judge report is not reported")
-    path = Path(record.report_json_path)
+    path = _trusted_artifact_path(record.report_json_path, roots)
     try:
         report = JudgeCalibrationReport.model_validate_json(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, ValidationError) as exc:
@@ -587,7 +670,7 @@ def _judge_report(record: JudgeCalibrationRecord) -> JudgeCalibrationReport:
 
 
 async def list_judge_calibrations(
-    session: AsyncSession, *, limit: int, offset: int
+    session: AsyncSession, *, limit: int, offset: int, roots: tuple[Path, ...]
 ) -> JudgeCalibrationListResponse:
     records = tuple(
         (
@@ -603,11 +686,14 @@ async def list_judge_calibrations(
     for record in records:
         plan = record.plan_json
         report: JudgeCalibrationReport | None = None
+        report_evidence_status: str = "NOT_REPORTED"
         if record.report_json_path and record.report_digest:
             try:
-                report = _judge_report(record)
+                report = _judge_report(record, roots)
             except WorkbenchAPIError:
-                report = None
+                report_evidence_status = "INTEGRITY_ERROR"
+            else:
+                report_evidence_status = "REPORTED"
         cells = plan.get("judge_cells")
         cell_count = len(cells) if isinstance(cells, list) else 0
         items.append(
@@ -618,6 +704,7 @@ async def list_judge_calibrations(
                 plan_digest=record.plan_digest,
                 report_digest=record.report_digest,
                 status=record.status,
+                report_evidence_status=cast(Any, report_evidence_status),
                 judge_cell_count=cell_count,
                 qualifications=(
                     tuple(cell.qualification_status.value for cell in report.cells)
@@ -633,12 +720,12 @@ async def list_judge_calibrations(
 
 
 async def judge_calibration_detail(
-    session: AsyncSession, calibration_id: str
+    session: AsyncSession, calibration_id: str, roots: tuple[Path, ...]
 ) -> JudgeCalibrationDetail:
     record = await session.get(JudgeCalibrationRecord, calibration_id)
     if record is None:
         raise WorkbenchAPIError(404, "NOT_FOUND", "Judge calibration does not exist")
-    report = _judge_report(record)
+    report = _judge_report(record, roots)
     cells = tuple(
         JudgeCellDetail(
             judge_cell_id=cell.judge_cell_id,
@@ -676,27 +763,24 @@ async def judge_calibration_detail(
 
 
 async def regression_compare(
-    session: AsyncSession, request: RegressionCompareRequest
+    session: AsyncSession, request: RegressionCompareRequest, roots: tuple[Path, ...]
 ) -> RegressionCompareResponse:
     baseline_record = await _experiment(session, request.baseline_experiment_id)
     candidate_record = await _experiment(session, request.candidate_experiment_id)
-    baseline_plan = _plan(baseline_record)
-    candidate_plan = _plan(candidate_record)
-    baseline_report = await _report(session, baseline_record.id)
-    candidate_report = await _report(session, candidate_record.id)
+    baseline_report = await _report(session, baseline_record.id, roots)
+    candidate_report = await _report(session, candidate_record.id, roots)
+
+    def guard(path: Path) -> Path:
+        return _trusted_artifact_path(path, roots)
+
+    baseline_evidence = await load_verified_experiment_evidence(
+        session, baseline_record.id, artifact_path_guard=guard
+    )
+    candidate_evidence = await load_verified_experiment_evidence(
+        session, candidate_record.id, artifact_path_guard=guard
+    )
     baseline_cells = {cell.cell_id: cell for cell in baseline_report.cells}
     candidate_cells = {cell.cell_id: cell for cell in candidate_report.cells}
-    baseline_config = {cell.id: cell for cell in baseline_plan.cells}
-    candidate_config = {cell.id: cell for cell in candidate_plan.cells}
-    baseline_task_controls = {
-        task.task_id: task.model_dump(mode="json", exclude={"package_path"})
-        for task in baseline_plan.tasks
-    }
-    candidate_task_controls = {
-        task.task_id: task.model_dump(mode="json", exclude={"package_path"})
-        for task in candidate_plan.tasks
-    }
-    task_controls_equal = baseline_task_controls == candidate_task_controls
     mapping = request.cell_mapping or {
         cell_id: cell_id for cell_id in sorted(set(baseline_cells) & set(candidate_cells))
     }
@@ -705,6 +789,7 @@ async def regression_compare(
             422, "INVALID_REGRESSION_REQUEST", "experiments have no mapped logical cells"
         )
     comparisons: list[RegressionCellComparison] = []
+    common_task_ids: set[str] = set()
     for baseline_id, candidate_id in sorted(mapping.items()):
         if baseline_id not in baseline_cells or candidate_id not in candidate_cells:
             raise WorkbenchAPIError(
@@ -712,20 +797,49 @@ async def regression_compare(
             )
         left = baseline_cells[baseline_id]
         right = candidate_cells[candidate_id]
-        cell_controls_equal = baseline_config[baseline_id].model_dump(
-            mode="json", exclude={"id", "profile_reference"}
-        ) == candidate_config[candidate_id].model_dump(
-            mode="json", exclude={"id", "profile_reference"}
-        )
-        reasons = tuple(
-            code
-            for condition, code in (
-                (not cell_controls_equal, "HARD_CONTROL_MISMATCH"),
-                (not task_controls_equal, "TASK_CONTROL_MISMATCH"),
+        capability = {
+            StatisticalOutcome.CAPABILITY_PASS,
+            StatisticalOutcome.CAPABILITY_FAIL,
+        }
+        baseline_by_slot = {
+            (item.run.task_id, item.run.repeat_index): item
+            for item in baseline_evidence.observations
+            if item.run.cell_id == baseline_id
+            and item.observation.outcome in capability
+            and item.facts is not None
+        }
+        candidate_by_slot = {
+            (item.run.task_id, item.run.repeat_index): item
+            for item in candidate_evidence.observations
+            if item.run.cell_id == candidate_id
+            and item.observation.outcome in capability
+            and item.facts is not None
+        }
+        paired_slots = sorted(set(baseline_by_slot) & set(candidate_by_slot))
+        statuses: list[ComparabilityValue] = []
+        reason_codes: set[str] = set()
+        engine = ComparabilityEngine()
+        for slot in paired_slots:
+            baseline_item = baseline_by_slot[slot]
+            candidate_item = candidate_by_slot[slot]
+            assert baseline_item.facts is not None and candidate_item.facts is not None
+            assessment = engine.assess(
+                baseline_item.facts,
+                candidate_item.facts,
+                intent=request.intent,
             )
-            if condition
-        )
-        status: ComparabilityValue = "COMPARABLE" if not reasons else "NOT_COMPARABLE"
+            statuses.append(_comparability_value(assessment.status.value))
+            reason_codes.update(reason.code.value for reason in assessment.reasons)
+        if not statuses:
+            status: ComparabilityValue = "NOT_COMPARABLE"
+            reason_codes.add("NO_PAIRED_CAPABILITY_EVIDENCE")
+        else:
+            status = max(statuses, key=COMPARABILITY_ORDER.__getitem__)
+        if request.intent is ComparabilityIntent.GENERAL and status == "COMPARABLE":
+            status = "PARTIALLY_COMPARABLE"
+            reason_codes.add("GENERAL_EXPLORATORY_ONLY")
+        reasons = tuple(sorted(reason_codes))
+        common_task_ids.update(task_id for task_id, _repeat_index in paired_slots)
         left_value = numeric(left.success_rate)
         right_value = numeric(right.success_rate)
         if left_value.value is None or right_value.value is None:
@@ -749,17 +863,11 @@ async def regression_compare(
                 candidate_tier=right.evidence_tier.value,
                 comparability=status,
                 reason_codes=reasons,
+                paired_observations=len(paired_slots),
                 baseline_infra_count=left.infra_failures,
                 candidate_infra_count=right.infra_failures,
             )
         )
-    common_tasks = tuple(
-        sorted(
-            task_id
-            for task_id in set(baseline_task_controls) & set(candidate_task_controls)
-            if baseline_task_controls[task_id] == candidate_task_controls[task_id]
-        )
-    )
     return RegressionCompareResponse(
         baseline_experiment_id=baseline_record.id,
         candidate_experiment_id=candidate_record.id,
@@ -767,7 +875,8 @@ async def regression_compare(
         candidate_plan_digest=candidate_report.plan_digest,
         baseline_report_digest=baseline_report.digest,
         candidate_report_digest=candidate_report.digest,
-        common_tasks=common_tasks,
+        intent=request.intent,
+        common_tasks=tuple(sorted(common_task_ids)),
         comparisons=tuple(comparisons),
         limitation=(
             "Directional evidence only; no causal attribution or new significance claim is made."
@@ -775,7 +884,7 @@ async def regression_compare(
     )
 
 
-async def core_readiness(session: AsyncSession) -> CoreReadinessResponse:
+async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> CoreReadinessResponse:
     experiments = tuple(
         (
             await session.scalars(
@@ -789,26 +898,35 @@ async def core_readiness(session: AsyncSession) -> CoreReadinessResponse:
     plans = tuple(_plan(record) for record in experiments)
     reports: list[ExperimentReport] = []
     for record in experiments:
-        reports.append(await _report(session, record.id))
+        reports.append(await _report(session, record.id, roots))
     task_ids = {task.task_id for plan in plans for task in plan.tasks}
     matrix_available = any(report.plan_run_count > 0 for report in reports)
     formal_available = any(any(cell.formal_eligible for cell in report.cells) for report in reports)
     paired_available = any(bool(report.pairs) for report in reports)
     ablation_available = any(bool(report.ablations) for report in reports)
-    judge_count = int(
-        await session.scalar(
-            select(func.count())
-            .select_from(JudgeCalibrationRecord)
-            .where(JudgeCalibrationRecord.status == "completed")
-        )
-        or 0
+    completed_judges = tuple(
+        (
+            await session.scalars(
+                select(JudgeCalibrationRecord).where(JudgeCalibrationRecord.status == "completed")
+            )
+        ).all()
     )
+    judge_count = 0
+    for judge_record in completed_judges:
+        try:
+            _judge_report(judge_record, roots)
+        except WorkbenchAPIError:
+            continue
+        judge_count += 1
+    task_corpus_ready = 15 <= len(task_ids) <= 25
     checks = (
         ReadinessCheck(
             key="TASK_CORPUS",
             label="Persisted task corpus",
-            status="READY" if task_ids else "NOT_REPORTED",
-            evidence=f"{len(task_ids)} persisted task identities",
+            status=(
+                "READY" if task_corpus_ready else "NOT_VERIFIED" if task_ids else "NOT_REPORTED"
+            ),
+            evidence=f"{len(task_ids)} persisted task identities; Core requirement is 15-25",
         ),
         ReadinessCheck(
             key="MATRIX_EVIDENCE",
@@ -837,8 +955,13 @@ async def core_readiness(session: AsyncSession) -> CoreReadinessResponse:
         ReadinessCheck(
             key="JUDGE_CALIBRATION",
             label="Judge calibration evidence",
-            status="READY" if judge_count else "NOT_REPORTED",
-            evidence=f"{judge_count} completed persisted calibrations",
+            status=(
+                "READY" if judge_count else "NOT_VERIFIED" if completed_judges else "NOT_REPORTED"
+            ),
+            evidence=(
+                f"{judge_count} integrity-validated completed calibrations "
+                f"of {len(completed_judges)} completed records"
+            ),
         ),
         ReadinessCheck(
             key="REAL_MATRIX_EVIDENCE",

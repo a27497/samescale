@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import defaultdict
+from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
@@ -40,6 +42,24 @@ from harnesslab.sandbox.artifacts import sha256_file
 
 class ExperimentReportError(RuntimeError):
     """Persisted experiment evidence is incomplete, mutable, or incoherent."""
+
+
+@dataclass(frozen=True)
+class VerifiedRunObservation:
+    """One persisted run after its slot, digest, controls, and outcome agree."""
+
+    run: ExperimentRunRecord
+    observation: RunObservation
+    facts: ComparisonFacts | None
+
+
+@dataclass(frozen=True)
+class VerifiedExperimentEvidence:
+    """Shared verified-observation input for reports and read-only consumers."""
+
+    plan: ExperimentPlan
+    runs: tuple[ExperimentRunRecord, ...]
+    observations: tuple[VerifiedRunObservation, ...]
 
 
 class PairEvidence(BaseModel):
@@ -207,10 +227,13 @@ def _manifest_metrics(raw: dict[str, Any]) -> dict[str, float | None]:
 
 def _load_persisted_manifest(
     run: ExperimentRunRecord,
+    artifact_path_guard: Callable[[Path], Path] | None = None,
 ) -> tuple[dict[str, Any], ComparisonFacts]:
     if run.artifact_manifest_path is None or run.evidence_digest is None:
         raise ExperimentReportError(f"run {run.run_id} lacks persisted artifact identity")
     path = Path(run.artifact_manifest_path)
+    if artifact_path_guard is not None:
+        path = artifact_path_guard(path)
     if not path.is_file() or sha256_file(path) != run.evidence_digest:
         raise ExperimentReportError(f"run {run.run_id} artifact digest is unavailable or changed")
     try:
@@ -222,12 +245,14 @@ def _load_persisted_manifest(
     return raw, load_manifest_facts(path)
 
 
-async def build_experiment_report(
+async def load_verified_experiment_evidence(
     session: AsyncSession,
     experiment_id: str,
     *,
-    bootstrap_resamples: int = 9_999,
-) -> ExperimentReport:
+    artifact_path_guard: Callable[[Path], Path] | None = None,
+) -> VerifiedExperimentEvidence:
+    """Load immutable run observations once without calculating any statistics."""
+
     experiment = await session.get(ExperimentRecord, experiment_id)
     if experiment is None:
         raise ExperimentReportError("experiment does not exist")
@@ -246,10 +271,7 @@ async def build_experiment_report(
     if len(runs) != len(plan.run_slots):
         raise ExperimentReportError("persisted experiment run set is incomplete")
 
-    observations_by_cell: dict[str, list[RunObservation]] = defaultdict(list)
-    observations_by_run: dict[str, RunObservation] = {}
-    facts_by_run: dict[str, ComparisonFacts] = {}
-    runs_by_cell_pair: dict[tuple[str, str], ExperimentRunRecord] = {}
+    verified: list[VerifiedRunObservation] = []
     for run in runs:
         if run.normalized_outcome is None or run.source_outcome is None:
             continue
@@ -261,9 +283,10 @@ async def build_experiment_report(
             "tool_calls": None,
             "steps": None,
         }
+        facts: ComparisonFacts | None = None
         has_artifact = run.artifact_manifest_path is not None or run.evidence_digest is not None
         if has_artifact:
-            raw, facts = _load_persisted_manifest(run)
+            raw, facts = _load_persisted_manifest(run, artifact_path_guard)
             slot = ExperimentRunSlot.model_validate(run.slot_json)
             try:
                 validate_manifest_against_slot(raw, facts, slot)
@@ -284,7 +307,6 @@ async def build_experiment_report(
                     f"run {run.run_id} source outcome disagrees with immutable evidence"
                 )
             metrics = _manifest_metrics(raw)
-            facts_by_run[run.run_id] = facts
         elif normalized in {
             StatisticalOutcome.CAPABILITY_PASS,
             StatisticalOutcome.CAPABILITY_FAIL,
@@ -292,20 +314,50 @@ async def build_experiment_report(
             raise ExperimentReportError(
                 f"run {run.run_id} capability outcome lacks immutable lane evidence"
             )
-        observation = RunObservation(
-            run_id=run.run_id,
-            task_id=run.task_id,
-            repeat_index=run.repeat_index,
-            paired_slot_identity=run.paired_slot_identity,
-            outcome=normalized,
-            source_outcome=run.source_outcome,
-            duration_ms=metrics["duration_ms"],
-            input_tokens=metrics["input_tokens"],
-            output_tokens=metrics["output_tokens"],
-            tool_calls=metrics["tool_calls"],
-            steps=metrics["steps"],
-            explicit_cost=None,
+        verified.append(
+            VerifiedRunObservation(
+                run=run,
+                observation=RunObservation(
+                    run_id=run.run_id,
+                    task_id=run.task_id,
+                    repeat_index=run.repeat_index,
+                    paired_slot_identity=run.paired_slot_identity,
+                    outcome=normalized,
+                    source_outcome=run.source_outcome,
+                    duration_ms=metrics["duration_ms"],
+                    input_tokens=metrics["input_tokens"],
+                    output_tokens=metrics["output_tokens"],
+                    tool_calls=metrics["tool_calls"],
+                    steps=metrics["steps"],
+                    explicit_cost=None,
+                ),
+                facts=facts,
+            )
         )
+    return VerifiedExperimentEvidence(plan=plan, runs=runs, observations=tuple(verified))
+
+
+async def build_experiment_report(
+    session: AsyncSession,
+    experiment_id: str,
+    *,
+    bootstrap_resamples: int = 9_999,
+    artifact_path_guard: Callable[[Path], Path] | None = None,
+) -> ExperimentReport:
+    evidence = await load_verified_experiment_evidence(
+        session, experiment_id, artifact_path_guard=artifact_path_guard
+    )
+    plan = evidence.plan
+
+    observations_by_cell: dict[str, list[RunObservation]] = defaultdict(list)
+    observations_by_run: dict[str, RunObservation] = {}
+    facts_by_run: dict[str, ComparisonFacts] = {}
+    runs_by_cell_pair: dict[tuple[str, str], ExperimentRunRecord] = {}
+    for item in evidence.observations:
+        run = item.run
+        observation = item.observation
+        if item.facts is not None:
+            facts_by_run[run.run_id] = item.facts
         observations_by_cell[run.cell_id].append(observation)
         observations_by_run[run.run_id] = observation
         runs_by_cell_pair[(run.cell_id, run.paired_slot_identity)] = run

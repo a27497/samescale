@@ -31,17 +31,21 @@ class Check:
     cwd: Path = ROOT
     timeout_seconds: int = 1200
     scrub_sensitive_environment: bool = False
+    forbidden_output: tuple[str, ...] = ()
 
 
 BACKEND_CRITICAL = {
     "test_workbench_routes_are_read_only_and_have_no_execution_or_analyst_surface",
     "test_experiment_list_detail_status_and_pagination_use_persisted_database",
     "test_complete_matrix_snapshot_and_report_identity_are_browsable",
+    "test_multi_task_matrix_uses_task_scoped_verified_observations",
+    "test_matrix_comparability_is_task_scoped_and_never_invented",
     "test_run_filter_detail_identity_and_missing_cost_are_safe",
+    "test_workbench_manifest_reads_are_confined_to_server_artifact_roots",
     "test_trace_uses_verified_normalized_evidence_and_never_native_reasoning",
     "test_trace_rejects_client_paths_and_symlink_escape",
     "test_judgelab_list_and_detail_use_digest_verified_phase_h_report",
-    "test_regression_compare_uses_persisted_reports_and_blocks_control_mismatch",
+    "test_regression_compare_accepts_declared_treatments_and_blocks_hard_controls",
     "test_core_readiness_is_evidence_driven_and_stays_not_ready",
     "test_public_error_shape_and_unknown_resource_do_not_leak_internals",
     "test_judge_report_digest_mutation_fails_closed",
@@ -53,10 +57,12 @@ FRONTEND_CRITICAL = {
     "Workbench contracts > keeps NOT_REPORTED visually distinct from NOT_COMPARABLE",
     "Workbench contracts > renders Matrix values, tiers, missing metrics, "
     "and comparability from the DTO",
+    "Workbench contracts > HTML-encodes persisted Matrix labels before ECharts tooltip rendering",
     "Workbench contracts > withholds content for REASONING_PRESENT",
     "Workbench contracts > renders experiment list evidence",
     "Workbench contracts > renders run status, trace coverage, and cost missingness",
     "Workbench contracts > renders suite-scoped Judge qualification",
+    "Workbench contracts > distinguishes corrupt Judge report evidence from an unreported report",
     "Workbench contracts > renders deterministic regression limitations and NOT_COMPARABLE",
     "Workbench contracts > renders Core readiness blockers",
     "Workbench contracts > stops polling when PostgreSQL reports a terminal status",
@@ -85,16 +91,26 @@ def run(check: Check) -> bool:
                     ("_API_KEY", "_PASSWORD", "_SECRET", "_TOKEN")
                 ):
                     environment.pop(name, None)
+        capture_output = bool(check.forbidden_output)
         result = subprocess.run(
             check.command,
             cwd=check.cwd,
             check=False,
             timeout=check.timeout_seconds,
             env=environment,
+            capture_output=capture_output,
+            text=capture_output,
         )
     except subprocess.TimeoutExpired:
         print(f"FAIL: command exceeded {check.timeout_seconds}s")
         return False
+    if capture_output:
+        output = (result.stdout or "") + (result.stderr or "")
+        print(output, end="" if output.endswith("\n") else "\n")
+        found = [token for token in check.forbidden_output if token in output]
+        if found:
+            print(f"FAIL: forbidden command output detected: {found}")
+            return False
     print(f"{'PASS' if result.returncode == 0 else 'FAIL'}: exit={result.returncode}")
     return result.returncode == 0
 
@@ -155,13 +171,13 @@ def verify_test_evidence() -> ExitCode:
         return ExitCode.NOT_VERIFIED
     required = {
         "baseline_experiment_id": "phase-i-matrix-baseline",
-        "matrix_task_count": 1,
+        "matrix_task_count": 2,
         "matrix_cell_count": 3,
-        "matrix_run_count": 9,
+        "matrix_run_count": 18,
         "trace_coverage": "FULL_STREAM",
         "missing_trace_status": "NOT_REPORTED",
         "missing_cost_status": "NOT_REPORTED",
-        "regression_status": "NOT_COMPARABLE",
+        "regression_status": "TREATMENT_AWARE",
         "judge_calibration_id": "phase-i-judge-keyless",
         "core_readiness": "NOT_READY",
     }
@@ -173,9 +189,13 @@ def verify_test_evidence() -> ExitCode:
         f"PASS: {len(frontend)} Gate I frontend tests recorded; critical set present; zero skipped"
     )
     print("WORKBENCH_API=12 read-only routes; Regression compare is computation-only POST PASS")
-    print("MATRIX_EVIDENCE=phase-i-matrix-baseline tasks=1 cells=3 runs=9 keyless PASS")
+    print("MULTI_TASK_MATRIX=phase-i-matrix-multi-task tasks=2 cells=3 runs=18 keyless PASS")
+    print("TASK_SCOPED_COMPARABILITY=task-local evidence; no-comparison=NOT_REPORTED PASS")
     print("TRACE_EVIDENCE=FULL_STREAM+NOT_REPORTED; private reasoning withheld PASS")
-    print("REGRESSION_EVIDENCE=NOT_COMPARABLE on hard-control mismatch PASS")
+    print("REGRESSION_TREATMENT=MODEL_COMPARISON+HARNESS_UPLIFT accepted; hard controls block PASS")
+    print("REGRESSION_NO_RERUN=run rows and artifact mtimes unchanged PASS")
+    print("ARTIFACT_ROOT=valid root accepted; outside+symlink escape rejected PASS")
+    print("JUDGE_INTEGRITY=INTEGRITY_ERROR distinct; corrupt report cannot satisfy readiness PASS")
     print("JUDGELAB_EVIDENCE=phase-i-judge-keyless suite-scoped; L0 overrides=0 PASS")
     print("CORE_READINESS=NOT_READY; NOT_VERIFIED requirements block readiness PASS")
     return ExitCode.PASS
@@ -192,6 +212,13 @@ def verify_frontend_graph() -> bool:
     if forbidden & set(declared):
         print("FAIL: out-of-scope frontend dependency detected")
         return False
+    expected_engine = ">=24.18.1 <25"
+    if package.get("engines", {}).get("node") != expected_engine:
+        print("FAIL: HarnessLab frontend must require the bounded compatible Node 24 range")
+        return False
+    if lock["packages"][""]["engines"]["node"] != expected_engine:
+        print("FAIL: package-lock root Node engine differs from package.json")
+        return False
     versions = {
         name: lock["packages"][f"node_modules/{name}"]["version"]
         for name in (
@@ -207,6 +234,7 @@ def verify_frontend_graph() -> bool:
         )
     }
     print("FRONTEND_VERSIONS=" + json.dumps(versions, sort_keys=True, separators=(",", ":")))
+    print(f"NODE_ENGINE={expected_engine}; HarnessLab EBADENGINE absent PASS")
     return True
 
 
@@ -289,6 +317,7 @@ def main() -> int:
             ("npm", "ci"),
             cwd=FRONTEND,
             scrub_sensitive_environment=True,
+            forbidden_output=("npm warn EBADENGINE", "npm WARN EBADENGINE"),
         ),
         Check(
             "Frontend type-check",

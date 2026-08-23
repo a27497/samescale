@@ -12,6 +12,7 @@ import { useExperimentStore } from '@/stores/experiments'
 import CoreReadinessView from '@/views/CoreReadinessView.vue'
 import ExperimentsView from '@/views/ExperimentsView.vue'
 import JudgeDetailView from '@/views/JudgeDetailView.vue'
+import JudgeLabView from '@/views/JudgeLabView.vue'
 import RegressionView from '@/views/RegressionView.vue'
 import RunDetailView from '@/views/RunDetailView.vue'
 
@@ -36,14 +37,14 @@ const notReported = { status: 'NOT_REPORTED' as const, value: null }
 
 const experiment = {
   experiment_id: 'matrix-keyless', name: 'Keyless Matrix', status: 'completed',
-  plan_digest: 'sha256:plan', cell_count: 2, task_count: 1, planned_run_count: 6,
-  completed_capability_count: 6, infra_count: 0, created_at: '2026-08-23T00:00:00Z',
+  plan_digest: 'sha256:plan', cell_count: 2, task_count: 2, planned_run_count: 12,
+  completed_capability_count: 12, infra_count: 0, created_at: '2026-08-23T00:00:00Z',
   started_at: '2026-08-23T00:00:01Z', finished_at: '2026-08-23T00:01:00Z',
 }
 
 const matrix = {
   experiment_id: 'matrix-keyless', plan_digest: 'sha256:plan', report_digest: 'sha256:report',
-  tasks: ['micro-python-clamp'], cells: ['direct', 'codex'], infra_count: 0,
+  tasks: ['micro-python-clamp', 'micro-typescript-clamp'], cells: ['direct', 'codex'], infra_count: 0,
   points: [
     {
       task_id: 'micro-python-clamp', cell_id: 'direct', n: 3, tier: 'INFORMAL',
@@ -51,6 +52,22 @@ const matrix = {
       metrics: {
         success_rate: reported(1), latency_p50_ms: reported(12), latency_p95_ms: reported(18),
         infra_rate: reported(0), pass_at_1: reported(1), pass_at_3: reported(1), pass_at_5: notReported,
+      },
+    },
+    {
+      task_id: 'micro-typescript-clamp', cell_id: 'direct', n: 3, tier: 'INFORMAL',
+      comparability: 'NOT_REPORTED' as const, reason_codes: [],
+      metrics: {
+        success_rate: reported(.25), latency_p50_ms: reported(31), latency_p95_ms: reported(39),
+        infra_rate: reported(0), pass_at_1: reported(.25), pass_at_3: reported(.5), pass_at_5: notReported,
+      },
+    },
+    {
+      task_id: 'micro-typescript-clamp', cell_id: 'codex', n: 3, tier: 'INFORMAL',
+      comparability: 'PARTIALLY_COMPARABLE' as const, reason_codes: ['TRACE_COVERAGE_LIMITED'],
+      metrics: {
+        success_rate: reported(.75), latency_p50_ms: reported(41), latency_p95_ms: reported(49),
+        infra_rate: reported(0), pass_at_1: reported(.75), pass_at_3: reported(1), pass_at_5: notReported,
       },
     },
     {
@@ -123,6 +140,7 @@ describe('Workbench contracts', () => {
     expect(wrapper.text()).toContain('NOT_REPORTED')
     expect(wrapper.text()).toContain('NOT_COMPARABLE')
     expect(wrapper.text()).toContain('PARTIALLY_COMPARABLE')
+    expect(wrapper.text()).toContain('micro-typescript-clamp')
     expect(wrapper.text()).toContain('INFORMAL')
   })
 
@@ -176,20 +194,39 @@ describe('Workbench contracts', () => {
     expect(wrapper.text()).toContain('core-calibration@1.0.0')
   })
 
+  it('distinguishes corrupt Judge report evidence from an unreported report', async () => {
+    api.listCalibrations.mockResolvedValue({
+      items: [{
+        calibration_id: 'judge-corrupt', suite_id: 'core-calibration', suite_version: '1.0.0',
+        plan_digest: 'sha256:plan', report_digest: 'sha256:report', status: 'completed',
+        report_evidence_status: 'INTEGRITY_ERROR', judge_cell_count: 2, qualifications: [],
+        created_at: '2026-08-23T00:00:00Z', finished_at: '2026-08-23T00:01:00Z',
+      }], total: 1, limit: 25, offset: 0,
+    })
+    const wrapper = mount(JudgeLabView, { global: { plugins: [router] } })
+    await flushPromises()
+    expect(wrapper.text()).toContain('INTEGRITY_ERROR')
+    expect(wrapper.text()).not.toContain('No Judge calibration is reported')
+  })
+
   it('renders deterministic regression limitations and NOT_COMPARABLE', async () => {
     api.compare.mockResolvedValue({
       baseline_experiment_id: 'a', candidate_experiment_id: 'b', baseline_plan_digest: 'sha256:a',
       candidate_plan_digest: 'sha256:b', baseline_report_digest: 'sha256:ra', candidate_report_digest: 'sha256:rb',
-      common_tasks: ['task'], limitation: 'Directional evidence only; no causal attribution.',
-      comparisons: [{ baseline_cell_id: 'direct', candidate_cell_id: 'codex', baseline_value: reported(1), candidate_value: reported(.5), delta: reported(-.5), direction: 'DECREASED', baseline_tier: 'INFORMAL', candidate_tier: 'INFORMAL', comparability: 'NOT_COMPARABLE', reason_codes: ['HARD_CONTROL_MISMATCH'], baseline_infra_count: 0, candidate_infra_count: 1 }],
+      intent: 'MODEL_COMPARISON', common_tasks: ['task'], limitation: 'Directional evidence only; no causal attribution.',
+      comparisons: [{ baseline_cell_id: 'direct', candidate_cell_id: 'codex', baseline_value: reported(1), candidate_value: reported(.5), delta: reported(-.5), direction: 'DECREASED', baseline_tier: 'INFORMAL', candidate_tier: 'INFORMAL', comparability: 'NOT_COMPARABLE', reason_codes: ['HARD_CONTROL_MISMATCH'], paired_observations: 3, baseline_infra_count: 0, candidate_infra_count: 1 }],
     })
     const wrapper = mount(RegressionView)
     await wrapper.get('[aria-label="Baseline experiment ID"]').setValue('a')
     await wrapper.get('[aria-label="Candidate experiment ID"]').setValue('b')
+    await wrapper.get('[aria-label="Comparison intent"]').setValue('MODEL_COMPARISON')
     await wrapper.get('button').trigger('click')
     await flushPromises()
     expect(wrapper.text()).toContain('NOT_COMPARABLE')
     expect(wrapper.text()).toContain('no causal attribution')
+    expect(wrapper.text()).toContain('HARD_CONTROL_MISMATCH')
+    expect(wrapper.text()).toContain('Raw direction')
+    expect(api.compare).toHaveBeenCalledWith('a', 'b', 'MODEL_COMPARISON')
   })
 
   it('renders Core readiness blockers', async () => {

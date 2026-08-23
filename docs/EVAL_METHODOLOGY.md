@@ -156,11 +156,17 @@ zero and from `NOT_COMPARABLE`. A direct-model run without Normalized Trace repo
 `TRACE=NOT_REPORTED`; a missing explicit cost reports `COST=NOT_REPORTED`. Provider pricing is not
 estimated from model names.
 
-Regression compare aligns common or explicitly mapped persisted cells, returns baseline and
-candidate report identities, directional success-rate delta when both values are reported,
-evidence tiers, infra counts, and comparability limitations. A critical configuration mismatch is
-`NOT_COMPARABLE` even if the numeric values look favorable. The page makes no causal or new
-statistical-significance claim and never reruns either experiment.
+Each Matrix task×cell point filters the shared verified Phase G observations before calling
+`summarize_cell()`. Capability n is pass+fail, infra is separate, and unrelated tasks are never
+pooled into a point. Task-scoped `PairEvidence` controls Matrix comparison status; no pair is
+`NOT_REPORTED` rather than assumed comparable.
+
+Regression compare aligns actual persisted capability manifests by task and repeat under an
+explicit `MODEL_COMPARISON`, `HARNESS_UPLIFT`, or exploratory `GENERAL` intent, and delegates
+eligibility to the Phase F `ComparabilityEngine`. It returns report identities, raw directional
+success-rate delta, evidence tiers, infra counts, paired count, and reason codes. Critical controls
+remain `NOT_COMPARABLE` even if values look favorable; declared treatments are not mistaken for
+hard-control drift. The page makes no causal or new significance claim and never reruns subjects.
 
 Polling refreshes only durable PostgreSQL lifecycle state and stops at a terminal experiment.
 Route reconstruction triggers a new API fetch; Pinia is not persisted as authoritative evidence.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Self
 from urllib.parse import urlsplit
 
@@ -21,6 +22,10 @@ class Settings(BaseSettings):
 
     environment: str = Field(default="development", alias="HARNESSLAB_ENVIRONMENT")
     database_url: SecretStr = Field(alias="DATABASE_URL")
+    workbench_artifact_roots: tuple[Path, ...] = Field(
+        default=(Path("artifacts"), Path("harnesslab-artifacts")),
+        alias="HARNESSLAB_WORKBENCH_ARTIFACT_ROOTS",
+    )
 
     @field_validator("environment")
     @classmethod
@@ -42,6 +47,13 @@ class Settings(BaseSettings):
             raise ValueError(
                 "DATABASE_URL must use postgresql+psycopg and include a host and database name"
             )
+        return value
+
+    @field_validator("workbench_artifact_roots")
+    @classmethod
+    def artifact_roots_are_explicit(cls, value: tuple[Path, ...]) -> tuple[Path, ...]:
+        if not value:
+            raise ValueError("at least one Workbench artifact root is required")
         return value
 
     @property

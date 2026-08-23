@@ -111,12 +111,15 @@ This file separates repository evidence from intended design. A capability moves
   deterministic Regression compare, durable status polling, and Core readiness
 - Vue 3/Vite/TypeScript frontend with pinned npm graph, Pinia query state, Vue Router routes,
   focused Element Plus affordances, modular ECharts, Axios, Vitest, and production build
-- Real keyless Phase G queue/runner/manifest/report and Phase H fake-Judge persisted fixtures read
-  end-to-end through Workbench API contracts, including digest/path/private-reasoning sensitivity
+- Real keyless Phase G queue/runner/manifest/report evidence including an authoritative two-task,
+  three-cell, three-repeat persisted Matrix, plus Phase H fake-Judge fixtures read end-to-end
+  through Workbench API contracts, including trusted-root/digest/path/private-reasoning sensitivity
 - Explicit `NOT_REPORTED`, `PARTIALLY_COMPARABLE`, and `NOT_COMPARABLE` UI/API semantics; suite-
   scoped Judge qualification; directional non-causal Regression comparison; `NOT_READY` evidence-
   driven Core dashboard; and no browser execution endpoint
-- An authoritative non-recursive Gate I with 12 backend persisted-evidence tests, 13 focused
+- Treatment-aware immutable-manifest Regression using Phase F ComparabilityEngine; task-scoped
+  Matrix comparability; explicit Judge report integrity state; and 15-25 task readiness threshold
+- An authoritative non-recursive Gate I with 15 backend persisted-evidence tests, 14 focused
   frontend tests, strict TypeScript, Vite production build, Ruff, mypy, and scope/secret checks
 
 Evidence date: 2026-08-24. Phase H remote evidence is approved at the exact head/run above. Phase I

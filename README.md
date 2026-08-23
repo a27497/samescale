@@ -72,8 +72,9 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
   keyless Gate H
 - A Vue 3/Vite/TypeScript analytical Workbench with Pinia, Vue Router, Element Plus, ECharts,
   Axios, Vitest, and a pinned npm dependency graph
-- Read-only experiment, Matrix, run/trace, JudgeLab, deterministic Regression compare, polling,
-  and Core readiness views over PostgreSQL plus digest-verified immutable evidence
+- Read-only experiment, task-scoped multi-task Matrix, run/trace, JudgeLab, treatment-aware
+  deterministic Regression compare, polling, and Core readiness views over PostgreSQL plus
+  trusted-root-confined, digest-verified immutable evidence
 - Explicit `NOT_REPORTED` versus zero and `NOT_COMPARABLE` versus missing evidence semantics,
   with no browser-triggered model, Harness, or Judge execution
 - An authoritative non-recursive, fully keyless Gate I using real persisted Phase G/H fixtures
@@ -95,7 +96,7 @@ remain out of scope.
 ## Local setup
 
 Gate A prerequisites are Docker and [uv](https://docs.astral.sh/uv/). Gate B additionally requires
-Java 21 (`java` and `javac`) and Node.js 24 or newer on `PATH`. Gate C requires a reachable local
+Java 21 (`java` and `javac`) and Node.js `>=24.18.1 <25` on `PATH`. Gate C requires a reachable local
 Docker Engine, or Docker Desktop using Linux containers; remote TCP/SSH contexts are unsupported.
 Gate D uses deterministic fake/MockTransport providers and requires no model API key. Gate E
 builds the pinned Codex image and uses deterministic Fake Codex runs. Gate F builds pinned Claude
@@ -103,8 +104,10 @@ and DeepSeek images and uses deterministic fake harness runs; none requires a ke
 Gate G adds real PostgreSQL queue concurrency and actual keyless runner execution without
 consuming provider or ambient harness credentials.
 Gate H adds a 15-case keyless suite and 126 persisted Judge slots without real model calls.
-Gate I adds a keyless persisted Matrix and Judge calibration fixture, typed Workbench API tests,
-and frontend type/test/build checks.
+Gate I adds a keyless persisted two-task Matrix, Judge calibration fixture, treatment-aware
+manifest Regression proofs, trusted artifact-root escape tests, typed Workbench API tests, and
+frontend type/test/build checks. The frontend accepts compatible Node releases in
+`>=24.18.1 <25`.
 
 ```powershell
 Copy-Item .env.example .env

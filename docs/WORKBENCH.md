@@ -10,7 +10,9 @@ modify tasks and gold.
 FastAPI routes live under `/api/workbench`. They use strict Pydantic response DTOs rather than
 serializing SQLAlchemy rows. PostgreSQL supplies durable identity and lifecycle state. Existing
 ExperimentPlan/ExperimentReport and JudgeCalibrationReport contracts supply authoritative metrics.
-Immutable disk artifacts are reopened only behind a persisted run/calibration identity.
+Immutable disk artifacts are reopened only behind a persisted run/calibration identity and after
+their resolved path is confined to server-configured trusted artifact roots. Clients cannot supply
+or extend those roots; tests override the dependency explicitly.
 
 ## API inventory
 
@@ -50,9 +52,10 @@ Quality commands are `npm run type-check`, `npm run test`, and `npm run build`.
 ## Matrix heatmap and numeric authority
 
 The ECharts heatmap consumes API-provided success, latency p50/p95, infra-rate, pass@k, sample
-count, evidence tier, and comparability DTOs. Vue only selects a metric and formats it. For a
-multi-task report that lacks an authoritative task-level numeric statistic, that Matrix point is
-`NOT_REPORTED`; the frontend does not reconstruct Phase G formulas.
+count, evidence tier, and comparability DTOs. Every task×cell point is summarized from only that
+task's verified persisted observations through the Phase G `summarize_cell()` implementation.
+Infrastructure remains outside the capability denominator, and pass@k is `NOT_REPORTED` when
+`n < k`. Vue only selects and formats metrics; it never reconstructs formulas.
 
 Infrastructure counts are displayed independently from capability success. Tooltips and the
 textual chart summary include task, cell, metric, `n`, tier, comparability, and reason codes.
@@ -65,11 +68,13 @@ pricing database and never estimates current prices. `TRACE=NOT_REPORTED` means 
 Trace exists, not a successful empty trace.
 
 Comparability is a separate dimension. `NOT_COMPARABLE` remains blocked and reason-coded;
-`PARTIALLY_COMPARABLE` remains limited. Neither is converted to missing data or a green result.
+`PARTIALLY_COMPARABLE` remains limited. Matrix comparability is keyed by persisted task and cell
+pair evidence; an unpaired task×cell is `NOT_REPORTED`, never invented as `COMPARABLE`.
 
 ## Trace safety
 
-The trace client supplies only `run_id`. The backend resolves the persisted manifest, validates
+The trace client supplies only `run_id`. The backend resolves the persisted manifest inside a
+trusted server-side artifact root, validates
 its digest and deterministic attempt identity, confines `trace/normalized.json` to the run bundle,
 verifies its digest, and parses the strict Normalized Trace model. Arbitrary path query parameters
 are rejected. Native transcripts, private reasoning, credential references, absolute artifact
@@ -80,16 +85,21 @@ paths, hidden verifier/oracle files, and database configuration never enter fron
 
 ## JudgeLab and Regression
 
-Judge calibration detail reopens the persisted report and verifies calibration/report identity.
+Judge calibration detail reopens the trusted-root-confined persisted report and verifies
+calibration/report identity. Lists expose `REPORTED`, `NOT_REPORTED`, or `INTEGRITY_ERROR`, so a
+corrupt completed report cannot look like ordinary missing qualification evidence.
 `QUALIFIED_FOR_SUITE` is displayed with the frozen suite/version scope, never as universal Judge
 reliability. Provider infra, all approved metrics, L0 disagreements, and zero L0 overrides remain
 visible. `REAL_JUDGE_SMOKE=NOT_RUN` is preserved.
 
-Regression compare reads two immutable reports. It aligns same-named cells or an explicit mapping,
-reports directional deltas only when both values exist, retains tier/infra/digest facts, and blocks
-hard cell or task/workspace/verifier control mismatches with `NOT_COMPARABLE`. Mapping requests are
-bounded before sorting or alignment. It does not rerun subjects, claim statistical significance,
-or attribute cause.
+Regression compare reads two immutable reports and their trusted-root-confined run manifests. A
+bounded explicit intent (`MODEL_COMPARISON`, `HARNESS_UPLIFT`, or `GENERAL`) is assessed by the
+Phase F `ComparabilityEngine` for task/repeat-paired capability observations. Declared model or
+Harness treatments are allowed only under the matching intent; task, workspace, context, verifier,
+provider route, budget, network, and the intent-specific Harness/model controls remain protected.
+`GENERAL` is exploratory and cannot silently become a strong formal claim. Raw directional deltas
+remain visually subordinate to blocked comparability. Regression never reruns subjects, claims
+statistical significance, or attributes cause.
 
 ## Polling and Core readiness
 
@@ -97,7 +107,9 @@ The frontend polls the PostgreSQL-backed status route only for non-terminal expe
 every three seconds, and stops after a durable terminal state. Browser reload performs a fresh
 fetch. No Redis, WebSocket, SSE, or message broker was added.
 
-Core readiness is derived from structured persisted plans/reports/calibrations. Missing formal,
+Core readiness is derived from structured persisted plans/reports/calibrations. `TASK_CORPUS` is
+ready only with 15-25 persisted task identities, and Judge readiness counts only completed reports
+whose trusted path, identity, and integrity validate. Missing formal,
 real Matrix, real Judge, Phase J, or release-document evidence remains blocking or unverified, so
 the Phase I dashboard truthfully reports `NOT_READY`. It never creates a Git tag.
 

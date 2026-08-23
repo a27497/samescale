@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from harnesslab.api.workbench_dependencies import workbench_session
+from harnesslab.api.workbench_dependencies import workbench_artifact_roots, workbench_session
 from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.api.workbench_models import (
     CoreReadinessResponse,
@@ -39,6 +40,7 @@ from harnesslab.api.workbench_service import (
 
 router = APIRouter(prefix="/workbench", tags=["workbench"])
 Session = Annotated[AsyncSession, Depends(workbench_session)]
+ArtifactRoots = Annotated[tuple[Path, ...], Depends(workbench_artifact_roots)]
 PageLimit = Annotated[int, Query(ge=1, le=100)]
 PageOffset = Annotated[int, Query(ge=0, le=100_000)]
 
@@ -61,13 +63,17 @@ async def experiments(
 
 
 @router.get("/experiments/{experiment_id}", response_model=ExperimentDetail)
-async def get_experiment(experiment_id: str, session: Session) -> ExperimentDetail:
-    return await experiment_detail(session, experiment_id)
+async def get_experiment(
+    experiment_id: str, session: Session, artifact_roots: ArtifactRoots
+) -> ExperimentDetail:
+    return await experiment_detail(session, experiment_id, artifact_roots)
 
 
 @router.get("/experiments/{experiment_id}/matrix", response_model=MatrixResponse)
-async def get_matrix(experiment_id: str, session: Session) -> MatrixResponse:
-    return await matrix(session, experiment_id)
+async def get_matrix(
+    experiment_id: str, session: Session, artifact_roots: ArtifactRoots
+) -> MatrixResponse:
+    return await matrix(session, experiment_id, artifact_roots)
 
 
 @router.get("/experiments/{experiment_id}/runs", response_model=RunListResponse)
@@ -96,8 +102,10 @@ async def runs(
 
 
 @router.get("/experiments/{experiment_id}/report", response_model=ExperimentReportResponse)
-async def get_report(experiment_id: str, session: Session) -> ExperimentReportResponse:
-    return await experiment_report(session, experiment_id)
+async def get_report(
+    experiment_id: str, session: Session, artifact_roots: ArtifactRoots
+) -> ExperimentReportResponse:
+    return await experiment_report(session, experiment_id, artifact_roots)
 
 
 @router.get("/experiments/{experiment_id}/status", response_model=ExperimentStatusResponse)
@@ -106,40 +114,48 @@ async def get_status(experiment_id: str, session: Session) -> ExperimentStatusRe
 
 
 @router.get("/runs/{run_id}", response_model=RunDetail)
-async def get_run(run_id: str, session: Session) -> RunDetail:
-    return await run_detail(session, run_id)
+async def get_run(run_id: str, session: Session, artifact_roots: ArtifactRoots) -> RunDetail:
+    return await run_detail(session, run_id, artifact_roots)
 
 
 @router.get("/runs/{run_id}/trace", response_model=TraceResponse)
 async def get_trace(
     run_id: str,
     session: Session,
+    artifact_roots: ArtifactRoots,
     path: str | None = Query(default=None, include_in_schema=False),
 ) -> TraceResponse:
     if path is not None:
         raise WorkbenchAPIError(
             422, "INVALID_ARTIFACT_REFERENCE", "artifact paths are not accepted"
         )
-    return await trace_detail(session, run_id)
+    return await trace_detail(session, run_id, artifact_roots)
 
 
 @router.get("/judgelab/calibrations", response_model=JudgeCalibrationListResponse)
 async def calibrations(
-    session: Session, limit: PageLimit = 25, offset: PageOffset = 0
+    session: Session,
+    artifact_roots: ArtifactRoots,
+    limit: PageLimit = 25,
+    offset: PageOffset = 0,
 ) -> JudgeCalibrationListResponse:
-    return await list_judge_calibrations(session, limit=limit, offset=offset)
+    return await list_judge_calibrations(session, limit=limit, offset=offset, roots=artifact_roots)
 
 
 @router.get("/judgelab/calibrations/{calibration_id}", response_model=JudgeCalibrationDetail)
-async def get_calibration(calibration_id: str, session: Session) -> JudgeCalibrationDetail:
-    return await judge_calibration_detail(session, calibration_id)
+async def get_calibration(
+    calibration_id: str, session: Session, artifact_roots: ArtifactRoots
+) -> JudgeCalibrationDetail:
+    return await judge_calibration_detail(session, calibration_id, artifact_roots)
 
 
 @router.post("/regression/compare", response_model=RegressionCompareResponse)
-async def compare(request: RegressionCompareRequest, session: Session) -> RegressionCompareResponse:
-    return await regression_compare(session, request)
+async def compare(
+    request: RegressionCompareRequest, session: Session, artifact_roots: ArtifactRoots
+) -> RegressionCompareResponse:
+    return await regression_compare(session, request, artifact_roots)
 
 
 @router.get("/core-readiness", response_model=CoreReadinessResponse)
-async def readiness(session: Session) -> CoreReadinessResponse:
-    return await core_readiness(session)
+async def readiness(session: Session, artifact_roots: ArtifactRoots) -> CoreReadinessResponse:
+    return await core_readiness(session, artifact_roots)

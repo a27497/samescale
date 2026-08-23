@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,11 +11,11 @@ from typing import Any
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from harnesslab.api.app import create_app
-from harnesslab.api.workbench_dependencies import workbench_session
+from harnesslab.api.workbench_dependencies import workbench_artifact_roots, workbench_session
 from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.common import EvaluationLane, Protocol
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
@@ -32,7 +33,9 @@ from harnesslab.experiment.executor import (
 from harnesslab.experiment.plan import ExperimentPlan, build_experiment_plan
 from harnesslab.experiment.queue import enqueue_plan
 from harnesslab.experiment.spec import ExperimentSpec
-from harnesslab.harness_lane.fake import FakeCodexBackend
+from harnesslab.harness_lane.adapter import CodexExecutionPlan
+from harnesslab.harness_lane.fake import FakeCodexBackend, FakeCodexScenario
+from harnesslab.harness_lane.models import CodexProcessCapture
 from harnesslab.harness_lane.profile import canonical_codex_profile
 from harnesslab.harness_lane.runner import CodexHarnessRunner
 from harnesslab.judgelab.calibration import execute_calibration
@@ -40,12 +43,16 @@ from harnesslab.judgelab.plan import build_calibration_plan, load_calibration_sp
 from harnesslab.judgelab.suite import load_judge_definition, load_judge_suite
 from harnesslab.model_lane.fake import FakeDirectProvider
 from harnesslab.model_lane.runner import DirectModelRunner
+from harnesslab.sandbox.artifacts import sha256_file
 from harnesslab.tasks.package import TaskPackage
 from tests.phase_g_helpers import PYTHON_TASK_PATH, ROOT
 from tests.test_experiment_e2e import PATCH, _cell, _image
 
 SUITE_ROOT = ROOT / "judge_suites/core-calibration/1.0.0"
-EXPERIMENT_IDS = ("phase-i-matrix-baseline", "phase-i-matrix-candidate")
+REGRESSION_EXPERIMENT_IDS = ("phase-i-matrix-baseline", "phase-i-matrix-candidate")
+MULTI_TASK_EXPERIMENT_ID = "phase-i-matrix-multi-task"
+EXPERIMENT_IDS = (*REGRESSION_EXPERIMENT_IDS, MULTI_TASK_EXPERIMENT_ID)
+TYPESCRIPT_TASK_PATH = "tasks/micro-typescript-clamp/1.0.0"
 CALIBRATION_ID = "phase-i-judge-keyless"
 PRIVATE_SENTINEL = "PRIVATE_REASONING_SENTINEL"
 
@@ -56,14 +63,34 @@ class PhaseIEvidence:
     app: Any
     baseline_id: str
     candidate_id: str
+    multi_task_id: str
     calibration_id: str
     trace_run_id: str
     no_trace_run_id: str
 
 
+class TaskSelectiveFakeCodexBackend:
+    """Deterministically solves Python while leaving TypeScript unchanged."""
+
+    @property
+    def artifact_secret_values(self) -> tuple[str, ...]:
+        return ()
+
+    async def run(self, plan: CodexExecutionPlan) -> CodexProcessCapture:
+        scenario = (
+            FakeCodexScenario.SOLVE
+            if plan.task_id == "micro-python-clamp"
+            else FakeCodexScenario.FILE_CHANGE_LIE
+        )
+        return await FakeCodexBackend(scenario).run(plan)
+
+
 def _matrix_plan(experiment_id: str) -> tuple[ExperimentPlan, dict[str, ExperimentLaneBinding]]:
+    is_candidate = experiment_id == REGRESSION_EXPERIMENT_IDS[1]
+    direct_requested_model = "fake-model-a"
+    codex_low_requested_model = "fake-model-b" if is_candidate else "fake-shared-model"
     direct_profile = ModelProfile(
-        requested_model="fake-shared-model",
+        requested_model=direct_requested_model,
         provider="fake-provider",
         base_url="https://fake.invalid/v1",
         route="/responses",
@@ -71,25 +98,26 @@ def _matrix_plan(experiment_id: str) -> tuple[ExperimentPlan, dict[str, Experime
         reasoning=ReasoningProfile(effort="low", max_output_tokens=2048),
     )
     codex_low = canonical_codex_profile(
-        _image(), requested_model="fake-shared-model", reasoning_effort="low"
+        _image(), requested_model=codex_low_requested_model, reasoning_effort="low"
     )
     codex_high = canonical_codex_profile(
         _image(), requested_model="fake-shared-model", reasoning_effort="high"
     )
     package = TaskPackage.load(ROOT / PYTHON_TASK_PATH)
     budget_identity = canonical_digest(package.definition.budget.model_dump(mode="json"))
+    direct_cell = _cell(
+        "direct",
+        EvaluationLane.MODEL,
+        provider_route="fake-provider|responses|https://fake.invalid/v1/responses",
+        profile_identity=resolved_comparison_profile_identity(direct_profile),
+        harness_config_identity=canonical_digest(direct_profile.model_dump(mode="json")),
+        reasoning_effort="low",
+        harness="direct-model",
+        harness_version="evidence-schema-1",
+        runner_contract="direct-model-v1",
+    ).model_copy(update={"requested_model": direct_requested_model})
     cells = (
-        _cell(
-            "direct",
-            EvaluationLane.MODEL,
-            provider_route="fake-provider|responses|https://fake.invalid/v1/responses",
-            profile_identity=resolved_comparison_profile_identity(direct_profile),
-            harness_config_identity=canonical_digest(direct_profile.model_dump(mode="json")),
-            reasoning_effort="low",
-            harness="direct-model",
-            harness_version="evidence-schema-1",
-            runner_contract="direct-model-v1",
-        ),
+        direct_cell,
         _cell(
             "codex-low",
             EvaluationLane.HARNESS,
@@ -100,7 +128,7 @@ def _matrix_plan(experiment_id: str) -> tuple[ExperimentPlan, dict[str, Experime
             harness="codex",
             harness_version=codex_low.codex_cli_version,
             runner_contract="codex-harness-v1",
-        ),
+        ).model_copy(update={"requested_model": codex_low_requested_model}),
         _cell(
             "codex-high",
             EvaluationLane.HARNESS,
@@ -124,19 +152,27 @@ def _matrix_plan(experiment_id: str) -> tuple[ExperimentPlan, dict[str, Experime
             execution_seed=20260824,
             comparison_intent="HARNESS_UPLIFT",
             paired_comparisons=(
-                {
-                    "id": "direct-vs-codex",
-                    "left_cell_id": "direct",
-                    "right_cell_id": "codex-low",
-                },
+                ()
+                if is_candidate
+                else (
+                    {
+                        "id": "direct-vs-codex",
+                        "left_cell_id": "direct",
+                        "right_cell_id": "codex-low",
+                    },
+                )
             ),
             ablations=(
-                {
-                    "id": "codex-effort",
-                    "base_cell_id": "codex-low",
-                    "variant_cell_id": "codex-high",
-                    "changed_dimension": "reasoning_effort",
-                },
+                ()
+                if is_candidate
+                else (
+                    {
+                        "id": "codex-effort",
+                        "base_cell_id": "codex-low",
+                        "variant_cell_id": "codex-high",
+                        "changed_dimension": "reasoning_effort",
+                    },
+                )
             ),
         ),
         ROOT,
@@ -149,7 +185,7 @@ def _matrix_plan(experiment_id: str) -> tuple[ExperimentPlan, dict[str, Experime
                 allow_custom_endpoint=True,
             ),
             direct_profile,
-            FakeDirectProvider(PATCH, observed_model="fake-shared-model"),
+            FakeDirectProvider(PATCH, observed_model=direct_requested_model),
         ),
         "codex-low": CodexHarnessBinding(
             CodexHarnessRunner(
@@ -157,7 +193,7 @@ def _matrix_plan(experiment_id: str) -> tuple[ExperimentPlan, dict[str, Experime
                 runtime_root=ROOT / ".phase-i-test-runtime" / experiment_id / "codex-low",
             ),
             codex_low,
-            FakeCodexBackend(),
+            TaskSelectiveFakeCodexBackend(),
         ),
         "codex-high": CodexHarnessBinding(
             CodexHarnessRunner(
@@ -165,7 +201,100 @@ def _matrix_plan(experiment_id: str) -> tuple[ExperimentPlan, dict[str, Experime
                 runtime_root=ROOT / ".phase-i-test-runtime" / experiment_id / "codex-high",
             ),
             codex_high,
-            FakeCodexBackend(),
+            TaskSelectiveFakeCodexBackend(),
+        ),
+    }
+
+
+def _multi_task_matrix_plan() -> tuple[ExperimentPlan, dict[str, ExperimentLaneBinding]]:
+    codex_low = canonical_codex_profile(
+        _image(), requested_model="fake-shared-model", reasoning_effort="low"
+    )
+    codex_high = canonical_codex_profile(
+        _image(), requested_model="fake-shared-model", reasoning_effort="high"
+    )
+    cells = (
+        _cell(
+            "codex-low",
+            EvaluationLane.HARNESS,
+            provider_route=codex_low.provider_route,
+            profile_identity=resolved_comparison_profile_identity(codex_low),
+            harness_config_identity=codex_low.fingerprint,
+            reasoning_effort="low",
+            harness="codex",
+            harness_version=codex_low.codex_cli_version,
+            runner_contract="codex-harness-v1",
+        ),
+        _cell(
+            "codex-high",
+            EvaluationLane.HARNESS,
+            provider_route=codex_high.provider_route,
+            profile_identity=resolved_comparison_profile_identity(codex_high),
+            harness_config_identity=codex_high.fingerprint,
+            reasoning_effort="high",
+            harness="codex",
+            harness_version=codex_high.codex_cli_version,
+            runner_contract="codex-harness-v1",
+        ),
+        _cell(
+            "codex-unpaired",
+            EvaluationLane.HARNESS,
+            provider_route=codex_low.provider_route,
+            profile_identity=resolved_comparison_profile_identity(codex_low),
+            harness_config_identity=codex_low.fingerprint,
+            reasoning_effort="low",
+            harness="codex",
+            harness_version=codex_low.codex_cli_version,
+            runner_contract="codex-harness-v1",
+        ),
+    )
+    plan = build_experiment_plan(
+        ExperimentSpec(
+            experiment_id=MULTI_TASK_EXPERIMENT_ID,
+            name="Phase I authoritative multi-task Matrix",
+            task_packages=(PYTHON_TASK_PATH, TYPESCRIPT_TASK_PATH),
+            cells=cells,
+            repeat_count=3,
+            execution_seed=20260825,
+            comparison_intent="HARNESS_UPLIFT",
+            ablations=(
+                {
+                    "id": "codex-effort-treatment",
+                    "base_cell_id": "codex-low",
+                    "variant_cell_id": "codex-high",
+                    "changed_dimension": "reasoning_effort",
+                },
+            ),
+        ),
+        ROOT,
+    )
+    artifact_root = ROOT / ".phase-i-test-artifacts"
+    return plan, {
+        "codex-low": CodexHarnessBinding(
+            CodexHarnessRunner(
+                artifact_root=artifact_root,
+                runtime_root=ROOT / ".phase-i-test-runtime" / MULTI_TASK_EXPERIMENT_ID / "low",
+            ),
+            codex_low,
+            TaskSelectiveFakeCodexBackend(),
+        ),
+        "codex-high": CodexHarnessBinding(
+            CodexHarnessRunner(
+                artifact_root=artifact_root,
+                runtime_root=ROOT / ".phase-i-test-runtime" / MULTI_TASK_EXPERIMENT_ID / "high",
+            ),
+            codex_high,
+            TaskSelectiveFakeCodexBackend(),
+        ),
+        "codex-unpaired": CodexHarnessBinding(
+            CodexHarnessRunner(
+                artifact_root=artifact_root,
+                runtime_root=(
+                    ROOT / ".phase-i-test-runtime" / MULTI_TASK_EXPERIMENT_ID / "unpaired"
+                ),
+            ),
+            codex_low,
+            TaskSelectiveFakeCodexBackend(),
         ),
     }
 
@@ -181,6 +310,8 @@ async def phase_i_evidence(
     factory = create_session_factory(engine)
     artifact_root = ROOT / ".phase-i-test-artifacts"
     runtime_root = ROOT / ".phase-i-test-runtime"
+    shutil.rmtree(artifact_root, ignore_errors=True)
+    shutil.rmtree(runtime_root, ignore_errors=True)
     artifact_root.mkdir(exist_ok=True)
     runtime_root.mkdir(exist_ok=True)
     async with factory() as cleanup, cleanup.begin():
@@ -192,7 +323,11 @@ async def phase_i_evidence(
         )
 
     for experiment_id in EXPERIMENT_IDS:
-        plan, bindings = _matrix_plan(experiment_id)
+        plan, bindings = (
+            _multi_task_matrix_plan()
+            if experiment_id == MULTI_TASK_EXPERIMENT_ID
+            else _matrix_plan(experiment_id)
+        )
         async with factory() as session, session.begin():
             await enqueue_plan(session, plan)
         executor = ExperimentRunExecutor(
@@ -202,7 +337,7 @@ async def phase_i_evidence(
             owner=f"phase-i-{experiment_id}",
         )
         completed = await executor.run_until_idle(experiment_id)
-        assert len(completed) == 9
+        assert len(completed) == (18 if experiment_id == MULTI_TASK_EXPERIMENT_ID else 9)
 
     suite = load_judge_suite(SUITE_ROOT)
     definition = load_judge_definition(SUITE_ROOT / "definition.yaml")
@@ -212,13 +347,14 @@ async def phase_i_evidence(
     judge_plan = build_calibration_plan(
         spec, suite, {cell.id: definition for cell in spec.judge_cells}
     )
+    judge_artifact_root = tmp_path_factory.mktemp("phase-i-judge-artifacts")
     async with factory() as session:
         await execute_calibration(
             session,
             plan=judge_plan,
             suite=suite,
             definitions={cell.id: definition for cell in judge_plan.judge_cells},
-            artifact_root=tmp_path_factory.mktemp("phase-i-judge-artifacts"),
+            artifact_root=judge_artifact_root,
         )
 
     async with factory() as session:
@@ -245,19 +381,23 @@ async def phase_i_evidence(
             yield session
 
     app.dependency_overrides[workbench_session] = override_session
+    app.dependency_overrides[workbench_artifact_roots] = lambda: (
+        artifact_root.resolve(),
+        judge_artifact_root.resolve(),
+    )
     if evidence_path := os.environ.get("HARNESSLAB_GATE_I_EVIDENCE_PATH"):
         Path(evidence_path).write_text(
             json.dumps(
                 {
                     "baseline_experiment_id": EXPERIMENT_IDS[0],
                     "candidate_experiment_id": EXPERIMENT_IDS[1],
-                    "matrix_task_count": 1,
+                    "matrix_task_count": 2,
                     "matrix_cell_count": 3,
-                    "matrix_run_count": 9,
+                    "matrix_run_count": 18,
                     "trace_coverage": "FULL_STREAM",
                     "missing_trace_status": "NOT_REPORTED",
                     "missing_cost_status": "NOT_REPORTED",
-                    "regression_status": "NOT_COMPARABLE",
+                    "regression_status": "TREATMENT_AWARE",
                     "judge_calibration_id": CALIBRATION_ID,
                     "core_readiness": "NOT_READY",
                 },
@@ -271,6 +411,7 @@ async def phase_i_evidence(
         app=app,
         baseline_id=EXPERIMENT_IDS[0],
         candidate_id=EXPERIMENT_IDS[1],
+        multi_task_id=MULTI_TASK_EXPERIMENT_ID,
         calibration_id=CALIBRATION_ID,
         trace_run_id=trace_run.run_id,
         no_trace_run_id=no_trace_run.run_id,
@@ -286,8 +427,6 @@ async def phase_i_evidence(
                 delete(JudgeCalibrationRecord).where(JudgeCalibrationRecord.id == CALIBRATION_ID)
             )
         await engine.dispose()
-        import shutil
-
         shutil.rmtree(artifact_root, ignore_errors=True)
         shutil.rmtree(runtime_root, ignore_errors=True)
 
@@ -331,10 +470,10 @@ async def test_experiment_list_detail_status_and_pagination_use_persisted_databa
     client: AsyncClient, phase_i_evidence: PhaseIEvidence
 ) -> None:
     listing = await client.get(
-        "/api/workbench/experiments", params={"search": "phase-i-matrix", "limit": 2}
+        "/api/workbench/experiments", params={"search": "phase-i-matrix", "limit": 3}
     )
     assert listing.status_code == 200
-    assert listing.json()["total"] == 2
+    assert listing.json()["total"] == 3
     assert {item["experiment_id"] for item in listing.json()["items"]} == set(EXPERIMENT_IDS)
     detail = await client.get(f"/api/workbench/experiments/{phase_i_evidence.baseline_id}")
     assert detail.status_code == 200
@@ -373,6 +512,101 @@ async def test_complete_matrix_snapshot_and_report_identity_are_browsable(
 
 
 @pytest.mark.integration
+async def test_multi_task_matrix_uses_task_scoped_verified_observations(
+    client: AsyncClient, phase_i_evidence: PhaseIEvidence
+) -> None:
+    response = await client.get(
+        f"/api/workbench/experiments/{phase_i_evidence.multi_task_id}/matrix"
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["tasks"] == ["micro-python-clamp", "micro-typescript-clamp"]
+    assert body["cells"] == ["codex-high", "codex-low", "codex-unpaired"]
+    assert len(body["points"]) == 6
+    assert all(point["n"] == 3 for point in body["points"])
+    assert all(point["metrics"]["success_rate"]["status"] == "REPORTED" for point in body["points"])
+    assert all(
+        point["metrics"]["infra_rate"] == {"status": "REPORTED", "value": 0.0}
+        for point in body["points"]
+    )
+    assert all(point["metrics"]["pass_at_3"]["status"] == "REPORTED" for point in body["points"])
+    assert all(
+        point["metrics"]["pass_at_5"]["status"] == "NOT_REPORTED" for point in body["points"]
+    )
+    task_values = {
+        (point["task_id"], point["cell_id"]): point["metrics"]["success_rate"]["value"]
+        for point in body["points"]
+    }
+    assert set(task_values.values()) == {0.0, 1.0}
+    assert 0.5 not in task_values.values()
+    assert all(
+        point["comparability"] == "NOT_REPORTED" and point["reason_codes"] == []
+        for point in body["points"]
+        if point["cell_id"] == "codex-unpaired"
+    )
+
+
+@pytest.mark.integration
+async def test_matrix_comparability_is_task_scoped_and_never_invented(
+    client: AsyncClient, phase_i_evidence: PhaseIEvidence
+) -> None:
+    async with phase_i_evidence.factory() as session:
+        run = await session.scalar(
+            select(ExperimentRunRecord).where(
+                ExperimentRunRecord.experiment_id == phase_i_evidence.multi_task_id,
+                ExperimentRunRecord.cell_id == "codex-high",
+                ExperimentRunRecord.task_id == "micro-typescript-clamp",
+                ExperimentRunRecord.repeat_index == 0,
+            )
+        )
+        assert run is not None and run.artifact_manifest_path is not None
+        path = Path(run.artifact_manifest_path)
+        original_digest = run.evidence_digest
+    original = path.read_bytes()
+    payload = json.loads(original)
+    payload["trace_coverage"] = "FINAL_OUTPUT_ONLY"
+    path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+    async with phase_i_evidence.factory() as session, session.begin():
+        run = await session.scalar(
+            select(ExperimentRunRecord).where(
+                ExperimentRunRecord.experiment_id == phase_i_evidence.multi_task_id,
+                ExperimentRunRecord.cell_id == "codex-high",
+                ExperimentRunRecord.task_id == "micro-typescript-clamp",
+                ExperimentRunRecord.repeat_index == 0,
+            )
+        )
+        assert run is not None
+        run.evidence_digest = sha256_file(path)
+    try:
+        response = await client.get(
+            f"/api/workbench/experiments/{phase_i_evidence.multi_task_id}/matrix"
+        )
+        assert response.status_code == 200, response.text
+        points = {
+            (point["task_id"], point["cell_id"]): point for point in response.json()["points"]
+        }
+        affected = points[("micro-typescript-clamp", "codex-high")]
+        unrelated = points[("micro-python-clamp", "codex-high")]
+        assert affected["comparability"] == "PARTIALLY_COMPARABLE"
+        assert "TRACE_COVERAGE_LIMITED" in affected["reason_codes"]
+        assert "TRACE_COVERAGE_LIMITED" not in unrelated["reason_codes"]
+        assert unrelated["comparability"] != "NOT_REPORTED"
+    finally:
+        path.write_bytes(original)
+        async with phase_i_evidence.factory() as session, session.begin():
+            run = await session.scalar(
+                select(ExperimentRunRecord).where(
+                    ExperimentRunRecord.experiment_id == phase_i_evidence.multi_task_id,
+                    ExperimentRunRecord.cell_id == "codex-high",
+                    ExperimentRunRecord.task_id == "micro-typescript-clamp",
+                    ExperimentRunRecord.repeat_index == 0,
+                )
+            )
+            assert run is not None
+            run.evidence_digest = original_digest
+
+
+@pytest.mark.integration
 async def test_run_filter_detail_identity_and_missing_cost_are_safe(
     client: AsyncClient, phase_i_evidence: PhaseIEvidence
 ) -> None:
@@ -391,6 +625,51 @@ async def test_run_filter_detail_identity_and_missing_cost_are_safe(
     assert detail["explicit_cost"] == {"status": "NOT_REPORTED", "value": None}
     assert "credential_reference" not in json.dumps(detail)
     assert "/home/" not in json.dumps(detail)
+
+
+@pytest.mark.integration
+async def test_workbench_manifest_reads_are_confined_to_server_artifact_roots(
+    client: AsyncClient, phase_i_evidence: PhaseIEvidence, tmp_path: Path
+) -> None:
+    async with phase_i_evidence.factory() as session:
+        record = await session.get(ExperimentRunRecord, phase_i_evidence.trace_run_id)
+        assert record is not None and record.artifact_manifest_path is not None
+        original_path = record.artifact_manifest_path
+    original = Path(original_path)
+    outside = tmp_path / "matching-run-manifest.json"
+    outside.write_bytes(original.read_bytes())
+
+    async with phase_i_evidence.factory() as session, session.begin():
+        record = await session.get(ExperimentRunRecord, phase_i_evidence.trace_run_id)
+        assert record is not None
+        record.artifact_manifest_path = str(outside)
+    rejected = await client.get(f"/api/workbench/runs/{phase_i_evidence.trace_run_id}")
+    assert rejected.status_code == 409
+    assert rejected.json()["error"] == {
+        "code": "ARTIFACT_INTEGRITY_ERROR",
+        "message": "artifact is outside trusted storage",
+    }
+
+    trusted_link = original.parents[1] / "symlink-escape-manifest.json"
+    trusted_link.symlink_to(outside)
+    try:
+        async with phase_i_evidence.factory() as session, session.begin():
+            record = await session.get(ExperimentRunRecord, phase_i_evidence.trace_run_id)
+            assert record is not None
+            record.artifact_manifest_path = str(trusted_link)
+        symlink_rejected = await client.get(f"/api/workbench/runs/{phase_i_evidence.trace_run_id}")
+        assert symlink_rejected.status_code == 409
+        assert symlink_rejected.json()["error"]["code"] == "ARTIFACT_INTEGRITY_ERROR"
+    finally:
+        trusted_link.unlink()
+        async with phase_i_evidence.factory() as session, session.begin():
+            record = await session.get(ExperimentRunRecord, phase_i_evidence.trace_run_id)
+            assert record is not None
+            record.artifact_manifest_path = original_path
+
+    legitimate = await client.get(f"/api/workbench/runs/{phase_i_evidence.trace_run_id}")
+    assert legitimate.status_code == 200
+    assert legitimate.json()["artifact_name"] == "manifest.json"
 
 
 @pytest.mark.integration
@@ -466,67 +745,118 @@ async def test_judgelab_list_and_detail_use_digest_verified_phase_h_report(
 
 
 @pytest.mark.integration
-async def test_regression_compare_uses_persisted_reports_and_blocks_control_mismatch(
+async def test_regression_compare_accepts_declared_treatments_and_blocks_hard_controls(
     client: AsyncClient, phase_i_evidence: PhaseIEvidence
 ) -> None:
-    response = await client.post(
+    async with phase_i_evidence.factory() as session:
+        before_runs = tuple(
+            (
+                await session.scalars(
+                    select(ExperimentRunRecord).where(
+                        ExperimentRunRecord.experiment_id.in_(REGRESSION_EXPERIMENT_IDS)
+                    )
+                )
+            ).all()
+        )
+    before_artifacts = {
+        run.run_id: (
+            run.artifact_manifest_path,
+            Path(run.artifact_manifest_path).stat().st_mtime_ns
+            if run.artifact_manifest_path
+            else None,
+        )
+        for run in before_runs
+    }
+
+    model_response = await client.post(
         "/api/workbench/regression/compare",
         json={
             "baseline_experiment_id": phase_i_evidence.baseline_id,
             "candidate_experiment_id": phase_i_evidence.candidate_id,
+            "intent": "MODEL_COMPARISON",
+            "cell_mapping": {"codex-low": "codex-low"},
+        },
+    )
+    assert model_response.status_code == 200, model_response.text
+    model = model_response.json()
+    assert model["intent"] == "MODEL_COMPARISON"
+    assert model["comparisons"][0]["comparability"] in {
+        "COMPARABLE",
+        "PARTIALLY_COMPARABLE",
+    }, json.dumps(model["comparisons"][0], sort_keys=True)
+    assert "INTENDED_TREATMENT_DIFFERENCE" in model["comparisons"][0]["reason_codes"]
+    assert model["comparisons"][0]["paired_observations"] == 3
+
+    harness_response = await client.post(
+        "/api/workbench/regression/compare",
+        json={
+            "baseline_experiment_id": phase_i_evidence.baseline_id,
+            "candidate_experiment_id": phase_i_evidence.candidate_id,
+            "intent": "HARNESS_UPLIFT",
+            "cell_mapping": {"codex-low": "codex-high"},
+        },
+    )
+    assert harness_response.status_code == 200, harness_response.text
+    harness = harness_response.json()["comparisons"][0]
+    assert harness["comparability"] in {"COMPARABLE", "PARTIALLY_COMPARABLE"}
+    assert "INTENDED_TREATMENT_DIFFERENCE" in harness["reason_codes"]
+    assert harness["paired_observations"] == 3
+
+    hard_control_response = await client.post(
+        "/api/workbench/regression/compare",
+        json={
+            "baseline_experiment_id": phase_i_evidence.baseline_id,
+            "candidate_experiment_id": phase_i_evidence.candidate_id,
+            "intent": "MODEL_COMPARISON",
             "cell_mapping": {"direct": "codex-low"},
         },
     )
-    assert response.status_code == 200
-    body = response.json()
-    assert body["comparisons"][0]["comparability"] == "NOT_COMPARABLE"
-    assert body["comparisons"][0]["reason_codes"] == ["HARD_CONTROL_MISMATCH"]
-    assert "causal attribution" in body["limitation"]
-    assert body["baseline_report_digest"].startswith("sha256:")
-    assert body["candidate_report_digest"].startswith("sha256:")
+    assert hard_control_response.status_code == 200
+    hard_control = hard_control_response.json()["comparisons"][0]
+    assert hard_control["comparability"] == "NOT_COMPARABLE"
+    assert "HARD_CONTROL_MISMATCH" in hard_control["reason_codes"]
+    assert "causal attribution" in hard_control_response.json()["limitation"]
+
     oversized = await client.post(
         "/api/workbench/regression/compare",
         json={
             "baseline_experiment_id": phase_i_evidence.baseline_id,
             "candidate_experiment_id": phase_i_evidence.candidate_id,
+            "intent": "GENERAL",
             "cell_mapping": {f"cell-{index}": "direct" for index in range(101)},
         },
     )
     assert oversized.status_code == 422
+    arbitrary_intent = await client.post(
+        "/api/workbench/regression/compare",
+        json={
+            "baseline_experiment_id": phase_i_evidence.baseline_id,
+            "candidate_experiment_id": phase_i_evidence.candidate_id,
+            "intent": "CUSTOM_TREATMENT_FIELDS",
+            "cell_mapping": {"codex-low": "codex-low"},
+        },
+    )
+    assert arbitrary_intent.status_code == 422
 
-    async with phase_i_evidence.factory() as session, session.begin():
-        record = await session.get(ExperimentRecord, phase_i_evidence.candidate_id)
-        assert record is not None
-        original_plan_json = record.plan_json
-        original_plan_digest = record.plan_digest
-        candidate_plan = ExperimentPlan.model_validate(record.plan_json)
-        changed_task = candidate_plan.tasks[0].model_copy(
-            update={"verifier_identity": "sha256:" + "0" * 64}
+    async with phase_i_evidence.factory() as session:
+        after_count = int(
+            await session.scalar(
+                select(func.count())
+                .select_from(ExperimentRunRecord)
+                .where(ExperimentRunRecord.experiment_id.in_(REGRESSION_EXPERIMENT_IDS))
+            )
+            or 0
         )
-        changed_plan = candidate_plan.model_copy(update={"tasks": (changed_task,)})
-        record.plan_json = changed_plan.model_dump(mode="json")
-        record.plan_digest = changed_plan.digest
-
-    try:
-        task_mismatch = await client.post(
-            "/api/workbench/regression/compare",
-            json={
-                "baseline_experiment_id": phase_i_evidence.baseline_id,
-                "candidate_experiment_id": phase_i_evidence.candidate_id,
-                "cell_mapping": {"direct": "direct"},
-            },
+    assert after_count == len(before_runs)
+    assert before_artifacts == {
+        run.run_id: (
+            run.artifact_manifest_path,
+            Path(run.artifact_manifest_path).stat().st_mtime_ns
+            if run.artifact_manifest_path
+            else None,
         )
-        assert task_mismatch.status_code == 200, task_mismatch.text
-        comparison = task_mismatch.json()["comparisons"][0]
-        assert comparison["comparability"] == "NOT_COMPARABLE"
-        assert comparison["reason_codes"] == ["TASK_CONTROL_MISMATCH"]
-        assert task_mismatch.json()["common_tasks"] == []
-    finally:
-        async with phase_i_evidence.factory() as session, session.begin():
-            record = await session.get(ExperimentRecord, phase_i_evidence.candidate_id)
-            assert record is not None
-            record.plan_json = original_plan_json
-            record.plan_digest = original_plan_digest
+        for run in before_runs
+    }
 
 
 @pytest.mark.integration
@@ -538,6 +868,9 @@ async def test_core_readiness_is_evidence_driven_and_stays_not_ready(
     body = response.json()
     assert body["status"] == "NOT_READY"
     assert body["task_corpus_size"] >= 1
+    task_check = next(check for check in body["checks"] if check["key"] == "TASK_CORPUS")
+    assert task_check["status"] == "NOT_VERIFIED"
+    assert "15-25" in task_check["evidence"]
     assert "REAL_MATRIX_EVIDENCE" in body["blockers"]
     assert "REAL_JUDGE_EVIDENCE" in body["blockers"]
     assert "PHASE_J" in body["blockers"]
@@ -569,11 +902,26 @@ async def test_judge_report_digest_mutation_fails_closed(
     payload["limitations"] = [*payload["limitations"], "mutated"]
     report_path.write_text(json.dumps(payload), encoding="utf-8")
     try:
+        listing = await client.get("/api/workbench/judgelab/calibrations")
+        assert listing.status_code == 200
+        item = next(
+            item
+            for item in listing.json()["items"]
+            if item["calibration_id"] == phase_i_evidence.calibration_id
+        )
+        assert item["report_evidence_status"] == "INTEGRITY_ERROR"
+        assert item["qualifications"] == []
         response = await client.get(
             f"/api/workbench/judgelab/calibrations/{phase_i_evidence.calibration_id}"
         )
         assert response.status_code == 409
         assert response.json()["error"]["code"] == "ARTIFACT_INTEGRITY_ERROR"
+        readiness = (await client.get("/api/workbench/core-readiness")).json()
+        judge_check = next(
+            check for check in readiness["checks"] if check["key"] == "JUDGE_CALIBRATION"
+        )
+        assert judge_check["status"] == "NOT_VERIFIED"
+        assert judge_check["evidence"].startswith("0 integrity-validated")
     finally:
         report_path.write_bytes(original)
 

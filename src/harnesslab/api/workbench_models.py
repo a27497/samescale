@@ -5,8 +5,14 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from harnesslab.comparability.models import ComparabilityIntent
+
 EvidenceStatus = Literal["REPORTED", "NOT_REPORTED"]
 ComparabilityValue = Literal["COMPARABLE", "PARTIALLY_COMPARABLE", "NOT_COMPARABLE"]
+MatrixComparabilityValue = Literal[
+    "COMPARABLE", "PARTIALLY_COMPARABLE", "NOT_COMPARABLE", "NOT_REPORTED"
+]
+JudgeReportEvidenceStatus = Literal["REPORTED", "NOT_REPORTED", "INTEGRITY_ERROR"]
 
 
 class WorkbenchModel(BaseModel):
@@ -115,7 +121,7 @@ class MatrixPoint(WorkbenchModel):
     cell_id: str
     n: int
     tier: str
-    comparability: ComparabilityValue
+    comparability: MatrixComparabilityValue
     reason_codes: tuple[str, ...]
     metrics: MatrixMetricSet
 
@@ -206,6 +212,7 @@ class JudgeCalibrationSummary(WorkbenchModel):
     plan_digest: str
     report_digest: str | None
     status: str
+    report_evidence_status: JudgeReportEvidenceStatus
     judge_cell_count: int
     qualifications: tuple[str, ...]
     created_at: datetime
@@ -257,6 +264,7 @@ class RegressionCompareRequest(BaseModel):
 
     baseline_experiment_id: str = Field(min_length=1, max_length=100)
     candidate_experiment_id: str = Field(min_length=1, max_length=100)
+    intent: ComparabilityIntent
     cell_mapping: dict[str, str] = Field(default_factory=dict, max_length=100)
 
     @field_validator("cell_mapping")
@@ -281,6 +289,7 @@ class RegressionCellComparison(WorkbenchModel):
     candidate_tier: str
     comparability: ComparabilityValue
     reason_codes: tuple[str, ...]
+    paired_observations: int
     baseline_infra_count: int
     candidate_infra_count: int
 
@@ -292,6 +301,7 @@ class RegressionCompareResponse(WorkbenchModel):
     candidate_plan_digest: str
     baseline_report_digest: str
     candidate_report_digest: str
+    intent: ComparabilityIntent
     common_tasks: tuple[str, ...]
     comparisons: tuple[RegressionCellComparison, ...]
     limitation: str

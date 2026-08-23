@@ -9,6 +9,7 @@ import type {
   JudgeCalibrationSummary,
   MatrixResponse,
   RegressionResponse,
+  RegressionIntent,
   RunDetail,
   RunListResponse,
   TraceResponse,
@@ -51,11 +52,17 @@ export const workbenchApi = {
         `/judgelab/calibrations/${encodeURIComponent(id)}`,
       )
     ).data,
-  compare: async (baselineId: string, candidateId: string, cellMapping: Record<string, string> = {}) =>
+  compare: async (
+    baselineId: string,
+    candidateId: string,
+    intent: RegressionIntent,
+    cellMapping: Record<string, string> = {},
+  ) =>
     (
       await apiClient.post<RegressionResponse>('/regression/compare', {
         baseline_experiment_id: baselineId,
         candidate_experiment_id: candidateId,
+        intent,
         cell_mapping: cellMapping,
       })
     ).data,
