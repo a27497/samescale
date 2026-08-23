@@ -49,11 +49,29 @@ This file separates repository evidence from intended design. A capability moves
 - Deterministic Fake Codex execution of all three controlled tasks through the Phase C isolated
   hidden verifier, including fail-closed protocol/profile/artifact and self-report-negative cases
 - `harnesslab harness codex doctor` and the authoritative no-key Gate E runner
+- Remote GitHub Actions Gate A + Gate B + Gate C + Gate D + Gate E for the approved Phase E head
+  `ca0cc5921169259f9cd8668901bfc4eaa3d758c0` (run `32594279021`, result `success`)
+- Pinned project-owned Claude Code 2.1.241 and DeepSeek Harness 0.1.1-rc.2 images/profiles with
+  immutable npm integrity, non-root execution, and Python 3.12.11, Java/Javac 21.0.12, and
+  Node 24.19.0 task toolchains
+- One shared Phase F H-Lane runner with fresh workspace, filesystem-authoritative diff, exact-secret
+  artifact withholding, Phase C Hidden Verifier authority, and immutable multi-harness evidence
+- Claude `claude-harness-v1` bare stream-JSON collection with minimal Read/Edit/Write/Bash tools,
+  retry/lifecycle/failure evidence, unknown-event preservation, and private-reasoning exclusion
+- Public DeepSeek E1 `dsh --profile headless` collection with isolated `DSH_HOME`, default/effective
+  config digests, `FINAL_OUTPUT_ONLY` trace coverage, and explicit developer-preview identity
+- Deterministic Fake Claude and Fake DeepSeek runs of all three controlled tasks through the
+  isolated Hidden Verifier, including self-report negatives, taxonomy, config-drift, and
+  secret/reasoning controls
+- Comparability contracts, manifest fact extraction, deterministic intent-aware assessment, and
+  `harnesslab compare assess` text/JSON output with field-level reasons and evidence identities
+- `harnesslab harness claude doctor`, `harnesslab harness deepseek doctor`, and the authoritative
+  non-recursive, keyless Gate F runner
 
-Evidence date: 2026-08-23. Phase E entries above are local Gate E evidence pending this change's
-named remote CI run. Phase D provider contracts are MockTransport/fake-provider verified; Phase E
-Codex behavior is deterministic Fake Codex verified. Neither implies a real provider/model call or
-VM-level isolation.
+Evidence date: 2026-08-23. Phase E remote evidence is approved at the exact head/run above. Phase F
+entries are current local Gate F evidence pending this change's named remote CI run. Phase D
+provider contracts are MockTransport/fake-provider verified; Phase E/F harness behavior is
+deterministic fake verified. None implies a real provider/model call or VM-level isolation.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
 
@@ -62,8 +80,8 @@ not yet been demonstrated.
 
 ## DESIGN_ONLY
 
-- Additional Harness adapters
-- P-Lane comparability and the experiment execution engine
+- Additional Harness adapters beyond Codex, Claude Code, and DeepSeek E1
+- Experiment matrix/execution engine
 - Full PostgreSQL queue, scheduler, and worker lifecycle
 - Statistical intervals and pass@k
 - JudgeLab and judge calibration implementation
@@ -75,7 +93,9 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-`REAL_PROVIDER_SMOKE = NOT_RUN` and `REAL_CODEX_SMOKE = NOT_RUN`. No real provider credential is
-required for Gate D or Gate E, no ambient Codex login is consumed, and no real-provider/model
-invocation is claimed. The provider-control-plane versus subject-network separation is not yet
-operationally verified. Future capabilities remain `DESIGN_ONLY` until their own gates exist.
+`REAL_PROVIDER_SMOKE = NOT_RUN`, `REAL_CODEX_SMOKE = NOT_RUN`,
+`REAL_CLAUDE_SMOKE = NOT_RUN`, and `REAL_DEEPSEEK_SMOKE = NOT_RUN`. DeepSeek persistent-session E2
+is `DEFERRED_NOT_VERIFIED`. No real provider credential is required for Gates D-F, no ambient
+harness login is consumed, and no real-provider/model invocation is claimed. The provider control
+plane versus subject network separation is not operationally verified. Future capabilities remain
+`DESIGN_ONLY` until their own gates exist.

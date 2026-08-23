@@ -3,7 +3,8 @@
 HarnessLab AI is a reproducible **Model × Harness × Judge** evaluation and attribution
 platform. The repository currently contains **Phase A — Foundation & Contracts** and
 **Phase B — Task Contract + Deterministic Verifier**, **Phase C — Native Docker Sandbox**, and
-**Phase D — M-Lane Direct Model**, and **Phase E — Codex H-Lane**.
+**Phase D — M-Lane Direct Model**, **Phase E — Codex H-Lane**, and
+**Phase F — Multi-Harness + Comparability**.
 
 ## Implemented now
 
@@ -40,14 +41,20 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
   filesystem-authoritative workspace changes and immutable H-Lane evidence
 - Fake Codex end-to-end runs for the Python, Java, and TypeScript tasks through the isolated
   hidden verifier, and an authoritative no-key Gate E runner
+- Pinned, non-root Claude Code 2.1.241 and DeepSeek Harness 0.1.1-rc.2 subject images with the
+  same Python 3.12, Java/Javac 21, and Node 24 task toolchains as the verifier
+- One shared Phase F runner for Claude Code bare stream-JSON and the public DeepSeek
+  `dsh --profile headless` contract, including safe evidence and explicit trace coverage
+- A deterministic Comparability Engine with three claim intents, field-level reasons, and
+  `COMPARABLE`, `PARTIALLY_COMPARABLE`, or `NOT_COMPARABLE` outcomes
+- An authoritative, keyless, non-recursive Gate F with critical-test and sensitivity enforcement
 - pytest integration/unit coverage, Ruff, mypy, and one authoritative Gate A runner
 - GitHub Actions using PostgreSQL 18 without model-provider credentials
 
 ## Planned Core
 
-Additional harness families, the P-Lane/comparability and experiment engines, the full durable
-queue and worker scheduler, aggregate scoring/statistics, and judge calibration are **PLANNED**.
-Phase E implements only the Codex H-Lane; it does not implement Phase F capabilities.
+The experiment execution engine, full durable queue and worker scheduler, aggregate
+scoring/statistics, and judge calibration are **PLANNED**. Phase F does not implement Phase G.
 
 ## Workbench later
 
@@ -60,7 +67,8 @@ Gate A prerequisites are Docker and [uv](https://docs.astral.sh/uv/). Gate B add
 Java 21 (`java` and `javac`) and Node.js 24 or newer on `PATH`. Gate C requires a reachable local
 Docker Engine, or Docker Desktop using Linux containers; remote TCP/SSH contexts are unsupported.
 Gate D uses deterministic fake/MockTransport providers and requires no model API key. Gate E
-builds the pinned Codex image and uses deterministic Fake Codex runs; it also requires no key.
+builds the pinned Codex image and uses deterministic Fake Codex runs. Gate F builds pinned Claude
+and DeepSeek images and uses deterministic fake harness runs; none requires a key.
 
 ```powershell
 Copy-Item .env.example .env
@@ -71,6 +79,8 @@ uv run harnesslab doctor
 uv run harnesslab sandbox doctor
 uv run harnesslab model profile validate profiles/openai-responses.example.yaml
 uv run harnesslab harness codex doctor
+uv run harnesslab harness claude doctor
+uv run harnesslab harness deepseek doctor
 ```
 
 Start the API and query its health endpoint:
@@ -140,7 +150,18 @@ uv run --locked python scripts/verify_gate_e.py
 Real Codex execution is opt-in and is not Gate E evidence. The default result is
 `REAL_CODEX_SMOKE=NOT_RUN`; HarnessLab does not consume ambient Codex login state or credentials.
 
+The non-recursive Phase F gate independently verifies Phase F and its current-tree contracts:
+
+```powershell
+uv run --locked python scripts/verify_gate_f.py
+```
+
+Real Claude and DeepSeek calls are optional and are not Gate F evidence. DeepSeek E1 is honestly
+`FINAL_OUTPUT_ONLY`; E2 is `DEFERRED_NOT_VERIFIED` because no sufficiently documented public
+persistent-session extractor seam was established.
+
 See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_METHODOLOGY.md), and
 [Task Format](docs/TASK_FORMAT.md), [Sandbox Security](docs/SANDBOX_SECURITY.md), and
-[M-Lane Direct Model](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md), and
+[M-Lane Direct Model](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md),
+[Harness Comparability](docs/HARNESS_COMPARABILITY.md), and
 [Resume Scope](docs/RESUME_SCOPE.md).

@@ -205,16 +205,15 @@ def verify_source_and_scope() -> bool:
     print(f"GIT_DIRTY={bool(worktree.stdout.strip())}")
     forbidden = (
         ROOT / "src" / "harnesslab" / "workers",
-        ROOT / "src" / "harnesslab" / "comparability",
         ROOT / "src" / "harnesslab" / "statistics",
         ROOT / "src" / "harnesslab" / "judges",
         ROOT / "frontend",
     )
     existing = [str(path.relative_to(ROOT)) for path in forbidden if path.exists()]
     if existing:
-        print(f"FAIL: Phase F/later implementation paths exist: {existing}")
+        print(f"FAIL: Phase G/later implementation paths exist: {existing}")
         return False
-    print("PASS: no Phase F comparability, worker, judge, statistics, or frontend paths")
+    print("PASS: no Phase G worker, judge, statistics, or frontend paths")
     return True
 
 

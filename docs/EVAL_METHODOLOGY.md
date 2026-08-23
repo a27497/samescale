@@ -2,8 +2,9 @@
 
 Phase A establishes vocabulary and contracts. Phase B implements deterministic task validation,
 Phase C isolates untrusted workspace verification, Phase D implements the first M-Lane direct
-model path, and Phase E implements the Codex H-Lane. P/J lanes, the comparability engine,
-experiment execution engine, and judges remain design-only.
+model path, Phase E implements the Codex H-Lane, and Phase F adds Claude/DeepSeek H-Lanes plus
+deterministic evidence comparability. The experiment execution engine, repeated-run statistics,
+and judges remain design-only.
 
 ## Evaluation lanes
 
@@ -12,9 +13,9 @@ experiment execution engine, and judges remain design-only.
   subject-visible text and accepts only a strict JSON patch; the model receives no tools, hidden
   verifier, or oracle.
 - **H-Lane (Harness Evaluation):** evaluate a coding harness through its tools and workspace while
-  holding the requested model, task, and verifier facts stable. Phase E records the Codex runtime,
-  frozen profile, safe trajectory, and final workspace, then delegates correctness exclusively to
-  the isolated hidden verifier.
+  holding the requested model, task, and verifier facts stable. Phases E/F record frozen runtime,
+  profile, safe trajectory coverage, and final workspace, then delegate correctness exclusively
+  to the isolated hidden verifier.
 - **P-Lane (Paired Model-vs-Harness Evaluation):** compare direct-model execution with harness
   execution on controlled micro tasks where the necessary context and verifier are equivalent, in
   order to measure harness uplift.
@@ -48,10 +49,16 @@ artifact into a success.
 
 ## Comparability
 
-A comparison is meaningful only when task/version, workspace digest, prompt hash, verifier
-version, provider route/protocol, harness version/configuration, reasoning budget, network policy,
-sandbox image, and judge definition are recorded or controlled. Phase A contracts preserve these
-facts but do not implement a comparability engine.
+A comparison is meaningful only when task/version/digest, input workspace, context, verifier,
+requested and observed model, provider route, resource budget, network policy, harness/profile,
+prompt, and trace coverage are explicit. Phase F implements a deterministic assessment of these
+facts; it does not infer absent identities.
+
+For `HARNESS_UPLIFT`, task/workspace/context/verifier/model/route/budget/network fields are hard
+controls, while harness/profile/prompt differences are intended treatments. A missing observed
+model yields `PARTIALLY_COMPARABLE`; a known observed-model mismatch yields `NOT_COMPARABLE`.
+Incomplete trace coverage limits trace-dependent attribution but does not erase final correctness.
+`MODEL_COMPARISON` treats requested/observed model differences as its declared treatment.
 
 Requested model is the model identifier sent by the experiment definition. Observed model is the
 identity reported or otherwise evidenced during the run. They can differ because aliases,
@@ -63,12 +70,13 @@ comparability analysis.
 
 Phase E applies the same separation to Codex. If native JSONL does not expose the routed model,
 `observed_model` remains null with `not_exposed` status; HarnessLab never copies the requested
-identity into an observed field. This is evidence collection, not the Phase F comparability engine.
+identity into an observed field. Phase F consumes this evidence without guessing the missing value.
 
 ## H-Lane outcome authority
 
-Codex public messages, native file-change events, and process exit status describe trajectory, not
-task correctness. HarnessLab hashes the real workspace before and after Codex, scans artifacts for
+Codex, Claude, and DeepSeek public messages, native file-change events, and process exit status
+describe trajectory, not task correctness. HarnessLab hashes the real workspace before and after
+the harness, scans artifacts for
 run credentials, and sends the final workspace to the isolated deterministic verifier. Thus an
 agent message claiming success followed by `turn.completed` and exit zero can still produce
 `VERIFIED_FAIL`. Harness failures remain separate from verifier failures.

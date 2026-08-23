@@ -124,12 +124,45 @@ Native file-change claims and agent success messages are trajectory evidence onl
 digests and changed-path inventory come from the actual filesystem, and the isolated hidden
 verifier alone produces the pass/score outcome.
 
+## Phase F multi-harness and comparability
+
+Phase F adds Claude Code and DeepSeek Harness without creating separate orchestration stacks.
+Both implement the same adapter contract and traverse one shared runner for task loading, fresh
+workspace materialization, prompt identity, filesystem inventory/diff, artifact withholding, the
+Phase C isolated Hidden Verifier, and immutable evidence persistence.
+
+```text
+Phase B task ─ fresh workspace ─┬─ Claude bare/stream-json ─ safe native stream ─┐
+                               └─ dsh --profile headless ─ final stdout only ────┤
+                                                                                 │
+                              filesystem identity ─ Phase C Hidden Verifier ─────┘
+                                                              │
+                                             Phase F H-Lane evidence manifests
+                                                              │
+                    M/H manifest facts ─ Comparability Engine ─┘
+```
+
+Claude Code 2.1.241 runs in bare print mode with exactly Read/Edit/Write/Bash exposed and no MCP,
+plugins, skills, Web, or user interaction. Thinking content becomes only `REASONING_PRESENT`.
+Structured retry and failure events remain distinct, and unknown safe events become `UNKNOWN`.
+
+DeepSeek Harness 0.1.1-rc.2 uses only documented E1:
+`dsh --profile headless <task>`, with the fresh workspace as cwd and isolated `DSH_HOME`. Gate F
+records default/effective config digests. E1 prints only a final answer, so it declares
+`FINAL_OUTPUT_ONLY`. The public plugin architecture does not document a stable, safe
+persistent-session extractor sufficient for E2; E2 remains `DEFERRED_NOT_VERIFIED`.
+
+The Comparability Engine is a pure assessment over extracted evidence identities. Intent selects
+controls and treatments. It emits every field comparison, reason codes/severities, both evidence
+identities, and `COMPARABLE`, `PARTIALLY_COMPARABLE`, or `NOT_COMPARABLE`. It does not schedule
+experiments, calculate statistics, or judge output quality.
+
 ## Planned Core boundaries
 
 The following are **PLANNED**, not implemented:
 
 - Additional harness adapters at explicit external-system boundaries
-- Aggregate scoring/statistics and the Phase F comparability engine
+- Aggregate scoring/statistics and the Phase G experiment engine
 - A PostgreSQL-backed durable experiment queue and full worker lifecycle
 - Remote/cloud artifact storage and worker execution
 

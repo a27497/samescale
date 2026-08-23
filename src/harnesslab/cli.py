@@ -11,6 +11,9 @@ import uvicorn
 from pydantic import ValidationError
 
 from harnesslab import __version__
+from harnesslab.comparability.engine import ComparabilityEngine
+from harnesslab.comparability.manifest import ComparabilityInputError, load_manifest_facts
+from harnesslab.comparability.models import ComparabilityIntent
 from harnesslab.core.config import Settings
 from harnesslab.db.health import check_database
 from harnesslab.harness_lane.profile import canonical_codex_profile
@@ -18,6 +21,9 @@ from harnesslab.harness_lane.runtime import CodexRuntime
 from harnesslab.model_lane.models import DirectModelOutcome, ProviderFailureCategory
 from harnesslab.model_lane.profiles import ModelProfileError, load_model_profile
 from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
+from harnesslab.multi_harness.models import DeepSeekSessionExtraction, HarnessKind
+from harnesslab.multi_harness.profile import canonical_claude_profile, canonical_deepseek_profile
+from harnesslab.multi_harness.runtime import MultiHarnessRuntime
 from harnesslab.sandbox.preflight import DockerPreflightError, docker_preflight
 from harnesslab.tasks.package import TaskPackageError
 from harnesslab.tasks.validation import validate_task_package
@@ -27,14 +33,54 @@ task_app = typer.Typer(no_args_is_help=True, help="Inspect and validate versione
 sandbox_app = typer.Typer(no_args_is_help=True, help="Inspect the Phase C Docker sandbox boundary.")
 model_app = typer.Typer(no_args_is_help=True, help="Run Phase D direct-model evaluations.")
 model_profile_app = typer.Typer(no_args_is_help=True, help="Validate direct-model profiles.")
-harness_app = typer.Typer(no_args_is_help=True, help="Inspect Phase E coding harnesses.")
+harness_app = typer.Typer(no_args_is_help=True, help="Inspect pinned coding harness runtimes.")
 codex_harness_app = typer.Typer(no_args_is_help=True, help="Inspect the pinned Codex harness.")
+claude_harness_app = typer.Typer(no_args_is_help=True, help="Inspect the pinned Claude harness.")
+deepseek_harness_app = typer.Typer(
+    no_args_is_help=True, help="Inspect the pinned DeepSeek harness."
+)
+compare_app = typer.Typer(no_args_is_help=True, help="Assess evidence comparability.")
 app.add_typer(task_app, name="task")
 app.add_typer(sandbox_app, name="sandbox")
 app.add_typer(model_app, name="model")
 app.add_typer(harness_app, name="harness")
+app.add_typer(compare_app, name="compare")
 model_app.add_typer(model_profile_app, name="profile")
 harness_app.add_typer(codex_harness_app, name="codex")
+harness_app.add_typer(claude_harness_app, name="claude")
+harness_app.add_typer(deepseek_harness_app, name="deepseek")
+
+
+@compare_app.command("assess")
+def assess_comparability(
+    left: str = typer.Argument(help="Left M-Lane or H-Lane manifest.json."),
+    right: str = typer.Argument(help="Right M-Lane or H-Lane manifest.json."),
+    intent: str = typer.Option("general", "--intent", help="Comparison claim intent."),
+    json_output: bool = typer.Option(False, "--json", help="Emit canonical JSON."),
+) -> None:
+    """Assess two immutable evidence manifests without guessing missing identities."""
+
+    try:
+        parsed_intent = ComparabilityIntent(intent.replace("-", "_").upper())
+        report = ComparabilityEngine().assess(
+            load_manifest_facts(Path(left)),
+            load_manifest_facts(Path(right)),
+            intent=parsed_intent,
+        )
+    except (ComparabilityInputError, ValueError) as exc:
+        typer.echo(f"FAIL comparability input: {exc}")
+        raise typer.Exit(code=1) from exc
+    if json_output:
+        typer.echo(report.canonical_json())
+        return
+    typer.echo(f"status={report.status.value}")
+    typer.echo(f"intent={report.intent.value}")
+    typer.echo(f"left_evidence={report.left_evidence_identity}")
+    typer.echo(f"right_evidence={report.right_evidence_identity}")
+    for reason in report.reasons:
+        typer.echo(
+            f"{reason.severity.value} {reason.code.value} field={reason.field}: {reason.detail}"
+        )
 
 
 class CheckStatus(StrEnum):
@@ -203,6 +249,59 @@ def codex_harness_doctor() -> None:
     )
     typer.echo(f"PASS profile_hash={profile.fingerprint}")
     typer.echo("REAL_CODEX_SMOKE=NOT_RUN")
+
+
+@claude_harness_app.command("doctor")
+def claude_harness_doctor() -> None:
+    """Verify Claude Code version, image, stream flags, toolchains, and fingerprint."""
+
+    try:
+        result = asyncio.run(MultiHarnessRuntime(HarnessKind.CLAUDE_CODE).doctor())
+        profile = canonical_claude_profile(result.image)
+    except DockerPreflightError as exc:
+        typer.echo(f"NOT_VERIFIED Claude Code Harness: {exc}")
+        raise typer.Exit(code=2) from exc
+    except Exception as exc:
+        typer.echo(f"FAIL Claude Code Harness: {type(exc).__name__}: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"PASS version={result.version}")
+    typer.echo(f"PASS image={result.image.reference} id={result.image.image_id}")
+    typer.echo(f"PASS exec_flags={','.join(result.required_flags)}")
+    typer.echo(
+        "PASS toolchain="
+        + ",".join(f"{name}={version}" for name, version in result.tool_versions.items())
+    )
+    typer.echo(f"PASS profile_hash={profile.fingerprint}")
+    typer.echo("REAL_CLAUDE_SMOKE=NOT_RUN")
+
+
+@deepseek_harness_app.command("doctor")
+def deepseek_harness_doctor() -> None:
+    """Verify the public DeepSeek headless/config contracts and pinned runtime."""
+
+    try:
+        result = asyncio.run(MultiHarnessRuntime(HarnessKind.DEEPSEEK).doctor())
+        if result.config_digest is None:
+            raise RuntimeError("effective config digest is missing")
+        profile = canonical_deepseek_profile(result.image, result.config_digest)
+    except DockerPreflightError as exc:
+        typer.echo(f"NOT_VERIFIED DeepSeek Harness: {exc}")
+        raise typer.Exit(code=2) from exc
+    except Exception as exc:
+        typer.echo(f"FAIL DeepSeek Harness: {type(exc).__name__}: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"PASS version={result.version}")
+    typer.echo(f"PASS image={result.image.reference} id={result.image.image_id}")
+    typer.echo(f"PASS launcher_flags={','.join(result.required_flags)}")
+    typer.echo(f"PASS default_config_digest={result.default_config_digest}")
+    typer.echo(f"PASS effective_config_digest={result.config_digest}")
+    typer.echo(
+        "PASS toolchain="
+        + ",".join(f"{name}={version}" for name, version in result.tool_versions.items())
+    )
+    typer.echo(f"PASS profile_hash={profile.fingerprint}")
+    typer.echo(f"DEEPSEEK_E2={DeepSeekSessionExtraction.DEFERRED_NOT_VERIFIED.value}")
+    typer.echo("REAL_DEEPSEEK_SMOKE=NOT_RUN")
 
 
 @model_profile_app.command("validate")
