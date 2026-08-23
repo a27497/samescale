@@ -19,6 +19,7 @@ from harnesslab.db.health import check_database
 from harnesslab.experiment.cli import experiment_app, report_app, run_app
 from harnesslab.harness_lane.profile import canonical_codex_profile
 from harnesslab.harness_lane.runtime import CodexRuntime
+from harnesslab.judgelab.cli import judge_app
 from harnesslab.model_lane.models import DirectModelOutcome, ProviderFailureCategory
 from harnesslab.model_lane.profiles import ModelProfileError, load_model_profile
 from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
@@ -49,6 +50,7 @@ app.add_typer(compare_app, name="compare")
 app.add_typer(experiment_app, name="experiment")
 app.add_typer(run_app, name="run")
 app.add_typer(report_app, name="report")
+app.add_typer(judge_app, name="judge")
 model_app.add_typer(model_profile_app, name="profile")
 harness_app.add_typer(codex_harness_app, name="codex")
 harness_app.add_typer(claude_harness_app, name="claude")

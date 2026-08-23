@@ -1,0 +1,83 @@
+schema_version: 1
+suite_id: core-calibration
+version: 1.0.0
+gold:
+  - case_id: label-l0-pass
+    mode: LABEL
+    gold_source: DETERMINISTIC_L0
+    expected: PASS
+    deterministic_authority: L0_AUTHORITATIVE
+    curator_note: GOLD_ONLY_SENTINEL_PASS; ORACLE_SENTINEL_NEVER_PROMPT
+  - case_id: label-l0-fail
+    mode: LABEL
+    gold_source: DETERMINISTIC_L0
+    expected: FAIL
+    deterministic_authority: L0_AUTHORITATIVE
+    curator_note: GOLD_ONLY_SENTINEL_FAIL; VERIFIER_SENTINEL_NEVER_PROMPT
+  - case_id: label-l1-clear
+    mode: LABEL
+    gold_source: CURATED_HUMAN_L1
+    expected: PASS
+    curator_note: Repository-curated clear-answer example.
+  - case_id: label-l1-irrelevant
+    mode: LABEL
+    gold_source: CURATED_HUMAN_L1
+    expected: FAIL
+    curator_note: Repository-curated relevance example.
+  - case_id: label-unknown
+    mode: LABEL
+    gold_source: CURATED_HUMAN_L1
+    expected: UNKNOWN
+    curator_note: Repository-curated insufficient-information example.
+  - case_id: score-low
+    mode: SCORE
+    gold_source: CURATED_HUMAN_L1
+    expected: 1
+    score_tolerance: 0.25
+  - case_id: score-mid-low
+    mode: SCORE
+    gold_source: CURATED_HUMAN_L1
+    expected: 2
+    score_tolerance: 0.25
+  - case_id: score-mid-high
+    mode: SCORE
+    gold_source: CURATED_HUMAN_L1
+    expected: 4
+    score_tolerance: 0.25
+  - case_id: score-high
+    mode: SCORE
+    gold_source: CURATED_HUMAN_L1
+    expected: 5
+    score_tolerance: 0.25
+  - case_id: pair-a-wins
+    mode: PAIRWISE
+    gold_source: CURATED_HUMAN_L1
+    expected: A
+    probe: {position_probe: true}
+  - case_id: pair-b-wins-adversarial
+    mode: PAIRWISE
+    gold_source: CURATED_HUMAN_L1
+    expected: B
+    probe: {position_probe: true}
+  - case_id: pair-tie
+    mode: PAIRWISE
+    gold_source: CURATED_HUMAN_L1
+    expected: TIE
+    probe: {position_probe: true}
+  - case_id: pair-unknown
+    mode: PAIRWISE
+    gold_source: CURATED_HUMAN_L1
+    expected: UNKNOWN
+    probe: {position_probe: true}
+  - case_id: pair-verbosity-a
+    mode: PAIRWISE
+    gold_source: CURATED_HUMAN_L1
+    expected: TIE
+    probe: {position_probe: true, verbosity_probe: true, longer_candidate: A}
+    curator_note: Extra words add no substantive quality.
+  - case_id: pair-verbosity-b
+    mode: PAIRWISE
+    gold_source: CURATED_HUMAN_L1
+    expected: TIE
+    probe: {position_probe: true, verbosity_probe: true, longer_candidate: B}
+    curator_note: Extra words add no substantive quality.

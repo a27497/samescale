@@ -1,0 +1,50 @@
+schema_version: 1
+calibration_id: core-calibration-keyless-v1
+name: Core keyless good-versus-biased Judge calibration
+suite_reference: judge_suites/core-calibration/1.0.0
+suite_digest: sha256:6b9f66eea247b5451284c6cbf8e2af220c7c19acf4b827c2afdeb99d96d3bf23
+judge_cells:
+  - id: good-judge
+    definition_reference: judge_suites/core-calibration/1.0.0/definition.yaml
+    definition_digest: sha256:440c35dc374992849e19c51286b31cff07bc94bd937b076f7ecc75cf42d008bc
+    model_profile:
+      requested_model: fake-good-judge-v1
+      provider: phase-h-fake
+      base_url: https://phase-h-fake.invalid/v1
+      route: /responses
+      protocol: responses
+      reasoning: {temperature: 0, max_output_tokens: 256}
+      request_timeout_seconds: 30
+    profile_identity: sha256:1dbf478aabcfd9fa2e8d6ec33238d2d85ad0c2358a523dc7f85ee4d6d0f4b2a4
+    order_swap_policy: REQUIRED
+    runner_contract: phase-h-fake-good-v1
+  - id: biased-unstable-judge
+    definition_reference: judge_suites/core-calibration/1.0.0/definition.yaml
+    definition_digest: sha256:440c35dc374992849e19c51286b31cff07bc94bd937b076f7ecc75cf42d008bc
+    model_profile:
+      requested_model: fake-biased-unstable-judge-v1
+      provider: phase-h-fake
+      base_url: https://phase-h-fake.invalid/v1
+      route: /responses
+      protocol: responses
+      reasoning: {temperature: 0, max_output_tokens: 256}
+      request_timeout_seconds: 30
+    profile_identity: sha256:2c73f8743d33557910b0272154d72add0587345e3f2d11236da5a9316c9e8650
+    order_swap_policy: REQUIRED
+    runner_contract: phase-h-fake-biased-v1
+repeat_count: 3
+execution_seed: 20260823
+qualification_policy:
+  policy_id: core-suite-policy
+  version: 1.0.0
+  minimum_coverage: 0.80
+  minimum_label_accuracy: 0.80
+  minimum_macro_f1: 0.95
+  maximum_score_mae: 0.25
+  minimum_spearman_rho: 0.95
+  require_spearman: true
+  minimum_pairwise_accuracy: 0.80
+  minimum_position_consistency: 0.95
+  minimum_repeat_consistency: 0.95
+  maximum_abstain_error_rate: 0.15
+  maximum_verbosity_bias_rate: 0.10

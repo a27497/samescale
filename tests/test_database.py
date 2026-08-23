@@ -48,6 +48,8 @@ def test_migration_from_empty_database(database_url: str, monkeypatch: pytest.Mo
                 "to_regclass('public.experiment_cell'), "
                 "to_regclass('public.experiment_run'), "
                 "to_regclass('public.experiment_pair'), "
+                "to_regclass('public.judge_calibration'), "
+                "to_regclass('public.judge_evaluation'), "
                 "(SELECT version_num FROM alembic_version)"
             ).fetchone()
         assert row == (
@@ -57,7 +59,9 @@ def test_migration_from_empty_database(database_url: str, monkeypatch: pytest.Mo
             "experiment_cell",
             "experiment_run",
             "experiment_pair",
-            "20260823_0003",
+            "judge_calibration",
+            "judge_evaluation",
+            "20260823_0004",
         )
     finally:
         get_settings.cache_clear()

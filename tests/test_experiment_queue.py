@@ -247,7 +247,7 @@ def test_phase_f_to_phase_g_migration_preserves_execution_lease(database_url: st
                 "VALUES ('preserved-phase-c-run', 'claimed', 2)"
             )
             connection.commit()
-        command.upgrade(config, "head")
+        command.upgrade(config, "20260823_0003")
         with psycopg.connect(temporary_psycopg_url) as connection:
             row = connection.execute(
                 "SELECT run_id, status, attempt, "

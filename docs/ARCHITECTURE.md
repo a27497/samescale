@@ -192,13 +192,42 @@ paired statistics. Infrastructure failures remain outside capability denominator
 require sufficient repetition per intended task and `COMPARABLE` pairs per intended task; pooled
 smoke, insufficient, and `NOT_COMPARABLE` evidence cannot enter formal ordering.
 
+## Phase H JudgeLab and calibrated L2 evidence
+
+Phase H adds Judge as an evaluation dimension over immutable inputs; it never reruns an M/H/P
+subject because another Judge cell is added. A strict spec resolves a versioned JudgeDefinition,
+ModelProfile identities, public-case/hidden-gold suite digest, three explicit repeats, and a
+versioned qualification policy into timestamp-free slots.
+
+```text
+public case ─ public-only prompt ─ existing ProviderAdapter ─ strict JSON ─ JudgeEvidence
+                                                                          │
+hidden gold ────────────── disk reopen + digest/identity validation ───────┤
+                                                                          v
+                         LABEL/SCORE/PAIRWISE metrics ─ suite qualification
+
+Authority: deterministic L0 > repository-curated human L1 > Judge L2
+```
+
+Every provider-facing slot is exactly one attempt. Refusal is abstention, malformed judgment is
+an output error, and transport/auth/rate-limit/timeout uses the Phase D failure taxonomy. No
+DirectModelRunner, patch parser, subject runner, or Hidden Verifier runs for the Judge call.
+JudgeEvidence stores safe route/model/request/usage/latency facts and digests, but no gold, oracle,
+API key, raw HTTP, private reasoning, or duplicated subject artifact.
+
+PAIRWISE cases use neutral Candidate A/B labels and expand original and swapped orders. LEFT/RIGHT
+is canonicalized to stable A/B identity before position consistency, gold accuracy, repetition,
+and verbosity probes. Reports reopen each artifact and verify slot, suite, case, definition, and
+profile identities. PostgreSQL stores durable calibration/slot state and artifact references;
+the immutable Judge evidence remains on disk.
+
 ## Planned Core boundaries
 
 The following are **PLANNED**, not implemented:
 
 - Additional harness adapters at explicit external-system boundaries
 - Remote/cloud artifact storage and worker execution
-- JudgeLab and judge calibration
+- Remote/cloud Judge artifact storage and distributed Judge workers
 
 ## Deliberate exclusions
 

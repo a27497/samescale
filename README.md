@@ -5,7 +5,8 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 **Phase B — Task Contract + Deterministic Verifier**, **Phase C — Native Docker Sandbox**, and
 **Phase D — M-Lane Direct Model**, **Phase E — Codex H-Lane**, and
 **Phase F — Multi-Harness + Comparability**, and
-**Phase G — Experiment Matrix + Repeated Runs + P-Lane + Statistics**.
+**Phase G — Experiment Matrix + Repeated Runs + P-Lane + Statistics**, and
+**Phase H — JudgeLab + Judge Calibration**.
 
 ## Implemented now
 
@@ -60,12 +61,21 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 - Comparability-gated P-Lane and controlled ablation reporting in deterministic JSON/Markdown
 - `harnesslab experiment plan/run`, `harnesslab run inspect`, `harnesslab report compare`, and an
   authoritative non-recursive, keyless Gate G
+- Strict JudgeDefinition and public-case/hidden-gold suite contracts for LABEL, SCORE, and
+  PAIRWISE evaluation
+- Public-only Judge prompts over the existing one-attempt ProviderAdapter layer, with strict JSON
+  outputs, immutable JudgeEvidence, pairwise order swaps, bias probes, and repeated calibration
+- Label/score/pairwise metrics, suite-scoped qualification, PostgreSQL slots, verified disk
+  artifact reload, deterministic reports, and a keyless Good-vs-Biased E2E
+- `harnesslab judge suite validate/plan/calibrate/report` and an authoritative non-recursive,
+  keyless Gate H
 - pytest integration/unit coverage, Ruff, mypy, and one authoritative Gate A runner
 - GitHub Actions using PostgreSQL 18 without model-provider credentials
 
-## Planned Core
+## Core boundary
 
-JudgeLab and judge calibration are **PLANNED** for Phase H. Phase G does not implement them.
+JudgeLab is an L2 annotation and comparison layer. Evidence authority is
+`L0 deterministic > L1 repository-curated human gold > L2 LLM Judge`.
 
 ## Workbench later
 
@@ -82,6 +92,7 @@ builds the pinned Codex image and uses deterministic Fake Codex runs. Gate F bui
 and DeepSeek images and uses deterministic fake harness runs; none requires a key.
 Gate G adds real PostgreSQL queue concurrency and actual keyless runner execution without
 consuming provider or ambient harness credentials.
+Gate H adds a 15-case keyless suite and 126 persisted Judge slots without real model calls.
 
 ```powershell
 Copy-Item .env.example .env
@@ -95,6 +106,8 @@ uv run harnesslab harness codex doctor
 uv run harnesslab harness claude doctor
 uv run harnesslab harness deepseek doctor
 uv run harnesslab experiment --help
+uv run harnesslab judge suite validate judge_suites/core-calibration/1.0.0
+uv run harnesslab judge plan judge_suites/core-calibration/1.0.0/calibration.yaml
 ```
 
 Start the API and query its health endpoint:
@@ -185,8 +198,19 @@ uv run --locked python scripts/verify_gate_g.py
 `REAL_MATRIX_EVIDENCE=NOT_RUN` remains separate from deterministic Gate G. A real Matrix Evidence
 run is still required before the final Core hard stop and is never synthesized from ambient login.
 
+The non-recursive Phase H gate verifies Judge contracts, leakage, strict outputs, evidence
+hierarchy, order swaps, bias probes, repeats, persistence, artifact integrity, and qualification:
+
+```powershell
+uv run --locked python scripts/verify_gate_h.py
+```
+
+Gate H is keyless. `REAL_JUDGE_SMOKE=NOT_RUN` unless explicitly enabled with a
+credential-reference-only ModelProfile.
+
 See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_METHODOLOGY.md), and
 [Task Format](docs/TASK_FORMAT.md), [Sandbox Security](docs/SANDBOX_SECURITY.md), and
 [M-Lane Direct Model](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md),
 [Harness Comparability](docs/HARNESS_COMPARABILITY.md),
 [Experiment Statistics](docs/EXPERIMENT_STATISTICS.md), and [Resume Scope](docs/RESUME_SCOPE.md).
+[JudgeLab](docs/JUDGELAB.md) documents the Phase H authority and calibration boundary.

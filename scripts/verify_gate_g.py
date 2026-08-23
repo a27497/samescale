@@ -193,20 +193,27 @@ def verify_dependencies_and_scope() -> bool:
     if any(dependency in installed_project for dependency in forbidden_dependencies):
         print("FAIL: unapproved quantitative dependency detected")
         return False
-    forbidden_paths = (ROOT / "src" / "harnesslab" / "judges", ROOT / "frontend")
+    forbidden_paths = (
+        ROOT / "frontend",
+        ROOT / "src" / "harnesslab" / "analyst",
+        ROOT / "src" / "harnesslab" / "regression_workbench",
+    )
     if any(path.exists() for path in forbidden_paths):
-        print("FAIL: Phase H/frontend path detected")
+        print("FAIL: Phase I/frontend path detected")
         return False
     violations: list[str] = []
-    patterns = (r"\bclass\s+JudgeLab\b", r"\b(?:from|import)\s+langgraph\b")
+    patterns = (
+        r"\bclass\s+(?:MatrixUI|RegressionWorkbench|AnalystAgent)\b",
+        r"\b(?:from|import)\s+langgraph\b",
+    )
     for path in (ROOT / "src" / "harnesslab").rglob("*.py"):
         content = path.read_text(encoding="utf-8")
         if any(re.search(pattern, content) for pattern in patterns):
             violations.append(path.relative_to(ROOT).as_posix())
     if violations:
-        print(f"FAIL: Phase H/analyst implementation detected: {violations}")
+        print(f"FAIL: Phase I/analyst implementation detected: {violations}")
         return False
-    print("PASS: Phase G scope contains no JudgeLab, frontend, analyst, RAG, or multi-agent stack")
+    print("PASS: Phase H allowed; no Phase I frontend, analyst, RAG, or multi-agent stack")
     return True
 
 

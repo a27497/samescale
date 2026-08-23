@@ -4,7 +4,8 @@ Phase A establishes vocabulary and contracts. Phase B implements deterministic t
 Phase C isolates untrusted workspace verification, Phase D implements the first M-Lane direct
 model path, Phase E implements the Codex H-Lane, and Phase F adds Claude/DeepSeek H-Lanes plus
 deterministic evidence comparability. Phase G implements the experiment engine, repeated-run
-statistics, P-Lane pairing, and controlled ablation. Judges remain design-only.
+statistics, P-Lane pairing, and controlled ablation. Phase H implements suite-scoped Judge
+calibration as an L2 layer.
 
 ## Evaluation lanes
 
@@ -113,6 +114,27 @@ is `NOT_AVAILABLE`, not zero, unless immutable evidence provides a trustworthy e
 
 ## Judge calibration
 
-A planned judge must be calibrated against deterministic and human-gold cases, checked for bias
-and consistency, and prevented from overruling deterministic ground truth. Phase A provides only
-the schema field and methodology boundary.
+Phase H calibrates LABEL, SCORE, and PAIRWISE. The Core suite separates public cases from hidden
+gold, whose source is deterministic L0 or repository-curated human L1. Gold values and notes never
+enter provider requests or JudgeEvidence.
+
+Every pairwise repeat evaluates A/B and B/A as one logical trial. LEFT/RIGHT positions are
+canonicalized to stable candidate A/B identity. Order disagreement remains visible position
+inconsistency; no implementation selects whichever order matched gold. L1 TIE cases with one
+longer but substantively equivalent candidate provide a limited verbosity-bias probe. LABEL and
+PAIRWISE report categorical repeat agreement; SCORE reports within-case dispersion.
+
+LABEL reports accuracy, confusion, macro F1, and failure counts. SCORE uses median aggregation and
+reports coverage, MAE, Spearman, dispersion, and explicit reasons when correlation is undefined.
+PAIRWISE reports logical gold/tie accuracy, position consistency, abstention/output/provider
+counts, repeat consistency, and verbosity probe results. Abstentions and output errors hurt Judge
+capability; provider infrastructure failures remain disclosed separately.
+
+Qualification is versioned and suite-scoped: `QUALIFIED_FOR_SUITE`, `LIMITED`, or
+`NOT_QUALIFIED`. Passing this small corpus is not universal Judge reliability, a population-level
+claim, an expert panel, an inter-rater study, or external benchmark validation.
+
+Authority is independent of qualification. L0 remains authoritative when present, otherwise L1
+does, while L2 annotates. A Judge PASS cannot change L0 FAIL and a Judge FAIL cannot change L0
+PASS. The L0 override count is zero by construction, and JudgeLab never updates Phase G outcomes,
+verifier results, or capability denominators.

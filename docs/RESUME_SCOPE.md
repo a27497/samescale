@@ -88,9 +88,23 @@ This file separates repository evidence from intended design. A capability moves
 - Deterministic JSON/Markdown reports and the Phase G experiment/run/report CLI
 - An authoritative non-recursive, keyless Gate G with real PostgreSQL queue evidence and an
   actual nine-slot runner-to-manifest-to-loader-to-report experiment E2E
+- Approved Phase G head `1f9ef540d3d1d32e7ae8ccc5e514374600959ce0`, remote CI run
+  `32639483950` (`success`), including execution-time worker heartbeat, stale-worker write
+  prevention, attempt-scoped artifacts, coherent cancellation, per-task repetition eligibility,
+  task lane-support validation, and manifest-vs-slot enforcement
+- Strict versioned JudgeDefinition, public-case/hidden-gold suite, deterministic
+  definition/public/gold/suite/plan identities, and LABEL/SCORE/PAIRWISE contracts
+- Existing one-attempt ProviderAdapter reuse, immutable JudgeEvidence, refusal/output/provider/
+  artifact taxonomy, and private-reasoning/gold/credential exclusion
+- Three explicit repeats, pairwise A/B↔B/A swaps and canonicalization, position consistency,
+  verbosity probes, repeat consistency, and suite-scoped qualification metrics
+- PostgreSQL Judge calibration/evaluation persistence at Alembic `20260823_0004`, verified disk
+  artifact reload, Phase G read-only regression, and deterministic JSON/Markdown reports
+- Actual keyless 126-slot Good-vs-Biased Judge E2E and non-recursive Gate H coverage across
+  leakage, hierarchy, strict output, bias, repetition, persistence, qualification, CLI, and scope
 
-Evidence date: 2026-08-23. Phase F remote evidence is approved at the exact head/run above. Phase G
-entries have current local Gate G evidence pending this change's named remote CI run. Phase D
+Evidence date: 2026-08-23. Phase G remote evidence is approved at the exact head/run above. Phase H
+entries have current local Gate H evidence pending this change's named remote CI run. Phase D
 provider contracts are MockTransport/fake-provider verified; Phase E/F harness behavior is
 deterministic fake verified. None implies a real provider/model call or VM-level isolation.
 
@@ -102,7 +116,6 @@ not yet been demonstrated.
 ## DESIGN_ONLY
 
 - Additional Harness adapters beyond Codex, Claude Code, and DeepSeek E1
-- JudgeLab and judge calibration implementation
 - Matrix UI and analyst workbench
 
 ## WORKBENCH_ONLY
@@ -111,7 +124,7 @@ None implemented. Future UI or analyst conveniences belong here and are not Core
 
 ## NOT_VERIFIED
 
-`REAL_MATRIX_EVIDENCE = NOT_RUN`, `REAL_PROVIDER_SMOKE = NOT_RUN`,
+`REAL_JUDGE_SMOKE = NOT_RUN`, `REAL_MATRIX_EVIDENCE = NOT_RUN`, `REAL_PROVIDER_SMOKE = NOT_RUN`,
 `REAL_CODEX_SMOKE = NOT_RUN`,
 `REAL_CLAUDE_SMOKE = NOT_RUN`, and `REAL_DEEPSEEK_SMOKE = NOT_RUN`. DeepSeek persistent-session E2
 is `DEFERRED_NOT_VERIFIED`. No real provider credential is required for Gates D-F, no ambient

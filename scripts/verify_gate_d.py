@@ -112,13 +112,15 @@ CRITICAL_TESTS = {
     "test_workspace_staging_failure_is_not_blame_assigned_to_model",
 }
 PHASE_H_MODULE_NAMES = {
-    "judgelab.py",
-    "judge.py",
+    "frontend.py",
+    "matrix_ui.py",
+    "regression_workbench.py",
+    "analyst.py",
 }
 PHASE_H_SYMBOLS = tuple(
     re.compile(pattern)
     for pattern in (
-        r"\bclass\s+JudgeLab\b",
+        r"\bclass\s+(?:MatrixUI|RegressionWorkbench|AnalystAgent)\b",
         r"\b(?:from|import)\s+langgraph\b",
     )
 )
@@ -127,9 +129,9 @@ PHASE_H_SYMBOLS = tuple(
 def phase_h_violation(relative: str, content: str) -> str | None:
     path = Path(relative)
     if path.name in PHASE_H_MODULE_NAMES:
-        return f"forbidden Phase H/later module name: {relative}"
+        return f"forbidden Phase I/later module name: {relative}"
     if any(pattern.search(content) for pattern in PHASE_H_SYMBOLS):
-        return f"forbidden Phase H/later source symbol: {relative}"
+        return f"forbidden Phase I/later source symbol: {relative}"
     return None
 
 
@@ -221,16 +223,16 @@ def verify_source_and_scope() -> bool:
     print(f"GIT_HEAD={identity.stdout.strip()}")
     print(f"GIT_DIRTY={bool(worktree.stdout.strip())}")
     forbidden = (
-        ROOT / "src" / "harnesslab" / "judges",
         ROOT / "frontend",
+        ROOT / "src" / "harnesslab" / "analyst",
     )
     existing = [str(path.relative_to(ROOT)) for path in forbidden if path.exists()]
     if existing:
-        print(f"FAIL: Phase H/later implementation paths exist: {existing}")
+        print(f"FAIL: Phase I/later implementation paths exist: {existing}")
         return False
     sensitivity_cases = (
-        ("src/harnesslab/judgelab.py", "", True),
-        ("src/harnesslab/other.py", "class JudgeLab: pass", True),
+        ("src/harnesslab/judgelab.py", "", False),
+        ("src/harnesslab/frontend.py", "class MatrixUI: pass", True),
         ("src/harnesslab/experiment/queue.py", "class ExperimentWorker: pass", False),
         ("src/harnesslab/harness_lane/adapter.py", "class HarnessAdapter: pass", False),
         ("src/harnesslab/harness_lane/models.py", "class NormalizedTrace: pass", False),
@@ -239,7 +241,7 @@ def verify_source_and_scope() -> bool:
         (phase_h_violation(relative, content) is not None) is not expected
         for relative, content, expected in sensitivity_cases
     ):
-        print("FAIL: Phase H source detector failed its sensitivity control")
+        print("FAIL: Phase I source detector failed its sensitivity control")
         return False
     source_violations: list[str] = []
     for path in (ROOT / "src" / "harnesslab").rglob("*.py"):
@@ -253,9 +255,9 @@ def verify_source_and_scope() -> bool:
         if violation is not None:
             source_violations.append(violation)
     if source_violations:
-        print(f"FAIL: Phase H/later source detected: {source_violations}")
+        print(f"FAIL: Phase I/later source detected: {source_violations}")
         return False
-    print("PASS: no Phase H JudgeLab, analyst, or frontend paths")
+    print("PASS: Phase H allowed; no Phase I Matrix UI, analyst, or frontend paths")
     return True
 
 
