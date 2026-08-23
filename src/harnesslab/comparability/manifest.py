@@ -50,6 +50,22 @@ def _verifier_identity(raw: dict[str, Any]) -> str | None:
     )
 
 
+def _profile_identity(raw: dict[str, Any], profile: dict[str, Any]) -> str | None:
+    if profile:
+        controls = dict(profile)
+        controls.pop("requested_model", None)
+        return canonical_digest(controls)
+    if "provider" not in raw:
+        return None
+    controls = {
+        "provider": raw.get("provider"),
+        "endpoint": raw.get("endpoint"),
+        "protocol": raw.get("protocol"),
+        "generation_settings": raw.get("generation_settings"),
+    }
+    return canonical_digest(controls)
+
+
 def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
     profile = _mapping(raw.get("profile"))
     generation = _mapping(raw.get("generation_settings"))
@@ -57,6 +73,10 @@ def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
     if harness is None and "provider" in raw:
         harness = "direct-model"
     version = _string(profile.get("cli_version")) or _string(profile.get("codex_cli_version"))
+    if version is None and harness == "direct-model":
+        schema_version = raw.get("schema_version")
+        if isinstance(schema_version, int) and not isinstance(schema_version, bool):
+            version = f"evidence-schema-{schema_version}"
     route = _string(raw.get("provider_route"))
     if route is None and "provider" in raw:
         provider = _string(raw.get("provider"))
@@ -90,8 +110,7 @@ def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
         network_policy=network,
         harness=harness,
         harness_version=version,
-        harness_profile_identity=_string(raw.get("profile_hash"))
-        or (canonical_digest(profile) if profile else None),
+        harness_profile_identity=_profile_identity(raw, profile),
         prompt_identity=_string(raw.get("prompt_hash")),
         trace_coverage=_string(raw.get("trace_coverage")),
     )

@@ -17,7 +17,9 @@ The initial `system/init` event must expose exactly Read, Edit, Write, and Bash 
 state. Unexpected tools are a profile violation. Assistant text, tool use/results, lifecycle,
 structured API retries, terminal results, and unknown safe events are retained. Thinking is only
 `REASONING_PRESENT`; its content is not evidence. Trace coverage is `FULL_STREAM` for the accepted
-native stream, not a claim to provider internals.
+native stream, not a claim to provider internals. Retry evidence preserves the bounded structured
+attempt number, retry limit, delay, HTTP status, error category, event id, and session id in both
+the sanitized native stream and Normalized Trace v1.
 
 DeepSeek Harness is developer preview and pinned to `@deepseek-ai/dsh@0.1.1-rc.2` with npm
 integrity
@@ -45,8 +47,14 @@ not harness file-change claims, determine changed paths. The Phase C isolated Hi
 determines pass and score.
 
 Phase F also makes the existing Codex evidence contract explicit: its accepted native JSONL stream
-declares `FULL_STREAM`. This preserves the Phase E profile fingerprint while allowing new Codex
-manifests to participate in trace-coverage assessment without inference.
+declares `FULL_STREAM`, allowing new Codex manifests to participate in trace-coverage assessment
+without inference.
+
+New Phase D and Phase E manifests bind the same task resource budget and verifier-definition
+digest already present in Phase F. Phase E also binds `codex-cli-default` as its configured provider
+route in both its frozen profile and top-level evidence. These additions let the Comparability
+loader consume actual evidence from all three phases without substituting generation settings or
+guessing task controls.
 
 ## Comparability assessment
 
@@ -63,7 +71,10 @@ identities, every field comparison, reason codes and severities, declared intent
 For `HARNESS_UPLIFT`, task id/version/digest, input workspace, context, verifier definition/image,
 requested model, provider route, resource budget, and network policy are controls. Harness name,
 version, profile, and prompt are intended treatments. For `MODEL_COMPARISON`, model identity is the
-treatment and harness identity is a control. `GENERAL` reports conservative field-level gaps.
+treatment and harness identity is a control. The comparable harness-profile identity excludes its
+nested `requested_model`, because that value is assessed separately as the treatment; all other
+recorded profile fields remain controls. `MODEL_COMPARISON` is `NOT_COMPARABLE` when either
+requested-model identity is absent. `GENERAL` reports conservative field-level gaps.
 
 Missing fields remain missing. The loader does not copy requested model into observed model, infer
 trace coverage for older evidence, or treat null context as missing when the manifest explicitly

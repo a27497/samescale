@@ -237,13 +237,35 @@ def test_claude_retry_and_unknown_events_remain_observable() -> None:
     lines = (
         '{"type":"system","subtype":"init","tools":["Read","Edit","Write","Bash"],'
         '"mcp_servers":[],"plugins":[]}',
-        '{"type":"system","subtype":"api_retry","attempt":"2","error":"overloaded"}',
+        '{"type":"system","subtype":"api_retry","attempt":2,"max_retries":10,'
+        '"retry_delay_ms":750.5,"error_status":529,"error":"overloaded",'
+        '"uuid":"retry-uuid","session_id":"safe-session-id"}',
         '{"type":"future_event","subtype":"new"}',
         '{"type":"result","subtype":"success","is_error":false,"result":"done"}',
     )
     collection = collect_claude_stream(HarnessProcessCapture(lines, "", 0, 1))
 
     assert collection.retry_count == 1
+    retry = collection.sanitized_events[1]
+    assert retry.model_dump(exclude_none=True) == {
+        "ordinal": 2,
+        "event_type": "system.api_retry",
+        "item_id": "retry-uuid",
+        "thread_id": "safe-session-id",
+        "file_changes": (),
+        "reasoning_present": False,
+        "error_code": "overloaded",
+        "attempt": 2,
+        "max_retries": 10,
+        "retry_delay_ms": 750.5,
+        "error_status": 529,
+    }
+    normalized_retry = collection.trace.events[1]
+    assert normalized_retry.attempt == 2
+    assert normalized_retry.max_retries == 10
+    assert normalized_retry.retry_delay_ms == 750.5
+    assert normalized_retry.error_status == 529
+    assert normalized_retry.error_code == "overloaded"
     assert tuple(event.type for event in collection.trace.events) == (
         TraceEventType.THREAD_STARTED,
         TraceEventType.API_RETRY,

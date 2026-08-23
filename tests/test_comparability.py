@@ -143,6 +143,22 @@ def test_model_comparison_treats_model_identity_difference_as_intended() -> None
     assert report.status is ComparabilityStatus.COMPARABLE
 
 
+@pytest.mark.parametrize("missing_side", ("left", "right", "both"))
+def test_model_comparison_missing_requested_model_is_not_comparable(missing_side: str) -> None:
+    left = facts(requested_model=None) if missing_side in {"left", "both"} else facts()
+    right = facts(evidence_identity="sha256:" + "8" * 64)
+    if missing_side in {"right", "both"}:
+        right = facts(evidence_identity="sha256:" + "8" * 64, requested_model=None)
+
+    report = ComparabilityEngine().assess(left, right, intent=ComparabilityIntent.MODEL_COMPARISON)
+
+    assert report.status is ComparabilityStatus.NOT_COMPARABLE
+    assert any(
+        reason.code is ReasonCode.REQUESTED_MODEL_MISSING and reason.field == "requested_model"
+        for reason in report.reasons
+    )
+
+
 def phase_f_manifest(harness: str) -> dict[str, object]:
     return {
         "task_id": "micro-python-clamp",
@@ -161,6 +177,8 @@ def phase_f_manifest(harness: str) -> dict[str, object]:
         "profile": {
             "cli_version": "1.0.0" if harness == "left" else "2.0.0",
             "network_policy": "deny",
+            "provider_route": "same-route",
+            "requested_model": "same-model",
         },
         "profile_hash": "sha256:" + ("7" if harness == "left" else "8") * 64,
         "requested_model": "same-model",
@@ -206,6 +224,89 @@ def test_new_codex_manifest_trace_coverage_is_consumed_without_inference() -> No
     manifest = phase_f_manifest("codex")
     manifest["trace_coverage"] = "FULL_STREAM"
     assert facts_from_manifest(manifest).trace_coverage == "FULL_STREAM"
+
+
+def test_actual_phase_d_e_f_shapes_supply_comparability_controls() -> None:
+    shared = {
+        "schema_version": 1,
+        "task_id": "micro-python-clamp",
+        "task_version": "1.0.0",
+        "task_digest": "sha256:" + "2" * 64,
+        "verifier_definition_digest": "sha256:" + "3" * 64,
+        "resource_budget": {
+            "timeout_seconds": 60,
+            "max_output_tokens": 1000,
+            "network_policy": "deny",
+        },
+        "workspace_input_digest": "sha256:" + "4" * 64,
+        "context_digest": None,
+        "prompt_hash": "sha256:" + "5" * 64,
+        "requested_model": "same-model",
+        "observed_model": "same-model",
+        "verifier_sandbox_manifest": {
+            "role": "verifier",
+            "image": {"image_id": "sha256:" + "9" * 64},
+        },
+    }
+    phase_d = {
+        **shared,
+        "provider": "openai",
+        "endpoint": "https://api.openai.invalid/v1/responses",
+        "protocol": "responses",
+        "generation_settings": {"request_timeout_seconds": 30, "attempt_count": 1},
+    }
+    phase_e = {
+        **shared,
+        "harness": "codex",
+        "provider_route": "codex-cli-default",
+        "profile": {
+            "codex_cli_version": "0.149.0",
+            "requested_model": "same-model",
+            "provider_route": "codex-cli-default",
+            "tool_network_policy": "deny",
+        },
+        "profile_hash": "sha256:" + "7" * 64,
+        "trace_coverage": "FULL_STREAM",
+    }
+    phase_f = phase_f_manifest("left")
+
+    for manifest in (phase_d, phase_e, phase_f):
+        parsed = facts_from_manifest(manifest)
+        assert all(
+            getattr(parsed, field) is not None
+            for field in (
+                "verifier_identity",
+                "budget_identity",
+                "network_policy",
+                "harness",
+                "harness_version",
+                "harness_profile_identity",
+                "provider_route",
+            )
+        )
+
+
+def test_actual_profile_requested_model_is_not_double_counted_as_a_control() -> None:
+    left = phase_f_manifest("left")
+    right = json.loads(json.dumps(left))
+    right["requested_model"] = "other-requested"
+    right["observed_model"] = "other-observed"
+    right_profile = right["profile"]
+    assert isinstance(right_profile, dict)
+    right_profile["requested_model"] = "other-requested"
+    right["profile_hash"] = "sha256:" + "a" * 64
+
+    report = ComparabilityEngine().assess(
+        facts_from_manifest(left),
+        facts_from_manifest(right),
+        intent=ComparabilityIntent.MODEL_COMPARISON,
+    )
+
+    assert report.status is ComparabilityStatus.COMPARABLE
+    profile_field = next(
+        field for field in report.fields if field.field == "harness_profile_identity"
+    )
+    assert profile_field.state is FieldState.MATCH
 
 
 def test_compare_cli_emits_deterministic_json_and_text(tmp_path: Path) -> None:

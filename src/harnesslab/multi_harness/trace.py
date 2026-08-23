@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from typing import Any
 
 from harnesslab.harness_lane.models import (
@@ -60,6 +61,20 @@ def _usage(value: object) -> CodexTokenUsage | None:
         cache_write_input_tokens=number("cache_creation_input_tokens"),
         output_tokens=number("output_tokens"),
     )
+
+
+def _integer(value: object, *, minimum: int, maximum: int) -> int | None:
+    if isinstance(value, int) and not isinstance(value, bool) and minimum <= value <= maximum:
+        return value
+    return None
+
+
+def _number(value: object, *, minimum: float, maximum: float) -> float | None:
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        number = float(value)
+        if math.isfinite(number) and minimum <= number <= maximum:
+            return number
+    return None
 
 
 def _digest(sanitized_jsonl: str, trace: NormalizedTrace) -> tuple[str, str]:
@@ -127,6 +142,8 @@ def _trace_event(event: SanitizedNativeEvent) -> NormalizedTraceEvent:
         type=mapping.get(event.event_type, TraceEventType.UNKNOWN),
         native_event_type=event.event_type,
         item_type=event.item_type,
+        item_id=event.item_id,
+        thread_id=event.thread_id,
         status=event.status,
         text=event.text,
         command=event.command,
@@ -134,6 +151,11 @@ def _trace_event(event: SanitizedNativeEvent) -> NormalizedTraceEvent:
         exit_code=event.exit_code,
         file_changes=event.file_changes,
         usage=event.usage,
+        error_code=event.error_code,
+        attempt=event.attempt,
+        max_retries=event.max_retries,
+        retry_delay_ms=event.retry_delay_ms,
+        error_status=event.error_status,
     )
 
 
@@ -255,8 +277,15 @@ def collect_claude_stream(
                     SanitizedNativeEvent(
                         ordinal=len(events) + 1,
                         event_type="system.api_retry",
-                        status=_text(raw.get("attempt"), secret_values, 200),
+                        item_id=_text(raw.get("uuid"), secret_values, 300),
+                        thread_id=_text(raw.get("session_id"), secret_values, 300),
                         error_code=_text(raw.get("error"), secret_values, 200),
+                        attempt=_integer(raw.get("attempt"), minimum=1, maximum=1_000_000),
+                        max_retries=_integer(raw.get("max_retries"), minimum=0, maximum=1_000_000),
+                        retry_delay_ms=_number(
+                            raw.get("retry_delay_ms"), minimum=0, maximum=86_400_000
+                        ),
+                        error_status=_integer(raw.get("error_status"), minimum=100, maximum=599),
                     )
                 )
             elif root_type == "result":

@@ -318,6 +318,8 @@ class DirectModelRunner:
             task_id=package.definition.id,
             task_version=package.definition.version,
             task_digest=package.definition.content_digest,
+            verifier_definition_digest=package.verifier_digest,
+            resource_budget=package.definition.budget,
             workspace_input_digest=prompt.workspace_digest,
             workspace_output_digest=workspace_output_digest,
             context_digest=prompt.context_digest,

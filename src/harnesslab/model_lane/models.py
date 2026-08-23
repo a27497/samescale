@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from harnesslab.contracts.common import Identifier, Protocol, Sha256Digest
 from harnesslab.contracts.model import ModelProfile
+from harnesslab.contracts.task import ResourceBudget
 from harnesslab.sandbox.models import SandboxArtifactManifest, SandboxStatus
 
 MAX_PUBLIC_OUTPUT_BYTES = 1_100_000
@@ -143,6 +144,8 @@ class DirectModelEvidence(BaseModel):
     task_id: Identifier
     task_version: str
     task_digest: Sha256Digest
+    verifier_definition_digest: Sha256Digest
+    resource_budget: ResourceBudget
     workspace_input_digest: Sha256Digest
     workspace_output_digest: Sha256Digest | None = None
     context_digest: Sha256Digest | None = None

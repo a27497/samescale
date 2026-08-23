@@ -76,8 +76,13 @@ CRITICAL_TESTS = {
     "test_requested_observed_mismatch_blocks_uplift_even_when_both_sides_match",
     "test_trace_coverage_mismatch_is_partial_not_automatic_invalidation",
     "test_model_comparison_treats_model_identity_difference_as_intended",
+    "test_model_comparison_missing_requested_model_is_not_comparable[left]",
+    "test_model_comparison_missing_requested_model_is_not_comparable[right]",
+    "test_model_comparison_missing_requested_model_is_not_comparable[both]",
     "test_manifest_loader_consumes_phase_f_and_older_lane_shapes_without_inference",
     "test_new_codex_manifest_trace_coverage_is_consumed_without_inference",
+    "test_actual_phase_d_e_f_shapes_supply_comparability_controls",
+    "test_actual_profile_requested_model_is_not_double_counted_as_a_control",
     "test_compare_cli_emits_deterministic_json_and_text",
 }
 

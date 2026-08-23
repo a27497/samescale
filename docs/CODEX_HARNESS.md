@@ -28,6 +28,8 @@ The frozen profile uses strict configuration validation, workspace-write sandbox
 `never`, disabled tool network and web search, ephemeral state, ignored user config/rules, and no
 external MCP/plugins/skills. Requested model is always recorded. Observed model is recorded only
 when native evidence exposes it; otherwise it remains null with `not_exposed` status.
+The configured provider route is explicitly identified as `codex-cli-default`; this describes the
+frozen CLI routing configuration and does not claim an observed provider-internal route.
 
 The provider credential is injected only into the outer Codex control process. Codex 0.149.0 is
 explicitly configured with shell environment inheritance `core`, default credential-name excludes
@@ -51,6 +53,8 @@ runner's redaction, workspace, verifier, and artifact boundary; the caller does 
 Exact run credentials in paths or file content fail artifact publication closed. The Phase C
 verifier then runs separately with read-only workspace/verifier mounts; its result and score are
 bound into the immutable H-Lane evidence.
+The task's verifier-definition digest and resource budget are also bound at the evidence top level
+so Phase E manifests expose the same Comparability controls as Phase D and Phase F.
 
 The real backend always attempts kill and forced removal in its `finally` path. Absence is verified
 only when the final Docker container query succeeds and returns no match. A daemon or query failure,

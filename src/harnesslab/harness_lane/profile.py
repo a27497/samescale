@@ -5,6 +5,7 @@ from harnesslab.sandbox.models import ImageIdentity
 
 CODEX_CLI_VERSION = "0.149.0"
 CODEX_IMAGE = "harnesslab-phase-e-codex:0.149.0"
+CODEX_PROVIDER_ROUTE = "codex-cli-default"
 SUBJECT_TOOLCHAIN_PROFILE = "python3.12.11+temurin21-jdk+node24-bookworm"
 SHELL_TOOL_ENVIRONMENT_POLICY = (
     "inherit=core;ignore_default_excludes=false;"
@@ -22,6 +23,7 @@ def canonical_codex_profile(
     return CodexHarnessProfile(
         codex_cli_version=CODEX_CLI_VERSION,
         requested_model=requested_model,
+        provider_route=CODEX_PROVIDER_ROUTE,
         reasoning_effort=reasoning_effort,
         built_in_behavior_profile=f"codex-cli-{CODEX_CLI_VERSION}-built-ins",
         execution_timeout_seconds=execution_timeout_seconds,

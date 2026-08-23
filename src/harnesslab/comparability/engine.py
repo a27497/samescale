@@ -91,7 +91,16 @@ class ComparabilityEngine:
                 FieldComparison(field=name, left=left_value, right=right_value, state=state)
             )
             if state is FieldState.MISSING:
-                if name == "observed_model":
+                if name == "requested_model" and intent is ComparabilityIntent.MODEL_COMPARISON:
+                    reasons.append(
+                        ComparabilityReason(
+                            code=ReasonCode.REQUESTED_MODEL_MISSING,
+                            severity=ReasonSeverity.BLOCKING,
+                            field=name,
+                            detail=("A requested model identity is required for model comparison."),
+                        )
+                    )
+                elif name == "observed_model":
                     reasons.append(
                         ComparabilityReason(
                             code=ReasonCode.OBSERVED_MODEL_MISSING,

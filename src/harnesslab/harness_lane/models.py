@@ -10,6 +10,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from harnesslab.contracts.common import Identifier, NetworkPolicy, Sha256Digest
+from harnesslab.contracts.task import ResourceBudget
 from harnesslab.sandbox.models import ImageIdentity, SandboxArtifactManifest, SandboxStatus
 
 
@@ -88,8 +89,8 @@ class SanitizedNativeEvent(BaseModel):
     event_type: str = Field(min_length=1, max_length=200)
     item_type: str | None = Field(default=None, max_length=200)
     item_id: str | None = Field(default=None, max_length=300)
-    status: str | None = Field(default=None, max_length=200)
     thread_id: str | None = Field(default=None, max_length=300)
+    status: str | None = Field(default=None, max_length=200)
     observed_model: str | None = Field(default=None, max_length=300)
     text: str | None = Field(default=None, max_length=131_072)
     command: str | None = Field(default=None, max_length=16_384)
@@ -99,6 +100,10 @@ class SanitizedNativeEvent(BaseModel):
     usage: CodexTokenUsage | None = None
     reasoning_present: bool = False
     error_code: str | None = Field(default=None, max_length=200)
+    attempt: int | None = Field(default=None, ge=1)
+    max_retries: int | None = Field(default=None, ge=0)
+    retry_delay_ms: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+    error_status: int | None = Field(default=None, ge=100, le=599)
 
     def canonical_json(self) -> str:
         return json.dumps(
@@ -117,6 +122,7 @@ class NormalizedTraceEvent(BaseModel):
     native_event_type: str
     item_type: str | None = None
     item_id: str | None = None
+    thread_id: str | None = None
     status: str | None = None
     text: str | None = None
     command: str | None = None
@@ -124,6 +130,11 @@ class NormalizedTraceEvent(BaseModel):
     exit_code: int | None = None
     file_changes: tuple[NativeFileChange, ...] = ()
     usage: CodexTokenUsage | None = None
+    error_code: str | None = None
+    attempt: int | None = Field(default=None, ge=1)
+    max_retries: int | None = Field(default=None, ge=0)
+    retry_delay_ms: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+    error_status: int | None = Field(default=None, ge=100, le=599)
 
 
 class NormalizedTrace(BaseModel):
@@ -166,6 +177,7 @@ class CodexHarnessProfile(BaseModel):
     harness: Literal["codex"] = "codex"
     codex_cli_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
     requested_model: str = Field(min_length=1, max_length=300)
+    provider_route: Literal["codex-cli-default"]
     reasoning_effort: str = Field(min_length=1, max_length=50)
     sandbox_mode: Literal["workspace-write"] = "workspace-write"
     approval_policy: Literal["never"] = "never"
@@ -242,6 +254,8 @@ class HarnessLaneEvidence(BaseModel):
     task_id: Identifier
     task_version: str
     task_digest: Sha256Digest
+    verifier_definition_digest: Sha256Digest
+    resource_budget: ResourceBudget
     workspace_input_digest: Sha256Digest
     workspace_output_digest: Sha256Digest
     changed_paths: tuple[ChangedPathEvidence, ...]
@@ -254,6 +268,7 @@ class HarnessLaneEvidence(BaseModel):
     requested_model: str
     observed_model: str | None = None
     observed_model_status: ObservedModelStatus
+    provider_route: str = Field(min_length=1, max_length=300)
     native_transcript_digest: Sha256Digest
     normalized_trace_version: Literal[1] = 1
     normalized_trace_digest: Sha256Digest
@@ -282,6 +297,8 @@ class HarnessLaneEvidence(BaseModel):
             raise ValueError("Harness profile fingerprint mismatch")
         if self.requested_model != self.profile.requested_model:
             raise ValueError("requested model does not match Harness profile")
+        if self.provider_route != self.profile.provider_route:
+            raise ValueError("provider route does not match Harness profile")
         if self.observed_model_status is ObservedModelStatus.NOT_EXPOSED:
             if self.observed_model is not None:
                 raise ValueError("unexposed observed model must remain null")
