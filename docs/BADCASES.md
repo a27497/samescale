@@ -6,7 +6,7 @@ No real BadCase can be selected before the authorized Core Matrix has produced t
 
 ## Required evidence bundle
 
-Each future BadCase must bind the task/version/digest, run identity, cell/profile identity, artifact and report references, verifier outcome, and only the safe trace facts permitted by the trace policy. It must state the observed failure, separate capability from infrastructure and Judge disagreement, and classify attribution as supported fact or hypothesis. Root cause is included only when the evidence supports it. The closing lesson records the mitigation and what HarnessLab detected that a simple pass-rate table would miss.
+Each future Core BadCase must be a real `capability_fail` persisted as `failed_subject`, bind the task/version/digest, run identity, cell/profile identity, artifact and report references, verifier outcome, and only the safe trace facts permitted by the trace policy. Infrastructure and cancellation observations remain separately classified and cannot occupy these three capability BadCase slots. Root cause is included only when the evidence supports it. The closing lesson records the mitigation and what HarnessLab detected that a simple pass-rate table would miss.
 
 ## Slot 1
 
@@ -24,4 +24,4 @@ Candidate: a cross-lane difference whose controls and trace evidence permit care
 
 `NOT_VERIFIED — REAL EVIDENCE PENDING`
 
-Candidate: infrastructure, missing-evidence, or Judge disagreement that shows why HarnessLab keeps evidence layers separate. No candidate has been selected.
+Candidate: a verifier-backed subject failure whose safe trace adds a distinct mitigation lesson. No candidate has been selected.

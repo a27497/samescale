@@ -67,10 +67,13 @@ CRITICAL_TESTS = {
     "test_final_release_rejects_wrong_experiment_corpus",
     "test_final_release_rejects_629_runs",
     "test_final_release_rejects_corrupt_run_manifest_set",
+    "test_final_release_accepts_production_valid_capability_failure",
+    "test_final_release_rejects_inconsistent_run_lifecycle",
     "test_final_release_rejects_fake_pair_evidence",
     "test_final_release_rejects_ablation_hard_control_drift",
     "test_final_release_rejects_corrupt_judge_report",
     "test_final_release_rejects_badcase_bound_to_wrong_run",
+    "test_final_release_rejects_capability_pass_badcase",
     "test_final_release_rejects_unsupported_real_resume_claim",
     "test_final_release_rejects_remote_ci_head_or_workflow_mismatch",
     "test_fully_valid_fake_semantic_fixture_passes_and_issues_receipt",
@@ -205,9 +208,10 @@ def verify_contract_mode() -> bool:
     print("CONTROLLED_ABLATION=PLANNED_NOT_RUN; reasoning_effort is sole treatment")
     print("DEEPSEEK_E2=DEFERRED_NOT_VERIFIED")
     print("FAKE_KEYLESS_CONTRACT_EVIDENCE=PASS; REAL_RELEASE_EVIDENCE=NOT_RUN")
+    print("REAL_EVALUATION_CALL_COUNT=0")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
-    print("PHASE_K_A_REVIEW_FIXED_AWAITING_REAL_EVIDENCE_AUTHORIZATION")
+    print("PHASE_K_A_FINAL_REVIEW_FIXED_AWAITING_REAL_EVIDENCE_AUTHORIZATION")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")

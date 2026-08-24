@@ -43,6 +43,14 @@ to remain genuinely `COMPARABLE`) or `NO_HARNESS_UPLIFT_CLAIM`; `NOT_COMPARABLE`
 relabeled. Only successful semantic verification returns a receipt accepted by the tag guard.
 Missing or corrupt evidence returns `NOT_VERIFIED` and never creates a tag.
 
+Run completion as evidence is distinct from task success. Phase K validates the authoritative
+Phase G terminal mapping: `capability_pass`/`completed`, `capability_fail`/`failed_subject`,
+`infra_failure`/`failed_infra`, and `cancelled`/`cancelled`. The Phase G loader remains authoritative
+for immutable artifact requirements, so infrastructure and cancellation rows may lack a subject
+artifact. They remain outside the capability denominator and cannot be converted into capability
+failures. Formal Pair/Ablation evidence still requires its exact comparable capability observations,
+and all three Core BadCases must be verifier-backed `capability_fail` rows.
+
 `scripts/verify_fresh_setup.py` default mode is only a pinned preflight contract. Its explicit
 `--actions-reproduction` mode runs only after the ordered Gates A-K in GitHub Actions, binds the
 attestation to the exact `GITHUB_SHA`, verifies pinned runtimes and an unmodified tracked checkout,

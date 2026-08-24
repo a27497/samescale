@@ -15,7 +15,7 @@ from harnesslab.db.models.experiment import (
     ExperimentRecord,
     ExperimentRunRecord,
 )
-from harnesslab.experiment.outcomes import StatisticalOutcome
+from harnesslab.experiment.outcomes import StatisticalOutcome, terminal_status_for_outcome
 from harnesslab.experiment.plan import ExperimentPlan, ExperimentRunSlot
 
 
@@ -340,20 +340,12 @@ async def finish_run(
     if run.status != RunStatus.SCORING.value:
         raise ExperimentConflict("a run may finish only after scoring")
     if run.cancellation_requested:
-        terminal = RunStatus.CANCELLED
         normalized_outcome = StatisticalOutcome.CANCELLED
         source_outcome = "cancellation_requested"
         artifact_manifest_path = None
         evidence_digest = None
         failure_detail = None
-    elif normalized_outcome is StatisticalOutcome.CANCELLED:
-        terminal = RunStatus.CANCELLED
-    elif normalized_outcome is StatisticalOutcome.INFRA_FAILURE:
-        terminal = RunStatus.FAILED_INFRA
-    elif normalized_outcome is StatisticalOutcome.CAPABILITY_FAIL:
-        terminal = RunStatus.FAILED_SUBJECT
-    else:
-        terminal = RunStatus.COMPLETED
+    terminal = terminal_status_for_outcome(normalized_outcome)
     run.status = terminal.value
     run.normalized_outcome = normalized_outcome.value
     run.source_outcome = source_outcome

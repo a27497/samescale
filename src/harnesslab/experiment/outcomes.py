@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
 
+from harnesslab.contracts.run import RunStatus
 from harnesslab.harness_lane.models import HarnessFailureCategory, HarnessLaneOutcome
 from harnesslab.model_lane.models import DirectModelOutcome
 
@@ -14,6 +15,36 @@ class StatisticalOutcome(StrEnum):
     CAPABILITY_FAIL = "capability_fail"
     INFRA_FAILURE = "infra_failure"
     CANCELLED = "cancelled"
+
+
+TERMINAL_STATUS_BY_OUTCOME: dict[StatisticalOutcome, RunStatus] = {
+    StatisticalOutcome.CAPABILITY_PASS: RunStatus.COMPLETED,
+    StatisticalOutcome.CAPABILITY_FAIL: RunStatus.FAILED_SUBJECT,
+    StatisticalOutcome.INFRA_FAILURE: RunStatus.FAILED_INFRA,
+    StatisticalOutcome.CANCELLED: RunStatus.CANCELLED,
+}
+
+
+def terminal_status_for_outcome(outcome: StatisticalOutcome | str) -> RunStatus:
+    """Return the authoritative Phase G terminal status for a statistical outcome."""
+
+    return TERMINAL_STATUS_BY_OUTCOME[StatisticalOutcome(outcome)]
+
+
+def validate_terminal_run_lifecycle(
+    status: RunStatus | str, outcome: StatisticalOutcome | str
+) -> None:
+    """Fail closed unless a persisted terminal status/outcome pair matches Phase G."""
+
+    persisted_status = RunStatus(status)
+    persisted_outcome = StatisticalOutcome(outcome)
+    expected_status = terminal_status_for_outcome(persisted_outcome)
+    if persisted_status is not expected_status:
+        raise ValueError(
+            "inconsistent terminal run lifecycle: "
+            f"{persisted_status.value}+{persisted_outcome.value}; "
+            f"expected {expected_status.value}"
+        )
 
 
 @dataclass(frozen=True)

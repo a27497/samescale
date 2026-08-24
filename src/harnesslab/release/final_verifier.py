@@ -11,12 +11,17 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from harnesslab.comparability.models import canonical_digest
+from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import ExperimentRecord
 from harnesslab.db.models.judgelab import JudgeCalibrationRecord, JudgeEvaluationRecord
 from harnesslab.evidence.reader import (
     EvidenceReadError,
     load_normalized_trace,
     trusted_artifact_path,
+)
+from harnesslab.experiment.outcomes import (
+    StatisticalOutcome,
+    validate_terminal_run_lifecycle,
 )
 from harnesslab.experiment.plan import ExperimentPlan
 from harnesslab.experiment.report import (
@@ -53,10 +58,10 @@ class RunEvidenceSummary(StrictModel):
     task_digest: str
     verifier_identity: str
     repeat_index: int
-    status: str
-    normalized_outcome: str
+    status: RunStatus
+    normalized_outcome: StatisticalOutcome
     source_outcome: str
-    evidence_digest: str
+    evidence_digest: str | None
     safe_trace_available: bool
     normalized_trace_digest: str | None
     safe_trace_facts: tuple[str, ...]
@@ -257,6 +262,14 @@ async def _resolve_snapshot_in_session(
     planned_slots = {slot.slot_id: slot for slot in evidence.plan.run_slots}
     run_summaries: list[RunEvidenceSummary] = []
     for run in evidence.runs:
+        try:
+            validate_terminal_run_lifecycle(run.status, run.normalized_outcome or "")
+            status = RunStatus(run.status)
+            normalized_outcome = StatisticalOutcome(run.normalized_outcome or "")
+        except ValueError as exc:
+            raise CoreReleaseError(
+                f"persisted run {run.run_id} has an invalid Phase G terminal lifecycle"
+            ) from exc
         trace_digest: str | None = None
         trace_facts: tuple[str, ...] = ()
         try:
@@ -276,10 +289,10 @@ async def _resolve_snapshot_in_session(
                 task_digest=run.task_digest,
                 verifier_identity=planned_slots[run.slot_id].task.verifier_identity,
                 repeat_index=run.repeat_index,
-                status=run.status,
-                normalized_outcome=run.normalized_outcome or "",
+                status=status,
+                normalized_outcome=normalized_outcome,
                 source_outcome=run.source_outcome or "",
-                evidence_digest=run.evidence_digest or "",
+                evidence_digest=run.evidence_digest,
                 safe_trace_available=trace_digest is not None and bool(trace_facts),
                 normalized_trace_digest=trace_digest,
                 safe_trace_facts=trace_facts,
@@ -509,12 +522,15 @@ def _verify_plan(
             or run.task_version != slot.task.task_version
             or run.task_digest != slot.task.task_digest
             or run.repeat_index != slot.repeat_index
-            or run.status != "completed"
-            or not run.normalized_outcome
             or not run.source_outcome
-            or not run.evidence_digest
         ):
             raise CoreReleaseError(f"persisted run disagrees with slot {slot_id}")
+        try:
+            validate_terminal_run_lifecycle(run.status, run.normalized_outcome)
+        except ValueError as exc:
+            raise CoreReleaseError(
+                f"persisted run lifecycle disagrees with Phase G for slot {slot_id}"
+            ) from exc
     if (
         experiment.report_experiment_id != plan.experiment_id
         or experiment.report_plan_digest != plan.digest
@@ -689,6 +705,14 @@ def _verify_badcases_and_claims(
         run = runs.get(run_id)
         if run is None or slot.run_identity != f"run:{run.run_id}":
             raise CoreReleaseError(f"BadCase {slot.slot_id} references the wrong run")
+        if (
+            run.status is not RunStatus.FAILED_SUBJECT
+            or run.normalized_outcome is not StatisticalOutcome.CAPABILITY_FAIL
+            or run.evidence_digest is None
+        ):
+            raise CoreReleaseError(
+                f"BadCase {slot.slot_id} is not a verifier-backed capability failure"
+            )
         task_identity = f"task:{run.task_id}@{run.task_version}#{run.task_digest}"
         required_refs = {
             f"run:{run.run_id}",
@@ -701,7 +725,6 @@ def _verify_badcases_and_claims(
         if (
             slot.task_identity != task_identity
             or slot.cell_identity != f"cell:{run.cell_id}"
-            or run.normalized_outcome == "CAPABILITY_PASS"
             or not run.safe_trace_available
             or not set(slot.safe_trace_facts) <= set(run.safe_trace_facts)
             or not required_refs <= set(slot.evidence_refs)

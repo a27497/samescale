@@ -8,6 +8,14 @@ import pytest
 from pydantic import ValidationError
 
 from harnesslab.comparability.models import canonical_digest
+from harnesslab.contracts.run import RunStatus
+from harnesslab.experiment.outcomes import (
+    StatisticalOutcome,
+    terminal_status_for_outcome,
+    validate_terminal_run_lifecycle,
+)
+from harnesslab.harness_lane.models import HarnessLaneOutcome
+from harnesslab.model_lane.models import DirectModelOutcome
 from harnesslab.release.contracts import (
     CoreReleaseError,
     build_corpus_manifest,
@@ -30,6 +38,50 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _verify(fixture: dict[str, Any]) -> Any:
     return verify_semantic_final_release(**fixture)
+
+
+def test_phase_g_lifecycle_accepts_completed_capability_pass() -> None:
+    validate_terminal_run_lifecycle(RunStatus.COMPLETED, StatisticalOutcome.CAPABILITY_PASS)
+    assert terminal_status_for_outcome(StatisticalOutcome.CAPABILITY_PASS) is RunStatus.COMPLETED
+
+
+def test_phase_g_lifecycle_accepts_failed_subject_capability_fail() -> None:
+    validate_terminal_run_lifecycle(RunStatus.FAILED_SUBJECT, StatisticalOutcome.CAPABILITY_FAIL)
+    assert (
+        terminal_status_for_outcome(StatisticalOutcome.CAPABILITY_FAIL) is RunStatus.FAILED_SUBJECT
+    )
+
+
+def test_phase_g_lifecycle_accepts_failed_infra_infra_failure() -> None:
+    validate_terminal_run_lifecycle(RunStatus.FAILED_INFRA, StatisticalOutcome.INFRA_FAILURE)
+    assert terminal_status_for_outcome(StatisticalOutcome.INFRA_FAILURE) is RunStatus.FAILED_INFRA
+
+
+def test_phase_g_lifecycle_accepts_cancelled_cancelled() -> None:
+    validate_terminal_run_lifecycle(RunStatus.CANCELLED, StatisticalOutcome.CANCELLED)
+    assert terminal_status_for_outcome(StatisticalOutcome.CANCELLED) is RunStatus.CANCELLED
+
+
+def test_phase_g_lifecycle_rejects_completed_capability_fail() -> None:
+    with pytest.raises(ValueError, match="inconsistent terminal run lifecycle"):
+        validate_terminal_run_lifecycle(RunStatus.COMPLETED, StatisticalOutcome.CAPABILITY_FAIL)
+
+
+def test_phase_g_lifecycle_rejects_failed_subject_capability_pass() -> None:
+    with pytest.raises(ValueError, match="inconsistent terminal run lifecycle"):
+        validate_terminal_run_lifecycle(
+            RunStatus.FAILED_SUBJECT, StatisticalOutcome.CAPABILITY_PASS
+        )
+
+
+def test_phase_g_lifecycle_rejects_failed_infra_capability_pass() -> None:
+    with pytest.raises(ValueError, match="inconsistent terminal run lifecycle"):
+        validate_terminal_run_lifecycle(RunStatus.FAILED_INFRA, StatisticalOutcome.CAPABILITY_PASS)
+
+
+def test_phase_g_lifecycle_rejects_cancelled_capability_fail() -> None:
+    with pytest.raises(ValueError, match="inconsistent terminal run lifecycle"):
+        validate_terminal_run_lifecycle(RunStatus.CANCELLED, StatisticalOutcome.CAPABILITY_FAIL)
 
 
 def test_corpus_has_sixteen_semantic_families_and_one_cross_language_control() -> None:
@@ -151,6 +203,77 @@ def test_final_release_rejects_corrupt_run_manifest_set() -> None:
         _verify(fixture)
 
 
+def test_final_release_accepts_production_valid_capability_failure() -> None:
+    fixture = semantic_fixture()
+    failed = fixture["snapshot"].experiment.runs[0]
+
+    assert failed.status is RunStatus.FAILED_SUBJECT
+    assert failed.normalized_outcome is StatisticalOutcome.CAPABILITY_FAIL
+    assert _verify(fixture).semantic_verified
+
+
+def test_final_release_rejects_inconsistent_run_lifecycle() -> None:
+    fixture = semantic_fixture()
+    experiment = fixture["snapshot"].experiment
+    runs = list(experiment.runs)
+    runs[10] = runs[10].model_copy(
+        update={
+            "status": RunStatus.COMPLETED,
+            "normalized_outcome": StatisticalOutcome.CAPABILITY_FAIL,
+            "source_outcome": DirectModelOutcome.VERIFIED_FAIL.value,
+        }
+    )
+    fixture["snapshot"] = fixture["snapshot"].model_copy(
+        update={"experiment": experiment.model_copy(update={"runs": tuple(runs)})}
+    )
+
+    with pytest.raises(CoreReleaseError, match="lifecycle disagrees with Phase G"):
+        _verify(fixture)
+
+
+def test_final_release_accepts_infra_and_cancelled_without_artifact_identity() -> None:
+    fixture = semantic_fixture()
+    experiment = fixture["snapshot"].experiment
+    formal_cells = {
+        experiment.pair.left_cell_id,
+        experiment.pair.right_cell_id,
+        experiment.ablation.base_cell_id,
+        experiment.ablation.variant_cell_id,
+    }
+    candidates = [
+        index
+        for index, run in enumerate(experiment.runs)
+        if index >= 3 and run.cell_id not in formal_cells
+    ]
+    assert len(candidates) >= 2
+    runs = list(experiment.runs)
+    replacements = (
+        (
+            RunStatus.FAILED_INFRA,
+            StatisticalOutcome.INFRA_FAILURE,
+            HarnessLaneOutcome.INFRA_ERROR.value,
+        ),
+        (RunStatus.CANCELLED, StatisticalOutcome.CANCELLED, "cancellation_requested"),
+    )
+    for index, (status, outcome, source) in zip(candidates[:2], replacements, strict=True):
+        runs[index] = runs[index].model_copy(
+            update={
+                "status": status,
+                "normalized_outcome": outcome,
+                "source_outcome": source,
+                "evidence_digest": None,
+                "safe_trace_available": False,
+                "normalized_trace_digest": None,
+                "safe_trace_facts": (),
+            }
+        )
+    fixture["snapshot"] = fixture["snapshot"].model_copy(
+        update={"experiment": experiment.model_copy(update={"runs": tuple(runs)})}
+    )
+
+    assert _verify(fixture).semantic_verified
+
+
 def test_final_release_rejects_fake_pair_evidence() -> None:
     fixture = semantic_fixture()
     pair = fixture["snapshot"].experiment.pair.model_copy(update={"total_observations": 89})
@@ -205,6 +328,25 @@ def test_final_release_rejects_badcase_bound_to_wrong_run() -> None:
         _verify(fixture)
 
 
+def test_final_release_rejects_capability_pass_badcase() -> None:
+    fixture = semantic_fixture()
+    experiment = fixture["snapshot"].experiment
+    runs = list(experiment.runs)
+    runs[0] = runs[0].model_copy(
+        update={
+            "status": RunStatus.COMPLETED,
+            "normalized_outcome": StatisticalOutcome.CAPABILITY_PASS,
+            "source_outcome": DirectModelOutcome.VERIFIED_PASS.value,
+        }
+    )
+    fixture["snapshot"] = fixture["snapshot"].model_copy(
+        update={"experiment": experiment.model_copy(update={"runs": tuple(runs)})}
+    )
+
+    with pytest.raises(CoreReleaseError, match="not a verifier-backed capability failure"):
+        _verify(fixture)
+
+
 def test_final_release_rejects_unsupported_real_resume_claim() -> None:
     fixture = semantic_fixture()
     claims = list(fixture["claims"].claims)
@@ -240,6 +382,14 @@ def test_final_release_rejects_remote_ci_head_or_workflow_mismatch() -> None:
 
 def test_fully_valid_fake_semantic_fixture_passes_and_issues_receipt() -> None:
     fixture = semantic_fixture()
+    badcase_runs = fixture["snapshot"].experiment.runs[:3]
+    assert all(run.status is RunStatus.FAILED_SUBJECT for run in badcase_runs)
+    assert all(run.normalized_outcome is StatisticalOutcome.CAPABILITY_FAIL for run in badcase_runs)
+    assert all(
+        run.status is RunStatus.COMPLETED
+        and run.normalized_outcome is StatisticalOutcome.CAPABILITY_PASS
+        for run in fixture["snapshot"].experiment.runs[3:]
+    )
     assert not tag_creation_authorized(fixture["manifest"])
     receipt = _verify(fixture)
 

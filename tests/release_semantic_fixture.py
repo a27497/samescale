@@ -6,6 +6,8 @@ from typing import Any
 from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.common import EvaluationLane, NetworkPolicy, Protocol
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
+from harnesslab.contracts.run import RunStatus
+from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.plan import (
     ExperimentPlan,
     ExperimentRunSlot,
@@ -20,6 +22,7 @@ from harnesslab.judgelab.plan import (
     resolve_definitions,
     resolve_suite,
 )
+from harnesslab.model_lane.models import DirectModelOutcome
 from harnesslab.release.contracts import (
     load_core_corpus,
     load_real_evidence_plan,
@@ -214,9 +217,17 @@ def semantic_fixture() -> dict[str, Any]:
             task_digest=slot.task.task_digest,
             verifier_identity=slot.task.verifier_identity,
             repeat_index=slot.repeat_index,
-            status="completed",
-            normalized_outcome="CAPABILITY_FAIL" if index < 3 else "CAPABILITY_PASS",
-            source_outcome="FAILED" if index < 3 else "PASSED",
+            status=(RunStatus.FAILED_SUBJECT.value if index < 3 else RunStatus.COMPLETED.value),
+            normalized_outcome=(
+                StatisticalOutcome.CAPABILITY_FAIL.value
+                if index < 3
+                else StatisticalOutcome.CAPABILITY_PASS.value
+            ),
+            source_outcome=(
+                DirectModelOutcome.VERIFIED_FAIL.value
+                if index < 3
+                else DirectModelOutcome.VERIFIED_PASS.value
+            ),
             evidence_digest=canonical_digest({"run": index}),
             safe_trace_available=True,
             normalized_trace_digest=canonical_digest({"trace": index}),
