@@ -151,6 +151,7 @@ def main() -> int:
                 "-q",
                 f"--junitxml={JUNIT}",
             ),
+            timeout_seconds=600,
         ),
         Check("Ruff check", ("uv", "run", "--locked", "ruff", "check", ".")),
         Check("Ruff format", ("uv", "run", "--locked", "ruff", "format", "--check", ".")),
