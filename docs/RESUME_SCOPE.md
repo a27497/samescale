@@ -125,12 +125,13 @@ This file separates repository evidence from intended design. A capability moves
   request/action/report contracts and no checkpoint, RAG, or multi-agent expansion
 - Exactly six experiment-scoped read tools, trusted manifest/normalized-trace reopening, safe task
   contract resolution, approved Phase G report/statistics reuse, and persisted ablation evidence
-- Deterministic non-path citations, fabricated-reference rejection, enforced
-  `VERIFIED_FACT`/`HYPOTHESIS` separation, and causal factual-claim rejection
+- Deterministic non-path citations, exact-value structured fact binding, fabricated-reference and
+  contradiction rejection, canonical host-rendered fact prose, and enforced
+  `VERIFIED_FACT`/`HYPOTHESIS` separation
 - Canonical timestamp-free report JSON/digest plus Markdown, atomically persisted only after
   validation under a controlled Analyst artifact root
 - A keyless production-path Gate J fixture using ExperimentSpec/Plan, queue, executor, fake Codex,
-  persisted manifests/report/AblationSpec; 19 focused tests with zero skips
+  persisted manifests/report/AblationSpec; 22 focused tests with zero skips
 - Before/after proof that analysis leaves experiment/cell/pair/ablation/run rows, outcomes,
   artifact digests/mtimes, Judge state, and fake execution-backend call counts unchanged
 

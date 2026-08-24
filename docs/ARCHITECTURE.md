@@ -272,7 +272,7 @@ AnalysisRequest + bound experiment ─ decide ─ strict six-action union
                                                            v
                               experiment-scoped read repository
                                                            │
-                                  citation + claim validation ─ report
+                            structured fact + citation validation ─ report
 ```
 
 The repository starts PostgreSQL work read-only and exposes no mutation method. Run, cell, task,
@@ -282,9 +282,12 @@ root confinement plus manifest and normalized-trace digests. Native transcripts 
 
 `compare_cells` calls the Phase G report/statistics path; it copies no formulas and creates no new
 significance claim. `get_ablation` returns declared treatment and persisted paired statistics with
-evidence tier and Comparability limitations. Every `VERIFIED_FACT` requires catalog citations;
-unknown references and causal factual wording fail validation. Unsupported interpretation remains
-`HYPOTHESIS` and names evidence needed to verify or falsify it.
+evidence tier and Comparability limitations. Every `VERIFIED_FACT` is a set of exact-value
+assertions over a cited entry's tool namespace and field path. The trusted host resolves and checks
+those assertions, derives citations, and renders the canonical statement; the backend cannot attach
+contradictory prose. Unknown references, wrong namespaces, absent paths, and unequal values fail
+closed. Unsupported interpretation remains `HYPOTHESIS` and names evidence needed to verify or
+falsify it.
 
 `FakeAnalystBackend` is the only operational Phase J backend. No implicit credential/provider path
 or Workbench Analyst route exists. Trusted host code alone atomically persists a validated report;

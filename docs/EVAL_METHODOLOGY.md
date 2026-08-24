@@ -177,10 +177,14 @@ Phase J adds no evidence authority. The hierarchy remains
 `L0 deterministic > L1 repository-curated human gold > L2 LLM Judge`; Analyst prose is a
 read-only explanation layer over persisted facts.
 
-Every factual conclusion is a `VERIFIED_FACT` with deterministic logical citations to returned
-run, trace-event, task-version, cell, pair, or ablation catalog entries. Digest bindings connect
-entries to plans, reports, manifests, or normalized traces where applicable. An invented citation
-rejects the draft.
+Every factual conclusion is a `VERIFIED_FACT` composed of deterministic `FactAssertion` values.
+Each assertion binds a logical run, trace-event, task-version, cell, pair, or ablation reference to
+a tool namespace, bounded field path, `EQ` operator, and expected JSON value. The trusted host
+resolves the field from catalog evidence and requires canonical JSON equality. Digest bindings
+connect entries to plans, reports, manifests, or normalized traces where applicable. An invented
+citation, wrong namespace, missing path, or contradictory value rejects the draft. Fact citations
+and authoritative prose are derived canonically from the validated assertions, not supplied by the
+backend.
 
 A `HYPOTHESIS` is interpretation not deterministically established by available evidence and must
 name evidence needed to verify or falsify it. Natural-language confidence never upgrades a

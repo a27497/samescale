@@ -83,8 +83,9 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
   explicit 8-decision/12-tool-call bound and no generic Agent, RAG, or multi-agent runtime
 - Exactly six experiment-scoped evidence tools: `query_runs`, `compare_cells`, `inspect_trace`,
   `inspect_failure`, `get_task_contract`, and `get_ablation`
-- Deterministic evidence citations, enforced `VERIFIED_FACT` versus `HYPOTHESIS`, canonical
-  JSON/Markdown reports, and a production-path keyless Gate J read-only proof
+- Exact-value structured fact assertions bound to deterministic evidence citations, enforced
+  `VERIFIED_FACT` versus `HYPOTHESIS`, canonical JSON/Markdown reports, and a production-path
+  keyless Gate J read-only proof
 - pytest integration/unit coverage, Ruff, mypy, and one authoritative Gate A runner
 - GitHub Actions using PostgreSQL 18 without model-provider credentials
 
@@ -123,7 +124,8 @@ manifest Regression proofs, trusted artifact-root escape tests, typed Workbench 
 frontend type/test/build checks. The frontend accepts compatible Node releases in
 `>=24.18.1 <25`.
 Gate J adds a keyless production queue/executor/manifest/report fixture, controlled ablation,
-strict citations, safe normalized-trace reads, no-ablation hypothesis proof, and source snapshots.
+host-validated structured fact binding, safe normalized-trace reads, no-ablation hypothesis proof,
+and source snapshots.
 
 ```powershell
 Copy-Item .env.example .env
@@ -259,8 +261,9 @@ uv run --locked python scripts/verify_gate_i.py
 All `REAL_*` evidence remains `NOT_RUN`; Gate I never uses provider or ambient Harness credentials.
 
 The non-recursive Phase J gate verifies the bounded graph, exact tool surface, persisted evidence
-reads, citations, fact/hypothesis boundary, controlled ablation, injection resistance,
-deterministic reports, and source immutability:
+reads, structured fact-to-evidence binding, contradictory run/numeric rejection, citations,
+fact/hypothesis boundary, controlled ablation, injection resistance, deterministic reports, and
+source immutability:
 
 ```powershell
 uv run --locked python scripts/verify_gate_j.py
@@ -275,4 +278,5 @@ See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_MET
 [Experiment Statistics](docs/EXPERIMENT_STATISTICS.md), and [Resume Scope](docs/RESUME_SCOPE.md).
 [JudgeLab](docs/JUDGELAB.md) documents the Phase H authority and calibration boundary, and
 [Workbench](docs/WORKBENCH.md) documents the Phase I read API and Vue evidence surface.
-[Attribution Analyst](docs/ANALYST.md) documents Phase J citations and read-only graph boundary.
+[Attribution Analyst](docs/ANALYST.md) documents Phase J structured facts and read-only graph
+boundary.

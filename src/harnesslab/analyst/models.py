@@ -188,29 +188,136 @@ class ClaimClass(StrEnum):
     HYPOTHESIS = "HYPOTHESIS"
 
 
-class AttributionClaim(StrictModel):
-    classification: ClaimClass
+class FactOperator(StrEnum):
+    EQ = "EQ"
+
+
+class FactAssertion(StrictModel):
+    evidence_ref: str = Field(min_length=1, max_length=260)
+    tool: ToolName
+    field_path: tuple[str | int, ...] = Field(min_length=1, max_length=16)
+    operator: Literal[FactOperator.EQ] = FactOperator.EQ
+    expected_value: JsonValue
+
+    @field_validator("evidence_ref")
+    @classmethod
+    def evidence_identity_is_logical(cls, value: str) -> str:
+        EvidenceRef(id=value)
+        return value
+
+    @field_validator("field_path")
+    @classmethod
+    def field_path_is_bounded(cls, value: tuple[str | int, ...]) -> tuple[str | int, ...]:
+        for segment in value:
+            if isinstance(segment, str):
+                if not segment or len(segment) > 200:
+                    raise ValueError("fact field path keys must be 1..200 characters")
+            elif segment < 0:
+                raise ValueError("fact field path indexes cannot be negative")
+        return value
+
+    @field_validator("expected_value")
+    @classmethod
+    def expected_value_is_canonical_json(cls, value: JsonValue) -> JsonValue:
+        try:
+            json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("fact expected value must be canonical JSON") from exc
+        return value
+
+
+def canonical_json_value(value: JsonValue) -> str:
+    return json.dumps(
+        value,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    )
+
+
+def resolve_fact_assertion(assertion: FactAssertion, entry: EvidenceEntry) -> JsonValue:
+    tool_key = assertion.tool.value
+    if assertion.tool not in entry.tools or tool_key not in entry.data_by_tool:
+        raise ValueError("fact assertion tool namespace is absent from the cited evidence")
+    current: JsonValue = entry.data_by_tool[tool_key]
+    for segment in assertion.field_path:
+        if isinstance(segment, str):
+            if not isinstance(current, dict) or segment not in current:
+                raise ValueError("fact assertion field path is absent from the cited evidence")
+            current = current[segment]
+        else:
+            if not isinstance(current, list) or segment >= len(current):
+                raise ValueError("fact assertion field path is absent from the cited evidence")
+            current = current[segment]
+    return current
+
+
+def fact_evidence_refs(assertions: tuple[FactAssertion, ...]) -> tuple[str, ...]:
+    return tuple(dict.fromkeys(assertion.evidence_ref for assertion in assertions))
+
+
+def canonical_fact_statement(assertions: tuple[FactAssertion, ...]) -> str:
+    expressions = []
+    for assertion in assertions:
+        path = ""
+        for segment in assertion.field_path:
+            if isinstance(segment, int):
+                path += f"[{segment}]"
+            elif re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]*", segment):
+                path += f".{segment}"
+            else:
+                path += f"[{json.dumps(segment, ensure_ascii=False)}]"
+        expected = json.dumps(
+            assertion.expected_value,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+        expressions.append(
+            f"{assertion.tool.value}[{assertion.evidence_ref}]{path} "
+            f"{assertion.operator.value} {expected}"
+        )
+    return "Observed " + "; ".join(expressions) + "."
+
+
+class VerifiedFactDraft(StrictModel):
+    classification: Literal[ClaimClass.VERIFIED_FACT] = ClaimClass.VERIFIED_FACT
+    assertions: tuple[FactAssertion, ...] = Field(min_length=1, max_length=16)
+
+
+class HypothesisClaim(StrictModel):
+    classification: Literal[ClaimClass.HYPOTHESIS] = ClaimClass.HYPOTHESIS
     statement: str = Field(min_length=1, max_length=2_000)
     evidence_refs: tuple[str, ...] = ()
-    additional_evidence_needed: str | None = Field(default=None, max_length=2_000)
+    additional_evidence_needed: str = Field(min_length=1, max_length=2_000)
 
     @field_validator("statement", "additional_evidence_needed")
     @classmethod
-    def text_is_safe(cls, value: str | None) -> str | None:
-        if value is None:
-            return None
+    def text_is_safe(cls, value: str) -> str:
         return safe_public_text(value, limit=2_000)
 
+
+class VerifiedFact(StrictModel):
+    classification: Literal[ClaimClass.VERIFIED_FACT] = ClaimClass.VERIFIED_FACT
+    statement: str = Field(min_length=1, max_length=8_000)
+    evidence_refs: tuple[str, ...] = Field(min_length=1)
+    assertions: tuple[FactAssertion, ...] = Field(min_length=1, max_length=16)
+
     @model_validator(mode="after")
-    def class_has_required_fields(self) -> AttributionClaim:
-        if self.classification is ClaimClass.VERIFIED_FACT:
-            if not self.evidence_refs:
-                raise ValueError("VERIFIED_FACT requires evidence references")
-            if self.additional_evidence_needed is not None:
-                raise ValueError("VERIFIED_FACT cannot request additional evidence")
-        elif not self.additional_evidence_needed:
-            raise ValueError("HYPOTHESIS requires evidence needed to verify or falsify it")
+    def prose_and_citations_are_canonical(self) -> VerifiedFact:
+        if self.evidence_refs != fact_evidence_refs(self.assertions):
+            raise ValueError("VERIFIED_FACT citations must be derived from its assertions")
+        if self.statement != canonical_fact_statement(self.assertions):
+            raise ValueError("VERIFIED_FACT prose must be canonical structured-fact rendering")
         return self
+
+
+type AttributionClaim = Annotated[
+    VerifiedFactDraft | HypothesisClaim,
+    Field(discriminator="classification"),
+]
 
 
 class AttributionDraft(StrictModel):
@@ -265,19 +372,36 @@ class AttributionReport(StrictModel):
     execution: ExecutionMetadata
     summary: str = Field(min_length=1, max_length=4_000)
     evidence_catalog: tuple[EvidenceEntry, ...]
-    verified_facts: tuple[AttributionClaim, ...]
-    hypotheses: tuple[AttributionClaim, ...]
+    verified_facts: tuple[VerifiedFact, ...]
+    hypotheses: tuple[HypothesisClaim, ...]
     ablation_refs: tuple[str, ...]
     limitations: tuple[str, ...]
 
     @model_validator(mode="after")
     def report_is_internally_classified(self) -> AttributionReport:
+        ids = tuple(entry.ref.id for entry in self.evidence_catalog)
+        if len(ids) != len(set(ids)):
+            raise ValueError("evidence catalog contains duplicate identities")
+        catalog = {entry.ref.id: entry for entry in self.evidence_catalog}
         if any(
             claim.classification is not ClaimClass.VERIFIED_FACT for claim in self.verified_facts
         ):
             raise ValueError("verified_facts contains a non-fact claim")
         if any(claim.classification is not ClaimClass.HYPOTHESIS for claim in self.hypotheses):
             raise ValueError("hypotheses contains a non-hypothesis claim")
+        for fact in self.verified_facts:
+            for assertion in fact.assertions:
+                entry = catalog.get(assertion.evidence_ref)
+                if entry is None:
+                    raise ValueError("claim cites evidence absent from the catalog")
+                actual = resolve_fact_assertion(assertion, entry)
+                if canonical_json_value(actual) != canonical_json_value(assertion.expected_value):
+                    raise ValueError("fact assertion expected value contradicts the cited evidence")
+        for hypothesis in self.hypotheses:
+            if set(hypothesis.evidence_refs) - set(catalog):
+                raise ValueError("claim cites evidence absent from the catalog")
+        if any(ref not in catalog or not ref.startswith("ablation:") for ref in self.ablation_refs):
+            raise ValueError("ablation reference is missing or not an ablation identity")
         return self
 
     def canonical_json(self) -> str:

@@ -379,6 +379,17 @@ async def test_production_queue_executor_manifests_report_and_ablation_are_read_
     assert ablation_ref in refs
     assert ablation_ref in report.ablation_refs
     assert any(ablation_ref in claim.evidence_refs for claim in report.verified_facts)
+    fact = next(claim for claim in report.verified_facts if ablation_ref in claim.evidence_refs)
+    asserted_fields = {assertion.field_path for assertion in fact.assertions}
+    assert {
+        ("changed_dimension",),
+        ("evidence_tier",),
+        ("comparable_pairs",),
+        ("partially_comparable_pairs",),
+        ("not_comparable_pairs",),
+        ("formal_eligible",),
+        ("limitations",),
+    } <= asserted_fields
     entry = next(item for item in report.evidence_catalog if item.ref.id == ablation_ref)
     data = entry.data_by_tool[ToolName.GET_ABLATION.value]
     assert data["changed_dimension"] == "reasoning_effort"

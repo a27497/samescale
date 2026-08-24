@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import os
-import re
 import tempfile
 from pathlib import Path
+
+from pydantic import ValidationError
 
 from harnesslab.analyst.models import (
     AnalysisRequest,
@@ -14,32 +15,31 @@ from harnesslab.analyst.models import (
     EvidenceEntry,
     ExecutionMetadata,
     ExecutionStatus,
+    FactAssertion,
+    FactOperator,
+    VerifiedFact,
+    canonical_fact_statement,
+    canonical_json_value,
+    fact_evidence_refs,
+    resolve_fact_assertion,
 )
 
 
 class AttributionValidationError(ValueError):
-    """A draft contains fabricated citations or violates the fact/hypothesis boundary."""
+    """A draft contains fabricated citations or unsupported structured facts."""
 
 
-_CAUSAL_WORDING = re.compile(
-    r"(?i)\b(?:because|caused?|causal(?:ly)?|due to|led to|resulted from|attribut(?:e|ed|ion))\b"
-)
-_EXECUTION_WORDING = re.compile(
-    r"(?i)\b(?:command executed|command ran|shell ran|provider called|browser opened|tool added)\b"
-)
-
-
-def _execution_fact_is_supported(
-    statement: str, evidence_refs: tuple[str, ...], catalog: dict[str, EvidenceEntry]
-) -> bool:
-    if not _EXECUTION_WORDING.search(statement):
-        return True
-    for ref in evidence_refs:
-        entry = catalog[ref]
-        trace = entry.data_by_tool.get("inspect_trace")
-        if trace is not None and trace.get("type") == "COMMAND_EXECUTION":
-            return True
-    return False
+def _validate_assertion(assertion: FactAssertion, entry: EvidenceEntry) -> None:
+    try:
+        actual = resolve_fact_assertion(assertion, entry)
+    except ValueError as exc:
+        raise AttributionValidationError(str(exc)) from exc
+    if assertion.operator is not FactOperator.EQ:
+        raise AttributionValidationError("unsupported fact assertion operator")
+    if canonical_json_value(actual) != canonical_json_value(assertion.expected_value):
+        raise AttributionValidationError(
+            "fact assertion expected value contradicts the cited evidence"
+        )
 
 
 def validate_and_build_report(
@@ -57,23 +57,26 @@ def validate_and_build_report(
         raise AttributionValidationError("evidence catalog contains duplicate identities")
     by_id = {entry.ref.id: entry for entry in catalog}
     known = set(by_id)
-    verified = []
+    verified: list[VerifiedFact] = []
     hypotheses = []
     for claim in draft.claims:
-        missing = set(claim.evidence_refs) - known
-        if missing:
-            raise AttributionValidationError("claim cites evidence absent from the catalog")
         if claim.classification is ClaimClass.VERIFIED_FACT:
-            if _CAUSAL_WORDING.search(claim.statement):
-                raise AttributionValidationError(
-                    "causal language cannot be emitted as a VERIFIED_FACT"
+            missing = {assertion.evidence_ref for assertion in claim.assertions} - known
+            if missing:
+                raise AttributionValidationError("claim cites evidence absent from the catalog")
+            for assertion in claim.assertions:
+                _validate_assertion(assertion, by_id[assertion.evidence_ref])
+            verified.append(
+                VerifiedFact(
+                    statement=canonical_fact_statement(claim.assertions),
+                    evidence_refs=fact_evidence_refs(claim.assertions),
+                    assertions=claim.assertions,
                 )
-            if not _execution_fact_is_supported(claim.statement, claim.evidence_refs, by_id):
-                raise AttributionValidationError(
-                    "cited evidence does not support the factual execution statement"
-                )
-            verified.append(claim)
+            )
         else:
+            missing = set(claim.evidence_refs) - known
+            if missing:
+                raise AttributionValidationError("claim cites evidence absent from the catalog")
             hypotheses.append(claim)
     if any(ref not in known or not ref.startswith("ablation:") for ref in draft.ablation_refs):
         raise AttributionValidationError(
@@ -101,6 +104,12 @@ def validate_and_build_report(
 def persist_report(report: AttributionReport, artifact_root: Path) -> tuple[Path, Path]:
     """Atomically persist only the validated Analyst report under its deterministic identity."""
 
+    try:
+        report = AttributionReport.model_validate(report.model_dump(mode="python"))
+    except ValidationError as exc:
+        raise AttributionValidationError(
+            "report failed structured fact binding revalidation"
+        ) from exc
     artifact_root.mkdir(parents=True, exist_ok=True)
     resolved_root = artifact_root.resolve(strict=True)
     target = resolved_root / report.analysis_id

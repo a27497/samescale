@@ -37,8 +37,11 @@ CRITICAL_TESTS = {
     "test_langgraph_stops_at_twelve_total_tool_calls",
     "test_langgraph_stops_at_eight_decision_iterations",
     "test_fabricated_evidence_reference_is_rejected",
-    "test_causal_wording_cannot_be_a_verified_fact",
-    "test_injection_like_evidence_cannot_add_tools_or_support_a_fake_fact",
+    "test_contradictory_run_fact_is_rejected",
+    "test_contradictory_numeric_fact_is_rejected",
+    "test_valid_structured_fact_is_accepted_and_rendered_deterministically",
+    "test_verified_fact_contract_rejects_backend_controlled_prose",
+    "test_injection_like_text_cannot_manufacture_a_supported_structured_fact",
     "test_deterministic_report_json_markdown_digest_and_atomic_persistence",
     "test_production_queue_executor_manifests_report_and_ablation_are_read_and_cited",
     "test_compare_cells_reuses_approved_report_statistics_and_comparability",
@@ -133,6 +136,8 @@ def verify_test_evidence() -> ExitCode:
     )
     print("BOUNDS=8 decision iterations; 12 total tool calls; safe structured termination PASS")
     print("READ_ONLY=source DB+artifacts+Judge+execution snapshots unchanged PASS")
+    print("FACT_BINDING=structured exact-value assertions validated against catalog tool data PASS")
+    print("CONTRADICTIONS=run status/outcome and numeric statistic mismatches rejected PASS")
     print("CITATIONS=fabricated refs rejected; deterministic logical identities PASS")
     print("FACT_HYPOTHESIS=causal no-ablation output remains HYPOTHESIS PASS")
     print("CONTROLLED_ABLATION=production queue/executor/manifest/report evidence cited PASS")

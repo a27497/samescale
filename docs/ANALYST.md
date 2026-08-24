@@ -35,11 +35,18 @@ Evidence catalog entries use stable logical identities, never paths: `run:<id>`,
 `trace:<run>#event:<ordinal>`, `task:<id>@<version>`, `cell:<experiment>:<cell>`, and
 `ablation:<experiment>:<ablation>`.
 
-Every factual claim is `VERIFIED_FACT` and must cite returned catalog entries. Unknown citations
-reject the draft. Interpretations are `HYPOTHESIS` and must name evidence needed to verify or
-falsify them. Causal wording is not accepted as a verified fact. A controlled ablation supports a
-fact about the observed ablation result, but evidence tier, sample size, and Comparability
-limitations remain visible and controlling.
+Every `VERIFIED_FACT` draft contains one or more `FactAssertion` values: a logical evidence
+reference, one of the six tool namespaces, a bounded field path, the `EQ` operator, and an expected
+JSON value. Trusted host validation resolves each path against the cited `EvidenceEntry.data_by_tool`
+namespace and compares canonical JSON exactly. Missing references, wrong tool namespaces, missing
+paths, and contradictory values reject the draft.
+
+The backend cannot supply `VERIFIED_FACT` prose or citations separately. After all assertions pass,
+the host derives citations and renders the authoritative statement canonically from the assertions.
+Interpretations remain natural-language `HYPOTHESIS` claims and must name evidence needed to verify
+or falsify them. Without controlled ablation, causal interpretation remains a hypothesis. A
+controlled ablation may report only its observed structured fields; evidence tier, sample size, and
+Comparability limitations remain visible and controlling.
 
 The evidence hierarchy remains `L0 > L1 > L2`; Analyst output cannot alter PASS/FAIL, scores,
 ground truth, Judge output, or capability denominators.
