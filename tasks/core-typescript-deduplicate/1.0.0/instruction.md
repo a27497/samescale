@@ -1,5 +1,6 @@
-# Preserve first-seen event order
+# Repair canonical pagination cursors
 
-Fix `deduplicate` so repeated identifiers are removed while the first-seen order is preserved.
-Return a new array, keep the typed API unchanged, add no dependencies, and do not modify
+Implement `parseCursor` for the exact `<offset>@<anchor>` form. Offset must be a non-negative safe
+integer in canonical decimal form (`0` or no leading zeroes). Anchor must be non-empty URL-safe
+base64 text (`A-Z`, `a-z`, `0-9`, `_`, `-`). Throw `TypeError` for malformed cursors. Preserve
 `contract.txt`.

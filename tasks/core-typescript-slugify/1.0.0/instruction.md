@@ -1,5 +1,6 @@
-# Implement deterministic ASCII slugs
+# Repair event subscription disposal
 
-Complete `slugify`: retain lowercase ASCII letters and digits, replace each run of other
-characters with one hyphen, and trim boundary hyphens. Punctuation-only input returns an empty
-string. Add no dependencies and preserve `contract.txt`.
+Implement `Subscription`: the constructor subscribes exactly once and forwards events while
+active. `dispose()` is idempotent, calls the returned unsubscribe function exactly once, and stops
+forwarding even if the source later invokes its retained callback. If subscribing throws, propagate
+the error without invoking the handler. Preserve `contract.txt`.

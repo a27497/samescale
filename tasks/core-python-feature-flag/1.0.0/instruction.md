@@ -1,5 +1,5 @@
-# Repair feature-flag parsing
+# Repair bounded window parsing
 
-Implement the documented `parse_feature_flag` contract. Accept case-insensitive `true`, `1`,
-`yes`, `on` and `false`, `0`, `no`, `off`, including surrounding whitespace. Return the supplied
-default for `None`; raise `ValueError` for every other value. Do not modify `contract.txt`.
+Implement `parse_window(value, limit)` for `start:end` integer windows. Surrounding whitespace is
+allowed around both numbers and the colon. Require `0 <= start <= end <= limit`; reject malformed
+input, signed values, and a negative limit with `ValueError`. Do not modify `contract.txt`.

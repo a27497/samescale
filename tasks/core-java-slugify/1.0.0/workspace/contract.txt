@@ -1,1 +1,1 @@
-ASCII [a-z0-9] survives; all other runs collapse to one hyphen; trim boundary hyphens.
+Partition in order into fresh mutable outer and inner lists; reject non-positive batch size.

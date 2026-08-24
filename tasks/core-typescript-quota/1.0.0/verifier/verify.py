@@ -11,15 +11,22 @@ def main() -> int:
     workspace = Path(sys.argv[1])
     uri = (workspace / "quota.ts").resolve().as_uri()
     source = f"""
-import {{ Quota }} from {json.dumps(uri)};
-const quota = new Quota(5);
-const success = quota.consume(2) && quota.remaining === 3;
-const boundary = quota.consume(3) && quota.remaining === 0;
-const rejected = !quota.consume(1) && quota.remaining === 0;
-let zero = false; let negative = false;
-try {{ new Quota(3).consume(0); }} catch (error) {{ zero = error instanceof RangeError; }}
-try {{ new Quota(3).consume(-1); }} catch (error) {{ negative = error instanceof RangeError; }}
-console.log(JSON.stringify([success, boundary, rejected, zero, negative]));
+import {{ retryDelays }} from {json.dumps(uri)};
+const rejects = args => {{
+  try {{ retryDelays(...args); return false; }}
+  catch (error) {{ return error instanceof RangeError; }}
+}};
+console.log(JSON.stringify([
+  JSON.stringify(retryDelays(1, 100, 1000)) === "[]",
+  JSON.stringify(retryDelays(5, 100, 1000)) === JSON.stringify([100, 200, 400, 800]),
+  JSON.stringify(retryDelays(7, 300, 1000)) === JSON.stringify([300, 600, 1000, 1000, 1000, 1000]),
+  JSON.stringify(retryDelays(
+    4, Number.MAX_SAFE_INTEGER - 1, Number.MAX_SAFE_INTEGER
+  )) === JSON.stringify([
+    Number.MAX_SAFE_INTEGER - 1, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER
+  ]),
+  [[0,1,2], [2,0,2], [2,3,2], [2,1.5,3], [2,1,Infinity]].every(rejects)
+]));
 """
     with tempfile.TemporaryDirectory(prefix="harnesslab-typescript-") as temporary:
         harness = Path(temporary) / "hidden-verifier.mjs"
@@ -30,11 +37,11 @@ console.log(JSON.stringify([success, boundary, rejected, zero, negative]));
         return run.returncode
     values = json.loads(run.stdout)
     names = (
-        "success-mutates",
-        "exact-boundary",
-        "failure-no-mutation",
-        "zero-invalid",
-        "negative-invalid",
+        "one-attempt",
+        "doubling",
+        "capping",
+        "overflow-safe",
+        "validation",
     )
     checks = [
         {"name": name, "passed": bool(value), "score": 1.0 if value else 0.0}
@@ -47,7 +54,7 @@ console.log(JSON.stringify([success, boundary, rejected, zero, negative]));
                 "passed": all(values),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "TypeScript quota lifecycle cases",
+                "summary": "TypeScript retry schedule cases",
             },
             separators=(",", ":"),
         )

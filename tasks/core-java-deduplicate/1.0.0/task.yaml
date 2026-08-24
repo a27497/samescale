@@ -14,5 +14,7 @@ expected_tools:
 protected_paths: [contract.txt]
 metadata:
   language: java
-  category: data-transformation
-  difficulty: foundation
+  category: serialization-codec
+  difficulty: intermediate
+  scenario_family: length-prefixed-record-codec
+  benchmark_role: INDEPENDENT

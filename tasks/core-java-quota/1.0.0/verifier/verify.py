@@ -9,14 +9,22 @@ from pathlib import Path
 HARNESS = """
 public final class HiddenVerifier {
     public static void main(String[] args) {
-        Quota quota = new Quota(5);
-        boolean success = quota.consume(2) && quota.remaining() == 3;
-        boolean boundary = quota.consume(3) && quota.remaining() == 0;
-        boolean rejected = !quota.consume(1) && quota.remaining() == 0;
-        boolean zero = false; boolean negative = false;
-        try { new Quota(3).consume(0); } catch (IllegalArgumentException expected) { zero = true; }
-        try { new Quota(3).consume(-1); } catch (IllegalArgumentException expected) { negative = true; }
-        System.out.println(success + "," + boundary + "," + rejected + "," + zero + "," + negative);
+        Quota committed = new Quota();
+        boolean initial = committed.state() == Quota.State.NEW;
+        committed.reserve(); committed.commit();
+        boolean commitPath = committed.state() == Quota.State.COMMITTED;
+        Quota cancelled = new Quota(); cancelled.reserve(); cancelled.cancel();
+        boolean cancelPath = cancelled.state() == Quota.State.CANCELLED;
+        boolean terminal = rejects(() -> committed.cancel()) && committed.state() == Quota.State.COMMITTED;
+        Quota fresh = new Quota();
+        boolean ordering = rejects(() -> fresh.commit()) && rejects(() -> fresh.cancel()) && fresh.state() == Quota.State.NEW;
+        Quota duplicate = new Quota(); duplicate.reserve();
+        boolean reserveOnce = rejects(() -> duplicate.reserve()) && duplicate.state() == Quota.State.RESERVED;
+        System.out.println(initial + "," + commitPath + "," + cancelPath + "," + terminal + "," + ordering + "," + reserveOnce);
+    }
+    private static boolean rejects(Runnable action) {
+        try { action.run(); return false; }
+        catch (IllegalStateException expected) { return true; }
     }
 }
 """
@@ -48,11 +56,12 @@ def main() -> int:
             return run.returncode
     values = run.stdout.strip().split(",")
     names = (
-        "success-mutates",
-        "exact-boundary",
-        "failure-no-mutation",
-        "zero-invalid",
-        "negative-invalid",
+        "initial",
+        "commit-path",
+        "cancel-path",
+        "terminal",
+        "ordering",
+        "reserve-once",
     )
     checks = [
         {"name": name, "passed": value == "true", "score": 1.0 if value == "true" else 0.0}
@@ -65,7 +74,7 @@ def main() -> int:
                 "passed": all(item["passed"] for item in checks),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "Java quota lifecycle cases",
+                "summary": "Java reservation state machine cases",
             },
             separators=(",", ":"),
         )

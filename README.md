@@ -283,9 +283,11 @@ boundary.
 
 ## Phase K-A Core release preparation
 
-The prospective Core corpus contains 18 independently validated tasks: six each in Python, Java,
-and TypeScript across targeted bug fixes, data transformation, API/input contracts, state/lifecycle,
-multi-file behavior, and small features. The canonical inventory is `release/core-corpus.json`.
+The prospective Core corpus contains 18 validated tasks: six each in Python, Java, and TypeScript.
+It has one intentional three-language clamp control and 15 semantically independent scenarios, for
+16 scenario families across multiple categories and difficulty bands. The canonical inventory is
+`release/core-corpus.json`; reconstruction checks task semantics, metadata, hidden verifiers,
+baseline failure, and oracle success.
 
 Gate K keyless mode verifies the corpus, release Matrix/profile slots, Pair and ablation controls,
 Judge-suite binding, evidence schema, documentation, resume map, BadCase placeholders, fresh setup,
@@ -314,6 +316,11 @@ npm --prefix frontend ci
 npm --prefix frontend run build
 uv run --locked python scripts/verify_fresh_setup.py --check-runtime
 ```
+
+That command is a non-mutating setup preflight contract, not proof that a clean checkout was fully
+reproduced. GitHub Actions supplies the authoritative clean-checkout reproduction: after its ordered
+Gates A-K succeed, `--actions-reproduction` verifies the exact `GITHUB_SHA`, pinned runtimes, and an
+unmodified tracked checkout. That mode is CI-only and does not invoke any gate recursively.
 
 Run `scripts/verify_gate_a.py` through `scripts/verify_gate_k.py` in order for the full keyless gate
 chain; Gates H-J also require `DATABASE_URL` pointing at PostgreSQL. Future real execution uses only

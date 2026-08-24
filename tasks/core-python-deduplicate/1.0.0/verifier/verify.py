@@ -13,11 +13,26 @@ def main() -> int:
         raise RuntimeError("unable to load events.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+    ledger = module.RetryLedger()
+    first = ledger.record_success("op-1", "created") is True
+    duplicate = ledger.record_success("op-1", "created") is False
+    conflict = False
+    try:
+        ledger.record_success("op-1", "different")
+    except ValueError:
+        conflict = True
+    preserved = ledger.lookup("op-1") == "created"
+    empty = False
+    try:
+        ledger.record_success("", "x")
+    except ValueError:
+        empty = True
     cases = (
-        ("preserves-order", module.deduplicate(["z", "a", "z", "b"]) == ["z", "a", "b"]),
-        ("adjacent", module.deduplicate(["a", "a", "b"]) == ["a", "b"]),
-        ("empty", module.deduplicate([]) == []),
-        ("already-unique", module.deduplicate(["b", "a"]) == ["b", "a"]),
+        ("first-records", first),
+        ("identical-retry-idempotent", duplicate),
+        ("conflict-rejected", conflict),
+        ("conflict-preserves-original", preserved),
+        ("empty-key-rejected", empty),
     )
     checks = [
         {"name": name, "passed": passed, "score": 1.0 if passed else 0.0} for name, passed in cases
@@ -29,7 +44,7 @@ def main() -> int:
                 "passed": all(value for _, value in cases),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "ordered deduplication edge cases",
+                "summary": "idempotent retry-ledger cases",
             },
             separators=(",", ":"),
         )

@@ -1,11 +1,11 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
-
 public final class Events {
     private Events() {}
 
-    public static List<String> deduplicate(List<String> events) {
-        return new ArrayList<>(new TreeSet<>(events));
+    public static String encode(String payload) {
+        return payload.length() + "#" + payload;
+    }
+
+    public static String decode(String record) {
+        return record.split("#")[1];
     }
 }

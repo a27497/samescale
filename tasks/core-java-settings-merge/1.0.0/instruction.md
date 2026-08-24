@@ -1,4 +1,6 @@
-# Correct layered settings
+# Repair HTTP header normalization
 
-Fix `Settings.merge` so caller overrides take precedence over `Defaults.values()`, unknown keys are
-preserved, and neither input map is mutated. Keep the two-class Java 21 API and `contract.txt`.
+Implement `Settings.normalize`: return a new insertion-ordered map with lowercase trimmed names and
+values whose spaces/tabs are collapsed and trimmed. Reject blank names, CR/LF in names or values,
+and names that collide after normalization. Do not mutate the input; keep both classes and
+`contract.txt`.

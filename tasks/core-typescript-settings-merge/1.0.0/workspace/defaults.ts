@@ -1,5 +1,1 @@
-export const DEFAULTS: Record<string, unknown> = {
-  timeout: 30,
-  retries: 2,
-  region: "local",
-};
+export const SENSITIVE_KEYS = new Set(["password", "token", "authorization"]);

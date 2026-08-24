@@ -9,12 +9,24 @@ from pathlib import Path
 HARNESS = """
 public final class HiddenVerifier {
     public static void main(String[] args) {
-        boolean truthy = FeatureFlag.parse(" YES ", false) && FeatureFlag.parse("1", false) && FeatureFlag.parse("on", false);
-        boolean falsy = !FeatureFlag.parse(" NO ", true) && !FeatureFlag.parse("0", true) && !FeatureFlag.parse("off", true);
-        boolean defaults = FeatureFlag.parse(null, true) && !FeatureFlag.parse(null, false);
-        boolean invalid = false;
-        try { FeatureFlag.parse("enabled", false); } catch (IllegalArgumentException expected) { invalid = true; }
-        System.out.println(truthy + "," + falsy + "," + defaults + "," + invalid);
+        boolean value = FeatureFlag.fetch(key -> "value:" + key, "x").equals("value:x");
+        boolean blank = rejectsBlank(null) && rejectsBlank("  ");
+        var cause = new FeatureFlag.RepositoryException("offline");
+        boolean wrapped = false;
+        try { FeatureFlag.fetch(key -> { throw cause; }, "x"); }
+        catch (FeatureFlag.ServiceException error) { wrapped = error.getCause() == cause; }
+        var unrelated = new IllegalStateException("bug");
+        boolean propagated = propagates(unrelated);
+        System.out.println(value + "," + blank + "," + wrapped + "," + propagated);
+    }
+    private static boolean rejectsBlank(String key) {
+        try { FeatureFlag.fetch(value -> "called", key); return false; }
+        catch (IllegalArgumentException expected) { return true; }
+        catch (RuntimeException error) { return false; }
+    }
+    private static boolean propagates(IllegalStateException expected) {
+        try { FeatureFlag.fetch(key -> { throw expected; }, "x"); return false; }
+        catch (RuntimeException error) { return error == expected; }
     }
 }
 """
@@ -45,7 +57,7 @@ def main() -> int:
             sys.stderr.write(run.stderr)
             return run.returncode
     values = run.stdout.strip().split(",")
-    names = ("truthy", "falsy", "defaults", "invalid")
+    names = ("returns-value", "blank-before-call", "preserves-cause", "unrelated-propagates")
     checks = [
         {"name": name, "passed": value == "true", "score": 1.0 if value == "true" else 0.0}
         for name, value in zip(names, values, strict=True)
@@ -57,7 +69,7 @@ def main() -> int:
                 "passed": all(item["passed"] for item in checks),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "Java feature flag contract cases",
+                "summary": "Java exception propagation cases",
             },
             separators=(",", ":"),
         )

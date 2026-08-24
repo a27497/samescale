@@ -1,6 +1,6 @@
 # Real Evidence Authorization
 
-Phase K-A stop state: `PHASE_K_PREPARED_AWAITING_REAL_EVIDENCE_AUTHORIZATION`.
+Phase K-A stop state: `PHASE_K_A_REVIEW_FIXED_AWAITING_REAL_EVIDENCE_AUTHORIZATION`.
 
 No provider, Codex, Claude Code, DeepSeek, or Judge call is authorized by this document. Ambient credentials and existing logins are not authorization. Phase K-B may start only after the user explicitly approves the exact bounded execution below and resolves the requested Model-only model ids.
 

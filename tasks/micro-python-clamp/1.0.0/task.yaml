@@ -24,4 +24,6 @@ protected_paths:
 metadata:
   language: python
   category: targeted-bug-fix
+  scenario_family: clamp-boundary-control
+  benchmark_role: CROSS_LANGUAGE_CONTROL
   difficulty: foundation

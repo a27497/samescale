@@ -4,7 +4,7 @@
   "core_corpus": {
     "state": "VERIFIED",
     "identity": "harnesslab-core-18-v1",
-    "digest": "sha256:353362d4075db0dacd90f865cd0a8f9e79ca625ee11808fd80faa17c2b0d669b",
+    "digest": "sha256:5d73190e0cf809f7518bb19e925909ed5a8366400056ef13e24c1b208bb893b3",
     "limitation": "Keyless corpus contract evidence; no real performance implication."
   },
   "release_commit": {
@@ -16,7 +16,7 @@
   "experiment_plan": {
     "state": "NOT_VERIFIED",
     "identity": "core-real-evidence-v1",
-    "digest": "sha256:692b8e686a7330b960d3d22ded10c4885a7053ef814c5ec938f09125f8590941",
+    "digest": "sha256:8e92fe3a82bfc743c00520bfb6c437774b8ff63370ab4748f8a1010df51d5685",
     "limitation": "K-A preflight plan is structurally verified, but exact model selections and the executable ExperimentPlan remain unresolved."
   },
   "real_matrix": {
@@ -78,7 +78,7 @@
   "resume_claim_map": {
     "state": "VERIFIED",
     "identity": "release/resume-claim-evidence.json",
-    "digest": "sha256:f5aa1b0827318a952b0ca9459cbd4b509c3998a2efcd6333610f7a36790256e9",
+    "digest": "sha256:160bd1c6b0eefb32557db9859af098738d32a9bb3c6de0642b46e243d244326e",
     "limitation": "Real-performance claims remain NOT_VERIFIED."
   },
   "remote_ci": {
@@ -87,6 +87,7 @@
     "digest": null,
     "limitation": "Exact-head GitHub Actions evidence will be recorded after push."
   },
+  "paired_claim_policy": "NOT_SELECTED",
   "real_statuses": {
     "REAL_PROVIDER_SMOKE": "NOT_RUN",
     "REAL_CODEX_SMOKE": "NOT_RUN",

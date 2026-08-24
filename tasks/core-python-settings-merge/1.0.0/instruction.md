@@ -1,5 +1,5 @@
-# Correct layered settings
+# Repair managed session lifecycle
 
-Fix `settings.build_settings` so caller overrides take precedence over `DEFAULTS`, unknown override
-keys are preserved, and neither input mapping is mutated. The defaults live in a separate module;
-keep both public modules and `contract.txt` intact.
+Fix `ManagedSession` so `send` delegates while open and raises `RuntimeError` after closing.
+`close` must be idempotent and close the transport exactly once. The context manager must return
+the session and close it on both normal and exceptional exit. Keep both modules and `contract.txt`.

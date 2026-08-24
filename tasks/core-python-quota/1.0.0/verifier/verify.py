@@ -13,21 +13,27 @@ def main() -> int:
         raise RuntimeError("unable to load quota.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    quota = module.Quota(5)
-    first = quota.consume(2) is True and quota.remaining == 3
-    boundary = quota.consume(3) is True and quota.remaining == 0
-    rejected = quota.consume(1) is False and quota.remaining == 0
-    invalid = []
-    for units in (0, -1):
-        try:
-            module.Quota(3).consume(units)
-        except ValueError:
-            invalid.append(True)
+    cache = module.LRUCache(2)
+    cache.put("a", 1)
+    cache.put("b", 2)
+    hit = cache.get("a") == 1 and cache.keys() == ["b", "a"]
+    cache.put("c", 3)
+    eviction = cache.get("b") is None and cache.keys() == ["a", "c"]
+    cache.put("a", 4)
+    update = cache.get("a") == 4 and cache.keys() == ["c", "a"]
+    before = cache.keys()
+    miss = cache.get("missing") is None and cache.keys() == before
+    invalid = False
+    try:
+        module.LRUCache(0)
+    except ValueError:
+        invalid = True
     cases = (
-        ("success-mutates", first),
-        ("exact-boundary", boundary),
-        ("failure-no-mutation", rejected),
-        ("invalid-units", len(invalid) == 2),
+        ("hit-refreshes", hit),
+        ("evicts-lru", eviction),
+        ("update-refreshes", update),
+        ("miss-stable", miss),
+        ("capacity-validation", invalid),
     )
     checks = [
         {"name": name, "passed": passed, "score": 1.0 if passed else 0.0} for name, passed in cases
@@ -39,7 +45,7 @@ def main() -> int:
                 "passed": all(value for _, value in cases),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "quota lifecycle cases",
+                "summary": "LRU cache recency cases",
             },
             separators=(",", ":"),
         )

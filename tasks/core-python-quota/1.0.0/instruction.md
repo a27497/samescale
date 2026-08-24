@@ -1,5 +1,6 @@
-# Fix quota consumption lifecycle
+# Repair LRU cache recency and eviction
 
-Correct `Quota.consume`: a positive request succeeds when enough units remain, including an exact
-boundary match, and decrements state only on success. Zero or negative requests must raise
-`ValueError`. Preserve the public API and `contract.txt`.
+Implement `LRUCache`: `get` returns `None` on a miss and refreshes recency on a hit; `put` inserts
+or updates a key, refreshes it, and evicts exactly the least-recently-used key when over capacity.
+`keys()` returns keys from least to most recent. Reject non-positive capacity. Preserve
+`contract.txt`.

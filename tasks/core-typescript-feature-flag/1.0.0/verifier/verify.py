@@ -11,14 +11,23 @@ def main() -> int:
     workspace = Path(sys.argv[1])
     uri = (workspace / "flags.ts").resolve().as_uri()
     source = f"""
-import {{ parseFeatureFlag }} from {json.dumps(uri)};
-let invalid = false;
-try {{ parseFeatureFlag("enabled"); }} catch (error) {{ invalid = error instanceof TypeError; }}
+import {{ validateRequest }} from {json.dumps(uri)};
+const rejects = value => {{
+  try {{ validateRequest(value); return false; }}
+  catch (error) {{ return error instanceof TypeError; }}
+}};
+const read = {{ kind: "read", key: "a" }};
+const readResult = validateRequest(read);
+const write = validateRequest({{ kind: "write", key: "b", value: null }});
+const inherited = Object.create({{ kind: "read" }}); inherited.key = "x";
 console.log(JSON.stringify([
-  ["true", "1", "YES", " on "].every(value => parseFeatureFlag(value)),
-  ["false", "0", "NO", " off "].every(value => !parseFeatureFlag(value, true)),
-  parseFeatureFlag(undefined, true) && !parseFeatureFlag(undefined, false),
-  invalid
+  readResult.kind === "read" && readResult.key === "a" && readResult !== read,
+  write.kind === "write" && write.value === null,
+  [
+    null, [], {{kind:"read",key:" "}}, {{kind:"read",key:"x",extra:true}},
+    {{kind:"write",key:"x"}}, inherited
+  ].every(rejects),
+  rejects({{kind:"other",key:"x"}})
 ]));
 """
     with tempfile.TemporaryDirectory(prefix="harnesslab-typescript-") as temporary:
@@ -29,7 +38,7 @@ console.log(JSON.stringify([
         sys.stderr.write(run.stderr)
         return run.returncode
     values = json.loads(run.stdout)
-    names = ("truthy", "falsy", "defaults", "invalid")
+    names = ("read-fresh", "write-null-value", "invalid-shapes", "unknown-kind")
     checks = [
         {"name": name, "passed": bool(value), "score": 1.0 if value else 0.0}
         for name, value in zip(names, values, strict=True)
@@ -41,7 +50,7 @@ console.log(JSON.stringify([
                 "passed": all(values),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "TypeScript feature flag contract cases",
+                "summary": "TypeScript discriminated request cases",
             },
             separators=(",", ":"),
         )

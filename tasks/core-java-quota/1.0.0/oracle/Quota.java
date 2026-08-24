@@ -1,13 +1,11 @@
 public final class Quota {
-    private int remaining;
-
-    public Quota(int capacity) { this.remaining = capacity; }
-    public int remaining() { return remaining; }
-
-    public boolean consume(int units) {
-        if (units <= 0) throw new IllegalArgumentException("units must be positive");
-        if (units > remaining) return false;
-        remaining -= units;
-        return true;
+    public enum State { NEW, RESERVED, COMMITTED, CANCELLED }
+    private State state = State.NEW;
+    public State state() { return state; }
+    public void reserve() { require(State.NEW); state = State.RESERVED; }
+    public void commit() { require(State.RESERVED); state = State.COMMITTED; }
+    public void cancel() { require(State.RESERVED); state = State.CANCELLED; }
+    private void require(State expected) {
+        if (state != expected) throw new IllegalStateException("invalid transition from " + state);
     }
 }

@@ -11,13 +11,24 @@ def main() -> int:
     workspace = Path(sys.argv[1])
     uri = (workspace / "slug.ts").resolve().as_uri()
     source = f"""
-import {{ slugify }} from {json.dumps(uri)};
+import {{ Subscription }} from {json.dumps(uri)};
+let listener; let subscribeCalls = 0; let unsubscribeCalls = 0; const values = [];
+const subscription = new Subscription(callback => {{
+  subscribeCalls += 1;
+  listener = callback;
+  return () => {{ unsubscribeCalls += 1; }};
+}}, value => values.push(value));
+listener("a"); subscription.dispose(); subscription.dispose(); listener("b");
+const marker = new Error("subscribe failed"); let propagated = false; let handled = false;
+try {{
+  new Subscription(() => {{ throw marker; }}, () => {{ handled = true; }});
+}} catch (error) {{ propagated = error === marker; }}
 console.log(JSON.stringify([
-  slugify("Hello World") === "hello-world",
-  slugify("  API---Contract  ") === "api-contract",
-  slugify("one_two.three") === "one-two-three",
-  slugify("Release 2.0") === "release-2-0",
-  slugify("***") === ""
+  subscribeCalls === 1,
+  JSON.stringify(values) === JSON.stringify(["a"]),
+  unsubscribeCalls === 1,
+  propagated,
+  !handled
 ]));
 """
     with tempfile.TemporaryDirectory(prefix="harnesslab-typescript-") as temporary:
@@ -28,7 +39,13 @@ console.log(JSON.stringify([
         sys.stderr.write(run.stderr)
         return run.returncode
     values = json.loads(run.stdout)
-    names = ("basic", "collapse", "punctuation", "digits", "empty")
+    names = (
+        "subscribe-once",
+        "active-only",
+        "dispose-idempotent",
+        "subscribe-error",
+        "no-handler-on-error",
+    )
     checks = [
         {"name": name, "passed": bool(value), "score": 1.0 if value else 0.0}
         for name, value in zip(names, values, strict=True)
@@ -40,7 +57,7 @@ console.log(JSON.stringify([
                 "passed": all(values),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "TypeScript ASCII slug edge cases",
+                "summary": "TypeScript subscription disposal cases",
             },
             separators=(",", ":"),
         )

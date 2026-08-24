@@ -14,15 +14,34 @@ def main() -> int:
         raise RuntimeError("unable to load settings.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    overrides = {"timeout": 5, "feature": True}
-    before = dict(overrides)
-    result = module.build_settings(overrides)
+    from defaults import CloseTracker
+
+    tracker = CloseTracker()
+    session = module.ManagedSession(tracker)
+    delegated = session.send("alpha") == "sent:alpha" and tracker.sent == ["alpha"]
+    session.close()
+    session.close()
+    idempotent = tracker.close_calls == 1
+    rejected = False
+    try:
+        session.send("late")
+    except RuntimeError:
+        rejected = True
+    context_tracker = CloseTracker()
+    context_session = module.ManagedSession(context_tracker)
+    returned = False
+    try:
+        with context_session as entered:
+            returned = entered is context_session
+            raise LookupError("exercise exceptional exit")
+    except LookupError:
+        pass
     cases = (
-        ("override-wins", result["timeout"] == 5),
-        ("default-retained", result["retries"] == 2 and result["region"] == "local"),
-        ("unknown-retained", result["feature"] is True),
-        ("input-not-mutated", overrides == before),
-        ("fresh-result", module.build_settings({}) is not result),
+        ("send-delegates", delegated),
+        ("close-idempotent", idempotent),
+        ("send-after-close", rejected),
+        ("context-returns-self", returned),
+        ("exceptional-exit-closes", context_tracker.close_calls == 1 and context_session.closed),
     )
     checks = [
         {"name": name, "passed": passed, "score": 1.0 if passed else 0.0} for name, passed in cases
@@ -34,7 +53,7 @@ def main() -> int:
                 "passed": all(value for _, value in cases),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "layered settings cases",
+                "summary": "managed session lifecycle cases",
             },
             separators=(",", ":"),
         )

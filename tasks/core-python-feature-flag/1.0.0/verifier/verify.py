@@ -13,22 +13,21 @@ def main() -> int:
         raise RuntimeError("unable to load flags.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    invalid = False
-    try:
-        module.parse_feature_flag("enabled")
-    except ValueError:
-        invalid = True
+
+    def rejects(value: str, limit: int = 10) -> bool:
+        try:
+            module.parse_window(value, limit)
+        except ValueError:
+            return True
+        return False
+
     cases = (
-        ("truthy", all(module.parse_feature_flag(value) for value in ("true", "1", "YES", " on "))),
-        (
-            "falsy",
-            not any(
-                module.parse_feature_flag(value, True) for value in ("false", "0", "NO", " off ")
-            ),
-        ),
-        ("none-default-true", module.parse_feature_flag(None, True) is True),
-        ("none-default-false", module.parse_feature_flag(None, False) is False),
-        ("invalid", invalid),
+        ("basic", module.parse_window("2:7", 10) == (2, 7)),
+        ("whitespace", module.parse_window(" 0 : 10 ", 10) == (0, 10)),
+        ("reverse", rejects("8:3")),
+        ("limit", rejects("2:11")),
+        ("syntax", all(rejects(value) for value in ("2", "+2:3", "2:3:4", "a:3"))),
+        ("negative-limit", rejects("0:0", -1)),
     )
     checks = [
         {"name": name, "passed": passed, "score": 1.0 if passed else 0.0} for name, passed in cases
@@ -40,7 +39,7 @@ def main() -> int:
                 "passed": all(value for _, value in cases),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "feature flag contract cases",
+                "summary": "bounded window parser cases",
             },
             separators=(",", ":"),
         )

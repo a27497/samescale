@@ -1,1 +1,1 @@
-Overrides win over defaults; unknown keys survive; inputs remain unchanged.
+Lowercase trimmed names and collapsed values; reject controls, blanks, and normalized duplicates.

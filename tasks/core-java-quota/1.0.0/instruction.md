@@ -1,5 +1,5 @@
-# Fix quota consumption lifecycle
+# Repair reservation transitions
 
-Correct `Quota.consume`: positive requests succeed when enough units remain, including the exact
-boundary, and state changes only on success. Zero or negative requests throw
-`IllegalArgumentException`. Keep the API and `contract.txt` unchanged.
+Implement the `Quota` reservation state machine. A new reservation may be reserved once, then
+either committed or cancelled. A cancelled or committed reservation is terminal. Invalid
+transitions throw `IllegalStateException` without changing state. Preserve `contract.txt`.

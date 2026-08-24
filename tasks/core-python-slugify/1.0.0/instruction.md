@@ -1,5 +1,6 @@
-# Implement deterministic ASCII slugs
+# Repair stable priority scheduling
 
-Complete `slugify`: lowercase ASCII letters and digits are retained, every run of other characters
-becomes one hyphen, and leading/trailing hyphens are removed. Empty or punctuation-only input
-returns an empty string. Do not add dependencies or modify `contract.txt`.
+Implement `schedule(jobs)` to return a new list ordered by descending integer `priority`. Jobs with
+equal priority must retain their input order, including repeated object references. Do not mutate
+the input list or job dictionaries; raise `ValueError` when a priority is missing or not an integer.
+Preserve `contract.txt`.

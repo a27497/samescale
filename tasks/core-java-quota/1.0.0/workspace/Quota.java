@@ -1,15 +1,8 @@
 public final class Quota {
-    private int remaining;
-
-    public Quota(int capacity) { this.remaining = capacity; }
-    public int remaining() { return remaining; }
-
-    public boolean consume(int units) {
-        if (units < remaining) {
-            remaining -= units;
-            return true;
-        }
-        remaining -= units;
-        return false;
-    }
+    public enum State { NEW, RESERVED, COMMITTED, CANCELLED }
+    private State state = State.NEW;
+    public State state() { return state; }
+    public void reserve() { state = State.RESERVED; }
+    public void commit() { state = State.COMMITTED; }
+    public void cancel() { state = State.CANCELLED; }
 }

@@ -68,3 +68,7 @@ jobs:
         run: uv run --locked python scripts/verify_gate_j.py
       - name: Run keyless Gate K contract/preparation verification
         run: uv run --locked python scripts/verify_gate_k.py
+      - name: Attest clean Actions fresh-setup reproduction
+        run: >-
+          uv run --locked python scripts/verify_fresh_setup.py
+          --check-runtime --actions-reproduction

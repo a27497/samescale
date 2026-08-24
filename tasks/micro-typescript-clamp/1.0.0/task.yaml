@@ -23,4 +23,6 @@ expected_tools:
 metadata:
   language: typescript
   category: targeted-bug-fix
+  scenario_family: clamp-boundary-control
+  benchmark_role: CROSS_LANGUAGE_CONTROL
   difficulty: foundation

@@ -116,7 +116,7 @@
     },
     {
       "claim_id": "core-corpus-18",
-      "claim": "Prepared a deterministic Core corpus of 18 validated tasks balanced across Python, Java, and TypeScript.",
+      "claim": "Prepared a deterministic Core corpus of 18 validated tasks balanced across Python, Java, and TypeScript, with one cross-language control and 15 independent semantic scenarios.",
       "status": "VERIFIED",
       "required_evidence_type": "canonical corpus inventory and task validation",
       "evidence_refs": [

@@ -1,3 +1,5 @@
-export function parseFeatureFlag(value: string | undefined, defaultValue = false): boolean {
-  return value === undefined ? false : value.toLowerCase() === "true";
+export type Request = { kind: "read"; key: string } | { kind: "write"; key: string; value: unknown };
+
+export function validateRequest(input: unknown): Request {
+  return input as Request;
 }

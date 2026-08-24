@@ -1,1 +1,1 @@
-deduplicate(List<String>) returns a new mutable list in first-seen order.
+Records use <decimal Java-char length>#<payload>; malformed or length-mismatched records throw.

@@ -10,4 +10,9 @@ oracle: {path: oracle}
 budget: {timeout_seconds: 90, max_output_tokens: 2000, network_policy: deny}
 expected_tools: [{name: java, version: "21"}, {name: javac, version: "21"}]
 protected_paths: [contract.txt]
-metadata: {language: java, category: small-feature, difficulty: foundation}
+metadata:
+  language: java
+  category: collection-partitioning
+  difficulty: foundation
+  scenario_family: mutable-batch-partitioning
+  benchmark_role: INDEPENDENT

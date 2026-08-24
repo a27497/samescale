@@ -13,5 +13,7 @@ expected_tools:
 protected_paths: [contract.txt]
 metadata:
   language: python
-  category: small-feature
-  difficulty: foundation
+  category: ordering-stability
+  difficulty: intermediate
+  scenario_family: stable-priority-scheduling
+  benchmark_role: INDEPENDENT

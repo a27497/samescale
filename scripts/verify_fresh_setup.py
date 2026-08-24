@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -69,6 +70,41 @@ def verify_runtime() -> None:
             raise RuntimeError(f"{label} runtime mismatch: {output}")
 
 
+def verify_actions_reproduction() -> None:
+    """Attest the clean checkout only after the ordered Actions gate chain succeeds."""
+
+    if os.environ.get("GITHUB_ACTIONS") != "true":
+        raise RuntimeError("actual reproduction attestation is restricted to GitHub Actions")
+    expected_sha = os.environ.get("GITHUB_SHA")
+    if not expected_sha or re.fullmatch(r"[0-9a-f]{40}", expected_sha) is None:
+        raise RuntimeError("GITHUB_SHA must be the exact 40-character checkout identity")
+    actual_sha = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    ).stdout.strip()
+    if actual_sha != expected_sha:
+        raise RuntimeError(
+            f"Actions checkout mismatch: expected {expected_sha}, found {actual_sha}"
+        )
+    tracked_changes = subprocess.run(
+        ("git", "status", "--porcelain", "--untracked-files=no"),
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    ).stdout.strip()
+    if tracked_changes:
+        raise RuntimeError("ordered gate execution mutated tracked checkout content")
+    print(f"FRESH_SETUP_ACTIONS_SHA={actual_sha}")
+    print("FRESH_SETUP_ACTUAL_REPRODUCTION=PASS")
+    print("GATE_RECURSION=NONE")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Bounded HarnessLab fresh-clone preflight")
     parser.add_argument(
@@ -76,11 +112,20 @@ def main() -> int:
         action="store_true",
         help="also require the documented host tool versions; never installs anything",
     )
+    parser.add_argument(
+        "--actions-reproduction",
+        action="store_true",
+        help="attest the already-completed clean GitHub Actions Gates A-K checkout",
+    )
     arguments = parser.parse_args()
     verify_repository_contract()
     if arguments.check_runtime:
         verify_runtime()
-    print("FRESH_SETUP_CONTRACT=PASS")
+    if arguments.actions_reproduction:
+        verify_actions_reproduction()
+    print("FRESH_SETUP_PREFLIGHT_CONTRACT=PASS")
+    if not arguments.actions_reproduction:
+        print("FRESH_SETUP_ACTUAL_REPRODUCTION=NOT_RUN_USE_ACTIONS")
     print("PYTHON=3.12.14 UV=0.12.5 POSTGRESQL=18 JAVA=21 NODE=24 DOCKER=REQUIRED")
     print("REAL_EVIDENCE_CONFIGURATION=CREDENTIAL_REFERENCES_ONLY")
     return 0

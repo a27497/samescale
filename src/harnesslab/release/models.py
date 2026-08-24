@@ -36,6 +36,12 @@ class EvidenceState(StrEnum):
     INTEGRITY_ERROR = "INTEGRITY_ERROR"
 
 
+class PairedClaimPolicy(StrEnum):
+    NOT_SELECTED = "NOT_SELECTED"
+    HARNESS_UPLIFT_CLAIM = "HARNESS_UPLIFT_CLAIM"
+    NO_HARNESS_UPLIFT_CLAIM = "NO_HARNESS_UPLIFT_CLAIM"
+
+
 class ValidationResult(StrictModel):
     passed: bool
     score: float = Field(ge=0, le=1)
@@ -48,6 +54,8 @@ class CoreTaskInventoryEntry(StrictModel):
     language: Literal["python", "java", "typescript"]
     domain: str
     category: str
+    scenario_family: Identifier
+    benchmark_role: Literal["CROSS_LANGUAGE_CONTROL", "INDEPENDENT"]
     difficulty_band: Literal["foundation", "intermediate", "advanced"]
     task_digest: Sha256Digest
     verifier_identity: Sha256Digest
@@ -89,6 +97,24 @@ class CoreCorpusManifest(CanonicalModel):
             raise ValueError("Core corpus must contain six tasks per language")
         if len({task.category for task in self.tasks}) < 5:
             raise ValueError("Core corpus category diversity is insufficient")
+        controls = tuple(
+            task for task in self.tasks if task.benchmark_role == "CROSS_LANGUAGE_CONTROL"
+        )
+        independent = tuple(task for task in self.tasks if task.benchmark_role == "INDEPENDENT")
+        control_families = {task.scenario_family for task in controls}
+        if len(controls) != 3 or len(control_families) != 1:
+            raise ValueError("Core corpus requires exactly one three-language control family")
+        if {task.language for task in controls} != {"python", "java", "typescript"}:
+            raise ValueError("Core control family must span all three languages")
+        independent_families = {task.scenario_family for task in independent}
+        if len(independent) != 15 or len(independent_families) != 15:
+            raise ValueError("Every independent task requires a unique scenario family")
+        if control_families & independent_families:
+            raise ValueError("Control and independent scenario families must be disjoint")
+        if len(control_families | independent_families) < 16:
+            raise ValueError("Core corpus requires at least sixteen semantic scenario families")
+        if len({task.difficulty_band for task in self.tasks}) < 2:
+            raise ValueError("Core corpus requires multiple difficulty bands")
         return self
 
 
@@ -266,6 +292,7 @@ class ReleaseEvidenceManifest(CanonicalModel):
     badcase_evidence: tuple[EvidenceBinding, EvidenceBinding, EvidenceBinding]
     resume_claim_map: EvidenceBinding
     remote_ci: EvidenceBinding
+    paired_claim_policy: PairedClaimPolicy = PairedClaimPolicy.NOT_SELECTED
     real_statuses: dict[str, EvidenceState]
     core_release_ready: bool
     real_evidence_authorization_required: bool
@@ -302,7 +329,16 @@ class ReleaseEvidenceManifest(CanonicalModel):
             raise ValueError("CORE_RELEASE_READY must be derived from all mandatory evidence")
         if self.core_release_ready and self.real_evidence_authorization_required:
             raise ValueError("ready release cannot still require real-evidence authorization")
+        if self.core_release_ready and self.paired_claim_policy is PairedClaimPolicy.NOT_SELECTED:
+            raise ValueError("ready release requires an explicit paired-claim policy")
         return self
+
+
+class SemanticReleaseReceipt(StrictModel):
+    semantic_verified: Literal[True] = True
+    release_manifest_digest: Sha256Digest
+    release_head: str = Field(pattern=r"^[0-9a-f]{40}$")
+    remote_ci_run_id: str = Field(min_length=1, max_length=100)
 
 
 class ResumeClaim(StrictModel):

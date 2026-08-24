@@ -13,12 +13,26 @@ def main() -> int:
         raise RuntimeError("unable to load slug.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+    jobs = [
+        {"id": "a", "priority": 2},
+        {"id": "b", "priority": 5},
+        {"id": "c", "priority": 2},
+        {"id": "d", "priority": 1},
+    ]
+    before = [dict(job) for job in jobs]
+    result = module.schedule(jobs)
+    invalid = []
+    for bad in ({"id": "x"}, {"id": "x", "priority": "high"}, {"id": "x", "priority": True}):
+        try:
+            module.schedule([bad])
+        except Exception as error:
+            invalid.append(isinstance(error, ValueError))
     cases = (
-        ("basic", module.slugify("Hello World") == "hello-world"),
-        ("collapse", module.slugify("  API---Contract  ") == "api-contract"),
-        ("punctuation", module.slugify("one_two.three") == "one-two-three"),
-        ("digits", module.slugify("Release 2.0") == "release-2-0"),
-        ("empty", module.slugify("***") == ""),
+        ("descending", [job["id"] for job in result] == ["b", "a", "c", "d"]),
+        ("stable-ties", result[1] is jobs[0] and result[2] is jobs[2]),
+        ("input-list-unchanged", jobs == before),
+        ("fresh-list", result is not jobs),
+        ("invalid-priority", len(invalid) == 3),
     )
     checks = [
         {"name": name, "passed": passed, "score": 1.0 if passed else 0.0} for name, passed in cases
@@ -30,7 +44,7 @@ def main() -> int:
                 "passed": all(value for _, value in cases),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "ASCII slug edge cases",
+                "summary": "stable priority scheduling cases",
             },
             separators=(",", ":"),
         )

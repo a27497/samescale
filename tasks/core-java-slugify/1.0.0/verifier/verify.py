@@ -9,12 +9,22 @@ from pathlib import Path
 HARNESS = """
 public final class HiddenVerifier {
     public static void main(String[] args) {
-        boolean basic = Slug.slugify("Hello World").equals("hello-world");
-        boolean collapse = Slug.slugify("  API---Contract  ").equals("api-contract");
-        boolean punctuation = Slug.slugify("one_two.three").equals("one-two-three");
-        boolean digits = Slug.slugify("Release 2.0").equals("release-2-0");
-        boolean empty = Slug.slugify("***").equals("");
-        System.out.println(basic + "," + collapse + "," + punctuation + "," + digits + "," + empty);
+        var input = new java.util.ArrayList<>(java.util.List.of(1, 2, 3, 4, 5));
+        var result = Slug.partition(input, 2);
+        boolean shape = result.equals(java.util.List.of(java.util.List.of(1, 2), java.util.List.of(3, 4), java.util.List.of(5)));
+        input.set(0, 9); boolean detached = result.get(0).get(0) == 1;
+        boolean mutable = isMutable(result);
+        boolean empty = Slug.partition(java.util.List.of(), 3).isEmpty();
+        boolean invalid = rejects(0) && rejects(-1);
+        System.out.println(shape + "," + detached + "," + mutable + "," + empty + "," + invalid);
+    }
+    private static boolean rejects(int size) {
+        try { Slug.partition(java.util.List.of(1), size); return false; }
+        catch (IllegalArgumentException expected) { return true; }
+    }
+    private static boolean isMutable(java.util.List<java.util.List<Integer>> result) {
+        try { result.get(0).add(7); result.add(new java.util.ArrayList<>()); return result.size() == 4; }
+        catch (UnsupportedOperationException error) { return false; }
     }
 }
 """
@@ -45,7 +55,7 @@ def main() -> int:
             sys.stderr.write(run.stderr)
             return run.returncode
     values = run.stdout.strip().split(",")
-    names = ("basic", "collapse", "punctuation", "digits", "empty")
+    names = ("shape", "detached", "mutable", "empty", "invalid-size")
     checks = [
         {"name": name, "passed": value == "true", "score": 1.0 if value == "true" else 0.0}
         for name, value in zip(names, values, strict=True)
@@ -57,7 +67,7 @@ def main() -> int:
                 "passed": all(item["passed"] for item in checks),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "Java ASCII slug edge cases",
+                "summary": "Java batch partitioning cases",
             },
             separators=(",", ":"),
         )

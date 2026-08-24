@@ -1,5 +1,6 @@
-# Repair feature-flag parsing
+# Repair discriminated request validation
 
-Implement `parseFeatureFlag`: accept case-insensitive true/1/yes/on and false/0/no/off with
-surrounding whitespace, return the supplied default for `undefined`, and throw `TypeError` for any
-other value. Preserve the typed API and `contract.txt`.
+Implement `validateRequest(input)`. A `read` request has exactly `kind` and a non-empty string
+`key`; a `write` request additionally has an own `value` property (whose value may be `null`).
+Reject arrays, inherited fields, extra keys, blank keys, and every other shape with `TypeError`.
+Return a fresh request object and preserve `contract.txt`.

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
+import asyncio
 import os
 import re
 import subprocess
@@ -10,7 +10,6 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
 
-from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from harnesslab.release.contracts import (
@@ -25,7 +24,12 @@ from harnesslab.release.contracts import (
     tag_creation_authorized,
     validate_keyless_contract_state,
 )
-from harnesslab.release.models import EvidenceBinding, EvidenceState
+from harnesslab.release.final_verifier import (
+    resolve_authoritative_snapshot,
+    resolve_github_ci,
+    verify_semantic_final_release,
+)
+from harnesslab.release.models import EvidenceState
 
 ROOT = Path(__file__).resolve().parents[1]
 JUNIT = ROOT / "gate-k-results.xml"
@@ -43,6 +47,9 @@ REQUIRED_DOCS = (
 )
 CRITICAL_TESTS = {
     "test_core_corpus_is_exact_balanced_deterministic_and_validated",
+    "test_corpus_has_sixteen_semantic_families_and_one_cross_language_control",
+    "test_corpus_rejects_duplicate_independent_scenario_family",
+    "test_corpus_reconstruction_detects_semantic_metadata_drift",
     "test_corpus_rejects_a_mutated_verifier",
     "test_real_plan_has_strict_unresolved_profiles_and_exact_preflight",
     "test_planned_uplift_pair_cannot_bypass_provider_route_comparability",
@@ -54,6 +61,19 @@ CRITICAL_TESTS = {
     "test_tag_guard_refuses_incomplete_release_and_tag_is_absent",
     "test_release_docs_and_fresh_setup_contract_exist",
     "test_ci_runs_keyless_gate_k_after_gate_j_without_real_execution",
+    "test_final_release_rejects_arbitrary_matching_sha_artifact",
+    "test_final_release_rejects_postgresql_select_one_without_experiment",
+    "test_final_release_rejects_wrong_experiment_plan_digest",
+    "test_final_release_rejects_wrong_experiment_corpus",
+    "test_final_release_rejects_629_runs",
+    "test_final_release_rejects_corrupt_run_manifest_set",
+    "test_final_release_rejects_fake_pair_evidence",
+    "test_final_release_rejects_ablation_hard_control_drift",
+    "test_final_release_rejects_corrupt_judge_report",
+    "test_final_release_rejects_badcase_bound_to_wrong_run",
+    "test_final_release_rejects_unsupported_real_resume_claim",
+    "test_final_release_rejects_remote_ci_head_or_workflow_mismatch",
+    "test_fully_valid_fake_semantic_fixture_passes_and_issues_receipt",
 }
 
 
@@ -187,81 +207,68 @@ def verify_contract_mode() -> bool:
     print("FAKE_KEYLESS_CONTRACT_EVIDENCE=PASS; REAL_RELEASE_EVIDENCE=NOT_RUN")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
+    print("PHASE_K_A_REVIEW_FIXED_AWAITING_REAL_EVIDENCE_AUTHORIZATION")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")
     return True
 
 
-def sha256_file(path: Path) -> str:
-    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def verify_artifact_binding(binding: EvidenceBinding, artifact_root: Path, label: str) -> None:
-    if binding.state is not EvidenceState.VERIFIED or not binding.identity or not binding.digest:
-        raise CoreReleaseError(f"{label} is not VERIFIED")
-    if not binding.identity.startswith("artifact:"):
-        raise CoreReleaseError(f"{label} must use artifact:<relative-path> identity")
-    relative = binding.identity.removeprefix("artifact:")
-    candidate = (artifact_root / relative).resolve()
-    resolved_root = artifact_root.resolve()
-    if resolved_root not in candidate.parents or not candidate.is_file():
-        raise CoreReleaseError(f"{label} artifact is outside the trusted root or missing")
-    if sha256_file(candidate) != binding.digest:
-        raise CoreReleaseError(f"{label} artifact digest mismatch")
-
-
-def verify_final_release(
-    database_url: str | None, artifact_root_raw: str | None, remote_head: str | None
+async def verify_final_release(
+    database_url: str | None, artifact_root_raw: str | None, github_run_id: str | None
 ) -> bool:
     try:
+        checked = load_core_corpus(ROOT / "release/core-corpus.json")
+        rebuilt = build_corpus_manifest(ROOT)
+        plan = load_real_evidence_plan(ROOT / "release/core-real-evidence-plan.json")
         manifest = load_release_evidence(ROOT / "release/release-evidence.json")
         claims = load_resume_claim_map(ROOT / "release/resume-claim-evidence.json")
         badcases = load_badcase_plan(ROOT / "release/badcases.json")
-        readiness = evaluate_release_readiness(manifest)
-        if not database_url or not database_url.startswith("postgresql+"):
+        if not database_url or not artifact_root_raw or not github_run_id:
             raise CoreReleaseError(
-                "--database-url must identify the trusted PostgreSQL evidence store"
+                "--database-url, --artifact-root, and --github-run-id are required"
             )
-        if not artifact_root_raw or not remote_head:
-            raise CoreReleaseError("--artifact-root and --remote-head are required")
         local_head = subprocess.run(
             ("git", "rev-parse", "HEAD"), cwd=ROOT, check=True, capture_output=True, text=True
         ).stdout.strip()
-        if remote_head != local_head:
-            raise CoreReleaseError("remote CI head does not match the checked-out release head")
-        if manifest.release_commit.identity != f"git:{local_head}":
-            raise CoreReleaseError("release commit evidence does not bind the checked-out head")
-        with create_engine(database_url).connect() as connection:
-            if connection.execute(text("SELECT 1")).scalar_one() != 1:
-                raise CoreReleaseError("trusted PostgreSQL evidence store is unavailable")
-        artifact_root = Path(artifact_root_raw)
-        for label, binding in (
-            ("real_matrix", manifest.real_matrix),
-            ("paired_lane", manifest.paired_lane),
-            ("controlled_ablation", manifest.controlled_ablation),
-            ("judge_report", manifest.judge_report),
-            *tuple(
-                (f"badcase_{index}", binding)
-                for index, binding in enumerate(manifest.badcase_evidence, 1)
-            ),
+        if not manifest.judge_report.identity or not manifest.judge_report.identity.startswith(
+            "judge-report:"
         ):
-            verify_artifact_binding(binding, artifact_root, label)
-        for claim in claims.claims:
-            if claim.status is EvidenceState.VERIFIED and (
-                not claim.evidence_refs
-                or any(not (ROOT / ref).exists() for ref in claim.evidence_refs)
-            ):
-                raise CoreReleaseError(f"VERIFIED resume claim lacks evidence: {claim.claim_id}")
-        if any(slot.status is not EvidenceState.VERIFIED for slot in badcases.slots):
-            raise CoreReleaseError("three evidence-bound VERIFIED BadCases are required")
-        if not readiness.core_release_ready or not tag_creation_authorized(manifest):
-            raise CoreReleaseError(f"hard-stop blockers remain: {readiness.blockers}")
-    except (CoreReleaseError, OSError, SQLAlchemyError, subprocess.SubprocessError) as exc:
+            raise CoreReleaseError("judge_report must identify judge-report:<calibration-id>")
+        calibration_id = manifest.judge_report.identity.removeprefix("judge-report:")
+        snapshot = await resolve_authoritative_snapshot(
+            database_url,
+            (Path(artifact_root_raw),),
+            experiment_id=plan.experiment_id,
+            calibration_id=calibration_id,
+        )
+        ci = resolve_github_ci(github_run_id)
+        receipt = verify_semantic_final_release(
+            repository_root=ROOT,
+            checked_corpus=checked,
+            rebuilt_corpus=rebuilt,
+            release_plan=plan,
+            manifest=manifest,
+            claims=claims,
+            badcases=badcases,
+            snapshot=snapshot,
+            ci=ci,
+            local_head=local_head,
+        )
+        if not tag_creation_authorized(manifest, receipt):
+            raise CoreReleaseError("semantic receipt did not authorize tag creation")
+    except (
+        CoreReleaseError,
+        OSError,
+        SQLAlchemyError,
+        subprocess.SubprocessError,
+        ValueError,
+    ) as exc:
         print(f"NOT_VERIFIED: final release refused: {exc}")
         print("CORE_RELEASE_READY=FALSE")
         return False
     print("CORE_RELEASE_READY=TRUE")
+    print(f"SEMANTIC_RELEASE_RECEIPT={receipt.release_manifest_digest}")
     print("TAG_CREATION_AUTHORIZED=TRUE")
     return True
 
@@ -271,13 +278,15 @@ def main() -> int:
     parser.add_argument("--final-release", action="store_true")
     parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
     parser.add_argument("--artifact-root")
-    parser.add_argument("--remote-head")
+    parser.add_argument("--github-run-id")
     arguments = parser.parse_args()
     if arguments.final_release:
         return (
             0
-            if verify_final_release(
-                arguments.database_url, arguments.artifact_root, arguments.remote_head
+            if asyncio.run(
+                verify_final_release(
+                    arguments.database_url, arguments.artifact_root, arguments.github_run_id
+                )
             )
             else 2
         )
@@ -291,6 +300,7 @@ def main() -> int:
                 "--locked",
                 "pytest",
                 "tests/test_release_contracts.py",
+                "tests/test_release_semantic_verifier.py",
                 f"--junitxml={JUNIT}",
                 "-q",
             ),

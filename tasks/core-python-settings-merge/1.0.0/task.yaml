@@ -13,5 +13,7 @@ expected_tools:
 protected_paths: [contract.txt]
 metadata:
   language: python
-  category: multi-file-behavior
-  difficulty: intermediate
+  category: resource-lifecycle
+  difficulty: advanced
+  scenario_family: managed-session-close-lifecycle
+  benchmark_role: INDEPENDENT

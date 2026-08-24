@@ -17,5 +17,7 @@ expected_tools:
 protected_paths: [contract.txt]
 metadata:
   language: python
-  category: api-input-contract
+  category: parsing-normalization
   difficulty: intermediate
+  scenario_family: integer-window-expression-parser
+  benchmark_role: INDEPENDENT

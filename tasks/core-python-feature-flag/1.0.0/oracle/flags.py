@@ -1,9 +1,13 @@
-def parse_feature_flag(value: str | None, default: bool = False) -> bool:
-    if value is None:
-        return default
-    normalized = value.strip().lower()
-    if normalized in {"true", "1", "yes", "on"}:
-        return True
-    if normalized in {"false", "0", "no", "off"}:
-        return False
-    raise ValueError("invalid feature flag")
+import re
+
+
+def parse_window(value: str, limit: int) -> tuple[int, int]:
+    if limit < 0:
+        raise ValueError("limit must be non-negative")
+    match = re.fullmatch(r"\s*(\d+)\s*:\s*(\d+)\s*", value)
+    if match is None:
+        raise ValueError("invalid window")
+    start, end = (int(part) for part in match.groups())
+    if start > end or end > limit:
+        raise ValueError("window out of range")
+    return start, end

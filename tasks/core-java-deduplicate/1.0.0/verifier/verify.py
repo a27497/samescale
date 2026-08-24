@@ -7,16 +7,22 @@ import tempfile
 from pathlib import Path
 
 HARNESS = """
-import java.util.List;
 public final class HiddenVerifier {
     public static void main(String[] args) {
-        var ordered = Events.deduplicate(List.of("z", "a", "z", "b"));
-        boolean order = ordered.equals(List.of("z", "a", "b"));
-        boolean adjacent = Events.deduplicate(List.of("a", "a", "b")).equals(List.of("a", "b"));
-        boolean empty = Events.deduplicate(List.of()).isEmpty();
-        ordered.add("new");
-        boolean mutable = ordered.equals(List.of("z", "a", "b", "new"));
-        System.out.println(order + "," + adjacent + "," + empty + "," + mutable);
+        boolean roundTrip = decodes(Events.encode("alpha"), "alpha");
+        boolean empty = Events.encode("").equals("0#") && decodes("0#", "");
+        boolean delimiter = decodes("3#a#b", "a#b");
+        boolean syntax = rejects("abc") && rejects("+1#a") && rejects("x#a");
+        boolean mismatch = rejects("2#a") && rejects("1#ab");
+        System.out.println(roundTrip + "," + empty + "," + delimiter + "," + syntax + "," + mismatch);
+    }
+    private static boolean rejects(String value) {
+        try { Events.decode(value); return false; }
+        catch (RuntimeException expected) { return true; }
+    }
+    private static boolean decodes(String value, String expected) {
+        try { return Events.decode(value).equals(expected); }
+        catch (RuntimeException error) { return false; }
     }
 }
 """
@@ -47,7 +53,7 @@ def main() -> int:
             sys.stderr.write(run.stderr)
             return run.returncode
     values = run.stdout.strip().split(",")
-    names = ("preserves-order", "adjacent", "empty", "mutable-result")
+    names = ("round-trip", "empty", "embedded-delimiter", "syntax", "length-mismatch")
     checks = [
         {"name": name, "passed": value == "true", "score": 1.0 if value == "true" else 0.0}
         for name, value in zip(names, values, strict=True)
@@ -59,7 +65,7 @@ def main() -> int:
                 "passed": all(item["passed"] for item in checks),
                 "score": sum(item["score"] for item in checks) / len(checks),
                 "checks": checks,
-                "summary": "Java ordered deduplication cases",
+                "summary": "Java length-prefixed codec cases",
             },
             separators=(",", ":"),
         )

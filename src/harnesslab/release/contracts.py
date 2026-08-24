@@ -16,6 +16,7 @@ from harnesslab.release.models import (
     ReleaseEvidenceManifest,
     ReleaseReadiness,
     ResumeClaimMap,
+    SemanticReleaseReceipt,
     ValidationResult,
 )
 from harnesslab.tasks.package import TaskPackage, TaskPackageError
@@ -56,6 +57,8 @@ def build_corpus_manifest(repository_root: Path) -> CoreCorpusManifest:
         try:
             language = metadata["language"]
             category = metadata["category"]
+            scenario_family = metadata["scenario_family"]
+            benchmark_role = metadata["benchmark_role"]
             difficulty = metadata["difficulty"]
         except KeyError as exc:
             raise CoreReleaseError(f"Core task metadata is incomplete for {definition.id}") from exc
@@ -67,6 +70,8 @@ def build_corpus_manifest(repository_root: Path) -> CoreCorpusManifest:
                 language=language,
                 domain=definition.domain,
                 category=category,
+                scenario_family=scenario_family,
+                benchmark_role=benchmark_role,
                 difficulty_band=difficulty,
                 task_digest=definition.content_digest,
                 verifier_identity=package.verifier_digest,
@@ -149,6 +154,14 @@ def validate_keyless_contract_state(manifest: ReleaseEvidenceManifest) -> None:
         raise CoreReleaseError("K-A must require explicit real-evidence authorization")
 
 
-def tag_creation_authorized(manifest: ReleaseEvidenceManifest) -> bool:
+def tag_creation_authorized(
+    manifest: ReleaseEvidenceManifest, receipt: SemanticReleaseReceipt | None = None
+) -> bool:
     readiness = evaluate_release_readiness(manifest)
-    return readiness.core_release_ready and not readiness.real_evidence_authorization_required
+    return (
+        readiness.core_release_ready
+        and not readiness.real_evidence_authorization_required
+        and receipt is not None
+        and receipt.semantic_verified
+        and receipt.release_manifest_digest == manifest.digest
+    )

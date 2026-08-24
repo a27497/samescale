@@ -1,10 +1,13 @@
-class Quota:
+class LRUCache:
     def __init__(self, capacity: int) -> None:
-        self.remaining = capacity
+        self.capacity = capacity
+        self._values: dict[str, object] = {}
 
-    def consume(self, units: int) -> bool:
-        if units < self.remaining:
-            self.remaining -= units
-            return True
-        self.remaining -= units
-        return False
+    def get(self, key: str) -> object | None:
+        return self._values.get(key)
+
+    def put(self, key: str, value: object) -> None:
+        self._values[key] = value
+
+    def keys(self) -> list[str]:
+        return list(self._values)

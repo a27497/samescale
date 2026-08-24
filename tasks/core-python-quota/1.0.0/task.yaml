@@ -13,5 +13,7 @@ expected_tools:
 protected_paths: [contract.txt]
 metadata:
   language: python
-  category: state-lifecycle
-  difficulty: intermediate
+  category: cache-collection-behavior
+  difficulty: advanced
+  scenario_family: lru-cache-recency-eviction
+  benchmark_role: INDEPENDENT

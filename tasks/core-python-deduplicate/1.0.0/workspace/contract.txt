@@ -1,1 +1,1 @@
-deduplicate(events: list[str]) -> list[str]
+RetryLedger.record_success is idempotent by non-empty operation key and preserves first success.

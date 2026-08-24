@@ -1,1 +1,1 @@
-consume accepts positive units, mutates only on success, and permits exact remaining capacity.
+NEW -> RESERVED -> COMMITTED or CANCELLED; terminal and duplicate transitions throw without mutation.

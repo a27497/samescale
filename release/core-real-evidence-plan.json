@@ -2,7 +2,7 @@
   "schema_version": 1,
   "plan_id": "core-real-evidence-v1",
   "corpus_reference": "release/core-corpus.json",
-  "corpus_digest": "sha256:353362d4075db0dacd90f865cd0a8f9e79ca625ee11808fd80faa17c2b0d669b",
+  "corpus_digest": "sha256:5d73190e0cf809f7518bb19e925909ed5a8366400056ef13e24c1b208bb893b3",
   "experiment_id": "core-real-matrix-v1",
   "execution_seed": 20260824,
   "model_profile_slots": [

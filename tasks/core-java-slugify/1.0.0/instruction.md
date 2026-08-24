@@ -1,5 +1,5 @@
-# Implement deterministic ASCII slugs
+# Repair collection batch partitioning
 
-Complete `Slug.slugify`: retain lowercase ASCII letters and digits, replace every run of other
-characters with one hyphen, and trim boundary hyphens. Punctuation-only input returns an empty
-string. Keep the API dependency-free and preserve `contract.txt`.
+Implement `Slug.partition(values, size)` to preserve order and return consecutive batches of at
+most `size`. Reject non-positive sizes. Both the outer list and every batch must be new mutable
+lists, and later mutations of the input must not change them. Preserve `contract.txt`.

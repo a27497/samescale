@@ -53,7 +53,7 @@ def test_core_corpus_is_exact_balanced_deterministic_and_validated() -> None:
     assert 15 <= len(checked.tasks) <= 25
     assert rebuilt == checked
     assert (
-        rebuilt.digest == "sha256:353362d4075db0dacd90f865cd0a8f9e79ca625ee11808fd80faa17c2b0d669b"
+        rebuilt.digest == "sha256:5d73190e0cf809f7518bb19e925909ed5a8366400056ef13e24c1b208bb893b3"
     )
     assert len({(task.task_id, task.version) for task in checked.tasks}) == 18
     assert {
@@ -230,6 +230,8 @@ def test_release_docs_and_fresh_setup_contract_exist() -> None:
 def test_ci_runs_keyless_gate_k_after_gate_j_without_real_execution() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     assert workflow.index("scripts/verify_gate_j.py") < workflow.index("scripts/verify_gate_k.py")
+    assert workflow.index("scripts/verify_gate_k.py") < workflow.index("--actions-reproduction")
+    assert "--clean-reproduction" not in workflow
     assert "--final-release" not in workflow
     assert "REAL_EVIDENCE_AUTHORIZED" not in workflow
     assert not any(

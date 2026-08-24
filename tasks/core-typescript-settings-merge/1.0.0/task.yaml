@@ -10,4 +10,9 @@ oracle: {path: oracle}
 budget: {timeout_seconds: 90, max_output_tokens: 2000, network_policy: deny}
 expected_tools: [{name: node, version: "24"}]
 protected_paths: [contract.txt]
-metadata: {language: typescript, category: multi-file-behavior, difficulty: intermediate}
+metadata:
+  language: typescript
+  category: recursive-data-safety
+  difficulty: advanced
+  scenario_family: recursive-json-secret-redaction
+  benchmark_role: INDEPENDENT

@@ -1,1 +1,1 @@
-undefined uses default; supported literals are true/1/yes/on and false/0/no/off; others throw.
+Read is exactly {kind,key}; write is exactly {kind,key,value}; own fields only and non-blank key.

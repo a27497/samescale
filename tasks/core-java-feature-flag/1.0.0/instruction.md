@@ -1,5 +1,6 @@
-# Repair feature-flag parsing
+# Preserve repository failure causes
 
-Implement `FeatureFlag.parse`: accept case-insensitive true/1/yes/on and false/0/no/off with
-surrounding whitespace, return the supplied default for `null`, and throw
-`IllegalArgumentException` for any other value. Preserve `contract.txt`.
+Fix `FeatureFlag.fetch`: reject a null or blank key before calling the repository. Return repository
+values unchanged. Wrap `RepositoryException` in `ServiceException` with the original exception as
+the direct cause, while allowing unrelated runtime exceptions to propagate unchanged. Preserve
+`contract.txt`.
