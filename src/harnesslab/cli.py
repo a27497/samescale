@@ -27,6 +27,12 @@ from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
 from harnesslab.multi_harness.models import DeepSeekSessionExtraction, HarnessKind
 from harnesslab.multi_harness.profile import canonical_claude_profile, canonical_deepseek_profile
 from harnesslab.multi_harness.runtime import MultiHarnessRuntime
+from harnesslab.release.smoke import (
+    SmokeControlPlane,
+    SmokeControlPlaneError,
+    SmokeExecutionStatus,
+    execute_real_smoke,
+)
 from harnesslab.sandbox.preflight import DockerPreflightError, docker_preflight
 from harnesslab.tasks.package import TaskPackageError
 from harnesslab.tasks.validation import validate_task_package
@@ -43,6 +49,10 @@ deepseek_harness_app = typer.Typer(
     no_args_is_help=True, help="Inspect the pinned DeepSeek harness."
 )
 compare_app = typer.Typer(no_args_is_help=True, help="Assess evidence comparability.")
+release_app = typer.Typer(no_args_is_help=True, help="Prepare bounded Core release operations.")
+release_smoke_app = typer.Typer(
+    no_args_is_help=True, help="Preflight or explicitly execute the exact K-B1 smoke plan."
+)
 app.add_typer(task_app, name="task")
 app.add_typer(sandbox_app, name="sandbox")
 app.add_typer(model_app, name="model")
@@ -53,10 +63,70 @@ app.add_typer(run_app, name="run")
 app.add_typer(report_app, name="report")
 app.add_typer(judge_app, name="judge")
 app.add_typer(analyst_app, name="analyst")
+app.add_typer(release_app, name="release")
 model_app.add_typer(model_profile_app, name="profile")
 harness_app.add_typer(codex_harness_app, name="codex")
 harness_app.add_typer(claude_harness_app, name="claude")
 harness_app.add_typer(deepseek_harness_app, name="deepseek")
+release_app.add_typer(release_smoke_app, name="smoke")
+
+
+@release_smoke_app.command("preflight")
+def preflight_release_smoke(
+    repository_root: str = typer.Option(
+        ".", "--repository-root", help="Repository containing the frozen release plans."
+    ),
+) -> None:
+    """Validate the exact eight-call plan keylessly, without resolving secrets or networking."""
+
+    try:
+        control = SmokeControlPlane.load(Path(repository_root))
+        receipt = control.preflight()
+    except SmokeControlPlaneError as exc:
+        typer.echo(f"FAIL smoke preflight: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo("SMOKE_PREFLIGHT=PASS")
+    typer.echo(f"SMOKE_PLAN_DIGEST={receipt.smoke_plan_digest}")
+    typer.echo(f"RELEASE_PLAN_DIGEST={receipt.release_plan_digest}")
+    typer.echo(f"SMOKE_CALL_BINDINGS={len(control.bindings)}")
+    typer.echo("REAL_EVALUATION_CALL_COUNT=0")
+
+
+@release_smoke_app.command("execute")
+def execute_release_smoke(
+    allow_real_smoke: bool = typer.Option(
+        False,
+        "--allow-real-smoke",
+        help="Explicitly authorize only the frozen eight-call provider smoke.",
+    ),
+    repository_root: str = typer.Option(
+        ".", "--repository-root", help="Repository containing the frozen release plans."
+    ),
+    artifact_root: str | None = typer.Option(
+        None, "--artifact-root", help="Safe immutable smoke evidence destination."
+    ),
+) -> None:
+    """Execute the exact smoke plan; it is inert unless the explicit authorization flag is set."""
+
+    try:
+        receipt = asyncio.run(
+            execute_real_smoke(
+                Path(repository_root),
+                allow_real_smoke=allow_real_smoke,
+                artifact_root=Path(artifact_root) if artifact_root is not None else None,
+            )
+        )
+    except SmokeControlPlaneError as exc:
+        typer.echo(f"FAIL smoke execution: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo(f"SMOKE_EXECUTION={receipt.status.value}")
+    typer.echo(f"ATTEMPTED_TOP_LEVEL_LAUNCHES={receipt.attempted_top_level_launches}")
+    if receipt.failing_call_id is not None:
+        typer.echo(f"FAILING_CALL_ID={receipt.failing_call_id}")
+        assert receipt.failure_category is not None
+        typer.echo(f"FAILURE_CATEGORY={receipt.failure_category.value}")
+    if receipt.status is SmokeExecutionStatus.ABORTED:
+        raise typer.Exit(code=1)
 
 
 @compare_app.command("assess")

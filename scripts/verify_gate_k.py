@@ -12,6 +12,7 @@ from pathlib import Path
 
 from sqlalchemy.exc import SQLAlchemyError
 
+from harnesslab.egress import EGRESS_PROXY_BASE, EGRESS_PROXY_IMAGE, EgressProxyRuntime
 from harnesslab.release.contracts import (
     CoreReleaseError,
     build_corpus_manifest,
@@ -31,6 +32,7 @@ from harnesslab.release.final_verifier import (
     verify_semantic_final_release,
 )
 from harnesslab.release.models import EvidenceState
+from harnesslab.release.smoke import SmokeControlPlane
 
 ROOT = Path(__file__).resolve().parents[1]
 JUNIT = ROOT / "gate-k-results.xml"
@@ -86,6 +88,18 @@ CRITICAL_TESTS = {
     "test_kb0_pair_is_configured_but_never_claims_comparable_or_uplift",
     "test_kb0_smoke_plan_is_exact_bounded_and_unexecuted",
     "test_kb0_matrix_preflight_and_release_hard_stop_are_unchanged",
+    "test_smoke_production_control_plane_exact_eight_call_binding",
+    "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
+    "test_smoke_same_path_fake_execution_consumes_exact_plan_without_network",
+    "test_smoke_missing_config_stops_before_first_call",
+    "test_smoke_abort_on_first_failure_never_invokes_calls_four_through_eight",
+    "test_smoke_one_judge_call_only",
+    "test_smoke_ninth_call_is_rejected_before_execution",
+    "test_smoke_provider_fallbacks_are_rejected_in_production_assertions",
+    "test_immutable_egress_proxy_image_identity_is_required",
+    "test_actual_local_docker_egress_topology_denies_bypass_and_cleans_up",
+    "test_egress_cleanup_attempts_every_resource_after_partial_failure",
+    "test_codex_and_multiharness_cleanup_continue_after_subject_failure",
 }
 
 
@@ -135,6 +149,7 @@ def verify_contract_mode() -> bool:
         rebuilt = build_corpus_manifest(ROOT)
         plan = load_real_evidence_plan(ROOT / "release/core-real-evidence-plan.json")
         smoke = load_real_smoke_plan(ROOT / "release/core-real-smoke-plan.json")
+        smoke_control = SmokeControlPlane.load(ROOT)
         evidence = load_release_evidence(ROOT / "release/release-evidence.json")
         claims = load_resume_claim_map(ROOT / "release/resume-claim-evidence.json")
         badcases = load_badcase_plan(ROOT / "release/badcases.json")
@@ -202,6 +217,9 @@ def verify_contract_mode() -> bool:
     if smoke.real_evaluation_call_count != 0 or smoke.execution_state is not EvidenceState.NOT_RUN:
         print("FAIL: K-B0 smoke plan implies a real call")
         return False
+    if smoke_control.preflight().attempted_top_level_launches != 0:
+        print("FAIL: K-B0 smoke preflight attempted a provider call")
+        return False
     if (
         smoke.release_plan_digest != plan.digest
         or len(plan.selected_profiles) != 8
@@ -239,13 +257,26 @@ def verify_contract_mode() -> bool:
     )
     print("PAIRED_LANE=CONFIGURED_NOT_VERIFIED; ComparabilityEngine smoke evidence required")
     print("CONTROLLED_ABLATION=CONFIGURED_NOT_RUN; reasoning_effort is sole treatment")
+    try:
+        proxy_image = asyncio.run(EgressProxyRuntime().ensure_image())
+    except Exception as exc:
+        print(f"FAIL: egress proxy image identity unavailable: {type(exc).__name__}")
+        return False
+    print(
+        "K_B1_SMOKE_CONTROL_PLANE=PASS; command='harnesslab release smoke preflight'; "
+        f"plan_digest={smoke_control.smoke_plan_digest}"
+    )
     print("K_B1_SMOKE_PLAN=8 top-level calls; output ceiling=14256; NOT_RUN")
+    print(f"EGRESS_PROXY_BASE={EGRESS_PROXY_BASE}")
+    print(f"EGRESS_PROXY_IMAGE={EGRESS_PROXY_IMAGE}")
+    print(f"EGRESS_PROXY_IMAGE_ID={proxy_image.image_id}")
+    print("EGRESS_PROXY_SECURITY_ATTESTATION=PASS; LOCAL_DOCKER_BYPASS_DENIAL=PASS")
     print("DEEPSEEK_E2=DEFERRED_NOT_VERIFIED")
     print("FAKE_KEYLESS_CONTRACT_EVIDENCE=PASS; REAL_RELEASE_EVIDENCE=NOT_RUN")
     print("REAL_EVALUATION_CALL_COUNT=0")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
-    print("PHASE_K_B0_PREPARED_AWAITING_REAL_SMOKE_AUTHORIZATION")
+    print("PHASE_K_B0_REVIEW_FIXED_AWAITING_REAL_SMOKE_AUTHORIZATION")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")
@@ -340,6 +371,7 @@ def main() -> int:
                 "tests/test_release_contracts.py",
                 "tests/test_release_semantic_verifier.py",
                 "tests/test_phase_kb0.py",
+                "tests/test_phase_kb0_review.py",
                 f"--junitxml={JUNIT}",
                 "-q",
             ),

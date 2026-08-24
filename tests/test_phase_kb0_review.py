@@ -1,0 +1,472 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import shutil
+from pathlib import Path
+from types import SimpleNamespace
+from typing import cast
+from uuid import uuid4
+
+import pytest
+from typer.testing import CliRunner
+
+from harnesslab.cli import app
+from harnesslab.egress import (
+    EGRESS_PROXY_BASE,
+    EGRESS_PROXY_IMAGE,
+    EGRESS_PROXY_SOURCE_DIGEST,
+    EgressPolicy,
+    EgressProxyRuntime,
+    EgressSecurityError,
+    ProviderScopedDockerBoundary,
+)
+from harnesslab.harness_lane.adapter import HarnessAdapterError
+from harnesslab.harness_lane.docker_backend import DockerCodexBackend
+from harnesslab.harness_lane.profile import CODEX_IMAGE, canonical_codex_profile
+from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
+from harnesslab.multi_harness.profile import (
+    CLAUDE_IMAGE,
+    DEEPSEEK_IMAGE,
+    canonical_deepseek_profile,
+)
+from harnesslab.release.smoke import (
+    EXPECTED_ADAPTERS,
+    EXPECTED_CALL_IDS,
+    EXPECTED_RUNNERS,
+    REQUIRED_CONFIGURATION_REFERENCES,
+    ResolvedSmokeBinding,
+    RuntimeIdentities,
+    SmokeCallFailure,
+    SmokeCallResult,
+    SmokeControlPlane,
+    SmokeControlPlaneError,
+    SmokeExecutionStatus,
+    SmokeFailureCategory,
+)
+from harnesslab.sandbox.docker_cli import _DockerCLI
+from harnesslab.sandbox.models import ImageIdentity
+from harnesslab.sandbox.preflight import _docker_runtime_preflight
+
+ROOT = Path(__file__).resolve().parents[1]
+RUNNER = CliRunner()
+SAFE_ENVIRONMENT = {
+    "HARNESSLAB_GPT56_RELAY_BASE_URL": "https://relay.example.test/v1",
+    "HARNESSLAB_GPT56_RELAY_API_KEY": "fake-relay-key",
+    "DASHSCOPE_API_KEY": "fake-dashscope-key",
+    "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": "https://bailian.example.test/v1",
+    "HARNESSLAB_BAILIAN_OPENAI_BASE_URL": "https://bailian-openai.example.test/v1",
+    "DEEPSEEK_API_KEY": "fake-deepseek-key",
+}
+
+
+def _image(reference: str, marker: str) -> ImageIdentity:
+    return ImageIdentity(reference=reference, image_id="sha256:" + marker * 64)
+
+
+def _runtime() -> RuntimeIdentities:
+    return RuntimeIdentities(
+        codex_image=_image(CODEX_IMAGE, "1"),
+        claude_image=_image(CLAUDE_IMAGE, "2"),
+        deepseek_image=_image(DEEPSEEK_IMAGE, "3"),
+        egress_proxy_image=_image(EGRESS_PROXY_IMAGE, "4"),
+        deepseek_config_digest="sha256:" + "5" * 64,
+    )
+
+
+class RecordingInvoker:
+    def __init__(self, failing_call_id: str | None = None) -> None:
+        self.failing_call_id = failing_call_id
+        self.calls: list[ResolvedSmokeBinding] = []
+
+    async def invoke(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+        self.calls.append(binding)
+        call_id = binding.frozen.call.call_id
+        if call_id == self.failing_call_id:
+            raise SmokeCallFailure(SmokeFailureCategory.ROUTE_MISMATCH, "fake failure")
+        return SmokeCallResult(
+            call_id=call_id,
+            evidence_references=(f"fake://{call_id}",),
+            evidence_digests=("sha256:" + "6" * 64,),
+        )
+
+
+def _mutated_repository(tmp_path: Path) -> Path:
+    root = tmp_path / "repository"
+    shutil.copytree(ROOT / "release", root / "release")
+    task = next(
+        item
+        for item in json.loads((ROOT / "release/core-corpus.json").read_text())["tasks"]
+        if item["task_id"] == "core-python-deduplicate"
+    )
+    source = ROOT / task["package_path"]
+    shutil.copytree(source, root / task["package_path"])
+    return root
+
+
+def test_smoke_production_control_plane_exact_eight_call_binding() -> None:
+    control = SmokeControlPlane.load(ROOT)
+    assert tuple(binding.call.call_id for binding in control.bindings) == EXPECTED_CALL_IDS
+    assert tuple(binding.runner_identity for binding in control.bindings) == EXPECTED_RUNNERS
+    assert tuple(binding.adapter_identity for binding in control.bindings) == EXPECTED_ADAPTERS
+    assert control.smoke_plan.max_top_level_launch_count == 8
+    assert control.smoke_plan.max_output_token_ceiling == 14_256
+    assert control.smoke_plan.release_plan_digest == control.release_plan.digest
+
+
+def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
+    control = SmokeControlPlane.load(ROOT)
+    receipt = control.preflight()
+    assert receipt.status is SmokeExecutionStatus.SUCCEEDED
+    assert receipt.attempted_top_level_launches == 0
+    assert receipt.results == ()
+    cli = RUNNER.invoke(app, ["release", "smoke", "preflight", "--repository-root", str(ROOT)])
+    assert cli.exit_code == 0
+    assert "SMOKE_CALL_BINDINGS=8" in cli.stdout
+    assert "REAL_EVALUATION_CALL_COUNT=0" in cli.stdout
+    disabled = RUNNER.invoke(app, ["release", "smoke", "execute", "--repository-root", str(ROOT)])
+    assert disabled.exit_code == 2
+    assert "real smoke requires --allow-real-smoke" in disabled.stdout
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text()
+    assert "--allow-real-smoke" not in workflow
+    assert "release smoke execute" not in workflow
+
+
+@pytest.mark.asyncio
+async def test_smoke_same_path_fake_execution_consumes_exact_plan_without_network() -> None:
+    control = SmokeControlPlane.load(ROOT)
+    bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
+    invoker = RecordingInvoker()
+    receipt = await control.execute(bindings, invoker, allow_real_smoke=True)
+    assert receipt.status is SmokeExecutionStatus.SUCCEEDED
+    assert receipt.attempted_top_level_launches == 8
+    assert len(receipt.results) == 8
+    assert tuple(item.frozen.call.call_id for item in invoker.calls) == EXPECTED_CALL_IDS
+    assert tuple(item.frozen.call.max_output_tokens for item in invoker.calls) == (
+        2000,
+        2000,
+        2000,
+        2000,
+        2000,
+        2000,
+        2000,
+        256,
+    )
+    assert sum(int(item.frozen.call.top_level_launches) for item in invoker.calls) == 8
+    assert {ref for item in invoker.calls for ref in item.frozen.call.credential_references} == set(
+        REQUIRED_CONFIGURATION_REFERENCES
+    )
+
+
+@pytest.mark.asyncio
+async def test_smoke_missing_config_stops_before_first_call() -> None:
+    control = SmokeControlPlane.load(ROOT)
+    invoker = RecordingInvoker()
+    environment = dict(SAFE_ENVIRONMENT)
+    environment.pop("DASHSCOPE_API_KEY")
+    with pytest.raises(SmokeControlPlaneError, match="DASHSCOPE_API_KEY"):
+        control.resolve_real_bindings(environment, _runtime())
+    assert invoker.calls == []
+
+
+@pytest.mark.asyncio
+async def test_smoke_abort_on_first_failure_never_invokes_calls_four_through_eight() -> None:
+    control = SmokeControlPlane.load(ROOT)
+    bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
+    invoker = RecordingInvoker(EXPECTED_CALL_IDS[2])
+    receipt = await control.execute(bindings, invoker, allow_real_smoke=True)
+    assert receipt.status is SmokeExecutionStatus.ABORTED
+    assert receipt.attempted_top_level_launches == 3
+    assert receipt.failing_call_id == EXPECTED_CALL_IDS[2]
+    assert receipt.failure_category is SmokeFailureCategory.ROUTE_MISMATCH
+    assert tuple(item.frozen.call.call_id for item in invoker.calls) == EXPECTED_CALL_IDS[:3]
+    assert len(receipt.results) == 2
+
+
+@pytest.mark.asyncio
+async def test_smoke_one_judge_call_only() -> None:
+    control = SmokeControlPlane.load(ROOT)
+    bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
+    assert sum(binding.frozen.call.lane == "J" for binding in bindings) == 1
+    assert bindings[-1].frozen.call.judge_case_reference == (
+        "judge_suites/core-calibration/1.0.0#label-l0-pass"
+    )
+    invoker = RecordingInvoker()
+    receipt = await control.execute(bindings, invoker, allow_real_smoke=True)
+    judge_calls = [item for item in invoker.calls if item.frozen.call.lane == "J"]
+    assert receipt.status is SmokeExecutionStatus.SUCCEEDED
+    assert len(judge_calls) == 1
+
+
+@pytest.mark.parametrize(
+    ("mutation", "value"),
+    (
+        ("ninth-call", None),
+        ("task-id", "other-task"),
+        ("task-digest", "sha256:" + "9" * 64),
+        ("model", "other-model"),
+        ("route", "other|responses|env:OTHER/responses"),
+        ("output-ceiling", 14_257),
+        ("judge-launches", 2),
+    ),
+)
+def test_smoke_plan_mutation_or_ninth_call_is_rejected_before_execution(
+    tmp_path: Path, mutation: str, value: object
+) -> None:
+    root = _mutated_repository(tmp_path)
+    path = root / "release/core-real-smoke-plan.json"
+    raw = json.loads(path.read_text())
+    if mutation == "ninth-call":
+        extra = dict(raw["calls"][-1])
+        extra["call_id"] = "smoke-9-forbidden"
+        raw["calls"].append(extra)
+    elif mutation == "task-id":
+        raw["calls"][0]["task_id"] = value
+    elif mutation == "task-digest":
+        raw["calls"][0]["task_digest"] = value
+    elif mutation == "model":
+        raw["calls"][0]["requested_model"] = value
+    elif mutation == "route":
+        raw["calls"][0]["provider_route"] = value
+    elif mutation == "output-ceiling":
+        raw["max_output_token_ceiling"] = value
+    else:
+        raw["calls"][-1]["top_level_launches"] = value
+    path.write_text(json.dumps(raw), encoding="utf-8")
+    with pytest.raises(SmokeControlPlaneError):
+        SmokeControlPlane.load(root)
+
+
+def test_smoke_ninth_call_is_rejected_before_execution(tmp_path: Path) -> None:
+    root = _mutated_repository(tmp_path)
+    path = root / "release/core-real-smoke-plan.json"
+    raw = json.loads(path.read_text())
+    extra = dict(raw["calls"][-1])
+    extra["call_id"] = "smoke-9-forbidden"
+    raw["calls"].append(extra)
+    path.write_text(json.dumps(raw), encoding="utf-8")
+    with pytest.raises(SmokeControlPlaneError):
+        SmokeControlPlane.load(root)
+
+
+def test_smoke_provider_fallbacks_are_rejected_in_production_assertions() -> None:
+    control = SmokeControlPlane.load(ROOT)
+    profiles = {profile.profile_id: profile for profile in control.release_plan.selected_profiles}
+    with pytest.raises(SmokeControlPlaneError, match="Codex relay fallback"):
+        control._assert_codex_route(
+            canonical_codex_profile(_runtime().codex_image),
+            profiles["harness-codex-gpt56-medium"],
+            SAFE_ENVIRONMENT,
+        )
+    claude_fallback = dict(SAFE_ENVIRONMENT)
+    claude_fallback["HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL"] = "https://api.anthropic.com"
+    with pytest.raises(SmokeControlPlaneError, match="Claude Bailian fallback"):
+        control.resolve_real_bindings(claude_fallback, _runtime())
+    with pytest.raises(SmokeControlPlaneError, match="DeepSeek official-route"):
+        control._assert_deepseek_route(
+            canonical_deepseek_profile(
+                _runtime().deepseek_image, _runtime().deepseek_config_digest
+            ),
+            profiles["harness-deepseek-v4flash"],
+            SAFE_ENVIRONMENT,
+        )
+
+
+def test_immutable_egress_proxy_image_identity_is_required() -> None:
+    assert "@sha256:" in EGRESS_PROXY_BASE
+    assert EGRESS_PROXY_SOURCE_DIGEST.startswith("sha256:")
+    dockerfile = (ROOT / "docker/egress/Dockerfile").read_text()
+    assert dockerfile.splitlines()[0] == f"FROM {EGRESS_PROXY_BASE}"
+    assert EGRESS_PROXY_SOURCE_DIGEST in dockerfile
+    proxy_bytes = (ROOT / "docker/egress/proxy.py").read_bytes()
+    proxy_digest = "sha256:" + hashlib.sha256(proxy_bytes).hexdigest()
+    assert proxy_digest == EGRESS_PROXY_SOURCE_DIGEST
+    with pytest.raises(EgressSecurityError, match="inspected non-zero"):
+        ProviderScopedDockerBoundary(
+            EgressPolicy(allowed_hostname="provider.example.test"),
+            "review-internal",
+            "review-proxy",
+            ImageIdentity(reference=EGRESS_PROXY_IMAGE, image_id="sha256:" + "0" * 64),
+        )
+
+
+@pytest.mark.asyncio
+async def test_egress_cleanup_attempts_every_resource_after_partial_failure() -> None:
+    class FailingCLI:
+        def __init__(self) -> None:
+            self.calls: list[tuple[str, ...]] = []
+
+        async def run(self, *arguments: str, **_: object) -> object:
+            self.calls.append(arguments)
+            if arguments[0] == "kill":
+                raise RuntimeError("synthetic subject cleanup failure")
+            return SimpleNamespace(
+                returncode=1 if arguments[:2] == ("network", "inspect") else 0,
+                stdout=b"",
+            )
+
+    cli = FailingCLI()
+    boundary = ProviderScopedDockerBoundary(
+        EgressPolicy(allowed_hostname="provider.example.test"),
+        "review-internal",
+        "review-proxy",
+        _runtime().egress_proxy_image,
+    )
+    with pytest.raises(EgressSecurityError, match="cleanup was not verified"):
+        await boundary.cleanup(cli)
+    assert ("rm", "--force", "review-proxy") in cli.calls
+    assert ("network", "rm", "review-internal") in cli.calls
+    assert ("network", "inspect", "review-internal") in cli.calls
+
+
+@pytest.mark.asyncio
+async def test_codex_and_multiharness_cleanup_continue_after_subject_failure() -> None:
+    class PartialFailureCLI:
+        def __init__(self, subject: str) -> None:
+            self.subject = subject
+            self.calls: list[tuple[str, ...]] = []
+
+        async def run(self, *arguments: str, **_: object) -> object:
+            self.calls.append(arguments)
+            if arguments == ("kill", self.subject):
+                raise RuntimeError("synthetic subject cleanup failure")
+            return SimpleNamespace(
+                returncode=1 if arguments[:2] == ("network", "inspect") else 0,
+                stdout=b"",
+            )
+
+    for backend_type, prefix in (
+        (DockerCodexBackend, "codex"),
+        (DockerMultiHarnessBackend, "multi"),
+    ):
+        boundary = ProviderScopedDockerBoundary(
+            EgressPolicy(allowed_hostname="provider.example.test"),
+            f"{prefix}-internal",
+            f"{prefix}-proxy",
+            _runtime().egress_proxy_image,
+        )
+        backend = backend_type(egress_boundary=boundary)
+        cli = PartialFailureCLI(f"{prefix}-subject")
+        with pytest.raises(HarnessAdapterError, match="cleanup was not verified"):
+            await backend._cleanup_execution(
+                cast(_DockerCLI, cli), f"{prefix}-subject", create_attempted=True
+            )
+        assert ("rm", "--force", f"{prefix}-proxy") in cli.calls
+        assert ("network", "rm", f"{prefix}-internal") in cli.calls
+
+
+@pytest.mark.asyncio
+async def test_actual_local_docker_egress_topology_denies_bypass_and_cleans_up() -> None:
+    identity = await EgressProxyRuntime().ensure_image()
+    _, environment = await _docker_runtime_preflight()
+    cli = _DockerCLI(output_limit=1_000_000, environment=environment)
+    suffix = uuid4().hex[:12]
+    network = f"hl-review-{suffix}-internal"
+    proxy = f"hl-review-{suffix}-proxy"
+    subject = f"hl-review-{suffix}-subject"
+    verifier = f"hl-review-{suffix}-verifier"
+    boundary = ProviderScopedDockerBoundary(
+        EgressPolicy(allowed_hostname="provider.example.test"),
+        network,
+        proxy,
+        identity,
+    )
+    provisioned = False
+    try:
+        attestation = await boundary.provision(cli)
+        provisioned = True
+        assert attestation.image.image_id == identity.image_id
+        assert attestation.networks == tuple(sorted((network, "bridge")))
+        assert attestation.internal_network_is_internal
+        assert not attestation.privileged
+        assert attestation.read_only_rootfs
+        assert attestation.user == "10001:10001"
+        assert "ALL" in attestation.cap_drop
+        assert "no-new-privileges=true" in attestation.security_options
+        assert not attestation.published_ports
+        assert not attestation.docker_socket_mounted
+
+        subject_code = f"""
+import socket, sys, time
+deadline = time.monotonic() + 5
+while True:
+    try:
+        sock = socket.create_connection(({proxy!r}, 8080), timeout=1)
+        break
+    except OSError:
+        if time.monotonic() >= deadline:
+            raise
+sock.sendall(b'CONNECT undeclared.invalid:443 HTTP/1.1\\r\\nHost: undeclared.invalid\\r\\n\\r\\n')
+reply = sock.recv(128)
+sock.close()
+if not reply.startswith(b'HTTP/1.1 403'):
+    sys.exit(10)
+try:
+    socket.create_connection(('1.1.1.1', 443), timeout=1)
+except OSError:
+    sys.exit(0)
+sys.exit(11)
+"""
+        await cli.run(
+            "create",
+            "--name",
+            subject,
+            "--network",
+            network,
+            "--read-only",
+            "--cap-drop",
+            "ALL",
+            "--security-opt",
+            "no-new-privileges=true",
+            "--entrypoint",
+            "python",
+            EGRESS_PROXY_IMAGE,
+            "-c",
+            subject_code,
+        )
+        subject_networks = await cli.run(
+            "inspect", subject, "--format", "{{json .NetworkSettings.Networks}}"
+        )
+        assert tuple(json.loads(subject_networks.stdout).keys()) == (network,)
+        subject_result = await cli.run("start", "--attach", subject, check=False, timeout=15)
+        assert subject_result.returncode == 0
+
+        verifier_code = """
+import socket, sys
+try:
+    socket.create_connection(('1.1.1.1', 443), timeout=1)
+except OSError:
+    sys.exit(0)
+sys.exit(12)
+"""
+        await cli.run(
+            "create",
+            "--name",
+            verifier,
+            "--network",
+            "none",
+            "--entrypoint",
+            "python",
+            EGRESS_PROXY_IMAGE,
+            "-c",
+            verifier_code,
+        )
+        verifier_network = await cli.run(
+            "inspect", verifier, "--format", "{{json .HostConfig.NetworkMode}}"
+        )
+        assert json.loads(verifier_network.stdout) == "none"
+        verifier_result = await cli.run("start", "--attach", verifier, check=False, timeout=10)
+        assert verifier_result.returncode == 0
+    finally:
+        for container in (subject, verifier):
+            await cli.run("kill", container, check=False)
+            await cli.run("rm", "--force", container, check=False)
+        if provisioned:
+            await boundary.cleanup(cli)
+    for container in (subject, verifier, proxy):
+        absent = await cli.run(
+            "ps", "--all", "--quiet", "--filter", f"name=^/{container}$", check=False
+        )
+        assert not absent.stdout.strip()
+    absent_network = await cli.run("network", "inspect", network, check=False)
+    assert absent_network.returncode != 0

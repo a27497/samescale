@@ -1,6 +1,6 @@
 # Real Evidence Authorization
 
-Phase K-B0 stop state: `PHASE_K_B0_PREPARED_AWAITING_REAL_SMOKE_AUTHORIZATION`.
+Phase K-B0 stop state: `PHASE_K_B0_REVIEW_FIXED_AWAITING_REAL_SMOKE_AUTHORIZATION`.
 
 No provider, Codex, Claude Code, DeepSeek, or Judge call is authorized by this document. Ambient credentials and existing logins are not authorization. The eight-call K-B1 smoke in `release/core-real-smoke-plan.json` requires separate explicit authorization; the 630-run Matrix and 63 Judge calls require later authorization.
 
@@ -52,3 +52,5 @@ The `codex-gpt56-reasoning-effort` ablation compares Codex medium with Codex hig
 All six equal `NOT_RUN`. K-B1 authorization must name `core-real-smoke-v1`, approve exactly eight top-level launches and the 14,256-token ceiling, supply the declared configuration references, and accept every predefined abort condition. It does not authorize the Matrix, full Judge run, tag, or uplift claim.
 
 The smoke must stop on authentication, route/schema/observed-model/alias drift, any secret leak, proxy bypass or unrestricted network, verifier networking, P-Lane route mismatch, task/artifact binding failure, provider fallback, or Judge persistence/integrity failure. Only successful separately authorized smoke may support a later Matrix authorization decision.
+
+The production control plane is `harnesslab release smoke preflight` for keyless validation and `harnesslab release smoke execute --allow-real-smoke` for the later explicitly authorized run. Both consume the same exact-plan bindings. Gate K injects fake providers into the same executor used by the real command. Preflight resolves no credential values and performs zero provider calls. Execute validates all six references and all routes before call one, enforces eight launches and 14,256 output tokens internally, runs in plan order, and persists an abort receipt immediately on the first typed failure. Its Judge path invokes only `core-calibration/1.0.0#label-l0-pass` through `JudgeRunner`; it never invokes or reports the 63-call calibration campaign.

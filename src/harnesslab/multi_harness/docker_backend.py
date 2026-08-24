@@ -7,7 +7,7 @@ from collections.abc import Mapping
 from uuid import uuid4
 
 from harnesslab.contracts.provider import validate_provider_base_url
-from harnesslab.egress import ProviderScopedDockerBoundary
+from harnesslab.egress import ProviderScopedDockerBoundary, ProxySecurityAttestation
 from harnesslab.harness_lane.adapter import HarnessAdapterError
 from harnesslab.multi_harness.adapter import HarnessExecutionPlan
 from harnesslab.multi_harness.models import HarnessKind, HarnessProcessCapture
@@ -34,6 +34,7 @@ class DockerMultiHarnessBackend:
         self.explicitly_enabled = explicitly_enabled
         self.credentials = dict(credentials or {})
         self.egress_boundary = egress_boundary
+        self.egress_attestation: ProxySecurityAttestation | None = None
 
     @property
     def artifact_secret_values(self) -> tuple[str, ...]:
@@ -122,7 +123,7 @@ class DockerMultiHarnessBackend:
         create_attempted = False
         try:
             if self.egress_boundary is not None:
-                await self.egress_boundary.provision(cli)
+                self.egress_attestation = await self.egress_boundary.provision(cli)
             create_attempted = True
             await cli.run(*self.create_argv(plan, name), environment=create_environment)
             await self._verify_effective_security(cli, name)
@@ -180,10 +181,7 @@ class DockerMultiHarnessBackend:
             if state.returncode == 0:
                 exit_code = int(json.loads(state.stdout.decode()))
         finally:
-            if create_attempted:
-                await self._cleanup(cli, name)
-            if self.egress_boundary is not None:
-                await self.egress_boundary.cleanup(cli)
+            await self._cleanup_execution(cli, name, create_attempted=create_attempted)
         try:
             stderr_text = b"".join(stderr_parts).decode(errors="strict")
         except UnicodeDecodeError:
@@ -196,6 +194,27 @@ class DockerMultiHarnessBackend:
             timed_out,
             cancelled,
         )
+
+    async def _cleanup_execution(
+        self, cli: _DockerCLI, name: str, *, create_attempted: bool
+    ) -> None:
+        """Attempt every cleanup layer even when an earlier layer raises."""
+
+        cleanup_failures: list[str] = []
+        if create_attempted:
+            try:
+                await self._cleanup(cli, name)
+            except BaseException as exc:
+                cleanup_failures.append(f"subject:{type(exc).__name__}")
+        if self.egress_boundary is not None:
+            try:
+                await self.egress_boundary.cleanup(cli)
+            except BaseException as exc:
+                cleanup_failures.append(f"egress:{type(exc).__name__}")
+        if cleanup_failures:
+            raise HarnessAdapterError(
+                "Phase F cleanup was not verified: " + ",".join(cleanup_failures)
+            )
 
     async def _cleanup(self, cli: _DockerCLI, name: str) -> None:
         await cli.run("kill", name, check=False)

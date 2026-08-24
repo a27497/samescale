@@ -303,7 +303,11 @@ During K-B0 a pass intentionally reports `CORE_RELEASE_READY=FALSE`,
 provider, Harness, or Judge call and does not create `v1.0.0-core`. The selected GPT profile is
 `gpt-5.6-sol` via an operator-trusted OpenAI-compatible relay whose upstream first-party provenance
 is not independently verified. See [Real Evidence Authorization](docs/REAL_EVIDENCE_AUTHORIZATION.md)
-for the exact eight-call K-B1 smoke plan, which still requires separate authorization.
+for the exact eight-call K-B1 smoke plan, which still requires separate authorization. The keyless
+`harnesslab release smoke preflight` command validates the same frozen bindings consumed by the
+future `harnesslab release smoke execute --allow-real-smoke` command. Gate K injects a fake invoker
+into that production executor to prove its fail-closed, abort-on-first-failure behavior; ordinary CI
+never invokes the real execute command.
 
 ## Fresh clone operator path
 

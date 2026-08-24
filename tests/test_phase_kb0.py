@@ -20,7 +20,12 @@ from harnesslab.contracts.provider import (
     ThinkingTransport,
     validate_provider_base_url,
 )
-from harnesslab.egress import EgressDenied, EgressPolicy, ProviderScopedDockerBoundary
+from harnesslab.egress import (
+    EGRESS_PROXY_IMAGE,
+    EgressDenied,
+    EgressPolicy,
+    ProviderScopedDockerBoundary,
+)
 from harnesslab.harness_lane.adapter import CodexHarnessAdapter
 from harnesslab.harness_lane.docker_backend import DockerCodexBackend
 from harnesslab.harness_lane.profile import (
@@ -225,7 +230,9 @@ def test_kb0_deepseek_harness_e1_is_official_and_e2_deferred() -> None:
 
 def test_kb0_provider_scoped_egress_allows_fake_and_denies_bypass_and_targets() -> None:
     policy = EgressPolicy(allowed_hostname="provider.example.test")
-    boundary = ProviderScopedDockerBoundary(policy, "kb0-internal", "kb0-proxy")
+    boundary = ProviderScopedDockerBoundary(
+        policy, "kb0-internal", "kb0-proxy", image(EGRESS_PROXY_IMAGE)
+    )
     response, event = boundary.deterministic_fake_forward(
         "provider.example.test", 443, b"opaque-tls", lambda value: value[::-1]
     )
@@ -252,7 +259,10 @@ def test_kb0_provider_scoped_egress_allows_fake_and_denies_bypass_and_targets() 
 
 def test_kb0_subject_docker_uses_only_internal_proxy_network(tmp_path: Path) -> None:
     boundary = ProviderScopedDockerBoundary(
-        EgressPolicy(allowed_hostname="relay.example.test"), "kb0-internal", "kb0-proxy"
+        EgressPolicy(allowed_hostname="relay.example.test"),
+        "kb0-internal",
+        "kb0-proxy",
+        image(EGRESS_PROXY_IMAGE),
     )
     profile = configured_gpt56_relay_codex_profile(
         image("harnesslab-phase-e-codex:0.149.0"),

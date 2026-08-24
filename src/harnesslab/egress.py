@@ -1,21 +1,43 @@
 from __future__ import annotations
 
+import hashlib
 import ipaddress
 import json
+from asyncio import CancelledError
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
+from pathlib import Path
 from typing import Any, Literal
 from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from harnesslab.contracts.provider import validate_provider_base_url
+from harnesslab.sandbox.docker_cli import _DockerCLI
+from harnesslab.sandbox.models import ImageIdentity
+from harnesslab.sandbox.preflight import _docker_runtime_preflight
+from harnesslab.sandbox.subprocess_loop import run_on_subprocess_loop
+
+EGRESS_PROXY_VERSION = "1.0.0"
+EGRESS_PROXY_IMAGE = f"harnesslab-egress-proxy:{EGRESS_PROXY_VERSION}"
+EGRESS_PROXY_BASE = (
+    "python:3.12.14-slim-bookworm@"
+    "sha256:a116514e19457bcb7af7efe9c3dd0b9b71e85b317694e7882a1c52aa15a78134"
+)
+EGRESS_PROXY_LABEL = "com.harnesslab.role=provider-scoped-egress"
+EGRESS_PROXY_SOURCE_DIGEST = (
+    "sha256:6197201fdf9529cef8963c6c0de3b764608f057ab5507d2326afabb3d9d94592"
+)
 
 
 class EgressDenied(ValueError):
     """A subject attempted a destination outside its frozen provider route."""
+
+
+class EgressSecurityError(RuntimeError):
+    """The effective Docker egress boundary was unsafe or could not be cleaned."""
 
 
 class ConnectionResult(StrEnum):
@@ -80,6 +102,102 @@ class SafeEgressEvent(BaseModel):
         return json.dumps(self.model_dump(mode="json"), sort_keys=True, separators=(",", ":"))
 
 
+class ProxySecurityAttestation(BaseModel):
+    """Effective, inspected proxy state recorded before a subject can start."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    image: ImageIdentity
+    privileged: bool
+    read_only_rootfs: bool
+    user: str
+    cap_drop: tuple[str, ...]
+    security_options: tuple[str, ...]
+    published_ports: bool
+    networks: tuple[str, str]
+    internal_network: str
+    internal_network_is_internal: bool
+    docker_socket_mounted: bool
+
+    def canonical_json(self) -> str:
+        return json.dumps(
+            self.model_dump(mode="json"),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+
+    @property
+    def digest(self) -> str:
+        return "sha256:" + hashlib.sha256(self.canonical_json().encode()).hexdigest()
+
+
+class EgressProxyRuntime:
+    """Build and inspect the one pinned proxy image without provider access."""
+
+    async def ensure_image(self) -> ImageIdentity:
+        return await run_on_subprocess_loop(self._ensure_image())
+
+    async def _ensure_image(self) -> ImageIdentity:
+        _, environment = await _docker_runtime_preflight()
+        cli = _DockerCLI(output_limit=1_000_000, environment=environment)
+        inspected = await cli.run(
+            "image",
+            "inspect",
+            EGRESS_PROXY_IMAGE,
+            "--format",
+            "{{json .Config.Labels}}",
+            check=False,
+        )
+        labels = (
+            json.loads(inspected.stdout.decode())
+            if inspected.returncode == 0 and inspected.stdout.strip()
+            else {}
+        )
+        expected_labels = {
+            "com.harnesslab.egress.version": EGRESS_PROXY_VERSION,
+            "com.harnesslab.egress.base": EGRESS_PROXY_BASE.rsplit("@", 1)[1],
+            "com.harnesslab.egress.source": EGRESS_PROXY_SOURCE_DIGEST,
+        }
+        if inspected.returncode != 0 or any(
+            labels.get(key) != value for key, value in expected_labels.items()
+        ):
+            repository_root = Path(__file__).resolve().parents[2]
+            dockerfile = repository_root / "docker" / "egress" / "Dockerfile"
+            first_line = dockerfile.read_text(encoding="utf-8").splitlines()[0]
+            if first_line != f"FROM {EGRESS_PROXY_BASE}":
+                raise EgressSecurityError("egress proxy Dockerfile base identity drifted")
+            await cli.run(
+                "build",
+                "--tag",
+                EGRESS_PROXY_IMAGE,
+                str(dockerfile.parent),
+                timeout=600,
+            )
+        result = await cli.run(
+            "image",
+            "inspect",
+            EGRESS_PROXY_IMAGE,
+            "--format",
+            "{{json .Id}}|{{json .RepoDigests}}",
+        )
+        image_id_raw, repo_digests_raw = result.stdout.decode().strip().split("|", 1)
+        identity = ImageIdentity(
+            reference=EGRESS_PROXY_IMAGE,
+            image_id=json.loads(image_id_raw),
+            repo_digests=tuple(json.loads(repo_digests_raw) or ()),
+        )
+        if identity.image_id == "sha256:" + "0" * 64:
+            raise EgressSecurityError("egress proxy image identity was not inspected")
+        labels_result = await cli.run(
+            "image", "inspect", EGRESS_PROXY_IMAGE, "--format", "{{json .Config.Labels}}"
+        )
+        effective_labels = json.loads(labels_result.stdout.decode()) or {}
+        if any(effective_labels.get(key) != value for key, value in expected_labels.items()):
+            raise EgressSecurityError("egress proxy build identity labels drifted")
+        return identity
+
+
 @dataclass(frozen=True)
 class ProviderScopedDockerBoundary:
     """Auditable Docker topology for one real Harness execution.
@@ -91,7 +209,16 @@ class ProviderScopedDockerBoundary:
     policy: EgressPolicy
     network_name: str
     proxy_name: str
-    proxy_image: str = "harnesslab-egress-proxy:1"
+    proxy_image: ImageIdentity
+    outbound_network_name: str = "bridge"
+
+    def __post_init__(self) -> None:
+        if self.proxy_image.reference != EGRESS_PROXY_IMAGE:
+            raise EgressSecurityError("unexpected egress proxy image reference")
+        if self.proxy_image.image_id == "sha256:" + "0" * 64:
+            raise EgressSecurityError("egress proxy requires an inspected non-zero image identity")
+        if not self.network_name or self.network_name == self.outbound_network_name:
+            raise EgressSecurityError("egress boundary requires distinct network identities")
 
     @property
     def verifier_network_mode(self) -> str:
@@ -115,39 +242,142 @@ class ProviderScopedDockerBoundary:
             self.proxy_name,
             "--network",
             self.network_name,
+            "--user",
+            "10001:10001",
             "--read-only",
             "--cap-drop",
             "ALL",
             "--security-opt",
             "no-new-privileges=true",
+            "--restart",
+            "no",
+            "--label",
+            EGRESS_PROXY_LABEL,
             "--env",
             f"HARNESSLAB_ALLOWED_CONNECT_HOST={self.policy.allowed_hostname}",
             "--env",
             "HARNESSLAB_ALLOWED_CONNECT_PORT=443",
-            self.proxy_image,
+            self.proxy_image.reference,
         )
 
     def connect_proxy_outbound_argv(self) -> tuple[str, ...]:
-        return ("network", "connect", "bridge", self.proxy_name)
+        return ("network", "connect", self.outbound_network_name, self.proxy_name)
 
     def subject_proxy_environment(self) -> dict[str, str]:
         proxy = f"http://{self.proxy_name}:8080"
         return {"HTTPS_PROXY": proxy, "https_proxy": proxy, "NO_PROXY": ""}
 
-    async def provision(self, cli: Any) -> None:
+    async def provision(self, cli: Any) -> ProxySecurityAttestation:
         await cli.run(*self.create_internal_network_argv())
         try:
             await cli.run(*self.create_proxy_argv())
             await cli.run(*self.connect_proxy_outbound_argv())
             await cli.run("start", self.proxy_name)
-        except Exception:
-            await self.cleanup(cli)
+            return await self.attest_effective_security(cli)
+        except BaseException:
+            try:
+                await self.cleanup(cli)
+            except Exception as cleanup_exc:
+                raise EgressSecurityError(
+                    "egress provisioning failed and cleanup could not be verified"
+                ) from cleanup_exc
             raise
 
     async def cleanup(self, cli: Any) -> None:
-        await cli.run("kill", self.proxy_name, check=False)
-        await cli.run("rm", "--force", self.proxy_name, check=False)
-        await cli.run("network", "rm", self.network_name, check=False)
+        failures: list[str] = []
+        for action in (
+            ("kill", self.proxy_name),
+            ("rm", "--force", self.proxy_name),
+            ("network", "rm", self.network_name),
+        ):
+            try:
+                await cli.run(*action, check=False)
+            except (Exception, CancelledError) as exc:
+                failures.append(type(exc).__name__)
+        try:
+            proxy = await cli.run(
+                "ps",
+                "--all",
+                "--quiet",
+                "--no-trunc",
+                "--filter",
+                f"name=^/{self.proxy_name}$",
+                check=False,
+            )
+            if proxy.returncode != 0 or proxy.stdout.strip():
+                failures.append("proxy-present")
+        except Exception as exc:
+            failures.append(type(exc).__name__)
+        try:
+            network = await cli.run("network", "inspect", self.network_name, check=False)
+            if network.returncode == 0:
+                failures.append("network-present")
+        except Exception as exc:
+            failures.append(type(exc).__name__)
+        if failures:
+            raise EgressSecurityError(
+                "egress cleanup was not verified: " + ",".join(sorted(failures))
+            )
+
+    async def attest_effective_security(self, cli: Any) -> ProxySecurityAttestation:
+        template = (
+            "{{json .Image}}|{{json .HostConfig.Privileged}}|"
+            "{{json .HostConfig.ReadonlyRootfs}}|{{json .Config.User}}|"
+            "{{json .HostConfig.CapDrop}}|{{json .HostConfig.SecurityOpt}}|"
+            "{{json .HostConfig.PortBindings}}|{{json .NetworkSettings.Networks}}|"
+            "{{json .Mounts}}"
+        )
+        result = await cli.run("inspect", self.proxy_name, "--format", template)
+        values = [json.loads(value) for value in result.stdout.decode().strip().split("|")]
+        if len(values) != 9:
+            raise EgressSecurityError("unexpected egress proxy inspection output")
+        (
+            image_id,
+            privileged,
+            read_only,
+            user,
+            cap_drop,
+            security_options,
+            port_bindings,
+            networks,
+            mounts,
+        ) = values
+        network_result = await cli.run(
+            "network", "inspect", self.network_name, "--format", "{{json .Internal}}"
+        )
+        internal = json.loads(network_result.stdout.decode().strip())
+        actual_networks = tuple(sorted((networks or {}).keys()))
+        expected_networks = tuple(sorted((self.network_name, self.outbound_network_name)))
+        docker_socket = any(
+            mount.get("Destination") == "/var/run/docker.sock" for mount in (mounts or ())
+        )
+        required = (
+            image_id == self.proxy_image.image_id,
+            not privileged,
+            read_only,
+            user == "10001:10001",
+            "ALL" in (cap_drop or ()),
+            "no-new-privileges=true" in (security_options or ()),
+            not port_bindings,
+            actual_networks == expected_networks,
+            internal is True,
+            not docker_socket,
+        )
+        if not all(required):
+            raise EgressSecurityError("effective egress proxy security profile is not canonical")
+        return ProxySecurityAttestation(
+            image=self.proxy_image,
+            privileged=bool(privileged),
+            read_only_rootfs=bool(read_only),
+            user=str(user),
+            cap_drop=tuple(cap_drop or ()),
+            security_options=tuple(security_options or ()),
+            published_ports=bool(port_bindings),
+            networks=expected_networks,
+            internal_network=self.network_name,
+            internal_network_is_internal=True,
+            docker_socket_mounted=False,
+        )
 
     def deterministic_fake_forward(
         self,
@@ -174,11 +404,15 @@ class ProviderScopedDockerBoundary:
 
 
 def boundary_for_provider_url(
-    provider_url: str, *, network_name: str, proxy_name: str
+    provider_url: str,
+    *,
+    network_name: str,
+    proxy_name: str,
+    proxy_image: ImageIdentity,
 ) -> ProviderScopedDockerBoundary:
     safe = validate_provider_base_url(provider_url)
     hostname = urlsplit(safe).hostname
     assert hostname is not None
     return ProviderScopedDockerBoundary(
-        EgressPolicy(allowed_hostname=hostname), network_name, proxy_name
+        EgressPolicy(allowed_hostname=hostname), network_name, proxy_name, proxy_image
     )

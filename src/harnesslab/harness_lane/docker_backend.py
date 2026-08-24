@@ -7,7 +7,7 @@ from collections.abc import Mapping
 from contextlib import suppress
 from uuid import uuid4
 
-from harnesslab.egress import ProviderScopedDockerBoundary
+from harnesslab.egress import ProviderScopedDockerBoundary, ProxySecurityAttestation
 from harnesslab.harness_lane.adapter import CodexExecutionPlan, HarnessAdapterError
 from harnesslab.harness_lane.models import CodexProcessCapture
 from harnesslab.harness_lane.profile import CODEX_IMAGE
@@ -37,6 +37,7 @@ class DockerCodexBackend:
         self.explicitly_enabled = explicitly_enabled
         self.credentials = dict(credentials or {})
         self.egress_boundary = egress_boundary
+        self.egress_attestation: ProxySecurityAttestation | None = None
 
     @property
     def artifact_secret_values(self) -> tuple[str, ...]:
@@ -116,7 +117,7 @@ class DockerCodexBackend:
         exit_code: int | None = None
         try:
             if self.egress_boundary is not None:
-                await self.egress_boundary.provision(cli)
+                self.egress_attestation = await self.egress_boundary.provision(cli)
             create_attempted = True
             await cli.run(*self.create_argv(plan, name), environment=create_environment)
             await self._verify_effective_security(cli, name)
@@ -179,10 +180,7 @@ class DockerCodexBackend:
             if state.returncode == 0:
                 exit_code = int(json.loads(state.stdout.decode("utf-8")))
         finally:
-            if create_attempted:
-                await self._cleanup_outer_container(cli, name)
-            if self.egress_boundary is not None:
-                await self.egress_boundary.cleanup(cli)
+            await self._cleanup_execution(cli, name, create_attempted=create_attempted)
         return CodexProcessCapture(
             lines=tuple(lines),
             exit_code=exit_code,
@@ -190,6 +188,27 @@ class DockerCodexBackend:
             timed_out=timed_out,
             cancelled=cancelled,
         )
+
+    async def _cleanup_execution(
+        self, cli: _DockerCLI, name: str, *, create_attempted: bool
+    ) -> None:
+        """Attempt every cleanup layer even when an earlier layer raises."""
+
+        cleanup_failures: list[str] = []
+        if create_attempted:
+            try:
+                await self._cleanup_outer_container(cli, name)
+            except BaseException as exc:
+                cleanup_failures.append(f"subject:{type(exc).__name__}")
+        if self.egress_boundary is not None:
+            try:
+                await self.egress_boundary.cleanup(cli)
+            except BaseException as exc:
+                cleanup_failures.append(f"egress:{type(exc).__name__}")
+        if cleanup_failures:
+            raise HarnessAdapterError(
+                "real Codex cleanup was not verified: " + ",".join(cleanup_failures)
+            )
 
     async def _cleanup_outer_container(self, cli: _DockerCLI, name: str) -> None:
         await cli.run("kill", name, check=False)

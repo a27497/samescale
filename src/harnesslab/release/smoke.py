@@ -1,0 +1,901 @@
+from __future__ import annotations
+
+import json
+import os
+import tempfile
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from enum import StrEnum
+from pathlib import Path
+from typing import Protocol as TypingProtocol
+from uuid import uuid4
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from harnesslab.contracts.common import Protocol
+from harnesslab.contracts.model import ModelProfile
+from harnesslab.contracts.provider import ProviderProfile
+from harnesslab.egress import (
+    EGRESS_PROXY_IMAGE,
+    EgressProxyRuntime,
+    ProviderScopedDockerBoundary,
+    ProxySecurityAttestation,
+    boundary_for_provider_url,
+)
+from harnesslab.harness_lane.docker_backend import DockerCodexBackend
+from harnesslab.harness_lane.models import (
+    CodexHarnessProfile,
+    HarnessFailureCategory,
+    HarnessLaneOutcome,
+)
+from harnesslab.harness_lane.profile import (
+    CODEX_IMAGE,
+    configured_gpt56_relay_codex_profile,
+)
+from harnesslab.harness_lane.runner import CodexHarnessRunner
+from harnesslab.harness_lane.runtime import CodexRuntime
+from harnesslab.judgelab.models import (
+    JudgeEvaluationSlot,
+    JudgeRunOutcome,
+    OrderVariant,
+)
+from harnesslab.judgelab.models import (
+    digest as judge_digest,
+)
+from harnesslab.judgelab.runner import JudgeRunner
+from harnesslab.judgelab.suite import load_judge_definition, load_judge_suite
+from harnesslab.model_lane.models import DirectModelOutcome, ProviderFailureCategory
+from harnesslab.model_lane.providers import (
+    AnthropicMessagesAdapter,
+    OpenAICompatibleChatAdapter,
+    OpenAIResponsesAdapter,
+)
+from harnesslab.model_lane.runner import DirectModelRunner
+from harnesslab.multi_harness.adapter import ClaudeCodeAdapter, DeepSeekHarnessAdapter
+from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
+from harnesslab.multi_harness.models import HarnessKind, MultiHarnessProfile
+from harnesslab.multi_harness.profile import (
+    CLAUDE_IMAGE,
+    DEEPSEEK_IMAGE,
+    configured_deepseek_v4flash_profile,
+    configured_qwen_bailian_claude_profile,
+)
+from harnesslab.multi_harness.runner import MultiHarnessRunner
+from harnesslab.multi_harness.runtime import MultiHarnessRuntime
+from harnesslab.release.contracts import (
+    CoreReleaseError,
+    load_core_corpus,
+    load_real_evidence_plan,
+    load_real_smoke_plan,
+)
+from harnesslab.release.models import RealEvidencePlan, RealSmokeCall, RealSmokePlan
+from harnesslab.release.provider_config import configured_model_profile
+from harnesslab.sandbox.models import ImageIdentity
+from harnesslab.tasks.package import TaskPackage, TaskPackageError, digest_tree
+
+EXPECTED_CALL_IDS = (
+    "smoke-1-model-gpt56-relay-responses",
+    "smoke-2-model-qwen38-bailian-messages",
+    "smoke-3-model-deepseek-v4pro-chat",
+    "smoke-4-harness-codex-gpt56-medium",
+    "smoke-5-harness-codex-gpt56-high",
+    "smoke-6-harness-claude-qwen38",
+    "smoke-7-harness-deepseek-v4flash",
+    "smoke-8-judge-glm52",
+)
+EXPECTED_RUNNERS = (
+    "DirectModelRunner",
+    "DirectModelRunner",
+    "DirectModelRunner",
+    "CodexHarnessRunner",
+    "CodexHarnessRunner",
+    "MultiHarnessRunner",
+    "MultiHarnessRunner",
+    "JudgeRunner",
+)
+EXPECTED_ADAPTERS = (
+    "OpenAIResponsesAdapter",
+    "AnthropicMessagesAdapter",
+    "OpenAICompatibleChatAdapter",
+    "DockerCodexBackend",
+    "DockerCodexBackend",
+    "DockerMultiHarnessBackend",
+    "DockerMultiHarnessBackend",
+    "OpenAICompatibleChatAdapter",
+)
+REQUIRED_CONFIGURATION_REFERENCES = (
+    "HARNESSLAB_GPT56_RELAY_BASE_URL",
+    "HARNESSLAB_GPT56_RELAY_API_KEY",
+    "DASHSCOPE_API_KEY",
+    "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
+    "HARNESSLAB_BAILIAN_OPENAI_BASE_URL",
+    "DEEPSEEK_API_KEY",
+)
+SUBJECT_TASK_ID = "core-python-deduplicate"
+JUDGE_CASE_REFERENCE = "judge_suites/core-calibration/1.0.0#label-l0-pass"
+
+
+class SmokeControlPlaneError(CoreReleaseError):
+    """The frozen K-B1 smoke cannot be resolved or safely executed."""
+
+
+class SmokeFailureCategory(StrEnum):
+    CONFIGURATION = "CONFIGURATION"
+    AUTHENTICATION = "AUTHENTICATION"
+    ROUTE_MISMATCH = "ROUTE_MISMATCH"
+    SCHEMA_MISMATCH = "SCHEMA_MISMATCH"
+    OBSERVED_MODEL_CONFLICT = "OBSERVED_MODEL_CONFLICT"
+    PROVIDER_FAILURE = "PROVIDER_FAILURE"
+    HARNESS_FAILURE = "HARNESS_FAILURE"
+    ARTIFACT_INTEGRITY = "ARTIFACT_INTEGRITY"
+    SECURITY_BOUNDARY = "SECURITY_BOUNDARY"
+    JUDGE_PERSISTENCE = "JUDGE_PERSISTENCE"
+    INFRASTRUCTURE = "INFRASTRUCTURE"
+
+
+class SmokeCallFailure(RuntimeError):
+    def __init__(
+        self,
+        category: SmokeFailureCategory,
+        message: str,
+        evidence_result: SmokeCallResult | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.category = category
+        self.evidence_result = evidence_result
+
+
+class SmokeCallResult(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    call_id: str
+    evidence_references: tuple[str, ...] = ()
+    evidence_digests: tuple[str, ...] = ()
+
+
+class SmokeExecutionStatus(StrEnum):
+    SUCCEEDED = "SUCCEEDED"
+    ABORTED = "ABORTED"
+
+
+class SmokeExecutionReceipt(BaseModel):
+    """Safe terminal state; it intentionally excludes credentials and provider content."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: int = 1
+    plan_id: str
+    smoke_plan_digest: str
+    release_plan_digest: str
+    status: SmokeExecutionStatus
+    attempted_top_level_launches: int = Field(ge=0, le=8)
+    failing_call_id: str | None = None
+    failure_category: SmokeFailureCategory | None = None
+    results: tuple[SmokeCallResult, ...]
+
+    def canonical_json(self) -> str:
+        return json.dumps(
+            self.model_dump(mode="json"),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+
+
+@dataclass(frozen=True)
+class SmokeBinding:
+    call: RealSmokeCall
+    provider_profile: ProviderProfile
+    runner_identity: str
+    adapter_identity: str
+    task_path: Path | None
+
+
+@dataclass(frozen=True)
+class RuntimeIdentities:
+    codex_image: ImageIdentity
+    claude_image: ImageIdentity
+    deepseek_image: ImageIdentity
+    egress_proxy_image: ImageIdentity
+    deepseek_config_digest: str
+
+    def validate(self) -> None:
+        expected = (
+            (self.codex_image, CODEX_IMAGE),
+            (self.claude_image, CLAUDE_IMAGE),
+            (self.deepseek_image, DEEPSEEK_IMAGE),
+            (self.egress_proxy_image, EGRESS_PROXY_IMAGE),
+        )
+        for identity, reference in expected:
+            if identity.reference != reference or identity.image_id == "sha256:" + "0" * 64:
+                raise SmokeControlPlaneError(f"uninspected runtime image: {reference}")
+        if not self.deepseek_config_digest.startswith("sha256:"):
+            raise SmokeControlPlaneError("DeepSeek effective config identity is unavailable")
+
+
+@dataclass(frozen=True)
+class ResolvedSmokeBinding:
+    frozen: SmokeBinding
+    runtime_profile: ModelProfile | CodexHarnessProfile | MultiHarnessProfile
+    egress_boundary: ProviderScopedDockerBoundary | None = None
+
+
+class SmokeInvoker(TypingProtocol):
+    async def invoke(self, binding: ResolvedSmokeBinding) -> SmokeCallResult: ...
+
+
+class SmokeControlPlane:
+    """The sole exact-plan control plane used by fake and future real smoke execution."""
+
+    def __init__(
+        self,
+        repository_root: Path,
+        release_plan: RealEvidencePlan,
+        smoke_plan: RealSmokePlan,
+        bindings: tuple[SmokeBinding, ...],
+    ) -> None:
+        self.repository_root = repository_root.resolve()
+        self.release_plan = release_plan
+        self.smoke_plan = smoke_plan
+        self.bindings = bindings
+
+    @classmethod
+    def load(cls, repository_root: Path) -> SmokeControlPlane:
+        root = repository_root.resolve()
+        try:
+            release_plan = load_real_evidence_plan(root / "release/core-real-evidence-plan.json")
+            smoke_plan = load_real_smoke_plan(root / "release/core-real-smoke-plan.json")
+            corpus = load_core_corpus(root / "release/core-corpus.json")
+        except CoreReleaseError as exc:
+            raise SmokeControlPlaneError(str(exc)) from exc
+        if smoke_plan.release_plan_digest != release_plan.digest:
+            raise SmokeControlPlaneError("smoke/release plan digest mismatch")
+        if (
+            len(smoke_plan.calls) != 8
+            or smoke_plan.max_top_level_launch_count != 8
+            or smoke_plan.max_output_token_ceiling != 14_256
+            or sum(int(call.top_level_launches) for call in smoke_plan.calls) != 8
+            or sum(call.max_output_tokens for call in smoke_plan.calls) != 14_256
+        ):
+            raise SmokeControlPlaneError("smoke bounds are not exactly 8 calls / 14,256 tokens")
+        if tuple(call.call_id for call in smoke_plan.calls) != EXPECTED_CALL_IDS:
+            raise SmokeControlPlaneError("smoke call identity or deterministic order drifted")
+        profiles = {profile.profile_id: profile for profile in release_plan.selected_profiles}
+        corpus_tasks = {task.task_id: task for task in corpus.tasks}
+        task = corpus_tasks.get(SUBJECT_TASK_ID)
+        if task is None:
+            raise SmokeControlPlaneError("frozen smoke task is absent from the Core corpus")
+        task_path = (root / task.package_path).resolve()
+        if root not in task_path.parents or not task_path.is_dir():
+            raise SmokeControlPlaneError("frozen smoke task escapes the repository")
+        try:
+            package = TaskPackage.load(task_path)
+        except TaskPackageError as exc:
+            raise SmokeControlPlaneError("frozen smoke task package is invalid") from exc
+        if (
+            package.definition.id != task.task_id
+            or package.definition.content_digest != task.task_digest
+        ):
+            raise SmokeControlPlaneError("frozen smoke task package identity drifted")
+        bindings: list[SmokeBinding] = []
+        for index, call in enumerate(smoke_plan.calls):
+            profile = profiles.get(call.profile_id)
+            if profile is None:
+                raise SmokeControlPlaneError("smoke call references an undeclared profile")
+            expected_lane = "J" if index == 7 else "M" if index < 3 else "H"
+            expected_task_id = None if expected_lane == "J" else SUBJECT_TASK_ID
+            expected_task_digest = None if expected_lane == "J" else task.task_digest
+            expected_judge = JUDGE_CASE_REFERENCE if expected_lane == "J" else None
+            exact = (
+                call.lane == expected_lane,
+                call.task_id == expected_task_id,
+                call.task_digest == expected_task_digest,
+                call.judge_case_reference == expected_judge,
+                call.requested_model == profile.requested_model,
+                call.provider_route == profile.route_identity,
+                call.max_output_tokens == profile.max_output_tokens,
+                call.timeout_seconds == profile.timeout_seconds,
+                call.credential_references
+                == tuple(
+                    reference
+                    for reference in (profile.base_url_reference, profile.credential_reference)
+                    if reference is not None
+                ),
+            )
+            if not all(exact):
+                raise SmokeControlPlaneError(f"frozen call contract drifted: {call.call_id}")
+            bindings.append(
+                SmokeBinding(
+                    call=call,
+                    provider_profile=profile,
+                    runner_identity=EXPECTED_RUNNERS[index],
+                    adapter_identity=EXPECTED_ADAPTERS[index],
+                    task_path=None if expected_lane == "J" else task_path,
+                )
+            )
+        if release_plan.credential_references != REQUIRED_CONFIGURATION_REFERENCES:
+            raise SmokeControlPlaneError("release configuration reference order drifted")
+        return cls(root, release_plan, smoke_plan, tuple(bindings))
+
+    @property
+    def smoke_plan_digest(self) -> str:
+        return self.smoke_plan.digest
+
+    def preflight(self) -> SmokeExecutionReceipt:
+        """Keyless structural preflight. It cannot invoke a provider or resolve credentials."""
+
+        return SmokeExecutionReceipt(
+            plan_id=self.smoke_plan.plan_id,
+            smoke_plan_digest=self.smoke_plan_digest,
+            release_plan_digest=self.release_plan.digest,
+            status=SmokeExecutionStatus.SUCCEEDED,
+            attempted_top_level_launches=0,
+            results=(),
+        )
+
+    def validate_real_environment(self, environment: Mapping[str, str]) -> None:
+        missing = tuple(
+            reference
+            for reference in REQUIRED_CONFIGURATION_REFERENCES
+            if not environment.get(reference, "").strip()
+        )
+        if missing:
+            raise SmokeControlPlaneError(
+                "required operator configuration is missing: " + ",".join(missing)
+            )
+        for profile in self.release_plan.selected_profiles:
+            profile.resolve_base_url(environment)
+
+    def resolve_real_bindings(
+        self, environment: Mapping[str, str], runtime: RuntimeIdentities
+    ) -> tuple[ResolvedSmokeBinding, ...]:
+        self.validate_real_environment(environment)
+        runtime.validate()
+        execution_id = uuid4().hex[:12]
+        resolved: list[ResolvedSmokeBinding] = []
+        for index, binding in enumerate(self.bindings):
+            provider = binding.provider_profile
+            call = binding.call
+            boundary = None
+            if call.call_id.startswith("smoke-4-") or call.call_id.startswith("smoke-5-"):
+                codex_profile = configured_gpt56_relay_codex_profile(
+                    runtime.codex_image,
+                    provider_base_url=provider.resolve_base_url(environment),
+                    reasoning_effort=provider.reasoning_effort or "",
+                    execution_timeout_seconds=provider.timeout_seconds,
+                )
+                profile: ModelProfile | CodexHarnessProfile | MultiHarnessProfile = codex_profile
+                boundary = self._boundary(provider, environment, execution_id, index, runtime)
+                self._assert_codex_route(codex_profile, provider, environment)
+            elif call.call_id == "smoke-6-harness-claude-qwen38":
+                profile = configured_qwen_bailian_claude_profile(
+                    runtime.claude_image, execution_timeout_seconds=provider.timeout_seconds
+                )
+                boundary = self._boundary(provider, environment, execution_id, index, runtime)
+                self._assert_claude_route(profile, provider, environment)
+            elif call.call_id == "smoke-7-harness-deepseek-v4flash":
+                profile = configured_deepseek_v4flash_profile(
+                    runtime.deepseek_image,
+                    runtime.deepseek_config_digest,
+                    execution_timeout_seconds=provider.timeout_seconds,
+                )
+                boundary = self._boundary(provider, environment, execution_id, index, runtime)
+                self._assert_deepseek_route(profile, provider, environment)
+            else:
+                profile = configured_model_profile(provider, environment)
+                if call.call_id == "smoke-8-judge-glm52":
+                    self._assert_judge_route(profile, provider, environment)
+            resolved.append(ResolvedSmokeBinding(binding, profile, boundary))
+        direct = resolved[0].runtime_profile
+        codex = resolved[3].runtime_profile
+        assert isinstance(direct, ModelProfile)
+        assert isinstance(codex, CodexHarnessProfile)
+        direct_provider = resolved[0].frozen.provider_profile
+        codex_provider = resolved[3].frozen.provider_profile
+        if direct.base_url != codex.provider_base_url or direct_provider.resolved_route_identity(
+            environment
+        ) != codex_provider.resolved_route_identity(environment):
+            raise SmokeControlPlaneError("Direct GPT and Codex-medium resolved routes differ")
+        return tuple(resolved)
+
+    def _boundary(
+        self,
+        profile: ProviderProfile,
+        environment: Mapping[str, str],
+        execution_id: str,
+        index: int,
+        runtime: RuntimeIdentities,
+    ) -> ProviderScopedDockerBoundary:
+        return boundary_for_provider_url(
+            profile.resolve_base_url(environment),
+            network_name=f"hl-smoke-{execution_id}-{index}-internal",
+            proxy_name=f"hl-smoke-{execution_id}-{index}-proxy",
+            proxy_image=runtime.egress_proxy_image,
+        )
+
+    @staticmethod
+    def _assert_codex_route(
+        profile: CodexHarnessProfile,
+        provider: ProviderProfile,
+        environment: Mapping[str, str],
+    ) -> None:
+        required = (
+            profile.model_provider_id == "harnesslab_gpt56_relay",
+            profile.provider_wire_api == "responses",
+            profile.provider_base_url == provider.resolve_base_url(environment),
+            profile.provider_credential_reference == "HARNESSLAB_GPT56_RELAY_API_KEY",
+            profile.requested_model == "gpt-5.6-sol",
+            profile.provider_route == provider.route_identity,
+        )
+        if not all(required):
+            raise SmokeControlPlaneError("Codex relay fallback protection failed")
+
+    @staticmethod
+    def _assert_claude_route(
+        profile: MultiHarnessProfile,
+        provider: ProviderProfile,
+        environment: Mapping[str, str],
+    ) -> None:
+        required = (
+            profile.provider_base_url_reference == "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
+            profile.provider_credential_reference == "DASHSCOPE_API_KEY",
+            profile.requested_model == "qwen3.8-max",
+            profile.provider_route == provider.route_identity,
+            "api.anthropic.com" not in provider.resolve_base_url(environment),
+        )
+        if not all(required):
+            raise SmokeControlPlaneError("Claude Bailian fallback protection failed")
+
+    @staticmethod
+    def _assert_deepseek_route(
+        profile: MultiHarnessProfile,
+        provider: ProviderProfile,
+        environment: Mapping[str, str],
+    ) -> None:
+        required = (
+            provider.resolve_base_url(environment) == "https://api.deepseek.com",
+            profile.requested_model == "deepseek-v4-flash",
+            profile.provider_route == provider.route_identity,
+        )
+        if not all(required):
+            raise SmokeControlPlaneError("DeepSeek official-route protection failed")
+
+    @staticmethod
+    def _assert_judge_route(
+        profile: ModelProfile,
+        provider: ProviderProfile,
+        environment: Mapping[str, str],
+    ) -> None:
+        required = (
+            profile.requested_model == "glm-5.2",
+            profile.protocol is Protocol.CHAT_COMPLETIONS,
+            profile.base_url == provider.resolve_base_url(environment),
+            profile.credential_reference == "DASHSCOPE_API_KEY",
+        )
+        if not all(required):
+            raise SmokeControlPlaneError("Judge Bailian route protection failed")
+
+    async def execute(
+        self,
+        bindings: Sequence[ResolvedSmokeBinding],
+        invoker: SmokeInvoker,
+        *,
+        allow_real_smoke: bool,
+        receipt_path: Path | None = None,
+    ) -> SmokeExecutionReceipt:
+        if not allow_real_smoke:
+            raise SmokeControlPlaneError("real smoke requires --allow-real-smoke")
+        if len(bindings) != 8 or tuple(item.frozen for item in bindings) != self.bindings:
+            raise SmokeControlPlaneError("executor received a mutated smoke binding set")
+        results: list[SmokeCallResult] = []
+        attempted = 0
+        failing_call_id = None
+        failure_category = None
+        for expected_call, binding in zip(EXPECTED_CALL_IDS, bindings, strict=True):
+            if binding.frozen.call.call_id != expected_call or attempted >= 8:
+                raise SmokeControlPlaneError("top-level launch bound was exceeded")
+            attempted += 1
+            try:
+                result = await invoker.invoke(binding)
+                if result.call_id != expected_call:
+                    raise SmokeCallFailure(
+                        SmokeFailureCategory.ARTIFACT_INTEGRITY,
+                        "smoke result identity mismatch",
+                    )
+                results.append(result)
+            except SmokeCallFailure as exc:
+                if exc.evidence_result is not None:
+                    results.append(exc.evidence_result)
+                failing_call_id = expected_call
+                failure_category = exc.category
+                break
+            except Exception:
+                failing_call_id = expected_call
+                failure_category = SmokeFailureCategory.INFRASTRUCTURE
+                break
+        receipt = SmokeExecutionReceipt(
+            plan_id=self.smoke_plan.plan_id,
+            smoke_plan_digest=self.smoke_plan_digest,
+            release_plan_digest=self.release_plan.digest,
+            status=(
+                SmokeExecutionStatus.SUCCEEDED
+                if failing_call_id is None
+                else SmokeExecutionStatus.ABORTED
+            ),
+            attempted_top_level_launches=attempted,
+            failing_call_id=failing_call_id,
+            failure_category=failure_category,
+            results=tuple(results),
+        )
+        if receipt_path is not None:
+            self._persist_receipt(receipt_path, receipt)
+        return receipt
+
+    @staticmethod
+    def _persist_receipt(path: Path, receipt: SmokeExecutionReceipt) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(
+            "w", encoding="utf-8", dir=path.parent, delete=False
+        ) as handle:
+            handle.write(receipt.canonical_json() + "\n")
+            temporary = Path(handle.name)
+        os.replace(temporary, path)
+
+
+class ProductionSmokeInvoker:
+    """Exact runner dispatch. It has no arbitrary provider/model/task entry point."""
+
+    def __init__(
+        self,
+        repository_root: Path,
+        environment: Mapping[str, str],
+        artifact_root: Path,
+    ) -> None:
+        self.repository_root = repository_root.resolve()
+        self.environment = dict(environment)
+        self.artifact_root = artifact_root.resolve()
+
+    async def invoke(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+        call_id = binding.frozen.call.call_id
+        if call_id in EXPECTED_CALL_IDS[:3]:
+            return await self._direct(binding)
+        if call_id in EXPECTED_CALL_IDS[3:5]:
+            return await self._codex(binding)
+        if call_id == EXPECTED_CALL_IDS[5]:
+            return await self._claude(binding)
+        if call_id == EXPECTED_CALL_IDS[6]:
+            return await self._deepseek(binding)
+        if call_id == EXPECTED_CALL_IDS[7]:
+            return await self._judge(binding)
+        raise SmokeCallFailure(SmokeFailureCategory.CONFIGURATION, "undeclared smoke call")
+
+    def _credentials(self, call: RealSmokeCall) -> dict[str, str]:
+        return {reference: self.environment[reference] for reference in call.credential_references}
+
+    async def _direct(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+        profile = binding.runtime_profile
+        assert isinstance(profile, ModelProfile)
+        adapters = {
+            Protocol.RESPONSES: OpenAIResponsesAdapter,
+            Protocol.MESSAGES: AnthropicMessagesAdapter,
+            Protocol.CHAT_COMPLETIONS: OpenAICompatibleChatAdapter,
+        }
+        adapter = adapters[profile.protocol](environment=self.environment)
+        assert binding.frozen.task_path is not None
+        result = await DirectModelRunner(
+            artifact_root=self.artifact_root / binding.frozen.call.call_id,
+            environment=self.environment,
+            allow_custom_endpoint=True,
+        ).run(
+            binding.frozen.task_path,
+            profile,
+            adapter=adapter,
+            run_id=binding.frozen.call.call_id,
+        )
+        evidence = result.evidence
+        artifact = self._artifact_result(binding, result.artifact_directory)
+        if evidence.provider_failure is not None:
+            raise SmokeCallFailure(
+                self._provider_failure_category(evidence.provider_failure),
+                "direct provider smoke failed",
+                artifact,
+            )
+        if evidence.outcome is DirectModelOutcome.INFRA_ERROR:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.INFRASTRUCTURE,
+                "direct smoke infrastructure failed",
+                artifact,
+            )
+        if evidence.outcome is DirectModelOutcome.ARTIFACT_ERROR:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.ARTIFACT_INTEGRITY,
+                "direct smoke artifact integrity failed",
+                artifact,
+            )
+        if evidence.observed_model != profile.requested_model:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
+                "direct observed model conflict",
+                artifact,
+            )
+        return artifact
+
+    async def _codex(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+        profile = binding.runtime_profile
+        assert isinstance(profile, CodexHarnessProfile)
+        assert binding.frozen.task_path is not None and binding.egress_boundary is not None
+        backend = DockerCodexBackend(
+            explicitly_enabled=True,
+            credentials=self._credentials(binding.frozen.call),
+            egress_boundary=binding.egress_boundary,
+        )
+        result = await CodexHarnessRunner(
+            artifact_root=self.artifact_root / binding.frozen.call.call_id
+        ).run(
+            binding.frozen.task_path,
+            profile,
+            backend=backend,
+            run_id=binding.frozen.call.call_id,
+        )
+        artifact = self._artifact_result(
+            binding, result.artifact_directory, egress_attestation=backend.egress_attestation
+        )
+        if result.evidence.harness_failure is not None:
+            raise SmokeCallFailure(
+                self._harness_failure_category(result.evidence.harness_failure),
+                "Codex smoke failed",
+                artifact,
+            )
+        if result.evidence.outcome is HarnessLaneOutcome.INFRA_ERROR:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.INFRASTRUCTURE,
+                "Codex smoke infrastructure failed",
+                artifact,
+            )
+        if result.evidence.outcome is HarnessLaneOutcome.ARTIFACT_ERROR:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.ARTIFACT_INTEGRITY,
+                "Codex smoke artifact integrity failed",
+                artifact,
+            )
+        if result.evidence.observed_model != profile.requested_model:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
+                "Codex observed model conflict",
+                artifact,
+            )
+        return artifact
+
+    async def _claude(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+        return await self._multi(binding, ClaudeCodeAdapter())
+
+    async def _deepseek(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+        profile = binding.runtime_profile
+        assert isinstance(profile, MultiHarnessProfile) and profile.config_digest is not None
+        return await self._multi(
+            binding, DeepSeekHarnessAdapter(observed_config_digest=profile.config_digest)
+        )
+
+    async def _multi(self, binding: ResolvedSmokeBinding, adapter: object) -> SmokeCallResult:
+        profile = binding.runtime_profile
+        assert isinstance(profile, MultiHarnessProfile)
+        assert binding.frozen.task_path is not None and binding.egress_boundary is not None
+        backend = DockerMultiHarnessBackend(
+            explicitly_enabled=True,
+            credentials=self._credentials(binding.frozen.call),
+            egress_boundary=binding.egress_boundary,
+        )
+        result = await MultiHarnessRunner(
+            artifact_root=self.artifact_root / binding.frozen.call.call_id
+        ).run(
+            binding.frozen.task_path,
+            profile,
+            adapter=adapter,  # type: ignore[arg-type]
+            backend=backend,
+            run_id=binding.frozen.call.call_id,
+        )
+        artifact = self._artifact_result(
+            binding, result.artifact_directory, egress_attestation=backend.egress_attestation
+        )
+        if result.evidence.harness_failure is not None:
+            raise SmokeCallFailure(
+                self._harness_failure_category(result.evidence.harness_failure),
+                "Harness smoke failed",
+                artifact,
+            )
+        if result.evidence.outcome is HarnessLaneOutcome.INFRA_ERROR:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.INFRASTRUCTURE,
+                "Harness smoke infrastructure failed",
+                artifact,
+            )
+        if result.evidence.outcome is HarnessLaneOutcome.ARTIFACT_ERROR:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.ARTIFACT_INTEGRITY,
+                "Harness smoke artifact integrity failed",
+                artifact,
+            )
+        if result.evidence.observed_model != profile.requested_model:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
+                "Harness observed model conflict",
+                artifact,
+            )
+        return artifact
+
+    async def _judge(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+        profile = binding.runtime_profile
+        assert isinstance(profile, ModelProfile)
+        suite_root = self.repository_root / "judge_suites/core-calibration/1.0.0"
+        suite = load_judge_suite(suite_root)
+        definition = load_judge_definition(suite_root / "definition.yaml")
+        cases = {case.case_id: case for case in suite.public.cases}
+        case = cases.get("label-l0-pass")
+        if case is None:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.CONFIGURATION, "bounded Judge case is unavailable"
+            )
+        profile_identity = judge_digest(profile)
+        slot_identity = {
+            "calibration_id": "core-real-smoke-v1",
+            "judge_cell_id": "judge-glm52-bailian-chat",
+            "suite_digest": suite.suite_digest,
+            "definition_digest": definition.definition_digest,
+            "profile_identity": profile_identity,
+            "case_id": case.case_id,
+            "case_public_digest": case.public_digest,
+            "repeat_index": 0,
+            "order_variant": OrderVariant.NOT_APPLICABLE.value,
+        }
+        slot = JudgeEvaluationSlot(
+            slot_id=judge_digest(slot_identity),
+            slot_order=0,
+            calibration_id="core-real-smoke-v1",
+            judge_cell_id="judge-glm52-bailian-chat",
+            case_id=case.case_id,
+            case_mode=case.mode,
+            case_public_digest=case.public_digest,
+            repeat_index=0,
+            order_variant=OrderVariant.NOT_APPLICABLE,
+        )
+        result = await JudgeRunner(self.artifact_root / binding.frozen.call.call_id).run(
+            slot=slot,
+            case=case,
+            suite_id=suite.public.suite_id,
+            suite_version=suite.public.version,
+            suite_digest=suite.suite_digest,
+            definition=definition,
+            profile_identity=profile_identity,
+            profile=profile,
+            adapter=OpenAICompatibleChatAdapter(environment=self.environment),
+        )
+        if result.artifact_path is None or result.artifact_digest is None:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.JUDGE_PERSISTENCE, "bounded Judge evidence was not persisted"
+            )
+        artifact = SmokeCallResult(
+            call_id=binding.frozen.call.call_id,
+            evidence_references=(str(result.artifact_path.resolve()),),
+            evidence_digests=(result.artifact_digest,),
+        )
+        if result.evidence.outcome is JudgeRunOutcome.PROVIDER_ERROR:
+            assert result.evidence.provider_failure is not None
+            raise SmokeCallFailure(
+                self._provider_failure_category(result.evidence.provider_failure),
+                "bounded Judge provider call failed",
+                artifact,
+            )
+        if result.evidence.outcome is JudgeRunOutcome.JUDGE_OUTPUT_ERROR:
+            raise SmokeCallFailure(
+                SmokeFailureCategory.SCHEMA_MISMATCH,
+                "bounded Judge output schema failed",
+                artifact,
+            )
+        if result.evidence.observed_judge_model != "glm-5.2":
+            raise SmokeCallFailure(
+                SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
+                "bounded Judge observed model conflict",
+                artifact,
+            )
+        return artifact
+
+    @staticmethod
+    def _provider_failure_category(
+        category: ProviderFailureCategory,
+    ) -> SmokeFailureCategory:
+        if category is ProviderFailureCategory.AUTHENTICATION:
+            return SmokeFailureCategory.AUTHENTICATION
+        if category in {
+            ProviderFailureCategory.MALFORMED_RESPONSE,
+            ProviderFailureCategory.INCOMPLETE_RESPONSE,
+        }:
+            return SmokeFailureCategory.SCHEMA_MISMATCH
+        if category is ProviderFailureCategory.CONFIGURATION:
+            return SmokeFailureCategory.CONFIGURATION
+        return SmokeFailureCategory.PROVIDER_FAILURE
+
+    @staticmethod
+    def _harness_failure_category(category: HarnessFailureCategory) -> SmokeFailureCategory:
+        if category is HarnessFailureCategory.AUTHENTICATION:
+            return SmokeFailureCategory.AUTHENTICATION
+        if category is HarnessFailureCategory.PROTOCOL_ERROR:
+            return SmokeFailureCategory.SCHEMA_MISMATCH
+        if category in {
+            HarnessFailureCategory.CONFIGURATION,
+            HarnessFailureCategory.PROFILE_VIOLATION,
+        }:
+            return SmokeFailureCategory.CONFIGURATION
+        if category is HarnessFailureCategory.ARTIFACT_ERROR:
+            return SmokeFailureCategory.ARTIFACT_INTEGRITY
+        return SmokeFailureCategory.HARNESS_FAILURE
+
+    @staticmethod
+    def _artifact_result(
+        binding: ResolvedSmokeBinding,
+        path: Path,
+        *,
+        egress_attestation: ProxySecurityAttestation | None = None,
+    ) -> SmokeCallResult:
+        references = [str(path.resolve())]
+        digests = [digest_tree(path)]
+        if egress_attestation is not None:
+            references.append(
+                "egress-proxy:"
+                f"{egress_attestation.image.reference}@{egress_attestation.image.image_id}"
+            )
+            digests.append(egress_attestation.digest)
+        return SmokeCallResult(
+            call_id=binding.frozen.call.call_id,
+            evidence_references=tuple(references),
+            evidence_digests=tuple(digests),
+        )
+
+
+async def resolve_runtime_identities() -> RuntimeIdentities:
+    """Inspect every local runtime before call #1; this performs no provider request."""
+
+    codex = await CodexRuntime().ensure_image()
+    claude = await MultiHarnessRuntime(HarnessKind.CLAUDE_CODE).ensure_image()
+    deepseek_doctor = await MultiHarnessRuntime(HarnessKind.DEEPSEEK).doctor()
+    if deepseek_doctor.config_digest is None:
+        raise SmokeControlPlaneError("DeepSeek effective config identity is unavailable")
+    proxy = await EgressProxyRuntime().ensure_image()
+    runtime = RuntimeIdentities(
+        codex_image=codex,
+        claude_image=claude,
+        deepseek_image=deepseek_doctor.image,
+        egress_proxy_image=proxy,
+        deepseek_config_digest=deepseek_doctor.config_digest,
+    )
+    runtime.validate()
+    return runtime
+
+
+async def execute_real_smoke(
+    repository_root: Path,
+    *,
+    allow_real_smoke: bool,
+    environment: Mapping[str, str] | None = None,
+    artifact_root: Path | None = None,
+) -> SmokeExecutionReceipt:
+    """Future K-B1 entry point. Calling it without explicit authorization fails closed."""
+
+    if not allow_real_smoke:
+        raise SmokeControlPlaneError("real smoke requires --allow-real-smoke")
+    selected_environment = environment if environment is not None else os.environ
+    control = SmokeControlPlane.load(repository_root)
+    control.validate_real_environment(selected_environment)
+    runtime = await resolve_runtime_identities()
+    bindings = control.resolve_real_bindings(selected_environment, runtime)
+    output = (
+        artifact_root
+        if artifact_root is not None
+        else Path(tempfile.gettempdir()) / "harnesslab-phase-k-smoke"
+    ).resolve()
+    invoker = ProductionSmokeInvoker(repository_root, selected_environment, output)
+    return await control.execute(
+        bindings,
+        invoker,
+        allow_real_smoke=True,
+        receipt_path=output / "smoke-execution.json",
+    )
