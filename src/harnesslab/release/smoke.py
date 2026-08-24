@@ -28,6 +28,7 @@ from harnesslab.harness_lane.models import (
     CodexHarnessProfile,
     HarnessFailureCategory,
     HarnessLaneOutcome,
+    ObservedModelStatus,
 )
 from harnesslab.harness_lane.profile import (
     CODEX_IMAGE,
@@ -54,7 +55,7 @@ from harnesslab.model_lane.providers import (
 from harnesslab.model_lane.runner import DirectModelRunner
 from harnesslab.multi_harness.adapter import ClaudeCodeAdapter, DeepSeekHarnessAdapter
 from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
-from harnesslab.multi_harness.models import HarnessKind, MultiHarnessProfile
+from harnesslab.multi_harness.models import HarnessKind, MultiHarnessProfile, TraceCoverage
 from harnesslab.multi_harness.profile import (
     CLAUDE_IMAGE,
     DEEPSEEK_IMAGE,
@@ -144,6 +145,34 @@ class SmokeCallFailure(RuntimeError):
         super().__init__(message)
         self.category = category
         self.evidence_result = evidence_result
+
+
+def _validate_harness_observed_model(
+    profile: MultiHarnessProfile,
+    *,
+    trace_coverage: TraceCoverage,
+    observed_model_status: ObservedModelStatus,
+    observed_model: str | None,
+) -> None:
+    """Validate each harness's declared observation surface without inferring identity."""
+
+    if profile.harness is HarnessKind.CLAUDE_CODE:
+        valid = (
+            trace_coverage is TraceCoverage.FULL_STREAM
+            and observed_model_status is ObservedModelStatus.EXPOSED
+            and observed_model == profile.requested_model
+        )
+    else:
+        valid = (
+            trace_coverage is TraceCoverage.FINAL_OUTPUT_ONLY
+            and observed_model_status is ObservedModelStatus.NOT_EXPOSED
+            and observed_model is None
+        )
+    if not valid:
+        raise SmokeCallFailure(
+            SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
+            f"{profile.harness.value} observed-model contract failed",
+        )
 
 
 class SmokeCallResult(BaseModel):
@@ -716,12 +745,15 @@ class ProductionSmokeInvoker:
                 "Harness smoke artifact integrity failed",
                 artifact,
             )
-        if result.evidence.observed_model != profile.requested_model:
-            raise SmokeCallFailure(
-                SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
-                "Harness observed model conflict",
-                artifact,
+        try:
+            _validate_harness_observed_model(
+                profile,
+                trace_coverage=result.evidence.trace_coverage,
+                observed_model_status=result.evidence.observed_model_status,
+                observed_model=result.evidence.observed_model,
             )
+        except SmokeCallFailure as exc:
+            raise SmokeCallFailure(exc.category, str(exc), artifact) from exc
         return artifact
 
     async def _judge(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:

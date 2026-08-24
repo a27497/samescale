@@ -101,6 +101,10 @@ CRITICAL_TESTS = {
     "test_smoke_one_judge_call_only",
     "test_smoke_ninth_call_is_rejected_before_execution",
     "test_smoke_provider_fallbacks_are_rejected_in_production_assertions",
+    "test_dsh_e1_not_exposed_is_accepted_without_observed_model_fabrication",
+    "test_claude_smoke_requires_exact_exposed_observed_model",
+    "test_dsh_incoherent_observed_model_state_is_rejected",
+    "test_deepseek_runtime_config_drift_remains_rejected",
     "test_immutable_egress_proxy_image_identity_is_required",
     "test_internal_network_create_argv_requires_isolated_gateway_mode",
     "test_real_smoke_network_isolation_preflight_fails_before_first_call",
@@ -294,7 +298,7 @@ def verify_contract_mode() -> bool:
     print("REAL_EVALUATION_CALL_COUNT=0")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
-    print("PHASE_K_B0_NETWORK_ISOLATION_FIXED_AWAITING_REAL_SMOKE_AUTHORIZATION")
+    print("PHASE_K_B0_DSH_OBSERVED_MODEL_FIXED_AWAITING_REAL_SMOKE_AUTHORIZATION")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")

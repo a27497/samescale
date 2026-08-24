@@ -17,6 +17,7 @@ from harnesslab.comparability.manifest import ComparabilityInputError, load_mani
 from harnesslab.comparability.models import ComparabilityIntent
 from harnesslab.core.config import Settings
 from harnesslab.db.health import check_database
+from harnesslab.egress import EgressNetworkIsolationUnavailable
 from harnesslab.experiment.cli import experiment_app, report_app, run_app
 from harnesslab.harness_lane.profile import canonical_codex_profile
 from harnesslab.harness_lane.runtime import CodexRuntime
@@ -116,7 +117,7 @@ def execute_release_smoke(
                 artifact_root=Path(artifact_root) if artifact_root is not None else None,
             )
         )
-    except SmokeControlPlaneError as exc:
+    except (SmokeControlPlaneError, EgressNetworkIsolationUnavailable) as exc:
         typer.echo(f"FAIL smoke execution: {exc}")
         raise typer.Exit(code=2) from exc
     typer.echo(f"SMOKE_EXECUTION={receipt.status.value}")

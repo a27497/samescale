@@ -42,6 +42,15 @@ DEEPSEEK_REQUIRED_HELP = (
 )
 
 
+def _validate_deepseek_effective_config(effective_text: str) -> None:
+    required = (
+        f"provider: {DEEPSEEK_DEFAULT_PROVIDER}",
+        f"model: {DEEPSEEK_DEFAULT_MODEL}",
+    )
+    if any(item not in effective_text for item in required):
+        raise RuntimeError("DeepSeek effective provider/model identity drifted")
+
+
 @dataclass(frozen=True)
 class MultiHarnessRuntimeDoctor:
     harness: HarnessKind
@@ -167,12 +176,7 @@ class MultiHarnessRuntime:
             if not default.stdout.strip() or not effective.stdout.strip():
                 raise RuntimeError("DeepSeek config dumps were empty")
             effective_text = effective.stdout.decode()
-            required_config = (
-                f"provider: {DEEPSEEK_DEFAULT_PROVIDER}",
-                f"model: {DEEPSEEK_DEFAULT_MODEL}",
-            )
-            if any(item not in effective_text for item in required_config):
-                raise RuntimeError("DeepSeek effective provider/model identity drifted")
+            _validate_deepseek_effective_config(effective_text)
             default_digest = "sha256:" + hashlib.sha256(default.stdout).hexdigest()
             config_digest = "sha256:" + hashlib.sha256(effective.stdout).hexdigest()
         return MultiHarnessRuntimeDoctor(

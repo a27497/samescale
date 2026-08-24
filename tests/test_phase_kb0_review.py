@@ -28,13 +28,19 @@ from harnesslab.egress import (
 )
 from harnesslab.harness_lane.adapter import HarnessAdapterError
 from harnesslab.harness_lane.docker_backend import DockerCodexBackend
+from harnesslab.harness_lane.models import ObservedModelStatus
 from harnesslab.harness_lane.profile import CODEX_IMAGE, canonical_codex_profile
 from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
+from harnesslab.multi_harness.models import HarnessProcessCapture, TraceCoverage
 from harnesslab.multi_harness.profile import (
     CLAUDE_IMAGE,
     DEEPSEEK_IMAGE,
     canonical_deepseek_profile,
+    configured_deepseek_v4flash_profile,
+    configured_qwen_bailian_claude_profile,
 )
+from harnesslab.multi_harness.runtime import _validate_deepseek_effective_config
+from harnesslab.multi_harness.trace import collect_deepseek_final
 from harnesslab.release.smoke import (
     EXPECTED_ADAPTERS,
     EXPECTED_CALL_IDS,
@@ -48,6 +54,7 @@ from harnesslab.release.smoke import (
     SmokeControlPlaneError,
     SmokeExecutionStatus,
     SmokeFailureCategory,
+    _validate_harness_observed_model,
     execute_real_smoke,
 )
 from harnesslab.sandbox.docker_cli import _DockerCLI
@@ -276,6 +283,98 @@ def test_smoke_provider_fallbacks_are_rejected_in_production_assertions() -> Non
             profiles["harness-deepseek-v4flash"],
             SAFE_ENVIRONMENT,
         )
+
+
+def test_dsh_e1_not_exposed_is_accepted_without_observed_model_fabrication() -> None:
+    profile = configured_deepseek_v4flash_profile(
+        _runtime().deepseek_image, _runtime().deepseek_config_digest
+    )
+    collection = collect_deepseek_final(HarnessProcessCapture(("completed output",), "", 0, 1))
+    _validate_harness_observed_model(
+        profile,
+        trace_coverage=profile.trace_coverage,
+        observed_model_status=collection.observed_model_status,
+        observed_model=collection.observed_model,
+    )
+    assert profile.requested_model == "deepseek-v4-flash"
+    assert collection.observed_model_status is ObservedModelStatus.NOT_EXPOSED
+    assert collection.observed_model is None
+    assert collection.sanitized_events[0].observed_model is None
+    assert profile.requested_model not in collection.sanitized_jsonl
+
+
+def test_claude_smoke_requires_exact_exposed_observed_model() -> None:
+    profile = configured_qwen_bailian_claude_profile(_runtime().claude_image)
+    _validate_harness_observed_model(
+        profile,
+        trace_coverage=TraceCoverage.FULL_STREAM,
+        observed_model_status=ObservedModelStatus.EXPOSED,
+        observed_model="qwen3.8-max",
+    )
+    for status, observed_model in (
+        (ObservedModelStatus.NOT_EXPOSED, None),
+        (ObservedModelStatus.EXPOSED, "wrong-model"),
+    ):
+        with pytest.raises(SmokeCallFailure) as raised:
+            _validate_harness_observed_model(
+                profile,
+                trace_coverage=TraceCoverage.FULL_STREAM,
+                observed_model_status=status,
+                observed_model=observed_model,
+            )
+        assert raised.value.category is SmokeFailureCategory.OBSERVED_MODEL_CONFLICT
+
+
+def test_dsh_incoherent_observed_model_state_is_rejected() -> None:
+    profile = configured_deepseek_v4flash_profile(
+        _runtime().deepseek_image, _runtime().deepseek_config_digest
+    )
+    for coverage, status, observed_model in (
+        (TraceCoverage.FINAL_OUTPUT_ONLY, ObservedModelStatus.EXPOSED, "deepseek-v4-flash"),
+        (TraceCoverage.FINAL_OUTPUT_ONLY, ObservedModelStatus.NOT_EXPOSED, "deepseek-v4-flash"),
+        (TraceCoverage.FULL_STREAM, ObservedModelStatus.NOT_EXPOSED, None),
+    ):
+        with pytest.raises(SmokeCallFailure) as raised:
+            _validate_harness_observed_model(
+                profile,
+                trace_coverage=coverage,
+                observed_model_status=status,
+                observed_model=observed_model,
+            )
+        assert raised.value.category is SmokeFailureCategory.OBSERVED_MODEL_CONFLICT
+
+
+def test_deepseek_runtime_config_drift_remains_rejected() -> None:
+    _validate_deepseek_effective_config("provider: deepseek-official\nmodel: deepseek-v4-flash\n")
+    for drifted in (
+        "provider: other-provider\nmodel: deepseek-v4-flash\n",
+        "provider: deepseek-official\nmodel: other-model\n",
+    ):
+        with pytest.raises(RuntimeError, match="effective provider/model identity drifted"):
+            _validate_deepseek_effective_config(drifted)
+
+
+def test_release_cli_normalizes_egress_isolation_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def unavailable(*_: object, **__: object) -> object:
+        raise EgressNetworkIsolationUnavailable("EGRESS_NETWORK_ISOLATION_UNAVAILABLE")
+
+    monkeypatch.setattr("harnesslab.cli.execute_real_smoke", unavailable)
+    result = RUNNER.invoke(
+        app,
+        [
+            "release",
+            "smoke",
+            "execute",
+            "--allow-real-smoke",
+            "--repository-root",
+            str(ROOT),
+        ],
+    )
+    assert result.exit_code == 2
+    assert "FAIL smoke execution: EGRESS_NETWORK_ISOLATION_UNAVAILABLE" in result.stdout
+    assert "Traceback" not in result.stdout
 
 
 def test_immutable_egress_proxy_image_identity_is_required() -> None:
