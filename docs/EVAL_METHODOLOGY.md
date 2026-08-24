@@ -194,3 +194,17 @@ A controlled ablation supports facts about its observed paired result, treatment
 and Comparability limitations. It does not erase `PARTIALLY_COMPARABLE`, `NOT_COMPARABLE`, small-n,
 or informal-evidence limits. The Analyst introduces no statistics formula or significance result,
 and the approved infrastructure denominator remains unchanged.
+
+## Core release evaluation plan
+
+The Core corpus freezes 18 validated tasks, balanced six each across Python, Java, and TypeScript,
+with six behavioral categories. The planned real Matrix expands seven cells across every task at
+five repetitions per task/cell: three unresolved Model-only profiles, Codex medium/high, Claude
+Code, and DeepSeek Harness E1. DeepSeek E2 remains deferred. Formal evidence is evaluated per task;
+unrelated task observations are never pooled to manufacture n ≥ 5.
+
+The Codex medium/high controlled ablation changes only reasoning effort. The prospective direct
+OpenAI/Codex P-Lane is not currently a valid uplift comparison because provider routes differ and
+the direct model is unresolved. This limitation is an evaluation result of the contract, not a gap
+to conceal. No real result, rank, uplift, cost, latency, Judge-quality, or regression statement is
+present in K-A.

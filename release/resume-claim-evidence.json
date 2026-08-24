@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "claims": [
+    {
+      "claim_id": "immutable-task-packages",
+      "claim": "Designed versioned coding-task packages with hidden verifiers, deterministic identities, protected paths, and baseline/oracle validation.",
+      "status": "VERIFIED",
+      "required_evidence_type": "source contract and keyless gate",
+      "evidence_refs": [
+        "src/harnesslab/tasks/package.py",
+        "src/harnesslab/tasks/validation.py",
+        "scripts/verify_gate_b.py"
+      ],
+      "source_phase": "B",
+      "limitations": ["This verifies repository behavior, not real-model task performance."]
+    },
+    {
+      "claim_id": "direct-model-lane",
+      "claim": "Implemented a bounded credential-reference-only Model-only execution lane with immutable manifests.",
+      "status": "VERIFIED",
+      "required_evidence_type": "source contract and keyless gate",
+      "evidence_refs": [
+        "src/harnesslab/model_lane",
+        "scripts/verify_gate_c.py"
+      ],
+      "source_phase": "C",
+      "limitations": ["No real provider result is claimed."]
+    },
+    {
+      "claim_id": "codex-harness-lane",
+      "claim": "Implemented an isolated Codex Harness lane with bounded tools, artifacts, and explicit execution identity.",
+      "status": "VERIFIED",
+      "required_evidence_type": "source contract and keyless gate",
+      "evidence_refs": [
+        "src/harnesslab/harness_lane",
+        "scripts/verify_gate_d.py"
+      ],
+      "source_phase": "D",
+      "limitations": ["Keyless fixtures do not establish real Codex quality."]
+    },
+    {
+      "claim_id": "multi-harness-lanes",
+      "claim": "Implemented contract-compatible Claude Code and DeepSeek Harness E1 lanes while explicitly deferring DeepSeek E2.",
+      "status": "VERIFIED",
+      "required_evidence_type": "source contract and keyless gate",
+      "evidence_refs": [
+        "src/harnesslab/multi_harness",
+        "scripts/verify_gate_e.py"
+      ],
+      "source_phase": "E",
+      "limitations": ["DeepSeek E2 and real harness outcomes are not verified."]
+    },
+    {
+      "claim_id": "judge-calibration",
+      "claim": "Implemented Judge calibration whose L1 assessment cannot override deterministic L0 task verification.",
+      "status": "VERIFIED",
+      "required_evidence_type": "source contract, frozen suite, and keyless gate",
+      "evidence_refs": [
+        "src/harnesslab/judgelab",
+        "judge_suites/core-calibration/1.0.0/calibration.yaml",
+        "scripts/verify_gate_f.py"
+      ],
+      "source_phase": "F",
+      "limitations": ["No real Judge provider quality is claimed."]
+    },
+    {
+      "claim_id": "experiment-comparability",
+      "claim": "Implemented immutable experiment plans, per-task repetition, controlled ablations, and fail-closed Comparability contracts.",
+      "status": "VERIFIED",
+      "required_evidence_type": "source contract and keyless gate",
+      "evidence_refs": [
+        "src/harnesslab/experiment",
+        "src/harnesslab/comparability",
+        "scripts/verify_gate_g.py"
+      ],
+      "source_phase": "G",
+      "limitations": ["The contracts do not by themselves establish causal uplift."]
+    },
+    {
+      "claim_id": "durable-execution-control-plane",
+      "claim": "Implemented PostgreSQL-backed queue, lease, heartbeat, retry, and immutable artifact orchestration.",
+      "status": "VERIFIED",
+      "required_evidence_type": "source contract and persisted keyless gate",
+      "evidence_refs": [
+        "src/harnesslab/experiment/queue.py",
+        "src/harnesslab/experiment/executor.py",
+        "scripts/verify_gate_h.py"
+      ],
+      "source_phase": "H",
+      "limitations": ["This is repository-scale orchestration, not a claim of internet-scale operations."]
+    },
+    {
+      "claim_id": "read-only-workbench",
+      "claim": "Built a read-only evidence Workbench with integrity-aware Matrix, Judge, trace, and readiness views.",
+      "status": "VERIFIED",
+      "required_evidence_type": "API/frontend source and keyless gate",
+      "evidence_refs": [
+        "src/harnesslab/api/routes/workbench.py",
+        "frontend/src",
+        "scripts/verify_gate_i.py"
+      ],
+      "source_phase": "I",
+      "limitations": ["The UI presents persisted evidence and does not trigger evaluations."]
+    },
+    {
+      "claim_id": "evidence-bound-analyst",
+      "claim": "Built a read-only bounded Analyst that separates verified facts from hypotheses and rejects fabricated evidence references.",
+      "status": "VERIFIED",
+      "required_evidence_type": "source contract and persisted keyless gate",
+      "evidence_refs": [
+        "src/harnesslab/analyst",
+        "scripts/verify_gate_j.py"
+      ],
+      "source_phase": "J",
+      "limitations": ["The approved implementation uses a deterministic fake backend for keyless proof."]
+    },
+    {
+      "claim_id": "core-corpus-18",
+      "claim": "Prepared a deterministic Core corpus of 18 validated tasks balanced across Python, Java, and TypeScript.",
+      "status": "VERIFIED",
+      "required_evidence_type": "canonical corpus inventory and task validation",
+      "evidence_refs": [
+        "release/core-corpus.json",
+        "tasks"
+      ],
+      "source_phase": "K-A",
+      "limitations": ["Corpus readiness does not imply real model or harness performance."]
+    },
+    {
+      "claim_id": "real-matrix-results",
+      "claim": "Measured real Model-only and Harness performance on the frozen Core Matrix.",
+      "status": "NOT_VERIFIED",
+      "required_evidence_type": "trusted real ExperimentPlan, run manifests, and report",
+      "evidence_refs": [],
+      "source_phase": "K-B",
+      "limitations": ["REAL_MATRIX_EVIDENCE is NOT_RUN pending explicit authorization."]
+    },
+    {
+      "claim_id": "harness-uplift",
+      "claim": "Demonstrated Harness uplift over a comparable direct-model baseline.",
+      "status": "NOT_VERIFIED",
+      "required_evidence_type": "COMPARABLE paired real evidence with frozen hard controls",
+      "evidence_refs": [],
+      "source_phase": "K-B",
+      "limitations": ["The current direct OpenAI and Codex routes differ, so uplift is not presently comparable."]
+    },
+    {
+      "claim_id": "real-judge-quality",
+      "claim": "Established real Judge quality on the frozen calibration suite.",
+      "status": "NOT_VERIFIED",
+      "required_evidence_type": "trusted real Judge calibration report",
+      "evidence_refs": [],
+      "source_phase": "K-B",
+      "limitations": ["REAL_JUDGE_SMOKE is NOT_RUN pending explicit authorization."]
+    },
+    {
+      "claim_id": "real-badcases",
+      "claim": "Documented three evidence-backed real failure cases and lessons.",
+      "status": "NOT_VERIFIED",
+      "required_evidence_type": "three real run/cell/task evidence bundles",
+      "evidence_refs": [],
+      "source_phase": "K-B",
+      "limitations": ["No real BadCase is invented during K-A."]
+    }
+  ]
+}

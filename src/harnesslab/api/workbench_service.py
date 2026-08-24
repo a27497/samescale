@@ -62,6 +62,15 @@ from harnesslab.experiment.report import (
 )
 from harnesslab.experiment.statistics import summarize_cell
 from harnesslab.judgelab.report import JudgeCalibrationReport
+from harnesslab.release.contracts import (
+    CoreReleaseError,
+    load_badcase_plan,
+    load_core_corpus,
+    load_real_evidence_plan,
+    load_release_evidence,
+    load_resume_claim_map,
+)
+from harnesslab.release.models import EvidenceState
 
 TERMINAL_RUN_STATUSES = {
     RunStatus.COMPLETED.value,
@@ -864,25 +873,6 @@ async def regression_compare(
 
 
 async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> CoreReadinessResponse:
-    experiments = tuple(
-        (
-            await session.scalars(
-                select(ExperimentRecord)
-                .where(ExperimentRecord.status == "completed")
-                .order_by(ExperimentRecord.finished_at.desc())
-                .limit(25)
-            )
-        ).all()
-    )
-    plans = tuple(_plan(record) for record in experiments)
-    reports: list[ExperimentReport] = []
-    for record in experiments:
-        reports.append(await _report(session, record.id, roots))
-    task_ids = {task.task_id for plan in plans for task in plan.tasks}
-    matrix_available = any(report.plan_run_count > 0 for report in reports)
-    formal_available = any(any(cell.formal_eligible for cell in report.cells) for report in reports)
-    paired_available = any(bool(report.pairs) for report in reports)
-    ablation_available = any(bool(report.ablations) for report in reports)
     completed_judges = tuple(
         (
             await session.scalars(
@@ -897,39 +887,102 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
         except WorkbenchAPIError:
             continue
         judge_count += 1
-    task_corpus_ready = 15 <= len(task_ids) <= 25
+    repository_root = Path(__file__).resolve().parents[3]
+    try:
+        corpus = load_core_corpus(repository_root / "release/core-corpus.json")
+        release_plan = load_real_evidence_plan(
+            repository_root / "release/core-real-evidence-plan.json"
+        )
+        release_evidence = load_release_evidence(repository_root / "release/release-evidence.json")
+        claim_map = load_resume_claim_map(repository_root / "release/resume-claim-evidence.json")
+        badcases = load_badcase_plan(repository_root / "release/badcases.json")
+        corpus_ready = (
+            release_evidence.core_corpus.state is EvidenceState.VERIFIED
+            and release_evidence.core_corpus.digest == corpus.digest
+            and len(corpus.tasks) == 18
+            and all(not task.baseline.passed and task.oracle.passed for task in corpus.tasks)
+        )
+        matrix_plan_ready = len(release_plan.cells) == 7
+        docs_ready = all(
+            (repository_root / path).is_file()
+            for path in (
+                "docs/FAIRNESS_CONTRACT.md",
+                "docs/BADCASES.md",
+                "docs/INTERVIEW_GUIDE.md",
+                "docs/SECURITY.md",
+                "docs/RELEASE_EVIDENCE.md",
+                "docs/REAL_EVIDENCE_AUTHORIZATION.md",
+            )
+        )
+        phase_j_ready = (
+            any(
+                claim.source_phase == "J" and claim.status is EvidenceState.VERIFIED
+                for claim in claim_map.claims
+            )
+            and (repository_root / "scripts/verify_gate_j.py").is_file()
+        )
+        release_contracts_available = True
+    except CoreReleaseError:
+        corpus = None
+        release_plan = None
+        release_evidence = None
+        badcases = None
+        corpus_ready = matrix_plan_ready = docs_ready = phase_j_ready = False
+        release_contracts_available = False
+    release_task_count = len(corpus.tasks) if corpus is not None else 0
+    real_matrix_state = (
+        release_evidence.real_matrix.state.value if release_evidence is not None else "NOT_VERIFIED"
+    )
+    judge_release_state = (
+        release_evidence.judge_report.state.value
+        if release_evidence is not None
+        else "NOT_VERIFIED"
+    )
     checks = (
         ReadinessCheck(
             key="TASK_CORPUS",
-            label="Persisted task corpus",
-            status=(
-                "READY" if task_corpus_ready else "NOT_VERIFIED" if task_ids else "NOT_REPORTED"
+            label="Canonical Core task corpus",
+            status="READY" if corpus_ready else "NOT_VERIFIED",
+            evidence=(
+                f"{release_task_count} digest-bound task identities; Core requirement is 15-25"
             ),
-            evidence=f"{len(task_ids)} persisted task identities; Core requirement is 15-25",
         ),
         ReadinessCheck(
-            key="MATRIX_EVIDENCE",
-            label="Matrix evidence",
-            status="READY" if matrix_available else "NOT_REPORTED",
-            evidence=f"{len(reports)} completed persisted experiment reports",
+            key="MODEL_ONLY_PROFILES",
+            label="Frozen Model-only profiles",
+            status="NOT_VERIFIED",
+            evidence=(
+                f"{len(release_plan.model_profile_slots) if release_plan else 0} strict slots; "
+                "exact requested model selections remain NOT_VERIFIED"
+            ),
         ),
         ReadinessCheck(
-            key="FORMAL_REPEATED_EVIDENCE",
-            label="Formal repeated evidence",
-            status="READY" if formal_available else "NOT_VERIFIED",
-            evidence="FORMAL tier is derived from persisted report contracts",
+            key="HARNESS_MATRIX_PLAN",
+            label="Core Harness Matrix plan",
+            status="READY" if matrix_plan_ready else "NOT_VERIFIED",
+            evidence="7 structurally validated cells; DeepSeek E2 is DEFERRED_NOT_VERIFIED",
         ),
         ReadinessCheck(
-            key="PAIRED_EVIDENCE",
-            label="Paired evidence",
-            status="READY" if paired_available else "NOT_REPORTED",
-            evidence="Persisted Phase G pair definitions and report evidence",
+            key="REAL_MATRIX_EVIDENCE",
+            label="Real Matrix evidence",
+            status=(
+                "READY"
+                if release_evidence is not None
+                and release_evidence.real_matrix.state is EvidenceState.VERIFIED
+                else "NOT_VERIFIED"
+            ),
+            evidence=f"REAL_MATRIX_EVIDENCE={real_matrix_state}",
         ),
         ReadinessCheck(
-            key="ABLATION_EVIDENCE",
-            label="Ablation evidence",
-            status="READY" if ablation_available else "NOT_REPORTED",
-            evidence="Persisted Phase G ablation definitions and report evidence",
+            key="JUDGE_EVIDENCE",
+            label="Core real Judge evidence",
+            status=(
+                "READY"
+                if release_evidence is not None
+                and release_evidence.judge_report.state is EvidenceState.VERIFIED
+                else "NOT_VERIFIED"
+            ),
+            evidence=f"Judge suite is frozen; REAL_JUDGE_SMOKE={judge_release_state}",
         ),
         ReadinessCheck(
             key="JUDGE_CALIBRATION",
@@ -943,34 +996,76 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
             ),
         ),
         ReadinessCheck(
-            key="REAL_MATRIX_EVIDENCE",
-            label="Real Matrix evidence",
+            key="PAIRED_LANE",
+            label="Comparable release P-Lane",
             status="NOT_VERIFIED",
-            evidence="REAL_MATRIX_EVIDENCE=NOT_RUN",
+            evidence="Planned direct /responses and Codex routes differ; uplift is not COMPARABLE",
         ),
         ReadinessCheck(
-            key="REAL_JUDGE_EVIDENCE",
-            label="Real Judge evidence",
+            key="ABLATION",
+            label="Controlled real ablation",
             status="NOT_VERIFIED",
-            evidence="REAL_JUDGE_SMOKE=NOT_RUN",
+            evidence=(
+                "Codex medium/high reasoning-effort plan is valid; real observations are NOT_RUN"
+            ),
         ),
         ReadinessCheck(
             key="PHASE_J",
             label="Phase J analyst evidence",
-            status="BLOCKED",
-            evidence="Phase J is intentionally outside the current completed scope",
+            status="READY" if phase_j_ready else "NOT_VERIFIED",
+            evidence="Approved bounded Analyst source and Gate J evidence mapping",
         ),
         ReadinessCheck(
             key="RELEASE_DOCUMENTATION",
             label="Release documentation",
+            status="READY" if docs_ready else "NOT_VERIFIED",
+            evidence="Core document set is checked from repository source",
+        ),
+        ReadinessCheck(
+            key="BADCASE_EVIDENCE",
+            label="Three real BadCases",
+            status="NOT_VERIFIED",
+            evidence=(
+                f"{len(badcases.slots) if badcases else 0} placeholders; "
+                "NOT_VERIFIED — REAL EVIDENCE PENDING"
+            ),
+        ),
+        ReadinessCheck(
+            key="RELEASE_EVIDENCE",
+            label="Final release evidence manifest",
+            status=(
+                "READY"
+                if release_evidence is not None and release_evidence.core_release_ready
+                else "NOT_VERIFIED"
+            ),
+            evidence=(
+                "Strict release contract loaded; CORE_RELEASE_READY=FALSE"
+                if release_contracts_available
+                else "Release contract is unavailable or invalid"
+            ),
+        ),
+        ReadinessCheck(
+            key="REMOTE_CI",
+            label="Exact-head remote CI",
+            status=(
+                "READY"
+                if release_evidence is not None
+                and release_evidence.remote_ci.state is EvidenceState.VERIFIED
+                else "NOT_VERIFIED"
+            ),
+            evidence="Final exact-head CI binding is not yet in release evidence",
+        ),
+        ReadinessCheck(
+            key="CORE_TAG",
+            label="v1.0.0-core tag",
             status="NOT_REPORTED",
-            evidence="No structured release-candidate artifact is persisted",
+            evidence="Tag creation is refused until final release verification passes",
         ),
     )
     blockers = tuple(check.key for check in checks if check.status != "READY")
     return CoreReadinessResponse(
         status="NOT_READY" if blockers else "READY",
-        task_corpus_size=len(task_ids),
+        task_corpus_size=release_task_count,
         checks=checks,
         blockers=blockers,
         evaluated_at=datetime.now(UTC),

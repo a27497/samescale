@@ -25,6 +25,8 @@ gate-i-frontend-results.xml
 gate-i-evidence.json
 gate-j-results.xml
 gate-j-evidence.json
+gate-k-results.xml
+full-pytest-results.xml
 harnesslab-runtime/
 harnesslab-artifacts/
 frontend/node_modules/

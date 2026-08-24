@@ -1,0 +1,1 @@
+None uses default; supported literals are true/1/yes/on and false/0/no/off; others raise ValueError.

@@ -1,0 +1,1 @@
+consume accepts positive units, mutates only on success, and permits exact remaining capacity.

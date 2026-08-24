@@ -867,13 +867,14 @@ async def test_core_readiness_is_evidence_driven_and_stays_not_ready(
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "NOT_READY"
-    assert body["task_corpus_size"] >= 1
+    assert body["task_corpus_size"] == 18
     task_check = next(check for check in body["checks"] if check["key"] == "TASK_CORPUS")
-    assert task_check["status"] == "NOT_VERIFIED"
+    assert task_check["status"] == "READY"
     assert "15-25" in task_check["evidence"]
     assert "REAL_MATRIX_EVIDENCE" in body["blockers"]
-    assert "REAL_JUDGE_EVIDENCE" in body["blockers"]
-    assert "PHASE_J" in body["blockers"]
+    assert "JUDGE_EVIDENCE" in body["blockers"]
+    assert "MODEL_ONLY_PROFILES" in body["blockers"]
+    assert "PHASE_J" not in body["blockers"]
 
 
 @pytest.mark.integration

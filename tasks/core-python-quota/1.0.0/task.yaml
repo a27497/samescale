@@ -1,0 +1,17 @@
+schema_version: 1
+id: core-python-quota
+version: 1.0.0
+domain: software-engineering
+lane_support: [M, H]
+instruction_path: instruction.md
+workspace_path: workspace
+verifier: {kind: python, version: "1", entrypoint: verifier/verify.py, timeout_seconds: 15}
+oracle: {path: oracle}
+budget: {timeout_seconds: 90, max_output_tokens: 2000, network_policy: deny}
+expected_tools:
+  - {name: python, version: "3.12"}
+protected_paths: [contract.txt]
+metadata:
+  language: python
+  category: state-lifecycle
+  difficulty: intermediate

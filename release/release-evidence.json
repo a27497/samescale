@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "release_id": "v1.0.0-core",
+  "core_corpus": {
+    "state": "VERIFIED",
+    "identity": "harnesslab-core-18-v1",
+    "digest": "sha256:353362d4075db0dacd90f865cd0a8f9e79ca625ee11808fd80faa17c2b0d669b",
+    "limitation": "Keyless corpus contract evidence; no real performance implication."
+  },
+  "release_commit": {
+    "state": "NOT_VERIFIED",
+    "identity": null,
+    "digest": null,
+    "limitation": "Final release commit is bound only after Phase K-B evidence is checked in."
+  },
+  "experiment_plan": {
+    "state": "NOT_VERIFIED",
+    "identity": "core-real-evidence-v1",
+    "digest": "sha256:692b8e686a7330b960d3d22ded10c4885a7053ef814c5ec938f09125f8590941",
+    "limitation": "K-A preflight plan is structurally verified, but exact model selections and the executable ExperimentPlan remain unresolved."
+  },
+  "real_matrix": {
+    "state": "NOT_RUN",
+    "identity": null,
+    "digest": null,
+    "limitation": "Explicit user authorization is required."
+  },
+  "paired_lane": {
+    "state": "NOT_RUN",
+    "identity": null,
+    "digest": null,
+    "limitation": "The planned direct OpenAI and Codex provider routes are not currently COMPARABLE."
+  },
+  "controlled_ablation": {
+    "state": "NOT_RUN",
+    "identity": null,
+    "digest": null,
+    "limitation": "No real ablation observations exist."
+  },
+  "judge_suite": {
+    "state": "VERIFIED",
+    "identity": "core-calibration@1.0.0",
+    "digest": "sha256:c2708196237eab94dac473581e3a06de2f7d0e2c50e8b55190b253e547fc43fb",
+    "limitation": "Suite identity is verified; real Judge execution is not."
+  },
+  "judge_report": {
+    "state": "NOT_RUN",
+    "identity": null,
+    "digest": null,
+    "limitation": "REAL_JUDGE_SMOKE requires explicit user authorization."
+  },
+  "analyst_report": {
+    "state": "NOT_RUN",
+    "identity": null,
+    "digest": null,
+    "limitation": "Optional release analysis has not been produced."
+  },
+  "badcase_evidence": [
+    {
+      "state": "NOT_VERIFIED",
+      "identity": null,
+      "digest": null,
+      "limitation": "BadCase 1 awaits real run evidence."
+    },
+    {
+      "state": "NOT_VERIFIED",
+      "identity": null,
+      "digest": null,
+      "limitation": "BadCase 2 awaits real run evidence."
+    },
+    {
+      "state": "NOT_VERIFIED",
+      "identity": null,
+      "digest": null,
+      "limitation": "BadCase 3 awaits real run evidence."
+    }
+  ],
+  "resume_claim_map": {
+    "state": "VERIFIED",
+    "identity": "release/resume-claim-evidence.json",
+    "digest": "sha256:f5aa1b0827318a952b0ca9459cbd4b509c3998a2efcd6333610f7a36790256e9",
+    "limitation": "Real-performance claims remain NOT_VERIFIED."
+  },
+  "remote_ci": {
+    "state": "NOT_VERIFIED",
+    "identity": null,
+    "digest": null,
+    "limitation": "Exact-head GitHub Actions evidence will be recorded after push."
+  },
+  "real_statuses": {
+    "REAL_PROVIDER_SMOKE": "NOT_RUN",
+    "REAL_CODEX_SMOKE": "NOT_RUN",
+    "REAL_CLAUDE_SMOKE": "NOT_RUN",
+    "REAL_DEEPSEEK_SMOKE": "NOT_RUN",
+    "REAL_MATRIX_EVIDENCE": "NOT_RUN",
+    "REAL_JUDGE_SMOKE": "NOT_RUN"
+  },
+  "core_release_ready": false,
+  "real_evidence_authorization_required": true
+}

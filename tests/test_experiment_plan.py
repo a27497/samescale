@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import shutil
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -128,9 +130,16 @@ def test_controlled_ablation_accepts_one_treatment_and_rejects_hard_drift() -> N
         ExperimentSpec.model_validate(raw)
 
 
-def test_plan_rejects_cell_lane_unsupported_by_real_task() -> None:
+def test_plan_rejects_cell_lane_unsupported_by_real_task(tmp_path: Path) -> None:
     task_path = "tasks/micro-java-clamp/1.0.0"
-    package = TaskPackage.load(ROOT / task_path)
+    copied_task = tmp_path / task_path
+    shutil.copytree(ROOT / task_path, copied_task)
+    definition = copied_task / "task.yaml"
+    definition.write_text(
+        definition.read_text(encoding="utf-8").replace("lane_support: [M, H]", "lane_support: [H]"),
+        encoding="utf-8",
+    )
+    package = TaskPackage.load(copied_task)
     model_cell = cell("model", EvaluationLane.MODEL).model_copy(
         update={
             "resource_budget_identity": canonical_digest(
@@ -147,4 +156,4 @@ def test_plan_rejects_cell_lane_unsupported_by_real_task() -> None:
     )
 
     with pytest.raises(ExperimentSpecError, match=r"does not support.*lane M"):
-        build_experiment_plan(spec, ROOT)
+        build_experiment_plan(spec, tmp_path)

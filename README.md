@@ -280,3 +280,42 @@ See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_MET
 [Workbench](docs/WORKBENCH.md) documents the Phase I read API and Vue evidence surface.
 [Attribution Analyst](docs/ANALYST.md) documents Phase J structured facts and read-only graph
 boundary.
+
+## Phase K-A Core release preparation
+
+The prospective Core corpus contains 18 independently validated tasks: six each in Python, Java,
+and TypeScript across targeted bug fixes, data transformation, API/input contracts, state/lifecycle,
+multi-file behavior, and small features. The canonical inventory is `release/core-corpus.json`.
+
+Gate K keyless mode verifies the corpus, release Matrix/profile slots, Pair and ablation controls,
+Judge-suite binding, evidence schema, documentation, resume map, BadCase placeholders, fresh setup,
+secret boundary, and tag guard:
+
+```bash
+uv run --locked python scripts/verify_gate_k.py
+```
+
+During K-A a pass intentionally reports `CORE_RELEASE_READY=FALSE`,
+`REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE`, and every `REAL_*` state `NOT_RUN`. It performs no
+provider, Harness, or Judge call and does not create `v1.0.0-core`. See
+[Real Evidence Authorization](docs/REAL_EVIDENCE_AUTHORIZATION.md) for the exact bounded preflight.
+
+## Fresh clone operator path
+
+Assumptions are Python 3.12.14, uv 0.12.5, Docker, PostgreSQL 18, Java 21, and Node 24
+(`>=24.18.1 <25`). From a fresh clone:
+
+```bash
+uv sync --locked
+docker compose up -d postgres
+uv run --locked alembic upgrade head
+uv run --locked harnesslab task validate tasks/micro-python-clamp/1.0.0
+npm --prefix frontend ci
+npm --prefix frontend run build
+uv run --locked python scripts/verify_fresh_setup.py --check-runtime
+```
+
+Run `scripts/verify_gate_a.py` through `scripts/verify_gate_k.py` in order for the full keyless gate
+chain; Gates H-J also require `DATABASE_URL` pointing at PostgreSQL. Future real execution uses only
+credential references from the authorization document; never commit `.env` or secret values. Final
+release mode is documented in [Release Evidence](docs/RELEASE_EVIDENCE.md) and remains fail-closed.

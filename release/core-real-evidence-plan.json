@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "plan_id": "core-real-evidence-v1",
+  "corpus_reference": "release/core-corpus.json",
+  "corpus_digest": "sha256:353362d4075db0dacd90f865cd0a8f9e79ca625ee11808fd80faa17c2b0d669b",
+  "experiment_id": "core-real-matrix-v1",
+  "execution_seed": 20260824,
+  "model_profile_slots": [
+    {
+      "slot_id": "model-openai-responses",
+      "release_name": "Core Model-only OpenAI Responses slot",
+      "protocol": "responses",
+      "provider": "openai",
+      "base_url": "https://api.openai.com/v1",
+      "route": "/responses",
+      "requested_model": null,
+      "reasoning_effort": "medium",
+      "max_output_tokens": 2000,
+      "request_timeout_seconds": 90,
+      "credential_reference": "OPENAI_API_KEY",
+      "selection_state": "NOT_VERIFIED",
+      "limitation": "Exact release model requires explicit user selection and authorization."
+    },
+    {
+      "slot_id": "model-anthropic-messages",
+      "release_name": "Core Model-only Anthropic Messages slot",
+      "protocol": "messages",
+      "provider": "anthropic",
+      "base_url": "https://api.anthropic.com",
+      "route": "/v1/messages",
+      "requested_model": null,
+      "reasoning_effort": "medium",
+      "max_output_tokens": 2000,
+      "request_timeout_seconds": 90,
+      "credential_reference": "ANTHROPIC_API_KEY",
+      "selection_state": "NOT_VERIFIED",
+      "limitation": "Exact release model requires explicit user selection and authorization."
+    },
+    {
+      "slot_id": "model-third-chat-completions",
+      "release_name": "Core Model-only third-provider Chat Completions slot",
+      "protocol": "chat_completions",
+      "provider": null,
+      "base_url": null,
+      "route": "/chat/completions",
+      "requested_model": null,
+      "reasoning_effort": null,
+      "max_output_tokens": 2000,
+      "request_timeout_seconds": 90,
+      "credential_reference": null,
+      "selection_state": "NOT_VERIFIED",
+      "limitation": "Provider, base URL, exact model, reasoning settings, and credential reference require explicit user selection."
+    }
+  ],
+  "cells": [
+    {"cell_id":"model-openai-responses","lane":"M","runtime":"direct-model","profile_slot":"model-openai-responses","requested_model":null,"provider_route":"https://api.openai.com/v1/responses","reasoning_effort":"medium","repeat_count":5,"task_count":18,"planned_runs":90,"evidence_state":"NOT_VERIFIED"},
+    {"cell_id":"model-anthropic-messages","lane":"M","runtime":"direct-model","profile_slot":"model-anthropic-messages","requested_model":null,"provider_route":"https://api.anthropic.com/v1/messages","reasoning_effort":"medium","repeat_count":5,"task_count":18,"planned_runs":90,"evidence_state":"NOT_VERIFIED"},
+    {"cell_id":"model-third-chat-completions","lane":"M","runtime":"direct-model","profile_slot":"model-third-chat-completions","requested_model":null,"provider_route":null,"reasoning_effort":null,"repeat_count":5,"task_count":18,"planned_runs":90,"evidence_state":"NOT_VERIFIED"},
+    {"cell_id":"harness-codex-medium","lane":"H","runtime":"codex","profile_slot":null,"requested_model":"gpt-5.6-sol","provider_route":"codex-cli-default","reasoning_effort":"medium","repeat_count":5,"task_count":18,"planned_runs":90,"evidence_state":"NOT_VERIFIED"},
+    {"cell_id":"harness-codex-high","lane":"H","runtime":"codex","profile_slot":null,"requested_model":"gpt-5.6-sol","provider_route":"codex-cli-default","reasoning_effort":"high","repeat_count":5,"task_count":18,"planned_runs":90,"evidence_state":"NOT_VERIFIED"},
+    {"cell_id":"harness-claude-sonnet","lane":"H","runtime":"claude-code","profile_slot":null,"requested_model":"sonnet","provider_route":"anthropic-api/claude-code","reasoning_effort":null,"repeat_count":5,"task_count":18,"planned_runs":90,"evidence_state":"NOT_VERIFIED"},
+    {"cell_id":"harness-deepseek-e1","lane":"H","runtime":"deepseek-e1","profile_slot":null,"requested_model":"deepseek-v4-flash","provider_route":"deepseek-official/dsh-api-gateway","reasoning_effort":null,"repeat_count":5,"task_count":18,"planned_runs":90,"evidence_state":"NOT_VERIFIED"}
+  ],
+  "paired_lane": {
+    "pair_id": "openai-direct-vs-codex",
+    "left_cell_id": "model-openai-responses",
+    "right_cell_id": "harness-codex-medium",
+    "intent": "HARNESS_UPLIFT",
+    "required_frozen_controls": ["requested_model","observed_model","provider_route","task_id","task_version","task_digest","workspace_input_digest","verifier_identity","budget_identity","network_policy"],
+    "expected_paired_observations": 90,
+    "comparability_state": "NOT_VERIFIED",
+    "blocker": "The direct model is unselected and the planned direct /responses route differs from codex-cli-default; current Comparability therefore cannot yet establish a COMPARABLE uplift pair."
+  },
+  "ablation": {
+    "ablation_id": "codex-reasoning-effort",
+    "base_cell_id": "harness-codex-medium",
+    "variant_cell_id": "harness-codex-high",
+    "changed_dimension": "reasoning_effort",
+    "base_value": "medium",
+    "variant_value": "high",
+    "frozen_hard_controls": ["requested_model","provider_route","task identities","workspace identities","verifier identities","resource budget","network policy","Codex CLI version","container image","prompt contract"],
+    "expected_paired_observations": 90,
+    "evidence_tier_expectation": "FORMAL_PER_TASK_N5",
+    "evidence_state": "NOT_RUN"
+  },
+  "judge": {
+    "suite_reference": "judge_suites/core-calibration/1.0.0",
+    "suite_id": "core-calibration",
+    "suite_version": "1.0.0",
+    "suite_digest": "sha256:c2708196237eab94dac473581e3a06de2f7d0e2c50e8b55190b253e547fc43fb",
+    "judge_profile_selection": "NOT_VERIFIED",
+    "judge_cell_count": 1,
+    "repeat_count": 3,
+    "public_case_count": 15,
+    "planned_calls": 63,
+    "max_output_tokens_per_call": 256,
+    "planned_output_token_ceiling": 16128
+  },
+  "preflight": {
+    "task_count":18,"cell_count":7,"repeat_count":5,"total_subject_runs":630,
+    "direct_model_runs":270,"codex_runs":180,"claude_runs":90,"deepseek_runs":90,
+    "judge_calls":63,"total_top_level_external_calls":693,"ablation_paired_observations":90,
+    "subject_output_token_ceiling":1260000,"judge_output_token_ceiling":16128,
+    "total_output_token_ceiling":1276128,
+    "internal_harness_provider_request_count":"NOT_CALCULATED_FROM_REPOSITORY_EVIDENCE",
+    "monetary_cost":"NOT_CALCULATED_FROM_REPOSITORY_EVIDENCE"
+  },
+  "credential_references": [
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "THIRD_MODEL_PROFILE_CREDENTIAL_REFERENCE_NOT_SELECTED",
+    "EXPLICIT_CODEX_LOGIN_AUTHORIZATION_REQUIRED",
+    "EXPLICIT_CLAUDE_LOGIN_AUTHORIZATION_REQUIRED",
+    "EXPLICIT_DEEPSEEK_CONFIGURATION_AUTHORIZATION_REQUIRED",
+    "JUDGE_CREDENTIAL_REFERENCE_NOT_SELECTED"
+  ],
+  "unresolved_authorization_items": [
+    "Exact requested model for each of the three Model-only slots",
+    "Third Model-only provider, base URL, reasoning settings, and credential reference",
+    "Exact real Judge model/profile and credential reference",
+    "A genuinely COMPARABLE Direct-Model versus Harness pair under current provider-route controls",
+    "Explicit authorization for all six REAL_* execution classes"
+  ],
+  "deepseek_e2": "DEFERRED_NOT_VERIFIED",
+  "real_evidence_authorization_required": true
+}

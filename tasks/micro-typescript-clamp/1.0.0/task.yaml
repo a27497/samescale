@@ -2,7 +2,7 @@ schema_version: 1
 id: micro-typescript-clamp
 version: 1.0.0
 domain: software-engineering
-lane_support: [H, P]
+lane_support: [M, H, P]
 instruction_path: instruction.md
 workspace_path: workspace
 context_path: context
@@ -14,7 +14,7 @@ verifier:
 oracle:
   path: oracle
 budget:
-  timeout_seconds: 60
+  timeout_seconds: 90
   max_output_tokens: 2000
   network_policy: deny
 expected_tools:
@@ -22,4 +22,5 @@ expected_tools:
     version: "24"
 metadata:
   language: typescript
-  difficulty: micro
+  category: targeted-bug-fix
+  difficulty: foundation

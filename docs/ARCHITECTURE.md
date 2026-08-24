@@ -313,3 +313,17 @@ solve HarnessLab's core reproducibility and adapter problem.
 
 These exclusions are decisions against premature complexity, not claims that those technologies
 are universally unsuitable.
+
+## Phase K Core release boundary
+
+Phase K adds no new execution backend. It composes approved A-J contracts into a canonical 18-task
+corpus, seven-cell real-evidence preflight, strict prospective release bindings, and keyless Gate K.
+Ordinary CI rebuilds task identities, validates plan/evidence semantics, and proves incomplete
+evidence cannot authorize a tag. It never resolves credentials or calls providers, Harnesses, or a
+Judge.
+
+The release layer is `src/harnesslab/release`; canonical inputs live in `release/`. K-A distinguishes
+structurally verified preparation from real results. Final mode additionally requires a trusted
+PostgreSQL store, trusted artifact root, artifact identities/digests, exact Git/remote CI head,
+supported resume claims, three BadCases, and all mandatory `REAL_*` states. Tag creation stays
+outside the verifier and is authorized only when derived readiness is true.

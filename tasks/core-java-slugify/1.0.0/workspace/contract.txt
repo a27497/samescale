@@ -1,0 +1,1 @@
+ASCII [a-z0-9] survives; all other runs collapse to one hyphen; trim boundary hyphens.

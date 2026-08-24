@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "slots": [
+    {
+      "slot_id": "badcase-1",
+      "status": "NOT_VERIFIED",
+      "task_identity": null,
+      "run_identity": null,
+      "cell_identity": null,
+      "evidence_refs": [],
+      "observed_failure": null,
+      "safe_trace_facts": [],
+      "verifier_result": null,
+      "attribution_classification": null,
+      "root_cause": null,
+      "mitigation_lesson": null,
+      "harnesslab_detection": null,
+      "placeholder": "NOT_VERIFIED — REAL EVIDENCE PENDING"
+    },
+    {
+      "slot_id": "badcase-2",
+      "status": "NOT_VERIFIED",
+      "task_identity": null,
+      "run_identity": null,
+      "cell_identity": null,
+      "evidence_refs": [],
+      "observed_failure": null,
+      "safe_trace_facts": [],
+      "verifier_result": null,
+      "attribution_classification": null,
+      "root_cause": null,
+      "mitigation_lesson": null,
+      "harnesslab_detection": null,
+      "placeholder": "NOT_VERIFIED — REAL EVIDENCE PENDING"
+    },
+    {
+      "slot_id": "badcase-3",
+      "status": "NOT_VERIFIED",
+      "task_identity": null,
+      "run_identity": null,
+      "cell_identity": null,
+      "evidence_refs": [],
+      "observed_failure": null,
+      "safe_trace_facts": [],
+      "verifier_result": null,
+      "attribution_classification": null,
+      "root_cause": null,
+      "mitigation_lesson": null,
+      "harnesslab_detection": null,
+      "placeholder": "NOT_VERIFIED — REAL EVIDENCE PENDING"
+    }
+  ]
+}
