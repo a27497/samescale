@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import hashlib
+import ipaddress
 import json
 import shutil
 from pathlib import Path
@@ -16,10 +18,13 @@ from harnesslab.egress import (
     EGRESS_PROXY_BASE,
     EGRESS_PROXY_IMAGE,
     EGRESS_PROXY_SOURCE_DIGEST,
+    INTERNAL_NETWORK_GATEWAY_MODE_OPTION,
+    EgressNetworkIsolationUnavailable,
     EgressPolicy,
     EgressProxyRuntime,
     EgressSecurityError,
     ProviderScopedDockerBoundary,
+    preflight_egress_network_isolation,
 )
 from harnesslab.harness_lane.adapter import HarnessAdapterError
 from harnesslab.harness_lane.docker_backend import DockerCodexBackend
@@ -43,6 +48,7 @@ from harnesslab.release.smoke import (
     SmokeControlPlaneError,
     SmokeExecutionStatus,
     SmokeFailureCategory,
+    execute_real_smoke,
 )
 from harnesslab.sandbox.docker_cli import _DockerCLI
 from harnesslab.sandbox.models import ImageIdentity
@@ -290,6 +296,102 @@ def test_immutable_egress_proxy_image_identity_is_required() -> None:
         )
 
 
+def test_internal_network_create_argv_requires_isolated_gateway_mode() -> None:
+    boundary = ProviderScopedDockerBoundary(
+        EgressPolicy(allowed_hostname="provider.example.test"),
+        "review-internal",
+        "review-proxy",
+        _runtime().egress_proxy_image,
+    )
+    assert boundary.create_internal_network_argv() == (
+        "network",
+        "create",
+        "--driver",
+        "bridge",
+        "--internal",
+        "--ipv6=false",
+        "-o",
+        "com.docker.network.bridge.gateway_mode_ipv4=isolated",
+        "review-internal",
+    )
+
+
+@pytest.mark.asyncio
+async def test_real_smoke_network_isolation_preflight_fails_before_first_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    runtime_resolution_attempted = False
+
+    async def unavailable() -> object:
+        raise EgressNetworkIsolationUnavailable("EGRESS_NETWORK_ISOLATION_UNAVAILABLE")
+
+    async def forbidden_runtime_resolution() -> RuntimeIdentities:
+        nonlocal runtime_resolution_attempted
+        runtime_resolution_attempted = True
+        return _runtime()
+
+    monkeypatch.setattr("harnesslab.release.smoke.preflight_egress_network_isolation", unavailable)
+    monkeypatch.setattr(
+        "harnesslab.release.smoke.resolve_runtime_identities", forbidden_runtime_resolution
+    )
+    with pytest.raises(
+        EgressNetworkIsolationUnavailable, match="EGRESS_NETWORK_ISOLATION_UNAVAILABLE"
+    ):
+        await execute_real_smoke(
+            ROOT,
+            allow_real_smoke=True,
+            environment=SAFE_ENVIRONMENT,
+        )
+    assert not runtime_resolution_attempted
+
+
+@pytest.mark.asyncio
+async def test_actual_docker_network_isolation_preflight_attests_and_cleans_up() -> None:
+    attestation = await preflight_egress_network_isolation()
+    assert attestation.driver == "bridge"
+    assert attestation.internal is True
+    assert attestation.enable_ipv6 is False
+    assert attestation.gateway_mode_ipv4 == "isolated"
+    _, environment = await _docker_runtime_preflight()
+    cli = _DockerCLI(output_limit=1_000_000, environment=environment)
+    absent = await cli.run("network", "inspect", attestation.network, check=False)
+    assert absent.returncode != 0
+
+
+@pytest.mark.asyncio
+async def test_network_attestation_rejects_internal_bridge_without_isolated_gateway_mode() -> None:
+    _, environment = await _docker_runtime_preflight()
+    cli = _DockerCLI(output_limit=1_000_000, environment=environment)
+    network = f"hl-review-mutation-{uuid4().hex[:12]}"
+    boundary = ProviderScopedDockerBoundary(
+        EgressPolicy(allowed_hostname="provider.example.test"),
+        network,
+        "hl-review-mutation-unused-proxy",
+        _runtime().egress_proxy_image,
+    )
+    try:
+        await cli.run(
+            "network",
+            "create",
+            "--driver",
+            "bridge",
+            "--internal",
+            "--ipv6=false",
+            network,
+        )
+        inspected = await cli.run("network", "inspect", network)
+        options = json.loads(inspected.stdout)[0]["Options"] or {}
+        assert options.get(INTERNAL_NETWORK_GATEWAY_MODE_OPTION) != "isolated"
+        with pytest.raises(
+            EgressNetworkIsolationUnavailable, match="EGRESS_NETWORK_ISOLATION_UNAVAILABLE"
+        ):
+            await boundary.attest_internal_network(cli)
+    finally:
+        await cli.run("network", "rm", network, check=False)
+    absent = await cli.run("network", "inspect", network, check=False)
+    assert absent.returncode != 0
+
+
 @pytest.mark.asyncio
 async def test_egress_cleanup_attempts_every_resource_after_partial_failure() -> None:
     class FailingCLI:
@@ -371,6 +473,17 @@ async def test_actual_local_docker_egress_topology_denies_bypass_and_cleans_up()
         proxy,
         identity,
     )
+    sentinel_connection = asyncio.Event()
+
+    async def record_sentinel_connection(
+        reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+    ) -> None:
+        sentinel_connection.set()
+        writer.close()
+        await writer.wait_closed()
+
+    sentinel = await asyncio.start_server(record_sentinel_connection, "0.0.0.0", 0)
+    sentinel_port = int(sentinel.sockets[0].getsockname()[1])
     provisioned = False
     try:
         attestation = await boundary.provision(cli)
@@ -378,6 +491,10 @@ async def test_actual_local_docker_egress_topology_denies_bypass_and_cleans_up()
         assert attestation.image.image_id == identity.image_id
         assert attestation.networks == tuple(sorted((network, "bridge")))
         assert attestation.internal_network_is_internal
+        assert attestation.internal_network_security.driver == "bridge"
+        assert attestation.internal_network_security.internal is True
+        assert attestation.internal_network_security.enable_ipv6 is False
+        assert attestation.internal_network_security.gateway_mode_ipv4 == "isolated"
         assert not attestation.privileged
         assert attestation.read_only_rootfs
         assert attestation.user == "10001:10001"
@@ -385,6 +502,11 @@ async def test_actual_local_docker_egress_topology_denies_bypass_and_cleans_up()
         assert "no-new-privileges=true" in attestation.security_options
         assert not attestation.published_ports
         assert not attestation.docker_socket_mounted
+        network_inspect = await cli.run("network", "inspect", network)
+        ipam_config = json.loads(network_inspect.stdout)[0]["IPAM"]["Config"][0]
+        assert "Gateway" not in ipam_config
+        subnet = ipaddress.ip_network(ipam_config["Subnet"])
+        ordinary_gateway = str(subnet.network_address + 1)
 
         subject_code = f"""
 import socket, sys, time
@@ -404,8 +526,14 @@ if not reply.startswith(b'HTTP/1.1 403'):
 try:
     socket.create_connection(('1.1.1.1', 443), timeout=1)
 except OSError:
+    pass
+else:
+    sys.exit(11)
+try:
+    socket.create_connection(({ordinary_gateway!r}, {sentinel_port}), timeout=1)
+except OSError:
     sys.exit(0)
-sys.exit(11)
+sys.exit(12)
 """
         await cli.run(
             "create",
@@ -430,6 +558,7 @@ sys.exit(11)
         assert tuple(json.loads(subject_networks.stdout).keys()) == (network,)
         subject_result = await cli.run("start", "--attach", subject, check=False, timeout=15)
         assert subject_result.returncode == 0
+        assert not sentinel_connection.is_set()
 
         verifier_code = """
 import socket, sys
@@ -458,6 +587,8 @@ sys.exit(12)
         verifier_result = await cli.run("start", "--attach", verifier, check=False, timeout=10)
         assert verifier_result.returncode == 0
     finally:
+        sentinel.close()
+        await sentinel.wait_closed()
         for container in (subject, verifier):
             await cli.run("kill", container, check=False)
             await cli.run("rm", "--force", container, check=False)

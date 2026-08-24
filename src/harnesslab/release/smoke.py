@@ -21,6 +21,7 @@ from harnesslab.egress import (
     ProviderScopedDockerBoundary,
     ProxySecurityAttestation,
     boundary_for_provider_url,
+    preflight_egress_network_isolation,
 )
 from harnesslab.harness_lane.docker_backend import DockerCodexBackend
 from harnesslab.harness_lane.models import (
@@ -844,6 +845,10 @@ class ProductionSmokeInvoker:
                 f"{egress_attestation.image.reference}@{egress_attestation.image.image_id}"
             )
             digests.append(egress_attestation.digest)
+            references.append(
+                f"egress-network:{egress_attestation.internal_network_security.network}"
+            )
+            digests.append(egress_attestation.internal_network_security.digest)
         return SmokeCallResult(
             call_id=binding.frozen.call.call_id,
             evidence_references=tuple(references),
@@ -885,6 +890,7 @@ async def execute_real_smoke(
     selected_environment = environment if environment is not None else os.environ
     control = SmokeControlPlane.load(repository_root)
     control.validate_real_environment(selected_environment)
+    await preflight_egress_network_isolation()
     runtime = await resolve_runtime_identities()
     bindings = control.resolve_real_bindings(selected_environment, runtime)
     output = (

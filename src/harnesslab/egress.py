@@ -11,6 +11,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Literal
 from urllib.parse import urlsplit
+from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -30,6 +31,9 @@ EGRESS_PROXY_LABEL = "com.harnesslab.role=provider-scoped-egress"
 EGRESS_PROXY_SOURCE_DIGEST = (
     "sha256:6197201fdf9529cef8963c6c0de3b764608f057ab5507d2326afabb3d9d94592"
 )
+INTERNAL_NETWORK_DRIVER = "bridge"
+INTERNAL_NETWORK_GATEWAY_MODE_OPTION = "com.docker.network.bridge.gateway_mode_ipv4"
+INTERNAL_NETWORK_GATEWAY_MODE = "isolated"
 
 
 class EgressDenied(ValueError):
@@ -38,6 +42,10 @@ class EgressDenied(ValueError):
 
 class EgressSecurityError(RuntimeError):
     """The effective Docker egress boundary was unsafe or could not be cleaned."""
+
+
+class EgressNetworkIsolationUnavailable(EgressSecurityError):
+    """The Docker Engine cannot prove the required host-gateway isolation."""
 
 
 class ConnectionResult(StrEnum):
@@ -102,6 +110,30 @@ class SafeEgressEvent(BaseModel):
         return json.dumps(self.model_dump(mode="json"), sort_keys=True, separators=(",", ":"))
 
 
+class NetworkSecurityAttestation(BaseModel):
+    """Effective Docker network state recorded before a subject can start."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    network: str
+    driver: Literal["bridge"]
+    internal: Literal[True]
+    enable_ipv6: Literal[False]
+    gateway_mode_ipv4: Literal["isolated"]
+
+    def canonical_json(self) -> str:
+        return json.dumps(
+            self.model_dump(mode="json"),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+
+    @property
+    def digest(self) -> str:
+        return "sha256:" + hashlib.sha256(self.canonical_json().encode()).hexdigest()
+
+
 class ProxySecurityAttestation(BaseModel):
     """Effective, inspected proxy state recorded before a subject can start."""
 
@@ -117,6 +149,7 @@ class ProxySecurityAttestation(BaseModel):
     networks: tuple[str, str]
     internal_network: str
     internal_network_is_internal: bool
+    internal_network_security: NetworkSecurityAttestation
     docker_socket_mounted: bool
 
     def canonical_json(self) -> str:
@@ -233,7 +266,17 @@ class ProviderScopedDockerBoundary:
         return False
 
     def create_internal_network_argv(self) -> tuple[str, ...]:
-        return ("network", "create", "--internal", self.network_name)
+        return (
+            "network",
+            "create",
+            "--driver",
+            INTERNAL_NETWORK_DRIVER,
+            "--internal",
+            "--ipv6=false",
+            "-o",
+            f"{INTERNAL_NETWORK_GATEWAY_MODE_OPTION}={INTERNAL_NETWORK_GATEWAY_MODE}",
+            self.network_name,
+        )
 
     def create_proxy_argv(self) -> tuple[str, ...]:
         return (
@@ -320,6 +363,7 @@ class ProviderScopedDockerBoundary:
             )
 
     async def attest_effective_security(self, cli: Any) -> ProxySecurityAttestation:
+        network_security = await self.attest_internal_network(cli)
         template = (
             "{{json .Image}}|{{json .HostConfig.Privileged}}|"
             "{{json .HostConfig.ReadonlyRootfs}}|{{json .Config.User}}|"
@@ -342,10 +386,6 @@ class ProviderScopedDockerBoundary:
             networks,
             mounts,
         ) = values
-        network_result = await cli.run(
-            "network", "inspect", self.network_name, "--format", "{{json .Internal}}"
-        )
-        internal = json.loads(network_result.stdout.decode().strip())
         actual_networks = tuple(sorted((networks or {}).keys()))
         expected_networks = tuple(sorted((self.network_name, self.outbound_network_name)))
         docker_socket = any(
@@ -360,7 +400,7 @@ class ProviderScopedDockerBoundary:
             "no-new-privileges=true" in (security_options or ()),
             not port_bindings,
             actual_networks == expected_networks,
-            internal is True,
+            network_security.internal is True,
             not docker_socket,
         )
         if not all(required):
@@ -376,7 +416,36 @@ class ProviderScopedDockerBoundary:
             networks=expected_networks,
             internal_network=self.network_name,
             internal_network_is_internal=True,
+            internal_network_security=network_security,
             docker_socket_mounted=False,
+        )
+
+    async def attest_internal_network(self, cli: Any) -> NetworkSecurityAttestation:
+        template = "{{json .Driver}}|{{json .Internal}}|{{json .EnableIPv6}}|{{json .Options}}"
+        result = await cli.run("network", "inspect", self.network_name, "--format", template)
+        values = [json.loads(value) for value in result.stdout.decode().strip().split("|")]
+        if len(values) != 4:
+            raise EgressNetworkIsolationUnavailable(
+                "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: unexpected network inspection output"
+            )
+        driver, internal, enable_ipv6, options = values
+        gateway_mode = (options or {}).get(INTERNAL_NETWORK_GATEWAY_MODE_OPTION)
+        if (
+            driver != INTERNAL_NETWORK_DRIVER
+            or internal is not True
+            or enable_ipv6 is not False
+            or gateway_mode != INTERNAL_NETWORK_GATEWAY_MODE
+        ):
+            raise EgressNetworkIsolationUnavailable(
+                "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: effective network is not an "
+                "IPv4 isolated internal bridge"
+            )
+        return NetworkSecurityAttestation(
+            network=self.network_name,
+            driver=driver,
+            internal=internal,
+            enable_ipv6=enable_ipv6,
+            gateway_mode_ipv4=gateway_mode,
         )
 
     def deterministic_fake_forward(
@@ -416,3 +485,54 @@ def boundary_for_provider_url(
     return ProviderScopedDockerBoundary(
         EgressPolicy(allowed_hostname=hostname), network_name, proxy_name, proxy_image
     )
+
+
+async def preflight_egress_network_isolation(
+    cli: Any | None = None,
+) -> NetworkSecurityAttestation:
+    """Create, inspect, remove, and verify an isolated bridge without provider traffic."""
+
+    if cli is None:
+        _, environment = await _docker_runtime_preflight()
+        cli = _DockerCLI(output_limit=1_000_000, environment=environment)
+    network_name = f"hl-egress-preflight-{uuid4().hex[:12]}"
+    boundary = ProviderScopedDockerBoundary(
+        EgressPolicy(allowed_hostname="preflight.invalid"),
+        network_name,
+        "hl-egress-preflight-unused-proxy",
+        ImageIdentity(reference=EGRESS_PROXY_IMAGE, image_id="sha256:" + "1" * 64),
+    )
+    created = False
+    attestation: NetworkSecurityAttestation | None = None
+    failure: BaseException | None = None
+    try:
+        result = await cli.run(*boundary.create_internal_network_argv(), check=False)
+        if result.returncode != 0:
+            raise EgressNetworkIsolationUnavailable(
+                "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: Docker rejected isolated gateway mode"
+            )
+        created = True
+        attestation = await boundary.attest_internal_network(cli)
+    except BaseException as exc:
+        failure = exc
+    finally:
+        try:
+            removed = await cli.run("network", "rm", network_name, check=False)
+            absent = await cli.run("network", "inspect", network_name, check=False)
+            if absent.returncode == 0 or (created and removed.returncode != 0):
+                failure = EgressNetworkIsolationUnavailable(
+                    "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: preflight cleanup was not verified"
+                )
+        except BaseException as exc:
+            failure = EgressNetworkIsolationUnavailable(
+                "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: preflight cleanup was not verified"
+            )
+            failure.__cause__ = exc
+    if failure is not None:
+        if isinstance(failure, EgressNetworkIsolationUnavailable):
+            raise failure
+        raise EgressNetworkIsolationUnavailable(
+            "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: network attestation failed"
+        ) from failure
+    assert attestation is not None
+    return attestation

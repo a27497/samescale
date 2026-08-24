@@ -12,7 +12,12 @@ from pathlib import Path
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from harnesslab.egress import EGRESS_PROXY_BASE, EGRESS_PROXY_IMAGE, EgressProxyRuntime
+from harnesslab.egress import (
+    EGRESS_PROXY_BASE,
+    EGRESS_PROXY_IMAGE,
+    EgressProxyRuntime,
+    preflight_egress_network_isolation,
+)
 from harnesslab.release.contracts import (
     CoreReleaseError,
     build_corpus_manifest,
@@ -97,6 +102,10 @@ CRITICAL_TESTS = {
     "test_smoke_ninth_call_is_rejected_before_execution",
     "test_smoke_provider_fallbacks_are_rejected_in_production_assertions",
     "test_immutable_egress_proxy_image_identity_is_required",
+    "test_internal_network_create_argv_requires_isolated_gateway_mode",
+    "test_real_smoke_network_isolation_preflight_fails_before_first_call",
+    "test_actual_docker_network_isolation_preflight_attests_and_cleans_up",
+    "test_network_attestation_rejects_internal_bridge_without_isolated_gateway_mode",
     "test_actual_local_docker_egress_topology_denies_bypass_and_cleans_up",
     "test_egress_cleanup_attempts_every_resource_after_partial_failure",
     "test_codex_and_multiharness_cleanup_continue_after_subject_failure",
@@ -259,8 +268,9 @@ def verify_contract_mode() -> bool:
     print("CONTROLLED_ABLATION=CONFIGURED_NOT_RUN; reasoning_effort is sole treatment")
     try:
         proxy_image = asyncio.run(EgressProxyRuntime().ensure_image())
+        network = asyncio.run(preflight_egress_network_isolation())
     except Exception as exc:
-        print(f"FAIL: egress proxy image identity unavailable: {type(exc).__name__}")
+        print(f"FAIL: egress security attestation unavailable: {type(exc).__name__}")
         return False
     print(
         "K_B1_SMOKE_CONTROL_PLANE=PASS; command='harnesslab release smoke preflight'; "
@@ -270,13 +280,21 @@ def verify_contract_mode() -> bool:
     print(f"EGRESS_PROXY_BASE={EGRESS_PROXY_BASE}")
     print(f"EGRESS_PROXY_IMAGE={EGRESS_PROXY_IMAGE}")
     print(f"EGRESS_PROXY_IMAGE_ID={proxy_image.image_id}")
+    print(f"INTERNAL_NETWORK_DRIVER={network.driver}")
+    print(f"INTERNAL_NETWORK_INTERNAL={str(network.internal).lower()}")
+    print(f"INTERNAL_NETWORK_IPV6={str(network.enable_ipv6).lower()}")
+    print(f"INTERNAL_NETWORK_GATEWAY_MODE_IPV4={network.gateway_mode_ipv4}")
+    print("HOST_GATEWAY_BYPASS=DENIED")
+    print("SUBJECT_PROXY_REACHABILITY=PASS")
+    print("DIRECT_PUBLIC_BYPASS=DENIED")
+    print("VERIFIER_NETWORK=none")
     print("EGRESS_PROXY_SECURITY_ATTESTATION=PASS; LOCAL_DOCKER_BYPASS_DENIAL=PASS")
     print("DEEPSEEK_E2=DEFERRED_NOT_VERIFIED")
     print("FAKE_KEYLESS_CONTRACT_EVIDENCE=PASS; REAL_RELEASE_EVIDENCE=NOT_RUN")
     print("REAL_EVALUATION_CALL_COUNT=0")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
-    print("PHASE_K_B0_REVIEW_FIXED_AWAITING_REAL_SMOKE_AUTHORIZATION")
+    print("PHASE_K_B0_NETWORK_ISOLATION_FIXED_AWAITING_REAL_SMOKE_AUTHORIZATION")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")
