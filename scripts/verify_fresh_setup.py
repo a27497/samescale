@@ -33,6 +33,7 @@ def verify_repository_contract() -> None:
         "frontend/package-lock.json",
         "release/core-corpus.json",
         "release/core-real-evidence-plan.json",
+        "release/core-real-smoke-plan.json",
         "release/release-evidence.json",
         "docs/REAL_EVIDENCE_AUTHORIZATION.md",
     )

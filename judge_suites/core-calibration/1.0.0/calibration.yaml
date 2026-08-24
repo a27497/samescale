@@ -15,7 +15,7 @@ judge_cells:
       protocol: responses
       reasoning: {temperature: 0, max_output_tokens: 256}
       request_timeout_seconds: 30
-    profile_identity: sha256:1dbf478aabcfd9fa2e8d6ec33238d2d85ad0c2358a523dc7f85ee4d6d0f4b2a4
+    profile_identity: sha256:bc78973475393074ef2dd6d33d124bf2e9a7c96030853fe1c00d83fea638043c
     runner_contract: phase-h-fake-good-v1
   - id: biased-unstable-judge
     definition_reference: judge_suites/core-calibration/1.0.0/definition.yaml
@@ -28,7 +28,7 @@ judge_cells:
       protocol: responses
       reasoning: {temperature: 0, max_output_tokens: 256}
       request_timeout_seconds: 30
-    profile_identity: sha256:2c73f8743d33557910b0272154d72add0587345e3f2d11236da5a9316c9e8650
+    profile_identity: sha256:928e0f03015ffda8ddd350070c19fc80df8ce765304746e53c47dfddc1164e5d
     runner_contract: phase-h-fake-biased-v1
 repeat_count: 3
 execution_seed: 20260823

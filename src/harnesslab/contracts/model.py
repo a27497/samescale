@@ -5,6 +5,7 @@ from urllib.parse import unquote, urlsplit
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from harnesslab.contracts.common import Protocol
+from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
 
 
 class ReasoningProfile(BaseModel):
@@ -26,6 +27,8 @@ class ModelProfile(BaseModel):
     route: str = Field(min_length=1, max_length=300)
     protocol: Protocol
     reasoning: ReasoningProfile = Field(default_factory=ReasoningProfile)
+    thinking_mode: ThinkingMode | None = None
+    thinking_transport: ThinkingTransport | None = None
     request_timeout_seconds: float = Field(default=60.0, gt=0, le=600)
     credential_reference: str | None = Field(
         default=None,
@@ -92,4 +95,8 @@ class ModelProfile(BaseModel):
         }.get(self.protocol)
         if expected_suffix is not None and not self.route.endswith(expected_suffix):
             raise ValueError(f"{self.protocol.value} route must end with {expected_suffix}")
+        if (self.thinking_mode is None) != (self.thinking_transport is None):
+            raise ValueError("thinking mode and typed transport must be selected together")
+        if self.thinking_transport is not None and self.protocol is not Protocol.CHAT_COMPLETIONS:
+            raise ValueError("typed thinking options require Chat Completions")
         return self

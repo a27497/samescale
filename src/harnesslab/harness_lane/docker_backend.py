@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from contextlib import suppress
 from uuid import uuid4
 
+from harnesslab.egress import ProviderScopedDockerBoundary
 from harnesslab.harness_lane.adapter import CodexExecutionPlan, HarnessAdapterError
 from harnesslab.harness_lane.models import CodexProcessCapture
 from harnesslab.harness_lane.profile import CODEX_IMAGE
@@ -31,9 +32,11 @@ class DockerCodexBackend:
         *,
         explicitly_enabled: bool = False,
         credentials: Mapping[str, str] | None = None,
+        egress_boundary: ProviderScopedDockerBoundary | None = None,
     ) -> None:
         self.explicitly_enabled = explicitly_enabled
         self.credentials = dict(credentials or {})
+        self.egress_boundary = egress_boundary
 
     @property
     def artifact_secret_values(self) -> tuple[str, ...]:
@@ -51,7 +54,11 @@ class DockerCodexBackend:
             "--label",
             f"com.harnesslab.run_id={container_name}",
             "--network",
-            "none",
+            (
+                self.egress_boundary.subject_network_mode
+                if self.egress_boundary is not None
+                else "none"
+            ),
             "--read-only",
             "--cap-drop",
             "ALL",
@@ -83,6 +90,9 @@ class DockerCodexBackend:
             )
         for name in sorted(self.credentials):
             arguments.extend(("--env", name))
+        if self.egress_boundary is not None:
+            for name, value in sorted(self.egress_boundary.subject_proxy_environment().items()):
+                arguments.extend(("--env", f"{name}={value}"))
         arguments.extend(("--entrypoint", "codex", CODEX_IMAGE, *plan.argv[1:]))
         return tuple(arguments)
 
@@ -105,6 +115,8 @@ class DockerCodexBackend:
         cancelled = False
         exit_code: int | None = None
         try:
+            if self.egress_boundary is not None:
+                await self.egress_boundary.provision(cli)
             create_attempted = True
             await cli.run(*self.create_argv(plan, name), environment=create_environment)
             await self._verify_effective_security(cli, name)
@@ -169,6 +181,8 @@ class DockerCodexBackend:
         finally:
             if create_attempted:
                 await self._cleanup_outer_container(cli, name)
+            if self.egress_boundary is not None:
+                await self.egress_boundary.cleanup(cli)
         return CodexProcessCapture(
             lines=tuple(lines),
             exit_code=exit_code,
@@ -208,7 +222,12 @@ class DockerCodexBackend:
         required = (
             not privileged,
             read_only,
-            network == "none",
+            network
+            == (
+                self.egress_boundary.subject_network_mode
+                if self.egress_boundary is not None
+                else "none"
+            ),
             user == "10001:10001",
             "ALL" in (cap_drop or ()),
             "no-new-privileges=true" in (security_options or ()),

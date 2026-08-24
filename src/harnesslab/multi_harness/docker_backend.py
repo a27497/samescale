@@ -6,6 +6,8 @@ import time
 from collections.abc import Mapping
 from uuid import uuid4
 
+from harnesslab.contracts.provider import validate_provider_base_url
+from harnesslab.egress import ProviderScopedDockerBoundary
 from harnesslab.harness_lane.adapter import HarnessAdapterError
 from harnesslab.multi_harness.adapter import HarnessExecutionPlan
 from harnesslab.multi_harness.models import HarnessKind, HarnessProcessCapture
@@ -27,9 +29,11 @@ class DockerMultiHarnessBackend:
         *,
         explicitly_enabled: bool = False,
         credentials: Mapping[str, str] | None = None,
+        egress_boundary: ProviderScopedDockerBoundary | None = None,
     ) -> None:
         self.explicitly_enabled = explicitly_enabled
         self.credentials = dict(credentials or {})
+        self.egress_boundary = egress_boundary
 
     @property
     def artifact_secret_values(self) -> tuple[str, ...]:
@@ -46,7 +50,11 @@ class DockerMultiHarnessBackend:
             "--label",
             f"com.harnesslab.run_id={container_name}",
             "--network",
-            "none",
+            (
+                self.egress_boundary.subject_network_mode
+                if self.egress_boundary is not None
+                else "none"
+            ),
             "--read-only",
             "--cap-drop",
             "ALL",
@@ -73,8 +81,14 @@ class DockerMultiHarnessBackend:
             arguments.extend(
                 ("--mount", f"type=bind,src={plan.context.resolve()},dst=/context,readonly")
             )
-        for name in sorted(self.credentials):
+        translated_sources = {source for _, source in plan.environment_references}
+        for name in sorted(set(self.credentials) - translated_sources):
             arguments.extend(("--env", name))
+        for name, _ in sorted((*plan.environment_references, *plan.environment_literals)):
+            arguments.extend(("--env", name))
+        if self.egress_boundary is not None:
+            for name, value in sorted(self.egress_boundary.subject_proxy_environment().items()):
+                arguments.extend(("--env", f"{name}={value}"))
         arguments.extend(("--entrypoint", plan.argv[0], image, *plan.argv[1:]))
         return tuple(arguments)
 
@@ -89,7 +103,16 @@ class DockerMultiHarnessBackend:
         preflight, environment = await _docker_runtime_preflight()
         cli = _DockerCLI(output_limit=1_000_000, environment=environment)
         name = f"harnesslab-phase-f-{uuid4().hex}"
-        create_environment = docker_environment(environment, self.credentials)
+        container_environment = dict(self.credentials)
+        for target, source in plan.environment_references:
+            if source not in self.credentials:
+                raise HarnessAdapterError(f"missing configured credential/reference: {source}")
+            value = self.credentials[source]
+            if target == "ANTHROPIC_BASE_URL":
+                value = validate_provider_base_url(value)
+            container_environment[target] = value
+        container_environment.update(plan.environment_literals)
+        create_environment = docker_environment(environment, container_environment)
         started = time.monotonic()
         lines: list[str] = []
         stderr_parts: list[bytes] = []
@@ -98,6 +121,8 @@ class DockerMultiHarnessBackend:
         exit_code: int | None = None
         create_attempted = False
         try:
+            if self.egress_boundary is not None:
+                await self.egress_boundary.provision(cli)
             create_attempted = True
             await cli.run(*self.create_argv(plan, name), environment=create_environment)
             await self._verify_effective_security(cli, name)
@@ -157,6 +182,8 @@ class DockerMultiHarnessBackend:
         finally:
             if create_attempted:
                 await self._cleanup(cli, name)
+            if self.egress_boundary is not None:
+                await self.egress_boundary.cleanup(cli)
         try:
             stderr_text = b"".join(stderr_parts).decode(errors="strict")
         except UnicodeDecodeError:
@@ -192,7 +219,12 @@ class DockerMultiHarnessBackend:
             (
                 not privileged,
                 read_only,
-                network == "none",
+                network
+                == (
+                    self.egress_boundary.subject_network_mode
+                    if self.egress_boundary is not None
+                    else "none"
+                ),
                 user == "10001:10001",
                 "ALL" in (cap_drop or ()),
                 "no-new-privileges=true" in (security_options or ()),

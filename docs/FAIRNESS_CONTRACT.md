@@ -26,7 +26,7 @@ Requested and observed model are separate facts. A provider or harness may route
 
 `COMPARABLE` means required hard controls are present and equal, with only the declared treatment differences. `PARTIALLY_COMPARABLE` preserves directional evidence when a non-hard fact such as observed-model identity or full trace coverage is missing. `NOT_COMPARABLE` blocks the intended strong comparison because a hard control is absent or mismatched.
 
-The K-A planned direct OpenAI `/responses` versus Codex `codex-cli-default` pair is `NOT_VERIFIED` and expected to be `NOT_COMPARABLE` under current identities because provider route is a hard control. Phase K-B must resolve a genuinely comparable pair or report that no Harness-uplift claim is available. It must not relabel the pair.
+K-B0 configures direct `gpt-5.6-sol` versus Codex medium through the same operator-trusted relay/Responses route identity. The pair is still `CONFIGURED_NOT_VERIFIED`: requested labels and display names cannot prove actual routing or observed model. Only authorized K-B1 evidence and the ComparabilityEngine may return `COMPARABLE`; otherwise no Harness-uplift claim is available.
 
 ## Denominators, repetitions, and ranking
 
@@ -38,4 +38,4 @@ Arbitrary pooled rankings are unsafe because tasks differ in language, category,
 
 ## Missing evidence
 
-Unknown is never encoded as zero, failure, or success. Release artifacts use `NOT_RUN`, `NOT_VERIFIED`, `DEFERRED_NOT_VERIFIED`, and `INTEGRITY_ERROR`. K-A is FAKE / KEYLESS / CONTRACT EVIDENCE only; it establishes no real ranking, uplift, latency, cost, Judge quality, regression, or production conclusion.
+Unknown is never encoded as zero, failure, or success. Release artifacts use `NOT_RUN`, `NOT_VERIFIED`, `CONFIGURED_NOT_SMOKED`, `DEFERRED_NOT_VERIFIED`, and `INTEGRITY_ERROR`. K-B0 is keyless configuration and contract evidence only; it establishes no real ranking, uplift, latency, cost, Judge quality, regression, or production conclusion.

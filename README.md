@@ -281,7 +281,7 @@ See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_MET
 [Attribution Analyst](docs/ANALYST.md) documents Phase J structured facts and read-only graph
 boundary.
 
-## Phase K-A Core release preparation
+## Phase K-B0 real-provider preparation
 
 The prospective Core corpus contains 18 validated tasks: six each in Python, Java, and TypeScript.
 It has one intentional three-language clamp control and 15 semantically independent scenarios, for
@@ -289,7 +289,8 @@ It has one intentional three-language clamp control and 15 semantically independ
 `release/core-corpus.json`; reconstruction checks task semantics, metadata, hidden verifiers,
 baseline failure, and oracle success.
 
-Gate K keyless mode verifies the corpus, release Matrix/profile slots, Pair and ablation controls,
+Gate K keyless mode verifies the corpus, eight selected provider profiles and truthful provenance,
+release Matrix/smoke ceilings, Pair and ablation controls, provider-scoped Harness egress,
 Judge-suite binding, evidence schema, documentation, resume map, BadCase placeholders, fresh setup,
 secret boundary, and tag guard:
 
@@ -297,10 +298,12 @@ secret boundary, and tag guard:
 uv run --locked python scripts/verify_gate_k.py
 ```
 
-During K-A a pass intentionally reports `CORE_RELEASE_READY=FALSE`,
+During K-B0 a pass intentionally reports `CORE_RELEASE_READY=FALSE`,
 `REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE`, and every `REAL_*` state `NOT_RUN`. It performs no
-provider, Harness, or Judge call and does not create `v1.0.0-core`. See
-[Real Evidence Authorization](docs/REAL_EVIDENCE_AUTHORIZATION.md) for the exact bounded preflight.
+provider, Harness, or Judge call and does not create `v1.0.0-core`. The selected GPT profile is
+`gpt-5.6-sol` via an operator-trusted OpenAI-compatible relay whose upstream first-party provenance
+is not independently verified. See [Real Evidence Authorization](docs/REAL_EVIDENCE_AUTHORIZATION.md)
+for the exact eight-call K-B1 smoke plan, which still requires separate authorization.
 
 ## Fresh clone operator path
 

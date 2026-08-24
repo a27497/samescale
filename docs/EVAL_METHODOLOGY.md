@@ -198,13 +198,17 @@ and the approved infrastructure denominator remains unchanged.
 ## Core release evaluation plan
 
 The Core corpus freezes 18 validated tasks, balanced six each across Python, Java, and TypeScript,
-with six behavioral categories. The planned real Matrix expands seven cells across every task at
-five repetitions per task/cell: three unresolved Model-only profiles, Codex medium/high, Claude
-Code, and DeepSeek Harness E1. DeepSeek E2 remains deferred. Formal evidence is evaluated per task;
-unrelated task observations are never pooled to manufacture n ≥ 5.
+with six behavioral categories. The planned real Matrix expands seven configured cells across every
+task at five repetitions per task/cell: direct `gpt-5.6-sol` through an operator-trusted relay,
+`qwen3.8-max` through Bailian Messages, non-thinking `deepseek-v4-pro` through DeepSeek official,
+Codex relay medium/high, Claude Code Harness × Qwen through Bailian, and DeepSeek Harness E1 ×
+`deepseek-v4-flash` through DeepSeek official. DeepSeek E2 remains deferred. Model identity and
+Harness identity remain distinct. Formal evidence is evaluated per task; unrelated observations
+are never pooled to manufacture n ≥ 5.
 
-The Codex medium/high controlled ablation changes only reasoning effort. The prospective direct
-OpenAI/Codex P-Lane is not currently a valid uplift comparison because provider routes differ and
-the direct model is unresolved. This limitation is an evaluation result of the contract, not a gap
-to conceal. No real result, rank, uplift, cost, latency, Judge-quality, or regression statement is
-present in K-A.
+The Codex medium/high controlled ablation changes only reasoning effort and remains
+`CONFIGURED_NOT_RUN`. The direct-relay/Codex-medium P-Lane shares a configured semantic route but is
+`CONFIGURED_NOT_VERIFIED`; authorized smoke must establish runtime routing and observed-model facts
+before the ComparabilityEngine can decide. No real result, rank, uplift, cost, latency,
+Judge-quality, or regression statement is present in K-B0. The eight-call K-B1 smoke plan must
+complete without an abort condition before any full Matrix authorization is considered.

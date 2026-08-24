@@ -10,6 +10,7 @@ import httpx
 from pydantic import ValidationError
 
 from harnesslab.contracts.common import Protocol
+from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
 from harnesslab.model_lane.models import (
     ProviderAdapter,
     ProviderFailureCategory,
@@ -450,6 +451,11 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
             payload["max_tokens"] = profile.reasoning.max_output_tokens
         if profile.reasoning.temperature is not None:
             payload["temperature"] = profile.reasoning.temperature
+        if profile.thinking_transport is ThinkingTransport.DEEPSEEK_THINKING_OBJECT:
+            assert profile.thinking_mode is not None
+            payload["thinking"] = {"type": profile.thinking_mode.value}
+        elif profile.thinking_transport is ThinkingTransport.BAILIAN_ENABLE_THINKING:
+            payload["enable_thinking"] = profile.thinking_mode is ThinkingMode.ENABLED
         return payload
 
     def _parse(

@@ -13,6 +13,7 @@ from harnesslab.release.models import (
     CoreTaskInventoryEntry,
     EvidenceState,
     RealEvidencePlan,
+    RealSmokePlan,
     ReleaseEvidenceManifest,
     ReleaseReadiness,
     ResumeClaimMap,
@@ -101,6 +102,10 @@ def load_real_evidence_plan(path: Path) -> RealEvidencePlan:
     return _load_json(path, RealEvidencePlan.model_validate, "real-evidence plan")
 
 
+def load_real_smoke_plan(path: Path) -> RealSmokePlan:
+    return _load_json(path, RealSmokePlan.model_validate, "real-smoke plan")
+
+
 def load_release_evidence(path: Path) -> ReleaseEvidenceManifest:
     return _load_json(path, ReleaseEvidenceManifest.model_validate, "release evidence")
 
@@ -147,11 +152,11 @@ def validate_keyless_contract_state(manifest: ReleaseEvidenceManifest) -> None:
         if state is not EvidenceState.NOT_RUN
     }
     if forbidden:
-        raise CoreReleaseError(f"K-A REAL_* state was forged: {sorted(forbidden)}")
+        raise CoreReleaseError(f"K-B0 REAL_* state was forged: {sorted(forbidden)}")
     if manifest.core_release_ready:
-        raise CoreReleaseError("K-A cannot report CORE_RELEASE_READY")
+        raise CoreReleaseError("K-B0 cannot report CORE_RELEASE_READY")
     if not manifest.real_evidence_authorization_required:
-        raise CoreReleaseError("K-A must require explicit real-evidence authorization")
+        raise CoreReleaseError("K-B0 must require explicit real-evidence authorization")
 
 
 def tag_creation_authorized(

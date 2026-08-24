@@ -6,6 +6,7 @@ from typing import Any
 from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.common import EvaluationLane, NetworkPolicy, Protocol
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
+from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
 from harnesslab.contracts.run import RunStatus
 from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.plan import (
@@ -72,9 +73,6 @@ def _experiment_plan() -> ExperimentPlan:
         )
         for item in corpus.tasks
     )
-    routes = {
-        "model-third-chat-completions": "third|chat_completions|https://third.invalid/v1/chat/completions"
-    }
     harness_names = {
         "direct-model": "direct-model",
         "codex": "codex",
@@ -86,7 +84,7 @@ def _experiment_plan() -> ExperimentPlan:
             id=item.cell_id,
             lane=EvaluationLane(item.lane),
             requested_model=item.requested_model or f"resolved-{item.cell_id}",
-            provider_route=item.provider_route or routes[item.cell_id],
+            provider_route=item.provider_route or "unresolved-provider-route",
             profile_reference="builtin:core-release-test",
             profile_identity=canonical_digest(
                 {"cell": item.cell_id, "reasoning": item.reasoning_effort}
@@ -176,13 +174,15 @@ def _judge_plan() -> Any:
     suite = resolve_suite(spec, ROOT)
     definitions = resolve_definitions(spec, ROOT)
     profile = ModelProfile(
-        requested_model="real-judge-model",
-        provider="openai",
-        base_url="https://api.openai.com/v1",
-        route="/responses",
-        protocol=Protocol.RESPONSES,
-        reasoning=ReasoningProfile(effort="medium", max_output_tokens=256),
-        credential_reference="JUDGE_TEST_CREDENTIAL",
+        requested_model="glm-5.2",
+        provider="bailian-openai",
+        base_url="https://bailian.example.test/v1",
+        route="/chat/completions",
+        protocol=Protocol.CHAT_COMPLETIONS,
+        reasoning=ReasoningProfile(max_output_tokens=256),
+        thinking_mode=ThinkingMode.DISABLED,
+        thinking_transport=ThinkingTransport.BAILIAN_ENABLE_THINKING,
+        credential_reference="DASHSCOPE_API_KEY",
     )
     source = spec.judge_cells[0]
     cell = JudgeCellSpec(
@@ -279,7 +279,7 @@ def semantic_fixture() -> dict[str, Any]:
         plan=judge_plan,
         evaluation_count=63,
         completed_evaluation_count=63,
-        observed_models=("real-judge-model-2026-08-24",),
+        observed_models=("glm-5.2",),
         report_calibration_id=judge_plan.calibration_id,
         report_plan_digest=judge_plan.plan_digest,
         report_suite_id=judge_plan.suite_id,

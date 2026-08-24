@@ -90,6 +90,24 @@ class CodexHarnessAdapter:
             raise HarnessAdapterError("subject workspace is unavailable or unsafe")
         if context is not None and (not context.is_dir() or context.is_symlink()):
             raise HarnessAdapterError("subject context is unavailable or unsafe")
+        provider_config: tuple[str, ...] = ()
+        if profile.model_provider_id is not None:
+            assert profile.provider_base_url is not None
+            assert profile.provider_credential_reference is not None
+            assert profile.provider_wire_api == "responses"
+            provider_id = profile.model_provider_id
+            provider_config = (
+                "-c",
+                f'model_provider="{provider_id}"',
+                "-c",
+                f'model_providers.{provider_id}.name="HarnessLab trusted GPT relay"',
+                "-c",
+                f'model_providers.{provider_id}.base_url="{profile.provider_base_url}"',
+                "-c",
+                f'model_providers.{provider_id}.env_key="{profile.provider_credential_reference}"',
+                "-c",
+                f'model_providers.{provider_id}.wire_api="{profile.provider_wire_api}"',
+            )
         argv = (
             "codex",
             "exec",
@@ -107,6 +125,7 @@ class CodexHarnessAdapter:
             "/workspace",
             "--model",
             profile.requested_model,
+            *provider_config,
             "-c",
             'approval_policy="never"',
             "-c",

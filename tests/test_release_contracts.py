@@ -80,14 +80,13 @@ def test_corpus_rejects_a_mutated_verifier(tmp_path: Path) -> None:
         build_corpus_manifest(repository)
 
 
-def test_real_plan_has_strict_unresolved_profiles_and_exact_preflight() -> None:
+def test_real_plan_has_frozen_kb0_profiles_and_exact_preflight() -> None:
     plan = load_real_evidence_plan(RELEASE / "core-real-evidence-plan.json")
 
     assert len(plan.model_profile_slots) == 3
-    assert all(slot.requested_model is None for slot in plan.model_profile_slots)
-    assert all(
-        slot.selection_state is EvidenceState.NOT_VERIFIED for slot in plan.model_profile_slots
-    )
+    assert len(plan.selected_profiles) == 8
+    assert all(slot.requested_model for slot in plan.model_profile_slots)
+    assert all(slot.selection_state == "CONFIGURED_NOT_SMOKED" for slot in plan.model_profile_slots)
     assert len(plan.cells) == 7
     assert {cell.runtime for cell in plan.cells} == {
         "direct-model",
@@ -99,7 +98,7 @@ def test_real_plan_has_strict_unresolved_profiles_and_exact_preflight() -> None:
     assert plan.preflight.total_subject_runs == 630
     assert plan.preflight.total_top_level_external_calls == 693
     assert plan.preflight.total_output_token_ceiling == 1_276_128
-    assert plan.preflight.monetary_cost == "NOT_CALCULATED_FROM_REPOSITORY_EVIDENCE"
+    assert plan.preflight.monetary_cost == ("NOT_CALCULATED_UNTIL_REAL_SMOKE_USAGE_AND_RELAY_PRICE")
 
 
 def test_planned_uplift_pair_cannot_bypass_provider_route_comparability() -> None:
@@ -127,7 +126,7 @@ def test_planned_uplift_pair_cannot_bypass_provider_route_comparability() -> Non
     )
     codex = ComparisonFacts(
         evidence_identity=canonical_digest({"side": "codex"}),
-        provider_route="codex-cli-default",
+        provider_route="different-provider-route",
         harness="codex",
         harness_version="cli",
         harness_profile_identity=canonical_digest({"codex": 1}),
@@ -139,7 +138,7 @@ def test_planned_uplift_pair_cannot_bypass_provider_route_comparability() -> Non
     assert report.status is ComparabilityStatus.NOT_COMPARABLE
     plan = load_real_evidence_plan(RELEASE / "core-real-evidence-plan.json")
     assert plan.paired_lane.comparability_state is EvidenceState.NOT_VERIFIED
-    assert "route differs" in plan.paired_lane.blocker.lower()
+    assert plan.paired_lane.configuration_state == "CONFIGURED_NOT_VERIFIED"
 
 
 def test_ablation_plan_freezes_hard_controls_and_is_not_run() -> None:
@@ -154,6 +153,7 @@ def test_ablation_plan_freezes_hard_controls_and_is_not_run() -> None:
     assert base.runtime == variant.runtime == "codex"
     assert base.provider_route == variant.provider_route
     assert plan.ablation.evidence_state is EvidenceState.NOT_RUN
+    assert plan.ablation.configuration_state == "CONFIGURED_NOT_RUN"
     assert set(plan.ablation.frozen_hard_controls) >= {
         "provider_route",
         "task identities",

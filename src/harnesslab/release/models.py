@@ -8,6 +8,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from harnesslab.contracts.common import Identifier, Sha256Digest
+from harnesslab.contracts.provider import ConfigurationState, ProviderProfile
 
 
 class StrictModel(BaseModel):
@@ -130,13 +131,23 @@ class ModelProfileSlot(StrictModel):
     max_output_tokens: int = Field(gt=0)
     request_timeout_seconds: int = Field(gt=0, le=600)
     credential_reference: str | None
-    selection_state: Literal[EvidenceState.NOT_VERIFIED] = EvidenceState.NOT_VERIFIED
+    selection_state: Literal[ConfigurationState.CONFIGURED_NOT_SMOKED] = (
+        ConfigurationState.CONFIGURED_NOT_SMOKED
+    )
     limitation: str
 
     @model_validator(mode="after")
-    def unresolved_selection_has_no_fake_model(self) -> ModelProfileSlot:
-        if self.requested_model is not None:
-            raise ValueError("K-A Model-only slots cannot invent a final requested model")
+    def selected_model_is_complete(self) -> ModelProfileSlot:
+        if any(
+            value is None
+            for value in (
+                self.provider,
+                self.base_url,
+                self.requested_model,
+                self.credential_reference,
+            )
+        ):
+            raise ValueError("K-B0 Model-only profile selection must be complete")
         return self
 
 
@@ -151,6 +162,9 @@ class ReleaseCellPlan(StrictModel):
     repeat_count: Literal[5] = 5
     task_count: Literal[18] = 18
     planned_runs: Literal[90] = 90
+    configuration_state: Literal[ConfigurationState.CONFIGURED_NOT_SMOKED] = (
+        ConfigurationState.CONFIGURED_NOT_SMOKED
+    )
     evidence_state: Literal[EvidenceState.NOT_VERIFIED] = EvidenceState.NOT_VERIFIED
 
 
@@ -161,6 +175,7 @@ class PairedLanePlan(StrictModel):
     intent: Literal["HARNESS_UPLIFT"] = "HARNESS_UPLIFT"
     required_frozen_controls: tuple[str, ...]
     expected_paired_observations: Literal[90] = 90
+    configuration_state: Literal["CONFIGURED_NOT_VERIFIED"] = "CONFIGURED_NOT_VERIFIED"
     comparability_state: Literal[EvidenceState.NOT_VERIFIED] = EvidenceState.NOT_VERIFIED
     blocker: str
 
@@ -175,6 +190,7 @@ class ControlledAblationPlan(StrictModel):
     frozen_hard_controls: tuple[str, ...]
     expected_paired_observations: Literal[90] = 90
     evidence_tier_expectation: Literal["FORMAL_PER_TASK_N5"] = "FORMAL_PER_TASK_N5"
+    configuration_state: Literal["CONFIGURED_NOT_RUN"] = "CONFIGURED_NOT_RUN"
     evidence_state: Literal[EvidenceState.NOT_RUN] = EvidenceState.NOT_RUN
 
 
@@ -183,7 +199,10 @@ class JudgeEvidencePlan(StrictModel):
     suite_id: str
     suite_version: str
     suite_digest: Sha256Digest
-    judge_profile_selection: Literal[EvidenceState.NOT_VERIFIED] = EvidenceState.NOT_VERIFIED
+    profile_id: Identifier
+    judge_profile_selection: Literal[ConfigurationState.CONFIGURED_NOT_SMOKED] = (
+        ConfigurationState.CONFIGURED_NOT_SMOKED
+    )
     judge_cell_count: Literal[1] = 1
     repeat_count: Literal[3] = 3
     public_case_count: Literal[15] = 15
@@ -207,21 +226,22 @@ class CallPreflight(StrictModel):
     subject_output_token_ceiling: Literal[1260000] = 1_260_000
     judge_output_token_ceiling: Literal[16128] = 16_128
     total_output_token_ceiling: Literal[1276128] = 1_276_128
-    internal_harness_provider_request_count: Literal["NOT_CALCULATED_FROM_REPOSITORY_EVIDENCE"] = (
-        "NOT_CALCULATED_FROM_REPOSITORY_EVIDENCE"
+    internal_harness_provider_request_count: Literal["NOT_CALCULATED_UNTIL_REAL_SMOKE"] = (
+        "NOT_CALCULATED_UNTIL_REAL_SMOKE"
     )
-    monetary_cost: Literal["NOT_CALCULATED_FROM_REPOSITORY_EVIDENCE"] = (
-        "NOT_CALCULATED_FROM_REPOSITORY_EVIDENCE"
+    monetary_cost: Literal["NOT_CALCULATED_UNTIL_REAL_SMOKE_USAGE_AND_RELAY_PRICE"] = (
+        "NOT_CALCULATED_UNTIL_REAL_SMOKE_USAGE_AND_RELAY_PRICE"
     )
 
 
 class RealEvidencePlan(CanonicalModel):
-    schema_version: Literal[1] = 1
+    schema_version: Literal[2] = 2
     plan_id: Literal["core-real-evidence-v1"] = "core-real-evidence-v1"
     corpus_reference: str
     corpus_digest: Sha256Digest
     experiment_id: Literal["core-real-matrix-v1"] = "core-real-matrix-v1"
     execution_seed: int
+    selected_profiles: tuple[ProviderProfile, ...]
     model_profile_slots: tuple[ModelProfileSlot, ...]
     cells: tuple[ReleaseCellPlan, ...]
     paired_lane: PairedLanePlan
@@ -235,10 +255,50 @@ class RealEvidencePlan(CanonicalModel):
 
     @model_validator(mode="after")
     def release_plan_is_complete_but_unexecuted(self) -> RealEvidencePlan:
+        if len(self.selected_profiles) != 8:
+            raise ValueError("K-B0 release plan requires exactly eight configured profiles")
+        profile_ids = {profile.profile_id for profile in self.selected_profiles}
+        expected_profile_models = {
+            "model-gpt56-relay-responses": "gpt-5.6-sol",
+            "model-qwen38-bailian-messages": "qwen3.8-max",
+            "model-deepseek-v4pro-chat": "deepseek-v4-pro",
+            "harness-codex-gpt56-medium": "gpt-5.6-sol",
+            "harness-codex-gpt56-high": "gpt-5.6-sol",
+            "harness-claude-qwen38": "qwen3.8-max",
+            "harness-deepseek-v4flash": "deepseek-v4-flash",
+            "judge-glm52-bailian-chat": "glm-5.2",
+        }
+        if profile_ids != set(expected_profile_models):
+            raise ValueError("K-B0 configured profile identity set drifted")
+        profiles = {profile.profile_id: profile for profile in self.selected_profiles}
+        if any(
+            profile.requested_model != expected_profile_models[profile_id]
+            for profile_id, profile in profiles.items()
+        ):
+            raise ValueError("K-B0 selected requested model drifted")
+        expected_provenance = {
+            "model-gpt56-relay-responses": "TRUSTED_THIRD_PARTY_RELAY",
+            "model-qwen38-bailian-messages": "FIRST_PARTY_PLATFORM_API",
+            "model-deepseek-v4pro-chat": "FIRST_PARTY_MODEL_API",
+            "harness-codex-gpt56-medium": "TRUSTED_THIRD_PARTY_RELAY",
+            "harness-codex-gpt56-high": "TRUSTED_THIRD_PARTY_RELAY",
+            "harness-claude-qwen38": "FIRST_PARTY_PLATFORM_API",
+            "harness-deepseek-v4flash": "FIRST_PARTY_MODEL_API",
+            "judge-glm52-bailian-chat": "ALIBABA_HOSTED_MODEL",
+        }
+        if any(
+            profile.provider_provenance.value != expected_provenance[profile_id]
+            for profile_id, profile in profiles.items()
+        ):
+            raise ValueError("K-B0 selected provider provenance drifted")
         if len(self.model_profile_slots) != 3:
             raise ValueError("release plan requires exactly three Model-only slots")
         if len(self.cells) != 7:
             raise ValueError("release plan requires seven planned cells")
+        if {cell.cell_id for cell in self.cells} != set(expected_profile_models) - {
+            "judge-glm52-bailian-chat"
+        }:
+            raise ValueError("K-B0 release cell identity set drifted")
         if {cell.runtime for cell in self.cells} != {
             "direct-model",
             "codex",
@@ -257,6 +317,94 @@ class RealEvidencePlan(CanonicalModel):
         }
         if not referenced <= cell_ids:
             raise ValueError("pair or ablation references an unknown release cell")
+        if self.paired_lane.pair_id != "gpt56-relay-direct-vs-codex":
+            raise ValueError("K-B0 Pair identity drifted")
+        if self.ablation.ablation_id != "codex-gpt56-reasoning-effort":
+            raise ValueError("K-B0 ablation identity drifted")
+        referenced_profiles = {cell.profile_slot for cell in self.cells} | {self.judge.profile_id}
+        if None in referenced_profiles or referenced_profiles != profile_ids:
+            raise ValueError("release cells and Judge must reference every configured profile once")
+        direct = profiles["model-gpt56-relay-responses"]
+        codex_medium = profiles["harness-codex-gpt56-medium"]
+        if direct.route_identity != codex_medium.route_identity:
+            raise ValueError("Direct and Codex-medium GPT relay routes must be identical")
+        if self.credential_references != (
+            "HARNESSLAB_GPT56_RELAY_BASE_URL",
+            "HARNESSLAB_GPT56_RELAY_API_KEY",
+            "DASHSCOPE_API_KEY",
+            "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
+            "HARNESSLAB_BAILIAN_OPENAI_BASE_URL",
+            "DEEPSEEK_API_KEY",
+        ):
+            raise ValueError("K-B0 configuration reference set drifted")
+        return self
+
+
+class RealSmokeCall(StrictModel):
+    call_id: Identifier
+    lane: Literal["M", "H", "J"]
+    task_id: Identifier | None = None
+    task_digest: Sha256Digest | None = None
+    judge_case_reference: str | None = None
+    profile_id: Identifier
+    requested_model: str
+    provider_route: str
+    max_output_tokens: int = Field(gt=0)
+    timeout_seconds: int = Field(gt=0, le=600)
+    top_level_launches: Literal[1] = 1
+    credential_references: tuple[str, ...]
+    expected_evidence: tuple[str, ...]
+
+    @model_validator(mode="after")
+    def target_is_exact(self) -> RealSmokeCall:
+        if self.lane in {"M", "H"} and (self.task_id is None or self.task_digest is None):
+            raise ValueError("subject smoke requires an exact task identity")
+        if self.lane == "J" and self.judge_case_reference is None:
+            raise ValueError("Judge smoke requires an exact calibration case")
+        return self
+
+
+class RealSmokePlan(CanonicalModel):
+    schema_version: Literal[1] = 1
+    plan_id: Literal["core-real-smoke-v1"] = "core-real-smoke-v1"
+    release_plan_reference: Literal["release/core-real-evidence-plan.json"]
+    release_plan_digest: Sha256Digest
+    calls: tuple[RealSmokeCall, ...]
+    max_top_level_launch_count: Literal[8] = 8
+    max_output_token_ceiling: Literal[14256] = 14_256
+    abort_conditions: tuple[str, ...]
+    execution_state: Literal[EvidenceState.NOT_RUN] = EvidenceState.NOT_RUN
+    real_evaluation_call_count: Literal[0] = 0
+    authorization_required: Literal[True] = True
+
+    @model_validator(mode="after")
+    def bounded_smoke_is_exact(self) -> RealSmokePlan:
+        if len(self.calls) != 8 or len({item.call_id for item in self.calls}) != 8:
+            raise ValueError("K-B1 smoke plan requires exactly eight unique top-level calls")
+        if sum(item.max_output_tokens for item in self.calls) != 14_256:
+            raise ValueError("K-B1 smoke output-token ceiling drifted")
+        if {item.lane for item in self.calls} != {"M", "H", "J"}:
+            raise ValueError("K-B1 smoke omits a required lane")
+        required_abort_conditions = {
+            "auth error",
+            "route mismatch",
+            "schema mismatch",
+            "observed model conflict",
+            "model alias unexpectedly resolves elsewhere",
+            "secret appears in artifact or trace",
+            "proxy bypass",
+            "unrestricted network detected",
+            "verifier receives network",
+            "provider-route identity mismatch in intended P-Lane",
+            "task binding mismatch",
+            "artifact integrity error",
+            "Codex relay provider falls back to OpenAI or ChatGPT default",
+            "Claude Code falls back to api.anthropic.com",
+            "DeepSeek Harness uses non-official route",
+            "Judge persistence or integrity failure",
+        }
+        if set(self.abort_conditions) != required_abort_conditions:
+            raise ValueError("K-B1 abort policy must contain the exact fail-closed set")
         return self
 
 

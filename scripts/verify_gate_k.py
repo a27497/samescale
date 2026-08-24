@@ -19,6 +19,7 @@ from harnesslab.release.contracts import (
     load_badcase_plan,
     load_core_corpus,
     load_real_evidence_plan,
+    load_real_smoke_plan,
     load_release_evidence,
     load_resume_claim_map,
     tag_creation_authorized,
@@ -51,7 +52,7 @@ CRITICAL_TESTS = {
     "test_corpus_rejects_duplicate_independent_scenario_family",
     "test_corpus_reconstruction_detects_semantic_metadata_drift",
     "test_corpus_rejects_a_mutated_verifier",
-    "test_real_plan_has_strict_unresolved_profiles_and_exact_preflight",
+    "test_real_plan_has_frozen_kb0_profiles_and_exact_preflight",
     "test_planned_uplift_pair_cannot_bypass_provider_route_comparability",
     "test_ablation_plan_freezes_hard_controls_and_is_not_run",
     "test_release_evidence_is_strict_keyless_and_not_ready",
@@ -77,6 +78,14 @@ CRITICAL_TESTS = {
     "test_final_release_rejects_unsupported_real_resume_claim",
     "test_final_release_rejects_remote_ci_head_or_workflow_mismatch",
     "test_fully_valid_fake_semantic_fixture_passes_and_issues_receipt",
+    "test_kb0_provider_contracts_freeze_truthful_selected_profiles",
+    "test_kb0_codex_custom_provider_is_explicit_secret_free_and_single_treatment",
+    "test_kb0_claude_qwen_uses_only_explicit_bailian_environment",
+    "test_kb0_provider_scoped_egress_allows_fake_and_denies_bypass_and_targets",
+    "test_kb0_subject_docker_uses_only_internal_proxy_network",
+    "test_kb0_pair_is_configured_but_never_claims_comparable_or_uplift",
+    "test_kb0_smoke_plan_is_exact_bounded_and_unexecuted",
+    "test_kb0_matrix_preflight_and_release_hard_stop_are_unchanged",
 }
 
 
@@ -125,6 +134,7 @@ def verify_contract_mode() -> bool:
         checked = load_core_corpus(ROOT / "release/core-corpus.json")
         rebuilt = build_corpus_manifest(ROOT)
         plan = load_real_evidence_plan(ROOT / "release/core-real-evidence-plan.json")
+        smoke = load_real_smoke_plan(ROOT / "release/core-real-smoke-plan.json")
         evidence = load_release_evidence(ROOT / "release/release-evidence.json")
         claims = load_resume_claim_map(ROOT / "release/resume-claim-evidence.json")
         badcases = load_badcase_plan(ROOT / "release/badcases.json")
@@ -173,6 +183,7 @@ def verify_contract_mode() -> bool:
         (ROOT / path).read_text(encoding="utf-8")
         for path in (
             "release/core-real-evidence-plan.json",
+            "release/core-real-smoke-plan.json",
             "release/release-evidence.json",
             "release/resume-claim-evidence.json",
         )
@@ -188,6 +199,17 @@ def verify_contract_mode() -> bool:
     if plan.deepseek_e2 is not EvidenceState.DEFERRED_NOT_VERIFIED:
         print("FAIL: DeepSeek E2 state drifted")
         return False
+    if smoke.real_evaluation_call_count != 0 or smoke.execution_state is not EvidenceState.NOT_RUN:
+        print("FAIL: K-B0 smoke plan implies a real call")
+        return False
+    if (
+        smoke.release_plan_digest != plan.digest
+        or len(plan.selected_profiles) != 8
+        or {item.profile_id for item in smoke.calls}
+        != {item.profile_id for item in plan.selected_profiles}
+    ):
+        print("FAIL: K-B0 smoke/release profile binding drifted")
+        return False
     tag = subprocess.run(
         ("git", "tag", "--list", "v1.0.0-core"),
         cwd=ROOT,
@@ -199,19 +221,31 @@ def verify_contract_mode() -> bool:
         print("FAIL: v1.0.0-core exists before final release authorization")
         return False
     print(f"CORE_CORPUS={len(checked.tasks)} digest={checked.digest} PASS")
-    print(f"MODEL_ONLY_PROFILE_SLOTS={len(plan.model_profile_slots)} selections=NOT_VERIFIED PASS")
+    print(f"SELECTED_PROVIDER_PROFILES={len(plan.selected_profiles)} CONFIGURED_NOT_SMOKED PASS")
+    for state_name in (
+        "MODEL_GPT56_RELAY_PROFILE",
+        "MODEL_QWEN38_BAILIAN_PROFILE",
+        "MODEL_DEEPSEEK_V4PRO_PROFILE",
+        "CODEX_GPT56_MEDIUM",
+        "CODEX_GPT56_HIGH",
+        "CLAUDE_QWEN38",
+        "DEEPSEEK_E1_V4FLASH",
+        "JUDGE_GLM52",
+    ):
+        print(f"{state_name}=CONFIGURED_NOT_SMOKED")
     print(
         f"REAL_MATRIX_PLAN={len(plan.cells)} cells x {plan.preflight.task_count} tasks "
         f"x {plan.preflight.repeat_count} repeats PASS"
     )
-    print("PAIRED_LANE=PLANNED_NOT_VERIFIED; provider-route mismatch remains blocking")
-    print("CONTROLLED_ABLATION=PLANNED_NOT_RUN; reasoning_effort is sole treatment")
+    print("PAIRED_LANE=CONFIGURED_NOT_VERIFIED; ComparabilityEngine smoke evidence required")
+    print("CONTROLLED_ABLATION=CONFIGURED_NOT_RUN; reasoning_effort is sole treatment")
+    print("K_B1_SMOKE_PLAN=8 top-level calls; output ceiling=14256; NOT_RUN")
     print("DEEPSEEK_E2=DEFERRED_NOT_VERIFIED")
     print("FAKE_KEYLESS_CONTRACT_EVIDENCE=PASS; REAL_RELEASE_EVIDENCE=NOT_RUN")
     print("REAL_EVALUATION_CALL_COUNT=0")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
-    print("PHASE_K_A_FINAL_REVIEW_FIXED_AWAITING_REAL_EVIDENCE_AUTHORIZATION")
+    print("PHASE_K_B0_PREPARED_AWAITING_REAL_SMOKE_AUTHORIZATION")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")
@@ -305,6 +339,7 @@ def main() -> int:
                 "pytest",
                 "tests/test_release_contracts.py",
                 "tests/test_release_semantic_verifier.py",
+                "tests/test_phase_kb0.py",
                 f"--junitxml={JUNIT}",
                 "-q",
             ),

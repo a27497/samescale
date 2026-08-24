@@ -162,18 +162,21 @@ not yet been demonstrated.
 `REAL_CLAUDE_SMOKE = NOT_RUN`, and `REAL_DEEPSEEK_SMOKE = NOT_RUN`. DeepSeek persistent-session E2
 is `DEFERRED_NOT_VERIFIED`. No real provider credential is required for Gates D-F, no ambient
 harness login is consumed, and no real-provider/model invocation is claimed. Deterministic Gate G
-does not replace the required pre-Core-hard-stop real Matrix Evidence. The provider control
-plane versus subject network separation is not operationally verified. Future capabilities remain
-`DESIGN_ONLY` until their own gates exist.
+does not replace the required pre-Core-hard-stop real Matrix Evidence. The provider-scoped
+internal-network/CONNECT-proxy boundary is deterministically configured and negative-tested but
+not operationally smoked with a real Harness. Future capabilities remain `DESIGN_ONLY` until their
+own gates exist.
 
-## Phase K-A release preparation
+## Phase K-B0 release preparation
 
 IMPLEMENTED_AND_VERIFIED engineering claims now include a deterministic 18-task Core corpus,
-strict real-evidence preflight/release schemas, a keyless Gate K hard stop, a structured resume
-claim map, and fail-closed three-slot BadCase placeholders. Their authority is source, canonical
-digests, and Gates A-K—not descriptive text alone.
+strict typed provider provenance, eight selected configuration profiles, typed DeepSeek/Bailian
+thinking controls, explicit Codex relay and Claude→Bailian configuration, an offline-tested
+provider-scoped Harness egress boundary, an exact eight-call smoke plan, a keyless Gate K hard stop,
+and fail-closed three-slot BadCase placeholders. These are configuration/security claims, not
+real-performance claims.
 
 NOT_VERIFIED claims include real Model-only/Harness Matrix performance, Harness uplift, real
 reasoning-effort effects, real Judge quality, latency/cost rankings, regressions, production
 conclusions, and real BadCases. No such claim moves to IMPLEMENTED_AND_VERIFIED until Phase K-B
-produces trusted evidence and final release verification succeeds. `v1.0.0-core` is absent in K-A.
+produces trusted evidence and final release verification succeeds. `v1.0.0-core` is absent in K-B0.

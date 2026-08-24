@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from harnesslab.contracts.provider import ProviderProvenance
 from harnesslab.multi_harness.models import (
     DeepSeekSessionExtraction,
     HarnessKind,
@@ -61,6 +62,57 @@ def canonical_deepseek_profile(
         package_integrity=DEEPSEEK_PACKAGE_INTEGRITY,
         requested_model=requested_model,
         provider_route=f"{DEEPSEEK_DEFAULT_PROVIDER}/dsh-api-gateway",
+        prompt_template_version=DEEPSEEK_PROMPT_VERSION,
+        tool_profile=("headless-profile-public-contract",),
+        output_format="final-stdout",
+        trace_coverage=TraceCoverage.FINAL_OUTPUT_ONLY,
+        image=image,
+        subject_toolchain_profile=SUBJECT_TOOLCHAIN_PROFILE,
+        execution_timeout_seconds=execution_timeout_seconds,
+        config_digest=config_digest,
+        developer_preview=True,
+        session_extraction=DeepSeekSessionExtraction.DEFERRED_NOT_VERIFIED,
+    )
+
+
+def configured_qwen_bailian_claude_profile(
+    image: ImageIdentity, *, execution_timeout_seconds: float = 90
+) -> MultiHarnessProfile:
+    return MultiHarnessProfile(
+        harness=HarnessKind.CLAUDE_CODE,
+        cli_version=CLAUDE_CLI_VERSION,
+        package_integrity=CLAUDE_PACKAGE_INTEGRITY,
+        requested_model="qwen3.8-max",
+        provider_route=(
+            "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/messages"
+        ),
+        provider_provenance=ProviderProvenance.FIRST_PARTY_PLATFORM_API,
+        provider_base_url_reference="HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
+        provider_credential_reference="DASHSCOPE_API_KEY",
+        prompt_template_version=CLAUDE_PROMPT_VERSION,
+        tool_profile=("Read", "Edit", "Write", "Bash"),
+        output_format="stream-json+verbose",
+        trace_coverage=TraceCoverage.FULL_STREAM,
+        image=image,
+        subject_toolchain_profile=SUBJECT_TOOLCHAIN_PROFILE,
+        execution_timeout_seconds=execution_timeout_seconds,
+    )
+
+
+def configured_deepseek_v4flash_profile(
+    image: ImageIdentity,
+    config_digest: str,
+    *,
+    execution_timeout_seconds: float = 90,
+) -> MultiHarnessProfile:
+    return MultiHarnessProfile(
+        harness=HarnessKind.DEEPSEEK,
+        cli_version=DEEPSEEK_CLI_VERSION,
+        package_integrity=DEEPSEEK_PACKAGE_INTEGRITY,
+        requested_model="deepseek-v4-flash",
+        provider_route=(
+            "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions"
+        ),
         prompt_template_version=DEEPSEEK_PROMPT_VERSION,
         tool_profile=("headless-profile-public-contract",),
         output_format="final-stdout",

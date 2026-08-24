@@ -10,6 +10,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from harnesslab.contracts.common import Identifier, NetworkPolicy, Sha256Digest
+from harnesslab.contracts.provider import ProviderProvenance, validate_provider_base_url
 from harnesslab.contracts.task import ResourceBudget
 from harnesslab.sandbox.models import ImageIdentity, SandboxArtifactManifest, SandboxStatus
 
@@ -177,7 +178,13 @@ class CodexHarnessProfile(BaseModel):
     harness: Literal["codex"] = "codex"
     codex_cli_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
     requested_model: str = Field(min_length=1, max_length=300)
-    provider_route: Literal["codex-cli-default"]
+    provider_route: str = Field(min_length=1, max_length=800)
+    model_provider_id: Identifier | None = None
+    provider_provenance: ProviderProvenance | None = None
+    provider_base_url: str | None = None
+    provider_wire_api: Literal["responses"] | None = None
+    provider_credential_reference: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
+    provider_config_digest: Sha256Digest | None = None
     reasoning_effort: str = Field(min_length=1, max_length=50)
     sandbox_mode: Literal["workspace-write"] = "workspace-write"
     approval_policy: Literal["never"] = "never"
@@ -208,6 +215,31 @@ class CodexHarnessProfile(BaseModel):
         )
         if not all(required):
             raise ValueError("Phase E Codex profile violates the canonical isolation policy")
+        provider_values = (
+            self.model_provider_id,
+            self.provider_provenance,
+            self.provider_base_url,
+            self.provider_wire_api,
+            self.provider_credential_reference,
+            self.provider_config_digest,
+        )
+        if any(value is not None for value in provider_values):
+            if any(value is None for value in provider_values):
+                raise ValueError("custom Codex provider identity must be complete")
+            assert self.provider_base_url is not None
+            validate_provider_base_url(self.provider_base_url)
+            raw = {
+                "model_provider_id": self.model_provider_id,
+                "provider_provenance": self.provider_provenance,
+                "provider_base_url": self.provider_base_url,
+                "provider_route": self.provider_route,
+                "provider_wire_api": self.provider_wire_api,
+                "provider_credential_reference": self.provider_credential_reference,
+            }
+            canonical = json.dumps(raw, sort_keys=True, separators=(",", ":"), default=str)
+            expected = "sha256:" + hashlib.sha256(canonical.encode()).hexdigest()
+            if self.provider_config_digest != expected:
+                raise ValueError("custom Codex provider config digest mismatch")
         return self
 
     def canonical_json(self) -> str:

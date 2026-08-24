@@ -16,8 +16,8 @@
   "experiment_plan": {
     "state": "NOT_VERIFIED",
     "identity": "core-real-evidence-v1",
-    "digest": "sha256:8e92fe3a82bfc743c00520bfb6c437774b8ff63370ab4748f8a1010df51d5685",
-    "limitation": "K-A preflight plan is structurally verified, but exact model selections and the executable ExperimentPlan remain unresolved."
+    "digest": "sha256:f65b20dd06619f950887c4e527ecb0608ab15e00de883f313fd8a5744a9b6efd",
+    "limitation": "K-B0 profiles are configured but no real smoke, observed-model evidence, or executable ExperimentPlan has been authorized."
   },
   "real_matrix": {
     "state": "NOT_RUN",
@@ -29,7 +29,7 @@
     "state": "NOT_RUN",
     "identity": null,
     "digest": null,
-    "limitation": "The planned direct OpenAI and Codex provider routes are not currently COMPARABLE."
+    "limitation": "The relay Direct/Codex route is configured but runtime routing and observed-model comparability remain unverified until authorized smoke."
   },
   "controlled_ablation": {
     "state": "NOT_RUN",

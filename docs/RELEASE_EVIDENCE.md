@@ -2,10 +2,11 @@
 
 The Phase K hard stop is implemented by strict models in `src/harnesslab/release`, canonical JSON artifacts in `release/`, and `scripts/verify_gate_k.py`. Documentation does not make evidence true; identities, digests, authoritative source references, state, and independent validation do.
 
-## K-A artifacts
+## K-B0 artifacts
 
 - `core-corpus.json` binds the 18 package, task, semantic-family, benchmark-role, workspace, verifier, lane, toolchain, baseline, and oracle identities. Exactly one clamp control spans all three languages; the other 15 families are independent.
-- `core-real-evidence-plan.json` defines three unresolved Model-only slots, seven cells, the planned Pair and ablation, frozen Judge suite, exact call/token ceilings, credential references, and authorization blockers.
+- `core-real-evidence-plan.json` binds eight configured-not-smoked profiles, seven cells, truthful provider provenance, the configured Pair and ablation, frozen Judge profile/suite, exact call/token ceilings, configuration references, and authorization blockers.
+- `core-real-smoke-plan.json` freezes seven one-task subject smokes and one Judge case: eight top-level launches, 14,256 maximum output tokens, exact evidence expectations, credential references, and sixteen fail-closed abort conditions. It executes nothing.
 - `release-evidence.json` is the prospective `v1.0.0-core` evidence manifest. All six `REAL_*` states are `NOT_RUN`, real result bindings carry no identity/digest, and readiness is false.
 - `resume-claim-evidence.json` maps engineering claims to source/gate evidence and leaves real-performance claims `NOT_VERIFIED`.
 - `badcases.json` reserves exactly three empty evidence slots.
@@ -18,7 +19,7 @@ Canonical models reject extra fields. `VERIFIED` bindings require both an identi
 uv run --locked python scripts/verify_gate_k.py
 ```
 
-It validates the task corpus from source, canonical inventories, Matrix/profile/Pair/ablation structure, docs, resume references, BadCase placeholders, secret boundaries, CI ordering, fresh-clone contract, and tag guard. Passing means the hard stop works. Expected K-A output includes `CORE_RELEASE_READY=FALSE`, `REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE`, and all six `REAL_*=NOT_RUN`.
+It validates the task corpus from source, provider/profile provenance, smoke and Matrix ceilings, Pair/ablation structure, egress policy, docs, resume references, BadCase placeholders, secret boundaries, CI ordering, fresh-clone contract, and tag guard. Passing means the hard stop works. Expected K-B0 output includes `CORE_RELEASE_READY=FALSE`, `REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE`, `REAL_EVALUATION_CALL_COUNT=0`, and all six `REAL_*=NOT_RUN`.
 
 ## Final release mode
 

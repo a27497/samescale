@@ -142,7 +142,7 @@
       "required_evidence_type": "COMPARABLE paired real evidence with frozen hard controls",
       "evidence_refs": [],
       "source_phase": "K-B",
-      "limitations": ["The current direct OpenAI and Codex routes differ, so uplift is not presently comparable."]
+      "limitations": ["The relay Direct/Codex route is configured, but only authorized smoke plus ComparabilityEngine may establish COMPARABLE evidence."]
     },
     {
       "claim_id": "real-judge-quality",

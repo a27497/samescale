@@ -298,6 +298,10 @@ async def _resolve_snapshot_in_session(
                 safe_trace_facts=trace_facts,
             )
         )
+    if len(evidence.plan.paired_comparisons) != 1 or len(evidence.plan.ablations) != 1:
+        raise CoreReleaseError(
+            "authoritative ExperimentPlan must declare one pair and one ablation"
+        )
     experiment_summary = ExperimentEvidenceSummary(
         experiment_id=experiment_id,
         record_status=experiment_record.status,
@@ -307,8 +311,8 @@ async def _resolve_snapshot_in_session(
         report_plan_digest=report.plan_digest,
         report_run_count=report.plan_run_count,
         report_digest=report.digest,
-        pair=_summarize_pair(report, evidence.plan, "openai-direct-vs-codex"),
-        ablation=_summarize_ablation(report, evidence.plan, "codex-reasoning-effort"),
+        pair=_summarize_pair(report, evidence.plan, evidence.plan.paired_comparisons[0].id),
+        ablation=_summarize_ablation(report, evidence.plan, evidence.plan.ablations[0].id),
         authoritative_loader_verified=True,
     )
 
@@ -639,6 +643,8 @@ def _verify_judge(
 ) -> None:
     plan = judge.plan
     expected = release_plan.judge
+    expected_profiles = {item.profile_id: item for item in release_plan.selected_profiles}
+    expected_profile = expected_profiles[expected.profile_id]
     if not judge.authoritative_report_verified or judge.record_status != "completed":
         raise CoreReleaseError("Judge evidence did not pass authoritative report verification")
     if (
@@ -657,11 +663,19 @@ def _verify_judge(
         raise CoreReleaseError("Judge plan, suite, model, or evaluation completion drifted")
     if any(
         cell.runner_contract != "provider-adapter-v1"
-        or not cell.model_profile.requested_model
-        or not cell.model_profile.credential_reference
+        or cell.model_profile.requested_model != expected_profile.requested_model
+        or cell.model_profile.provider != expected_profile.provider_id
+        or cell.model_profile.protocol is not expected_profile.protocol
+        or cell.model_profile.credential_reference != expected_profile.credential_reference
+        or cell.model_profile.reasoning.max_output_tokens != expected_profile.max_output_tokens
+        or cell.model_profile.thinking_mode is not expected_profile.thinking_mode
+        or cell.model_profile.thinking_transport is not expected_profile.thinking_transport
+        or cell.model_profile.route != expected_profile.route
         for cell in plan.judge_cells
     ):
         raise CoreReleaseError("Judge calibration did not use a real configured Judge profile")
+    if judge.observed_models != (expected_profile.requested_model,):
+        raise CoreReleaseError("Judge observed model conflicts with the configured Judge profile")
     _binding(
         manifest,
         "judge_suite",

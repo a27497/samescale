@@ -1,6 +1,6 @@
 # Core BadCases
 
-Status for Phase K-A: **NOT_VERIFIED — REAL EVIDENCE PENDING**.
+Status for Phase K-B0: **NOT_VERIFIED — REAL EVIDENCE PENDING**.
 
 No real BadCase can be selected before the authorized Core Matrix has produced trusted run, verifier, trace, and cell evidence. The machine-readable placeholders are in `release/badcases.json`; they contain no invented task, run, cell, or evidence identity.
 

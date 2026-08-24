@@ -10,6 +10,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from harnesslab.contracts.common import Identifier, NetworkPolicy, Sha256Digest
+from harnesslab.contracts.provider import ProviderProvenance
 from harnesslab.contracts.task import ResourceBudget
 from harnesslab.harness_lane.models import (
     ChangedPathEvidence,
@@ -49,6 +50,9 @@ class MultiHarnessProfile(BaseModel):
     package_integrity: str = Field(min_length=1, max_length=300)
     requested_model: str = Field(min_length=1, max_length=300)
     provider_route: str = Field(min_length=1, max_length=300)
+    provider_provenance: ProviderProvenance | None = None
+    provider_base_url_reference: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
+    provider_credential_reference: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
     prompt_template_version: str = Field(min_length=1, max_length=100)
     tool_profile: tuple[str, ...]
     network_policy: NetworkPolicy = NetworkPolicy.DENY
@@ -80,6 +84,15 @@ class MultiHarnessProfile(BaseModel):
                 raise ValueError("Claude Code tool profile is not canonical")
             if self.config_digest is not None or self.session_extraction is not None:
                 raise ValueError("Claude Code cannot claim DeepSeek config/session evidence")
+            provider_values = (
+                self.provider_provenance,
+                self.provider_base_url_reference,
+                self.provider_credential_reference,
+            )
+            if any(value is not None for value in provider_values) and any(
+                value is None for value in provider_values
+            ):
+                raise ValueError("Claude provider configuration must be complete")
         else:
             if self.cli_version != "0.1.1-rc.2":
                 raise ValueError("DeepSeek Harness CLI must be pinned to 0.1.1-rc.2")

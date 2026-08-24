@@ -25,6 +25,8 @@ class HarnessExecutionPlan:
     context: Path | None
     timeout_seconds: float
     task_id: str
+    environment_references: tuple[tuple[str, str], ...] = ()
+    environment_literals: tuple[tuple[str, str], ...] = ()
 
 
 class MultiHarnessBackend(Protocol):
@@ -99,6 +101,15 @@ class ClaudeCodeAdapter:
             "--disable-slash-commands",
             "--no-chrome",
         )
+        environment_references: tuple[tuple[str, str], ...] = ()
+        environment_literals: tuple[tuple[str, str], ...] = ()
+        if profile.provider_base_url_reference is not None:
+            assert profile.provider_credential_reference is not None
+            environment_references = (
+                ("ANTHROPIC_BASE_URL", profile.provider_base_url_reference),
+                ("ANTHROPIC_AUTH_TOKEN", profile.provider_credential_reference),
+            )
+            environment_literals = (("ANTHROPIC_MODEL", profile.requested_model),)
         return HarnessExecutionPlan(
             HarnessKind.CLAUDE_CODE,
             argv,
@@ -107,6 +118,8 @@ class ClaudeCodeAdapter:
             context,
             profile.execution_timeout_seconds,
             task_id,
+            environment_references,
+            environment_literals,
         )
 
     def collect(
