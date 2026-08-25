@@ -64,6 +64,8 @@ CRITICAL_TESTS = {
     "test_deepseek_final_output_redacts_exact_backend_secret",
     "test_phase_f_runtime_doctors_verify_pins_flags_and_toolchains[claude]",
     "test_phase_f_runtime_doctors_verify_pins_flags_and_toolchains[deepseek]",
+    "test_multiharness_runner_normalizes_restrictive_managed_context_without_identity_drift[claude]",
+    "test_multiharness_runner_normalizes_restrictive_managed_context_without_identity_drift[deepseek]",
     "test_harness_uplift_treatments_are_comparable_when_controls_match",
     "test_harness_uplift_hard_control_mutation_is_not_comparable[task_digest]",
     "test_harness_uplift_hard_control_mutation_is_not_comparable[workspace_input_digest]",

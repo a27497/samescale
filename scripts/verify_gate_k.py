@@ -280,7 +280,7 @@ def verify_contract_mode() -> bool:
         "K_B1_SMOKE_CONTROL_PLANE=PASS; command='harnesslab release smoke preflight'; "
         f"plan_digest={smoke_control.smoke_plan_digest}"
     )
-    print("K_B1_SMOKE_PLAN=8 top-level calls; output ceiling=14256; NOT_RUN")
+    print("K_B1_SMOKE_PLAN=8 top-level calls; output ceiling=14256; FROZEN_PLAN_DRIFT=NONE")
     print(f"EGRESS_PROXY_BASE={EGRESS_PROXY_BASE}")
     print(f"EGRESS_PROXY_IMAGE={EGRESS_PROXY_IMAGE}")
     print(f"EGRESS_PROXY_IMAGE_ID={proxy_image.image_id}")
@@ -294,11 +294,12 @@ def verify_contract_mode() -> bool:
     print("VERIFIER_NETWORK=none")
     print("EGRESS_PROXY_SECURITY_ATTESTATION=PASS; LOCAL_DOCKER_BYPASS_DENIAL=PASS")
     print("DEEPSEEK_E2=DEFERRED_NOT_VERIFIED")
-    print("FAKE_KEYLESS_CONTRACT_EVIDENCE=PASS; REAL_RELEASE_EVIDENCE=NOT_RUN")
+    print("FAKE_KEYLESS_CONTRACT_EVIDENCE=PASS; REAL_RELEASE_EVIDENCE=NOT_VERIFIED")
+    print("REAL_CALLS_THIS_REPAIR=0")
     print("REAL_EVALUATION_CALL_COUNT=0")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
-    print("PHASE_K_B0_DSH_OBSERVED_MODEL_FIXED_AWAITING_REAL_SMOKE_AUTHORIZATION")
+    print("PHASE_K_B1_ABORTED_HIDDEN_VERIFIER_PERMISSION_PORTABILITY_REPAIR")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")

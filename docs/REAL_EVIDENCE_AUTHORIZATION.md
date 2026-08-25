@@ -1,8 +1,12 @@
 # Real Evidence Authorization
 
-Phase K-B0 stop state: `PHASE_K_B0_DSH_OBSERVED_MODEL_FIXED_AWAITING_REAL_SMOKE_AUTHORIZATION`.
+Phase K-B1-R1 stop state: `PHASE_K_B1_ABORTED_HIDDEN_VERIFIER_PERMISSION_PORTABILITY_REPAIR`.
 
-No provider, Codex, Claude Code, DeepSeek, or Judge call is authorized by this document. Ambient credentials and existing logins are not authorization. The eight-call K-B1 smoke in `release/core-real-smoke-plan.json` requires separate explicit authorization; the 630-run Matrix and 63 Judge calls require later authorization.
+One real top-level K-B1 attempt occurred before this repair. Call 1 invoked the configured GPT relay successfully and completed with the requested and observed model `gpt-5.6-sol`; the overall smoke then aborted with `INFRASTRUCTURE` because the non-root Hidden Verifier could not read restrictive host bind mounts. Calls 2-8 were not run and there was no retry. The completed invocation does not verify the Provider smoke group, so `REAL_PROVIDER_SMOKE=NOT_VERIFIED`.
+
+The saved public direct patch parsed and applied successfully, and a keyless replay reproduced its workspace output digest. The incident is therefore attributed to restrictive host bind-mount permissions, not to the model, relay, Responses protocol, credential, observed-model identity, or patch machinery.
+
+This repair is keyless and authorizes no provider, Codex, Claude Code, DeepSeek, or Judge call. Ambient credentials and existing logins are not authorization. Any K-B1 retry requires separate new authorization; the 630-run Matrix and 63 Judge calls still require later authorization.
 
 ## Frozen Core scope
 
@@ -51,7 +55,7 @@ The `codex-gpt56-reasoning-effort` ablation compares Codex medium with Codex hig
 - `REAL_MATRIX_EVIDENCE`
 - `REAL_JUDGE_SMOKE`
 
-All six equal `NOT_RUN`. K-B1 authorization must name `core-real-smoke-v1`, approve exactly eight top-level launches and the 14,256-token ceiling, supply the declared configuration references, and accept every predefined abort condition. It does not authorize the Matrix, full Judge run, tag, or uplift claim.
+`REAL_PROVIDER_SMOKE=NOT_VERIFIED`; the other five states remain `NOT_RUN`. Any retry authorization must name `core-real-smoke-v1`, approve exactly eight top-level launches and the 14,256-token ceiling, supply the declared configuration references, and accept every predefined abort condition. It does not authorize the Matrix, full Judge run, tag, or uplift claim.
 
 The smoke must stop on authentication, route/schema/observed-model/alias drift, any secret leak, proxy bypass or unrestricted network, verifier networking, P-Lane route mismatch, task/artifact binding failure, provider fallback, or Judge persistence/integrity failure. Only successful separately authorized smoke may support a later Matrix authorization decision.
 

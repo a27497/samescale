@@ -27,6 +27,7 @@ from harnesslab.model_lane.patch import copy_workspace_snapshot
 from harnesslab.sandbox.artifacts import (
     ArtifactError,
     assert_tree_has_no_run_secrets,
+    make_tree_readable,
     make_tree_writable,
 )
 from harnesslab.sandbox.models import SandboxArtifactManifest
@@ -146,7 +147,9 @@ class CodexHarnessRunner:
             input_digest = digest_tree(materialized.workspace)
             input_inventory = workspace_inventory(materialized.workspace)
             context_digest = (
-                digest_tree(materialized.context) if materialized.context is not None else None
+                make_tree_readable(materialized.context)
+                if materialized.context is not None
+                else None
             )
             prompt = render_codex_harness_prompt(
                 task_instruction=package.definition.instruction,

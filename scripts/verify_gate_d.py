@@ -297,7 +297,7 @@ def verify_repository_secret_hygiene() -> bool:
         print(f"FAIL: possible provider credential material in repository files: {matches}")
         return False
     print("PASS: tracked/untracked files contain no recognized OpenAI/Anthropic credentials")
-    print("REAL_PROVIDER_SMOKE=NOT_RUN")
+    print("REAL_PROVIDER_SMOKE=NOT_VERIFIED")
     return True
 
 

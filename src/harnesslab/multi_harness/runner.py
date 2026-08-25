@@ -27,6 +27,7 @@ from harnesslab.multi_harness.prompt import render_harness_prompt
 from harnesslab.sandbox.artifacts import (
     ArtifactError,
     assert_tree_has_no_run_secrets,
+    make_tree_readable,
     make_tree_writable,
 )
 from harnesslab.sandbox.models import SandboxArtifactManifest
@@ -87,7 +88,9 @@ class MultiHarnessRunner:
             make_tree_writable(materialized.workspace)
             input_digest = digest_tree(materialized.workspace)
             before = workspace_inventory(materialized.workspace)
-            context_digest = digest_tree(materialized.context) if materialized.context else None
+            context_digest = (
+                make_tree_readable(materialized.context) if materialized.context else None
+            )
             prompt = render_harness_prompt(
                 profile.harness,
                 task_instruction=package.definition.instruction,

@@ -42,6 +42,7 @@ CRITICAL_TESTS = {
     "test_codex_exec_plan_uses_stdin_and_canonical_isolation_flags",
     "test_codex_harness_prompt_excludes_verifier_and_oracle",
     "test_codex_profile_and_prompt_hashes_are_deterministic",
+    "test_codex_runner_normalizes_restrictive_managed_context_without_identity_drift",
     "test_codex_runtime_doctor_verifies_pinned_version_and_flags",
     "test_codex_self_report_cannot_override_hidden_verifier",
     "test_backend_credentials_automatically_redact_all_harness_artifacts",

@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import subprocess
 import sys
 from collections.abc import Mapping
@@ -19,6 +20,7 @@ from harnesslab.sandbox.artifacts import (
     ArtifactError,
     assert_managed_path,
     assert_tree_has_no_run_secrets,
+    make_tree_readable,
     sha256_file,
 )
 from harnesslab.sandbox.docker_cli import CommandResult, _DockerCLI, docker_environment
@@ -61,6 +63,18 @@ def container_exists(name: str) -> bool:
         check=False,
     )
     return completed.returncode == 0
+
+
+def tree_modes(root: Path) -> dict[str, int]:
+    return {
+        path.relative_to(root).as_posix() or ".": stat.S_IMODE(path.stat().st_mode)
+        for path in (root, *root.rglob("*"))
+    }
+
+
+def make_tree_restrictive(root: Path) -> None:
+    for path in (root, *root.rglob("*")):
+        path.chmod(0o700 if path.is_dir() else 0o600)
 
 
 def test_security_model_rejects_privileged_inspect_mutation() -> None:
@@ -296,6 +310,143 @@ async def test_effective_inspect_profile_and_isolated_verifier_e2e(tmp_path: Pat
     assert not verifier_mounts["/verifier"].read_write
     assert verifier.run.manifest.cleanup_verified
     assert not container_exists(verifier.run.container_name)
+    assert await no_harnesslab_containers()
+
+
+def test_make_tree_readable_preserves_digest_and_execute_bits(tmp_path: Path) -> None:
+    root = tmp_path / "managed"
+    nested = root / "nested"
+    nested.mkdir(parents=True)
+    regular = nested / "regular.txt"
+    executable = nested / "script.py"
+    regular.write_text("regular", encoding="utf-8")
+    executable.write_text("print('safe')\n", encoding="utf-8")
+    root.chmod(0o700)
+    nested.chmod(0o700)
+    regular.chmod(0o600)
+    executable.chmod(0o700)
+    before = digest_tree(root)
+
+    assert make_tree_readable(root) == before
+
+    assert digest_tree(root) == before
+    assert stat.S_IMODE(root.stat().st_mode) == 0o755
+    assert stat.S_IMODE(nested.stat().st_mode) == 0o755
+    assert stat.S_IMODE(regular.stat().st_mode) == 0o644
+    assert stat.S_IMODE(executable.stat().st_mode) == 0o744
+
+
+@pytest.mark.integration
+async def test_restrictive_task_permissions_are_portable_to_non_root_hidden_verifier(
+    tmp_path: Path,
+) -> None:
+    copied_task = tmp_path / "restricted" / "micro-python-clamp" / "1.0.0"
+    shutil.copytree(PYTHON_TASK, copied_task)
+    make_tree_restrictive(copied_task)
+    source_modes_before = tree_modes(copied_task)
+    package = TaskPackage.load(copied_task)
+    source_verifier_digest = package.verifier_digest
+    managed = package.materialize(tmp_path / "materialized")
+    runner = sandbox(tmp_path)
+    try:
+        package.apply_oracle(managed)
+        make_tree_restrictive(managed.workspace)
+        workspace_digest = digest_tree(managed.workspace)
+        result = await runner.run_hidden_verifier_workspace(
+            package,
+            managed.workspace,
+            run_id="restrictive-permission-portability",
+        )
+        workspace_digest_after = digest_tree(managed.workspace)
+    finally:
+        managed.cleanup()
+
+    security = result.run.manifest.security
+    mounts = {mount.destination: mount for mount in security.mounts}
+    assert result.passed
+    assert result.score == 1.0
+    assert result.run.manifest.status is SandboxStatus.SUCCEEDED
+    assert result.run.manifest.workspace_input_digest == workspace_digest
+    assert workspace_digest_after == workspace_digest
+    assert (
+        source_verifier_digest == package.verifier_digest == digest_tree(copied_task / "verifier")
+    )
+    assert tree_modes(copied_task) == source_modes_before
+    assert stat.S_IMODE((copied_task / "verifier").stat().st_mode) == 0o700
+    assert stat.S_IMODE((copied_task / "verifier" / "verify.py").stat().st_mode) == 0o600
+    assert security.user == "10001:10001"
+    assert security.network_mode == "none"
+    assert not security.privileged
+    assert security.read_only_rootfs
+    assert "ALL" in security.cap_drop
+    assert "no-new-privileges=true" in security.security_options
+    assert not security.docker_socket_mounted
+    assert not security.published_ports
+    assert not mounts["/workspace"].read_write
+    assert not mounts["/verifier"].read_write
+    assert result.run.manifest.cleanup_verified
+    assert not runner.runtime_root.joinpath("restrictive-permission-portability").exists()
+    assert not container_exists(result.run.container_name)
+    assert await no_harnesslab_containers()
+
+
+@pytest.mark.integration
+async def test_verifier_staging_cleanup_failure_cannot_return_passed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package = TaskPackage.load(PYTHON_TASK)
+    managed = package.materialize(tmp_path / "materialized")
+    runner = sandbox(tmp_path)
+    original_cleanup = runner._cleanup_run_root
+
+    def cleanup_then_fail(run_root: Path) -> None:
+        original_cleanup(run_root)
+        raise OSError("synthetic staging cleanup failure")
+
+    monkeypatch.setattr(runner, "_cleanup_run_root", cleanup_then_fail)
+    try:
+        package.apply_oracle(managed)
+        with pytest.raises(
+            SandboxExecutionError, match="verifier staging cleanup could not be verified"
+        ):
+            await runner.run_hidden_verifier_workspace(
+                package,
+                managed.workspace,
+                run_id="staging-cleanup-failure",
+            )
+    finally:
+        managed.cleanup()
+
+    assert not runner.runtime_root.joinpath("staging-cleanup-failure").exists()
+    assert await no_harnesslab_containers()
+
+
+@pytest.mark.asyncio
+async def test_verifier_staging_rejects_source_digest_drift_before_container(
+    tmp_path: Path,
+) -> None:
+    copied_task = tmp_path / "drifted" / "micro-python-clamp" / "1.0.0"
+    shutil.copytree(PYTHON_TASK, copied_task)
+    package = TaskPackage.load(copied_task)
+    managed = package.materialize(tmp_path / "materialized")
+    runner = sandbox(tmp_path)
+    (copied_task / "verifier" / "verify.py").write_text(
+        "raise RuntimeError('drifted')\n", encoding="utf-8"
+    )
+    try:
+        with pytest.raises(
+            SandboxExecutionError, match="permission-portable verifier staging failed"
+        ):
+            await runner.run_hidden_verifier_workspace(
+                package,
+                managed.workspace,
+                run_id="source-verifier-drift",
+            )
+    finally:
+        managed.cleanup()
+
+    assert not (runner.artifact_root / "source-verifier-drift").exists()
+    assert not runner.runtime_root.joinpath("source-verifier-drift").exists()
     assert await no_harnesslab_containers()
 
 

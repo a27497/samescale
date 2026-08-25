@@ -171,7 +171,14 @@ def test_release_evidence_is_strict_keyless_and_not_ready() -> None:
     assert readiness.real_evidence_authorization_required
     assert "REAL_MATRIX_EVIDENCE" in readiness.blockers
     assert "JUDGE_EVIDENCE" in readiness.blockers
-    assert all(state is EvidenceState.NOT_RUN for state in manifest.real_statuses.values())
+    assert manifest.real_statuses == {
+        "REAL_PROVIDER_SMOKE": EvidenceState.NOT_VERIFIED,
+        "REAL_CODEX_SMOKE": EvidenceState.NOT_RUN,
+        "REAL_CLAUDE_SMOKE": EvidenceState.NOT_RUN,
+        "REAL_DEEPSEEK_SMOKE": EvidenceState.NOT_RUN,
+        "REAL_MATRIX_EVIDENCE": EvidenceState.NOT_RUN,
+        "REAL_JUDGE_SMOKE": EvidenceState.NOT_RUN,
+    }
 
 
 def test_verified_evidence_and_resume_claims_cannot_be_forged() -> None:

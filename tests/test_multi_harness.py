@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import shutil
+import stat
 from pathlib import Path
 
 import pytest
@@ -11,7 +13,11 @@ from harnesslab.harness_lane.models import (
     HarnessLaneOutcome,
     TraceEventType,
 )
-from harnesslab.multi_harness.adapter import ClaudeCodeAdapter, DeepSeekHarnessAdapter
+from harnesslab.multi_harness.adapter import (
+    ClaudeCodeAdapter,
+    DeepSeekHarnessAdapter,
+    HarnessExecutionPlan,
+)
 from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
 from harnesslab.multi_harness.fake import (
     PRIVATE_CLAUDE_REASONING_SENTINEL,
@@ -21,6 +27,7 @@ from harnesslab.multi_harness.fake import (
 from harnesslab.multi_harness.models import (
     DeepSeekSessionExtraction,
     HarnessKind,
+    HarnessProcessCapture,
     TraceCoverage,
 )
 from harnesslab.multi_harness.profile import (
@@ -40,7 +47,8 @@ from harnesslab.multi_harness.runtime import (
     MultiHarnessRuntime,
 )
 from harnesslab.sandbox.models import ImageIdentity
-from harnesslab.tasks.package import TaskPackage
+from harnesslab.sandbox.runner import DockerSandbox
+from harnesslab.tasks.package import TaskPackage, digest_tree
 
 ROOT = Path(__file__).resolve().parents[1]
 TASKS = {
@@ -107,6 +115,69 @@ async def test_three_h_lane_tasks_pass_each_phase_f_hidden_verifier(
         result.evidence.verifier_sandbox_manifest.workspace_input_digest
         == result.evidence.workspace_output_digest
     )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("harness", list(HarnessKind), ids=("claude", "deepseek"))
+async def test_multiharness_runner_normalizes_restrictive_managed_context_without_identity_drift(
+    tmp_path: Path, harness: HarnessKind
+) -> None:
+    copied_task = tmp_path / "micro-typescript-clamp" / "1.0.0"
+    shutil.copytree(TASKS["typescript"], copied_task)
+    source_context = copied_task / "context"
+    for path in (source_context, *source_context.rglob("*")):
+        path.chmod(0o700 if path.is_dir() else 0o600)
+    source_modes = {
+        path.relative_to(source_context).as_posix() or ".": stat.S_IMODE(path.stat().st_mode)
+        for path in (source_context, *source_context.rglob("*"))
+    }
+    package = TaskPackage.load(copied_task)
+    assert package.definition.context_bundle is not None
+    context_digest = package.definition.context_bundle.digest
+
+    class InspectingBackend(FakeMultiHarnessBackend):
+        async def run(self, plan: HarnessExecutionPlan) -> HarnessProcessCapture:
+            assert plan.context is not None
+            for path in (plan.context, *plan.context.rglob("*")):
+                mode = stat.S_IMODE(path.stat().st_mode)
+                assert mode & (0o555 if path.is_dir() else 0o444) == (
+                    0o555 if path.is_dir() else 0o444
+                )
+            assert digest_tree(plan.context) == context_digest
+            return await super().run(plan)
+
+    profile = fake_profile(harness)
+    result = await MultiHarnessRunner(
+        artifact_root=tmp_path / "artifacts",
+        runtime_root=tmp_path / "runtime",
+        sandbox=DockerSandbox(
+            artifact_root=tmp_path / "sandbox-artifacts",
+            runtime_root=tmp_path / "sandbox-runtime",
+        ),
+    ).run(
+        copied_task,
+        profile,
+        adapter=adapter_for(harness),
+        backend=InspectingBackend(),
+        run_id=f"restrictive-context-{harness.value}",
+    )
+
+    expected_prompt = render_harness_prompt(
+        harness,
+        task_instruction=package.definition.instruction,
+        task_digest=package.definition.content_digest,
+        workspace_input_digest=result.evidence.workspace_input_digest,
+        context_digest=context_digest,
+        network_policy=profile.network_policy,
+    )
+    assert result.evidence.outcome is HarnessLaneOutcome.VERIFIED_PASS
+    assert result.evidence.workspace_input_digest == package.definition.workspace.digest
+    assert result.evidence.context_digest == context_digest
+    assert result.evidence.prompt_hash == expected_prompt.prompt_hash
+    assert {
+        path.relative_to(source_context).as_posix() or ".": stat.S_IMODE(path.stat().st_mode)
+        for path in (source_context, *source_context.rglob("*"))
+    } == source_modes
 
 
 @pytest.mark.asyncio

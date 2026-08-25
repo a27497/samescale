@@ -117,7 +117,7 @@ the Phase I dashboard truthfully reports `NOT_READY`. It never creates a Git tag
 
 Gate I is deterministic and keyless:
 
-- `REAL_PROVIDER_SMOKE=NOT_RUN`
+- `REAL_PROVIDER_SMOKE=NOT_VERIFIED`
 - `REAL_CODEX_SMOKE=NOT_RUN`
 - `REAL_CLAUDE_SMOKE=NOT_RUN`
 - `REAL_DEEPSEEK_SMOKE=NOT_RUN`

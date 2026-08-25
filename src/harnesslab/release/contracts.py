@@ -146,17 +146,20 @@ def evaluate_release_readiness(manifest: ReleaseEvidenceManifest) -> ReleaseRead
 
 
 def validate_keyless_contract_state(manifest: ReleaseEvidenceManifest) -> None:
-    forbidden = {
-        key: state
-        for key, state in manifest.real_statuses.items()
-        if state is not EvidenceState.NOT_RUN
+    expected = {
+        "REAL_PROVIDER_SMOKE": EvidenceState.NOT_VERIFIED,
+        "REAL_CODEX_SMOKE": EvidenceState.NOT_RUN,
+        "REAL_CLAUDE_SMOKE": EvidenceState.NOT_RUN,
+        "REAL_DEEPSEEK_SMOKE": EvidenceState.NOT_RUN,
+        "REAL_MATRIX_EVIDENCE": EvidenceState.NOT_RUN,
+        "REAL_JUDGE_SMOKE": EvidenceState.NOT_RUN,
     }
-    if forbidden:
-        raise CoreReleaseError(f"K-B0 REAL_* state was forged: {sorted(forbidden)}")
+    if manifest.real_statuses != expected:
+        raise CoreReleaseError("K-B1-R1 REAL_* stop state drifted")
     if manifest.core_release_ready:
-        raise CoreReleaseError("K-B0 cannot report CORE_RELEASE_READY")
+        raise CoreReleaseError("K-B1-R1 cannot report CORE_RELEASE_READY")
     if not manifest.real_evidence_authorization_required:
-        raise CoreReleaseError("K-B0 must require explicit real-evidence authorization")
+        raise CoreReleaseError("K-B1-R1 must require explicit real-evidence authorization")
 
 
 def tag_creation_authorized(

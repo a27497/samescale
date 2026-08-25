@@ -356,7 +356,7 @@ def main() -> int:
     if not verify_frontend_graph() or not verify_scope_and_safety():
         return ExitCode.FAIL
     for status in (
-        "REAL_PROVIDER_SMOKE=NOT_RUN",
+        "REAL_PROVIDER_SMOKE=NOT_VERIFIED",
         "REAL_CODEX_SMOKE=NOT_RUN",
         "REAL_CLAUDE_SMOKE=NOT_RUN",
         "REAL_DEEPSEEK_SMOKE=NOT_RUN",

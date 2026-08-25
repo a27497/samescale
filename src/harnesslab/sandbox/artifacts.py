@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import os
 import shutil
+import stat
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -80,6 +81,25 @@ def make_tree_writable(root: Path) -> None:
             (directory_path / name).chmod(0o777)
         for name in file_names:
             (directory_path / name).chmod(0o666)
+
+
+def make_tree_readable(root: Path) -> str:
+    """Make a safe managed tree readable by a non-root container without changing identity."""
+
+    before_digest = digest_tree(root)
+    if os.name != "nt":
+        for directory, _, file_names in os.walk(root, followlinks=False):
+            directory_path = Path(directory)
+            directory_mode = stat.S_IMODE(directory_path.stat(follow_symlinks=False).st_mode)
+            directory_path.chmod(directory_mode | 0o555, follow_symlinks=False)
+            for name in file_names:
+                path = directory_path / name
+                file_mode = stat.S_IMODE(path.stat(follow_symlinks=False).st_mode)
+                path.chmod(file_mode | 0o444, follow_symlinks=False)
+    after_digest = digest_tree(root)
+    if after_digest != before_digest:
+        raise ArtifactError("permission normalization changed tree identity")
+    return before_digest
 
 
 class ArtifactWriter:

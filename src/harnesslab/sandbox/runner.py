@@ -16,6 +16,7 @@ from harnesslab.sandbox.artifacts import (
     ArtifactWriter,
     assert_managed_path,
     assert_tree_has_no_run_secrets,
+    make_tree_readable,
     make_tree_writable,
     redact_exact,
 )
@@ -38,7 +39,7 @@ from harnesslab.sandbox.models import (
 from harnesslab.sandbox.preflight import _docker_runtime_preflight
 from harnesslab.sandbox.subprocess_loop import run_on_subprocess_loop
 from harnesslab.tasks.models import VerifierReport
-from harnesslab.tasks.package import TaskPackage, digest_tree
+from harnesslab.tasks.package import TaskPackage, TaskPackageError, digest_tree
 
 SANDBOX_IMAGE = "harnesslab-phase-c:0.3.0"
 RUN_LABEL = "com.harnesslab.phase=C"
@@ -276,24 +277,50 @@ class DockerSandbox:
     ) -> IsolatedVerifierResult:
         if not workspace.is_dir() or workspace.is_symlink():
             raise ArtifactError("verifier workspace is unavailable or unsafe")
+        package_root = package.root.resolve()
+        if workspace == package_root or package_root in workspace.parents:
+            raise ArtifactError("task package source cannot be normalized for container access")
         assert_tree_has_no_run_secrets(workspace, secret_values)
         verifier_root = package.root / "verifier"
         entrypoint = package.verifier_entrypoint.relative_to(verifier_root).as_posix()
-        writer = ArtifactWriter(self.artifact_root, run_id)
-        workspace_input_digest = digest_tree(workspace)
-        run = await self._execute_container(
-            package=package,
-            role="verifier",
-            run_id=run_id,
-            workspace=workspace,
-            workspace_read_only=True,
-            additional_mounts=((verifier_root, "/verifier", True),),
-            command=(f"/verifier/{entrypoint}", "/workspace"),
-            timeout_seconds=timeout_seconds,
-            secrets={},
-            workspace_input_digest=workspace_input_digest,
-            writer=writer,
-        )
+        run_root = self._reserve_run_root(run_id)
+        try:
+            try:
+                workspace_input_digest = make_tree_readable(workspace)
+                source_digest = digest_tree(verifier_root)
+                if source_digest != package.verifier_digest:
+                    raise ArtifactError("source verifier identity drifted before staging")
+                staged_verifier = run_root / "verifier"
+                shutil.copytree(verifier_root, staged_verifier)
+                staged_digest = digest_tree(staged_verifier)
+                if staged_digest != source_digest:
+                    raise ArtifactError("verifier identity changed during staging")
+                normalized_digest = make_tree_readable(staged_verifier)
+                if normalized_digest != package.verifier_digest:
+                    raise ArtifactError("verifier identity changed during permission normalization")
+            except (ArtifactError, OSError, TaskPackageError) as exc:
+                raise SandboxExecutionError("permission-portable verifier staging failed") from exc
+            writer = ArtifactWriter(self.artifact_root, run_id)
+            run = await self._execute_container(
+                package=package,
+                role="verifier",
+                run_id=run_id,
+                workspace=workspace,
+                workspace_read_only=True,
+                additional_mounts=((staged_verifier, "/verifier", True),),
+                command=(f"/verifier/{entrypoint}", "/workspace"),
+                timeout_seconds=timeout_seconds,
+                secrets={},
+                workspace_input_digest=workspace_input_digest,
+                writer=writer,
+            )
+        finally:
+            try:
+                self._cleanup_run_root(run_root)
+            except (ArtifactError, OSError) as exc:
+                raise SandboxExecutionError(
+                    "verifier staging cleanup could not be verified"
+                ) from exc
         if run.manifest.status is not SandboxStatus.SUCCEEDED:
             raise SandboxExecutionError(
                 f"isolated verifier sandbox did not succeed: {run.manifest.status.value}"
@@ -633,6 +660,8 @@ class DockerSandbox:
         managed = assert_managed_path(self.runtime_root, run_root)
         if managed.exists():
             shutil.rmtree(managed)
+        if managed.exists():
+            raise ArtifactError("managed run root cleanup could not be verified")
 
 
 async def no_harnesslab_containers() -> bool:

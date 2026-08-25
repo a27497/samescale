@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
+import stat
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, cast
@@ -443,6 +444,61 @@ async def test_three_h_lane_tasks_fake_codex_pass_hidden_verifier(
     assert evidence.observed_model is None
     assert evidence.observed_model_status is ObservedModelStatus.NOT_EXPOSED
     assert PRIVATE_REASONING_SENTINEL not in all_artifact_text(result.artifact_directory)
+
+
+@pytest.mark.asyncio
+async def test_codex_runner_normalizes_restrictive_managed_context_without_identity_drift(
+    tmp_path: Path,
+) -> None:
+    copied_task = tmp_path / "micro-typescript-clamp" / "1.0.0"
+    shutil.copytree(TASKS[2], copied_task)
+    source_context = copied_task / "context"
+    for path in (source_context, *source_context.rglob("*")):
+        path.chmod(0o700 if path.is_dir() else 0o600)
+    source_modes = {
+        path.relative_to(source_context).as_posix() or ".": stat.S_IMODE(path.stat().st_mode)
+        for path in (source_context, *source_context.rglob("*"))
+    }
+    package = TaskPackage.load(copied_task)
+    assert package.definition.context_bundle is not None
+    context_digest = package.definition.context_bundle.digest
+
+    class InspectingBackend(FakeCodexBackend):
+        async def run(self, plan: CodexExecutionPlan) -> CodexProcessCapture:
+            assert plan.context is not None
+            for path in (plan.context, *plan.context.rglob("*")):
+                mode = stat.S_IMODE(path.stat().st_mode)
+                assert mode & (0o555 if path.is_dir() else 0o444) == (
+                    0o555 if path.is_dir() else 0o444
+                )
+            assert digest_tree(plan.context) == context_digest
+            return await super().run(plan)
+
+    profile = canonical_codex_profile(await CodexRuntime().ensure_image())
+    result = await CodexHarnessRunner(
+        artifact_root=tmp_path / "artifacts",
+        runtime_root=tmp_path / "runtime",
+        sandbox=DockerSandbox(
+            artifact_root=tmp_path / "sandbox-artifacts",
+            runtime_root=tmp_path / "sandbox-runtime",
+        ),
+    ).run(copied_task, profile, backend=InspectingBackend(), run_id="restrictive-context")
+
+    expected_prompt = render_codex_harness_prompt(
+        task_instruction=package.definition.instruction,
+        task_digest=package.definition.content_digest,
+        workspace_input_digest=result.evidence.workspace_input_digest,
+        context_digest=context_digest,
+        network_policy=profile.tool_network_policy,
+    )
+    assert result.evidence.outcome is HarnessLaneOutcome.VERIFIED_PASS
+    assert result.evidence.workspace_input_digest == package.definition.workspace.digest
+    assert result.evidence.context_digest == context_digest
+    assert result.evidence.prompt_hash == expected_prompt.prompt_hash
+    assert {
+        path.relative_to(source_context).as_posix() or ".": stat.S_IMODE(path.stat().st_mode)
+        for path in (source_context, *source_context.rglob("*"))
+    } == source_modes
 
 
 @pytest.mark.asyncio

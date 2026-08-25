@@ -31,6 +31,40 @@ not execute the subject-controlled workspace directly on the host: it starts a s
 container with network `none`, mounts the final subject workspace read-only at `/workspace`, and
 mounts the hidden verifier read-only at `/verifier`. The subject container never sees that mount.
 
+## Permission portability
+
+**Problem.** A non-root container cannot traverse or read a bind mount copied from an operator
+checkout whose directories and files use restrictive `0700`/`0600` modes. HarnessLab must give the
+same Git tree the same execution semantics under CI, umask `022`, umask `077`, and restrictive
+server checkouts without changing the checkout itself.
+
+**Why this design.** HarnessLab normalizes only its own ephemeral workspace and context copies.
+For Hidden Verifiers it copies the authoritative verifier tree into a per-run sandbox staging
+directory, proves `source digest == task package verifier digest == staged digest`, adds only the
+read/traverse bits required by UID `10001:10001`, and binds the staged tree read-only. Permission
+normalization computes `digest_tree` before and after and fails closed if logical identity changes.
+
+**Alternative rejected.** Recursive `chmod` of the repository or task package would mutate
+operator-owned source state. Running the verifier as root, relaxing mount/rootfs/network controls,
+or including a verifier copy as a new authoritative evidence definition would weaken existing
+security and identity contracts.
+
+**Invariant.** Relative paths and bytes—and therefore workspace, context, task, and verifier
+digests—do not change. The verifier remains non-root, network `none`, capability-free,
+`no-new-privileges`, read-only-rootfs, with `/workspace` and `/verifier` mounted read-only.
+
+**Failure mode.** Unsafe trees, source/staging digest mismatch, permission-normalization identity
+drift, staging errors, and unverified staging cleanup raise a sandbox infrastructure error. They
+are never converted into a capability failure or a passing verifier result.
+
+**Verification.** Gate C creates a restrictive task copy, replays the deterministic oracle through
+the real Docker Hidden Verifier, checks the hardened inspect manifest, proves source modes and
+digests unchanged, and proves staging cleanup. Gates E and F inspect restrictive managed context
+copies at fake-backend entry without invoking Codex, Claude, or DeepSeek.
+
+**Maintenance cost.** One small readable-mode helper and one per-run verifier copy are maintained;
+there is no new filesystem abstraction or provider/harness contract.
+
 ## Cleanup, secrets, and artifacts
 
 Timeout and explicit task cancellation both kill and remove the labeled container before control
