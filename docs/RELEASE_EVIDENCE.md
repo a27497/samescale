@@ -2,12 +2,14 @@
 
 The Phase K hard stop is implemented by strict models in `src/harnesslab/release`, canonical JSON artifacts in `release/`, and `scripts/verify_gate_k.py`. Documentation does not make evidence true; identities, digests, authoritative source references, state, and independent validation do.
 
-## K-B0 artifacts
+## Core real-evidence v2 artifacts
 
 - `core-corpus.json` binds the 18 package, task, semantic-family, benchmark-role, workspace, verifier, lane, toolchain, baseline, and oracle identities. Exactly one clamp control spans all three languages; the other 15 families are independent.
-- `core-real-evidence-plan.json` binds eight configured-not-smoked profiles, seven cells, truthful provider provenance, the configured Pair and ablation, frozen Judge profile/suite, exact call/token ceilings, configuration references, and authorization blockers.
-- `core-real-smoke-plan.json` freezes seven one-task subject smokes and one Judge case: eight top-level launches, 14,256 maximum output tokens, exact evidence expectations, credential references, and sixteen fail-closed abort conditions. `harnesslab release smoke preflight` validates it keylessly; only `execute --allow-real-smoke` can enter the shared production orchestrator. Two separately authorized executions aborted at call 1, and no further execution is currently authorized.
-- `release-evidence.json` is the prospective `v1.0.0-core` evidence manifest. `REAL_PROVIDER_SMOKE` is `NOT_VERIFIED` after the first attempt completed provider call 1 but aborted in Hidden Verifier infrastructure and the second attempt aborted on an unclassified provider timeout at the same call. The historical timeout phase is `NOT_AVAILABLE`; the other five `REAL_*` states are `NOT_RUN`, and readiness is false.
+- `core-real-evidence-plan.json` is `core-real-evidence-v2` / `core-real-matrix-v2`. It binds eight configured-not-smoked profiles, seven cells, truthful provider provenance, the unchanged Pair and ablation, frozen Judge profile/suite, exact call/token ceilings, four runtime configuration references, and authorization blockers.
+- `core-real-smoke-plan.json` is `core-real-smoke-v2` and freezes seven one-task subject smokes and one Judge case: eight top-level launches, 14,256 maximum output tokens, exact evidence expectations, credential references, and sixteen fail-closed abort conditions. `harnesslab release smoke preflight` validates it keylessly; only a separately authorized `execute --allow-real-smoke` can enter the shared production orchestrator. V2 has executed zero real calls.
+- `history/core-real-v1.json` preserves the v1 plan IDs and canonical digests through the authoritative starting commit and exact Git blob/byte identities. It truthfully records all three v1 attempts without copying operator-local artifacts.
+- `opencode-go-route-snapshot.json` freezes the selected official Qwen3.8 Max Messages and GLM-5.2 Chat Completions model IDs/endpoints, OpenCode Go third-party provenance, operator-confirmed benchmark permission, and the absence of a live model probe.
+- `release-evidence.json` is the prospective `v1.0.0-core` evidence manifest. `REAL_PROVIDER_SMOKE` remains `NOT_VERIFIED`; the other five `REAL_*` states are `NOT_RUN`, and readiness is false.
 - `resume-claim-evidence.json` maps engineering claims to source/gate evidence and leaves real-performance claims `NOT_VERIFIED`.
 - `badcases.json` reserves exactly three empty evidence slots.
 
@@ -19,7 +21,7 @@ Canonical models reject extra fields. `VERIFIED` bindings require both an identi
 uv run --locked python scripts/verify_gate_k.py
 ```
 
-It validates the task corpus from source, provider/profile provenance, exact smoke bindings and mutation rejection, smoke and Matrix ceilings, Pair/ablation structure, immutable proxy identity, effective Docker egress topology, docs, resume references, BadCase placeholders, secret boundaries, CI ordering, fresh-clone contract, and tag guard. Passing means the hard stop works. Expected K-B1-R2 output includes `CORE_RELEASE_READY=FALSE`, `REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE`, `REAL_CALLS_THIS_REPAIR=0`, `SMOKE_TIMEOUT_CHANGE=FALSE`, `REAL_PROVIDER_SMOKE=NOT_VERIFIED`, and the other five real scopes `NOT_RUN`.
+It validates the task corpus from source, v1 history, OpenCode Go routes/transport/provenance, exact smoke bindings and mutation rejection, smoke and Matrix ceilings, Pair/ablation structure, immutable proxy identity, effective Docker egress topology, docs, resume references, BadCase placeholders, secret boundaries, CI ordering, fresh-clone contract, and tag guard. Passing means the hard stop works. Expected R3 output includes `OPENCODE_GO_ROUTE_CONTRACT=PASS`, `OPENCODE_GO_CREDENTIAL_TRANSPORT=PASS`, `OPENCODE_GO_PROVENANCE=PASS`, `V1_HISTORY_PRESERVED=PASS`, `V2_SMOKE_PLAN=8_CALLS_14256_TOKENS`, `CORE_RELEASE_READY=FALSE`, and `REAL_CALLS_THIS_REPAIR=0`.
 
 ## Final release mode
 
@@ -33,7 +35,7 @@ uv run --locked python scripts/verify_gate_k.py --final-release \
 ```
 
 The verifier does not treat database connectivity or an arbitrary matching file SHA as release
-evidence. It loads the completed `core-real-matrix-v1` through the existing authoritative
+evidence. It loads the completed `core-real-matrix-v2` through the existing authoritative
 experiment loader, reconstructs the exact 18-task/7-cell/n=5/630-slot plan, rebuilds the actual
 report, and checks semantic bindings for `experiment-plan:`, `experiment-report:`,
 `experiment-pair:`, and `experiment-ablation:` identities. It independently verifies the trusted

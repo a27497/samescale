@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from harnesslab.contracts.provider import ProviderProvenance
 from harnesslab.multi_harness.models import (
+    ClaudeCredentialTransport,
     DeepSeekSessionExtraction,
     HarnessKind,
     MultiHarnessProfile,
@@ -75,7 +76,7 @@ def canonical_deepseek_profile(
     )
 
 
-def configured_qwen_bailian_claude_profile(
+def configured_qwen_opencode_go_claude_profile(
     image: ImageIdentity, *, execution_timeout_seconds: float = 90
 ) -> MultiHarnessProfile:
     return MultiHarnessProfile(
@@ -83,12 +84,11 @@ def configured_qwen_bailian_claude_profile(
         cli_version=CLAUDE_CLI_VERSION,
         package_integrity=CLAUDE_PACKAGE_INTEGRITY,
         requested_model="qwen3.8-max",
-        provider_route=(
-            "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages"
-        ),
-        provider_provenance=ProviderProvenance.FIRST_PARTY_PLATFORM_API,
-        provider_base_url_reference="HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-        provider_credential_reference="DASHSCOPE_API_KEY",
+        provider_route="opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+        provider_provenance=ProviderProvenance.THIRD_PARTY_INFERENCE_PLATFORM,
+        provider_fixed_base_url="https://opencode.ai/zen/go",
+        provider_credential_reference="HARNESSLAB_OPENCODE_GO_API_KEY",
+        provider_credential_transport=ClaudeCredentialTransport.ANTHROPIC_API_KEY,
         prompt_template_version=CLAUDE_PROMPT_VERSION,
         tool_profile=("Read", "Edit", "Write", "Bash"),
         output_format="stream-json+verbose",

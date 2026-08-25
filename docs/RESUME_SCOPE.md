@@ -170,8 +170,8 @@ own gates exist.
 ## Phase K-B0 release preparation
 
 IMPLEMENTED_AND_VERIFIED engineering claims now include a deterministic 18-task Core corpus,
-strict typed provider provenance, eight selected configuration profiles, typed DeepSeek/Bailian
-thinking controls, explicit Codex relay and Claude→Bailian configuration, an offline-tested
+strict typed provider provenance, eight selected configuration profiles, typed DeepSeek thinking
+controls, explicit Codex relay and Claude→OpenCode Go configuration, an offline-tested
 provider-scoped Harness egress boundary, an exact eight-call smoke plan, a keyless Gate K hard stop,
 and fail-closed three-slot BadCase placeholders. These are configuration/security claims, not
 real-performance claims.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import tempfile
@@ -55,12 +56,17 @@ from harnesslab.model_lane.providers import (
 from harnesslab.model_lane.runner import DirectModelRunner
 from harnesslab.multi_harness.adapter import ClaudeCodeAdapter, DeepSeekHarnessAdapter
 from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
-from harnesslab.multi_harness.models import HarnessKind, MultiHarnessProfile, TraceCoverage
+from harnesslab.multi_harness.models import (
+    ClaudeCredentialTransport,
+    HarnessKind,
+    MultiHarnessProfile,
+    TraceCoverage,
+)
 from harnesslab.multi_harness.profile import (
     CLAUDE_IMAGE,
     DEEPSEEK_IMAGE,
     configured_deepseek_v4flash_profile,
-    configured_qwen_bailian_claude_profile,
+    configured_qwen_opencode_go_claude_profile,
 )
 from harnesslab.multi_harness.runner import MultiHarnessRunner
 from harnesslab.multi_harness.runtime import MultiHarnessRuntime
@@ -77,13 +83,13 @@ from harnesslab.tasks.package import TaskPackage, TaskPackageError, digest_tree
 
 EXPECTED_CALL_IDS = (
     "smoke-1-model-gpt56-relay-responses",
-    "smoke-2-model-qwen38-bailian-messages",
+    "smoke-2-model-qwen38-opencode-go-messages",
     "smoke-3-model-deepseek-v4pro-chat",
     "smoke-4-harness-codex-gpt56-medium",
     "smoke-5-harness-codex-gpt56-high",
-    "smoke-6-harness-claude-qwen38",
+    "smoke-6-harness-claude-qwen38-opencode-go",
     "smoke-7-harness-deepseek-v4flash",
-    "smoke-8-judge-glm52",
+    "smoke-8-judge-glm52-opencode-go",
 )
 EXPECTED_RUNNERS = (
     "DirectModelRunner",
@@ -108,9 +114,7 @@ EXPECTED_ADAPTERS = (
 REQUIRED_CONFIGURATION_REFERENCES = (
     "HARNESSLAB_GPT56_RELAY_BASE_URL",
     "HARNESSLAB_GPT56_RELAY_API_KEY",
-    "DASHSCOPE_API_KEY",
-    "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-    "HARNESSLAB_BAILIAN_OPENAI_BASE_URL",
+    "HARNESSLAB_OPENCODE_GO_API_KEY",
     "DEEPSEEK_API_KEY",
 )
 SUBJECT_TASK_ID = "core-python-deduplicate"
@@ -280,6 +284,24 @@ class SmokeControlPlane:
             raise SmokeControlPlaneError(str(exc)) from exc
         if smoke_plan.release_plan_digest != release_plan.digest:
             raise SmokeControlPlaneError("smoke/release plan digest mismatch")
+        for reference, expected_digest, label in (
+            (
+                release_plan.history_reference,
+                release_plan.history_digest,
+                "v1 history",
+            ),
+            (
+                release_plan.official_route_snapshot_reference,
+                release_plan.official_route_snapshot_digest,
+                "OpenCode Go route snapshot",
+            ),
+        ):
+            path = (root / reference).resolve()
+            if root not in path.parents or not path.is_file():
+                raise SmokeControlPlaneError(f"{label} is unavailable")
+            actual = "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+            if actual != expected_digest:
+                raise SmokeControlPlaneError(f"{label} digest mismatch")
         if (
             len(smoke_plan.calls) != 8
             or smoke_plan.max_top_level_launch_count != 8
@@ -397,8 +419,8 @@ class SmokeControlPlane:
                 profile: ModelProfile | CodexHarnessProfile | MultiHarnessProfile = codex_profile
                 boundary = self._boundary(provider, environment, execution_id, index, runtime)
                 self._assert_codex_route(codex_profile, provider, environment)
-            elif call.call_id == "smoke-6-harness-claude-qwen38":
-                profile = configured_qwen_bailian_claude_profile(
+            elif call.call_id == "smoke-6-harness-claude-qwen38-opencode-go":
+                profile = configured_qwen_opencode_go_claude_profile(
                     runtime.claude_image, execution_timeout_seconds=provider.timeout_seconds
                 )
                 boundary = self._boundary(provider, environment, execution_id, index, runtime)
@@ -413,7 +435,7 @@ class SmokeControlPlane:
                 self._assert_deepseek_route(profile, provider, environment)
             else:
                 profile = configured_model_profile(provider, environment)
-                if call.call_id == "smoke-8-judge-glm52":
+                if call.call_id == "smoke-8-judge-glm52-opencode-go":
                     self._assert_judge_route(profile, provider, environment)
             resolved.append(ResolvedSmokeBinding(binding, profile, boundary))
         direct = resolved[0].runtime_profile
@@ -467,14 +489,18 @@ class SmokeControlPlane:
         environment: Mapping[str, str],
     ) -> None:
         required = (
-            profile.provider_base_url_reference == "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-            profile.provider_credential_reference == "DASHSCOPE_API_KEY",
+            profile.provider_base_url_reference is None,
+            profile.provider_fixed_base_url == "https://opencode.ai/zen/go",
+            profile.provider_credential_reference == "HARNESSLAB_OPENCODE_GO_API_KEY",
+            profile.provider_credential_transport is ClaudeCredentialTransport.ANTHROPIC_API_KEY,
             profile.requested_model == "qwen3.8-max",
             profile.provider_route == provider.route_identity,
-            "api.anthropic.com" not in provider.resolve_base_url(environment),
+            provider.resolve_base_url(environment) == "https://opencode.ai/zen/go",
+            f"{profile.provider_fixed_base_url}/v1/messages"
+            == "https://opencode.ai/zen/go/v1/messages",
         )
         if not all(required):
-            raise SmokeControlPlaneError("Claude Bailian fallback protection failed")
+            raise SmokeControlPlaneError("Claude OpenCode Go route protection failed")
 
     @staticmethod
     def _assert_deepseek_route(
@@ -500,10 +526,14 @@ class SmokeControlPlane:
             profile.requested_model == "glm-5.2",
             profile.protocol is Protocol.CHAT_COMPLETIONS,
             profile.base_url == provider.resolve_base_url(environment),
-            profile.credential_reference == "DASHSCOPE_API_KEY",
+            profile.base_url == "https://opencode.ai/zen/go",
+            profile.route == "/v1/chat/completions",
+            profile.credential_reference == "HARNESSLAB_OPENCODE_GO_API_KEY",
+            profile.thinking_mode is None,
+            profile.thinking_transport is None,
         )
         if not all(required):
-            raise SmokeControlPlaneError("Judge Bailian route protection failed")
+            raise SmokeControlPlaneError("Judge OpenCode Go route protection failed")
 
     async def execute(
         self,
@@ -770,8 +800,8 @@ class ProductionSmokeInvoker:
             )
         profile_identity = judge_digest(profile)
         slot_identity = {
-            "calibration_id": "core-real-smoke-v1",
-            "judge_cell_id": "judge-glm52-bailian-chat",
+            "calibration_id": "core-real-smoke-v2",
+            "judge_cell_id": "judge-glm52-opencode-go-chat",
             "suite_digest": suite.suite_digest,
             "definition_digest": definition.definition_digest,
             "profile_identity": profile_identity,
@@ -783,8 +813,8 @@ class ProductionSmokeInvoker:
         slot = JudgeEvaluationSlot(
             slot_id=judge_digest(slot_identity),
             slot_order=0,
-            calibration_id="core-real-smoke-v1",
-            judge_cell_id="judge-glm52-bailian-chat",
+            calibration_id="core-real-smoke-v2",
+            judge_cell_id="judge-glm52-opencode-go-chat",
             case_id=case.case_id,
             case_mode=case.mode,
             case_public_digest=case.public_digest,

@@ -7,10 +7,10 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from harnesslab.contracts.common import Identifier, NetworkPolicy, Sha256Digest
-from harnesslab.contracts.provider import ProviderProvenance
+from harnesslab.contracts.provider import ProviderProvenance, validate_provider_base_url
 from harnesslab.contracts.task import ResourceBudget
 from harnesslab.harness_lane.models import (
     ChangedPathEvidence,
@@ -35,6 +35,11 @@ class TraceCoverage(StrEnum):
     FINAL_OUTPUT_ONLY = "FINAL_OUTPUT_ONLY"
 
 
+class ClaudeCredentialTransport(StrEnum):
+    ANTHROPIC_API_KEY = "ANTHROPIC_API_KEY"
+    ANTHROPIC_AUTH_TOKEN = "ANTHROPIC_AUTH_TOKEN"
+
+
 class DeepSeekSessionExtraction(StrEnum):
     DEFERRED_NOT_VERIFIED = "DEFERRED_NOT_VERIFIED"
 
@@ -52,7 +57,9 @@ class MultiHarnessProfile(BaseModel):
     provider_route: str = Field(min_length=1, max_length=300)
     provider_provenance: ProviderProvenance | None = None
     provider_base_url_reference: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
+    provider_fixed_base_url: str | None = None
     provider_credential_reference: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
+    provider_credential_transport: ClaudeCredentialTransport | None = None
     prompt_template_version: str = Field(min_length=1, max_length=100)
     tool_profile: tuple[str, ...]
     network_policy: NetworkPolicy = NetworkPolicy.DENY
@@ -71,6 +78,11 @@ class MultiHarnessProfile(BaseModel):
     session_extraction: DeepSeekSessionExtraction | None = None
     attempt_count: Literal[1] = 1
 
+    @field_validator("provider_fixed_base_url")
+    @classmethod
+    def fixed_provider_url_is_safe(cls, value: str | None) -> str | None:
+        return validate_provider_base_url(value) if value is not None else None
+
     @model_validator(mode="after")
     def canonical_profile(self) -> MultiHarnessProfile:
         if self.image.image_id == "sha256:" + "0" * 64:
@@ -87,10 +99,16 @@ class MultiHarnessProfile(BaseModel):
             provider_values = (
                 self.provider_provenance,
                 self.provider_base_url_reference,
+                self.provider_fixed_base_url,
                 self.provider_credential_reference,
+                self.provider_credential_transport,
             )
-            if any(value is not None for value in provider_values) and any(
-                value is None for value in provider_values
+            if any(value is not None for value in provider_values) and (
+                self.provider_provenance is None
+                or (self.provider_base_url_reference is None)
+                == (self.provider_fixed_base_url is None)
+                or self.provider_credential_reference is None
+                or self.provider_credential_transport is None
             ):
                 raise ValueError("Claude provider configuration must be complete")
         else:

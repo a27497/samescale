@@ -103,13 +103,28 @@ class ClaudeCodeAdapter:
         )
         environment_references: tuple[tuple[str, str], ...] = ()
         environment_literals: tuple[tuple[str, str], ...] = ()
-        if profile.provider_base_url_reference is not None:
+        if profile.provider_credential_reference is not None:
             assert profile.provider_credential_reference is not None
+            assert profile.provider_credential_transport is not None
             environment_references = (
-                ("ANTHROPIC_BASE_URL", profile.provider_base_url_reference),
-                ("ANTHROPIC_AUTH_TOKEN", profile.provider_credential_reference),
+                (
+                    profile.provider_credential_transport.value,
+                    profile.provider_credential_reference,
+                ),
             )
-            environment_literals = (("ANTHROPIC_MODEL", profile.requested_model),)
+            if profile.provider_fixed_base_url is not None:
+                base_url = profile.provider_fixed_base_url
+            else:
+                assert profile.provider_base_url_reference is not None
+                environment_references = (
+                    ("ANTHROPIC_BASE_URL", profile.provider_base_url_reference),
+                    *environment_references,
+                )
+                base_url = None
+            literal_values = [("ANTHROPIC_MODEL", profile.requested_model)]
+            if base_url is not None:
+                literal_values.insert(0, ("ANTHROPIC_BASE_URL", base_url))
+            environment_literals = tuple(literal_values)
         return HarnessExecutionPlan(
             HarnessKind.CLAUDE_CODE,
             argv,

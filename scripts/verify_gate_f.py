@@ -39,7 +39,11 @@ class Check:
 
 ROOT = Path(__file__).resolve().parents[1]
 JUNIT = ROOT / "gate-f-results.xml"
-PHASE_F_TESTS = ("tests/test_multi_harness.py", "tests/test_comparability.py")
+PHASE_F_TESTS = (
+    "tests/test_multi_harness.py",
+    "tests/test_comparability.py",
+    "tests/test_phase_kb0.py",
+)
 CRITICAL_TESTS = {
     "test_three_h_lane_tasks_pass_each_phase_f_hidden_verifier[python-claude]",
     "test_three_h_lane_tasks_pass_each_phase_f_hidden_verifier[python-deepseek]",
@@ -86,6 +90,8 @@ CRITICAL_TESTS = {
     "test_real_runner_persisted_manifests_supply_comparability_controls",
     "test_actual_profile_requested_model_is_not_double_counted_as_a_control",
     "test_compare_cli_emits_deterministic_json_and_text",
+    "test_opencode_go_claude_qwen_uses_typed_api_key_transport",
+    "test_opencode_go_messages_exact_url_headers_and_shared_claude_route",
 }
 
 

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "history_id": "core-real-v1",
+  "authoritative_commit": "45e83d735cee48d9a29361da5964cee83d048a42",
+  "evidence_plan": {
+    "plan_id": "core-real-evidence-v1",
+    "canonical_digest": "sha256:b97a0798b7855b0544c8acdb861551bc918d57fc6fbda834cc13c992955ad098",
+    "git_blob": "e43733f50fc695d54d8c6f8a58e92a07f3d271b0",
+    "byte_sha256": "sha256:e8d230f7ae024d185dcf80067f58f6cb8e15a007f4e9ade93a4276ebc793f08e",
+    "path_at_commit": "release/core-real-evidence-plan.json"
+  },
+  "smoke_plan": {
+    "plan_id": "core-real-smoke-v1",
+    "canonical_digest": "sha256:a9a21424199fc30437589e4526a4bf91dbe2dce65520a69077924098d7dc528f",
+    "git_blob": "0236a1f491c727894d55c31d283bdfcad78508ab",
+    "byte_sha256": "sha256:3b16f3c73ad343275037c4db178ccb5d4ace100a09fdb09f14d31f9dc4288411",
+    "path_at_commit": "release/core-real-smoke-plan.json"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "facts": "GPT provider call completed; the overall smoke aborted on Hidden Verifier host-permission portability, later fixed by K-B1-R1."
+    },
+    {
+      "attempt": 2,
+      "facts": "GPT provider call timed out at approximately 90.454 seconds; the historical timeout subtype is NOT_AVAILABLE; diagnostics were later added by K-B1-R2."
+    },
+    {
+      "attempt": 3,
+      "facts": "Call 1 requested and observed gpt-5.6-sol, completed in 10947 ms, passed verifier sandbox execution, and produced verifier_passed=false, verifier_score=0.8, outcome=verified_fail. Call 2 qwen3.8-max through Bailian returned HTTP 403 AUTHENTICATION. Calls 3 through 8 were NOT_RUN."
+    }
+  ],
+  "aggregate_limitation": "The attempt-3 score is one smoke observation and is not a model aggregate.",
+  "operator_local_artifacts_included": false
+}

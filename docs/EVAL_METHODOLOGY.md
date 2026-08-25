@@ -200,8 +200,8 @@ and the approved infrastructure denominator remains unchanged.
 The Core corpus freezes 18 validated tasks, balanced six each across Python, Java, and TypeScript,
 with six behavioral categories. The planned real Matrix expands seven configured cells across every
 task at five repetitions per task/cell: direct `gpt-5.6-sol` through an operator-trusted relay,
-`qwen3.8-max` through Bailian Messages, non-thinking `deepseek-v4-pro` through DeepSeek official,
-Codex relay medium/high, Claude Code Harness × Qwen through Bailian, and DeepSeek Harness E1 ×
+`qwen3.8-max` through OpenCode Go Messages, non-thinking `deepseek-v4-pro` through DeepSeek official,
+Codex relay medium/high, Claude Code Harness × Qwen through OpenCode Go, and DeepSeek Harness E1 ×
 `deepseek-v4-flash` through DeepSeek official. DeepSeek E2 remains deferred. Model identity and
 Harness identity remain distinct. Formal evidence is evaluated per task; unrelated observations
 are never pooled to manufacture n ≥ 5.
@@ -210,5 +210,5 @@ The Codex medium/high controlled ablation changes only reasoning effort and rema
 `CONFIGURED_NOT_RUN`. The direct-relay/Codex-medium P-Lane shares a configured semantic route but is
 `CONFIGURED_NOT_VERIFIED`; authorized smoke must establish runtime routing and observed-model facts
 before the ComparabilityEngine can decide. No real result, rank, uplift, cost, latency,
-Judge-quality, or regression statement is present in K-B0. The eight-call K-B1 smoke plan must
+Judge-quality, or regression statement is present in the v2 keyless state. The eight-call smoke plan must
 complete without an abort condition before any full Matrix authorization is considered.

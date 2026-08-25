@@ -1,8 +1,8 @@
 {
-  "schema_version": 1,
-  "plan_id": "core-real-smoke-v1",
+  "schema_version": 2,
+  "plan_id": "core-real-smoke-v2",
   "release_plan_reference": "release/core-real-evidence-plan.json",
-  "release_plan_digest": "sha256:b97a0798b7855b0544c8acdb861551bc918d57fc6fbda834cc13c992955ad098",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
   "calls": [
     {
       "call_id": "smoke-1-model-gpt56-relay-responses",
@@ -27,20 +27,19 @@
       ]
     },
     {
-      "call_id": "smoke-2-model-qwen38-bailian-messages",
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
       "lane": "M",
       "task_id": "core-python-deduplicate",
       "task_digest": "sha256:af65f5f3a7e7e0f8c28fa1690c7416314b819d3e246b21d1c433e81dcaacd7f8",
       "judge_case_reference": null,
-      "profile_id": "model-qwen38-bailian-messages",
+      "profile_id": "model-qwen38-opencode-go-messages",
       "requested_model": "qwen3.8-max",
-      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
+      "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
       "max_output_tokens": 2000,
       "timeout_seconds": 90,
       "top_level_launches": 1,
       "credential_references": [
-        "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-        "DASHSCOPE_API_KEY"
+        "HARNESSLAB_OPENCODE_GO_API_KEY"
       ],
       "expected_evidence": [
         "provider authentication and schema",
@@ -120,20 +119,19 @@
       ]
     },
     {
-      "call_id": "smoke-6-harness-claude-qwen38",
+      "call_id": "smoke-6-harness-claude-qwen38-opencode-go",
       "lane": "H",
       "task_id": "core-python-deduplicate",
       "task_digest": "sha256:af65f5f3a7e7e0f8c28fa1690c7416314b819d3e246b21d1c433e81dcaacd7f8",
       "judge_case_reference": null,
-      "profile_id": "harness-claude-qwen38",
+      "profile_id": "harness-claude-qwen38-opencode-go",
       "requested_model": "qwen3.8-max",
-      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
+      "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
       "max_output_tokens": 2000,
       "timeout_seconds": 90,
       "top_level_launches": 1,
       "credential_references": [
-        "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-        "DASHSCOPE_API_KEY"
+        "HARNESSLAB_OPENCODE_GO_API_KEY"
       ],
       "expected_evidence": [
         "provider authentication and schema",
@@ -169,20 +167,19 @@
       ]
     },
     {
-      "call_id": "smoke-8-judge-glm52",
+      "call_id": "smoke-8-judge-glm52-opencode-go",
       "lane": "J",
       "task_id": null,
       "task_digest": null,
       "judge_case_reference": "judge_suites/core-calibration/1.0.0#label-l0-pass",
-      "profile_id": "judge-glm52-bailian-chat",
+      "profile_id": "judge-glm52-opencode-go-chat",
       "requested_model": "glm-5.2",
-      "provider_route": "bailian-openai|chat_completions|env:HARNESSLAB_BAILIAN_OPENAI_BASE_URL/chat/completions",
+      "provider_route": "opencode-go|chat_completions|https://opencode.ai/zen/go/v1/chat/completions",
       "max_output_tokens": 256,
       "timeout_seconds": 90,
       "top_level_launches": 1,
       "credential_references": [
-        "HARNESSLAB_BAILIAN_OPENAI_BASE_URL",
-        "DASHSCOPE_API_KEY"
+        "HARNESSLAB_OPENCODE_GO_API_KEY"
       ],
       "expected_evidence": [
         "provider authentication and schema",
@@ -208,7 +205,7 @@
     "task binding mismatch",
     "artifact integrity error",
     "Codex relay provider falls back to OpenAI or ChatGPT default",
-    "Claude Code falls back to api.anthropic.com",
+    "Claude Code leaves the fixed OpenCode Go route",
     "DeepSeek Harness uses non-official route",
     "Judge persistence or integrity failure"
   ],

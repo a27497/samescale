@@ -41,7 +41,7 @@ from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
 from harnesslab.multi_harness.models import HarnessKind
 from harnesslab.multi_harness.profile import (
     configured_deepseek_v4flash_profile,
-    configured_qwen_bailian_claude_profile,
+    configured_qwen_opencode_go_claude_profile,
 )
 from harnesslab.multi_harness.prompt import render_harness_prompt
 from harnesslab.release.contracts import (
@@ -56,7 +56,7 @@ from harnesslab.sandbox.models import ImageIdentity
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "release"
 SENTINEL = "kb0-secret-sentinel-never-persist"
-BAILIAN_ANTHROPIC_OPERATOR_BASE_URL = "https://dashscope.aliyuncs.com/apps/anthropic"
+OPENCODE_GO_BASE_URL = "https://opencode.ai/zen/go"
 
 
 def image(reference: str) -> ImageIdentity:
@@ -74,7 +74,7 @@ def test_kb0_provider_contracts_freeze_truthful_selected_profiles() -> None:
     assert relay.upstream_model_claim == "gpt-5.6-sol"
     assert relay.operator_trust_assertion == "VERIFIED_BY_OPERATOR"
     assert relay.upstream_first_party_provenance == "NOT_INDEPENDENTLY_VERIFIED"
-    qwen = profiles["model-qwen38-bailian-messages"]
+    qwen = profiles["model-qwen38-opencode-go-messages"]
     assert (qwen.requested_model, qwen.protocol, qwen.reasoning_effort) == (
         "qwen3.8-max",
         Protocol.MESSAGES,
@@ -83,22 +83,20 @@ def test_kb0_provider_contracts_freeze_truthful_selected_profiles() -> None:
     deepseek = profiles["model-deepseek-v4pro-chat"]
     assert deepseek.fixed_base_url == "https://api.deepseek.com"
     assert deepseek.thinking_mode is ThinkingMode.DISABLED
-    judge = profiles["judge-glm52-bailian-chat"]
+    judge = profiles["judge-glm52-opencode-go-chat"]
     assert judge.requested_model == "glm-5.2"
-    assert judge.provider_provenance is ProviderProvenance.ALIBABA_HOSTED_MODEL
+    assert judge.provider_provenance is ProviderProvenance.THIRD_PARTY_INFERENCE_PLATFORM
     assert judge.max_output_tokens == 256
     assert all(item.profile_digest == item.expected_profile_digest for item in profiles.values())
-    qwen_runtime = configured_model_profile(
-        qwen, {"HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL}
-    )
+    qwen_runtime = configured_model_profile(qwen, {})
     assert qwen_runtime.requested_model == "qwen3.8-max"
     assert qwen_runtime.route == "/v1/messages"
     assert (
-        qwen.resolved_route_identity(
-            {"HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL}
-        )
-        == "bailian-anthropic|messages|https://dashscope.aliyuncs.com/apps/anthropic/v1/messages"
+        qwen.resolved_route_identity({})
+        == "opencode-go|messages|https://opencode.ai/zen/go/v1/messages"
     )
+    assert qwen.provider_provenance is ProviderProvenance.THIRD_PARTY_INFERENCE_PLATFORM
+    assert qwen.inference_provider == "OpenCode Go"
     serialized = json.dumps(plan.model_dump(mode="json"))
     assert SENTINEL not in serialized
     assert all(item.credential_reference.isupper() for item in profiles.values())
@@ -186,8 +184,8 @@ def test_kb0_codex_custom_provider_is_explicit_secret_free_and_single_treatment(
     assert canonical_codex_profile(medium.codex_image).provider_route != medium.provider_route
 
 
-def test_kb0_claude_qwen_uses_only_explicit_bailian_environment(tmp_path: Path) -> None:
-    profile = configured_qwen_bailian_claude_profile(image("harnesslab-phase-f-claude:2.1.241"))
+def test_opencode_go_claude_qwen_uses_typed_api_key_transport(tmp_path: Path) -> None:
+    profile = configured_qwen_opencode_go_claude_profile(image("harnesslab-phase-f-claude:2.1.241"))
     prompt = render_harness_prompt(
         HarnessKind.CLAUDE_CODE,
         task_instruction="Fix task.",
@@ -201,43 +199,44 @@ def test_kb0_claude_qwen_uses_only_explicit_bailian_environment(tmp_path: Path) 
     )
     assert profile.requested_model == "qwen3.8-max"
     assert execution.environment_references == (
-        ("ANTHROPIC_BASE_URL", "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL"),
-        ("ANTHROPIC_AUTH_TOKEN", "DASHSCOPE_API_KEY"),
+        ("ANTHROPIC_API_KEY", "HARNESSLAB_OPENCODE_GO_API_KEY"),
     )
-    assert execution.environment_literals == (("ANTHROPIC_MODEL", "qwen3.8-max"),)
+    assert execution.environment_literals == (
+        ("ANTHROPIC_BASE_URL", OPENCODE_GO_BASE_URL),
+        ("ANTHROPIC_MODEL", "qwen3.8-max"),
+    )
     assert "api.anthropic.com" not in json.dumps(profile.model_dump(mode="json"))
     assert SENTINEL not in execution.argv
     docker_argv = DockerMultiHarnessBackend(
         credentials={
-            "DASHSCOPE_API_KEY": SENTINEL,
-            "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL,
+            "HARNESSLAB_OPENCODE_GO_API_KEY": SENTINEL,
         }
     ).create_argv(execution, "claude-subject")
     assert "ANTHROPIC_BASE_URL" in docker_argv
-    assert "ANTHROPIC_AUTH_TOKEN" in docker_argv
-    assert "DASHSCOPE_API_KEY" not in docker_argv
+    assert "ANTHROPIC_API_KEY" in docker_argv
+    assert "ANTHROPIC_AUTH_TOKEN" not in docker_argv
+    assert "HARNESSLAB_OPENCODE_GO_API_KEY" not in docker_argv
     assert SENTINEL not in docker_argv
 
 
 @pytest.mark.asyncio
-async def test_kb0_bailian_messages_official_url_shape_is_keyless_and_shared_with_claude(
+async def test_opencode_go_messages_exact_url_headers_and_shared_claude_route(
     tmp_path: Path,
 ) -> None:
     plan = load_real_evidence_plan(RELEASE / "core-real-evidence-plan.json")
     profiles = {item.profile_id: item for item in plan.selected_profiles}
-    direct_provider = profiles["model-qwen38-bailian-messages"]
-    direct_profile = configured_model_profile(
-        direct_provider,
-        {"HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL},
-    )
+    direct_provider = profiles["model-qwen38-opencode-go-messages"]
+    direct_profile = configured_model_profile(direct_provider, {})
     requested_urls: list[str] = []
+    requested_headers: list[httpx.Headers] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
         requested_urls.append(str(request.url))
+        requested_headers.append(request.headers)
         return httpx.Response(
             200,
             json={
-                "id": "keyless-bailian-contract",
+                "id": "keyless-opencode-go-contract",
                 "model": "qwen3.8-max",
                 "content": [{"type": "text", "text": "{}"}],
                 "stop_reason": "end_turn",
@@ -247,17 +246,20 @@ async def test_kb0_bailian_messages_official_url_shape_is_keyless_and_shared_wit
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
         result = await AnthropicMessagesAdapter(
-            client=client, environment={"DASHSCOPE_API_KEY": "keyless-fake-dashscope-key"}
+            client=client,
+            environment={"HARNESSLAB_OPENCODE_GO_API_KEY": "fake-key"},
         ).invoke(ProviderRequest(profile=direct_profile, instructions="system", input="input"))
 
-    expected_endpoint = f"{BAILIAN_ANTHROPIC_OPERATOR_BASE_URL}/v1/messages"
+    expected_endpoint = f"{OPENCODE_GO_BASE_URL}/v1/messages"
     assert requested_urls == [expected_endpoint]
     assert result.endpoint == expected_endpoint
     assert direct_profile.requested_model == "qwen3.8-max"
-    assert direct_profile.credential_reference == "DASHSCOPE_API_KEY"
-    assert direct_provider.provider_provenance is ProviderProvenance.FIRST_PARTY_PLATFORM_API
+    assert direct_profile.credential_reference == "HARNESSLAB_OPENCODE_GO_API_KEY"
+    assert requested_headers[0]["x-api-key"] == "fake-key"
+    assert "authorization" not in requested_headers[0]
+    assert direct_provider.provider_provenance is ProviderProvenance.THIRD_PARTY_INFERENCE_PLATFORM
 
-    claude_profile = configured_qwen_bailian_claude_profile(
+    claude_profile = configured_qwen_opencode_go_claude_profile(
         image("harnesslab-phase-f-claude:2.1.241")
     )
     prompt = render_harness_prompt(
@@ -272,17 +274,75 @@ async def test_kb0_bailian_messages_official_url_shape_is_keyless_and_shared_wit
         claude_profile, prompt, workspace=tmp_path, context=None, task_id="task"
     )
     operator_environment = {
-        "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL,
-        "DASHSCOPE_API_KEY": "keyless-fake-dashscope-key",
+        "HARNESSLAB_OPENCODE_GO_API_KEY": "fake-key",
+        "ANTHROPIC_AUTH_TOKEN": "ambient-host-token-must-not-be-used",
     }
     container_environment = {
         target: operator_environment[source] for target, source in execution.environment_references
     }
-    assert container_environment["ANTHROPIC_BASE_URL"] == BAILIAN_ANTHROPIC_OPERATOR_BASE_URL
+    container_environment.update(execution.environment_literals)
+    assert container_environment["ANTHROPIC_BASE_URL"] == OPENCODE_GO_BASE_URL
     assert not container_environment["ANTHROPIC_BASE_URL"].endswith("/v1")
-    assert execution.environment_references[1] == ("ANTHROPIC_AUTH_TOKEN", "DASHSCOPE_API_KEY")
+    assert execution.environment_references[0] == (
+        "ANTHROPIC_API_KEY",
+        "HARNESSLAB_OPENCODE_GO_API_KEY",
+    )
+    assert "ANTHROPIC_AUTH_TOKEN" not in container_environment
     assert claude_profile.requested_model == "qwen3.8-max"
-    assert claude_profile.provider_provenance is ProviderProvenance.FIRST_PARTY_PLATFORM_API
+    assert claude_profile.provider_provenance is ProviderProvenance.THIRD_PARTY_INFERENCE_PLATFORM
+    assert f"{container_environment['ANTHROPIC_BASE_URL']}/v1/messages" == expected_endpoint
+
+
+@pytest.mark.asyncio
+async def test_opencode_go_judge_exact_route_bearer_and_public_content_only() -> None:
+    plan = load_real_evidence_plan(RELEASE / "core-real-evidence-plan.json")
+    provider = next(
+        item for item in plan.selected_profiles if item.profile_id == "judge-glm52-opencode-go-chat"
+    )
+    profile = configured_model_profile(provider, {})
+    requests: list[httpx.Request] = []
+    private_reasoning = "PRIVATE_GLM_REASONING_MUST_NOT_PERSIST"
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
+            200,
+            json={
+                "id": "judge-keyless-contract",
+                "model": "glm-5.2",
+                "choices": [
+                    {
+                        "message": {
+                            "content": '{"label":"PASS","score":1.0}',
+                            "reasoning_content": private_reasoning,
+                        },
+                        "finish_reason": "stop",
+                    }
+                ],
+                "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+            },
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        adapter = OpenAICompatibleChatAdapter(
+            client=client,
+            environment={"HARNESSLAB_OPENCODE_GO_API_KEY": "fake-key"},
+        )
+        payload = adapter._payload(
+            ProviderRequest(profile=profile, instructions="judge", input="case")
+        )
+        result = await adapter.invoke(
+            ProviderRequest(profile=profile, instructions="judge", input="case")
+        )
+
+    assert str(requests[0].url) == "https://opencode.ai/zen/go/v1/chat/completions"
+    assert requests[0].headers["authorization"] == "Bearer fake-key"
+    assert "x-api-key" not in requests[0].headers
+    assert "enable_thinking" not in payload and "thinking" not in payload
+    assert provider.thinking_mode is None
+    assert provider.thinking_transport is None
+    assert result.public_output_text == '{"label":"PASS","score":1.0}'
+    assert private_reasoning not in result.model_dump_json()
 
 
 def test_kb0_deepseek_harness_e1_is_official_and_e2_deferred() -> None:
@@ -437,6 +497,31 @@ def test_kb0_smoke_plan_is_exact_bounded_and_unexecuted() -> None:
     assert evidence.judge_report.state is EvidenceState.NOT_RUN
     assert not evidence.core_release_ready
     assert evidence.real_evidence_authorization_required
+
+
+def test_v1_history_and_opencode_go_route_snapshot_are_frozen() -> None:
+    plan = load_real_evidence_plan(RELEASE / "core-real-evidence-plan.json")
+    history = json.loads((ROOT / plan.history_reference).read_text(encoding="utf-8"))
+    snapshot = json.loads(
+        (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
+    )
+    assert history["authoritative_commit"] == "45e83d735cee48d9a29361da5964cee83d048a42"
+    assert history["evidence_plan"]["canonical_digest"] == (
+        "sha256:b97a0798b7855b0544c8acdb861551bc918d57fc6fbda834cc13c992955ad098"
+    )
+    assert history["smoke_plan"]["canonical_digest"] == (
+        "sha256:a9a21424199fc30437589e4526a4bf91dbe2dce65520a69077924098d7dc528f"
+    )
+    assert len(history["attempts"]) == 3
+    assert "verifier_score=0.8" in history["attempts"][2]["facts"]
+    assert "HTTP 403 AUTHENTICATION" in history["attempts"][2]["facts"]
+    assert snapshot["provider_provenance"] == "THIRD_PARTY_INFERENCE_PLATFORM"
+    assert {(item["requested_model"], item["endpoint"]) for item in snapshot["models"]} == {
+        ("qwen3.8-max", "https://opencode.ai/zen/go/v1/messages"),
+        ("glm-5.2", "https://opencode.ai/zen/go/v1/chat/completions"),
+    }
+    assert snapshot["judge_thinking_control"] == ("PROVIDER_DEFAULT_NOT_EXPLICITLY_CONFIGURED")
+    assert snapshot["live_model_probe_performed"] is False
 
 
 def test_kb0_matrix_preflight_and_release_hard_stop_are_unchanged() -> None:

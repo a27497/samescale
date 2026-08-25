@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import os
 import re
 import subprocess
@@ -87,7 +88,10 @@ CRITICAL_TESTS = {
     "test_fully_valid_fake_semantic_fixture_passes_and_issues_receipt",
     "test_kb0_provider_contracts_freeze_truthful_selected_profiles",
     "test_kb0_codex_custom_provider_is_explicit_secret_free_and_single_treatment",
-    "test_kb0_claude_qwen_uses_only_explicit_bailian_environment",
+    "test_opencode_go_claude_qwen_uses_typed_api_key_transport",
+    "test_opencode_go_messages_exact_url_headers_and_shared_claude_route",
+    "test_opencode_go_judge_exact_route_bearer_and_public_content_only",
+    "test_v1_history_and_opencode_go_route_snapshot_are_frozen",
     "test_kb0_provider_scoped_egress_allows_fake_and_denies_bypass_and_targets",
     "test_kb0_subject_docker_uses_only_internal_proxy_network",
     "test_kb0_pair_is_configured_but_never_claims_comparable_or_uplift",
@@ -95,6 +99,7 @@ CRITICAL_TESTS = {
     "test_kb0_matrix_preflight_and_release_hard_stop_are_unchanged",
     "test_smoke_production_control_plane_exact_eight_call_binding",
     "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
+    "test_v2_credential_preflight_prints_presence_only",
     "test_smoke_same_path_fake_execution_consumes_exact_plan_without_network",
     "test_smoke_missing_config_stops_before_first_call",
     "test_smoke_abort_on_first_failure_never_invokes_calls_four_through_eight",
@@ -233,6 +238,28 @@ def verify_contract_mode() -> bool:
     if smoke_control.preflight().attempted_top_level_launches != 0:
         print("FAIL: K-B0 smoke preflight attempted a provider call")
         return False
+    history = json.loads((ROOT / plan.history_reference).read_text(encoding="utf-8"))
+    snapshot = json.loads(
+        (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
+    )
+    if (
+        history.get("authoritative_commit") != "45e83d735cee48d9a29361da5964cee83d048a42"
+        or history.get("evidence_plan", {}).get("canonical_digest")
+        != "sha256:b97a0798b7855b0544c8acdb861551bc918d57fc6fbda834cc13c992955ad098"
+        or history.get("smoke_plan", {}).get("canonical_digest")
+        != "sha256:a9a21424199fc30437589e4526a4bf91dbe2dce65520a69077924098d7dc528f"
+        or len(history.get("attempts", ())) != 3
+    ):
+        print("FAIL: immutable v1 plan or attempt history drifted")
+        return False
+    if (
+        snapshot.get("provider_provenance") != "THIRD_PARTY_INFERENCE_PLATFORM"
+        or snapshot.get("fixed_base_url") != "https://opencode.ai/zen/go"
+        or snapshot.get("live_model_probe_performed") is not False
+        or snapshot.get("judge_thinking_control") != "PROVIDER_DEFAULT_NOT_EXPLICITLY_CONFIGURED"
+    ):
+        print("FAIL: OpenCode Go official route snapshot drifted")
+        return False
     if (
         smoke.release_plan_digest != plan.digest
         or len(plan.selected_profiles) != 8
@@ -255,7 +282,7 @@ def verify_contract_mode() -> bool:
     print(f"SELECTED_PROVIDER_PROFILES={len(plan.selected_profiles)} CONFIGURED_NOT_SMOKED PASS")
     for state_name in (
         "MODEL_GPT56_RELAY_PROFILE",
-        "MODEL_QWEN38_BAILIAN_PROFILE",
+        "MODEL_QWEN38_OPENCODE_GO_PROFILE",
         "MODEL_DEEPSEEK_V4PRO_PROFILE",
         "CODEX_GPT56_MEDIUM",
         "CODEX_GPT56_HIGH",
@@ -281,6 +308,11 @@ def verify_contract_mode() -> bool:
         f"plan_digest={smoke_control.smoke_plan_digest}"
     )
     print("K_B1_SMOKE_PLAN=8 top-level calls; output ceiling=14256; FROZEN_PLAN_DRIFT=NONE")
+    print("OPENCODE_GO_ROUTE_CONTRACT=PASS")
+    print("OPENCODE_GO_CREDENTIAL_TRANSPORT=PASS")
+    print("OPENCODE_GO_PROVENANCE=PASS")
+    print("V1_HISTORY_PRESERVED=PASS")
+    print("V2_SMOKE_PLAN=8_CALLS_14256_TOKENS")
     print(f"EGRESS_PROXY_BASE={EGRESS_PROXY_BASE}")
     print(f"EGRESS_PROXY_IMAGE={EGRESS_PROXY_IMAGE}")
     print(f"EGRESS_PROXY_IMAGE_ID={proxy_image.image_id}")
@@ -302,7 +334,7 @@ def verify_contract_mode() -> bool:
     print("REAL_EVALUATION_CALL_COUNT=0")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
-    print("PHASE_K_B1_ABORTED_PROVIDER_TIMEOUT_DIAGNOSTICS_REPAIR")
+    print("PHASE_K_B1_OPENCODE_GO_ROUTE_REDESIGN_V2_COMPLETE_KEYLESS")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")

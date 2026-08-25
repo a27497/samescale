@@ -37,7 +37,7 @@ from harnesslab.multi_harness.profile import (
     DEEPSEEK_IMAGE,
     canonical_deepseek_profile,
     configured_deepseek_v4flash_profile,
-    configured_qwen_bailian_claude_profile,
+    configured_qwen_opencode_go_claude_profile,
 )
 from harnesslab.multi_harness.runtime import _validate_deepseek_effective_config
 from harnesslab.multi_harness.trace import collect_deepseek_final
@@ -66,9 +66,7 @@ RUNNER = CliRunner()
 SAFE_ENVIRONMENT = {
     "HARNESSLAB_GPT56_RELAY_BASE_URL": "https://relay.example.test/v1",
     "HARNESSLAB_GPT56_RELAY_API_KEY": "fake-relay-key",
-    "DASHSCOPE_API_KEY": "fake-dashscope-key",
-    "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": ("https://dashscope.aliyuncs.com/apps/anthropic"),
-    "HARNESSLAB_BAILIAN_OPENAI_BASE_URL": "https://bailian-openai.example.test/v1",
+    "HARNESSLAB_OPENCODE_GO_API_KEY": "fake-opencode-go-key",
     "DEEPSEEK_API_KEY": "fake-deepseek-key",
 }
 
@@ -145,6 +143,21 @@ def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
     assert "release smoke execute" not in workflow
 
 
+def test_v2_credential_preflight_prints_presence_only() -> None:
+    environment = {name: f"secret-value-for-{name}" for name in REQUIRED_CONFIGURATION_REFERENCES}
+    result = RUNNER.invoke(app, ["release", "smoke", "credential-preflight"], env=environment)
+    assert result.exit_code == 0
+    assert result.stdout.splitlines() == [
+        f"{name}=SET" for name in REQUIRED_CONFIGURATION_REFERENCES
+    ]
+    assert all(value not in result.stdout for value in environment.values())
+
+    environment.pop("HARNESSLAB_OPENCODE_GO_API_KEY")
+    missing = RUNNER.invoke(app, ["release", "smoke", "credential-preflight"], env=environment)
+    assert missing.exit_code == 2
+    assert "HARNESSLAB_OPENCODE_GO_API_KEY=MISSING" in missing.stdout
+
+
 @pytest.mark.asyncio
 async def test_smoke_same_path_fake_execution_consumes_exact_plan_without_network() -> None:
     control = SmokeControlPlane.load(ROOT)
@@ -176,8 +189,8 @@ async def test_smoke_missing_config_stops_before_first_call() -> None:
     control = SmokeControlPlane.load(ROOT)
     invoker = RecordingInvoker()
     environment = dict(SAFE_ENVIRONMENT)
-    environment.pop("DASHSCOPE_API_KEY")
-    with pytest.raises(SmokeControlPlaneError, match="DASHSCOPE_API_KEY"):
+    environment.pop("HARNESSLAB_OPENCODE_GO_API_KEY")
+    with pytest.raises(SmokeControlPlaneError, match="HARNESSLAB_OPENCODE_GO_API_KEY"):
         control.resolve_real_bindings(environment, _runtime())
     assert invoker.calls == []
 
@@ -271,10 +284,15 @@ def test_smoke_provider_fallbacks_are_rejected_in_production_assertions() -> Non
             profiles["harness-codex-gpt56-medium"],
             SAFE_ENVIRONMENT,
         )
-    claude_fallback = dict(SAFE_ENVIRONMENT)
-    claude_fallback["HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL"] = "https://api.anthropic.com"
-    with pytest.raises(SmokeControlPlaneError, match="Claude Bailian fallback"):
-        control.resolve_real_bindings(claude_fallback, _runtime())
+    claude = configured_qwen_opencode_go_claude_profile(_runtime().claude_image).model_copy(
+        update={"provider_fixed_base_url": "https://api.anthropic.com"}
+    )
+    with pytest.raises(SmokeControlPlaneError, match="Claude OpenCode Go route"):
+        control._assert_claude_route(
+            claude,
+            profiles["harness-claude-qwen38-opencode-go"],
+            SAFE_ENVIRONMENT,
+        )
     with pytest.raises(SmokeControlPlaneError, match="DeepSeek official-route"):
         control._assert_deepseek_route(
             canonical_deepseek_profile(
@@ -304,7 +322,7 @@ def test_dsh_e1_not_exposed_is_accepted_without_observed_model_fabrication() -> 
 
 
 def test_claude_smoke_requires_exact_exposed_observed_model() -> None:
-    profile = configured_qwen_bailian_claude_profile(_runtime().claude_image)
+    profile = configured_qwen_opencode_go_claude_profile(_runtime().claude_image)
     _validate_harness_observed_model(
         profile,
         trace_coverage=TraceCoverage.FULL_STREAM,

@@ -1,9 +1,14 @@
 {
-  "schema_version": 2,
-  "plan_id": "core-real-evidence-v1",
+  "schema_version": 3,
+  "plan_id": "core-real-evidence-v2",
+  "supersedes_plan_id": "core-real-evidence-v1",
+  "history_reference": "release/history/core-real-v1.json",
+  "history_digest": "sha256:ccae6eff90f5950080ebef8cf9d1d65bc3ee779f3c822f39b2b9585c077d4826",
+  "official_route_snapshot_reference": "release/opencode-go-route-snapshot.json",
+  "official_route_snapshot_digest": "sha256:9776fec405bedef1f20e9384ff1f390d3600909782a71e27cd9c6040b17867ad",
   "corpus_reference": "release/core-corpus.json",
   "corpus_digest": "sha256:5d73190e0cf809f7518bb19e925909ed5a8366400056ef13e24c1b208bb893b3",
-  "experiment_id": "core-real-matrix-v1",
+  "experiment_id": "core-real-matrix-v2",
   "execution_seed": 20260824,
   "model_profile_slots": [
     {
@@ -22,19 +27,19 @@
       "limitation": "Relay mapping is operator-trusted; upstream first-party provenance is not independently verified."
     },
     {
-      "slot_id": "model-qwen38-bailian-messages",
-      "release_name": "Core Model-only qwen3.8-max via Bailian Messages-compatible API",
+      "slot_id": "model-qwen38-opencode-go-messages",
+      "release_name": "Core Model-only qwen3.8-max via OpenCode Go Messages API",
       "protocol": "messages",
-      "provider": "bailian-anthropic",
-      "base_url": "env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
+      "provider": "opencode-go",
+      "base_url": "https://opencode.ai/zen/go",
       "route": "/v1/messages",
       "requested_model": "qwen3.8-max",
       "reasoning_effort": null,
       "max_output_tokens": 2000,
       "request_timeout_seconds": 90,
-      "credential_reference": "DASHSCOPE_API_KEY",
+      "credential_reference": "HARNESSLAB_OPENCODE_GO_API_KEY",
       "selection_state": "CONFIGURED_NOT_SMOKED",
-      "limitation": "Bailian URL remains operator configuration; no Anthropic effort semantics are invented."
+      "limitation": "OpenCode Go is a third-party inference platform; observed model identity awaits authorized smoke and no Anthropic effort semantics are invented."
     },
     {
       "slot_id": "model-deepseek-v4pro-chat",
@@ -68,12 +73,12 @@
       "evidence_state": "NOT_VERIFIED"
     },
     {
-      "cell_id": "model-qwen38-bailian-messages",
+      "cell_id": "model-qwen38-opencode-go-messages",
       "lane": "M",
       "runtime": "direct-model",
-      "profile_slot": "model-qwen38-bailian-messages",
+      "profile_slot": "model-qwen38-opencode-go-messages",
       "requested_model": "qwen3.8-max",
-      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
+      "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
       "reasoning_effort": null,
       "repeat_count": 5,
       "task_count": 18,
@@ -124,12 +129,12 @@
       "evidence_state": "NOT_VERIFIED"
     },
     {
-      "cell_id": "harness-claude-qwen38",
+      "cell_id": "harness-claude-qwen38-opencode-go",
       "lane": "H",
       "runtime": "claude-code",
-      "profile_slot": "harness-claude-qwen38",
+      "profile_slot": "harness-claude-qwen38-opencode-go",
       "requested_model": "qwen3.8-max",
-      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
+      "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
       "reasoning_effort": null,
       "repeat_count": 5,
       "task_count": 18,
@@ -214,7 +219,7 @@
     "planned_calls": 63,
     "max_output_tokens_per_call": 256,
     "planned_output_token_ceiling": 16128,
-    "profile_id": "judge-glm52-bailian-chat"
+    "profile_id": "judge-glm52-opencode-go-chat"
   },
   "preflight": {
     "task_count": 18,
@@ -237,13 +242,11 @@
   "credential_references": [
     "HARNESSLAB_GPT56_RELAY_BASE_URL",
     "HARNESSLAB_GPT56_RELAY_API_KEY",
-    "DASHSCOPE_API_KEY",
-    "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-    "HARNESSLAB_BAILIAN_OPENAI_BASE_URL",
+    "HARNESSLAB_OPENCODE_GO_API_KEY",
     "DEEPSEEK_API_KEY"
   ],
   "unresolved_authorization_items": [
-    "Explicit K-B1 authorization for the exact bounded eight-call smoke plan",
+    "Explicit post-R3 authorization for the exact bounded v2 eight-call smoke plan",
     "Observed-model and runtime-route evidence from authorized smoke",
     "ComparabilityEngine decision for gpt56-relay-direct-vs-codex",
     "Explicit later authorization for the 630-run Matrix and 63 Judge calls"
@@ -278,19 +281,19 @@
       "profile_digest": "sha256:e0a5ea52baeb318b7bfc890014ec1c79187248c0f215bb26f5f2fad910ca6f8b"
     },
     {
-      "profile_id": "model-qwen38-bailian-messages",
-      "provider_id": "bailian-anthropic",
-      "provider_display_name": "Alibaba Cloud Model Studio / Bailian",
-      "provider_provenance": "FIRST_PARTY_PLATFORM_API",
+      "profile_id": "model-qwen38-opencode-go-messages",
+      "provider_id": "opencode-go",
+      "provider_display_name": "OpenCode Go",
+      "provider_provenance": "THIRD_PARTY_INFERENCE_PLATFORM",
       "requested_model": "qwen3.8-max",
       "protocol": "messages",
-      "base_url_reference": "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-      "fixed_base_url": null,
+      "base_url_reference": null,
+      "fixed_base_url": "https://opencode.ai/zen/go",
       "route": "/v1/messages",
-      "route_identity": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
-      "credential_reference": "DASHSCOPE_API_KEY",
+      "route_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+      "credential_reference": "HARNESSLAB_OPENCODE_GO_API_KEY",
       "model_family": "Qwen",
-      "inference_provider": "Alibaba Cloud Model Studio",
+      "inference_provider": "OpenCode Go",
       "reasoning_effort": null,
       "thinking_mode": null,
       "thinking_transport": null,
@@ -301,7 +304,7 @@
       "upstream_model_claim": null,
       "operator_trust_assertion": null,
       "upstream_first_party_provenance": null,
-      "profile_digest": "sha256:56fd4c2f504ad3a7e72fbcdd66eca69af65c5f938d5833bfbb1ac5287705962a"
+      "profile_digest": "sha256:120fab71cda62994bc0e5f85434090def6595486b7e64330836f8a11a0a276d4"
     },
     {
       "profile_id": "model-deepseek-v4pro-chat",
@@ -382,19 +385,19 @@
       "profile_digest": "sha256:235f87ccaa531182e2de11373199876baad1a0bdca5ca42e07c5dbe7e56401e2"
     },
     {
-      "profile_id": "harness-claude-qwen38",
-      "provider_id": "bailian-anthropic",
-      "provider_display_name": "Alibaba Cloud Model Studio / Bailian",
-      "provider_provenance": "FIRST_PARTY_PLATFORM_API",
+      "profile_id": "harness-claude-qwen38-opencode-go",
+      "provider_id": "opencode-go",
+      "provider_display_name": "OpenCode Go",
+      "provider_provenance": "THIRD_PARTY_INFERENCE_PLATFORM",
       "requested_model": "qwen3.8-max",
       "protocol": "messages",
-      "base_url_reference": "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-      "fixed_base_url": null,
+      "base_url_reference": null,
+      "fixed_base_url": "https://opencode.ai/zen/go",
       "route": "/v1/messages",
-      "route_identity": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
-      "credential_reference": "DASHSCOPE_API_KEY",
+      "route_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+      "credential_reference": "HARNESSLAB_OPENCODE_GO_API_KEY",
       "model_family": "Qwen",
-      "inference_provider": "Alibaba Cloud Model Studio",
+      "inference_provider": "OpenCode Go",
       "reasoning_effort": null,
       "thinking_mode": null,
       "thinking_transport": null,
@@ -405,7 +408,7 @@
       "upstream_model_claim": null,
       "operator_trust_assertion": null,
       "upstream_first_party_provenance": null,
-      "profile_digest": "sha256:05ad47086ba98f6e96378a9b642197344c69269f97c1ae3ea4c112c57cde7e91"
+      "profile_digest": "sha256:377302e4112c25ca49158f8f1b04b8593c508e1d4b60fe99d6cdfa7ba9705ae1"
     },
     {
       "profile_id": "harness-deepseek-v4flash",
@@ -434,22 +437,22 @@
       "profile_digest": "sha256:0cf6426638bcd7a32a81474fd20cbd60dd9c6991dc60d50acd273f2d7ae076dd"
     },
     {
-      "profile_id": "judge-glm52-bailian-chat",
-      "provider_id": "bailian-openai",
-      "provider_display_name": "Alibaba Cloud Model Studio / Bailian",
-      "provider_provenance": "ALIBABA_HOSTED_MODEL",
+      "profile_id": "judge-glm52-opencode-go-chat",
+      "provider_id": "opencode-go",
+      "provider_display_name": "OpenCode Go",
+      "provider_provenance": "THIRD_PARTY_INFERENCE_PLATFORM",
       "requested_model": "glm-5.2",
       "protocol": "chat_completions",
-      "base_url_reference": "HARNESSLAB_BAILIAN_OPENAI_BASE_URL",
-      "fixed_base_url": null,
-      "route": "/chat/completions",
-      "route_identity": "bailian-openai|chat_completions|env:HARNESSLAB_BAILIAN_OPENAI_BASE_URL/chat/completions",
-      "credential_reference": "DASHSCOPE_API_KEY",
+      "base_url_reference": null,
+      "fixed_base_url": "https://opencode.ai/zen/go",
+      "route": "/v1/chat/completions",
+      "route_identity": "opencode-go|chat_completions|https://opencode.ai/zen/go/v1/chat/completions",
+      "credential_reference": "HARNESSLAB_OPENCODE_GO_API_KEY",
       "model_family": "GLM",
-      "inference_provider": "Alibaba Cloud Model Studio",
+      "inference_provider": "OpenCode Go",
       "reasoning_effort": null,
-      "thinking_mode": "disabled",
-      "thinking_transport": "bailian_enable_thinking",
+      "thinking_mode": null,
+      "thinking_transport": null,
       "timeout_seconds": 90,
       "max_output_tokens": 256,
       "observed_model_state": "NOT_VERIFIED_UNTIL_SMOKE",
@@ -457,7 +460,7 @@
       "upstream_model_claim": null,
       "operator_trust_assertion": null,
       "upstream_first_party_provenance": null,
-      "profile_digest": "sha256:5a5313f26d2e3ce9c2846c1de2a3f71813a484609cacd22f0c9c763c30d4eaeb"
+      "profile_digest": "sha256:4e49a97e705c3ffdcfdd4ba187a6ae00b9c5dde8c8d0b713aa9128183e723ff3"
     }
   ]
 }

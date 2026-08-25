@@ -31,6 +31,7 @@ PHASE_D_TESTS = (
     "tests/test_model_lane.py",
     "tests/test_cli.py",
     "tests/test_contracts.py",
+    "tests/test_phase_kb0.py",
 )
 CRITICAL_TESTS = {
     "test_anthropic_messages_adapter_contract_and_thinking_exclusion",
@@ -117,6 +118,8 @@ CRITICAL_TESTS = {
     "test_unset_optional_generation_controls_are_not_invented[chat-completions]",
     "test_unset_optional_generation_controls_are_not_invented[responses]",
     "test_workspace_staging_failure_is_not_blame_assigned_to_model",
+    "test_opencode_go_messages_exact_url_headers_and_shared_claude_route",
+    "test_opencode_go_judge_exact_route_bearer_and_public_content_only",
 }
 PHASE_J_MODULE_NAMES = {
     "analyst.py",

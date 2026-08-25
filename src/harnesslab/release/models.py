@@ -235,11 +235,16 @@ class CallPreflight(StrictModel):
 
 
 class RealEvidencePlan(CanonicalModel):
-    schema_version: Literal[2] = 2
-    plan_id: Literal["core-real-evidence-v1"] = "core-real-evidence-v1"
+    schema_version: Literal[3] = 3
+    plan_id: Literal["core-real-evidence-v2"] = "core-real-evidence-v2"
+    supersedes_plan_id: Literal["core-real-evidence-v1"] = "core-real-evidence-v1"
+    history_reference: Literal["release/history/core-real-v1.json"]
+    history_digest: Sha256Digest
+    official_route_snapshot_reference: Literal["release/opencode-go-route-snapshot.json"]
+    official_route_snapshot_digest: Sha256Digest
     corpus_reference: str
     corpus_digest: Sha256Digest
-    experiment_id: Literal["core-real-matrix-v1"] = "core-real-matrix-v1"
+    experiment_id: Literal["core-real-matrix-v2"] = "core-real-matrix-v2"
     execution_seed: int
     selected_profiles: tuple[ProviderProfile, ...]
     model_profile_slots: tuple[ModelProfileSlot, ...]
@@ -256,49 +261,90 @@ class RealEvidencePlan(CanonicalModel):
     @model_validator(mode="after")
     def release_plan_is_complete_but_unexecuted(self) -> RealEvidencePlan:
         if len(self.selected_profiles) != 8:
-            raise ValueError("K-B0 release plan requires exactly eight configured profiles")
+            raise ValueError("Core v2 release plan requires exactly eight configured profiles")
         profile_ids = {profile.profile_id for profile in self.selected_profiles}
         expected_profile_models = {
             "model-gpt56-relay-responses": "gpt-5.6-sol",
-            "model-qwen38-bailian-messages": "qwen3.8-max",
+            "model-qwen38-opencode-go-messages": "qwen3.8-max",
             "model-deepseek-v4pro-chat": "deepseek-v4-pro",
             "harness-codex-gpt56-medium": "gpt-5.6-sol",
             "harness-codex-gpt56-high": "gpt-5.6-sol",
-            "harness-claude-qwen38": "qwen3.8-max",
+            "harness-claude-qwen38-opencode-go": "qwen3.8-max",
             "harness-deepseek-v4flash": "deepseek-v4-flash",
-            "judge-glm52-bailian-chat": "glm-5.2",
+            "judge-glm52-opencode-go-chat": "glm-5.2",
         }
         if profile_ids != set(expected_profile_models):
-            raise ValueError("K-B0 configured profile identity set drifted")
+            raise ValueError("Core v2 configured profile identity set drifted")
         profiles = {profile.profile_id: profile for profile in self.selected_profiles}
         if any(
             profile.requested_model != expected_profile_models[profile_id]
             for profile_id, profile in profiles.items()
         ):
-            raise ValueError("K-B0 selected requested model drifted")
+            raise ValueError("Core v2 selected requested model drifted")
         expected_provenance = {
             "model-gpt56-relay-responses": "TRUSTED_THIRD_PARTY_RELAY",
-            "model-qwen38-bailian-messages": "FIRST_PARTY_PLATFORM_API",
+            "model-qwen38-opencode-go-messages": "THIRD_PARTY_INFERENCE_PLATFORM",
             "model-deepseek-v4pro-chat": "FIRST_PARTY_MODEL_API",
             "harness-codex-gpt56-medium": "TRUSTED_THIRD_PARTY_RELAY",
             "harness-codex-gpt56-high": "TRUSTED_THIRD_PARTY_RELAY",
-            "harness-claude-qwen38": "FIRST_PARTY_PLATFORM_API",
+            "harness-claude-qwen38-opencode-go": "THIRD_PARTY_INFERENCE_PLATFORM",
             "harness-deepseek-v4flash": "FIRST_PARTY_MODEL_API",
-            "judge-glm52-bailian-chat": "ALIBABA_HOSTED_MODEL",
+            "judge-glm52-opencode-go-chat": "THIRD_PARTY_INFERENCE_PLATFORM",
         }
         if any(
             profile.provider_provenance.value != expected_provenance[profile_id]
             for profile_id, profile in profiles.items()
         ):
-            raise ValueError("K-B0 selected provider provenance drifted")
+            raise ValueError("Core v2 selected provider provenance drifted")
+        opencode_profiles = {
+            profile_id: profiles[profile_id]
+            for profile_id in (
+                "model-qwen38-opencode-go-messages",
+                "harness-claude-qwen38-opencode-go",
+                "judge-glm52-opencode-go-chat",
+            )
+        }
+        if any(
+            (
+                profile.provider_id,
+                profile.provider_display_name,
+                profile.fixed_base_url,
+                profile.base_url_reference,
+                profile.credential_reference,
+                profile.inference_provider,
+            )
+            != (
+                "opencode-go",
+                "OpenCode Go",
+                "https://opencode.ai/zen/go",
+                None,
+                "HARNESSLAB_OPENCODE_GO_API_KEY",
+                "OpenCode Go",
+            )
+            for profile in opencode_profiles.values()
+        ):
+            raise ValueError("OpenCode Go fixed provider identity drifted")
+        qwen_direct = opencode_profiles["model-qwen38-opencode-go-messages"]
+        qwen_claude = opencode_profiles["harness-claude-qwen38-opencode-go"]
+        judge = opencode_profiles["judge-glm52-opencode-go-chat"]
+        if (
+            qwen_direct.protocol.value != "messages"
+            or qwen_direct.route != "/v1/messages"
+            or qwen_direct.route_identity != qwen_claude.route_identity
+            or judge.protocol.value != "chat_completions"
+            or judge.route != "/v1/chat/completions"
+            or judge.thinking_mode is not None
+            or judge.thinking_transport is not None
+        ):
+            raise ValueError("OpenCode Go model route contract drifted")
         if len(self.model_profile_slots) != 3:
             raise ValueError("release plan requires exactly three Model-only slots")
         if len(self.cells) != 7:
             raise ValueError("release plan requires seven planned cells")
         if {cell.cell_id for cell in self.cells} != set(expected_profile_models) - {
-            "judge-glm52-bailian-chat"
+            "judge-glm52-opencode-go-chat"
         }:
-            raise ValueError("K-B0 release cell identity set drifted")
+            raise ValueError("Core v2 release cell identity set drifted")
         if {cell.runtime for cell in self.cells} != {
             "direct-model",
             "codex",
@@ -318,9 +364,9 @@ class RealEvidencePlan(CanonicalModel):
         if not referenced <= cell_ids:
             raise ValueError("pair or ablation references an unknown release cell")
         if self.paired_lane.pair_id != "gpt56-relay-direct-vs-codex":
-            raise ValueError("K-B0 Pair identity drifted")
+            raise ValueError("Core Pair identity drifted")
         if self.ablation.ablation_id != "codex-gpt56-reasoning-effort":
-            raise ValueError("K-B0 ablation identity drifted")
+            raise ValueError("Core ablation identity drifted")
         referenced_profiles = {cell.profile_slot for cell in self.cells} | {self.judge.profile_id}
         if None in referenced_profiles or referenced_profiles != profile_ids:
             raise ValueError("release cells and Judge must reference every configured profile once")
@@ -331,12 +377,10 @@ class RealEvidencePlan(CanonicalModel):
         if self.credential_references != (
             "HARNESSLAB_GPT56_RELAY_BASE_URL",
             "HARNESSLAB_GPT56_RELAY_API_KEY",
-            "DASHSCOPE_API_KEY",
-            "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-            "HARNESSLAB_BAILIAN_OPENAI_BASE_URL",
+            "HARNESSLAB_OPENCODE_GO_API_KEY",
             "DEEPSEEK_API_KEY",
         ):
-            raise ValueError("K-B0 configuration reference set drifted")
+            raise ValueError("Core v2 configuration reference set drifted")
         return self
 
 
@@ -365,8 +409,8 @@ class RealSmokeCall(StrictModel):
 
 
 class RealSmokePlan(CanonicalModel):
-    schema_version: Literal[1] = 1
-    plan_id: Literal["core-real-smoke-v1"] = "core-real-smoke-v1"
+    schema_version: Literal[2] = 2
+    plan_id: Literal["core-real-smoke-v2"] = "core-real-smoke-v2"
     release_plan_reference: Literal["release/core-real-evidence-plan.json"]
     release_plan_digest: Sha256Digest
     calls: tuple[RealSmokeCall, ...]
@@ -380,11 +424,11 @@ class RealSmokePlan(CanonicalModel):
     @model_validator(mode="after")
     def bounded_smoke_is_exact(self) -> RealSmokePlan:
         if len(self.calls) != 8 or len({item.call_id for item in self.calls}) != 8:
-            raise ValueError("K-B1 smoke plan requires exactly eight unique top-level calls")
+            raise ValueError("Core v2 smoke plan requires exactly eight unique top-level calls")
         if sum(item.max_output_tokens for item in self.calls) != 14_256:
-            raise ValueError("K-B1 smoke output-token ceiling drifted")
+            raise ValueError("Core v2 smoke output-token ceiling drifted")
         if {item.lane for item in self.calls} != {"M", "H", "J"}:
-            raise ValueError("K-B1 smoke omits a required lane")
+            raise ValueError("Core v2 smoke omits a required lane")
         required_abort_conditions = {
             "auth error",
             "route mismatch",
@@ -399,12 +443,12 @@ class RealSmokePlan(CanonicalModel):
             "task binding mismatch",
             "artifact integrity error",
             "Codex relay provider falls back to OpenAI or ChatGPT default",
-            "Claude Code falls back to api.anthropic.com",
+            "Claude Code leaves the fixed OpenCode Go route",
             "DeepSeek Harness uses non-official route",
             "Judge persistence or integrity failure",
         }
         if set(self.abort_conditions) != required_abort_conditions:
-            raise ValueError("K-B1 abort policy must contain the exact fail-closed set")
+            raise ValueError("Core v2 abort policy must contain the exact fail-closed set")
         return self
 
 

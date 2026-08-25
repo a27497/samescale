@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import sys
 from dataclasses import dataclass
 from enum import StrEnum
@@ -128,6 +129,21 @@ def execute_release_smoke(
         typer.echo(f"FAILURE_CATEGORY={receipt.failure_category.value}")
     if receipt.status is SmokeExecutionStatus.ABORTED:
         raise typer.Exit(code=1)
+
+
+@release_smoke_app.command("credential-preflight")
+def preflight_release_smoke_credentials() -> None:
+    """Report only presence of v2 runtime references; never print credential values."""
+
+    from harnesslab.release.smoke import REQUIRED_CONFIGURATION_REFERENCES
+
+    missing = False
+    for reference in REQUIRED_CONFIGURATION_REFERENCES:
+        present = bool(os.environ.get(reference, "").strip())
+        typer.echo(f"{reference}={'SET' if present else 'MISSING'}")
+        missing = missing or not present
+    if missing:
+        raise typer.Exit(code=2)
 
 
 @compare_app.command("assess")

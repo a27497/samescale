@@ -6,7 +6,6 @@ from typing import Any
 from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.common import EvaluationLane, NetworkPolicy, Protocol
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
-from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
 from harnesslab.contracts.run import RunStatus
 from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.plan import (
@@ -175,14 +174,12 @@ def _judge_plan() -> Any:
     definitions = resolve_definitions(spec, ROOT)
     profile = ModelProfile(
         requested_model="glm-5.2",
-        provider="bailian-openai",
-        base_url="https://bailian.example.test/v1",
-        route="/chat/completions",
+        provider="opencode-go",
+        base_url="https://opencode.ai/zen/go",
+        route="/v1/chat/completions",
         protocol=Protocol.CHAT_COMPLETIONS,
         reasoning=ReasoningProfile(max_output_tokens=256),
-        thinking_mode=ThinkingMode.DISABLED,
-        thinking_transport=ThinkingTransport.BAILIAN_ENABLE_THINKING,
-        credential_reference="DASHSCOPE_API_KEY",
+        credential_reference="HARNESSLAB_OPENCODE_GO_API_KEY",
     )
     source = spec.judge_cells[0]
     cell = JudgeCellSpec(
@@ -195,7 +192,7 @@ def _judge_plan() -> Any:
     )
     real_spec = spec.model_copy(
         update={
-            "calibration_id": "core-real-judge-v1",
+            "calibration_id": "core-real-judge-v2",
             "name": "Core real Judge fixture",
             "judge_cells": (cell,),
         }

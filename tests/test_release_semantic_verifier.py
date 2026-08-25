@@ -150,8 +150,8 @@ async def test_final_release_rejects_postgresql_select_one_without_experiment() 
         await _resolve_snapshot_in_session(
             EmptySession(),  # type: ignore[arg-type]
             (ROOT / "artifacts",),
-            experiment_id="core-real-matrix-v1",
-            calibration_id="core-real-judge-v1",
+            experiment_id="core-real-matrix-v2",
+            calibration_id="core-real-judge-v2",
         )
 
 
