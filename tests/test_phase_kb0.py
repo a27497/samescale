@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import httpx
 import pytest
 
 from harnesslab.comparability.engine import ComparabilityEngine
@@ -34,7 +35,7 @@ from harnesslab.harness_lane.profile import (
 )
 from harnesslab.harness_lane.prompt import render_codex_harness_prompt
 from harnesslab.model_lane.models import ProviderRequest
-from harnesslab.model_lane.providers import OpenAICompatibleChatAdapter
+from harnesslab.model_lane.providers import AnthropicMessagesAdapter, OpenAICompatibleChatAdapter
 from harnesslab.multi_harness.adapter import ClaudeCodeAdapter
 from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
 from harnesslab.multi_harness.models import HarnessKind
@@ -55,6 +56,7 @@ from harnesslab.sandbox.models import ImageIdentity
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "release"
 SENTINEL = "kb0-secret-sentinel-never-persist"
+BAILIAN_ANTHROPIC_OPERATOR_BASE_URL = "https://dashscope.aliyuncs.com/apps/anthropic"
 
 
 def image(reference: str) -> ImageIdentity:
@@ -87,16 +89,15 @@ def test_kb0_provider_contracts_freeze_truthful_selected_profiles() -> None:
     assert judge.max_output_tokens == 256
     assert all(item.profile_digest == item.expected_profile_digest for item in profiles.values())
     qwen_runtime = configured_model_profile(
-        qwen,
-        {"HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": "https://bailian.example.test/v1"},
+        qwen, {"HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL}
     )
     assert qwen_runtime.requested_model == "qwen3.8-max"
-    assert qwen_runtime.route == "/messages"
+    assert qwen_runtime.route == "/v1/messages"
     assert (
         qwen.resolved_route_identity(
-            {"HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": "https://bailian.example.test/v1"}
+            {"HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL}
         )
-        == "bailian-anthropic|messages|https://bailian.example.test/v1/messages"
+        == "bailian-anthropic|messages|https://dashscope.aliyuncs.com/apps/anthropic/v1/messages"
     )
     serialized = json.dumps(plan.model_dump(mode="json"))
     assert SENTINEL not in serialized
@@ -209,13 +210,79 @@ def test_kb0_claude_qwen_uses_only_explicit_bailian_environment(tmp_path: Path) 
     docker_argv = DockerMultiHarnessBackend(
         credentials={
             "DASHSCOPE_API_KEY": SENTINEL,
-            "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": "https://bailian.example.test/v1",
+            "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL,
         }
     ).create_argv(execution, "claude-subject")
     assert "ANTHROPIC_BASE_URL" in docker_argv
     assert "ANTHROPIC_AUTH_TOKEN" in docker_argv
     assert "DASHSCOPE_API_KEY" not in docker_argv
     assert SENTINEL not in docker_argv
+
+
+@pytest.mark.asyncio
+async def test_kb0_bailian_messages_official_url_shape_is_keyless_and_shared_with_claude(
+    tmp_path: Path,
+) -> None:
+    plan = load_real_evidence_plan(RELEASE / "core-real-evidence-plan.json")
+    profiles = {item.profile_id: item for item in plan.selected_profiles}
+    direct_provider = profiles["model-qwen38-bailian-messages"]
+    direct_profile = configured_model_profile(
+        direct_provider,
+        {"HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL},
+    )
+    requested_urls: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requested_urls.append(str(request.url))
+        return httpx.Response(
+            200,
+            json={
+                "id": "keyless-bailian-contract",
+                "model": "qwen3.8-max",
+                "content": [{"type": "text", "text": "{}"}],
+                "stop_reason": "end_turn",
+                "usage": {"input_tokens": 1, "output_tokens": 1},
+            },
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        result = await AnthropicMessagesAdapter(
+            client=client, environment={"DASHSCOPE_API_KEY": "keyless-fake-dashscope-key"}
+        ).invoke(ProviderRequest(profile=direct_profile, instructions="system", input="input"))
+
+    expected_endpoint = f"{BAILIAN_ANTHROPIC_OPERATOR_BASE_URL}/v1/messages"
+    assert requested_urls == [expected_endpoint]
+    assert result.endpoint == expected_endpoint
+    assert direct_profile.requested_model == "qwen3.8-max"
+    assert direct_profile.credential_reference == "DASHSCOPE_API_KEY"
+    assert direct_provider.provider_provenance is ProviderProvenance.FIRST_PARTY_PLATFORM_API
+
+    claude_profile = configured_qwen_bailian_claude_profile(
+        image("harnesslab-phase-f-claude:2.1.241")
+    )
+    prompt = render_harness_prompt(
+        HarnessKind.CLAUDE_CODE,
+        task_instruction="Fix task.",
+        task_digest="sha256:" + "1" * 64,
+        workspace_input_digest="sha256:" + "2" * 64,
+        context_digest=None,
+        network_policy=NetworkPolicy.DENY,
+    )
+    execution = ClaudeCodeAdapter().prepare(
+        claude_profile, prompt, workspace=tmp_path, context=None, task_id="task"
+    )
+    operator_environment = {
+        "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": BAILIAN_ANTHROPIC_OPERATOR_BASE_URL,
+        "DASHSCOPE_API_KEY": "keyless-fake-dashscope-key",
+    }
+    container_environment = {
+        target: operator_environment[source] for target, source in execution.environment_references
+    }
+    assert container_environment["ANTHROPIC_BASE_URL"] == BAILIAN_ANTHROPIC_OPERATOR_BASE_URL
+    assert not container_environment["ANTHROPIC_BASE_URL"].endswith("/v1")
+    assert execution.environment_references[1] == ("ANTHROPIC_AUTH_TOKEN", "DASHSCOPE_API_KEY")
+    assert claude_profile.requested_model == "qwen3.8-max"
+    assert claude_profile.provider_provenance is ProviderProvenance.FIRST_PARTY_PLATFORM_API
 
 
 def test_kb0_deepseek_harness_e1_is_official_and_e2_deferred() -> None:
@@ -359,7 +426,10 @@ def test_kb0_smoke_plan_is_exact_bounded_and_unexecuted() -> None:
     }
     assert smoke.execution_state is EvidenceState.NOT_RUN
     assert smoke.real_evaluation_call_count == 0
+    assert smoke.authorization_required
     assert all(state is EvidenceState.NOT_RUN for state in evidence.real_statuses.values())
+    assert evidence.real_matrix.state is EvidenceState.NOT_RUN
+    assert evidence.judge_report.state is EvidenceState.NOT_RUN
     assert not evidence.core_release_ready
     assert evidence.real_evidence_authorization_required
 
@@ -371,3 +441,4 @@ def test_kb0_matrix_preflight_and_release_hard_stop_are_unchanged() -> None:
     assert plan.preflight.total_top_level_external_calls == 693
     assert plan.preflight.total_output_token_ceiling == 1_276_128
     assert len(json.loads((RELEASE / "core-corpus.json").read_text())["tasks"]) == 18
+    assert plan.real_evidence_authorization_required

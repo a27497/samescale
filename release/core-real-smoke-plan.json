@@ -2,7 +2,7 @@
   "schema_version": 1,
   "plan_id": "core-real-smoke-v1",
   "release_plan_reference": "release/core-real-evidence-plan.json",
-  "release_plan_digest": "sha256:f65b20dd06619f950887c4e527ecb0608ab15e00de883f313fd8a5744a9b6efd",
+  "release_plan_digest": "sha256:b97a0798b7855b0544c8acdb861551bc918d57fc6fbda834cc13c992955ad098",
   "calls": [
     {
       "call_id": "smoke-1-model-gpt56-relay-responses",
@@ -34,7 +34,7 @@
       "judge_case_reference": null,
       "profile_id": "model-qwen38-bailian-messages",
       "requested_model": "qwen3.8-max",
-      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/messages",
+      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
       "max_output_tokens": 2000,
       "timeout_seconds": 90,
       "top_level_launches": 1,
@@ -127,7 +127,7 @@
       "judge_case_reference": null,
       "profile_id": "harness-claude-qwen38",
       "requested_model": "qwen3.8-max",
-      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/messages",
+      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
       "max_output_tokens": 2000,
       "timeout_seconds": 90,
       "top_level_launches": 1,

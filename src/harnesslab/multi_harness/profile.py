@@ -84,7 +84,7 @@ def configured_qwen_bailian_claude_profile(
         package_integrity=CLAUDE_PACKAGE_INTEGRITY,
         requested_model="qwen3.8-max",
         provider_route=(
-            "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/messages"
+            "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages"
         ),
         provider_provenance=ProviderProvenance.FIRST_PARTY_PLATFORM_API,
         provider_base_url_reference="HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",

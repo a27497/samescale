@@ -32,6 +32,8 @@ The 360 Harness launches may issue internal provider requests whose count is `NO
 
 Configuration references are `HARNESSLAB_GPT56_RELAY_BASE_URL`, `HARNESSLAB_GPT56_RELAY_API_KEY`, `DASHSCOPE_API_KEY`, `HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL`, `HARNESSLAB_BAILIAN_OPENAI_BASE_URL`, and `DEEPSEEK_API_KEY`. Values must not enter Git or evidence artifacts. Operator URLs are syntax-checked without connecting.
 
+For the Beijing Bailian Anthropic-compatible API, `HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL` uses the operator/Claude Code base URL `https://dashscope.aliyuncs.com/apps/anthropic`. The frozen direct Messages route appends `/v1/messages`; Claude Code receives the operator base URL unchanged as `ANTHROPIC_BASE_URL`.
+
 The GPT mapping is `VERIFIED_BY_OPERATOR`; its upstream first-party provenance is `NOT_INDEPENDENTLY_VERIFIED`. It must be described as `gpt-5.6-sol via operator-trusted OpenAI-compatible relay`, never as OpenAI first-party or an OpenAI official API.
 
 ## Pair and ablation

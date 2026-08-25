@@ -27,7 +27,7 @@
       "protocol": "messages",
       "provider": "bailian-anthropic",
       "base_url": "env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
-      "route": "/messages",
+      "route": "/v1/messages",
       "requested_model": "qwen3.8-max",
       "reasoning_effort": null,
       "max_output_tokens": 2000,
@@ -73,7 +73,7 @@
       "runtime": "direct-model",
       "profile_slot": "model-qwen38-bailian-messages",
       "requested_model": "qwen3.8-max",
-      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/messages",
+      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
       "reasoning_effort": null,
       "repeat_count": 5,
       "task_count": 18,
@@ -129,7 +129,7 @@
       "runtime": "claude-code",
       "profile_slot": "harness-claude-qwen38",
       "requested_model": "qwen3.8-max",
-      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/messages",
+      "provider_route": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
       "reasoning_effort": null,
       "repeat_count": 5,
       "task_count": 18,
@@ -286,8 +286,8 @@
       "protocol": "messages",
       "base_url_reference": "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
       "fixed_base_url": null,
-      "route": "/messages",
-      "route_identity": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/messages",
+      "route": "/v1/messages",
+      "route_identity": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
       "credential_reference": "DASHSCOPE_API_KEY",
       "model_family": "Qwen",
       "inference_provider": "Alibaba Cloud Model Studio",
@@ -301,7 +301,7 @@
       "upstream_model_claim": null,
       "operator_trust_assertion": null,
       "upstream_first_party_provenance": null,
-      "profile_digest": "sha256:07c71cc8fba25c4791f6af46ca14d84adb9f367a5945b50e2a95b21b92d06c5e"
+      "profile_digest": "sha256:56fd4c2f504ad3a7e72fbcdd66eca69af65c5f938d5833bfbb1ac5287705962a"
     },
     {
       "profile_id": "model-deepseek-v4pro-chat",
@@ -390,8 +390,8 @@
       "protocol": "messages",
       "base_url_reference": "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL",
       "fixed_base_url": null,
-      "route": "/messages",
-      "route_identity": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/messages",
+      "route": "/v1/messages",
+      "route_identity": "bailian-anthropic|messages|env:HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
       "credential_reference": "DASHSCOPE_API_KEY",
       "model_family": "Qwen",
       "inference_provider": "Alibaba Cloud Model Studio",
@@ -405,7 +405,7 @@
       "upstream_model_claim": null,
       "operator_trust_assertion": null,
       "upstream_first_party_provenance": null,
-      "profile_digest": "sha256:0927fec6d4956d6a07d5b368f5b5a601dcf33b4897a16c38592e3a5608450dd9"
+      "profile_digest": "sha256:05ad47086ba98f6e96378a9b642197344c69269f97c1ae3ea4c112c57cde7e91"
     },
     {
       "profile_id": "harness-deepseek-v4flash",

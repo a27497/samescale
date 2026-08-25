@@ -16,7 +16,7 @@
   "experiment_plan": {
     "state": "NOT_VERIFIED",
     "identity": "core-real-evidence-v1",
-    "digest": "sha256:f65b20dd06619f950887c4e527ecb0608ab15e00de883f313fd8a5744a9b6efd",
+    "digest": "sha256:b97a0798b7855b0544c8acdb861551bc918d57fc6fbda834cc13c992955ad098",
     "limitation": "K-B0 profiles are configured but no real smoke, observed-model evidence, or executable ExperimentPlan has been authorized."
   },
   "real_matrix": {

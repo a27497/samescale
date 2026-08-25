@@ -67,7 +67,7 @@ SAFE_ENVIRONMENT = {
     "HARNESSLAB_GPT56_RELAY_BASE_URL": "https://relay.example.test/v1",
     "HARNESSLAB_GPT56_RELAY_API_KEY": "fake-relay-key",
     "DASHSCOPE_API_KEY": "fake-dashscope-key",
-    "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": "https://bailian.example.test/v1",
+    "HARNESSLAB_BAILIAN_ANTHROPIC_BASE_URL": ("https://dashscope.aliyuncs.com/apps/anthropic"),
     "HARNESSLAB_BAILIAN_OPENAI_BASE_URL": "https://bailian-openai.example.test/v1",
     "DEEPSEEK_API_KEY": "fake-deepseek-key",
 }
