@@ -17,7 +17,7 @@
     "state": "NOT_VERIFIED",
     "identity": "core-real-evidence-v1",
     "digest": "sha256:b97a0798b7855b0544c8acdb861551bc918d57fc6fbda834cc13c992955ad098",
-    "limitation": "Profiles are configured; one authorized K-B1 attempt aborted in Hidden Verifier infrastructure, so smoke evidence and an executable ExperimentPlan remain unverified."
+    "limitation": "Profiles are configured; the first K-B1 attempt aborted in Hidden Verifier infrastructure after provider call 1 completed, and the second aborted on an unclassified provider timeout at call 1. The historical timeout phase is not available, so smoke evidence and an executable ExperimentPlan remain unverified."
   },
   "real_matrix": {
     "state": "NOT_RUN",

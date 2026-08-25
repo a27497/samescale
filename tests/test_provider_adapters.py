@@ -14,6 +14,7 @@ from harnesslab.model_lane.models import (
     ProviderFailureCategory,
     ProviderInvocationError,
     ProviderRequest,
+    ProviderTimeoutPhase,
 )
 from harnesslab.model_lane.profiles import load_model_profile
 from harnesslab.model_lane.providers import (
@@ -408,6 +409,40 @@ async def test_http_provider_failures_are_distinct_and_not_retried(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("exception_type", "expected_phase"),
+    [
+        pytest.param(httpx.ConnectTimeout, ProviderTimeoutPhase.CONNECT, id="connect"),
+        pytest.param(httpx.ReadTimeout, ProviderTimeoutPhase.READ, id="read"),
+        pytest.param(httpx.WriteTimeout, ProviderTimeoutPhase.WRITE, id="write"),
+        pytest.param(httpx.PoolTimeout, ProviderTimeoutPhase.POOL, id="pool"),
+        pytest.param(httpx.TimeoutException, ProviderTimeoutPhase.UNKNOWN, id="unknown"),
+    ],
+)
+async def test_http_timeout_subtypes_are_preserved_without_retry(
+    exception_type: type[httpx.TimeoutException], expected_phase: ProviderTimeoutPhase
+) -> None:
+    attempts = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal attempts
+        attempts += 1
+        raise exception_type(f"unsafe timeout detail {FAKE_KEY}", request=request)
+
+    async with await client_for(handler) as client:
+        with pytest.raises(ProviderInvocationError) as caught:
+            await OpenAIResponsesAdapter(
+                client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+            ).invoke(provider_request(Protocol.RESPONSES))
+
+    assert caught.value.category is ProviderFailureCategory.TIMEOUT
+    assert caught.value.timeout_phase is expected_phase
+    assert caught.value.latency_ms is not None
+    assert caught.value.latency_ms >= 0
+    assert attempts == 1
+
+
+@pytest.mark.asyncio
 async def test_timeout_malformed_and_incomplete_are_distinct() -> None:
     timeout_attempts = 0
 
@@ -422,6 +457,7 @@ async def test_timeout_malformed_and_incomplete_are_distinct() -> None:
                 client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
             ).invoke(provider_request(Protocol.RESPONSES))
     assert timeout.value.category is ProviderFailureCategory.TIMEOUT
+    assert timeout.value.timeout_phase is ProviderTimeoutPhase.READ
     assert timeout_attempts == 1
 
     async with await client_for(lambda request: httpx.Response(200, content=b"not-json")) as client:

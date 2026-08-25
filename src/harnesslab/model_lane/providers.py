@@ -17,10 +17,23 @@ from harnesslab.model_lane.models import (
     ProviderInvocationError,
     ProviderRequest,
     ProviderResult,
+    ProviderTimeoutPhase,
     ProviderUsage,
 )
 
 MAX_PROVIDER_RESPONSE_BYTES = 2_000_000
+
+
+def _timeout_phase(exc: httpx.TimeoutException) -> ProviderTimeoutPhase:
+    if isinstance(exc, httpx.ConnectTimeout):
+        return ProviderTimeoutPhase.CONNECT
+    if isinstance(exc, httpx.ReadTimeout):
+        return ProviderTimeoutPhase.READ
+    if isinstance(exc, httpx.WriteTimeout):
+        return ProviderTimeoutPhase.WRITE
+    if isinstance(exc, httpx.PoolTimeout):
+        return ProviderTimeoutPhase.POOL
+    return ProviderTimeoutPhase.UNKNOWN
 
 
 def _object(value: object, label: str) -> dict[str, Any]:
@@ -146,6 +159,7 @@ class _HTTPProviderAdapter:
                 ProviderFailureCategory.TIMEOUT,
                 "provider request timed out",
                 latency_ms=int((time.perf_counter() - started) * 1000),
+                timeout_phase=_timeout_phase(exc),
             ) from exc
         except httpx.RequestError as exc:
             raise ProviderInvocationError(

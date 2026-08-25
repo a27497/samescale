@@ -150,6 +150,7 @@ class DirectModelRunner:
                     provider_failure=exc.category,
                     provider_error=ProviderError(
                         category=exc.category,
+                        timeout_phase=exc.timeout_phase,
                         status_code=exc.status_code,
                         request_id=exc.request_id,
                         response_status=exc.response_status,

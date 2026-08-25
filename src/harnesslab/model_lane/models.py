@@ -28,6 +28,14 @@ class ProviderFailureCategory(StrEnum):
     INCOMPLETE_RESPONSE = "incomplete_response"
 
 
+class ProviderTimeoutPhase(StrEnum):
+    CONNECT = "connect"
+    READ = "read"
+    WRITE = "write"
+    POOL = "pool"
+    UNKNOWN = "unknown"
+
+
 class ProviderInvocationError(RuntimeError):
     """Safe provider failure that never includes response bodies or credentials."""
 
@@ -40,13 +48,17 @@ class ProviderInvocationError(RuntimeError):
         request_id: str | None = None,
         response_status: str | None = None,
         latency_ms: int | None = None,
+        timeout_phase: ProviderTimeoutPhase | None = None,
     ) -> None:
+        if category is not ProviderFailureCategory.TIMEOUT and timeout_phase is not None:
+            raise ValueError("timeout phase requires a timeout provider failure")
         super().__init__(detail)
         self.category = category
         self.status_code = status_code
         self.request_id = request_id
         self.response_status = response_status
         self.latency_ms = latency_ms
+        self.timeout_phase = timeout_phase
 
 
 class ProviderError(BaseModel):
@@ -55,11 +67,18 @@ class ProviderError(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     category: ProviderFailureCategory
+    timeout_phase: ProviderTimeoutPhase | None = None
     status_code: int | None = Field(default=None, ge=100, le=599)
     request_id: str | None = Field(default=None, max_length=300)
     response_status: str | None = Field(default=None, max_length=200)
     latency_ms: int | None = Field(default=None, ge=0)
     attempt_count: Literal[1] = 1
+
+    @model_validator(mode="after")
+    def timeout_phase_matches_category(self) -> ProviderError:
+        if self.category is not ProviderFailureCategory.TIMEOUT and self.timeout_phase is not None:
+            raise ValueError("timeout phase requires a timeout provider failure")
+        return self
 
 
 class ProviderUsage(BaseModel):

@@ -58,8 +58,12 @@ Before evidence is published, the final workspace and staged artifact tree are s
 credential values in both relative paths and regular-file bytes. A match withholds the artifact.
 The M-Lane manifest stores the public response and digest, parsed-patch digest, input/output
 workspace digests, prompt identity, safe provider facts, verifier result, score, and outcome.
-Failure manifests retain only normalized safe facts when available (category, status code,
-request ID, response/stop status, bounded latency, and the single attempt count), never a raw body.
+Failure manifests retain only normalized safe facts when available (category, timeout phase,
+status code, request ID, response/stop status, bounded latency, and the single attempt count), never
+a raw body. Timeout phase is the typed `connect`, `read`, `write`, `pool`, or `unknown` transport
+stage; it is null for non-timeout failures and for historical timeout evidence collected before the
+phase field existed. It never contains an exception message, URL, header, credential, body, or
+traceback.
 The complete Phase C verifier artifact tree is copied under the manifest-declared `verifier/`
 namespace and bound by its own tree digest, so its relative stdout, stderr, manifest, and workspace
 references remain self-contained in the Phase D bundle.

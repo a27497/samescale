@@ -18,10 +18,12 @@ from harnesslab.model_lane.fake import FakeDirectProvider
 from harnesslab.model_lane.models import (
     DirectModelOutcome,
     GenerationSettings,
+    ProviderError,
     ProviderFailureCategory,
     ProviderInvocationError,
     ProviderRequest,
     ProviderResult,
+    ProviderTimeoutPhase,
 )
 from harnesslab.model_lane.patch import parse_direct_patch
 from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
@@ -77,6 +79,16 @@ class SafeFailureProvider:
             request_id="safe-failure-id",
             response_status="rate_limited",
             latency_ms=17,
+        )
+
+
+class SafeTimeoutProvider:
+    async def invoke(self, request: ProviderRequest) -> ProviderResult:
+        raise ProviderInvocationError(
+            ProviderFailureCategory.TIMEOUT,
+            f"unsafe timeout detail {FAKE_KEY}",
+            latency_ms=90_454,
+            timeout_phase=ProviderTimeoutPhase.READ,
         )
 
 
@@ -316,6 +328,58 @@ async def test_provider_failure_category_is_preserved_in_evidence(tmp_path: Path
     assert result.evidence.provider_error.category is ProviderFailureCategory.TIMEOUT
     assert result.evidence.provider_error.attempt_count == 1
     assert result.evidence.provider_result is None
+
+
+@pytest.mark.asyncio
+async def test_timeout_phase_is_persisted_in_canonical_evidence_without_raw_detail(
+    tmp_path: Path,
+) -> None:
+    runner = DirectModelRunner(
+        artifact_root=tmp_path / "artifacts",
+        runtime_root=tmp_path / "runtime",
+        environment={"GATE_D_FAKE_API_KEY": FAKE_KEY},
+    )
+    result = await runner.run(
+        TASK_ROOT,
+        fake_profile(),
+        adapter=SafeTimeoutProvider(),
+        run_id="provider-read-timeout",
+    )
+
+    error = result.evidence.provider_error
+    canonical = result.evidence.canonical_json()
+    assert result.evidence.outcome is DirectModelOutcome.PROVIDER_ERROR
+    assert result.evidence.provider_failure is ProviderFailureCategory.TIMEOUT
+    assert error is not None
+    assert error.category is ProviderFailureCategory.TIMEOUT
+    assert error.timeout_phase is ProviderTimeoutPhase.READ
+    assert error.status_code is None
+    assert error.request_id is None
+    assert error.response_status is None
+    assert error.latency_ms == 90_454
+    assert error.attempt_count == 1
+    assert '"timeout_phase":"read"' in canonical
+    assert FAKE_KEY not in canonical
+    assert "unsafe timeout detail" not in canonical
+    artifacts = all_file_bytes(result.artifact_directory)
+    assert FAKE_KEY.encode() not in artifacts
+    assert b"unsafe timeout detail" not in artifacts
+
+
+def test_provider_error_timeout_phase_schema_fails_closed() -> None:
+    historical = ProviderError(category=ProviderFailureCategory.TIMEOUT)
+    assert historical.timeout_phase is None
+
+    with pytest.raises(ValidationError, match="timeout phase requires a timeout"):
+        ProviderError(
+            category=ProviderFailureCategory.RATE_LIMIT,
+            timeout_phase=ProviderTimeoutPhase.READ,
+        )
+
+    with pytest.raises(ValidationError):
+        ProviderError.model_validate(
+            {"category": "timeout", "timeout_phase": "not-a-timeout-phase"}
+        )
 
 
 @pytest.mark.asyncio

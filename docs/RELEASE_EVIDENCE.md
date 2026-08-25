@@ -6,8 +6,8 @@ The Phase K hard stop is implemented by strict models in `src/harnesslab/release
 
 - `core-corpus.json` binds the 18 package, task, semantic-family, benchmark-role, workspace, verifier, lane, toolchain, baseline, and oracle identities. Exactly one clamp control spans all three languages; the other 15 families are independent.
 - `core-real-evidence-plan.json` binds eight configured-not-smoked profiles, seven cells, truthful provider provenance, the configured Pair and ablation, frozen Judge profile/suite, exact call/token ceilings, configuration references, and authorization blockers.
-- `core-real-smoke-plan.json` freezes seven one-task subject smokes and one Judge case: eight top-level launches, 14,256 maximum output tokens, exact evidence expectations, credential references, and sixteen fail-closed abort conditions. `harnesslab release smoke preflight` validates it keylessly; only `execute --allow-real-smoke` can enter the shared production orchestrator, and that remains unauthorized and unrun.
-- `release-evidence.json` is the prospective `v1.0.0-core` evidence manifest. `REAL_PROVIDER_SMOKE` is `NOT_VERIFIED` after one provider-completed attempt aborted in Hidden Verifier infrastructure; the other five `REAL_*` states are `NOT_RUN`, and readiness is false.
+- `core-real-smoke-plan.json` freezes seven one-task subject smokes and one Judge case: eight top-level launches, 14,256 maximum output tokens, exact evidence expectations, credential references, and sixteen fail-closed abort conditions. `harnesslab release smoke preflight` validates it keylessly; only `execute --allow-real-smoke` can enter the shared production orchestrator. Two separately authorized executions aborted at call 1, and no further execution is currently authorized.
+- `release-evidence.json` is the prospective `v1.0.0-core` evidence manifest. `REAL_PROVIDER_SMOKE` is `NOT_VERIFIED` after the first attempt completed provider call 1 but aborted in Hidden Verifier infrastructure and the second attempt aborted on an unclassified provider timeout at the same call. The historical timeout phase is `NOT_AVAILABLE`; the other five `REAL_*` states are `NOT_RUN`, and readiness is false.
 - `resume-claim-evidence.json` maps engineering claims to source/gate evidence and leaves real-performance claims `NOT_VERIFIED`.
 - `badcases.json` reserves exactly three empty evidence slots.
 
@@ -19,7 +19,7 @@ Canonical models reject extra fields. `VERIFIED` bindings require both an identi
 uv run --locked python scripts/verify_gate_k.py
 ```
 
-It validates the task corpus from source, provider/profile provenance, exact smoke bindings and mutation rejection, smoke and Matrix ceilings, Pair/ablation structure, immutable proxy identity, effective Docker egress topology, docs, resume references, BadCase placeholders, secret boundaries, CI ordering, fresh-clone contract, and tag guard. Passing means the hard stop works. Expected K-B1-R1 output includes `CORE_RELEASE_READY=FALSE`, `REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE`, `REAL_CALLS_THIS_REPAIR=0`, `REAL_PROVIDER_SMOKE=NOT_VERIFIED`, and the other five real scopes `NOT_RUN`.
+It validates the task corpus from source, provider/profile provenance, exact smoke bindings and mutation rejection, smoke and Matrix ceilings, Pair/ablation structure, immutable proxy identity, effective Docker egress topology, docs, resume references, BadCase placeholders, secret boundaries, CI ordering, fresh-clone contract, and tag guard. Passing means the hard stop works. Expected K-B1-R2 output includes `CORE_RELEASE_READY=FALSE`, `REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE`, `REAL_CALLS_THIS_REPAIR=0`, `SMOKE_TIMEOUT_CHANGE=FALSE`, `REAL_PROVIDER_SMOKE=NOT_VERIFIED`, and the other five real scopes `NOT_RUN`.
 
 ## Final release mode
 

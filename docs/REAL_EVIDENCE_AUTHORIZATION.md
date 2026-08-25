@@ -1,12 +1,14 @@
 # Real Evidence Authorization
 
-Phase K-B1-R1 stop state: `PHASE_K_B1_ABORTED_HIDDEN_VERIFIER_PERMISSION_PORTABILITY_REPAIR`.
+Phase K-B1-R2 stop state: `PHASE_K_B1_ABORTED_PROVIDER_TIMEOUT_DIAGNOSTICS_REPAIR`.
 
-One real top-level K-B1 attempt occurred before this repair. Call 1 invoked the configured GPT relay successfully and completed with the requested and observed model `gpt-5.6-sol`; the overall smoke then aborted with `INFRASTRUCTURE` because the non-root Hidden Verifier could not read restrictive host bind mounts. Calls 2-8 were not run and there was no retry. The completed invocation does not verify the Provider smoke group, so `REAL_PROVIDER_SMOKE=NOT_VERIFIED`.
+Two real top-level K-B1 attempts occurred before this repair. On the first, call 1 invoked the configured GPT relay successfully and completed with requested and observed model `gpt-5.6-sol` in approximately 16,773 ms; the overall smoke then aborted with `INFRASTRUCTURE` because the non-root Hidden Verifier could not read restrictive host bind mounts. The K-B1-R1 permission-portability repair addressed that infrastructure defect.
 
-The saved public direct patch parsed and applied successfully, and a keyless replay reproduced its workspace output digest. The incident is therefore attributed to restrictive host bind-mount permissions, not to the model, relay, Responses protocol, credential, observed-model identity, or patch machinery.
+On the second attempt, the same frozen call 1 aborted with `PROVIDER_FAILURE`, provider failure `timeout`, and latency approximately 90,454 ms. It had no status code, response status, or observed model. Calls 2-8 were not run and there was no retry within that attempt. The then-current evidence did not capture the timeout subtype, so `TIMEOUT_PHASE=NOT_AVAILABLE`; the supported conclusion is only `INTERMITTENT_OR_UNCLASSIFIED_PROVIDER_TIMEOUT`, not relay outage, read timeout, model latency regression, provider outage, or network failure.
 
-This repair is keyless and authorizes no provider, Codex, Claude Code, DeepSeek, or Judge call. Ambient credentials and existing logins are not authorization. Any K-B1 retry requires separate new authorization; the 630-run Matrix and 63 Judge calls still require later authorization.
+The first attempt's saved public direct patch parsed and applied successfully, and a keyless replay reproduced its workspace output digest. This R2 repair only adds safe timeout-phase diagnostics for future evidence; it does not infer a phase for the historical second attempt, change the frozen 90-second timeout, or authorize another attempt.
+
+This repair is keyless and authorizes no provider, Codex, Claude Code, DeepSeek, or Judge call. Ambient credentials and existing logins are not authorization. Any further K-B1 retry requires separate new authorization; the 630-run Matrix and 63 Judge calls still require later authorization.
 
 ## Frozen Core scope
 

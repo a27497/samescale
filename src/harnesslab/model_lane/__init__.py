@@ -6,6 +6,7 @@ from harnesslab.model_lane.models import (
     ProviderFailureCategory,
     ProviderRequest,
     ProviderResult,
+    ProviderTimeoutPhase,
     ProviderUsage,
 )
 
@@ -15,5 +16,6 @@ __all__ = [
     "ProviderFailureCategory",
     "ProviderRequest",
     "ProviderResult",
+    "ProviderTimeoutPhase",
     "ProviderUsage",
 ]
