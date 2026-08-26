@@ -607,7 +607,7 @@ print(json.dumps({
                 child_attestation = cast(dict[str, object], json.loads(probe.stdout))
             if authorities and child_attestation is not None:
                 break
-            if process.returncode is not None:
+            if process.returncode is not None and child_attestation is None:
                 break
             await asyncio.sleep(0.05)
 
