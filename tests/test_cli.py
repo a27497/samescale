@@ -143,4 +143,4 @@ def test_harness_codex_doctor_reports_pinned_runtime() -> None:
     assert result.exit_code == 0
     assert "PASS version=codex-cli 0.149.0" in result.stdout
     assert "harnesslab-phase-e-codex:0.149.0" in result.stdout
-    assert "REAL_CODEX_SMOKE=NOT_RUN" in result.stdout
+    assert "REAL_CODEX_SMOKE=NOT_VERIFIED" in result.stdout

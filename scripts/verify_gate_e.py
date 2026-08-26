@@ -38,6 +38,14 @@ PHASE_E_TESTS = (
     "tests/test_cli.py::test_harness_codex_doctor_reports_pinned_runtime",
 )
 CRITICAL_TESTS = {
+    "test_codex_docker_start_failure_is_typed",
+    "test_codex_early_exit_during_stdin_is_typed[broken-pipe]",
+    "test_codex_early_exit_during_stdin_is_typed[connection-reset]",
+    "test_codex_early_exit_during_stdin_is_typed[process-lookup]",
+    "test_codex_primary_and_cleanup_failures_are_both_preserved[cleanup-failure]",
+    "test_codex_primary_and_cleanup_failures_are_both_preserved[cleanup-success]",
+    "test_codex_stdout_read_failure_is_typed",
+    "test_codex_timeout_and_cancellation_remain_capture_states",
     "test_real_codex_backend_outer_docker_argv_is_hardened_and_secret_free",
     "test_codex_exec_plan_uses_stdin_and_canonical_isolation_flags",
     "test_codex_harness_prompt_excludes_verifier_and_oracle",
@@ -57,6 +65,7 @@ CRITICAL_TESTS = {
     "test_harness_failure_taxonomy_is_structurally_distinct[protocol]",
     "test_harness_failure_taxonomy_is_structurally_distinct[timeout]",
     "test_requested_model_is_not_fabricated_as_observed_model",
+    "test_precapture_stderr_secret_is_digest_only_in_immutable_evidence",
     "test_real_codex_cleanup_query_failure_is_unverified",
     "test_sanitized_jsonl_maps_trace_order_unknown_and_private_reasoning",
     "test_structured_authentication_error_is_not_guessed_from_free_text",
@@ -476,7 +485,16 @@ def main() -> int:
         failed = True
     if not verify_repository_secrets():
         failed = True
-    print("REAL_CODEX_SMOKE=NOT_RUN")
+    if not failed:
+        print("CODEX_STARTUP_FAILURE_EVIDENCE=PASS")
+        print("CODEX_EARLY_EXIT_PHASE_CLASSIFICATION=PASS")
+        print("CODEX_STARTUP_SECRET_HYGIENE=PASS")
+        print("CODEX_CLEANUP_INVARIANT=PASS")
+    print("REAL_CALLS_THIS_REPAIR=0")
+    print("REAL_PROVIDER_SMOKE=NOT_VERIFIED")
+    print("CORE_RELEASE_READY=FALSE")
+    print("v1.0.0-core=ABSENT")
+    print("REAL_CODEX_SMOKE=NOT_VERIFIED")
     return ExitCode.FAIL if failed else ExitCode.PASS
 
 

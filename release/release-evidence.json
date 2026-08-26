@@ -17,7 +17,7 @@
     "state": "NOT_VERIFIED",
     "identity": "core-real-evidence-v2",
     "digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
-    "limitation": "The OpenCode Go v2 routes are configured. One v2 smoke attempt executed two top-level launches and aborted at call 2 after the configured output-token budget was exhausted; no complete smoke evidence or executable ExperimentPlan is verified. Immutable v1 history records all three prior v1 attempts."
+    "limitation": "The OpenCode Go v2 routes are configured. The first v2 smoke attempt executed two top-level launches; the post-R4 attempt executed four and aborted at Codex-medium infrastructure before a durable Codex call artifact existed. No complete smoke evidence or executable ExperimentPlan is verified. Immutable safe summaries preserve both v2 attempts and all three prior v1 attempts."
   },
   "real_matrix": {
     "state": "NOT_RUN",
@@ -90,7 +90,7 @@
   "paired_claim_policy": "NOT_SELECTED",
   "real_statuses": {
     "REAL_PROVIDER_SMOKE": "NOT_VERIFIED",
-    "REAL_CODEX_SMOKE": "NOT_RUN",
+    "REAL_CODEX_SMOKE": "NOT_VERIFIED",
     "REAL_CLAUDE_SMOKE": "NOT_RUN",
     "REAL_DEEPSEEK_SMOKE": "NOT_RUN",
     "REAL_MATRIX_EVIDENCE": "NOT_RUN",

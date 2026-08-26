@@ -98,11 +98,14 @@ CRITICAL_TESTS = {
     "test_kb0_smoke_plan_is_exact_bounded_and_unexecuted",
     "test_kb0_matrix_preflight_and_release_hard_stop_are_unchanged",
     "test_smoke_production_control_plane_exact_eight_call_binding",
+    "test_post_r4_smoke_history_is_safe_immutable_and_truthful",
+    "test_production_smoke_persists_codex_precapture_infrastructure_evidence",
     "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
     "test_v2_credential_preflight_prints_presence_only",
     "test_smoke_same_path_fake_execution_consumes_exact_plan_without_network",
     "test_smoke_missing_config_stops_before_first_call",
     "test_smoke_abort_on_first_failure_never_invokes_calls_four_through_eight",
+    "test_smoke_typed_codex_infrastructure_failure_stops_without_retry_or_fallback",
     "test_smoke_one_judge_call_only",
     "test_smoke_ninth_call_is_rejected_before_execution",
     "test_smoke_provider_fallbacks_are_rejected_in_production_assertions",
@@ -239,6 +242,9 @@ def verify_contract_mode() -> bool:
         print("FAIL: K-B0 smoke preflight attempted a provider call")
         return False
     history = json.loads((ROOT / plan.history_reference).read_text(encoding="utf-8"))
+    post_r4_history = json.loads(
+        (ROOT / "release/history/core-real-v2-attempt-2.json").read_text(encoding="utf-8")
+    )
     snapshot = json.loads(
         (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
     )
@@ -251,6 +257,19 @@ def verify_contract_mode() -> bool:
         or len(history.get("attempts", ())) != 3
     ):
         print("FAIL: immutable v1 plan or attempt history drifted")
+        return False
+    if (
+        post_r4_history.get("source_commit") != "07e48c2b3eb330c3ff56a8473bb98025f86490b3"
+        or post_r4_history.get("receipt_digest")
+        != "sha256:e25ddea75fa5ca2ade3167bc063d9b771da1af5381f5a13403af118e136976d2"
+        or post_r4_history.get("attempted_top_level_launches") != 4
+        or [call.get("outcome") for call in post_r4_history.get("calls", ())]
+        != ["verified_fail", "verified_pass", "verified_pass", "INFRASTRUCTURE"]
+        or post_r4_history.get("calls_5_to_8") != "NOT_RUN"
+        or post_r4_history.get("retry_count") != 0
+        or post_r4_history.get("fallback_count") != 0
+    ):
+        print("FAIL: immutable post-R4 smoke history drifted")
         return False
     if (
         snapshot.get("provider_provenance") != "THIRD_PARTY_INFERENCE_PLATFORM"
@@ -333,9 +352,15 @@ def verify_contract_mode() -> bool:
     print("REAL_CALLS_THIS_REPAIR=0")
     print("OUTPUT_BUDGET_TRUNCATION_SEMANTICS=PASS")
     print("V2_REAL_ATTEMPT_1_TOP_LEVEL_LAUNCHES=2")
+    print("V2_REAL_ATTEMPT_2_TOP_LEVEL_LAUNCHES=4")
+    print("POST_R4_SMOKE_HISTORY_PRESERVED=PASS")
+    print("CODEX_STARTUP_FAILURE_EVIDENCE=PASS")
+    print("CODEX_EARLY_EXIT_PHASE_CLASSIFICATION=PASS")
+    print("CODEX_STARTUP_SECRET_HYGIENE=PASS")
+    print("CODEX_CLEANUP_INVARIANT=PASS")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
-    print("PHASE_K_B1_R4_OUTPUT_BUDGET_SEMANTICS_REPAIR_KEYLESS")
+    print("PHASE_K_B1_R5_CODEX_STARTUP_FAILURE_EVIDENCE_REPAIR_KEYLESS")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")

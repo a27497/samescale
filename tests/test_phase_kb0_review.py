@@ -27,8 +27,16 @@ from harnesslab.egress import (
     preflight_egress_network_isolation,
 )
 from harnesslab.harness_lane.adapter import HarnessAdapterError
-from harnesslab.harness_lane.docker_backend import DockerCodexBackend
-from harnesslab.harness_lane.models import ObservedModelStatus
+from harnesslab.harness_lane.docker_backend import (
+    CodexBackendExecutionError,
+    DockerCodexBackend,
+)
+from harnesslab.harness_lane.models import (
+    CodexBackendFailureEvidence,
+    CodexBackendFailurePhase,
+    CodexProcessCapture,
+    ObservedModelStatus,
+)
 from harnesslab.harness_lane.profile import CODEX_IMAGE, canonical_codex_profile
 from harnesslab.model_lane.models import DirectModelOutcome
 from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
@@ -127,6 +135,30 @@ def test_smoke_production_control_plane_exact_eight_call_binding() -> None:
     assert control.smoke_plan.release_plan_digest == control.release_plan.digest
 
 
+def test_post_r4_smoke_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-2.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "07e48c2b3eb330c3ff56a8473bb98025f86490b3"
+    assert history["receipt_digest"] == (
+        "sha256:e25ddea75fa5ca2ade3167bc063d9b771da1af5381f5a13403af118e136976d2"
+    )
+    assert history["attempted_top_level_launches"] == 4
+    assert [call["outcome"] for call in history["calls"]] == [
+        "verified_fail",
+        "verified_pass",
+        "verified_pass",
+        "INFRASTRUCTURE",
+    ]
+    assert [call.get("verifier_score") for call in history["calls"][:3]] == [0.8, 1.0, 1.0]
+    assert history["calls_5_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert "/home/dev/harnesslab-evidence" not in serialized
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
 def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
     control = SmokeControlPlane.load(ROOT)
     receipt = control.preflight()
@@ -220,6 +252,58 @@ async def test_smoke_direct_subject_output_error_is_capability_result(
 
 
 @pytest.mark.asyncio
+async def test_production_smoke_persists_codex_precapture_infrastructure_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    control = SmokeControlPlane.load(ROOT)
+    binding = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())[3]
+    secret = SAFE_ENVIRONMENT["HARNESSLAB_GPT56_RELAY_API_KEY"]
+
+    class PreCaptureFailureBackend:
+        def __init__(self, *, credentials: dict[str, str], **_: object) -> None:
+            self.credentials = credentials
+            self.egress_attestation = None
+
+        @property
+        def artifact_secret_values(self) -> tuple[str, ...]:
+            return tuple(value for name, value in self.credentials.items() if "KEY" in name)
+
+        async def run(self, _: object) -> CodexProcessCapture:
+            stderr_digest = (
+                "sha256:"
+                + hashlib.sha256(f"Codex failed; credential={secret}".encode()).hexdigest()
+            )
+            raise CodexBackendExecutionError(
+                CodexBackendFailureEvidence(
+                    phase=CodexBackendFailurePhase.CONTAINER_START,
+                    duration_ms=3,
+                    stderr_category="PRESENT",
+                    stderr_digest=stderr_digest,
+                )
+            )
+
+    monkeypatch.setattr("harnesslab.release.smoke.DockerCodexBackend", PreCaptureFailureBackend)
+    invoker = ProductionSmokeInvoker(ROOT, SAFE_ENVIRONMENT, tmp_path / "smoke")
+    with pytest.raises(SmokeCallFailure) as raised:
+        await invoker.invoke(binding)
+
+    assert raised.value.category is SmokeFailureCategory.INFRASTRUCTURE
+    evidence_result = raised.value.evidence_result
+    assert evidence_result is not None
+    assert evidence_result.call_id == EXPECTED_CALL_IDS[3]
+    artifact = Path(evidence_result.evidence_references[0])
+    artifact_text = "\n".join(
+        path.read_text(encoding="utf-8", errors="replace")
+        for path in artifact.rglob("*")
+        if path.is_file()
+    )
+    assert (artifact / "manifest.json").is_file()
+    assert secret not in artifact_text
+    assert secret not in str(raised.value)
+    assert secret not in evidence_result.model_dump_json()
+
+
+@pytest.mark.asyncio
 async def test_smoke_missing_config_stops_before_first_call() -> None:
     control = SmokeControlPlane.load(ROOT)
     invoker = RecordingInvoker()
@@ -242,6 +326,39 @@ async def test_smoke_abort_on_first_failure_never_invokes_calls_four_through_eig
     assert receipt.failure_category is SmokeFailureCategory.ROUTE_MISMATCH
     assert tuple(item.frozen.call.call_id for item in invoker.calls) == EXPECTED_CALL_IDS[:3]
     assert len(receipt.results) == 2
+
+
+@pytest.mark.asyncio
+async def test_smoke_typed_codex_infrastructure_failure_stops_without_retry_or_fallback() -> None:
+    control = SmokeControlPlane.load(ROOT)
+    bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
+
+    class TypedFailureInvoker(RecordingInvoker):
+        async def invoke(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+            self.calls.append(binding)
+            call_id = binding.frozen.call.call_id
+            result = SmokeCallResult(
+                call_id=call_id,
+                evidence_references=(f"fake://{call_id}",),
+                evidence_digests=("sha256:" + "7" * 64,),
+            )
+            if call_id == EXPECTED_CALL_IDS[3]:
+                raise SmokeCallFailure(
+                    SmokeFailureCategory.INFRASTRUCTURE,
+                    "typed Codex infrastructure failure",
+                    result,
+                )
+            return result
+
+    invoker = TypedFailureInvoker()
+    receipt = await control.execute(bindings, invoker, allow_real_smoke=True)
+
+    assert receipt.status is SmokeExecutionStatus.ABORTED
+    assert receipt.attempted_top_level_launches == 4
+    assert receipt.failing_call_id == EXPECTED_CALL_IDS[3]
+    assert receipt.failure_category is SmokeFailureCategory.INFRASTRUCTURE
+    assert tuple(item.call_id for item in receipt.results) == EXPECTED_CALL_IDS[:4]
+    assert tuple(item.frozen.call.call_id for item in invoker.calls) == EXPECTED_CALL_IDS[:4]
 
 
 @pytest.mark.asyncio

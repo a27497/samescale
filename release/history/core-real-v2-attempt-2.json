@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-2",
+  "source_commit": "07e48c2b3eb330c3ff56a8473bb98025f86490b3",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:e25ddea75fa5ca2ade3167bc063d9b771da1af5381f5a13403af118e136976d2",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 4,
+  "failing_call_id": "smoke-4-harness-codex-gpt56-medium",
+  "failure_category": "INFRASTRUCTURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": "gpt-5.6-sol",
+      "latency_ms": 89843,
+      "usage": {
+        "input_tokens": 346,
+        "output_tokens": 400,
+        "reasoning_tokens": 230,
+        "total_tokens": 746
+      },
+      "verifier_passed": false,
+      "verifier_score": 0.8,
+      "outcome": "verified_fail"
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "requested_model": "qwen3.8-max",
+      "observed_model": "qwen3.8-max",
+      "latency_ms": 45517,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 403,
+        "output_tokens": 1790,
+        "total_tokens": 2193
+      },
+      "verifier_passed": true,
+      "verifier_score": 1.0,
+      "outcome": "verified_pass"
+    },
+    {
+      "call_id": "smoke-3-model-deepseek-v4pro-chat",
+      "requested_model": "deepseek-v4-pro",
+      "observed_model": "deepseek-v4-pro",
+      "latency_ms": 2909,
+      "stop_reason": "stop",
+      "usage": {
+        "input_tokens": 379,
+        "output_tokens": 206,
+        "total_tokens": 585
+      },
+      "verifier_passed": true,
+      "verifier_score": 1.0,
+      "outcome": "verified_pass"
+    },
+    {
+      "call_id": "smoke-4-harness-codex-gpt56-medium",
+      "requested_model": "gpt-5.6-sol",
+      "outcome": "INFRASTRUCTURE",
+      "durable_codex_call_artifact": "NOT_PRODUCED"
+    }
+  ],
+  "calls_5_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "interpretation": "Call 4 failed in the unresolved post-create Codex start, stdin, runtime, stream-collection, or capture window. Completed keyless diagnostics exclude egress provisioning, outer-container creation, security attestation, cleanup, strict-config parsing, and GPT provider failure as supported attributions.",
+  "limitations": [
+    "Each completed call is one smoke observation, not aggregate model performance evidence.",
+    "No durable Codex call artifact exists for call 4, so the exact startup/execution phase remains unresolved.",
+    "No operator-local paths, credentials, raw provider content, stderr, or private reasoning are tracked here."
+  ]
+}

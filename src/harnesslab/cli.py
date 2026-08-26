@@ -344,7 +344,7 @@ def codex_harness_doctor() -> None:
     )
     typer.echo(f"PASS profile_hash={profile.fingerprint}")
     typer.echo("CODEX_TRACE_COVERAGE=FULL_STREAM")
-    typer.echo("REAL_CODEX_SMOKE=NOT_RUN")
+    typer.echo("REAL_CODEX_SMOKE=NOT_VERIFIED")
 
 
 @claude_harness_app.command("doctor")

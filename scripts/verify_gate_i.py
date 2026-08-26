@@ -357,7 +357,7 @@ def main() -> int:
         return ExitCode.FAIL
     for status in (
         "REAL_PROVIDER_SMOKE=NOT_VERIFIED",
-        "REAL_CODEX_SMOKE=NOT_RUN",
+        "REAL_CODEX_SMOKE=NOT_VERIFIED",
         "REAL_CLAUDE_SMOKE=NOT_RUN",
         "REAL_DEEPSEEK_SMOKE=NOT_RUN",
         "REAL_MATRIX_EVIDENCE=NOT_RUN",

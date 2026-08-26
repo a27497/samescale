@@ -1,15 +1,24 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import time
 from collections.abc import Mapping
 from contextlib import suppress
+from dataclasses import dataclass, field
 from uuid import uuid4
 
 from harnesslab.egress import ProviderScopedDockerBoundary, ProxySecurityAttestation
 from harnesslab.harness_lane.adapter import CodexExecutionPlan, HarnessAdapterError
-from harnesslab.harness_lane.models import CodexProcessCapture
+from harnesslab.harness_lane.models import (
+    CodexBackendFailureEvidence,
+    CodexBackendFailurePhase,
+    CodexCleanupFailure,
+    CodexCleanupFailureScope,
+    CodexProcessCapture,
+    CodexStreamDiagnosticCategory,
+)
 from harnesslab.harness_lane.profile import CODEX_IMAGE
 from harnesslab.sandbox.docker_cli import _DockerCLI, docker_environment
 from harnesslab.sandbox.preflight import _docker_runtime_preflight
@@ -20,11 +29,71 @@ MAX_CAPTURE_BYTES = 4_000_000
 MAX_LINE_BYTES = 1_000_000
 
 
+class CodexBackendExecutionError(HarnessAdapterError):
+    """Typed safe backend failure whose string form never includes process output."""
+
+    def __init__(self, evidence: CodexBackendFailureEvidence) -> None:
+        self.evidence = evidence
+        cleanup = "+CLEANUP" if evidence.cleanup_failures else ""
+        if evidence.phase is CodexBackendFailurePhase.CLEANUP:
+            message = "real Codex cleanup was not verified: CLEANUP"
+        else:
+            message = f"Codex backend execution failed: {evidence.phase.value}{cleanup}"
+        super().__init__(message)
+
+    def with_cleanup_failures(
+        self, failures: tuple[CodexCleanupFailure, ...]
+    ) -> CodexBackendExecutionError:
+        return CodexBackendExecutionError(
+            self.evidence.model_copy(
+                update={"cleanup_failures": self.evidence.cleanup_failures + failures}
+            )
+        )
+
+
+@dataclass
+class _StreamCapture:
+    lines: list[str] = field(default_factory=list)
+    stdout: bytearray = field(default_factory=bytearray)
+    stderr: bytearray = field(default_factory=bytearray)
+    stdout_category: CodexStreamDiagnosticCategory = CodexStreamDiagnosticCategory.EMPTY
+    stderr_category: CodexStreamDiagnosticCategory = CodexStreamDiagnosticCategory.EMPTY
+
+    def evidence(
+        self,
+        phase: CodexBackendFailurePhase,
+        *,
+        started: float,
+        exit_code: int | None = None,
+        timed_out: bool = False,
+        cancelled: bool = False,
+        cleanup_failures: tuple[CodexCleanupFailure, ...] = (),
+    ) -> CodexBackendFailureEvidence:
+        return CodexBackendFailureEvidence(
+            phase=phase,
+            exit_code=exit_code,
+            timed_out=timed_out,
+            cancelled=cancelled,
+            duration_ms=max(0, int((time.monotonic() - started) * 1000)),
+            stdout_category=self.stdout_category,
+            stdout_digest="sha256:" + hashlib.sha256(self.stdout).hexdigest(),
+            stderr_category=self.stderr_category,
+            stderr_digest="sha256:" + hashlib.sha256(self.stderr).hexdigest(),
+            cleanup_failures=cleanup_failures,
+        )
+
+
+class _AttachedProcessFailure(Exception):
+    def __init__(self, phase: CodexBackendFailurePhase) -> None:
+        self.phase = phase
+        super().__init__(phase.value)
+
+
 class DockerCodexBackend:
     """Optional real Codex process backend inside the HarnessLab outer Docker boundary.
 
-    It is deliberately not selected by Gate E. The outer network remains ``none`` because Phase E
-    cannot yet prove control-plane-only network separation for the pinned Codex sandbox.
+    Gate E never selects it for provider execution. Production callers must explicitly supply the
+    provider-scoped proxy boundary; otherwise the outer network remains ``none``.
     """
 
     def __init__(
@@ -41,7 +110,14 @@ class DockerCodexBackend:
 
     @property
     def artifact_secret_values(self) -> tuple[str, ...]:
-        return tuple(dict.fromkeys(value for value in self.credentials.values() if value))
+        sensitive_markers = ("KEY", "SECRET", "TOKEN", "PASSWORD")
+        return tuple(
+            dict.fromkeys(
+                value
+                for name, value in self.credentials.items()
+                if value and any(marker in name.upper() for marker in sensitive_markers)
+            )
+        )
 
     def create_argv(self, plan: CodexExecutionPlan, container_name: str) -> tuple[str, ...]:
         workspace_mount = f"type=bind,src={plan.workspace.resolve()},dst=/workspace"
@@ -105,24 +181,127 @@ class DockerCodexBackend:
         return await run_on_subprocess_loop(self._run(plan))
 
     async def _run(self, plan: CodexExecutionPlan) -> CodexProcessCapture:
-        preflight, environment = await _docker_runtime_preflight()
+        started = time.monotonic()
+        try:
+            preflight, environment = await _docker_runtime_preflight()
+        except asyncio.CancelledError:
+            raise
+        except BaseException as exc:
+            raise self._failure(CodexBackendFailurePhase.UNKNOWN, started=started) from exc
         cli = _DockerCLI(output_limit=1_000_000, environment=environment)
         name = f"harnesslab-codex-{uuid4().hex}"
         create_environment = docker_environment(environment, self.credentials)
         create_attempted = False
-        started = time.monotonic()
-        lines: list[str] = []
-        timed_out = False
-        cancelled = False
-        exit_code: int | None = None
+        capture: CodexProcessCapture | None = None
+        primary_failure: CodexBackendExecutionError | None = None
+        cancellation: asyncio.CancelledError | None = None
         try:
-            if self.egress_boundary is not None:
-                self.egress_attestation = await self.egress_boundary.provision(cli)
-            create_attempted = True
-            await cli.run(*self.create_argv(plan, name), environment=create_environment)
-            await self._verify_effective_security(cli, name)
+            try:
+                if self.egress_boundary is not None:
+                    try:
+                        self.egress_attestation = await self.egress_boundary.provision(cli)
+                    except asyncio.CancelledError:
+                        raise
+                    except BaseException as exc:
+                        raise self._failure(
+                            CodexBackendFailurePhase.EGRESS_PROVISION, started=started
+                        ) from exc
+                create_attempted = True
+                try:
+                    await cli.run(*self.create_argv(plan, name), environment=create_environment)
+                except asyncio.CancelledError:
+                    raise
+                except BaseException as exc:
+                    raise self._failure(
+                        CodexBackendFailurePhase.CONTAINER_CREATE, started=started
+                    ) from exc
+                try:
+                    await self._verify_effective_security(cli, name)
+                except asyncio.CancelledError:
+                    raise
+                except BaseException as exc:
+                    raise self._failure(
+                        CodexBackendFailurePhase.SECURITY_ATTEST, started=started
+                    ) from exc
+                capture = await self._execute_attached_process(
+                    preflight.cli_path,
+                    name,
+                    plan,
+                    environment,
+                    started=started,
+                )
+                try:
+                    state = await cli.run(
+                        "inspect", name, "--format", "{{json .State.ExitCode}}", check=False
+                    )
+                    if state.returncode != 0:
+                        raise ValueError("container exit state unavailable")
+                    exit_code = int(json.loads(state.stdout.decode("utf-8")))
+                    capture = CodexProcessCapture(
+                        lines=capture.lines,
+                        exit_code=exit_code,
+                        duration_ms=capture.duration_ms,
+                        timed_out=capture.timed_out,
+                        cancelled=capture.cancelled,
+                    )
+                except asyncio.CancelledError:
+                    raise
+                except BaseException as exc:
+                    raise self._failure(
+                        CodexBackendFailurePhase.PROCESS_EXIT,
+                        started=started,
+                        capture=capture,
+                    ) from exc
+            except CodexBackendExecutionError as exc:
+                primary_failure = exc
+            except asyncio.CancelledError as exc:
+                cancellation = exc
+            except BaseException:
+                primary_failure = self._failure(CodexBackendFailurePhase.UNKNOWN, started=started)
+        finally:
+            cleanup_failures = await self._collect_cleanup_failures(
+                cli, name, create_attempted=create_attempted
+            )
+        if primary_failure is not None:
+            if cleanup_failures:
+                primary_failure = primary_failure.with_cleanup_failures(cleanup_failures)
+            raise primary_failure
+        if cancellation is not None:
+            if cleanup_failures:
+                raise self._failure(
+                    CodexBackendFailurePhase.CLEANUP,
+                    started=started,
+                    cancelled=True,
+                    cleanup_failures=cleanup_failures,
+                ) from cancellation
+            raise cancellation
+        if cleanup_failures:
+            raise self._failure(
+                CodexBackendFailurePhase.CLEANUP,
+                started=started,
+                capture=capture,
+                cleanup_failures=cleanup_failures,
+            )
+        if capture is None:
+            raise self._failure(CodexBackendFailurePhase.UNKNOWN, started=started)
+        return capture
+
+    async def _execute_attached_process(
+        self,
+        cli_path: str,
+        name: str,
+        plan: CodexExecutionPlan,
+        environment: Mapping[str, str],
+        *,
+        started: float | None = None,
+    ) -> CodexProcessCapture:
+        """Start and capture docker attach without retaining raw stderr."""
+
+        effective_started = time.monotonic() if started is None else started
+        streams = _StreamCapture()
+        try:
             process = await asyncio.create_subprocess_exec(
-                preflight.cli_path,
+                cli_path,
                 "start",
                 "--attach",
                 "--interactive",
@@ -133,60 +312,143 @@ class DockerCodexBackend:
                 env=environment,
                 limit=MAX_LINE_BYTES + 1,
             )
-            assert process.stdin is not None
-            assert process.stdout is not None
-            assert process.stderr is not None
-            stdout = process.stdout
-            stderr = process.stderr
-            process.stdin.write(plan.prompt.encode("utf-8"))
-            await process.stdin.drain()
-            process.stdin.close()
+        except asyncio.CancelledError:
+            raise
+        except BaseException as exc:
+            raise CodexBackendExecutionError(
+                streams.evidence(
+                    CodexBackendFailurePhase.CONTAINER_START,
+                    started=effective_started,
+                )
+            ) from exc
+        if process.stdin is None or process.stdout is None or process.stderr is None:
+            self._kill_process(process)
+            raise CodexBackendExecutionError(
+                streams.evidence(
+                    CodexBackendFailurePhase.CONTAINER_START,
+                    started=effective_started,
+                )
+            )
+        stdin = process.stdin
+        stdout = process.stdout
+        stderr = process.stderr
 
-            async def read_stdout() -> None:
-                total = 0
+        async def read_stdout() -> None:
+            try:
                 while raw := await stdout.readline():
-                    total += len(raw)
-                    if len(raw) > MAX_LINE_BYTES or total > MAX_CAPTURE_BYTES:
-                        lines.append("{malformed-capture-limit")
-                        process.kill()
+                    streams.stdout.extend(raw)
+                    streams.stdout_category = CodexStreamDiagnosticCategory.PRESENT
+                    if len(raw) > MAX_LINE_BYTES or len(streams.stdout) > MAX_CAPTURE_BYTES:
+                        streams.stdout_category = CodexStreamDiagnosticCategory.TRUNCATED
+                        streams.lines.append("{malformed-capture-limit")
+                        self._kill_process(process)
                         return
                     try:
-                        lines.append(raw.decode("utf-8", errors="strict").rstrip("\r\n"))
+                        streams.lines.append(raw.decode("utf-8", errors="strict").rstrip("\r\n"))
                     except UnicodeDecodeError:
-                        lines.append("{malformed-utf8")
+                        streams.lines.append("{malformed-utf8")
+            except asyncio.CancelledError:
+                raise
+            except BaseException as exc:
+                streams.stdout_category = CodexStreamDiagnosticCategory.READ_FAILED
+                raise _AttachedProcessFailure(CodexBackendFailurePhase.STDOUT_READ) from exc
 
-            async def drain_stderr() -> None:
-                total = 0
-                while chunk := await stderr.read(65_536):
-                    total += len(chunk)
-                    if total > MAX_CAPTURE_BYTES:
-                        process.kill()
-                        return
-
+        async def read_stderr() -> None:
             try:
-                async with asyncio.timeout(plan.timeout_seconds):
-                    await asyncio.gather(read_stdout(), drain_stderr(), process.wait())
-            except TimeoutError:
-                timed_out = True
-                process.kill()
+                while chunk := await stderr.read(65_536):
+                    remaining = MAX_CAPTURE_BYTES - len(streams.stderr)
+                    if remaining > 0:
+                        streams.stderr.extend(chunk[:remaining])
+                    streams.stderr_category = CodexStreamDiagnosticCategory.PRESENT
+                    if len(chunk) > remaining:
+                        streams.stderr_category = CodexStreamDiagnosticCategory.TRUNCATED
+                        self._kill_process(process)
+                        return
+            except asyncio.CancelledError:
+                raise
+            except BaseException as exc:
+                streams.stderr_category = CodexStreamDiagnosticCategory.READ_FAILED
+                raise _AttachedProcessFailure(CodexBackendFailurePhase.STDERR_READ) from exc
+
+        async def wait_process() -> None:
+            try:
                 await process.wait()
             except asyncio.CancelledError:
-                cancelled = True
-                process.kill()
-                await process.wait()
-            state = await cli.run(
-                "inspect", name, "--format", "{{json .State.ExitCode}}", check=False
-            )
-            if state.returncode == 0:
-                exit_code = int(json.loads(state.stdout.decode("utf-8")))
+                raise
+            except BaseException as exc:
+                raise _AttachedProcessFailure(CodexBackendFailurePhase.PROCESS_WAIT) from exc
+
+        tasks = (
+            asyncio.create_task(read_stdout()),
+            asyncio.create_task(read_stderr()),
+            asyncio.create_task(wait_process()),
+        )
+        timed_out = False
+        cancelled = False
+        failure: _AttachedProcessFailure | None = None
+        try:
+            async with asyncio.timeout(plan.timeout_seconds):
+                try:
+                    stdin.write(plan.prompt.encode("utf-8"))
+                    await stdin.drain()
+                    stdin.close()
+                except asyncio.CancelledError:
+                    raise
+                except BaseException as exc:
+                    raise _AttachedProcessFailure(CodexBackendFailurePhase.STDIN_WRITE) from exc
+                await asyncio.gather(*tasks)
+        except TimeoutError:
+            timed_out = True
+        except asyncio.CancelledError:
+            cancelled = True
+        except _AttachedProcessFailure as exc:
+            failure = exc
         finally:
-            await self._cleanup_execution(cli, name, create_attempted=create_attempted)
+            if timed_out or cancelled or failure is not None:
+                self._kill_process(process)
+            with suppress(BaseException):
+                stdin.close()
+            await asyncio.gather(*tasks, return_exceptions=True)
+        duration_ms = max(0, int((time.monotonic() - effective_started) * 1000))
+        if failure is not None:
+            raise CodexBackendExecutionError(
+                streams.evidence(
+                    failure.phase,
+                    started=effective_started,
+                    exit_code=process.returncode,
+                )
+            ) from failure
         return CodexProcessCapture(
-            lines=tuple(lines),
-            exit_code=exit_code,
-            duration_ms=int((time.monotonic() - started) * 1000),
+            lines=tuple(streams.lines),
+            exit_code=process.returncode,
+            duration_ms=duration_ms,
             timed_out=timed_out,
             cancelled=cancelled,
+        )
+
+    @staticmethod
+    def _kill_process(process: asyncio.subprocess.Process) -> None:
+        with suppress(ProcessLookupError, RuntimeError):
+            process.kill()
+
+    @staticmethod
+    def _failure(
+        phase: CodexBackendFailurePhase,
+        *,
+        started: float,
+        capture: CodexProcessCapture | None = None,
+        cancelled: bool = False,
+        cleanup_failures: tuple[CodexCleanupFailure, ...] = (),
+    ) -> CodexBackendExecutionError:
+        return CodexBackendExecutionError(
+            CodexBackendFailureEvidence(
+                phase=phase,
+                exit_code=None if capture is None else capture.exit_code,
+                timed_out=False if capture is None else capture.timed_out,
+                cancelled=cancelled or (False if capture is None else capture.cancelled),
+                duration_ms=max(0, int((time.monotonic() - started) * 1000)),
+                cleanup_failures=cleanup_failures,
+            )
         )
 
     async def _cleanup_execution(
@@ -194,21 +456,45 @@ class DockerCodexBackend:
     ) -> None:
         """Attempt every cleanup layer even when an earlier layer raises."""
 
-        cleanup_failures: list[str] = []
+        failures = await self._collect_cleanup_failures(
+            cli, name, create_attempted=create_attempted
+        )
+        if failures:
+            raise CodexBackendExecutionError(
+                CodexBackendFailureEvidence(
+                    phase=CodexBackendFailurePhase.CLEANUP,
+                    duration_ms=0,
+                    cleanup_failures=failures,
+                )
+            )
+
+    async def _collect_cleanup_failures(
+        self, cli: _DockerCLI, name: str, *, create_attempted: bool
+    ) -> tuple[CodexCleanupFailure, ...]:
+        """Attempt every cleanup layer and return only bounded, non-message facts."""
+
+        cleanup_failures: list[CodexCleanupFailure] = []
         if create_attempted:
             try:
                 await self._cleanup_outer_container(cli, name)
             except BaseException as exc:
-                cleanup_failures.append(f"subject:{type(exc).__name__}")
+                cleanup_failures.append(
+                    CodexCleanupFailure(
+                        scope=CodexCleanupFailureScope.SUBJECT,
+                        error_type=type(exc).__name__,
+                    )
+                )
         if self.egress_boundary is not None:
             try:
                 await self.egress_boundary.cleanup(cli)
             except BaseException as exc:
-                cleanup_failures.append(f"egress:{type(exc).__name__}")
-        if cleanup_failures:
-            raise HarnessAdapterError(
-                "real Codex cleanup was not verified: " + ",".join(cleanup_failures)
-            )
+                cleanup_failures.append(
+                    CodexCleanupFailure(
+                        scope=CodexCleanupFailureScope.EGRESS,
+                        error_type=type(exc).__name__,
+                    )
+                )
+        return tuple(cleanup_failures)
 
     async def _cleanup_outer_container(self, cli: _DockerCLI, name: str) -> None:
         await cli.run("kill", name, check=False)

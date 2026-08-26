@@ -488,10 +488,11 @@ def test_kb0_smoke_plan_is_exact_bounded_and_unexecuted() -> None:
     assert smoke.real_evaluation_call_count == 0
     assert smoke.authorization_required
     assert evidence.real_statuses["REAL_PROVIDER_SMOKE"] is EvidenceState.NOT_VERIFIED
+    assert evidence.real_statuses["REAL_CODEX_SMOKE"] is EvidenceState.NOT_VERIFIED
     assert all(
         state is EvidenceState.NOT_RUN
         for key, state in evidence.real_statuses.items()
-        if key != "REAL_PROVIDER_SMOKE"
+        if key not in {"REAL_PROVIDER_SMOKE", "REAL_CODEX_SMOKE"}
     )
     assert evidence.real_matrix.state is EvidenceState.NOT_RUN
     assert evidence.judge_report.state is EvidenceState.NOT_RUN

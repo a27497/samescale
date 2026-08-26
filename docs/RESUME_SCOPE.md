@@ -158,7 +158,7 @@ not yet been demonstrated.
 ## NOT_VERIFIED
 
 `REAL_JUDGE_SMOKE = NOT_RUN`, `REAL_MATRIX_EVIDENCE = NOT_RUN`, `REAL_PROVIDER_SMOKE = NOT_VERIFIED`,
-`REAL_CODEX_SMOKE = NOT_RUN`,
+`REAL_CODEX_SMOKE = NOT_VERIFIED`,
 `REAL_CLAUDE_SMOKE = NOT_RUN`, and `REAL_DEEPSEEK_SMOKE = NOT_RUN`. DeepSeek persistent-session E2
 is `DEFERRED_NOT_VERIFIED`. No real provider credential is required for Gates D-F, no ambient
 harness login is consumed, and no real-provider/model invocation is claimed. Deterministic Gate G

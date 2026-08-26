@@ -78,5 +78,5 @@ as a real Codex model run.
 Real execution is never automatic and never consumes ambient `CODEX_HOME`, login state, quota, or
 API keys. It requires explicit opt-in and credential configuration. The outer Docker backend is
 hardened and subject network is denied; Phase E has not proven a safe provider-control-plane-only
-network channel. Accordingly the default and Gate E result is `REAL_CODEX_SMOKE=NOT_RUN`, and no
+network channel. The post-R4 attempt reached Codex but produced no durable Codex call artifact, so the current Gate E result is `REAL_CODEX_SMOKE=NOT_VERIFIED`, and no
 real Codex model success is claimed.

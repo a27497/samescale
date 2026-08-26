@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import shutil
 import stat
 from collections.abc import Mapping
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
@@ -17,13 +19,20 @@ from harnesslab.harness_lane.adapter import (
     CodexHarnessAdapter,
     HarnessAdapterError,
 )
-from harnesslab.harness_lane.docker_backend import DockerCodexBackend
+from harnesslab.harness_lane.docker_backend import (
+    CodexBackendExecutionError,
+    DockerCodexBackend,
+)
 from harnesslab.harness_lane.fake import (
     PRIVATE_REASONING_SENTINEL,
     FakeCodexBackend,
     FakeCodexScenario,
 )
 from harnesslab.harness_lane.models import (
+    CodexBackendFailureEvidence,
+    CodexBackendFailurePhase,
+    CodexCleanupFailure,
+    CodexCleanupFailureScope,
     CodexHarnessProfile,
     CodexProcessCapture,
     HarnessFailureCategory,
@@ -186,6 +195,231 @@ def test_real_codex_backend_outer_docker_argv_is_hardened_and_secret_free(
     assert "CODEX_HOME" not in " ".join(argv)
     assert secret not in argv
     assert argv[-1] == "-"
+
+
+class _FakePipeReader:
+    def __init__(
+        self, chunks: tuple[bytes, ...] = (), failure: BaseException | None = None
+    ) -> None:
+        self.chunks = list(chunks)
+        self.failure = failure
+
+    async def readline(self) -> bytes:
+        if self.failure is not None:
+            raise self.failure
+        return self.chunks.pop(0) if self.chunks else b""
+
+    async def read(self, _: int) -> bytes:
+        if self.failure is not None:
+            raise self.failure
+        return self.chunks.pop(0) if self.chunks else b""
+
+
+class _FakePipeWriter:
+    def __init__(self, failure: BaseException | None = None) -> None:
+        self.failure = failure
+        self.closed = False
+
+    def write(self, _: bytes) -> None:
+        if self.failure is not None:
+            raise self.failure
+
+    async def drain(self) -> None:
+        if self.failure is not None:
+            raise self.failure
+
+    def close(self) -> None:
+        self.closed = True
+
+
+class _FakeAttachedProcess:
+    def __init__(
+        self,
+        *,
+        stdin_failure: BaseException | None = None,
+        stdout: _FakePipeReader | None = None,
+        stderr: _FakePipeReader | None = None,
+        wait_forever: bool = False,
+        returncode: int | None = 0,
+    ) -> None:
+        self.stdin = _FakePipeWriter(stdin_failure)
+        self.stdout = stdout or _FakePipeReader()
+        self.stderr = stderr or _FakePipeReader()
+        self.returncode = returncode
+        self.wait_forever = wait_forever
+        self.killed = False
+        self.waiting = asyncio.Event()
+        self.terminated = asyncio.Event()
+
+    async def wait(self) -> int:
+        self.waiting.set()
+        if self.wait_forever:
+            await self.terminated.wait()
+        return self.returncode or 0
+
+    def kill(self) -> None:
+        self.killed = True
+        self.returncode = -9
+        self.terminated.set()
+
+
+def _execution_plan(tmp_path: Path, *, timeout: float = 1) -> CodexExecutionPlan:
+    return CodexExecutionPlan(
+        argv=("codex", "exec"),
+        prompt="safe prompt",
+        workspace=tmp_path,
+        context=None,
+        timeout_seconds=timeout,
+        task_id="micro-python-clamp",
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "early_exit",
+    (BrokenPipeError(), ConnectionResetError(), ProcessLookupError()),
+    ids=("broken-pipe", "connection-reset", "process-lookup"),
+)
+async def test_codex_early_exit_during_stdin_is_typed(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, early_exit: BaseException
+) -> None:
+    process = _FakeAttachedProcess(stdin_failure=early_exit, returncode=1)
+
+    async def create(*_: object, **__: object) -> _FakeAttachedProcess:
+        return process
+
+    monkeypatch.setattr(asyncio, "create_subprocess_exec", create)
+    with pytest.raises(CodexBackendExecutionError) as raised:
+        await DockerCodexBackend(explicitly_enabled=True)._execute_attached_process(
+            "docker", "subject", _execution_plan(tmp_path), {}
+        )
+
+    assert raised.value.evidence.phase is CodexBackendFailurePhase.STDIN_WRITE
+    assert process.killed
+    assert type(early_exit).__name__ not in str(raised.value)
+
+
+@pytest.mark.asyncio
+async def test_codex_docker_start_failure_is_typed(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    secret = "fake-start-secret-must-not-surface"
+
+    async def create(*_: object, **__: object) -> _FakeAttachedProcess:
+        raise RuntimeError(secret)
+
+    monkeypatch.setattr(asyncio, "create_subprocess_exec", create)
+    with pytest.raises(CodexBackendExecutionError) as raised:
+        await DockerCodexBackend(explicitly_enabled=True)._execute_attached_process(
+            "docker", "subject", _execution_plan(tmp_path), {}
+        )
+
+    assert raised.value.evidence.phase is CodexBackendFailurePhase.CONTAINER_START
+    assert secret not in str(raised.value)
+    assert secret not in raised.value.evidence.model_dump_json()
+
+
+@pytest.mark.asyncio
+async def test_codex_stdout_read_failure_is_typed(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    process = _FakeAttachedProcess(stdout=_FakePipeReader(failure=OSError("unsafe detail")))
+
+    async def create(*_: object, **__: object) -> _FakeAttachedProcess:
+        return process
+
+    monkeypatch.setattr(asyncio, "create_subprocess_exec", create)
+    with pytest.raises(CodexBackendExecutionError) as raised:
+        await DockerCodexBackend(explicitly_enabled=True)._execute_attached_process(
+            "docker", "subject", _execution_plan(tmp_path), {}
+        )
+
+    assert raised.value.evidence.phase is CodexBackendFailurePhase.STDOUT_READ
+    assert raised.value.evidence.stdout_category.value == "READ_FAILED"
+    assert "unsafe detail" not in str(raised.value)
+
+
+@pytest.mark.asyncio
+async def test_codex_timeout_and_cancellation_remain_capture_states(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    processes = [
+        _FakeAttachedProcess(wait_forever=True, returncode=None),
+        _FakeAttachedProcess(wait_forever=True, returncode=None),
+    ]
+
+    async def create(*_: object, **__: object) -> _FakeAttachedProcess:
+        return processes.pop(0)
+
+    monkeypatch.setattr(asyncio, "create_subprocess_exec", create)
+    backend = DockerCodexBackend(explicitly_enabled=True)
+    timed_out = await backend._execute_attached_process(
+        "docker", "timeout-subject", _execution_plan(tmp_path, timeout=0.001), {}
+    )
+    cancellation_task = asyncio.create_task(
+        backend._execute_attached_process(
+            "docker", "cancelled-subject", _execution_plan(tmp_path, timeout=10), {}
+        )
+    )
+    await asyncio.sleep(0)
+    cancellation_task.cancel()
+    cancelled = await cancellation_task
+
+    assert timed_out.timed_out and not timed_out.cancelled
+    assert cancelled.cancelled and not cancelled.timed_out
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("cleanup_fails", (False, True), ids=("cleanup-success", "cleanup-failure"))
+async def test_codex_primary_and_cleanup_failures_are_both_preserved(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, cleanup_fails: bool
+) -> None:
+    async def preflight() -> tuple[SimpleNamespace, dict[str, str]]:
+        return SimpleNamespace(cli_path="docker"), {}
+
+    class FakeCLI:
+        def __init__(self, **_: object) -> None:
+            pass
+
+        async def run(self, *_: str, **__: object) -> SimpleNamespace:
+            return SimpleNamespace(returncode=0, stdout=b"0")
+
+    class FailingBackend(DockerCodexBackend):
+        async def _verify_effective_security(self, *_: object) -> None:
+            return None
+
+        async def _execute_attached_process(self, *_: object, **__: object) -> CodexProcessCapture:
+            raise CodexBackendExecutionError(
+                CodexBackendFailureEvidence(
+                    phase=CodexBackendFailurePhase.STDIN_WRITE,
+                    duration_ms=1,
+                )
+            )
+
+        async def _collect_cleanup_failures(
+            self, *_: object, **__: object
+        ) -> tuple[CodexCleanupFailure, ...]:
+            if not cleanup_fails:
+                return ()
+            return (
+                CodexCleanupFailure(
+                    scope=CodexCleanupFailureScope.SUBJECT,
+                    error_type="RuntimeError",
+                ),
+            )
+
+    monkeypatch.setattr(
+        "harnesslab.harness_lane.docker_backend._docker_runtime_preflight", preflight
+    )
+    monkeypatch.setattr("harnesslab.harness_lane.docker_backend._DockerCLI", FakeCLI)
+    with pytest.raises(CodexBackendExecutionError) as raised:
+        await FailingBackend(explicitly_enabled=True)._run(_execution_plan(tmp_path))
+
+    assert raised.value.evidence.phase is CodexBackendFailurePhase.STDIN_WRITE
+    if cleanup_fails:
+        assert raised.value.evidence.cleanup_failures[0].scope is CodexCleanupFailureScope.SUBJECT
+    else:
+        assert raised.value.evidence.cleanup_failures == ()
 
 
 @pytest.mark.asyncio
@@ -642,3 +876,47 @@ async def test_backend_credentials_automatically_redact_all_harness_artifacts(
         assert secret not in (result.artifact_directory / relative).read_text(
             encoding="utf-8", errors="replace"
         )
+
+
+@pytest.mark.asyncio
+async def test_precapture_stderr_secret_is_digest_only_in_immutable_evidence(
+    tmp_path: Path,
+) -> None:
+    secret = "fake-precapture-stderr-credential"
+
+    class SecretStderrFailureBackend(DockerCodexBackend):
+        async def run(self, plan: CodexExecutionPlan) -> CodexProcessCapture:
+            stderr_digest = (
+                "sha256:" + hashlib.sha256(f"startup failed with {secret}".encode()).hexdigest()
+            )
+            raise CodexBackendExecutionError(
+                CodexBackendFailureEvidence(
+                    phase=CodexBackendFailurePhase.STDIN_WRITE,
+                    duration_ms=2,
+                    stderr_category="PRESENT",
+                    stderr_digest=stderr_digest,
+                )
+            )
+
+    backend = SecretStderrFailureBackend(
+        explicitly_enabled=True,
+        credentials={"OPENAI_API_KEY": secret},
+    )
+    profile = canonical_codex_profile(await CodexRuntime().ensure_image())
+    result = await CodexHarnessRunner(
+        artifact_root=tmp_path / "artifacts", runtime_root=tmp_path / "runtime"
+    ).run(
+        TASKS[0],
+        profile,
+        backend=backend,
+        run_id="precapture-secret",
+    )
+
+    artifact_text = all_artifact_text(result.artifact_directory)
+    assert result.evidence.outcome is HarnessLaneOutcome.INFRA_ERROR
+    assert result.evidence.backend_failure is not None
+    assert result.evidence.backend_failure.phase is CodexBackendFailurePhase.STDIN_WRITE
+    assert secret not in artifact_text
+    assert secret not in result.evidence.canonical_json()
+    assert secret not in str(CodexBackendExecutionError(result.evidence.backend_failure))
+    assert not (result.artifact_directory / "workspace").exists()

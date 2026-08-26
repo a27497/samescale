@@ -316,7 +316,7 @@ def main() -> int:
     print("EXPERIMENT_DB_HEAD=20260823_0003")
     print("REAL_MATRIX_EVIDENCE=NOT_RUN")
     print("REAL_PROVIDER_SMOKE=NOT_VERIFIED")
-    print("REAL_CODEX_SMOKE=NOT_RUN")
+    print("REAL_CODEX_SMOKE=NOT_VERIFIED")
     print("REAL_CLAUDE_SMOKE=NOT_RUN")
     print("REAL_DEEPSEEK_SMOKE=NOT_RUN")
     return ExitCode.FAIL if failed else ExitCode.PASS

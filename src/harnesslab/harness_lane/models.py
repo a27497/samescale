@@ -35,6 +35,69 @@ class HarnessLaneOutcome(StrEnum):
     ARTIFACT_ERROR = "artifact_error"
 
 
+class CodexBackendFailurePhase(StrEnum):
+    EGRESS_PROVISION = "EGRESS_PROVISION"
+    CONTAINER_CREATE = "CONTAINER_CREATE"
+    SECURITY_ATTEST = "SECURITY_ATTEST"
+    CONTAINER_START = "CONTAINER_START"
+    STDIN_WRITE = "STDIN_WRITE"
+    STDOUT_READ = "STDOUT_READ"
+    STDERR_READ = "STDERR_READ"
+    PROCESS_WAIT = "PROCESS_WAIT"
+    PROCESS_EXIT = "PROCESS_EXIT"
+    CAPTURE_PARSE = "CAPTURE_PARSE"
+    CLEANUP = "CLEANUP"
+    UNKNOWN = "UNKNOWN"
+
+
+class CodexStreamDiagnosticCategory(StrEnum):
+    UNAVAILABLE = "UNAVAILABLE"
+    EMPTY = "EMPTY"
+    PRESENT = "PRESENT"
+    TRUNCATED = "TRUNCATED"
+    READ_FAILED = "READ_FAILED"
+
+
+class CodexCleanupFailureScope(StrEnum):
+    SUBJECT = "SUBJECT"
+    EGRESS = "EGRESS"
+
+
+class CodexCleanupFailure(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    scope: CodexCleanupFailureScope
+    error_type: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_]{0,99}$")
+
+
+class CodexBackendFailureEvidence(BaseModel):
+    """Safe pre-capture diagnostics; raw process streams are never represented."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: Literal[1] = 1
+    phase: CodexBackendFailurePhase
+    exit_code: int | None = None
+    timed_out: bool = False
+    cancelled: bool = False
+    duration_ms: int = Field(ge=0)
+    stdout_category: CodexStreamDiagnosticCategory = CodexStreamDiagnosticCategory.UNAVAILABLE
+    stdout_digest: Sha256Digest | None = None
+    stderr_category: CodexStreamDiagnosticCategory = CodexStreamDiagnosticCategory.UNAVAILABLE
+    stderr_digest: Sha256Digest | None = None
+    cleanup_failures: tuple[CodexCleanupFailure, ...] = ()
+
+    @model_validator(mode="after")
+    def stream_diagnostics_are_coherent(self) -> CodexBackendFailureEvidence:
+        for category, digest in (
+            (self.stdout_category, self.stdout_digest),
+            (self.stderr_category, self.stderr_digest),
+        ):
+            if (category is CodexStreamDiagnosticCategory.UNAVAILABLE) != (digest is None):
+                raise ValueError("stream diagnostic availability and digest disagree")
+        return self
+
+
 class ObservedModelStatus(StrEnum):
     EXPOSED = "exposed"
     NOT_EXPOSED = "not_exposed"
@@ -315,6 +378,7 @@ class HarnessLaneEvidence(BaseModel):
     cancelled: bool = False
     usage: CodexTokenUsage | None = None
     harness_failure: HarnessFailureCategory | None = None
+    backend_failure: CodexBackendFailureEvidence | None = None
     verifier_sandbox_manifest: SandboxArtifactManifest | None = None
     verifier_artifact_namespace: Literal["verifier"] | None = None
     verifier_artifact_digest: Sha256Digest | None = None
@@ -363,6 +427,13 @@ class HarnessLaneEvidence(BaseModel):
                 raise ValueError("harness_error requires an explicit Harness failure category")
             if any(value is not None for value in verifier_fields):
                 raise ValueError("Harness failures cannot contain verifier results")
+        if self.backend_failure is not None:
+            if self.outcome is not HarnessLaneOutcome.INFRA_ERROR:
+                raise ValueError("Codex backend failure evidence requires infra_error")
+            if self.harness_failure is not None or any(
+                value is not None for value in verifier_fields
+            ):
+                raise ValueError("Codex backend failure evidence cannot contain result evidence")
         return self
 
     def canonical_json(self) -> str:

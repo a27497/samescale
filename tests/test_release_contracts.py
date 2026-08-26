@@ -173,7 +173,7 @@ def test_release_evidence_is_strict_keyless_and_not_ready() -> None:
     assert "JUDGE_EVIDENCE" in readiness.blockers
     assert manifest.real_statuses == {
         "REAL_PROVIDER_SMOKE": EvidenceState.NOT_VERIFIED,
-        "REAL_CODEX_SMOKE": EvidenceState.NOT_RUN,
+        "REAL_CODEX_SMOKE": EvidenceState.NOT_VERIFIED,
         "REAL_CLAUDE_SMOKE": EvidenceState.NOT_RUN,
         "REAL_DEEPSEEK_SMOKE": EvidenceState.NOT_RUN,
         "REAL_MATRIX_EVIDENCE": EvidenceState.NOT_RUN,
