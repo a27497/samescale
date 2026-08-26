@@ -30,6 +30,7 @@ from harnesslab.harness_lane.adapter import HarnessAdapterError
 from harnesslab.harness_lane.docker_backend import DockerCodexBackend
 from harnesslab.harness_lane.models import ObservedModelStatus
 from harnesslab.harness_lane.profile import CODEX_IMAGE, canonical_codex_profile
+from harnesslab.model_lane.models import DirectModelOutcome
 from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
 from harnesslab.multi_harness.models import HarnessProcessCapture, TraceCoverage
 from harnesslab.multi_harness.profile import (
@@ -46,6 +47,7 @@ from harnesslab.release.smoke import (
     EXPECTED_CALL_IDS,
     EXPECTED_RUNNERS,
     REQUIRED_CONFIGURATION_REFERENCES,
+    ProductionSmokeInvoker,
     ResolvedSmokeBinding,
     RuntimeIdentities,
     SmokeCallFailure,
@@ -182,6 +184,39 @@ async def test_smoke_same_path_fake_execution_consumes_exact_plan_without_networ
     assert {ref for item in invoker.calls for ref in item.frozen.call.credential_references} == set(
         REQUIRED_CONFIGURATION_REFERENCES
     )
+
+
+@pytest.mark.asyncio
+async def test_smoke_direct_subject_output_error_is_capability_result(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    control = SmokeControlPlane.load(ROOT)
+    binding = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())[1]
+    artifact = tmp_path / "subject-output-artifact"
+    artifact.mkdir()
+    (artifact / "manifest.json").write_text("{}\n", encoding="utf-8")
+
+    class SubjectOutputRunner:
+        def __init__(self, **_: object) -> None:
+            pass
+
+        async def run(self, *_: object, **__: object) -> SimpleNamespace:
+            return SimpleNamespace(
+                artifact_directory=artifact,
+                evidence=SimpleNamespace(
+                    provider_failure=None,
+                    outcome=DirectModelOutcome.SUBJECT_OUTPUT_ERROR,
+                    observed_model="qwen3.8-max",
+                ),
+            )
+
+    monkeypatch.setattr("harnesslab.release.smoke.DirectModelRunner", SubjectOutputRunner)
+    invoker = ProductionSmokeInvoker(ROOT, SAFE_ENVIRONMENT, tmp_path / "smoke")
+    result = await invoker.invoke(binding)
+
+    assert result.call_id == EXPECTED_CALL_IDS[1]
+    assert len(result.evidence_references) == 1
+    assert len(result.evidence_digests) == 1
 
 
 @pytest.mark.asyncio

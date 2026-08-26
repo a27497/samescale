@@ -399,13 +399,13 @@ class AnthropicMessagesAdapter(_HTTPProviderAdapter):
             and isinstance(block.get("text"), str)
         ]
         stop_reason = body.get("stop_reason")
-        if stop_reason in {"max_tokens", "model_context_window_exceeded"}:
+        if stop_reason == "model_context_window_exceeded":
             raise ProviderInvocationError(
                 ProviderFailureCategory.INCOMPLETE_RESPONSE,
-                "provider response reached a configured or context token limit",
+                "provider response exceeded the model context window",
             )
         refused = stop_reason == "refusal"
-        if stop_reason not in {"end_turn", "stop_sequence", "refusal"}:
+        if stop_reason not in {"end_turn", "stop_sequence", "refusal", "max_tokens"}:
             raise ProviderInvocationError(
                 ProviderFailureCategory.PROVIDER_ERROR,
                 "provider response did not end with terminal public text",
@@ -436,7 +436,7 @@ class AnthropicMessagesAdapter(_HTTPProviderAdapter):
                 ),
             ),
             stop_reason=stop_reason,
-            response_status="completed",
+            response_status="truncated" if stop_reason == "max_tokens" else "completed",
             latency_ms=latency_ms,
         )
 
@@ -501,12 +501,7 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
                 "choice message content must be public text",
             )
         finish_reason = choice.get("finish_reason")
-        if finish_reason == "length":
-            raise ProviderInvocationError(
-                ProviderFailureCategory.INCOMPLETE_RESPONSE,
-                "provider response reached the configured token limit",
-            )
-        if not refused and finish_reason != "stop":
+        if not refused and finish_reason not in {"stop", "length"}:
             raise ProviderInvocationError(
                 ProviderFailureCategory.PROVIDER_ERROR,
                 "provider response did not end with terminal public text",
@@ -533,7 +528,7 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
                 total_tokens=_optional_nonnegative(usage.get("total_tokens"), "total tokens"),
             ),
             stop_reason=finish_reason,
-            response_status="completed",
+            response_status="truncated" if finish_reason == "length" else "completed",
             latency_ms=latency_ms,
         )
 

@@ -1,6 +1,6 @@
 # Real Evidence Authorization
 
-Phase K-B1-R3 stop state: `PHASE_K_B1_OPENCODE_GO_ROUTE_REDESIGN_V2_COMPLETE_KEYLESS`.
+Phase K-B1-R4 stop state: `PHASE_K_B1_R4_OUTPUT_BUDGET_SEMANTICS_REPAIR_KEYLESS`.
 
 Three real top-level v1 K-B1 attempts occurred before this redesign. On the first, call 1 invoked the configured GPT relay successfully and completed with requested and observed model `gpt-5.6-sol` in approximately 16,773 ms; the overall smoke then aborted with `INFRASTRUCTURE` because the non-root Hidden Verifier could not read restrictive host bind mounts. The K-B1-R1 permission-portability repair addressed that infrastructure defect.
 
@@ -10,7 +10,9 @@ On the third attempt, call 1 requested and observed `gpt-5.6-sol`, completed in 
 
 The v1 plan identities and all three attempt facts are preserved in `release/history/core-real-v1.json`, anchored to authoritative commit `45e83d735cee48d9a29361da5964cee83d048a42`, exact Git blobs, byte digests, and canonical plan digests. Operator-local execution paths and artifacts are not imported. The Token Plan Lite mismatch was an operator/provider-contract mismatch; it is not evidence that Qwen itself failed.
 
-This v2 redesign is keyless and authorizes no provider, Codex, Claude Code, DeepSeek, or Judge call. `REAL_EVALUATION_CALL_COUNT=0` for v2. Ambient credentials and existing logins are not authorization. OpenCode Go automated benchmark use was explicitly confirmed by the operator (`OPENCODE_GO_AUTOMATED_BENCHMARK_PERMISSION=OPERATOR_CONFIRMED_PROVIDER_PERMISSION`), but a new explicit execution authorization is still required after R3 approval; the 630-run Matrix and 63 Judge calls require later authorization.
+After R3, one authorized v2 smoke attempt executed two top-level launches and then stopped fail-closed. Call 1 requested and observed `gpt-5.6-sol`, completed in 45,137 ms, and produced `verifier_passed=false`, `verifier_score=0.8`, `outcome=verified_fail`; this is one smoke observation, not aggregate model performance. Call 2 reached the fixed OpenCode Go Messages route for `qwen3.8-max`, returned a request ID, and ended after 60,131 ms with `response_status=max_tokens`. The pre-R4 adapter normalized that configured output-budget exhaustion as `incomplete_response`, which the smoke control plane mapped to `SCHEMA_MISMATCH`; calls 3-8 were `NOT_RUN`, with no retry or fallback. Safe attempt facts are preserved in `release/history/core-real-v2-attempt-1.json`.
+
+K-B1-R4 is a keyless semantics repair and makes zero real calls. A provider response that reaches the configured output-token budget through Messages `max_tokens` or Chat Completions `length` now preserves its public result, observed model when exposed, usage, request ID, and stop reason so the existing subject-output contract decides capability. Invalid/truncated direct-patch output therefore becomes `SUBJECT_OUTPUT_ERROR` rather than provider infrastructure failure. A true context-window overflow remains `INCOMPLETE_RESPONSE`. The 2,000-token subject budget, 90-second timeout, eight-call order, 14,256-token smoke ceiling, no-retry rule, and no-fallback rule are unchanged. OpenCode Go automated benchmark use remains operator-confirmed (`OPENCODE_GO_AUTOMATED_BENCHMARK_PERMISSION=OPERATOR_CONFIRMED_PROVIDER_PERMISSION`); the 630-run Matrix and 63 Judge calls still require later authorization.
 
 ## Frozen Core scope
 

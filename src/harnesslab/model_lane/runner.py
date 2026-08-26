@@ -198,13 +198,19 @@ class DirectModelRunner:
                 )
                 return self._persist(evidence, None, credential_values)
             except DirectPatchError:
+                output_budget_exhausted = provider_result.stop_reason in {"max_tokens", "length"}
                 evidence = self._base_evidence(
                     effective_run_id,
                     package,
                     profile,
                     prompt,
                     outcome=DirectModelOutcome.SUBJECT_OUTPUT_ERROR,
-                    summary="public model output violated direct-patch-v1",
+                    summary=(
+                        "public model output exhausted the output-token budget "
+                        "and violated direct-patch-v1"
+                        if output_budget_exhausted
+                        else "public model output violated direct-patch-v1"
+                    ),
                     provider_result=provider_result,
                     public_response_digest=public_digest,
                     public_response_text=provider_result.public_output_text,

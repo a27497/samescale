@@ -92,6 +92,23 @@ class SafeTimeoutProvider:
         )
 
 
+class OutputBudgetExhaustedProvider:
+    async def invoke(self, request: ProviderRequest) -> ProviderResult:
+        return ProviderResult(
+            requested_model=request.profile.requested_model,
+            observed_model=request.profile.requested_model,
+            provider=request.profile.provider,
+            endpoint=f"{request.profile.base_url}{request.profile.route}",
+            protocol=request.profile.protocol,
+            request_id="truncated-request-id",
+            public_output_text='{"schema_version":1,"operations":[',
+            usage={"input_tokens": 10, "output_tokens": 2000, "total_tokens": 2010},
+            stop_reason="max_tokens",
+            response_status="truncated",
+            latency_ms=17,
+        )
+
+
 def test_cleanup_reporting_cannot_be_promoted_to_run_failure() -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("error")
@@ -249,6 +266,32 @@ async def test_malformed_patch_fails_closed_without_workspace_snapshot(tmp_path:
     assert result.evidence.workspace_output_digest is None
     assert result.evidence.verifier_sandbox_manifest is None
     assert not (result.artifact_directory / "workspace").exists()
+
+
+@pytest.mark.asyncio
+async def test_output_budget_exhaustion_is_subject_output_failure(tmp_path: Path) -> None:
+    runner = DirectModelRunner(
+        artifact_root=tmp_path / "artifacts",
+        runtime_root=tmp_path / "runtime",
+        environment={"GATE_D_FAKE_API_KEY": FAKE_KEY},
+    )
+    result = await runner.run(
+        TASK_ROOT,
+        fake_profile(),
+        adapter=OutputBudgetExhaustedProvider(),
+        run_id="output-budget-exhausted",
+    )
+
+    assert result.evidence.outcome is DirectModelOutcome.SUBJECT_OUTPUT_ERROR
+    assert result.evidence.provider_failure is None
+    assert result.evidence.provider_error is None
+    assert result.evidence.provider_result is not None
+    assert result.evidence.provider_result.stop_reason == "max_tokens"
+    assert result.evidence.provider_result.response_status == "truncated"
+    assert result.evidence.provider_result.usage.output_tokens == 2000
+    assert result.evidence.public_response_text is not None
+    assert "exhausted the output-token budget" in result.evidence.summary
+    assert result.evidence.verifier_sandbox_manifest is None
 
 
 @pytest.mark.asyncio

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-1",
+  "source_commit": "d5c83591cfc22e981ad3299b8fa5cd25fc29f660",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:2af4ef729db4ef30d251a182715f201b293c27f03eaeb20155e7f18e1e73dee0",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 2,
+  "failing_call_id": "smoke-2-model-qwen38-opencode-go-messages",
+  "failure_category": "SCHEMA_MISMATCH",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": "gpt-5.6-sol",
+      "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+      "latency_ms": 45137,
+      "usage": {
+        "input_tokens": 346,
+        "output_tokens": 677,
+        "reasoning_tokens": 516,
+        "total_tokens": 1023
+      },
+      "verifier_passed": false,
+      "verifier_score": 0.8,
+      "outcome": "verified_fail"
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "requested_model": "qwen3.8-max",
+      "observed_model": null,
+      "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+      "latency_ms": 60131,
+      "attempt_count": 1,
+      "request_id_status": "PRESENT",
+      "provider_failure": "incomplete_response",
+      "response_status": "max_tokens",
+      "outcome": "provider_error",
+      "verifier": "NOT_RUN"
+    }
+  ],
+  "calls_3_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "interpretation": "The configured 2,000-token output budget was exhausted. R4 preserves future token-budget-truncated public results for subject-output evaluation instead of classifying configured output-budget exhaustion as provider infrastructure failure.",
+  "limitations": [
+    "This is one smoke attempt, not aggregate model performance evidence.",
+    "The pre-R4 adapter did not persist partial public output or observed model for call 2.",
+    "No operator-local paths, credentials, raw headers, or response bodies are tracked here."
+  ]
+}

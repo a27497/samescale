@@ -867,35 +867,68 @@ async def test_generic_effort_is_rejected_instead_of_silently_transformed() -> N
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    ("adapter_type", "protocol", "body"),
+    ("adapter_type", "protocol", "body", "expected_stop_reason"),
     [
         pytest.param(
             AnthropicMessagesAdapter,
             Protocol.MESSAGES,
             {
+                "id": "messages-truncated-id",
+                "model": "observed-model",
                 "content": [{"type": "text", "text": "partial"}],
                 "stop_reason": "max_tokens",
+                "usage": {"input_tokens": 3, "output_tokens": 4000},
             },
+            "max_tokens",
             id="messages-max-tokens",
         ),
         pytest.param(
             OpenAICompatibleChatAdapter,
             Protocol.CHAT_COMPLETIONS,
-            {"choices": [{"message": {"content": "partial"}, "finish_reason": "length"}]},
+            {
+                "id": "chat-truncated-id",
+                "model": "observed-model",
+                "choices": [{"message": {"content": "partial"}, "finish_reason": "length"}],
+                "usage": {
+                    "prompt_tokens": 3,
+                    "completion_tokens": 4000,
+                    "total_tokens": 4003,
+                },
+            },
+            "length",
             id="chat-length",
         ),
     ],
 )
-async def test_truncated_provider_stop_reasons_are_incomplete(
+async def test_output_budget_stop_reasons_preserve_public_result(
     adapter_type: type[AnthropicMessagesAdapter] | type[OpenAICompatibleChatAdapter],
     protocol: Protocol,
     body: dict[str, object],
+    expected_stop_reason: str,
 ) -> None:
     async with await client_for(lambda request: httpx.Response(200, json=body)) as client:
+        result = await adapter_type(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(provider_request(protocol, effort=None))
+    assert result.public_output_text == "partial"
+    assert result.observed_model == "observed-model"
+    assert result.stop_reason == expected_stop_reason
+    assert result.response_status == "truncated"
+    assert result.usage.input_tokens == 3
+    assert result.usage.output_tokens == 4000
+
+
+@pytest.mark.asyncio
+async def test_messages_context_window_exceeded_remains_incomplete_provider_failure() -> None:
+    body = {
+        "content": [{"type": "text", "text": "partial"}],
+        "stop_reason": "model_context_window_exceeded",
+    }
+    async with await client_for(lambda request: httpx.Response(200, json=body)) as client:
         with pytest.raises(ProviderInvocationError) as caught:
-            await adapter_type(
+            await AnthropicMessagesAdapter(
                 client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
-            ).invoke(provider_request(protocol, effort=None))
+            ).invoke(provider_request(Protocol.MESSAGES, effort=None))
     assert caught.value.category is ProviderFailureCategory.INCOMPLETE_RESPONSE
 
 

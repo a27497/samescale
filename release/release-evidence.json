@@ -17,7 +17,7 @@
     "state": "NOT_VERIFIED",
     "identity": "core-real-evidence-v2",
     "digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
-    "limitation": "The OpenCode Go v2 routes are configured but have executed zero real calls. Immutable v1 history records all three prior attempts, including the single GPT verified_fail observation and Bailian HTTP 403; no smoke evidence or executable ExperimentPlan is verified."
+    "limitation": "The OpenCode Go v2 routes are configured. One v2 smoke attempt executed two top-level launches and aborted at call 2 after the configured output-token budget was exhausted; no complete smoke evidence or executable ExperimentPlan is verified. Immutable v1 history records all three prior v1 attempts."
   },
   "real_matrix": {
     "state": "NOT_RUN",

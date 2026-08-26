@@ -331,10 +331,11 @@ def verify_contract_mode() -> bool:
     print("SMOKE_PLAN_DRIFT=NONE")
     print("RELEASE_PLAN_DRIFT=NONE")
     print("REAL_CALLS_THIS_REPAIR=0")
-    print("REAL_EVALUATION_CALL_COUNT=0")
+    print("OUTPUT_BUDGET_TRUNCATION_SEMANTICS=PASS")
+    print("V2_REAL_ATTEMPT_1_TOP_LEVEL_LAUNCHES=2")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
-    print("PHASE_K_B1_OPENCODE_GO_ROUTE_REDESIGN_V2_COMPLETE_KEYLESS")
+    print("PHASE_K_B1_R4_OUTPUT_BUDGET_SEMANTICS_REPAIR_KEYLESS")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")
