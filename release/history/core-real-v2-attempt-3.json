@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-3",
+  "source_commit": "519ee8034af845f636aac8d836536dd4c4601bd0",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:bb0f747005b90caa1983168f84d9dcc468be7e1ea7e575f488ce66e41e30faae",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 1,
+  "failing_call_id": "smoke-1-model-gpt56-relay-responses",
+  "failure_category": "PROVIDER_FAILURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": null,
+      "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+      "latency_ms": 90374,
+      "attempt_count": 1,
+      "provider_failure": "timeout",
+      "timeout_phase": "read",
+      "outcome": "provider_error",
+      "verifier": "NOT_RUN"
+    }
+  ],
+  "calls_2_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "raw_evidence_hygiene": "REJECTED_CONFIG_VALUE_DISCLOSURE",
+  "prior_v2_raw_evidence_audit": [
+    {
+      "attempt_id": "core-real-smoke-v2-attempt-1",
+      "file_count": 10,
+      "base_url_present": "YES",
+      "base_url_file_count": 1,
+      "api_key_present": "NO",
+      "api_key_file_count": 0
+    },
+    {
+      "attempt_id": "core-real-smoke-v2-attempt-2",
+      "file_count": 25,
+      "base_url_present": "YES",
+      "base_url_file_count": 1,
+      "api_key_present": "NO",
+      "api_key_file_count": 0
+    },
+    {
+      "attempt_id": "core-real-smoke-v2-attempt-3",
+      "file_count": 2,
+      "base_url_present": "YES",
+      "base_url_file_count": 1,
+      "api_key_present": "NO",
+      "api_key_file_count": 0
+    }
+  ],
+  "interpretation": "Call 1 reached the configured relay route and timed out during response reading. This operational provider failure is not capability evidence and does not justify a timeout, retry, fallback, or route change.",
+  "limitations": [
+    "This is one smoke observation, not aggregate model performance evidence.",
+    "The rejected raw evidence persisted a private runtime configuration value; only this sanitized summary is tracked.",
+    "No operator-local paths, runtime configuration values, credentials, raw provider content, or private reasoning are tracked here."
+  ]
+}

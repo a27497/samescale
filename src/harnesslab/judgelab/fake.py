@@ -83,7 +83,7 @@ class FakeJudgeProvider:
             requested_model=request.profile.requested_model,
             observed_model=request.profile.requested_model,
             provider=request.profile.provider,
-            endpoint=f"{request.profile.base_url}{request.profile.route}",
+            endpoint_identity=request.profile.provider_route_identity,
             protocol=request.profile.protocol,
             request_id=f"fake-judge-{len(self.requests)}",
             public_output_text=output,

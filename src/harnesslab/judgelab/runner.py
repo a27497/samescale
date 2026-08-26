@@ -135,7 +135,11 @@ class JudgeRunner:
             requested_judge_model=model_profile.requested_model,
             observed_judge_model=(provider_result.observed_model if provider_result else None),
             provider=model_profile.provider,
-            endpoint=f"{model_profile.base_url}{model_profile.route}",
+            endpoint=(
+                f"{model_profile.base_url}{model_profile.route}"
+                if model_profile.base_url is not None
+                else model_profile.provider_route_identity
+            ),
             protocol=model_profile.protocol.value,
             prompt_hash=prompt_hash,
             order_variant=slot.order_variant,

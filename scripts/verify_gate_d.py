@@ -32,6 +32,7 @@ PHASE_D_TESTS = (
     "tests/test_cli.py",
     "tests/test_contracts.py",
     "tests/test_phase_kb0.py",
+    "tests/test_runtime_config_hygiene.py",
 )
 CRITICAL_TESTS = {
     "test_anthropic_messages_adapter_contract_and_thinking_exclusion",
@@ -122,6 +123,9 @@ CRITICAL_TESTS = {
     "test_workspace_staging_failure_is_not_blame_assigned_to_model",
     "test_opencode_go_messages_exact_url_headers_and_shared_claude_route",
     "test_opencode_go_judge_exact_route_bearer_and_public_content_only",
+    "test_direct_success_uses_runtime_url_but_persists_only_route_identity",
+    "test_direct_failure_uses_runtime_url_without_persisting_value",
+    "test_smoke_result_and_receipt_exclude_runtime_url_value",
 }
 PHASE_J_MODULE_NAMES = {
     "analyst.py",
@@ -320,6 +324,9 @@ def verify_repository_secret_hygiene() -> bool:
     print("SMOKE_TIMEOUT_CHANGE=FALSE")
     print("REAL_CALLS_THIS_REPAIR=0")
     print("REAL_PROVIDER_SMOKE=NOT_VERIFIED")
+    print("DYNAMIC_ENDPOINT_EVIDENCE_HYGIENE=PASS")
+    print("GPT_RELAY_BASE_URL_VALUE_PERSISTENCE=DENIED")
+    print("SAFE_PROVIDER_ROUTE_IDENTITY=PASS")
     return True
 
 

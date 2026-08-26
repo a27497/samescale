@@ -34,7 +34,7 @@ class FakeDirectProvider:
             requested_model=request.profile.requested_model,
             observed_model=self.observed_model,
             provider=request.profile.provider,
-            endpoint=f"{request.profile.base_url}{request.profile.route}",
+            endpoint_identity=request.profile.provider_route_identity,
             protocol=request.profile.protocol,
             request_id="fake-response-1",
             public_output_text=self.public_output_text,

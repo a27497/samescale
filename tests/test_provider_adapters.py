@@ -127,7 +127,9 @@ async def test_openai_responses_adapter_contract_and_private_reasoning_exclusion
     assert result.public_output_text == '{"schema_version":1,"operations":[]}'
     assert result.requested_model == "requested-model"
     assert result.observed_model == "observed-openai-model"
-    assert result.endpoint == "https://api.openai.test/v1/responses"
+    assert result.endpoint_identity == (
+        "test-provider|responses|https://api.openai.test/v1/responses"
+    )
     assert result.request_id == "resp-safe-id"
     assert result.usage.reasoning_tokens == 3
     assert result.attempt_count == 1
@@ -234,7 +236,9 @@ async def test_anthropic_messages_adapter_contract_and_thinking_exclusion() -> N
 
     serialized = result.model_dump_json()
     assert result.observed_model == "observed-claude-model"
-    assert result.endpoint == "https://api.anthropic.test/v1/messages"
+    assert result.endpoint_identity == (
+        "test-provider|messages|https://api.anthropic.test/v1/messages"
+    )
     assert result.request_id == "msg-safe-id"
     assert result.stop_reason == "end_turn"
     assert result.usage.total_tokens == 20
@@ -311,7 +315,9 @@ async def test_openai_compatible_chat_completions_core_contract() -> None:
 
     assert result.public_output_text == '{"schema_version":1,"operations":[]}'
     assert result.observed_model == "observed-compatible-model"
-    assert result.endpoint == "https://compatible.test/v1/chat/completions"
+    assert result.endpoint_identity == (
+        "test-provider|chat_completions|https://compatible.test/v1/chat/completions"
+    )
     assert result.request_id == "chatcmpl-safe-id"
     assert result.stop_reason == "stop"
     assert result.usage.total_tokens == 15

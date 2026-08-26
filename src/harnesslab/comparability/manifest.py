@@ -59,7 +59,7 @@ def _profile_identity(raw: dict[str, Any], profile: dict[str, Any]) -> str | Non
         return None
     controls = {
         "provider": raw.get("provider"),
-        "endpoint": raw.get("endpoint"),
+        "endpoint_identity": raw.get("endpoint_identity", raw.get("endpoint")),
         "protocol": raw.get("protocol"),
         "generation_settings": raw.get("generation_settings"),
     }
@@ -80,10 +80,10 @@ def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
     route = _string(raw.get("provider_route"))
     if route is None and "provider" in raw:
         provider = _string(raw.get("provider"))
-        endpoint = _string(raw.get("endpoint"))
+        endpoint = _string(raw.get("endpoint_identity")) or _string(raw.get("endpoint"))
         protocol = _string(raw.get("protocol"))
         if provider and endpoint and protocol:
-            route = f"{provider}|{protocol}|{endpoint}"
+            route = endpoint if "|" in endpoint else f"{provider}|{protocol}|{endpoint}"
     budget = raw.get("resource_budget")
     if not isinstance(budget, dict) and generation:
         budget = generation

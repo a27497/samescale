@@ -9,12 +9,15 @@ from harnesslab.contracts.provider import ProviderProfile
 def configured_model_profile(
     profile: ProviderProfile, environment: Mapping[str, str]
 ) -> ModelProfile:
-    """Resolve a frozen non-secret profile into an executable direct/Judge profile offline."""
+    """Build a durable profile while validating its execution-only URL offline."""
+
+    profile.resolve_base_url(environment)
 
     return ModelProfile(
         requested_model=profile.requested_model,
         provider=profile.provider_id,
-        base_url=profile.resolve_base_url(environment),
+        base_url=profile.fixed_base_url,
+        base_url_reference=profile.base_url_reference,
         route=profile.route,
         protocol=profile.protocol,
         reasoning=ReasoningProfile(

@@ -9,6 +9,7 @@ from contextlib import suppress
 from dataclasses import dataclass, field
 from uuid import uuid4
 
+from harnesslab.contracts.provider import validate_provider_base_url
 from harnesslab.egress import ProviderScopedDockerBoundary, ProxySecurityAttestation
 from harnesslab.harness_lane.adapter import CodexExecutionPlan, HarnessAdapterError
 from harnesslab.harness_lane.models import (
@@ -110,14 +111,7 @@ class DockerCodexBackend:
 
     @property
     def artifact_secret_values(self) -> tuple[str, ...]:
-        sensitive_markers = ("KEY", "SECRET", "TOKEN", "PASSWORD")
-        return tuple(
-            dict.fromkeys(
-                value
-                for name, value in self.credentials.items()
-                if value and any(marker in name.upper() for marker in sensitive_markers)
-            )
-        )
+        return tuple(dict.fromkeys(value for value in self.credentials.values() if value))
 
     def create_argv(self, plan: CodexExecutionPlan, container_name: str) -> tuple[str, ...]:
         workspace_mount = f"type=bind,src={plan.workspace.resolve()},dst=/workspace"
@@ -165,12 +159,17 @@ class DockerCodexBackend:
                     f"type=bind,src={plan.context.resolve()},dst=/context,readonly",
                 )
             )
-        for name in sorted(self.credentials):
+        translated_sources = {source for _, source in plan.environment_references}
+        for name in sorted(set(self.credentials) - translated_sources):
+            arguments.extend(("--env", name))
+        for name, _ in sorted(plan.environment_references):
             arguments.extend(("--env", name))
         if self.egress_boundary is not None:
             for name, value in sorted(self.egress_boundary.subject_proxy_environment().items()):
                 arguments.extend(("--env", f"{name}={value}"))
-        arguments.extend(("--entrypoint", "codex", CODEX_IMAGE, *plan.argv[1:]))
+        arguments.extend(
+            ("--entrypoint", "/usr/local/bin/harnesslab-codex-runtime", CODEX_IMAGE, *plan.argv[1:])
+        )
         return tuple(arguments)
 
     async def run(self, plan: CodexExecutionPlan) -> CodexProcessCapture:
@@ -190,7 +189,20 @@ class DockerCodexBackend:
             raise self._failure(CodexBackendFailurePhase.UNKNOWN, started=started) from exc
         cli = _DockerCLI(output_limit=1_000_000, environment=environment)
         name = f"harnesslab-codex-{uuid4().hex}"
-        create_environment = docker_environment(environment, self.credentials)
+        container_environment = dict(self.credentials)
+        for target, source in plan.environment_references:
+            if source not in self.credentials:
+                raise self._failure(CodexBackendFailurePhase.CONTAINER_CREATE, started=started)
+            value = self.credentials[source]
+            if target == "HARNESSLAB_GPT56_RELAY_BASE_URL":
+                try:
+                    value = validate_provider_base_url(value)
+                except ValueError as exc:
+                    raise self._failure(
+                        CodexBackendFailurePhase.CONTAINER_CREATE, started=started
+                    ) from exc
+            container_environment[target] = value
+        create_environment = docker_environment(environment, container_environment)
         create_attempted = False
         capture: CodexProcessCapture | None = None
         primary_failure: CodexBackendExecutionError | None = None

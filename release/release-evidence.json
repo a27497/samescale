@@ -17,7 +17,7 @@
     "state": "NOT_VERIFIED",
     "identity": "core-real-evidence-v2",
     "digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
-    "limitation": "The OpenCode Go v2 routes are configured. The first v2 smoke attempt executed two top-level launches; the post-R4 attempt executed four and aborted at Codex-medium infrastructure before a durable Codex call artifact existed. No complete smoke evidence or executable ExperimentPlan is verified. Immutable safe summaries preserve both v2 attempts and all three prior v1 attempts."
+    "limitation": "The OpenCode Go v2 routes are configured. The three v2 smoke attempts stopped after two, four, and one top-level launches respectively; the post-R5 attempt ended in a direct GPT read timeout, and its raw evidence was rejected for private runtime URL disclosure. No complete smoke evidence or executable ExperimentPlan is verified. Immutable safe summaries preserve all three v2 attempts and all three prior v1 attempts."
   },
   "real_matrix": {
     "state": "NOT_RUN",

@@ -150,12 +150,12 @@ def test_kb0_codex_custom_provider_is_explicit_secret_free_and_single_treatment(
 ) -> None:
     medium = configured_gpt56_relay_codex_profile(
         image("harnesslab-phase-e-codex:0.149.0"),
-        provider_base_url="https://relay.example.test/v1",
+        provider_base_url_reference="HARNESSLAB_GPT56_RELAY_BASE_URL",
         reasoning_effort="medium",
     )
     high = configured_gpt56_relay_codex_profile(
         medium.codex_image,
-        provider_base_url="https://relay.example.test/v1",
+        provider_base_url_reference="HARNESSLAB_GPT56_RELAY_BASE_URL",
         reasoning_effort="high",
     )
     left = medium.model_dump(exclude={"reasoning_effort"})
@@ -176,10 +176,10 @@ def test_kb0_codex_custom_provider_is_explicit_secret_free_and_single_treatment(
     )
     joined = " ".join(argv)
     assert "--ignore-user-config" in argv
-    assert 'model_provider="harnesslab_gpt56_relay"' in argv
-    assert 'model_providers.harnesslab_gpt56_relay.wire_api="responses"' in argv
-    assert 'model_providers.harnesslab_gpt56_relay.base_url="https://relay.example.test/v1"' in argv
-    assert "HARNESSLAB_GPT56_RELAY_API_KEY" in joined
+    assert argv[argv.index("--profile") + 1] == "harnesslab-runtime"
+    assert medium.provider_base_url_reference == "HARNESSLAB_GPT56_RELAY_BASE_URL"
+    assert "https://relay.example.test/v1" not in joined
+    assert medium.provider_credential_reference == "HARNESSLAB_GPT56_RELAY_API_KEY"
     assert SENTINEL not in joined
     assert canonical_codex_profile(medium.codex_image).provider_route != medium.provider_route
 
@@ -252,7 +252,7 @@ async def test_opencode_go_messages_exact_url_headers_and_shared_claude_route(
 
     expected_endpoint = f"{OPENCODE_GO_BASE_URL}/v1/messages"
     assert requested_urls == [expected_endpoint]
-    assert result.endpoint == expected_endpoint
+    assert result.endpoint_identity == direct_profile.provider_route_identity
     assert direct_profile.requested_model == "qwen3.8-max"
     assert direct_profile.credential_reference == "HARNESSLAB_OPENCODE_GO_API_KEY"
     assert requested_headers[0]["x-api-key"] == "fake-key"
@@ -393,7 +393,7 @@ def test_kb0_subject_docker_uses_only_internal_proxy_network(tmp_path: Path) -> 
     )
     profile = configured_gpt56_relay_codex_profile(
         image("harnesslab-phase-e-codex:0.149.0"),
-        provider_base_url="https://relay.example.test/v1",
+        provider_base_url_reference="HARNESSLAB_GPT56_RELAY_BASE_URL",
         reasoning_effort="medium",
     )
     prompt = render_codex_harness_prompt(

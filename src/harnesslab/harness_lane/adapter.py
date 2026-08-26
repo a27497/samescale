@@ -30,6 +30,7 @@ class CodexExecutionPlan:
     context: Path | None
     timeout_seconds: float
     task_id: str
+    environment_references: tuple[tuple[str, str], ...] = ()
 
 
 class CodexBackend(Protocol):
@@ -91,22 +92,20 @@ class CodexHarnessAdapter:
         if context is not None and (not context.is_dir() or context.is_symlink()):
             raise HarnessAdapterError("subject context is unavailable or unsafe")
         provider_config: tuple[str, ...] = ()
+        environment_references: tuple[tuple[str, str], ...] = ()
         if profile.model_provider_id is not None:
-            assert profile.provider_base_url is not None
+            assert profile.provider_base_url_reference is not None
             assert profile.provider_credential_reference is not None
             assert profile.provider_wire_api == "responses"
-            provider_id = profile.model_provider_id
             provider_config = (
-                "-c",
-                f'model_provider="{provider_id}"',
-                "-c",
-                f'model_providers.{provider_id}.name="HarnessLab trusted GPT relay"',
-                "-c",
-                f'model_providers.{provider_id}.base_url="{profile.provider_base_url}"',
-                "-c",
-                f'model_providers.{provider_id}.env_key="{profile.provider_credential_reference}"',
-                "-c",
-                f'model_providers.{provider_id}.wire_api="{profile.provider_wire_api}"',
+                "--profile",
+                "harnesslab-runtime",
+            )
+            environment_references = (
+                (
+                    "HARNESSLAB_GPT56_RELAY_BASE_URL",
+                    profile.provider_base_url_reference,
+                ),
             )
         argv = (
             "codex",
@@ -153,6 +152,7 @@ class CodexHarnessAdapter:
             context=context,
             timeout_seconds=profile.execution_timeout_seconds,
             task_id=task_id,
+            environment_references=environment_references,
         )
 
     async def execute(self, plan: CodexExecutionPlan, backend: CodexBackend) -> CodexProcessCapture:

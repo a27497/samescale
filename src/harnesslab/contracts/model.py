@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from urllib.parse import unquote, urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -23,7 +24,14 @@ class ModelProfile(BaseModel):
 
     requested_model: str = Field(min_length=1, max_length=200)
     provider: str = Field(min_length=1, max_length=100)
-    base_url: str = Field(min_length=1, max_length=500)
+    base_url: str | None = Field(
+        default=None, min_length=1, max_length=500, exclude_if=lambda value: value is None
+    )
+    base_url_reference: str | None = Field(
+        default=None,
+        pattern=r"^[A-Z][A-Z0-9_]*$",
+        exclude_if=lambda value: value is None,
+    )
     route: str = Field(min_length=1, max_length=300)
     protocol: Protocol
     reasoning: ReasoningProfile = Field(default_factory=ReasoningProfile)
@@ -38,7 +46,9 @@ class ModelProfile(BaseModel):
 
     @field_validator("base_url")
     @classmethod
-    def base_url_is_safe(cls, value: str) -> str:
+    def base_url_is_safe(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
         try:
             value.encode("ascii")
         except UnicodeEncodeError as exc:
@@ -88,6 +98,8 @@ class ModelProfile(BaseModel):
 
     @model_validator(mode="after")
     def protocol_route_is_core(self) -> ModelProfile:
+        if (self.base_url is None) == (self.base_url_reference is None):
+            raise ValueError("exactly one model base URL source is required")
         expected_suffix = {
             Protocol.RESPONSES: "/responses",
             Protocol.MESSAGES: "/messages",
@@ -100,3 +112,21 @@ class ModelProfile(BaseModel):
         if self.thinking_transport is not None and self.protocol is not Protocol.CHAT_COMPLETIONS:
             raise ValueError("typed thinking options require Chat Completions")
         return self
+
+    @property
+    def provider_route_identity(self) -> str:
+        base = self.base_url if self.base_url is not None else f"env:{self.base_url_reference}"
+        return f"{self.provider}|{self.protocol.value}|{base}{self.route}"
+
+    def resolve_base_url(self, environment: Mapping[str, str]) -> str:
+        """Resolve an execution-only URL without adding it to the durable model profile."""
+
+        if self.base_url is not None:
+            return self.base_url
+        assert self.base_url_reference is not None
+        value = environment.get(self.base_url_reference)
+        if not value:
+            raise ValueError(f"missing provider URL reference: {self.base_url_reference}")
+        validated = self.base_url_is_safe(value)
+        assert validated is not None
+        return validated

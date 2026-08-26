@@ -117,9 +117,9 @@ class DirectModelRunner:
                 instructions=prompt.instructions,
                 input=prompt.input,
             )
-            credential_values = self._credential_values(profile, run_environment)
-            _assert_text_has_no_run_secrets(prompt.instructions, credential_values)
-            _assert_text_has_no_run_secrets(prompt.input, credential_values)
+            protected_values = self._protected_runtime_values(profile, run_environment)
+            _assert_text_has_no_run_secrets(prompt.instructions, protected_values)
+            _assert_text_has_no_run_secrets(prompt.input, protected_values)
             try:
                 official_route = (
                     profile.protocol is Protocol.RESPONSES
@@ -157,10 +157,10 @@ class DirectModelRunner:
                         latency_ms=exc.latency_ms,
                     ),
                 )
-                return self._persist(evidence, None, credential_values)
+                return self._persist(evidence, None, protected_values)
 
             public_digest = sha256_bytes(provider_result.public_output_text.encode("utf-8"))
-            _assert_text_has_no_run_secrets(provider_result.public_output_text, credential_values)
+            _assert_text_has_no_run_secrets(provider_result.public_output_text, protected_values)
             if provider_result.refused:
                 evidence = self._base_evidence(
                     effective_run_id,
@@ -173,7 +173,7 @@ class DirectModelRunner:
                     public_response_digest=public_digest,
                     public_response_text=provider_result.public_output_text,
                 )
-                return self._persist(evidence, None, credential_values)
+                return self._persist(evidence, None, protected_values)
             try:
                 assert_prompt_matches_task_identity(prompt, materialized.workspace)
                 patch = parse_direct_patch(provider_result.public_output_text)
@@ -196,7 +196,7 @@ class DirectModelRunner:
                     public_response_digest=public_digest,
                     public_response_text=provider_result.public_output_text,
                 )
-                return self._persist(evidence, None, credential_values)
+                return self._persist(evidence, None, protected_values)
             except DirectPatchError:
                 output_budget_exhausted = provider_result.stop_reason in {"max_tokens", "length"}
                 evidence = self._base_evidence(
@@ -215,15 +215,15 @@ class DirectModelRunner:
                     public_response_digest=public_digest,
                     public_response_text=provider_result.public_output_text,
                 )
-                return self._persist(evidence, None, credential_values)
+                return self._persist(evidence, None, protected_values)
 
             try:
-                assert_tree_has_no_run_secrets(materialized.workspace, credential_values)
+                assert_tree_has_no_run_secrets(materialized.workspace, protected_values)
                 verifier = await self.sandbox.run_hidden_verifier_workspace(
                     package,
                     materialized.workspace,
                     timeout_seconds=package.manifest.verifier.timeout_seconds,
-                    secret_values=credential_values,
+                    secret_values=protected_values,
                 )
                 if verifier.run.manifest.workspace_input_digest != output_digest:
                     raise RuntimeError("verifier workspace identity mismatch")
@@ -242,7 +242,7 @@ class DirectModelRunner:
                     public_response_text=provider_result.public_output_text,
                     parsed_patch_digest=patch_digest,
                 )
-                return self._persist(evidence, None, credential_values)
+                return self._persist(evidence, None, protected_values)
 
             outcome = (
                 DirectModelOutcome.VERIFIED_PASS
@@ -272,7 +272,7 @@ class DirectModelRunner:
             return self._persist(
                 evidence,
                 materialized.workspace,
-                credential_values,
+                protected_values,
                 verifier_artifacts=verifier.run.artifact_directory,
             )
         finally:
@@ -289,14 +289,19 @@ class DirectModelRunner:
             except OSError as exc:
                 _report_cleanup_failure(f"Phase D runtime cleanup failed: {type(exc).__name__}")
 
-    def _credential_values(
+    def _protected_runtime_values(
         self, profile: ModelProfile, environment: Mapping[str, str]
     ) -> tuple[str, ...]:
-        reference = profile.credential_reference
-        if reference is None:
-            return ()
-        value = environment.get(reference)
-        return (value,) if value else ()
+        references = tuple(
+            reference
+            for reference in (profile.credential_reference, profile.base_url_reference)
+            if reference is not None
+        )
+        return tuple(
+            dict.fromkeys(
+                value for reference in references if (value := environment.get(reference))
+            )
+        )
 
     def _base_evidence(
         self,
@@ -337,7 +342,7 @@ class DirectModelRunner:
                 provider_result.observed_model if provider_result is not None else None
             ),
             provider=profile.provider,
-            endpoint=f"{profile.base_url}{profile.route}",
+            endpoint_identity=profile.provider_route_identity,
             protocol=profile.protocol,
             generation_settings=GenerationSettings(
                 effort=profile.reasoning.effort,

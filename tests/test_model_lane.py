@@ -98,7 +98,7 @@ class OutputBudgetExhaustedProvider:
             requested_model=request.profile.requested_model,
             observed_model=request.profile.requested_model,
             provider=request.profile.provider,
-            endpoint=f"{request.profile.base_url}{request.profile.route}",
+            endpoint_identity=request.profile.provider_route_identity,
             protocol=request.profile.protocol,
             request_id="truncated-request-id",
             public_output_text='{"schema_version":1,"operations":[',
@@ -173,7 +173,9 @@ async def test_fake_provider_m_lane_e2e_uses_isolated_verifier_and_safe_evidence
     ).encode("utf-8")
     assert evidence.prompt_hash == f"sha256:{hashlib.sha256(prompt_canonical).hexdigest()}"
     assert evidence.provider == fake_profile().provider
-    assert evidence.endpoint == "https://fake-provider.invalid/v1/responses"
+    assert evidence.endpoint_identity == (
+        "fake-direct-provider|responses|https://fake-provider.invalid/v1/responses"
+    )
     assert evidence.protocol is Protocol.RESPONSES
     assert evidence.generation_settings.model_dump() == {
         "effort": "low",

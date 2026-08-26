@@ -76,7 +76,7 @@ def resolved_comparison_profile_identity(profile: LaneProfile) -> str:
         return canonical_digest(
             {
                 "provider": profile.provider,
-                "endpoint": f"{profile.base_url}{profile.route}",
+                "endpoint_identity": profile.provider_route_identity,
                 "protocol": profile.protocol.value,
                 "generation_settings": generation.model_dump(mode="json"),
             }

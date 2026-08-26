@@ -116,7 +116,7 @@ class ProviderResult(BaseModel):
     requested_model: str
     observed_model: str | None = None
     provider: str
-    endpoint: str
+    endpoint_identity: str = Field(min_length=1, max_length=800)
     protocol: Protocol
     request_id: str | None = Field(default=None, max_length=300)
     public_output_text: str
@@ -173,7 +173,7 @@ class DirectModelEvidence(BaseModel):
     requested_model: str
     observed_model: str | None = None
     provider: str
-    endpoint: str
+    endpoint_identity: str = Field(min_length=1, max_length=800)
     protocol: Protocol
     generation_settings: GenerationSettings
     provider_result: ProviderResult | None = None
@@ -201,7 +201,11 @@ class DirectModelEvidence(BaseModel):
                 ("requested_model", self.requested_model, self.provider_result.requested_model),
                 ("observed_model", self.observed_model, self.provider_result.observed_model),
                 ("provider", self.provider, self.provider_result.provider),
-                ("endpoint", self.endpoint, self.provider_result.endpoint),
+                (
+                    "endpoint_identity",
+                    self.endpoint_identity,
+                    self.provider_result.endpoint_identity,
+                ),
                 ("protocol", self.protocol, self.provider_result.protocol),
             )
             mismatches = [name for name, expected, actual in identity_pairs if expected != actual]

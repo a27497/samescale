@@ -159,6 +159,32 @@ def test_post_r4_smoke_history_is_safe_immutable_and_truthful() -> None:
     assert "reasoning_content" not in serialized
 
 
+def test_post_r5_smoke_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-3.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "519ee8034af845f636aac8d836536dd4c4601bd0"
+    assert history["receipt_digest"] == (
+        "sha256:bb0f747005b90caa1983168f84d9dcc468be7e1ea7e575f488ce66e41e30faae"
+    )
+    assert history["attempted_top_level_launches"] == 1
+    assert history["calls"][0]["outcome"] == "provider_error"
+    assert history["calls"][0]["provider_failure"] == "timeout"
+    assert history["calls"][0]["timeout_phase"] == "read"
+    assert history["calls_2_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert history["raw_evidence_hygiene"] == "REJECTED_CONFIG_VALUE_DISCLOSURE"
+    audits = history["prior_v2_raw_evidence_audit"]
+    assert [item["base_url_present"] for item in audits] == ["YES", "YES", "YES"]
+    assert [item["api_key_present"] for item in audits] == ["NO", "NO", "NO"]
+    assert "/home/dev/harnesslab-evidence" not in serialized
+    assert SAFE_ENVIRONMENT["HARNESSLAB_GPT56_RELAY_BASE_URL"] not in serialized
+    assert all(value not in serialized for name, value in SAFE_ENVIRONMENT.items() if "KEY" in name)
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
 def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
     control = SmokeControlPlane.load(ROOT)
     receipt = control.preflight()
@@ -258,6 +284,7 @@ async def test_production_smoke_persists_codex_precapture_infrastructure_evidenc
     control = SmokeControlPlane.load(ROOT)
     binding = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())[3]
     secret = SAFE_ENVIRONMENT["HARNESSLAB_GPT56_RELAY_API_KEY"]
+    runtime_url = SAFE_ENVIRONMENT["HARNESSLAB_GPT56_RELAY_BASE_URL"]
 
     class PreCaptureFailureBackend:
         def __init__(self, *, credentials: dict[str, str], **_: object) -> None:
@@ -266,7 +293,7 @@ async def test_production_smoke_persists_codex_precapture_infrastructure_evidenc
 
         @property
         def artifact_secret_values(self) -> tuple[str, ...]:
-            return tuple(value for name, value in self.credentials.items() if "KEY" in name)
+            return tuple(self.credentials.values())
 
         async def run(self, _: object) -> CodexProcessCapture:
             stderr_digest = (
@@ -299,8 +326,11 @@ async def test_production_smoke_persists_codex_precapture_infrastructure_evidenc
     )
     assert (artifact / "manifest.json").is_file()
     assert secret not in artifact_text
+    assert runtime_url not in artifact_text
     assert secret not in str(raised.value)
+    assert runtime_url not in str(raised.value)
     assert secret not in evidence_result.model_dump_json()
+    assert runtime_url not in evidence_result.model_dump_json()
 
 
 @pytest.mark.asyncio

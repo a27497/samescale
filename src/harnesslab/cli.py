@@ -413,7 +413,7 @@ def validate_model_profile(
         raise typer.Exit(code=1) from exc
     typer.echo(
         f"PASS provider={profile.provider} model={profile.requested_model} "
-        f"protocol={profile.protocol.value} endpoint={profile.base_url}{profile.route}"
+        f"protocol={profile.protocol.value} endpoint_identity={profile.provider_route_identity}"
     )
     typer.echo(f"credential_reference={profile.credential_reference or 'NOT_CONFIGURED'}")
 

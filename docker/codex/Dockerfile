@@ -27,6 +27,8 @@ RUN apt-get update \
     && groupadd --gid 10001 harnesslab \
     && useradd --uid 10001 --gid 10001 --no-create-home --shell /usr/sbin/nologin harnesslab
 
+COPY --chmod=0555 runtime_entrypoint.py /usr/local/bin/harnesslab-codex-runtime
+
 ENV CODEX_HOME=/tmp/codex-home \
     HOME=/tmp/home \
     JAVA_HOME=/opt/java/openjdk \
@@ -36,5 +38,5 @@ ENV CODEX_HOME=/tmp/codex-home \
 
 USER 10001:10001
 WORKDIR /workspace
-ENTRYPOINT ["codex"]
+ENTRYPOINT ["/usr/local/bin/harnesslab-codex-runtime"]
 CMD ["--version"]

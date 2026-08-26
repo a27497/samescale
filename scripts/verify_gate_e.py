@@ -35,6 +35,7 @@ JUNIT = ROOT / "gate-e-results.xml"
 CODEX_IMAGE = "harnesslab-phase-e-codex:0.149.0"
 PHASE_E_TESTS = (
     "tests/test_codex_harness.py",
+    "tests/test_runtime_config_hygiene.py",
     "tests/test_cli.py::test_harness_codex_doctor_reports_pinned_runtime",
 )
 CRITICAL_TESTS = {
@@ -73,6 +74,8 @@ CRITICAL_TESTS = {
     "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[java]",
     "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[python]",
     "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[typescript]",
+    "test_codex_runtime_url_is_environment_only_and_ephemeral",
+    "test_codex_runtime_values_are_absent_from_every_harness_artifact",
 }
 PHASE_J_MODULE_NAMES = {
     "analyst.py",
@@ -490,6 +493,9 @@ def main() -> int:
         print("CODEX_EARLY_EXIT_PHASE_CLASSIFICATION=PASS")
         print("CODEX_STARTUP_SECRET_HYGIENE=PASS")
         print("CODEX_CLEANUP_INVARIANT=PASS")
+        print("CODEX_RUNTIME_URL_ARGV_HYGIENE=PASS")
+        print("CODEX_RUNTIME_CONFIG_VALUE_PERSISTENCE=DENIED")
+        print("CODEX_AMBIENT_CONFIG_ISOLATION=PASS")
     print("REAL_CALLS_THIS_REPAIR=0")
     print("REAL_PROVIDER_SMOKE=NOT_VERIFIED")
     print("CORE_RELEASE_READY=FALSE")

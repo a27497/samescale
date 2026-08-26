@@ -412,7 +412,7 @@ class SmokeControlPlane:
             if call.call_id.startswith("smoke-4-") or call.call_id.startswith("smoke-5-"):
                 codex_profile = configured_gpt56_relay_codex_profile(
                     runtime.codex_image,
-                    provider_base_url=provider.resolve_base_url(environment),
+                    provider_base_url_reference=provider.base_url_reference or "",
                     reasoning_effort=provider.reasoning_effort or "",
                     execution_timeout_seconds=provider.timeout_seconds,
                 )
@@ -444,9 +444,10 @@ class SmokeControlPlane:
         assert isinstance(codex, CodexHarnessProfile)
         direct_provider = resolved[0].frozen.provider_profile
         codex_provider = resolved[3].frozen.provider_profile
-        if direct.base_url != codex.provider_base_url or direct_provider.resolved_route_identity(
-            environment
-        ) != codex_provider.resolved_route_identity(environment):
+        if (
+            direct.provider_route_identity != codex.provider_route
+            or direct_provider.route_identity != codex_provider.route_identity
+        ):
             raise SmokeControlPlaneError("Direct GPT and Codex-medium resolved routes differ")
         return tuple(resolved)
 
@@ -474,7 +475,7 @@ class SmokeControlPlane:
         required = (
             profile.model_provider_id == "harnesslab_gpt56_relay",
             profile.provider_wire_api == "responses",
-            profile.provider_base_url == provider.resolve_base_url(environment),
+            profile.provider_base_url_reference == provider.base_url_reference,
             profile.provider_credential_reference == "HARNESSLAB_GPT56_RELAY_API_KEY",
             profile.requested_model == "gpt-5.6-sol",
             profile.provider_route == provider.route_identity,

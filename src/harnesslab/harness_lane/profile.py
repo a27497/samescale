@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from harnesslab.contracts.provider import ProviderProvenance, validate_provider_base_url
+from harnesslab.contracts.provider import ProviderProvenance
 from harnesslab.harness_lane.models import CodexHarnessProfile
 from harnesslab.sandbox.models import ImageIdentity
 
@@ -40,18 +40,19 @@ def canonical_codex_profile(
 def configured_gpt56_relay_codex_profile(
     image: ImageIdentity,
     *,
-    provider_base_url: str,
+    provider_base_url_reference: str,
     reasoning_effort: str,
     execution_timeout_seconds: float = 90,
 ) -> CodexHarnessProfile:
     """Build the one typed K-B0 Codex relay provider; no free-form config is accepted."""
 
-    base_url = validate_provider_base_url(provider_base_url)
+    if provider_base_url_reference != "HARNESSLAB_GPT56_RELAY_BASE_URL":
+        raise ValueError("Codex relay base URL reference is not canonical")
     route = "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses"
     provider = {
         "model_provider_id": "harnesslab_gpt56_relay",
         "provider_provenance": ProviderProvenance.TRUSTED_THIRD_PARTY_RELAY,
-        "provider_base_url": base_url,
+        "provider_base_url_reference": provider_base_url_reference,
         "provider_route": route,
         "provider_wire_api": "responses",
         "provider_credential_reference": "HARNESSLAB_GPT56_RELAY_API_KEY",

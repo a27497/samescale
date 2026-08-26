@@ -115,7 +115,14 @@ class _HTTPProviderAdapter:
                 ProviderFailureCategory.CONFIGURATION,
                 f"credential environment variable {reference} is not configured",
             )
-        url = f"{request.profile.base_url}{request.profile.route}"
+        try:
+            runtime_base_url = request.profile.resolve_base_url(self._environment)
+        except ValueError as exc:
+            raise ProviderInvocationError(
+                ProviderFailureCategory.CONFIGURATION,
+                "provider runtime URL is not configured",
+            ) from exc
+        url = f"{runtime_base_url}{request.profile.route}"
         payload = self._payload(request)
         headers = self._headers(credential)
         started = time.perf_counter()
@@ -326,7 +333,7 @@ class OpenAIResponsesAdapter(_HTTPProviderAdapter):
             requested_model=request.profile.requested_model,
             observed_model=body.get("model") if isinstance(body.get("model"), str) else None,
             provider=request.profile.provider,
-            endpoint=f"{request.profile.base_url}{request.profile.route}",
+            endpoint_identity=request.profile.provider_route_identity,
             protocol=self.protocol,
             request_id=body.get("id") if isinstance(body.get("id"), str) else None,
             public_output_text="".join(public_parts),
@@ -421,7 +428,7 @@ class AnthropicMessagesAdapter(_HTTPProviderAdapter):
             requested_model=request.profile.requested_model,
             observed_model=body.get("model") if isinstance(body.get("model"), str) else None,
             provider=request.profile.provider,
-            endpoint=f"{request.profile.base_url}{request.profile.route}",
+            endpoint_identity=request.profile.provider_route_identity,
             protocol=self.protocol,
             request_id=request_id,
             public_output_text="".join(texts),
@@ -515,7 +522,7 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
             requested_model=request.profile.requested_model,
             observed_model=body.get("model") if isinstance(body.get("model"), str) else None,
             provider=request.profile.provider,
-            endpoint=f"{request.profile.base_url}{request.profile.route}",
+            endpoint_identity=request.profile.provider_route_identity,
             protocol=self.protocol,
             request_id=request_id,
             public_output_text=refusal if refused else content,
