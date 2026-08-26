@@ -66,6 +66,24 @@ def _profile_identity(raw: dict[str, Any], profile: dict[str, Any]) -> str | Non
     return canonical_digest(controls)
 
 
+def _effective_network_policy(profile: dict[str, Any]) -> str | None:
+    declared = _string(profile.get("network_policy")) or _string(profile.get("tool_network_policy"))
+    split_controls = (
+        "codex_inner_network_policy",
+        "codex_inner_network_enforcement",
+        "filesystem_enforcement",
+    )
+    if not any(name in profile for name in split_controls):
+        return declared
+    if (
+        declared != "deny"
+        or _string(profile.get("codex_inner_network_policy")) != "deny"
+        or _string(profile.get("codex_inner_network_enforcement")) != "seccomp"
+    ):
+        return None
+    return declared
+
+
 def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
     profile = _mapping(raw.get("profile"))
     generation = _mapping(raw.get("generation_settings"))
@@ -91,9 +109,18 @@ def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
     if isinstance(budget, dict):
         network = _string(budget.get("network_policy"))
     if network is None:
-        network = _string(profile.get("network_policy")) or _string(
-            profile.get("tool_network_policy")
+        network = _effective_network_policy(profile)
+    elif profile and any(
+        name in profile
+        for name in (
+            "codex_inner_network_policy",
+            "codex_inner_network_enforcement",
+            "filesystem_enforcement",
         )
+    ):
+        profile_network = _effective_network_policy(profile)
+        if profile_network != network:
+            network = None
     observed = _string(raw.get("observed_model"))
     return ComparisonFacts(
         evidence_identity=canonical_digest(raw),

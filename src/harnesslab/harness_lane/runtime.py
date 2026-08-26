@@ -19,7 +19,6 @@ REQUIRED_EXEC_HELP = (
     "--ignore-rules",
     "--skip-git-repo-check",
     "--color",
-    "--sandbox",
     "--cd",
     "--model",
 )

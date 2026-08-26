@@ -101,6 +101,7 @@ CRITICAL_TESTS = {
     "test_post_r4_smoke_history_is_safe_immutable_and_truthful",
     "test_post_r5_smoke_history_is_safe_immutable_and_truthful",
     "test_post_r6_smoke_history_is_safe_immutable_and_truthful",
+    "test_post_r7_smoke_history_is_safe_immutable_and_truthful",
     "test_production_smoke_persists_codex_precapture_infrastructure_evidence",
     "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
     "test_v2_credential_preflight_prints_presence_only",
@@ -130,6 +131,7 @@ CRITICAL_TESTS = {
     "test_smoke_result_and_receipt_exclude_runtime_url_value",
     "test_runtime_entrypoint_removes_url_only_from_codex_child_environment",
     "test_pinned_codex_uses_generated_isolated_relay_profile_without_websockets",
+    "test_pinned_codex_split_sandbox_executes_with_outer_filesystem_and_seccomp_network",
 }
 
 
@@ -260,6 +262,9 @@ def verify_contract_mode() -> bool:
     post_r6_history = json.loads(
         (ROOT / "release/history/core-real-v2-attempt-4.json").read_text(encoding="utf-8")
     )
+    post_r7_history = json.loads(
+        (ROOT / "release/history/core-real-v2-attempt-5.json").read_text(encoding="utf-8")
+    )
     snapshot = json.loads(
         (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
     )
@@ -315,6 +320,24 @@ def verify_contract_mode() -> bool:
         != {"base_url_present": "NO", "api_key_present": "NO"}
     ):
         print("FAIL: immutable post-R6 smoke history drifted")
+        return False
+    if (
+        post_r7_history.get("source_commit") != "029c0d84036dc697786fad02910c4212298ed28c"
+        or post_r7_history.get("receipt_digest")
+        != "sha256:9a8e4892d2fd070f004038068bc30aa2b327f366414455cf494be4a65fb6941a"
+        or post_r7_history.get("attempted_top_level_launches") != 4
+        or [call.get("outcome") for call in post_r7_history.get("calls", ())]
+        != ["verified_fail", "subject_output_error", "verified_pass", "harness_error"]
+        or post_r7_history.get("calls", [{}, {}, {}, {}])[3].get("harness_failure") != "timeout"
+        or post_r7_history.get("safe_command_diagnostics", {}).get("root_cause")
+        != "CODEX_INNER_BWRAP_USER_NAMESPACE_DENIED"
+        or post_r7_history.get("calls_5_to_8") != "NOT_RUN"
+        or post_r7_history.get("retry_count") != 0
+        or post_r7_history.get("fallback_count") != 0
+        or post_r7_history.get("runtime_value_hygiene")
+        != {"relay_base_url_present": "NO", "api_key_present": "NO"}
+    ):
+        print("FAIL: immutable post-R7 smoke history drifted")
         return False
     if (
         snapshot.get("provider_provenance") != "THIRD_PARTY_INFERENCE_PLATFORM"
@@ -401,6 +424,8 @@ def verify_contract_mode() -> bool:
     print("POST_R4_SMOKE_HISTORY_PRESERVED=PASS")
     print("POST_R5_SMOKE_HISTORY_PRESERVED=PASS")
     print("POST_R6_SMOKE_HISTORY_PRESERVED=PASS")
+    print("POST_R7_SMOKE_HISTORY_PRESERVED=PASS")
+    print("R8_LEGACY_LANDLOCK_WORKSPACE_WRITE=REJECTED_BY_PINNED_0_149_0")
     print("CODEX_STARTUP_FAILURE_EVIDENCE=PASS")
     print("CODEX_EARLY_EXIT_PHASE_CLASSIFICATION=PASS")
     print("CODEX_STARTUP_SECRET_HYGIENE=PASS")
@@ -418,6 +443,16 @@ def verify_contract_mode() -> bool:
     print("CODEX_AMBIENT_USER_CONFIG_ISOLATION=PASS")
     print("CODEX_RUNTIME_URL_CHILD_ENV=ABSENT")
     print("EGRESS_PROXY_POLICY_UNCHANGED=PASS")
+    print("CODEX_FILESYSTEM_ENFORCEMENT=OUTER_DOCKER")
+    print("CODEX_INNER_FILESYSTEM_POLICY=UNRESTRICTED")
+    print("CODEX_INNER_NETWORK_POLICY=DENY")
+    print("CODEX_INNER_NETWORK_ENFORCEMENT=SECCOMP")
+    print("CODEX_BWRAP_DEPENDENCY=ABSENT")
+    print("CODEX_PINNED_SHELL_EXECUTION=PASS")
+    print("CODEX_EFFECTIVE_WORKSPACE_WRITE=PASS")
+    print("CODEX_TOOL_NETWORK=DENIED")
+    print("CODEX_OUTER_DOCKER_SECURITY=PASS")
+    print("P_LANE_EFFECTIVE_NETWORK_CONTROL=PASS")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
     print("PHASE_K_B1_R6_RUNTIME_CONFIGURATION_EVIDENCE_IDENTITY_SEPARATION_KEYLESS")

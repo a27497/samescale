@@ -33,7 +33,10 @@ from harnesslab.harness_lane.models import (
     CodexBackendFailurePhase,
     CodexCleanupFailure,
     CodexCleanupFailureScope,
+    CodexFilesystemEnforcement,
     CodexHarnessProfile,
+    CodexInnerFilesystemPolicy,
+    CodexInnerNetworkEnforcement,
     CodexProcessCapture,
     HarnessFailureCategory,
     HarnessLaneOutcome,
@@ -42,6 +45,9 @@ from harnesslab.harness_lane.models import (
 )
 from harnesslab.harness_lane.profile import (
     CODEX_CLI_VERSION,
+    CODEX_PERMISSION_FILESYSTEM_OVERRIDE,
+    CODEX_PERMISSION_NETWORK_OVERRIDE,
+    CODEX_PERMISSION_PROFILE,
     SHELL_TOOL_ENVIRONMENT_POLICY,
     canonical_codex_profile,
 )
@@ -130,6 +136,16 @@ def test_codex_profile_and_prompt_hashes_are_deterministic() -> None:
     )
 
     assert first_profile.fingerprint == second_profile.fingerprint
+    assert first_profile.effective_filesystem_policy == "workspace-write"
+    assert first_profile.filesystem_enforcement is CodexFilesystemEnforcement.OUTER_DOCKER
+    assert first_profile.codex_inner_filesystem_policy is CodexInnerFilesystemPolicy.UNRESTRICTED
+    assert first_profile.codex_permission_profile == CODEX_PERMISSION_PROFILE
+    assert first_profile.codex_inner_network_policy is NetworkPolicy.DENY
+    assert first_profile.codex_inner_network_enforcement is CodexInnerNetworkEnforcement.SECCOMP
+    counterfactual = first_profile.model_copy(
+        update={"filesystem_enforcement": CodexFilesystemEnforcement.CODEX_INNER}
+    )
+    assert counterfactual.fingerprint != first_profile.fingerprint
     assert first_prompt.prompt_hash == second_prompt.prompt_hash
     assert first_prompt.template_version == PROMPT_TEMPLATE_VERSION
     with pytest.raises(ValidationError, match="frozen"):
@@ -161,7 +177,11 @@ def test_codex_exec_plan_uses_stdin_and_canonical_isolation_flags(tmp_path: Path
     assert "features.remote_models=false" in plan.argv
     assert "features.remote_plugin=false" in plan.argv
     assert "features.plugins=false" in plan.argv
-    assert "sandbox_workspace_write.network_access=false" in plan.argv
+    assert "--sandbox" not in plan.argv
+    assert f'default_permissions="{CODEX_PERMISSION_PROFILE}"' in plan.argv
+    assert CODEX_PERMISSION_FILESYSTEM_OVERRIDE in plan.argv
+    assert CODEX_PERMISSION_NETWORK_OVERRIDE in plan.argv
+    assert "features.use_legacy_landlock=true" not in plan.argv
     assert "mcp_servers={}" in plan.argv
     assert 'shell_environment_policy.inherit="core"' in plan.argv
     assert "shell_environment_policy.ignore_default_excludes=false" in plan.argv

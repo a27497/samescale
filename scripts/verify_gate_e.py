@@ -78,6 +78,7 @@ CRITICAL_TESTS = {
     "test_codex_runtime_values_are_absent_from_every_harness_artifact",
     "test_runtime_entrypoint_removes_url_only_from_codex_child_environment",
     "test_pinned_codex_uses_generated_isolated_relay_profile_without_websockets",
+    "test_pinned_codex_split_sandbox_executes_with_outer_filesystem_and_seccomp_network",
 }
 PHASE_J_MODULE_NAMES = {
     "analyst.py",
@@ -505,6 +506,15 @@ def main() -> int:
         print("CODEX_AMBIENT_USER_CONFIG_ISOLATION=PASS")
         print("CODEX_RUNTIME_URL_CHILD_ENV=ABSENT")
         print("EGRESS_PROXY_POLICY_UNCHANGED=PASS")
+        print("CODEX_FILESYSTEM_ENFORCEMENT=OUTER_DOCKER")
+        print("CODEX_INNER_FILESYSTEM_POLICY=UNRESTRICTED")
+        print("CODEX_INNER_NETWORK_POLICY=DENY")
+        print("CODEX_INNER_NETWORK_ENFORCEMENT=SECCOMP")
+        print("CODEX_BWRAP_DEPENDENCY=ABSENT")
+        print("CODEX_PINNED_SHELL_EXECUTION=PASS")
+        print("CODEX_EFFECTIVE_WORKSPACE_WRITE=PASS")
+        print("CODEX_TOOL_NETWORK=DENIED")
+        print("CODEX_OUTER_DOCKER_SECURITY=PASS")
     print("REAL_CALLS_THIS_REPAIR=0")
     print("REAL_PROVIDER_SMOKE=NOT_VERIFIED")
     print("CORE_RELEASE_READY=FALSE")

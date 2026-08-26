@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-5",
+  "source_commit": "029c0d84036dc697786fad02910c4212298ed28c",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:9a8e4892d2fd070f004038068bc30aa2b327f366414455cf494be4a65fb6941a",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 4,
+  "failing_call_id": "smoke-4-harness-codex-gpt56-medium",
+  "failure_category": "HARNESS_FAILURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": "gpt-5.6-sol",
+      "latency_ms": 21931,
+      "verifier_passed": false,
+      "verifier_score": 0.8,
+      "outcome": "verified_fail"
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "requested_model": "qwen3.8-max",
+      "observed_model": "qwen3.8-max",
+      "stop_reason": "max_tokens",
+      "output_tokens": 2002,
+      "outcome": "subject_output_error",
+      "verifier": "NOT_RUN"
+    },
+    {
+      "call_id": "smoke-3-model-deepseek-v4pro-chat",
+      "requested_model": "deepseek-v4-pro",
+      "latency_ms": 3095,
+      "verifier_passed": true,
+      "verifier_score": 1.0,
+      "outcome": "verified_pass"
+    },
+    {
+      "call_id": "smoke-4-harness-codex-gpt56-medium",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": null,
+      "duration_ms": 90563,
+      "process_exit_code": 0,
+      "timed_out": true,
+      "outcome": "harness_error",
+      "harness_failure": "timeout",
+      "trace_coverage": "FULL_STREAM",
+      "trace_event_count": 15,
+      "verifier": "NOT_RUN"
+    }
+  ],
+  "calls_5_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "safe_route_diagnostics": {
+    "builtin_provider_proxy_403_present": "NO",
+    "websocket_fallback_present": "NO"
+  },
+  "safe_command_diagnostics": {
+    "command_execution_attempts": 5,
+    "command_execution_failures": 5,
+    "root_cause": "CODEX_INNER_BWRAP_USER_NAMESPACE_DENIED"
+  },
+  "runtime_value_hygiene": {
+    "relay_base_url_present": "NO",
+    "api_key_present": "NO"
+  },
+  "interpretation": "R7 custom-provider routing is real-smoke validated. The failing Codex command path depended on an inner Bubblewrap user namespace unavailable inside the hardened outer container.",
+  "limitations": [
+    "Each completed call is one smoke observation, not aggregate model performance evidence.",
+    "The root-cause category summarizes sanitized normalized trace evidence; raw shell output, provider content, agent messages, and private reasoning are not tracked.",
+    "No operator-local paths, runtime configuration values, credentials, raw provider content, or private reasoning are tracked here."
+  ]
+}

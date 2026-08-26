@@ -12,6 +12,7 @@ from urllib.parse import unquote, urlsplit
 
 BASE_URL_REFERENCE = "HARNESSLAB_GPT56_RELAY_BASE_URL"
 RUNTIME_PROFILE = "harnesslab-runtime"
+PERMISSION_PROFILE = "harnesslab-outer-sandbox"
 CODEX_HOME = Path("/tmp/codex-home")
 
 
@@ -65,6 +66,12 @@ def _materialize_runtime_profile(base_url: str) -> None:
             'env_key = "HARNESSLAB_GPT56_RELAY_API_KEY"',
             'wire_api = "responses"',
             "supports_websockets = false",
+            "",
+            f'default_permissions = "{PERMISSION_PROFILE}"',
+            f"[permissions.{PERMISSION_PROFILE}.filesystem]",
+            '":root" = "write"',
+            f"[permissions.{PERMISSION_PROFILE}.network]",
+            "enabled = false",
             "",
         )
     )

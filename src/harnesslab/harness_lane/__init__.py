@@ -3,7 +3,10 @@
 from harnesslab.harness_lane.models import (
     CodexBackendFailureEvidence,
     CodexBackendFailurePhase,
+    CodexFilesystemEnforcement,
     CodexHarnessProfile,
+    CodexInnerFilesystemPolicy,
+    CodexInnerNetworkEnforcement,
     HarnessFailureCategory,
     HarnessLaneEvidence,
     HarnessLaneOutcome,
@@ -17,8 +20,11 @@ from harnesslab.harness_lane.runner import CodexHarnessRunner
 __all__ = [
     "CodexBackendFailureEvidence",
     "CodexBackendFailurePhase",
+    "CodexFilesystemEnforcement",
     "CodexHarnessProfile",
     "CodexHarnessRunner",
+    "CodexInnerFilesystemPolicy",
+    "CodexInnerNetworkEnforcement",
     "HarnessFailureCategory",
     "HarnessLaneEvidence",
     "HarnessLaneOutcome",

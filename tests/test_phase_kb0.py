@@ -162,6 +162,11 @@ def test_kb0_codex_custom_provider_is_explicit_secret_free_and_single_treatment(
     right = high.model_dump(exclude={"reasoning_effort"})
     assert left == right
     assert medium.provider_config_digest == high.provider_config_digest
+    assert medium.codex_permission_profile == high.codex_permission_profile
+    assert medium.filesystem_enforcement == high.filesystem_enforcement
+    assert medium.codex_inner_filesystem_policy == high.codex_inner_filesystem_policy
+    assert medium.codex_inner_network_policy == high.codex_inner_network_policy
+    assert medium.codex_inner_network_enforcement == high.codex_inner_network_enforcement
     prompt = render_codex_harness_prompt(
         task_instruction="Fix task.",
         task_digest="sha256:" + "1" * 64,
@@ -183,6 +188,8 @@ def test_kb0_codex_custom_provider_is_explicit_secret_free_and_single_treatment(
     assert medium.provider_base_url_reference == "HARNESSLAB_GPT56_RELAY_BASE_URL"
     assert "https://relay.example.test/v1" not in joined
     assert medium.provider_credential_reference == "HARNESSLAB_GPT56_RELAY_API_KEY"
+    assert "--sandbox" not in argv
+    assert 'default_permissions="harnesslab-outer-sandbox"' in argv
     assert SENTINEL not in joined
     assert canonical_codex_profile(medium.codex_image).provider_route != medium.provider_route
 

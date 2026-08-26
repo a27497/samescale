@@ -12,6 +12,9 @@ from harnesslab.harness_lane.models import (
 )
 from harnesslab.harness_lane.profile import (
     CODEX_CLI_VERSION,
+    CODEX_PERMISSION_FILESYSTEM_OVERRIDE,
+    CODEX_PERMISSION_NETWORK_OVERRIDE,
+    CODEX_PERMISSION_PROFILE,
     SHELL_TOOL_ENVIRONMENT_POLICY,
 )
 from harnesslab.harness_lane.prompt import CodexHarnessPrompt
@@ -77,6 +80,8 @@ class CodexHarnessAdapter:
             raise HarnessAdapterError("Codex image identity must come from an inspected image")
         if profile.shell_tool_environment_policy != SHELL_TOOL_ENVIRONMENT_POLICY:
             raise HarnessAdapterError("Codex shell-tool environment policy is not canonical")
+        if profile.codex_permission_profile != CODEX_PERMISSION_PROFILE:
+            raise HarnessAdapterError("Codex permission profile is not canonical")
 
     def prepare(
         self,
@@ -119,8 +124,6 @@ class CodexHarnessAdapter:
             "--skip-git-repo-check",
             "--color",
             "never",
-            "--sandbox",
-            profile.sandbox_mode,
             "--cd",
             "/workspace",
             "--model",
@@ -139,7 +142,11 @@ class CodexHarnessAdapter:
             "-c",
             "features.plugins=false",
             "-c",
-            "sandbox_workspace_write.network_access=false",
+            f'default_permissions="{profile.codex_permission_profile}"',
+            "-c",
+            CODEX_PERMISSION_FILESYSTEM_OVERRIDE,
+            "-c",
+            CODEX_PERMISSION_NETWORK_OVERRIDE,
             "-c",
             f'model_reasoning_effort="{profile.reasoning_effort}"',
             "-c",

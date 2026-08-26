@@ -28,6 +28,9 @@ from harnesslab.harness_lane.models import (
 )
 from harnesslab.harness_lane.profile import (
     CODEX_IMAGE,
+    CODEX_PERMISSION_FILESYSTEM_OVERRIDE,
+    CODEX_PERMISSION_NETWORK_OVERRIDE,
+    CODEX_PERMISSION_PROFILE,
     configured_gpt56_relay_codex_profile,
 )
 from harnesslab.harness_lane.prompt import render_codex_harness_prompt
@@ -237,6 +240,11 @@ def test_codex_runtime_url_is_environment_only_and_ephemeral(
     runtime_config = (isolated_home / "harnesslab-runtime.config.toml").read_text(encoding="utf-8")
     assert RUNTIME_URL in runtime_config
     assert "supports_websockets = false" in runtime_config
+    assert f'default_permissions = "{CODEX_PERMISSION_PROFILE}"' in runtime_config
+    assert f"[permissions.{CODEX_PERMISSION_PROFILE}.filesystem]" in runtime_config
+    assert '":root" = "write"' in runtime_config
+    assert f"[permissions.{CODEX_PERMISSION_PROFILE}.network]" in runtime_config
+    assert "enabled = false" in runtime_config
     assert stat.S_IMODE((isolated_home / "harnesslab-runtime.config.toml").stat().st_mode) == 0o600
     assert RUNTIME_URL not in script.read_text(encoding="utf-8")
 
@@ -274,6 +282,154 @@ def test_runtime_entrypoint_removes_url_only_from_codex_child_environment(
     assert R7_RUNTIME_URL in runtime_config
     assert f'env_key = "{API_KEY_REFERENCE}"' in runtime_config
     assert "supports_websockets = false" in runtime_config
+    assert f'default_permissions = "{CODEX_PERMISSION_PROFILE}"' in runtime_config
+
+
+@pytest.mark.asyncio
+async def test_pinned_codex_split_sandbox_executes_with_outer_filesystem_and_seccomp_network(
+    tmp_path: Path,
+) -> None:
+    image = await CodexRuntime().ensure_image()
+    preflight, environment = await _docker_runtime_preflight()
+    cli = _DockerCLI(output_limit=1_000_000, environment=environment)
+    workspace = tmp_path / "workspace"
+    context = tmp_path / "context"
+    workspace.mkdir(mode=0o777)
+    context.mkdir(mode=0o755)
+    workspace.chmod(0o777)
+    context.chmod(0o755)
+    workspace_input = workspace / "workspace-input.txt"
+    context_input = context / "context-input.txt"
+    workspace_input.write_text("workspace-readable\n", encoding="utf-8")
+    context_input.write_text("context-readable\n", encoding="utf-8")
+    workspace_input.chmod(0o644)
+    context_input.chmod(0o644)
+    suffix = uuid4().hex[:12]
+    strict_name = f"hl-r9-{suffix}-strict"
+    sandbox_name = f"hl-r9-{suffix}-sandbox"
+    profile_overrides = (
+        "-c",
+        f'default_permissions="{CODEX_PERMISSION_PROFILE}"',
+        "-c",
+        CODEX_PERMISSION_FILESYSTEM_OVERRIDE,
+        "-c",
+        CODEX_PERMISSION_NETWORK_OVERRIDE,
+    )
+    strict_plan = CodexExecutionPlan(
+        argv=(
+            "codex",
+            "exec",
+            "--strict-config",
+            "--ignore-user-config",
+            "--ephemeral",
+            "--skip-git-repo-check",
+            "--profile",
+            "harnesslab-runtime",
+            *profile_overrides,
+            "-",
+        ),
+        prompt="",
+        workspace=workspace,
+        context=context,
+        timeout_seconds=10,
+        task_id="r9-strict-config",
+        environment_references=((BASE_URL_REFERENCE, BASE_URL_REFERENCE),),
+    )
+    probe = (
+        'test "$PWD" = /workspace || exit 21; '
+        "test -r /workspace/workspace-input.txt || exit 22; "
+        "ls /workspace >/dev/null || exit 23; "
+        "cp /workspace/workspace-input.txt /workspace/r9-written.txt || exit 24; "
+        "test -s /workspace/r9-written.txt || exit 25; "
+        "if touch /usr/local/r9-rootfs-write-forbidden 2>/dev/null; then exit 31; fi; "
+        "test -r /context/context-input.txt || exit 26; "
+        "if touch /context/r9-context-write-forbidden 2>/dev/null; then exit 32; fi; "
+        "python3 -c 'import errno,socket; "
+        "x=None; "
+        "\ntry: socket.socket(socket.AF_INET,socket.SOCK_STREAM)"
+        "\nexcept OSError as e: x=e.errno"
+        "\nraise SystemExit(0 if x == errno.EPERM else 41)'; "
+        "printf 'R9_SPLIT_SANDBOX_PASS\\n'"
+    )
+    sandbox_plan = CodexExecutionPlan(
+        argv=(
+            "codex",
+            "sandbox",
+            "-C",
+            "/workspace",
+            "--profile",
+            "harnesslab-runtime",
+            *profile_overrides,
+            "-P",
+            CODEX_PERMISSION_PROFILE,
+            "--",
+            "/usr/bin/bash",
+            "-c",
+            probe,
+        ),
+        prompt="",
+        workspace=workspace,
+        context=context,
+        timeout_seconds=10,
+        task_id="r9-split-sandbox",
+        environment_references=((BASE_URL_REFERENCE, BASE_URL_REFERENCE),),
+    )
+    backend = DockerCodexBackend(
+        explicitly_enabled=True,
+        credentials={BASE_URL_REFERENCE: RUNTIME_URL, API_KEY_REFERENCE: FAKE_KEY},
+    )
+    create_environment = docker_environment(
+        environment,
+        {BASE_URL_REFERENCE: RUNTIME_URL, API_KEY_REFERENCE: FAKE_KEY},
+    )
+    try:
+        await cli.run(
+            *backend.create_argv(strict_plan, strict_name), environment=create_environment
+        )
+        await backend._verify_effective_security(cli, strict_name)
+        await backend._execute_attached_process(
+            preflight.cli_path,
+            strict_name,
+            strict_plan,
+            environment,
+        )
+        strict_state = await cli.run("inspect", strict_name, "--format", "{{json .State.ExitCode}}")
+        strict_logs = await cli.run("logs", strict_name, check=False)
+        strict_output = strict_logs.stdout + strict_logs.stderr
+        assert json.loads(strict_state.stdout) == 1
+        assert strict_output.endswith(b"No prompt provided via stdin.\n")
+        assert b"configuration error" not in strict_output.lower()
+
+        sandbox_argv = backend.create_argv(sandbox_plan, sandbox_name)
+        serialized_argv = "\n".join(sandbox_argv)
+        assert image.reference == CODEX_IMAGE
+        assert "--sandbox" not in sandbox_plan.argv
+        assert "features.use_legacy_landlock" not in serialized_argv
+        assert "--privileged" not in sandbox_argv
+        assert "--cap-add" not in sandbox_argv
+        assert "seccomp=unconfined" not in serialized_argv
+        assert "apparmor=unconfined" not in serialized_argv.casefold()
+        assert "docker.sock" not in serialized_argv
+        assert "--publish" not in sandbox_argv and "-p" not in sandbox_argv
+        await cli.run(*sandbox_argv, environment=create_environment)
+        await backend._verify_effective_security(cli, sandbox_name)
+        result = await cli.run("start", "--attach", sandbox_name, check=False)
+        combined = result.stdout + result.stderr
+        assert result.returncode == 0, combined.decode("utf-8", errors="replace")
+        assert result.stdout == b"R9_SPLIT_SANDBOX_PASS\n"
+        assert b"bwrap" not in combined.lower()
+        assert (workspace / "r9-written.txt").read_text(encoding="utf-8") == (
+            "workspace-readable\n"
+        )
+        assert not (context / "r9-context-write-forbidden").exists()
+    finally:
+        for name in (strict_name, sandbox_name):
+            await cli.run("kill", name, check=False)
+            await cli.run("rm", "--force", name, check=False)
+            absent = await cli.run(
+                "ps", "--all", "--quiet", "--filter", f"name=^/{name}$", check=False
+            )
+            assert not absent.stdout.strip()
 
 
 @pytest.mark.asyncio

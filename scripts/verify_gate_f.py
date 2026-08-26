@@ -78,6 +78,7 @@ CRITICAL_TESTS = {
     "test_harness_uplift_hard_control_mutation_is_not_comparable[provider_route]",
     "test_harness_uplift_hard_control_mutation_is_not_comparable[budget_identity]",
     "test_harness_uplift_hard_control_mutation_is_not_comparable[network_policy]",
+    "test_codex_split_sandbox_network_control_fails_closed_on_actual_policy_drift",
     "test_missing_observed_model_is_partial_but_mismatch_blocks_uplift",
     "test_requested_observed_mismatch_blocks_uplift_even_when_both_sides_match",
     "test_trace_coverage_mismatch_is_partial_not_automatic_invalidation",
@@ -438,6 +439,8 @@ def main() -> int:
         failed = True
     if not verify_repository_secrets():
         failed = True
+    if not failed:
+        print("P_LANE_EFFECTIVE_NETWORK_CONTROL=PASS")
     print("REAL_CLAUDE_SMOKE=NOT_RUN")
     print("REAL_DEEPSEEK_SMOKE=NOT_RUN")
     return ExitCode.FAIL if failed else ExitCode.PASS

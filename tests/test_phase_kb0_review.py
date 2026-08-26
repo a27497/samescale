@@ -224,6 +224,52 @@ def test_post_r6_smoke_history_is_safe_immutable_and_truthful() -> None:
     assert "reasoning_content" not in serialized
 
 
+def test_post_r7_smoke_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-5.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "029c0d84036dc697786fad02910c4212298ed28c"
+    assert history["receipt_digest"] == (
+        "sha256:9a8e4892d2fd070f004038068bc30aa2b327f366414455cf494be4a65fb6941a"
+    )
+    assert history["attempted_top_level_launches"] == 4
+    assert [call["outcome"] for call in history["calls"]] == [
+        "verified_fail",
+        "subject_output_error",
+        "verified_pass",
+        "harness_error",
+    ]
+    assert history["calls"][0]["verifier_score"] == 0.8
+    assert history["calls"][1]["stop_reason"] == "max_tokens"
+    assert history["calls"][2]["verifier_score"] == 1.0
+    codex = history["calls"][3]
+    assert codex["harness_failure"] == "timeout"
+    assert codex["duration_ms"] == 90563
+    assert codex["trace_coverage"] == "FULL_STREAM"
+    assert codex["trace_event_count"] == 15
+    assert codex["verifier"] == "NOT_RUN"
+    assert history["calls_5_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert history["safe_route_diagnostics"] == {
+        "builtin_provider_proxy_403_present": "NO",
+        "websocket_fallback_present": "NO",
+    }
+    assert history["safe_command_diagnostics"] == {
+        "command_execution_attempts": 5,
+        "command_execution_failures": 5,
+        "root_cause": "CODEX_INNER_BWRAP_USER_NAMESPACE_DENIED",
+    }
+    assert history["runtime_value_hygiene"] == {
+        "relay_base_url_present": "NO",
+        "api_key_present": "NO",
+    }
+    assert "/home/dev/harnesslab-evidence" not in serialized
+    assert all(value not in serialized for name, value in SAFE_ENVIRONMENT.items() if "KEY" in name)
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
 def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
     control = SmokeControlPlane.load(ROOT)
     receipt = control.preflight()

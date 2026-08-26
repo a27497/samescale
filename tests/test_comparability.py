@@ -108,6 +108,35 @@ def test_harness_uplift_hard_control_mutation_is_not_comparable(field: str) -> N
     )
 
 
+def test_codex_split_sandbox_network_control_fails_closed_on_actual_policy_drift() -> None:
+    manifest = {
+        "schema_version": 1,
+        "harness": "codex",
+        "profile": {
+            "harness": "codex",
+            "tool_network_policy": "deny",
+            "codex_inner_network_policy": "deny",
+            "codex_inner_network_enforcement": "seccomp",
+            "filesystem_enforcement": "outer-docker",
+        },
+    }
+    controlled = facts_from_manifest(manifest)
+    assert controlled.network_policy == "deny"
+
+    broadened = json.loads(json.dumps(manifest))
+    broadened["profile"]["codex_inner_network_policy"] = "allowlist"
+    broadened_facts = facts_from_manifest(broadened)
+    assert broadened_facts.network_policy is None
+    report = ComparabilityEngine().assess(
+        facts(), broadened_facts, intent=ComparabilityIntent.HARNESS_UPLIFT
+    )
+    assert report.status is ComparabilityStatus.NOT_COMPARABLE
+    assert any(
+        reason.code is ReasonCode.HARD_CONTROL_MISSING and reason.field == "network_policy"
+        for reason in report.reasons
+    )
+
+
 def test_missing_observed_model_is_partial_but_mismatch_blocks_uplift() -> None:
     partial = ComparabilityEngine().assess(
         facts(),

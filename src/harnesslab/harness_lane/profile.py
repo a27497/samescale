@@ -15,6 +15,11 @@ SHELL_TOOL_ENVIRONMENT_POLICY = (
     "inherit=core;ignore_default_excludes=false;"
     "exclude=*KEY*,*SECRET*,*TOKEN*,*PASSWORD*;allow_login_shell=false"
 )
+CODEX_PERMISSION_PROFILE = "harnesslab-outer-sandbox"
+CODEX_PERMISSION_FILESYSTEM_OVERRIDE = (
+    'permissions.harnesslab-outer-sandbox.filesystem={":root"="write"}'
+)
+CODEX_PERMISSION_NETWORK_OVERRIDE = "permissions.harnesslab-outer-sandbox.network.enabled=false"
 
 
 def canonical_codex_profile(

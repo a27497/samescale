@@ -24,9 +24,14 @@ both immutable image IDs and exact tool versions. Python 3.11 and Java/Javac 17 
 sensitivity controls and must be rejected.
 
 The adapter builds argv directly and sends the deterministic `codex-harness-v1` prompt on stdin.
-The frozen profile uses strict configuration validation, workspace-write sandboxing, approval
-`never`, disabled tool network and web search, ephemeral state, ignored user config/rules, and no
-external MCP/plugins/skills. Requested model is always recorded. Observed model is recorded only
+The frozen profile records an effective `workspace-write` filesystem policy with split enforcement:
+the hardened outer Docker boundary owns filesystem restrictions, while the named
+`harnesslab-outer-sandbox` Codex profile declares root write solely to select pinned 0.149.0's
+non-Bubblewrap fast path and keeps its inner network policy restricted under seccomp. The outer
+rootfs remains read-only, `/workspace` is the only writable bind, `/context` is read-only, and
+`/tmp` is isolated. Strict configuration validation, approval `never`, disabled tool network and
+web search, ephemeral state, ignored user config/rules, and no external MCP/plugins/skills remain.
+Requested model is always recorded. Observed model is recorded only
 when native evidence exposes it; otherwise it remains null with `not_exposed` status.
 The configured provider route is explicitly identified as `codex-cli-default`; this describes the
 frozen CLI routing configuration and does not claim an observed provider-internal route.
@@ -77,6 +82,9 @@ as a real Codex model run.
 
 Real execution is never automatic and never consumes ambient `CODEX_HOME`, login state, quota, or
 API keys. It requires explicit opt-in and credential configuration. The outer Docker backend is
-hardened and subject network is denied; Phase E has not proven a safe provider-control-plane-only
-network channel. The post-R4 attempt reached Codex but produced no durable Codex call artifact, so the current Gate E result is `REAL_CODEX_SMOKE=NOT_VERIFIED`, and no
+hardened. Keyless pinned-binary tests prove that the split profile avoids Bubblewrap, permits the
+intended workspace read/write operations, denies outer rootfs and context writes, and returns
+`EPERM` for an AF_INET socket from a Codex-sandboxed tool process. R8's legacy-Landlock alternative
+was rejected because pinned 0.149.0 requires direct runtime enforcement for its normal
+workspace-write profile. The current Gate E result remains `REAL_CODEX_SMOKE=NOT_VERIFIED`, and no
 real Codex model success is claimed.

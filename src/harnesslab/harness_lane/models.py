@@ -50,6 +50,21 @@ class CodexBackendFailurePhase(StrEnum):
     UNKNOWN = "UNKNOWN"
 
 
+class CodexFilesystemEnforcement(StrEnum):
+    CODEX_INNER = "codex-inner"
+    OUTER_DOCKER = "outer-docker"
+
+
+class CodexInnerFilesystemPolicy(StrEnum):
+    WORKSPACE_WRITE = "workspace-write"
+    UNRESTRICTED = "unrestricted"
+
+
+class CodexInnerNetworkEnforcement(StrEnum):
+    BUBBLEWRAP_NAMESPACE = "bubblewrap-namespace"
+    SECCOMP = "seccomp"
+
+
 class CodexStreamDiagnosticCategory(StrEnum):
     UNAVAILABLE = "UNAVAILABLE"
     EMPTY = "EMPTY"
@@ -250,9 +265,18 @@ class CodexHarnessProfile(BaseModel):
     provider_supports_websockets: Literal[False] | None = None
     provider_config_digest: Sha256Digest | None = None
     reasoning_effort: str = Field(min_length=1, max_length=50)
-    sandbox_mode: Literal["workspace-write"] = "workspace-write"
+    effective_filesystem_policy: Literal["workspace-write"] = "workspace-write"
+    filesystem_enforcement: CodexFilesystemEnforcement = CodexFilesystemEnforcement.OUTER_DOCKER
+    codex_inner_filesystem_policy: CodexInnerFilesystemPolicy = (
+        CodexInnerFilesystemPolicy.UNRESTRICTED
+    )
+    codex_permission_profile: Literal["harnesslab-outer-sandbox"] = "harnesslab-outer-sandbox"
     approval_policy: Literal["never"] = "never"
     tool_network_policy: NetworkPolicy = NetworkPolicy.DENY
+    codex_inner_network_policy: NetworkPolicy = NetworkPolicy.DENY
+    codex_inner_network_enforcement: CodexInnerNetworkEnforcement = (
+        CodexInnerNetworkEnforcement.SECCOMP
+    )
     web_search_policy: Literal["disabled"] = "disabled"
     ephemeral: Literal[True] = True
     ignore_user_config: bool = True
@@ -270,7 +294,13 @@ class CodexHarnessProfile(BaseModel):
     @model_validator(mode="after")
     def canonical_phase_e_policy(self) -> CodexHarnessProfile:
         required = (
+            self.effective_filesystem_policy == "workspace-write",
+            self.filesystem_enforcement is CodexFilesystemEnforcement.OUTER_DOCKER,
+            self.codex_inner_filesystem_policy is CodexInnerFilesystemPolicy.UNRESTRICTED,
+            self.codex_permission_profile == "harnesslab-outer-sandbox",
             self.tool_network_policy is NetworkPolicy.DENY,
+            self.codex_inner_network_policy is NetworkPolicy.DENY,
+            self.codex_inner_network_enforcement is CodexInnerNetworkEnforcement.SECCOMP,
             self.ephemeral,
             self.ambient_user_config_isolated,
             self.ignore_rules,
