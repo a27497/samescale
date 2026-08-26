@@ -50,8 +50,14 @@ CRITICAL_TESTS = {
     "test_codex_timeout_capture_does_not_claim_natural_container_exit_code",
     "test_clean_codex_timeout_after_successful_command_is_execution_budget_exhausted",
     "test_codex_timeout_without_useful_progress_remains_ambiguous_timeout",
-    "test_codex_timeout_after_successful_command_and_error_remains_infra_timeout",
-    "test_codex_timeout_after_failed_command_remains_infra_timeout",
+    "test_codex_timeout_after_proxy_error_trace_remains_infra_timeout",
+    "test_codex_timeout_after_subject_git_probe_and_file_change_is_budget_exhausted",
+    "test_codex_timeout_after_failed_subject_test_is_budget_exhausted",
+    "test_codex_timeout_after_arbitrary_subject_exit_two_is_budget_exhausted",
+    "test_codex_timeout_with_only_nonzero_command_and_no_healthy_progress_remains_infra",
+    "test_codex_bwrap_namespace_denial_timeout_remains_infra",
+    "test_codex_bwrap_namespace_denial_disqualifies_prior_healthy_progress",
+    "test_codex_timeout_after_failed_command_without_exit_code_remains_infra",
     "test_codex_timeout_with_malformed_event_is_protocol_error",
     "test_codex_cancelled_clean_progress_is_cancelled",
     "test_codex_budget_exhaustion_persists_typed_manifest_without_verifier",
@@ -525,8 +531,13 @@ def main() -> int:
         print("CODEX_OUTER_DOCKER_SECURITY=PASS")
         print("CODEX_CLEAN_BUDGET_EXHAUSTION=CAPABILITY_FAIL")
         print("CODEX_AMBIGUOUS_TIMEOUT=INFRA_FAILURE")
-        print("CODEX_FAILED_TOOL_TIMEOUT=INFRA_FAILURE")
         print("CODEX_ERROR_TRACE_TIMEOUT=INFRA_FAILURE")
+        print("SUBJECT_NONZERO_COMMAND_IS_NOT_INFRA=PASS")
+        print("GIT_STATUS_NONREPO_TIMEOUT=CAPABILITY_FAIL")
+        print("FAILED_TEST_COMMAND_TIMEOUT=CAPABILITY_FAIL")
+        print("NO_HEALTHY_PROGRESS_TIMEOUT=INFRA_FAILURE")
+        print("BWRAP_TIMEOUT_REMAINS_INFRA=PASS")
+        print("ERROR_TRACE_TIMEOUT_REMAINS_INFRA=PASS")
         print("PROCESS_EXIT_TIMEOUT_TRUTHFULNESS=PASS")
     print("REAL_CALLS_THIS_REPAIR=0")
     print("REAL_PROVIDER_SMOKE=NOT_VERIFIED")

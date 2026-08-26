@@ -161,6 +161,7 @@ def verify_test_evidence(evidence_path: Path) -> ExitCode:
     print("PHASE_G_BUDGET_EXHAUSTION=CAPABILITY_FAIL/FAILED_SUBJECT")
     print("PHASE_G_AMBIGUOUS_TIMEOUT=INFRA_FAILURE/FAILED_INFRA")
     print("EXECUTION_BUDGET_DENOMINATOR=INCLUDED")
+    print("R10_STATISTICAL_SEMANTICS=UNCHANGED")
     print("P_LANE=controlled-keyless COMPARABLE;actual-route-mismatch NOT_COMPARABLE PASS")
     print("ABLATION=reasoning_effort declared;observed-model limitation surfaced PASS")
     return ExitCode.PASS

@@ -104,6 +104,7 @@ CRITICAL_TESTS = {
     "test_post_r7_smoke_history_is_safe_immutable_and_truthful",
     "test_post_r9_attempt_6_history_is_safe_immutable_and_truthful",
     "test_post_r9_attempt_7_history_is_safe_immutable_and_truthful",
+    "test_post_r10_attempt_8_history_is_safe_immutable_and_truthful",
     "test_production_smoke_persists_codex_precapture_infrastructure_evidence",
     "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
     "test_v2_credential_preflight_prints_presence_only",
@@ -111,8 +112,10 @@ CRITICAL_TESTS = {
     "test_smoke_missing_config_stops_before_first_call",
     "test_smoke_abort_on_first_failure_never_invokes_calls_four_through_eight",
     "test_smoke_typed_codex_infrastructure_failure_stops_without_retry_or_fallback",
-    "test_smoke_codex_execution_budget_exhaustion_continues_to_call_five",
-    "test_smoke_codex_ambiguous_timeout_stops_at_call_four",
+    "test_smoke_post_r10_subject_command_failure_continues_to_call_five",
+    "test_smoke_infra_timeout_trace_stops_at_call_four[ambiguous]",
+    "test_smoke_infra_timeout_trace_stops_at_call_four[bwrap]",
+    "test_smoke_infra_timeout_trace_stops_at_call_four[error]",
     "test_smoke_budget_exhaustion_rejects_exposed_wrong_model",
     "test_smoke_multi_harness_model_turn_failure_is_capability_result",
     "test_smoke_one_judge_call_only",
@@ -277,6 +280,9 @@ def verify_contract_mode() -> bool:
     post_r9_attempt_7 = json.loads(
         (ROOT / "release/history/core-real-v2-attempt-7.json").read_text(encoding="utf-8")
     )
+    post_r10_attempt_8 = json.loads(
+        (ROOT / "release/history/core-real-v2-attempt-8.json").read_text(encoding="utf-8")
+    )
     snapshot = json.loads(
         (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
     )
@@ -387,6 +393,39 @@ def verify_contract_mode() -> bool:
         print("FAIL: immutable post-R9 attempt 7 history drifted")
         return False
     if (
+        post_r10_attempt_8.get("source_commit") != "2eb2be74c131e330be48467495b8c559776be146"
+        or post_r10_attempt_8.get("receipt_digest")
+        != "sha256:45eae792acbb7f8bc92d3097804dbc5c13ad85f181910f24092543d5d8c9749e"
+        or post_r10_attempt_8.get("attempted_top_level_launches") != 4
+        or [call.get("outcome") for call in post_r10_attempt_8.get("calls", ())]
+        != ["subject_output_error", "verified_fail", "verified_fail", "harness_error"]
+        or post_r10_attempt_8.get("calls", [{}, {}, {}, {}])[3].get(
+            "original_persisted_harness_failure"
+        )
+        != "timeout"
+        or post_r10_attempt_8.get("calls", [{}, {}, {}, {}])[3].get(
+            "original_persisted_process_exit_code"
+        )
+        is not None
+        or post_r10_attempt_8.get("r11_classification_review", {}).get("failed_command_reason")
+        != "SUBJECT_COMMAND_NONZERO_EXIT"
+        or post_r10_attempt_8.get("r11_classification_review", {}).get("safe_reason_detail")
+        != "GIT_WORKSPACE_PROBE_NOT_REPOSITORY"
+        or post_r10_attempt_8.get("r11_classification_review", {}).get("successful_command_count")
+        != 1
+        or post_r10_attempt_8.get("r11_classification_review", {}).get(
+            "subject_nonzero_command_count"
+        )
+        != 1
+        or post_r10_attempt_8.get("security_profile", {}).get("status") != "PASS"
+        or post_r10_attempt_8.get("runtime_value_hygiene", {}).get("status") != "PASS"
+        or post_r10_attempt_8.get("calls_5_to_8") != "NOT_RUN"
+        or post_r10_attempt_8.get("retry_count") != 0
+        or post_r10_attempt_8.get("fallback_count") != 0
+    ):
+        print("FAIL: immutable post-R10 attempt 8 history drifted")
+        return False
+    if (
         snapshot.get("provider_provenance") != "THIRD_PARTY_INFERENCE_PLATFORM"
         or snapshot.get("fixed_base_url") != "https://opencode.ai/zen/go"
         or snapshot.get("live_model_probe_performed") is not False
@@ -474,7 +513,9 @@ def verify_contract_mode() -> bool:
     print("POST_R7_SMOKE_HISTORY_PRESERVED=PASS")
     print("POST_R9_ATTEMPT_6_HISTORY=PRESERVED")
     print("POST_R9_ATTEMPT_7_HISTORY=PRESERVED")
+    print("POST_R10_ATTEMPT_8_HISTORY=PRESERVED")
     print("SMOKE_CAPABILITY_TIMEOUT_CONTINUES=PASS")
+    print("SMOKE_SUBJECT_COMMAND_FAILURE_CONTINUES=PASS")
     print("SMOKE_INFRA_TIMEOUT_STOPS=PASS")
     print("SMOKE_NULL_OBSERVED_MODEL_ON_BUDGET_EXHAUSTION=PASS")
     print("R8_LEGACY_LANDLOCK_WORKSPACE_WRITE=REJECTED_BY_PINNED_0_149_0")

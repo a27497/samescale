@@ -40,6 +40,7 @@ from harnesslab.harness_lane.models import (
     ObservedModelStatus,
 )
 from harnesslab.harness_lane.profile import CODEX_IMAGE, canonical_codex_profile
+from harnesslab.harness_lane.trace import collect_codex_jsonl
 from harnesslab.model_lane.models import DirectModelOutcome
 from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
 from harnesslab.multi_harness.models import HarnessProcessCapture, TraceCoverage
@@ -94,6 +95,109 @@ def _runtime() -> RuntimeIdentities:
         deepseek_image=_image(DEEPSEEK_IMAGE, "3"),
         egress_proxy_image=_image(EGRESS_PROXY_IMAGE, "4"),
         deepseek_config_digest="sha256:" + "5" * 64,
+    )
+
+
+def _post_r10_subject_command_timeout_lines() -> tuple[str, ...]:
+    return (
+        json.dumps({"type": "thread.started", "thread_id": "post-r10-thread"}),
+        json.dumps({"type": "turn.started"}),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "message-1",
+                    "type": "agent_message",
+                    "text": "Inspecting the workspace.",
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "item.started",
+                "item": {
+                    "id": "command-1",
+                    "type": "command_execution",
+                    "command": "sed -n '1,200p' events.py",
+                    "status": "in_progress",
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-1",
+                    "type": "command_execution",
+                    "command": "sed -n '1,200p' events.py",
+                    "aggregated_output": "source inspected",
+                    "status": "completed",
+                    "exit_code": 0,
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "item.started",
+                "item": {
+                    "id": "command-2",
+                    "type": "command_execution",
+                    "command": "git status --short",
+                    "status": "in_progress",
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-2",
+                    "type": "command_execution",
+                    "command": "git status --short",
+                    "aggregated_output": "fatal: not a git repository",
+                    "status": "failed",
+                    "exit_code": 128,
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "change-1",
+                    "type": "file_change",
+                    "status": "completed",
+                    "changes": [{"path": "events.py", "kind": "update"}],
+                },
+            }
+        ),
+    )
+
+
+def _bwrap_timeout_lines() -> tuple[str, ...]:
+    return (
+        json.dumps({"type": "thread.started", "thread_id": "bwrap-thread"}),
+        json.dumps({"type": "turn.started"}),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-1",
+                    "type": "command_execution",
+                    "command": "python -m pytest",
+                    "aggregated_output": "bwrap: No permissions to create a new namespace",
+                    "status": "failed",
+                    "exit_code": 1,
+                },
+            }
+        ),
+    )
+
+
+def _error_timeout_lines() -> tuple[str, ...]:
+    return (
+        *_post_r10_subject_command_timeout_lines()[:5],
+        json.dumps({"type": "error", "error": {"message": "provider proxy returned 403"}}),
     )
 
 
@@ -347,6 +451,55 @@ def test_post_r9_attempt_7_history_is_safe_immutable_and_truthful() -> None:
     assert "reasoning_content" not in serialized
 
 
+def test_post_r10_attempt_8_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-8.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "2eb2be74c131e330be48467495b8c559776be146"
+    assert history["receipt_digest"] == (
+        "sha256:45eae792acbb7f8bc92d3097804dbc5c13ad85f181910f24092543d5d8c9749e"
+    )
+    assert history["attempted_top_level_launches"] == 4
+    assert [call["outcome"] for call in history["calls"]] == [
+        "subject_output_error",
+        "verified_fail",
+        "verified_fail",
+        "harness_error",
+    ]
+    assert [call["statistical_outcome"] for call in history["calls"][:3]] == [
+        "capability_fail",
+        "capability_fail",
+        "capability_fail",
+    ]
+    assert [call["verifier_score"] for call in history["calls"][:3]] == [None, 0.8, 0.8]
+    codex = history["calls"][3]
+    assert codex["original_persisted_harness_failure"] == "timeout"
+    assert codex["original_persisted_process_exit_code"] is None
+    assert codex["duration_ms"] == 90530
+    assert codex["timed_out"] is True
+    review = history["r11_classification_review"]
+    assert review == {
+        "result": "EXECUTION_BUDGET_EXHAUSTED_CANDIDATE",
+        "successful_command_count": 1,
+        "subject_nonzero_command_count": 1,
+        "command_execution_infra_failure_count": 0,
+        "file_change_completed": True,
+        "failed_command_reason": "SUBJECT_COMMAND_NONZERO_EXIT",
+        "safe_reason_detail": "GIT_WORKSPACE_PROBE_NOT_REPOSITORY",
+    }
+    assert history["security_profile"]["status"] == "PASS"
+    assert history["runtime_value_hygiene"]["status"] == "PASS"
+    assert history["runtime_value_hygiene"]["all_runtime_value_match_file_count"] == 0
+    assert history["calls_5_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert "/home/dev/harnesslab-evidence" not in serialized
+    assert "git status --short" not in serialized
+    assert all(value not in serialized for name, value in SAFE_ENVIRONMENT.items() if "KEY" in name)
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
 def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
     control = SmokeControlPlane.load(ROOT)
     receipt = control.preflight()
@@ -554,7 +707,7 @@ async def test_smoke_typed_codex_infrastructure_failure_stops_without_retry_or_f
 
 
 @pytest.mark.asyncio
-async def test_smoke_codex_execution_budget_exhaustion_continues_to_call_five(
+async def test_smoke_post_r10_subject_command_failure_continues_to_call_five(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     control = SmokeControlPlane.load(ROOT)
@@ -572,10 +725,19 @@ async def test_smoke_codex_execution_budget_exhaustion_continues_to_call_five(
             pass
 
         async def run(self, *_: object, **__: object) -> SimpleNamespace:
+            collection = collect_codex_jsonl(
+                CodexProcessCapture(
+                    _post_r10_subject_command_timeout_lines(),
+                    None,
+                    90_530,
+                    timed_out=True,
+                )
+            )
+            assert collection.failure_category is HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED
             return SimpleNamespace(
                 artifact_directory=artifact,
                 evidence=SimpleNamespace(
-                    harness_failure=HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED,
+                    harness_failure=collection.failure_category,
                     outcome=HarnessLaneOutcome.HARNESS_ERROR,
                     observed_model=None,
                 ),
@@ -608,8 +770,22 @@ async def test_smoke_codex_execution_budget_exhaustion_continues_to_call_five(
 
 
 @pytest.mark.asyncio
-async def test_smoke_codex_ambiguous_timeout_stops_at_call_four(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+@pytest.mark.parametrize(
+    "trace_lines",
+    (
+        (
+            json.dumps({"type": "thread.started", "thread_id": "ambiguous-thread"}),
+            json.dumps({"type": "turn.started"}),
+        ),
+        _bwrap_timeout_lines(),
+        _error_timeout_lines(),
+    ),
+    ids=("ambiguous", "bwrap", "error"),
+)
+async def test_smoke_infra_timeout_trace_stops_at_call_four(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    trace_lines: tuple[str, ...],
 ) -> None:
     control = SmokeControlPlane.load(ROOT)
     bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
@@ -626,10 +802,14 @@ async def test_smoke_codex_ambiguous_timeout_stops_at_call_four(
             pass
 
         async def run(self, *_: object, **__: object) -> SimpleNamespace:
+            collection = collect_codex_jsonl(
+                CodexProcessCapture(trace_lines, None, 90_001, timed_out=True)
+            )
+            assert collection.failure_category is HarnessFailureCategory.TIMEOUT
             return SimpleNamespace(
                 artifact_directory=artifact,
                 evidence=SimpleNamespace(
-                    harness_failure=HarnessFailureCategory.TIMEOUT,
+                    harness_failure=collection.failure_category,
                     outcome=HarnessLaneOutcome.HARNESS_ERROR,
                     observed_model=None,
                 ),

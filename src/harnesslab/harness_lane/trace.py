@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from enum import StrEnum
 from typing import Any
 
 from harnesslab.harness_lane.models import (
@@ -24,6 +25,13 @@ MAX_NATIVE_TOTAL_BYTES = 4_000_000
 MAX_PUBLIC_TEXT = 131_072
 MAX_COMMAND_TEXT = 16_384
 MAX_COMMAND_OUTPUT = 65_536
+_BWRAP_NAMESPACE_DENIAL = "bwrap: No permissions to create a new namespace"
+
+
+class _CommandExecutionOutcome(StrEnum):
+    SUCCESSFUL = "successful_command"
+    SUBJECT_NONZERO_EXIT = "subject_command_nonzero_exit"
+    INFRA_FAILURE = "command_execution_infra_failure"
 
 
 class _DuplicateKey(ValueError):
@@ -224,6 +232,27 @@ def _normalized_trace(events: tuple[SanitizedNativeEvent, ...]) -> NormalizedTra
     )
 
 
+def _completed_command_outcome(
+    event: NormalizedTraceEvent,
+) -> _CommandExecutionOutcome | None:
+    """Classify completed commands without treating ordinary shell exits as infrastructure."""
+
+    if (
+        event.type is not TraceEventType.COMMAND_EXECUTION
+        or event.native_event_type != "item.completed"
+    ):
+        return None
+    if _BWRAP_NAMESPACE_DENIAL in (event.public_output or ""):
+        return _CommandExecutionOutcome.INFRA_FAILURE
+    if event.exit_code is not None and event.exit_code != 0:
+        return _CommandExecutionOutcome.SUBJECT_NONZERO_EXIT
+    if event.status in {"failed", "error"}:
+        return _CommandExecutionOutcome.INFRA_FAILURE
+    if event.status == "completed" and event.exit_code == 0:
+        return _CommandExecutionOutcome.SUCCESSFUL
+    return None
+
+
 def _clean_execution_budget_exhaustion(
     capture: CodexProcessCapture,
     trace: NormalizedTrace,
@@ -259,21 +288,14 @@ def _clean_execution_budget_exhaustion(
     }
     if trace_types & disqualifying:
         return False
-    commands = tuple(
-        event for event in trace.events if event.type is TraceEventType.COMMAND_EXECUTION
+    command_outcomes = tuple(
+        outcome
+        for event in trace.events
+        if (outcome := _completed_command_outcome(event)) is not None
     )
-    if any(
-        event.status in {"failed", "error"}
-        or (event.exit_code is not None and event.exit_code != 0)
-        for event in commands
-    ):
+    if _CommandExecutionOutcome.INFRA_FAILURE in command_outcomes:
         return False
-    return any(
-        event.native_event_type == "item.completed"
-        and event.status == "completed"
-        and event.exit_code == 0
-        for event in commands
-    )
+    return _CommandExecutionOutcome.SUCCESSFUL in command_outcomes
 
 
 def collect_codex_jsonl(

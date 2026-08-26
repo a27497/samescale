@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-8",
+  "source_commit": "2eb2be74c131e330be48467495b8c559776be146",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:45eae792acbb7f8bc92d3097804dbc5c13ad85f181910f24092543d5d8c9749e",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 4,
+  "failing_call_id": "smoke-4-harness-codex-gpt56-medium",
+  "failure_category": "HARNESS_FAILURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": "gpt-5.6-sol",
+      "outcome": "subject_output_error",
+      "statistical_outcome": "capability_fail",
+      "latency_ms": 8921,
+      "verifier_passed": null,
+      "verifier_score": null
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "requested_model": "qwen3.8-max",
+      "observed_model": "qwen3.8-max",
+      "outcome": "verified_fail",
+      "statistical_outcome": "capability_fail",
+      "latency_ms": 26416,
+      "verifier_passed": false,
+      "verifier_score": 0.8
+    },
+    {
+      "call_id": "smoke-3-model-deepseek-v4pro-chat",
+      "requested_model": "deepseek-v4-pro",
+      "observed_model": "deepseek-v4-pro",
+      "outcome": "verified_fail",
+      "statistical_outcome": "capability_fail",
+      "latency_ms": 2602,
+      "verifier_passed": false,
+      "verifier_score": 0.8
+    },
+    {
+      "call_id": "smoke-4-harness-codex-gpt56-medium",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": null,
+      "observed_model_status": "not_exposed",
+      "outcome": "harness_error",
+      "original_persisted_harness_failure": "timeout",
+      "original_persisted_process_exit_code": null,
+      "duration_ms": 90530,
+      "timed_out": true,
+      "cancelled": false,
+      "trace_coverage": "FULL_STREAM",
+      "trace_event_count": 10,
+      "terminal_native_event": null,
+      "verifier": "NOT_RUN"
+    }
+  ],
+  "calls_5_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "r11_classification_review": {
+    "result": "EXECUTION_BUDGET_EXHAUSTED_CANDIDATE",
+    "successful_command_count": 1,
+    "subject_nonzero_command_count": 1,
+    "command_execution_infra_failure_count": 0,
+    "file_change_completed": true,
+    "failed_command_reason": "SUBJECT_COMMAND_NONZERO_EXIT",
+    "safe_reason_detail": "GIT_WORKSPACE_PROBE_NOT_REPOSITORY"
+  },
+  "security_profile": {
+    "status": "PASS",
+    "effective_filesystem_policy": "workspace-write",
+    "filesystem_enforcement": "outer-docker",
+    "codex_inner_filesystem_policy": "unrestricted",
+    "tool_network_policy": "deny",
+    "codex_inner_network_policy": "deny",
+    "codex_inner_network_enforcement": "seccomp"
+  },
+  "safe_r9_diagnostics": {
+    "bwrap_namespace_error_present": "NO",
+    "provider_proxy_403_present": "NO",
+    "websocket_fallback_present": "NO"
+  },
+  "runtime_value_hygiene": {
+    "status": "PASS",
+    "relay_base_url_present": "NO",
+    "relay_api_key_present": "NO",
+    "opencode_go_api_key_present": "NO",
+    "deepseek_api_key_present": "NO",
+    "all_runtime_value_match_file_count": 0
+  },
+  "interpretation": "R11 classification review identifies the concrete nonzero shell exit as subject-level tool behavior after positively verified healthy progress, rather than Harness infrastructure failure.",
+  "limitations": [
+    "The original immutable Call 4 evidence and receipt remain harness_error/timeout and are not rewritten by this summary.",
+    "The independent verifier score is diagnostic only and is not promoted into official historical evidence.",
+    "Native file-change events are supportive trace evidence only; actual workspace diff and digest remain authoritative.",
+    "No runtime configuration values, credentials, raw provider content, command text, private reasoning, or operator-local evidence paths are tracked here."
+  ]
+}

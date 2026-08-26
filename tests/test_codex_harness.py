@@ -126,7 +126,7 @@ def clean_budget_timeout_lines(*, observed_model: str | None = None) -> tuple[st
                 "item": {
                     "id": "command-1",
                     "type": "command_execution",
-                    "command": "python -m pytest",
+                    "command": "sed -n '1,200p' events.py",
                     "status": "in_progress",
                 },
             }
@@ -137,8 +137,8 @@ def clean_budget_timeout_lines(*, observed_model: str | None = None) -> tuple[st
                 "item": {
                     "id": "command-1",
                     "type": "command_execution",
-                    "command": "python -m pytest",
-                    "aggregated_output": "tests passed",
+                    "command": "sed -n '1,200p' events.py",
+                    "aggregated_output": "source inspected",
                     "status": "completed",
                     "exit_code": 0,
                 },
@@ -741,17 +741,94 @@ def test_codex_timeout_without_useful_progress_remains_ambiguous_timeout() -> No
     assert collection.failure_category is HarnessFailureCategory.TIMEOUT
 
 
-def test_codex_timeout_after_successful_command_and_error_remains_infra_timeout() -> None:
+def test_codex_timeout_after_proxy_error_trace_remains_infra_timeout() -> None:
     lines = (
         *clean_budget_timeout_lines(),
-        json.dumps({"type": "error", "error": {"message": "safe provider failure"}}),
+        json.dumps({"type": "error", "error": {"message": "provider proxy returned 403"}}),
     )
     collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_001, timed_out=True))
 
     assert collection.failure_category is HarnessFailureCategory.TIMEOUT
 
 
-def test_codex_timeout_after_failed_command_remains_infra_timeout() -> None:
+def test_codex_timeout_after_subject_git_probe_and_file_change_is_budget_exhausted() -> None:
+    lines = (
+        *clean_budget_timeout_lines(),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-2",
+                    "type": "command_execution",
+                    "command": "git status --short",
+                    "aggregated_output": "fatal: not a git repository",
+                    "status": "failed",
+                    "exit_code": 128,
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "change-1",
+                    "type": "file_change",
+                    "status": "completed",
+                    "changes": [{"path": "events.py", "kind": "update"}],
+                },
+            }
+        ),
+    )
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_530, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED
+
+
+def test_codex_timeout_after_failed_subject_test_is_budget_exhausted() -> None:
+    lines = (
+        *clean_budget_timeout_lines(),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-2",
+                    "type": "command_execution",
+                    "command": "python -m pytest",
+                    "aggregated_output": "one test failed",
+                    "status": "failed",
+                    "exit_code": 1,
+                },
+            }
+        ),
+    )
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_001, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED
+
+
+def test_codex_timeout_after_arbitrary_subject_exit_two_is_budget_exhausted() -> None:
+    lines = (
+        *clean_budget_timeout_lines(),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-2",
+                    "type": "command_execution",
+                    "command": "grep missing events.py",
+                    "aggregated_output": "",
+                    "status": "failed",
+                    "exit_code": 2,
+                },
+            }
+        ),
+    )
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_001, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED
+
+
+def test_codex_timeout_with_only_nonzero_command_and_no_healthy_progress_remains_infra() -> None:
     lines = (
         *clean_budget_timeout_lines()[:3],
         json.dumps(
@@ -764,6 +841,71 @@ def test_codex_timeout_after_failed_command_remains_infra_timeout() -> None:
                     "aggregated_output": "operation not permitted",
                     "status": "failed",
                     "exit_code": 1,
+                },
+            }
+        ),
+    )
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_001, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.TIMEOUT
+
+
+def test_codex_bwrap_namespace_denial_timeout_remains_infra() -> None:
+    lines = (
+        *clean_budget_timeout_lines()[:2],
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-1",
+                    "type": "command_execution",
+                    "command": "python -m pytest",
+                    "aggregated_output": "bwrap: No permissions to create a new namespace",
+                    "status": "failed",
+                    "exit_code": 1,
+                },
+            }
+        ),
+    )
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_001, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.TIMEOUT
+
+
+def test_codex_bwrap_namespace_denial_disqualifies_prior_healthy_progress() -> None:
+    lines = (
+        *clean_budget_timeout_lines(),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-2",
+                    "type": "command_execution",
+                    "command": "python -m pytest",
+                    "aggregated_output": "bwrap: No permissions to create a new namespace",
+                    "status": "failed",
+                    "exit_code": 1,
+                },
+            }
+        ),
+    )
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_001, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.TIMEOUT
+
+
+def test_codex_timeout_after_failed_command_without_exit_code_remains_infra() -> None:
+    lines = (
+        *clean_budget_timeout_lines(),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-2",
+                    "type": "command_execution",
+                    "command": "python -m pytest",
+                    "aggregated_output": "execution status unavailable",
+                    "status": "failed",
                 },
             }
         ),
