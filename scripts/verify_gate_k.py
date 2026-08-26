@@ -98,6 +98,7 @@ CRITICAL_TESTS = {
     "test_kb0_smoke_plan_is_exact_bounded_and_unexecuted",
     "test_kb0_matrix_preflight_and_release_hard_stop_are_unchanged",
     "test_smoke_production_control_plane_exact_eight_call_binding",
+    "test_top_level_release_history_covers_repository_attempts_through_r12",
     "test_post_r4_smoke_history_is_safe_immutable_and_truthful",
     "test_post_r5_smoke_history_is_safe_immutable_and_truthful",
     "test_post_r6_smoke_history_is_safe_immutable_and_truthful",
@@ -263,30 +264,25 @@ def verify_contract_mode() -> bool:
         print("FAIL: K-B0 smoke preflight attempted a provider call")
         return False
     history = json.loads((ROOT / plan.history_reference).read_text(encoding="utf-8"))
-    post_r4_history = json.loads(
-        (ROOT / "release/history/core-real-v2-attempt-2.json").read_text(encoding="utf-8")
+    v2_history_paths = tuple(
+        sorted(
+            (ROOT / "release/history").glob("core-real-v2-attempt-*.json"),
+            key=lambda path: int(path.stem.rsplit("-", 1)[1]),
+        )
     )
-    post_r5_history = json.loads(
-        (ROOT / "release/history/core-real-v2-attempt-3.json").read_text(encoding="utf-8")
-    )
-    post_r6_history = json.loads(
-        (ROOT / "release/history/core-real-v2-attempt-4.json").read_text(encoding="utf-8")
-    )
-    post_r7_history = json.loads(
-        (ROOT / "release/history/core-real-v2-attempt-5.json").read_text(encoding="utf-8")
-    )
-    post_r9_attempt_6 = json.loads(
-        (ROOT / "release/history/core-real-v2-attempt-6.json").read_text(encoding="utf-8")
-    )
-    post_r9_attempt_7 = json.loads(
-        (ROOT / "release/history/core-real-v2-attempt-7.json").read_text(encoding="utf-8")
-    )
-    post_r10_attempt_8 = json.loads(
-        (ROOT / "release/history/core-real-v2-attempt-8.json").read_text(encoding="utf-8")
-    )
-    post_r11_attempt_9 = json.loads(
-        (ROOT / "release/history/core-real-v2-attempt-9.json").read_text(encoding="utf-8")
-    )
+    v2_histories = tuple(json.loads(path.read_text(encoding="utf-8")) for path in v2_history_paths)
+    v2_history_references = tuple(path.relative_to(ROOT).as_posix() for path in v2_history_paths)
+    if len(v2_histories) != 9:
+        print("FAIL: immutable v2 history must contain exactly attempts 1-9")
+        return False
+    post_r4_history = v2_histories[1]
+    post_r5_history = v2_histories[2]
+    post_r6_history = v2_histories[3]
+    post_r7_history = v2_histories[4]
+    post_r9_attempt_6 = v2_histories[5]
+    post_r9_attempt_7 = v2_histories[6]
+    post_r10_attempt_8 = v2_histories[7]
+    post_r11_attempt_9 = v2_histories[8]
     snapshot = json.loads(
         (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
     )
@@ -299,6 +295,45 @@ def verify_contract_mode() -> bool:
         or len(history.get("attempts", ())) != 3
     ):
         print("FAIL: immutable v1 plan or attempt history drifted")
+        return False
+    latest_summary = evidence.release_history
+    if (
+        tuple(int(item.get("attempt_id", "-").rsplit("-", 1)[-1]) for item in v2_histories)
+        != tuple(range(1, 10))
+        or latest_summary.attempt_references != v2_history_references
+        or latest_summary.latest_attempt_id != post_r11_attempt_9.get("attempt_id")
+        or latest_summary.latest_attempt_status != post_r11_attempt_9.get("status")
+        or latest_summary.latest_failing_call_id != post_r11_attempt_9.get("failing_call_id")
+        or post_r11_attempt_9.get("calls_7_to_8") != "NOT_RUN"
+        or latest_summary.latest_not_run_call_ids != tuple(call.call_id for call in smoke.calls[6:])
+        or latest_summary.post_latest_repair_id != "R12"
+        or latest_summary.post_latest_repair_state != "KEYLESS_VERIFIED"
+        or latest_summary.post_repair_real_smoke is not EvidenceState.NOT_RUN
+        or latest_summary.complete_smoke is not EvidenceState.NOT_VERIFIED
+        or latest_summary.matrix_evidence is not EvidenceState.NOT_RUN
+        or latest_summary.release_verification is not EvidenceState.NOT_VERIFIED
+        or evidence.remote_ci.state is not EvidenceState.NOT_VERIFIED
+        or evidence.core_release_ready
+        or any(
+            item.get("smoke_plan_digest") != smoke.digest
+            or item.get("release_plan_digest") != plan.digest
+            for item in v2_histories
+        )
+    ):
+        print("FAIL: top-level release history is inconsistent with immutable v2 attempts")
+        return False
+    release_docs = (ROOT / "docs/RELEASE_EVIDENCE.md").read_text(encoding="utf-8")
+    authorization_docs = (ROOT / "docs/REAL_EVIDENCE_AUTHORIZATION.md").read_text(encoding="utf-8")
+    resume_docs = (ROOT / "docs/RESUME_SCOPE.md").read_text(encoding="utf-8")
+    if (
+        any(Path(reference).name not in release_docs for reference in v2_history_references)
+        or any(reference not in authorization_docs for reference in v2_history_references)
+        or "post-R12 real smoke remains `NOT_RUN`" not in release_docs
+        or "Calls 7-8 were `NOT_RUN`" not in authorization_docs
+        or "attempts 1-9" not in resume_docs
+        or "post-R12 real smoke remains `NOT_RUN`" not in resume_docs
+    ):
+        print("FAIL: top-level release documentation lags immutable v2 history")
         return False
     if (
         post_r4_history.get("source_commit") != "07e48c2b3eb330c3ff56a8473bb98025f86490b3"
@@ -544,6 +579,8 @@ def verify_contract_mode() -> bool:
     print("POST_R9_ATTEMPT_7_HISTORY=PRESERVED")
     print("POST_R10_ATTEMPT_8_HISTORY=PRESERVED")
     print("POST_R11_ATTEMPT_9_HISTORY=PRESERVED")
+    print("V2_RELEASE_HISTORY=ATTEMPTS_1_TO_9_CURRENT")
+    print("POST_R12_REAL_SMOKE=NOT_RUN")
     print("SMOKE_CAPABILITY_TIMEOUT_CONTINUES=PASS")
     print("SMOKE_SUBJECT_COMMAND_FAILURE_CONTINUES=PASS")
     print("SMOKE_INFRA_TIMEOUT_STOPS=PASS")

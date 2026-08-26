@@ -56,7 +56,8 @@ This file separates repository evidence from intended design. A capability moves
   Node 24.19.0 task toolchains
 - One shared Phase F H-Lane runner with fresh workspace, filesystem-authoritative diff, exact-secret
   artifact withholding, Phase C Hidden Verifier authority, and immutable multi-harness evidence
-- Claude `claude-harness-v1` bare stream-JSON collection with minimal Read/Edit/Write/Bash tools,
+- Claude `claude-harness-v1` isolated non-bare stream-JSON collection with exact
+  Read/Edit/Write/Bash tools, disabled ambient setting sources, strict empty MCP configuration,
   retry/lifecycle/failure evidence, unknown-event preservation, and private-reasoning exclusion
 - Public DeepSeek E1 `dsh --profile headless` collection with isolated `DSH_HOME`, default/effective
   config digests, `FINAL_OUTPUT_ONLY` trace coverage, and explicit developer-preview identity
@@ -134,11 +135,23 @@ This file separates repository evidence from intended design. A capability moves
   persisted manifests/report/AblationSpec; 22 focused tests with zero skips
 - Before/after proof that analysis leaves experiment/cell/pair/ablation/run rows, outcomes,
   artifact digests/mtimes, Judge state, and fake execution-backend call counts unchanged
+- Immutable safe summaries for `core-real-smoke-v2` attempts 1-9. Attempt 9 stopped at Claude Call
+  6 with a startup/process failure before any normalized event; Calls 7-8 remain `NOT_RUN`.
+- R12 keyless diagnosis of the pinned Claude 2.1.241 invalid MCP shape and bare/tool-surface
+  contradiction, plus the isolated non-bare startup-profile repair. R12 made zero real calls and
+  post-R12 real smoke remains `NOT_RUN`.
+- Exact-head keyless GitHub Actions Gates A-K and fresh-setup success for R12 head
+  `6abac258e81d89f7ad45aa51dce2541f911a6033` (run `32996166257`). This engineering CI evidence is
+  distinct from the prospective manifest's final-release `remote_ci` binding.
 
-Evidence date: 2026-08-24. Phase H remote evidence is approved at the exact head/run above. Phase I
-and Phase J entries have current local gate evidence pending this change's named remote CI run. Phase D
-provider contracts are MockTransport/fake-provider verified; Phase E/F harness behavior is
-deterministic fake verified. None implies a real provider/model call or VM-level isolation.
+Evidence date: 2026-08-27. Phase H remote evidence remains bound to exact head
+`f8f6ecdf644cb01e73afb039a4a503a394a51fe5` and CI run `32651571933`. R12 keyless Gates A-K and
+fresh-setup evidence are separately bound to exact head
+`6abac258e81d89f7ad45aa51dce2541f911a6033` and CI run `32996166257`; that R12 engineering CI does
+not satisfy final-release `remote_ci` verification. Phase D provider contracts are
+MockTransport/fake-provider verified; Phase E/F harness behavior and the R12 Claude startup repair
+are deterministic or controlled keyless verified. None implies a post-R12 real provider/model call,
+complete smoke, Matrix evidence, release verification, or VM-level isolation.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
 
@@ -166,6 +179,10 @@ does not replace the required pre-Core-hard-stop real Matrix Evidence. The provi
 internal-network/CONNECT-proxy boundary is deterministically configured and negative-tested but
 not operationally smoked with a real Harness. Future capabilities remain `DESIGN_ONLY` until their
 own gates exist.
+
+All nine immutable v2 attempts aborted before completing the eight-call smoke. Successful
+observations within attempts 1-9 remain single observations and do not change any `REAL_*` state,
+authorize the Matrix or Judge, or establish release readiness.
 
 ## Phase K-B0 release preparation
 

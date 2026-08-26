@@ -469,12 +469,40 @@ class EvidenceBinding(StrictModel):
         return self
 
 
+class ReleaseHistorySummary(StrictModel):
+    smoke_plan_id: Literal["core-real-smoke-v2"] = "core-real-smoke-v2"
+    attempt_references: tuple[str, ...]
+    latest_attempt_id: Literal["core-real-smoke-v2-attempt-9"]
+    latest_attempt_status: Literal["ABORTED"]
+    latest_failing_call_id: Literal["smoke-6-harness-claude-qwen38-opencode-go"]
+    latest_not_run_call_ids: tuple[
+        Literal["smoke-7-harness-deepseek-v4flash"],
+        Literal["smoke-8-judge-glm52-opencode-go"],
+    ]
+    post_latest_repair_id: Literal["R12"]
+    post_latest_repair_state: Literal["KEYLESS_VERIFIED"]
+    post_repair_real_smoke: Literal[EvidenceState.NOT_RUN] = EvidenceState.NOT_RUN
+    complete_smoke: Literal[EvidenceState.NOT_VERIFIED] = EvidenceState.NOT_VERIFIED
+    matrix_evidence: Literal[EvidenceState.NOT_RUN] = EvidenceState.NOT_RUN
+    release_verification: Literal[EvidenceState.NOT_VERIFIED] = EvidenceState.NOT_VERIFIED
+
+    @model_validator(mode="after")
+    def attempt_references_are_exact_and_contiguous(self) -> ReleaseHistorySummary:
+        expected = tuple(
+            f"release/history/core-real-v2-attempt-{attempt}.json" for attempt in range(1, 10)
+        )
+        if self.attempt_references != expected:
+            raise ValueError("release history must cover the exact contiguous v2 attempt 1-9 set")
+        return self
+
+
 class ReleaseEvidenceManifest(CanonicalModel):
     schema_version: Literal[1] = 1
     release_id: Literal["v1.0.0-core"] = "v1.0.0-core"
     core_corpus: EvidenceBinding
     release_commit: EvidenceBinding
     experiment_plan: EvidenceBinding
+    release_history: ReleaseHistorySummary
     real_matrix: EvidenceBinding
     paired_lane: EvidenceBinding
     controlled_ablation: EvidenceBinding

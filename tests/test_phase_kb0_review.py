@@ -53,6 +53,8 @@ from harnesslab.multi_harness.profile import (
 )
 from harnesslab.multi_harness.runtime import _validate_deepseek_effective_config
 from harnesslab.multi_harness.trace import collect_deepseek_final
+from harnesslab.release.contracts import load_release_evidence
+from harnesslab.release.models import EvidenceState
 from harnesslab.release.smoke import (
     EXPECTED_ADAPTERS,
     EXPECTED_CALL_IDS,
@@ -239,6 +241,55 @@ def test_smoke_production_control_plane_exact_eight_call_binding() -> None:
     assert control.smoke_plan.max_top_level_launch_count == 8
     assert control.smoke_plan.max_output_token_ceiling == 14_256
     assert control.smoke_plan.release_plan_digest == control.release_plan.digest
+
+
+def test_top_level_release_history_covers_repository_attempts_through_r12() -> None:
+    history_paths = sorted(
+        (ROOT / "release/history").glob("core-real-v2-attempt-*.json"),
+        key=lambda path: int(path.stem.rsplit("-", 1)[1]),
+    )
+    histories = tuple(json.loads(path.read_text(encoding="utf-8")) for path in history_paths)
+    expected_attempts = tuple(range(1, 10))
+    expected_references = tuple(path.relative_to(ROOT).as_posix() for path in history_paths)
+    manifest = load_release_evidence(ROOT / "release/release-evidence.json")
+    summary = manifest.release_history
+
+    assert (
+        tuple(int(item["attempt_id"].rsplit("-", 1)[1]) for item in histories) == expected_attempts
+    )
+    assert summary.attempt_references == expected_references
+    assert summary.latest_attempt_id == histories[-1]["attempt_id"]
+    assert summary.latest_attempt_status == histories[-1]["status"] == "ABORTED"
+    assert summary.latest_failing_call_id == histories[-1]["failing_call_id"]
+    assert histories[-1]["calls_7_to_8"] == "NOT_RUN"
+    assert summary.latest_not_run_call_ids == EXPECTED_CALL_IDS[6:]
+    assert summary.post_latest_repair_id == "R12"
+    assert summary.post_latest_repair_state == "KEYLESS_VERIFIED"
+    assert summary.post_repair_real_smoke is EvidenceState.NOT_RUN
+    assert summary.complete_smoke is EvidenceState.NOT_VERIFIED
+    assert summary.matrix_evidence is EvidenceState.NOT_RUN
+    assert summary.release_verification is EvidenceState.NOT_VERIFIED
+    assert manifest.remote_ci.state is EvidenceState.NOT_VERIFIED
+    assert not manifest.core_release_ready
+    assert all(
+        item["smoke_plan_digest"]
+        == "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a"
+        and item["release_plan_digest"]
+        == "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb"
+        for item in histories
+    )
+
+    release_docs = (ROOT / "docs/RELEASE_EVIDENCE.md").read_text(encoding="utf-8")
+    authorization_docs = (ROOT / "docs/REAL_EVIDENCE_AUTHORIZATION.md").read_text(encoding="utf-8")
+    resume_docs = (ROOT / "docs/RESUME_SCOPE.md").read_text(encoding="utf-8")
+    for reference in expected_references:
+        basename = Path(reference).name
+        assert basename in release_docs
+        assert reference in authorization_docs
+    assert "post-R12 real smoke remains `NOT_RUN`" in release_docs
+    assert "Calls 7-8 were `NOT_RUN`" in authorization_docs
+    assert "attempts 1-9" in resume_docs
+    assert "post-R12 real smoke remains `NOT_RUN`" in resume_docs
 
 
 def test_post_r4_smoke_history_is_safe_immutable_and_truthful() -> None:
