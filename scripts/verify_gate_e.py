@@ -76,6 +76,8 @@ CRITICAL_TESTS = {
     "test_three_h_lane_tasks_fake_codex_pass_hidden_verifier[typescript]",
     "test_codex_runtime_url_is_environment_only_and_ephemeral",
     "test_codex_runtime_values_are_absent_from_every_harness_artifact",
+    "test_runtime_entrypoint_removes_url_only_from_codex_child_environment",
+    "test_pinned_codex_uses_generated_isolated_relay_profile_without_websockets",
 }
 PHASE_J_MODULE_NAMES = {
     "analyst.py",
@@ -496,6 +498,13 @@ def main() -> int:
         print("CODEX_RUNTIME_URL_ARGV_HYGIENE=PASS")
         print("CODEX_RUNTIME_CONFIG_VALUE_PERSISTENCE=DENIED")
         print("CODEX_AMBIENT_CONFIG_ISOLATION=PASS")
+        print("CODEX_GENERATED_PROFILE_LOAD=PASS")
+        print("CODEX_CUSTOM_PROVIDER_SELECTED=PASS")
+        print("CODEX_CUSTOM_PROVIDER_WEBSOCKET=DISABLED")
+        print("CODEX_RELAY_CONNECT_TARGET_BINDING=PASS")
+        print("CODEX_AMBIENT_USER_CONFIG_ISOLATION=PASS")
+        print("CODEX_RUNTIME_URL_CHILD_ENV=ABSENT")
+        print("EGRESS_PROXY_POLICY_UNCHANGED=PASS")
     print("REAL_CALLS_THIS_REPAIR=0")
     print("REAL_PROVIDER_SMOKE=NOT_VERIFIED")
     print("CORE_RELEASE_READY=FALSE")

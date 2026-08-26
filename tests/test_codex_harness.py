@@ -157,6 +157,10 @@ def test_codex_exec_plan_uses_stdin_and_canonical_isolation_flags(tmp_path: Path
     assert "--skip-git-repo-check" in plan.argv
     assert 'approval_policy="never"' in plan.argv
     assert 'web_search="disabled"' in plan.argv
+    assert "check_for_update_on_startup=false" in plan.argv
+    assert "features.remote_models=false" in plan.argv
+    assert "features.remote_plugin=false" in plan.argv
+    assert "features.plugins=false" in plan.argv
     assert "sandbox_workspace_write.network_access=false" in plan.argv
     assert "mcp_servers={}" in plan.argv
     assert 'shell_environment_policy.inherit="core"' in plan.argv

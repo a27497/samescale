@@ -64,6 +64,7 @@ def _materialize_runtime_profile(base_url: str) -> None:
             f"base_url = {json.dumps(base_url)}",
             'env_key = "HARNESSLAB_GPT56_RELAY_API_KEY"',
             'wire_api = "responses"',
+            "supports_websockets = false",
             "",
         )
     )
@@ -79,7 +80,9 @@ def main() -> None:
         raise RuntimeError("Codex runtime provider configuration is incomplete")
     if runtime_value is not None:
         _materialize_runtime_profile(_validated_base_url(runtime_value))
-    os.execvp("codex", ("codex", *sys.argv[1:]))
+    child_environment = dict(os.environ)
+    child_environment.pop(BASE_URL_REFERENCE, None)
+    os.execvpe("codex", ("codex", *sys.argv[1:]), child_environment)
 
 
 if __name__ == "__main__":

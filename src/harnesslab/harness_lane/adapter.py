@@ -93,6 +93,7 @@ class CodexHarnessAdapter:
             raise HarnessAdapterError("subject context is unavailable or unsafe")
         provider_config: tuple[str, ...] = ()
         environment_references: tuple[tuple[str, str], ...] = ()
+        user_config_flags = ("--ignore-user-config",) if profile.ignore_user_config else ()
         if profile.model_provider_id is not None:
             assert profile.provider_base_url_reference is not None
             assert profile.provider_credential_reference is not None
@@ -113,7 +114,7 @@ class CodexHarnessAdapter:
             "--json",
             "--strict-config",
             "--ephemeral",
-            "--ignore-user-config",
+            *user_config_flags,
             "--ignore-rules",
             "--skip-git-repo-check",
             "--color",
@@ -129,6 +130,14 @@ class CodexHarnessAdapter:
             'approval_policy="never"',
             "-c",
             'web_search="disabled"',
+            "-c",
+            "check_for_update_on_startup=false",
+            "-c",
+            "features.remote_models=false",
+            "-c",
+            "features.remote_plugin=false",
+            "-c",
+            "features.plugins=false",
             "-c",
             "sandbox_workspace_write.network_access=false",
             "-c",

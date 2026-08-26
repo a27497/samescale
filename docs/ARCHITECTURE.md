@@ -113,9 +113,11 @@ Phase B package -> fresh workspace -> Codex adapter -> sanitized JSONL -> Normal
 The project-owned image pins Node by digest and `@openai/codex` at 0.149.0, runs non-root, and
 contains only the Python, Java, and Node toolchains needed by the three controlled tasks. The
 canonical profile disables approvals, tool network access, web search, external MCP, plugins,
-ambient user config, and rules. The optional real backend constructs an argv-only hardened outer
-container, but Phase E does not claim a safely separated provider control plane; real smoke is
-therefore opt-in and `NOT_RUN` by default.
+ambient user config, and rules. The custom relay profile instead loads one generated 0600 profile
+from the container-only ephemeral `CODEX_HOME`; the operator home is never mounted, project config
+cannot redirect provider identity, and the runtime URL is removed before Codex starts. The optional
+real backend constructs an argv-only hardened outer container, while real smoke remains explicitly
+opt-in and `NOT_RUN` by default.
 
 Native events are sanitized in memory before persistence. Private reasoning becomes only a
 `REASONING_PRESENT` marker; malformed/raw authorization data and credentials are never artifacts.

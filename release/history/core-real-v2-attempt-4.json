@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-4",
+  "source_commit": "06027d08735886a2add1c492081154a4374ea3e2",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:c3eb90ce738805311f8ed35209c86b387749865739b797047f2b0ac5207b0856",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 4,
+  "failing_call_id": "smoke-4-harness-codex-gpt56-medium",
+  "failure_category": "HARNESS_FAILURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": "gpt-5.6-sol",
+      "latency_ms": 17460,
+      "verifier_passed": false,
+      "verifier_score": 0.8,
+      "outcome": "verified_fail"
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "requested_model": "qwen3.8-max",
+      "observed_model": "qwen3.8-max",
+      "latency_ms": 31264,
+      "verifier_passed": true,
+      "verifier_score": 1.0,
+      "outcome": "verified_pass"
+    },
+    {
+      "call_id": "smoke-3-model-deepseek-v4pro-chat",
+      "requested_model": "deepseek-v4-pro",
+      "observed_model": "deepseek-v4-pro",
+      "latency_ms": 3112,
+      "verifier_passed": true,
+      "verifier_score": 1.0,
+      "outcome": "verified_pass"
+    },
+    {
+      "call_id": "smoke-4-harness-codex-gpt56-medium",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": null,
+      "duration_ms": 90592,
+      "process_exit_code": 0,
+      "timed_out": true,
+      "outcome": "harness_error",
+      "harness_failure": "timeout",
+      "verifier": "NOT_RUN",
+      "terminal_native_event": "error",
+      "safe_diagnostics": [
+        "PROXY_CONNECT_DENIED_403",
+        "WEBSOCKET_TO_HTTPS_FALLBACK"
+      ]
+    }
+  ],
+  "calls_5_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "runtime_value_hygiene": {
+    "base_url_present": "NO",
+    "api_key_present": "NO"
+  },
+  "interpretation": "R7 keyless pinned-Codex route binding confirmed GENERATED_PROFILE_SUPPRESSED_BY_IGNORE_USER_CONFIG. This repair activates only the generated profile inside isolated ephemeral CODEX_HOME and does not change the egress allowlist.",
+  "limitations": [
+    "Each completed call is one smoke observation, not aggregate model performance evidence.",
+    "The diagnostic categories summarize sanitized trace evidence and do not preserve raw provider or stderr content.",
+    "No operator-local paths, runtime configuration values, credentials, raw provider content, or private reasoning are tracked here."
+  ]
+}

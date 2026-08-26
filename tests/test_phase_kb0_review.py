@@ -185,6 +185,45 @@ def test_post_r5_smoke_history_is_safe_immutable_and_truthful() -> None:
     assert "reasoning_content" not in serialized
 
 
+def test_post_r6_smoke_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-4.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "06027d08735886a2add1c492081154a4374ea3e2"
+    assert history["receipt_digest"] == (
+        "sha256:c3eb90ce738805311f8ed35209c86b387749865739b797047f2b0ac5207b0856"
+    )
+    assert history["attempted_top_level_launches"] == 4
+    assert [call["outcome"] for call in history["calls"]] == [
+        "verified_fail",
+        "verified_pass",
+        "verified_pass",
+        "harness_error",
+    ]
+    codex = history["calls"][3]
+    assert codex["harness_failure"] == "timeout"
+    assert codex["duration_ms"] == 90592
+    assert codex["observed_model"] is None
+    assert codex["verifier"] == "NOT_RUN"
+    assert codex["safe_diagnostics"] == [
+        "PROXY_CONNECT_DENIED_403",
+        "WEBSOCKET_TO_HTTPS_FALLBACK",
+    ]
+    assert history["calls_5_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert history["runtime_value_hygiene"] == {
+        "base_url_present": "NO",
+        "api_key_present": "NO",
+    }
+    assert "GENERATED_PROFILE_SUPPRESSED_BY_IGNORE_USER_CONFIG" in serialized
+    assert "/home/dev/harnesslab-evidence" not in serialized
+    assert SAFE_ENVIRONMENT["HARNESSLAB_GPT56_RELAY_BASE_URL"] not in serialized
+    assert all(value not in serialized for name, value in SAFE_ENVIRONMENT.items() if "KEY" in name)
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
 def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
     control = SmokeControlPlane.load(ROOT)
     receipt = control.preflight()

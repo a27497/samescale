@@ -100,6 +100,7 @@ CRITICAL_TESTS = {
     "test_smoke_production_control_plane_exact_eight_call_binding",
     "test_post_r4_smoke_history_is_safe_immutable_and_truthful",
     "test_post_r5_smoke_history_is_safe_immutable_and_truthful",
+    "test_post_r6_smoke_history_is_safe_immutable_and_truthful",
     "test_production_smoke_persists_codex_precapture_infrastructure_evidence",
     "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
     "test_v2_credential_preflight_prints_presence_only",
@@ -127,6 +128,8 @@ CRITICAL_TESTS = {
     "test_codex_runtime_url_is_environment_only_and_ephemeral",
     "test_codex_runtime_values_are_absent_from_every_harness_artifact",
     "test_smoke_result_and_receipt_exclude_runtime_url_value",
+    "test_runtime_entrypoint_removes_url_only_from_codex_child_environment",
+    "test_pinned_codex_uses_generated_isolated_relay_profile_without_websockets",
 }
 
 
@@ -254,6 +257,9 @@ def verify_contract_mode() -> bool:
     post_r5_history = json.loads(
         (ROOT / "release/history/core-real-v2-attempt-3.json").read_text(encoding="utf-8")
     )
+    post_r6_history = json.loads(
+        (ROOT / "release/history/core-real-v2-attempt-4.json").read_text(encoding="utf-8")
+    )
     snapshot = json.loads(
         (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
     )
@@ -293,6 +299,22 @@ def verify_contract_mode() -> bool:
         or post_r5_history.get("raw_evidence_hygiene") != "REJECTED_CONFIG_VALUE_DISCLOSURE"
     ):
         print("FAIL: immutable post-R5 smoke history drifted")
+        return False
+    if (
+        post_r6_history.get("source_commit") != "06027d08735886a2add1c492081154a4374ea3e2"
+        or post_r6_history.get("receipt_digest")
+        != "sha256:c3eb90ce738805311f8ed35209c86b387749865739b797047f2b0ac5207b0856"
+        or post_r6_history.get("attempted_top_level_launches") != 4
+        or [call.get("outcome") for call in post_r6_history.get("calls", ())]
+        != ["verified_fail", "verified_pass", "verified_pass", "harness_error"]
+        or post_r6_history.get("calls", [{}, {}, {}, {}])[3].get("harness_failure") != "timeout"
+        or post_r6_history.get("calls_5_to_8") != "NOT_RUN"
+        or post_r6_history.get("retry_count") != 0
+        or post_r6_history.get("fallback_count") != 0
+        or post_r6_history.get("runtime_value_hygiene")
+        != {"base_url_present": "NO", "api_key_present": "NO"}
+    ):
+        print("FAIL: immutable post-R6 smoke history drifted")
         return False
     if (
         snapshot.get("provider_provenance") != "THIRD_PARTY_INFERENCE_PLATFORM"
@@ -378,6 +400,7 @@ def verify_contract_mode() -> bool:
     print("V2_REAL_ATTEMPT_2_TOP_LEVEL_LAUNCHES=4")
     print("POST_R4_SMOKE_HISTORY_PRESERVED=PASS")
     print("POST_R5_SMOKE_HISTORY_PRESERVED=PASS")
+    print("POST_R6_SMOKE_HISTORY_PRESERVED=PASS")
     print("CODEX_STARTUP_FAILURE_EVIDENCE=PASS")
     print("CODEX_EARLY_EXIT_PHASE_CLASSIFICATION=PASS")
     print("CODEX_STARTUP_SECRET_HYGIENE=PASS")
@@ -388,9 +411,17 @@ def verify_contract_mode() -> bool:
     print("CODEX_RUNTIME_URL_ARGV_HYGIENE=PASS")
     print("CODEX_RUNTIME_CONFIG_VALUE_PERSISTENCE=DENIED")
     print("CODEX_AMBIENT_CONFIG_ISOLATION=PASS")
+    print("CODEX_GENERATED_PROFILE_LOAD=PASS")
+    print("CODEX_CUSTOM_PROVIDER_SELECTED=PASS")
+    print("CODEX_CUSTOM_PROVIDER_WEBSOCKET=DISABLED")
+    print("CODEX_RELAY_CONNECT_TARGET_BINDING=PASS")
+    print("CODEX_AMBIENT_USER_CONFIG_ISOLATION=PASS")
+    print("CODEX_RUNTIME_URL_CHILD_ENV=ABSENT")
+    print("EGRESS_PROXY_POLICY_UNCHANGED=PASS")
     print("CORE_RELEASE_READY=FALSE")
     print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
     print("PHASE_K_B1_R6_RUNTIME_CONFIGURATION_EVIDENCE_IDENTITY_SEPARATION_KEYLESS")
+    print("PHASE_K_B1_R7_CODEX_GENERATED_PROVIDER_PROFILE_ACTIVATION_KEYLESS")
     for key, state in sorted(evidence.real_statuses.items()):
         print(f"{key}={state.value}")
     print("v1.0.0-core=ABSENT")

@@ -175,7 +175,10 @@ def test_kb0_codex_custom_provider_is_explicit_secret_free_and_single_treatment(
         .argv
     )
     joined = " ".join(argv)
-    assert "--ignore-user-config" in argv
+    assert "--ignore-user-config" not in argv
+    assert medium.ignore_user_config is False
+    assert medium.ambient_user_config_isolated is True
+    assert medium.provider_supports_websockets is False
     assert argv[argv.index("--profile") + 1] == "harnesslab-runtime"
     assert medium.provider_base_url_reference == "HARNESSLAB_GPT56_RELAY_BASE_URL"
     assert "https://relay.example.test/v1" not in joined

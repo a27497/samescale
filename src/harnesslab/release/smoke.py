@@ -477,6 +477,9 @@ class SmokeControlPlane:
             profile.provider_wire_api == "responses",
             profile.provider_base_url_reference == provider.base_url_reference,
             profile.provider_credential_reference == "HARNESSLAB_GPT56_RELAY_API_KEY",
+            profile.provider_supports_websockets is False,
+            profile.ignore_user_config is False,
+            profile.ambient_user_config_isolated is True,
             profile.requested_model == "gpt-5.6-sol",
             profile.provider_route == provider.route_identity,
         )

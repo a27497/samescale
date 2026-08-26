@@ -247,6 +247,7 @@ class CodexHarnessProfile(BaseModel):
     provider_base_url_reference: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
     provider_wire_api: Literal["responses"] | None = None
     provider_credential_reference: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
+    provider_supports_websockets: Literal[False] | None = None
     provider_config_digest: Sha256Digest | None = None
     reasoning_effort: str = Field(min_length=1, max_length=50)
     sandbox_mode: Literal["workspace-write"] = "workspace-write"
@@ -254,7 +255,8 @@ class CodexHarnessProfile(BaseModel):
     tool_network_policy: NetworkPolicy = NetworkPolicy.DENY
     web_search_policy: Literal["disabled"] = "disabled"
     ephemeral: Literal[True] = True
-    ignore_user_config: Literal[True] = True
+    ignore_user_config: bool = True
+    ambient_user_config_isolated: Literal[True] = True
     ignore_rules: Literal[True] = True
     mcp_profile: Literal["none"] = "none"
     external_skill_plugin_profile: Literal["none"] = "none"
@@ -270,7 +272,7 @@ class CodexHarnessProfile(BaseModel):
         required = (
             self.tool_network_policy is NetworkPolicy.DENY,
             self.ephemeral,
-            self.ignore_user_config,
+            self.ambient_user_config_isolated,
             self.ignore_rules,
             self.mcp_profile == "none",
             self.external_skill_plugin_profile == "none",
@@ -285,10 +287,13 @@ class CodexHarnessProfile(BaseModel):
             self.provider_wire_api,
             self.provider_credential_reference,
             self.provider_config_digest,
+            self.provider_supports_websockets,
         )
         if any(value is not None for value in provider_values):
             if any(value is None for value in provider_values):
                 raise ValueError("custom Codex provider identity must be complete")
+            if self.ignore_user_config:
+                raise ValueError("generated Codex provider profile must remain loadable")
             raw = {
                 "model_provider_id": self.model_provider_id,
                 "provider_provenance": self.provider_provenance,
@@ -296,11 +301,14 @@ class CodexHarnessProfile(BaseModel):
                 "provider_route": self.provider_route,
                 "provider_wire_api": self.provider_wire_api,
                 "provider_credential_reference": self.provider_credential_reference,
+                "provider_supports_websockets": self.provider_supports_websockets,
             }
             canonical = json.dumps(raw, sort_keys=True, separators=(",", ":"), default=str)
             expected = "sha256:" + hashlib.sha256(canonical.encode()).hexdigest()
             if self.provider_config_digest != expected:
                 raise ValueError("custom Codex provider config digest mismatch")
+        elif not self.ignore_user_config:
+            raise ValueError("canonical Codex profile must ignore user configuration")
         return self
 
     def canonical_json(self) -> str:

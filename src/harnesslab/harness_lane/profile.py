@@ -56,6 +56,7 @@ def configured_gpt56_relay_codex_profile(
         "provider_route": route,
         "provider_wire_api": "responses",
         "provider_credential_reference": "HARNESSLAB_GPT56_RELAY_API_KEY",
+        "provider_supports_websockets": False,
     }
     canonical = json.dumps(provider, sort_keys=True, separators=(",", ":"), default=str)
     return CodexHarnessProfile(
@@ -67,6 +68,7 @@ def configured_gpt56_relay_codex_profile(
         codex_image=image,
         subject_toolchain_profile=SUBJECT_TOOLCHAIN_PROFILE,
         shell_tool_environment_policy=SHELL_TOOL_ENVIRONMENT_POLICY,
+        ignore_user_config=False,
         provider_config_digest="sha256:" + hashlib.sha256(canonical.encode()).hexdigest(),
         **provider,
     )
