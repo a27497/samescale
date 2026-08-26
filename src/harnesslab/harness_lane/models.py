@@ -23,8 +23,27 @@ class HarnessFailureCategory(StrEnum):
     PROCESS_ERROR = "process_error"
     PROTOCOL_ERROR = "protocol_error"
     MODEL_TURN_FAILED = "model_turn_failed"
+    EXECUTION_BUDGET_EXHAUSTED = "execution_budget_exhausted"
     PROFILE_VIOLATION = "profile_violation"
     ARTIFACT_ERROR = "artifact_error"
+
+
+CAPABILITY_HARNESS_FAILURES = frozenset(
+    {
+        HarnessFailureCategory.MODEL_TURN_FAILED,
+        HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED,
+    }
+)
+
+
+def is_capability_harness_failure(category: HarnessFailureCategory | str | None) -> bool:
+    """Return whether a typed Harness failure is a subject/capability observation."""
+
+    try:
+        parsed = HarnessFailureCategory(category) if category is not None else None
+    except ValueError:
+        return False
+    return parsed in CAPABILITY_HARNESS_FAILURES
 
 
 class HarnessLaneOutcome(StrEnum):
@@ -436,6 +455,8 @@ class HarnessLaneEvidence(BaseModel):
                 raise ValueError("unexposed observed model must remain null")
         elif self.observed_model is None:
             raise ValueError("exposed observed model status requires an observed model")
+        if (self.timed_out or self.cancelled) and self.process_exit_code is not None:
+            raise ValueError("budget-terminated process cannot claim a natural exit code")
         verifier_fields = (
             self.verifier_sandbox_manifest,
             self.verifier_artifact_namespace,

@@ -47,6 +47,14 @@ CRITICAL_TESTS = {
     "test_codex_primary_and_cleanup_failures_are_both_preserved[cleanup-success]",
     "test_codex_stdout_read_failure_is_typed",
     "test_codex_timeout_and_cancellation_remain_capture_states",
+    "test_codex_timeout_capture_does_not_claim_natural_container_exit_code",
+    "test_clean_codex_timeout_after_successful_command_is_execution_budget_exhausted",
+    "test_codex_timeout_without_useful_progress_remains_ambiguous_timeout",
+    "test_codex_timeout_after_successful_command_and_error_remains_infra_timeout",
+    "test_codex_timeout_after_failed_command_remains_infra_timeout",
+    "test_codex_timeout_with_malformed_event_is_protocol_error",
+    "test_codex_cancelled_clean_progress_is_cancelled",
+    "test_codex_budget_exhaustion_persists_typed_manifest_without_verifier",
     "test_real_codex_backend_outer_docker_argv_is_hardened_and_secret_free",
     "test_codex_exec_plan_uses_stdin_and_canonical_isolation_flags",
     "test_codex_harness_prompt_excludes_verifier_and_oracle",
@@ -515,6 +523,11 @@ def main() -> int:
         print("CODEX_EFFECTIVE_WORKSPACE_WRITE=PASS")
         print("CODEX_TOOL_NETWORK=DENIED")
         print("CODEX_OUTER_DOCKER_SECURITY=PASS")
+        print("CODEX_CLEAN_BUDGET_EXHAUSTION=CAPABILITY_FAIL")
+        print("CODEX_AMBIGUOUS_TIMEOUT=INFRA_FAILURE")
+        print("CODEX_FAILED_TOOL_TIMEOUT=INFRA_FAILURE")
+        print("CODEX_ERROR_TRACE_TIMEOUT=INFRA_FAILURE")
+        print("PROCESS_EXIT_TIMEOUT_TRUTHFULNESS=PASS")
     print("REAL_CALLS_THIS_REPAIR=0")
     print("REAL_PROVIDER_SMOKE=NOT_VERIFIED")
     print("CORE_RELEASE_READY=FALSE")

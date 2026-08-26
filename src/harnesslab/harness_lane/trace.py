@@ -224,6 +224,58 @@ def _normalized_trace(events: tuple[SanitizedNativeEvent, ...]) -> NormalizedTra
     )
 
 
+def _clean_execution_budget_exhaustion(
+    capture: CodexProcessCapture,
+    trace: NormalizedTrace,
+    *,
+    malformed: bool,
+    profile_violation: bool,
+    terminal: SanitizedNativeEvent | None,
+) -> bool:
+    """Recognize a budget-limited subject only from strict positive trace evidence."""
+
+    if (
+        not capture.timed_out
+        or capture.cancelled
+        or malformed
+        or profile_violation
+        or terminal is not None
+    ):
+        return False
+    trace_types = {event.type for event in trace.events}
+    if not {
+        TraceEventType.THREAD_STARTED,
+        TraceEventType.TURN_STARTED,
+    }.issubset(trace_types):
+        return False
+    disqualifying = {
+        TraceEventType.ITEM_ERROR,
+        TraceEventType.TURN_FAILED,
+        TraceEventType.ERROR,
+        TraceEventType.UNKNOWN,
+        TraceEventType.MCP_TOOL_CALL,
+        TraceEventType.WEB_SEARCH,
+        TraceEventType.API_RETRY,
+    }
+    if trace_types & disqualifying:
+        return False
+    commands = tuple(
+        event for event in trace.events if event.type is TraceEventType.COMMAND_EXECUTION
+    )
+    if any(
+        event.status in {"failed", "error"}
+        or (event.exit_code is not None and event.exit_code != 0)
+        for event in commands
+    ):
+        return False
+    return any(
+        event.native_event_type == "item.completed"
+        and event.status == "completed"
+        and event.exit_code == 0
+        for event in commands
+    )
+
+
 def collect_codex_jsonl(
     capture: CodexProcessCapture, *, secret_values: tuple[str, ...] = ()
 ) -> CodexCollection:
@@ -272,14 +324,24 @@ def collect_codex_jsonl(
         "invalid_api_key",
         "unauthorized",
     }
-    if capture.timed_out:
-        failure = HarnessFailureCategory.TIMEOUT
-    elif capture.cancelled:
+    if capture.cancelled:
         failure = HarnessFailureCategory.CANCELLED
     elif profile_violation:
         failure = HarnessFailureCategory.PROFILE_VIOLATION
     elif malformed or len(terminals) > 1:
         failure = HarnessFailureCategory.PROTOCOL_ERROR
+    elif capture.timed_out:
+        failure = (
+            HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED
+            if _clean_execution_budget_exhaustion(
+                capture,
+                trace,
+                malformed=malformed,
+                profile_violation=profile_violation,
+                terminal=terminal,
+            )
+            else HarnessFailureCategory.TIMEOUT
+        )
     elif terminal is None:
         failure = (
             HarnessFailureCategory.PROCESS_ERROR

@@ -3,10 +3,12 @@ from __future__ import annotations
 import pytest
 
 from harnesslab.comparability.models import ComparabilityStatus
+from harnesslab.contracts.run import RunStatus
 from harnesslab.experiment.outcomes import (
     StatisticalOutcome,
     normalize_lane_evidence,
     normalize_manifest_evidence,
+    terminal_status_for_outcome,
 )
 from harnesslab.experiment.statistics import (
     CellStatistics,
@@ -94,6 +96,10 @@ def test_lane_outcome_normalization_separates_subject_infra_and_cancellation() -
     ("failure", "expected"),
     [
         (HarnessFailureCategory.MODEL_TURN_FAILED, StatisticalOutcome.CAPABILITY_FAIL),
+        (
+            HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED,
+            StatisticalOutcome.CAPABILITY_FAIL,
+        ),
         (HarnessFailureCategory.PROCESS_ERROR, StatisticalOutcome.INFRA_FAILURE),
         (HarnessFailureCategory.TIMEOUT, StatisticalOutcome.INFRA_FAILURE),
         (HarnessFailureCategory.PROFILE_VIOLATION, StatisticalOutcome.INFRA_FAILURE),
@@ -113,6 +119,54 @@ def test_typed_and_persisted_harness_normalization_are_identical(
     normalized = normalize_manifest_evidence(persisted)
     assert normalized.outcome is expected
     assert normalized.source_taxonomy == f"harness_error:{failure.value}"
+
+
+def test_execution_budget_exhaustion_maps_to_failed_subject_for_persistence() -> None:
+    normalized = normalize_manifest_evidence(
+        {
+            "outcome": HarnessLaneOutcome.HARNESS_ERROR.value,
+            "harness_failure": HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED.value,
+        }
+    )
+    ambiguous_timeout = normalize_manifest_evidence(
+        {
+            "outcome": HarnessLaneOutcome.HARNESS_ERROR.value,
+            "harness_failure": HarnessFailureCategory.TIMEOUT.value,
+        }
+    )
+
+    assert normalized.outcome is StatisticalOutcome.CAPABILITY_FAIL
+    assert terminal_status_for_outcome(normalized.outcome) is RunStatus.FAILED_SUBJECT
+    assert ambiguous_timeout.outcome is StatisticalOutcome.INFRA_FAILURE
+    assert terminal_status_for_outcome(ambiguous_timeout.outcome) is RunStatus.FAILED_INFRA
+
+
+def test_execution_budget_exhaustion_is_in_capability_denominator() -> None:
+    budget_outcome = normalize_lane_evidence(
+        _Evidence(
+            HarnessLaneOutcome.HARNESS_ERROR,
+            HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED,
+        )
+    )
+    timeout_outcome = normalize_lane_evidence(
+        _Evidence(HarnessLaneOutcome.HARNESS_ERROR, HarnessFailureCategory.TIMEOUT)
+    )
+    summary = summarize_cell(
+        "budget-denominator",
+        3,
+        (
+            observation(0, StatisticalOutcome.CAPABILITY_PASS),
+            observation(1, budget_outcome),
+            observation(2, timeout_outcome),
+        ),
+        bootstrap_resamples=99,
+    )
+
+    assert summary.completed_capability_runs == 2
+    assert summary.capability_passes == 1
+    assert summary.capability_failures == 1
+    assert summary.infra_failures == 1
+    assert summary.success_rate == 0.5
 
 
 def test_infrastructure_failures_are_not_capability_failures_or_denominator_members() -> None:

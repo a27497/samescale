@@ -30,6 +30,7 @@ from harnesslab.harness_lane.models import (
     HarnessFailureCategory,
     HarnessLaneOutcome,
     ObservedModelStatus,
+    is_capability_harness_failure,
 )
 from harnesslab.harness_lane.profile import (
     CODEX_IMAGE,
@@ -705,11 +706,25 @@ class ProductionSmokeInvoker:
             binding, result.artifact_directory, egress_attestation=backend.egress_attestation
         )
         if result.evidence.harness_failure is not None:
-            raise SmokeCallFailure(
-                self._harness_failure_category(result.evidence.harness_failure),
-                "Codex smoke failed",
-                artifact,
-            )
+            if (
+                result.evidence.outcome is not HarnessLaneOutcome.HARNESS_ERROR
+                or not is_capability_harness_failure(result.evidence.harness_failure)
+            ):
+                raise SmokeCallFailure(
+                    self._harness_failure_category(result.evidence.harness_failure),
+                    "Codex smoke failed",
+                    artifact,
+                )
+            if (
+                result.evidence.observed_model is not None
+                and result.evidence.observed_model != profile.requested_model
+            ):
+                raise SmokeCallFailure(
+                    SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
+                    "Codex observed model conflict",
+                    artifact,
+                )
+            return artifact
         if result.evidence.outcome is HarnessLaneOutcome.INFRA_ERROR:
             raise SmokeCallFailure(
                 SmokeFailureCategory.INFRASTRUCTURE,
@@ -762,11 +777,25 @@ class ProductionSmokeInvoker:
             binding, result.artifact_directory, egress_attestation=backend.egress_attestation
         )
         if result.evidence.harness_failure is not None:
-            raise SmokeCallFailure(
-                self._harness_failure_category(result.evidence.harness_failure),
-                "Harness smoke failed",
-                artifact,
-            )
+            if (
+                result.evidence.outcome is not HarnessLaneOutcome.HARNESS_ERROR
+                or not is_capability_harness_failure(result.evidence.harness_failure)
+            ):
+                raise SmokeCallFailure(
+                    self._harness_failure_category(result.evidence.harness_failure),
+                    "Harness smoke failed",
+                    artifact,
+                )
+            if (
+                result.evidence.observed_model is not None
+                and result.evidence.observed_model != profile.requested_model
+            ):
+                raise SmokeCallFailure(
+                    SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
+                    "Harness observed model conflict",
+                    artifact,
+                )
+            return artifact
         if result.evidence.outcome is HarnessLaneOutcome.INFRA_ERROR:
             raise SmokeCallFailure(
                 SmokeFailureCategory.INFRASTRUCTURE,

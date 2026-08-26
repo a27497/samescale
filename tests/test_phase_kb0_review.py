@@ -35,6 +35,8 @@ from harnesslab.harness_lane.models import (
     CodexBackendFailureEvidence,
     CodexBackendFailurePhase,
     CodexProcessCapture,
+    HarnessFailureCategory,
+    HarnessLaneOutcome,
     ObservedModelStatus,
 )
 from harnesslab.harness_lane.profile import CODEX_IMAGE, canonical_codex_profile
@@ -270,6 +272,81 @@ def test_post_r7_smoke_history_is_safe_immutable_and_truthful() -> None:
     assert "reasoning_content" not in serialized
 
 
+def test_post_r9_attempt_6_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-6.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "14d18f9ac00cff18395c951a52c65f3469c199ad"
+    assert history["receipt_digest"] == (
+        "sha256:ba773df2c0b75d256ce5477e1ec4950286103031ebdd114bb33d730c45a28175"
+    )
+    assert history["attempted_top_level_launches"] == 1
+    call = history["calls"][0]
+    assert call["provider_failure"] == "timeout"
+    assert call["timeout_phase"] == "read"
+    assert call["latency_ms"] == 90386
+    assert history["calls_2_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert history["runtime_value_hygiene"] == {
+        "relay_base_url_present": "NO",
+        "relay_api_key_present": "NO",
+        "all_runtime_value_match_file_count": 0,
+    }
+    assert "/home/dev/harnesslab-evidence" not in serialized
+    assert all(value not in serialized for name, value in SAFE_ENVIRONMENT.items() if "KEY" in name)
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
+def test_post_r9_attempt_7_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-7.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "14d18f9ac00cff18395c951a52c65f3469c199ad"
+    assert history["receipt_digest"] == (
+        "sha256:fc77340afe9b71988c005af6bdbe519944287927767ff43f4a100743b8db02ed"
+    )
+    assert history["attempted_top_level_launches"] == 4
+    assert [call["outcome"] for call in history["calls"]] == [
+        "verified_pass",
+        "verified_pass",
+        "verified_pass",
+        "harness_error",
+    ]
+    assert [call["verifier_score"] for call in history["calls"][:3]] == [1.0, 1.0, 1.0]
+    codex = history["calls"][3]
+    assert codex["original_persisted_harness_failure"] == "timeout"
+    assert codex["original_persisted_process_exit_code"] == 0
+    assert codex["duration_ms"] == 90580
+    assert codex["terminal_native_event"] is None
+    assert codex["verifier"] == "NOT_RUN"
+    assert history["r10_classification_review"] == ("CLEAN_EXECUTION_BUDGET_EXHAUSTION_CANDIDATE")
+    assert history["safe_r9_diagnostics"] == {
+        "bwrap_namespace_error_present": "NO",
+        "provider_proxy_403_present": "NO",
+        "websocket_fallback_present": "NO",
+        "successful_command_count": 1,
+        "failed_command_count": 0,
+    }
+    assert history["security_profile"] == {
+        "status": "PASS",
+        "effective_filesystem_policy": "workspace-write",
+        "filesystem_enforcement": "outer-docker",
+        "codex_inner_filesystem_policy": "unrestricted",
+        "tool_network_policy": "deny",
+        "codex_inner_network_policy": "deny",
+        "codex_inner_network_enforcement": "seccomp",
+    }
+    assert history["calls_5_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert "/home/dev/harnesslab-evidence" not in serialized
+    assert all(value not in serialized for name, value in SAFE_ENVIRONMENT.items() if "KEY" in name)
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
 def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
     control = SmokeControlPlane.load(ROOT)
     receipt = control.preflight()
@@ -474,6 +551,184 @@ async def test_smoke_typed_codex_infrastructure_failure_stops_without_retry_or_f
     assert receipt.failure_category is SmokeFailureCategory.INFRASTRUCTURE
     assert tuple(item.call_id for item in receipt.results) == EXPECTED_CALL_IDS[:4]
     assert tuple(item.frozen.call.call_id for item in invoker.calls) == EXPECTED_CALL_IDS[:4]
+
+
+@pytest.mark.asyncio
+async def test_smoke_codex_execution_budget_exhaustion_continues_to_call_five(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    control = SmokeControlPlane.load(ROOT)
+    bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
+    artifact = tmp_path / "codex-budget-artifact"
+    artifact.mkdir()
+    (artifact / "manifest.json").write_text("{}\n", encoding="utf-8")
+
+    class FakeBackend:
+        def __init__(self, **_: object) -> None:
+            self.egress_attestation = None
+
+    class BudgetRunner:
+        def __init__(self, **_: object) -> None:
+            pass
+
+        async def run(self, *_: object, **__: object) -> SimpleNamespace:
+            return SimpleNamespace(
+                artifact_directory=artifact,
+                evidence=SimpleNamespace(
+                    harness_failure=HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED,
+                    outcome=HarnessLaneOutcome.HARNESS_ERROR,
+                    observed_model=None,
+                ),
+            )
+
+    monkeypatch.setattr("harnesslab.release.smoke.DockerCodexBackend", FakeBackend)
+    monkeypatch.setattr("harnesslab.release.smoke.CodexHarnessRunner", BudgetRunner)
+    production = ProductionSmokeInvoker(ROOT, SAFE_ENVIRONMENT, tmp_path / "smoke")
+
+    class SequenceInvoker(RecordingInvoker):
+        async def invoke(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+            self.calls.append(binding)
+            if binding.frozen.call.call_id == EXPECTED_CALL_IDS[3]:
+                return await production.invoke(binding)
+            return SmokeCallResult(
+                call_id=binding.frozen.call.call_id,
+                evidence_references=(f"fake://{binding.frozen.call.call_id}",),
+                evidence_digests=("sha256:" + "8" * 64,),
+            )
+
+    invoker = SequenceInvoker()
+    receipt = await control.execute(bindings, invoker, allow_real_smoke=True)
+
+    assert receipt.status is SmokeExecutionStatus.SUCCEEDED
+    assert receipt.attempted_top_level_launches == 8
+    assert tuple(item.call_id for item in receipt.results) == EXPECTED_CALL_IDS
+    assert tuple(item.frozen.call.call_id for item in invoker.calls) == EXPECTED_CALL_IDS
+    assert sum(item.frozen.call.call_id == EXPECTED_CALL_IDS[3] for item in invoker.calls) == 1
+    assert EXPECTED_CALL_IDS[4] in tuple(item.frozen.call.call_id for item in invoker.calls)
+
+
+@pytest.mark.asyncio
+async def test_smoke_codex_ambiguous_timeout_stops_at_call_four(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    control = SmokeControlPlane.load(ROOT)
+    bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
+    artifact = tmp_path / "codex-timeout-artifact"
+    artifact.mkdir()
+    (artifact / "manifest.json").write_text("{}\n", encoding="utf-8")
+
+    class FakeBackend:
+        def __init__(self, **_: object) -> None:
+            self.egress_attestation = None
+
+    class TimeoutRunner:
+        def __init__(self, **_: object) -> None:
+            pass
+
+        async def run(self, *_: object, **__: object) -> SimpleNamespace:
+            return SimpleNamespace(
+                artifact_directory=artifact,
+                evidence=SimpleNamespace(
+                    harness_failure=HarnessFailureCategory.TIMEOUT,
+                    outcome=HarnessLaneOutcome.HARNESS_ERROR,
+                    observed_model=None,
+                ),
+            )
+
+    monkeypatch.setattr("harnesslab.release.smoke.DockerCodexBackend", FakeBackend)
+    monkeypatch.setattr("harnesslab.release.smoke.CodexHarnessRunner", TimeoutRunner)
+    production = ProductionSmokeInvoker(ROOT, SAFE_ENVIRONMENT, tmp_path / "smoke")
+
+    class SequenceInvoker(RecordingInvoker):
+        async def invoke(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
+            self.calls.append(binding)
+            if binding.frozen.call.call_id == EXPECTED_CALL_IDS[3]:
+                return await production.invoke(binding)
+            return SmokeCallResult(call_id=binding.frozen.call.call_id)
+
+    invoker = SequenceInvoker()
+    receipt = await control.execute(bindings, invoker, allow_real_smoke=True)
+
+    assert receipt.status is SmokeExecutionStatus.ABORTED
+    assert receipt.attempted_top_level_launches == 4
+    assert receipt.failing_call_id == EXPECTED_CALL_IDS[3]
+    assert receipt.failure_category is SmokeFailureCategory.HARNESS_FAILURE
+    assert tuple(item.frozen.call.call_id for item in invoker.calls) == EXPECTED_CALL_IDS[:4]
+
+
+@pytest.mark.asyncio
+async def test_smoke_budget_exhaustion_rejects_exposed_wrong_model(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    control = SmokeControlPlane.load(ROOT)
+    binding = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())[3]
+    artifact = tmp_path / "codex-wrong-model-artifact"
+    artifact.mkdir()
+    (artifact / "manifest.json").write_text("{}\n", encoding="utf-8")
+
+    class FakeBackend:
+        def __init__(self, **_: object) -> None:
+            self.egress_attestation = None
+
+    class WrongModelRunner:
+        def __init__(self, **_: object) -> None:
+            pass
+
+        async def run(self, *_: object, **__: object) -> SimpleNamespace:
+            return SimpleNamespace(
+                artifact_directory=artifact,
+                evidence=SimpleNamespace(
+                    harness_failure=HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED,
+                    outcome=HarnessLaneOutcome.HARNESS_ERROR,
+                    observed_model="wrong-model",
+                ),
+            )
+
+    monkeypatch.setattr("harnesslab.release.smoke.DockerCodexBackend", FakeBackend)
+    monkeypatch.setattr("harnesslab.release.smoke.CodexHarnessRunner", WrongModelRunner)
+    invoker = ProductionSmokeInvoker(ROOT, SAFE_ENVIRONMENT, tmp_path / "smoke")
+
+    with pytest.raises(SmokeCallFailure) as raised:
+        await invoker.invoke(binding)
+
+    assert raised.value.category is SmokeFailureCategory.OBSERVED_MODEL_CONFLICT
+
+
+@pytest.mark.asyncio
+async def test_smoke_multi_harness_model_turn_failure_is_capability_result(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    control = SmokeControlPlane.load(ROOT)
+    binding = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())[5]
+    artifact = tmp_path / "claude-turn-failure-artifact"
+    artifact.mkdir()
+    (artifact / "manifest.json").write_text("{}\n", encoding="utf-8")
+
+    class FakeBackend:
+        def __init__(self, **_: object) -> None:
+            self.egress_attestation = None
+
+    class TurnFailureRunner:
+        def __init__(self, **_: object) -> None:
+            pass
+
+        async def run(self, *_: object, **__: object) -> SimpleNamespace:
+            return SimpleNamespace(
+                artifact_directory=artifact,
+                evidence=SimpleNamespace(
+                    harness_failure=HarnessFailureCategory.MODEL_TURN_FAILED,
+                    outcome=HarnessLaneOutcome.HARNESS_ERROR,
+                    observed_model=None,
+                ),
+            )
+
+    monkeypatch.setattr("harnesslab.release.smoke.DockerMultiHarnessBackend", FakeBackend)
+    monkeypatch.setattr("harnesslab.release.smoke.MultiHarnessRunner", TurnFailureRunner)
+    invoker = ProductionSmokeInvoker(ROOT, SAFE_ENVIRONMENT, tmp_path / "smoke")
+
+    result = await invoker.invoke(binding)
+
+    assert result.call_id == EXPECTED_CALL_IDS[5]
 
 
 @pytest.mark.asyncio

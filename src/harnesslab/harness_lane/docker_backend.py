@@ -242,28 +242,37 @@ class DockerCodexBackend:
                     environment,
                     started=started,
                 )
-                try:
-                    state = await cli.run(
-                        "inspect", name, "--format", "{{json .State.ExitCode}}", check=False
-                    )
-                    if state.returncode != 0:
-                        raise ValueError("container exit state unavailable")
-                    exit_code = int(json.loads(state.stdout.decode("utf-8")))
+                if capture.timed_out or capture.cancelled:
                     capture = CodexProcessCapture(
                         lines=capture.lines,
-                        exit_code=exit_code,
+                        exit_code=None,
                         duration_ms=capture.duration_ms,
                         timed_out=capture.timed_out,
                         cancelled=capture.cancelled,
                     )
-                except asyncio.CancelledError:
-                    raise
-                except BaseException as exc:
-                    raise self._failure(
-                        CodexBackendFailurePhase.PROCESS_EXIT,
-                        started=started,
-                        capture=capture,
-                    ) from exc
+                else:
+                    try:
+                        state = await cli.run(
+                            "inspect", name, "--format", "{{json .State.ExitCode}}", check=False
+                        )
+                        if state.returncode != 0:
+                            raise ValueError("container exit state unavailable")
+                        exit_code = int(json.loads(state.stdout.decode("utf-8")))
+                        capture = CodexProcessCapture(
+                            lines=capture.lines,
+                            exit_code=exit_code,
+                            duration_ms=capture.duration_ms,
+                            timed_out=capture.timed_out,
+                            cancelled=capture.cancelled,
+                        )
+                    except asyncio.CancelledError:
+                        raise
+                    except BaseException as exc:
+                        raise self._failure(
+                            CodexBackendFailurePhase.PROCESS_EXIT,
+                            started=started,
+                            capture=capture,
+                        ) from exc
             except CodexBackendExecutionError as exc:
                 primary_failure = exc
             except asyncio.CancelledError as exc:
@@ -432,7 +441,7 @@ class DockerCodexBackend:
             ) from failure
         return CodexProcessCapture(
             lines=tuple(streams.lines),
-            exit_code=process.returncode,
+            exit_code=None if timed_out or cancelled else process.returncode,
             duration_ms=duration_ms,
             timed_out=timed_out,
             cancelled=cancelled,

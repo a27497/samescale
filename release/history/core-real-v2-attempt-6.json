@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-6",
+  "source_commit": "14d18f9ac00cff18395c951a52c65f3469c199ad",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:ba773df2c0b75d256ce5477e1ec4950286103031ebdd114bb33d730c45a28175",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 1,
+  "failing_call_id": "smoke-1-model-gpt56-relay-responses",
+  "failure_category": "PROVIDER_FAILURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": null,
+      "latency_ms": 90386,
+      "attempt_count": 1,
+      "provider_failure": "timeout",
+      "timeout_phase": "read",
+      "outcome": "provider_error",
+      "verifier": "NOT_RUN"
+    }
+  ],
+  "calls_2_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "runtime_value_hygiene": {
+    "relay_base_url_present": "NO",
+    "relay_api_key_present": "NO",
+    "all_runtime_value_match_file_count": 0
+  },
+  "interpretation": "Call 1 reached the configured relay route and timed out during response reading. This is an operational provider failure, not capability evidence, and no later call ran.",
+  "limitations": [
+    "This is one smoke observation, not aggregate model performance evidence.",
+    "No operator-local paths, runtime configuration values, credentials, raw provider content, or private reasoning are tracked here."
+  ]
+}

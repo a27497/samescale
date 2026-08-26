@@ -52,6 +52,8 @@ CRITICAL_TESTS = {
     "test_repeated_run_tiers_are_conservative",
     "test_lane_outcome_normalization_separates_subject_infra_and_cancellation",
     "test_infrastructure_failures_are_not_capability_failures_or_denominator_members",
+    "test_execution_budget_exhaustion_maps_to_failed_subject_for_persistence",
+    "test_execution_budget_exhaustion_is_in_capability_denominator",
     "test_pass_at_k_boundaries_and_macro_per_task",
     "test_continuous_bootstrap_is_deterministic_and_paired",
     "test_exact_mcnemar_and_comparability_gating",
@@ -156,6 +158,9 @@ def verify_test_evidence(evidence_path: Path) -> ExitCode:
     print("LANE_SUPPORT=incompatible-lane-rejected-before-enqueue PASS")
     print("SLOT_BINDING=mismatched-successful-binding-is-infra-without-authoritative-artifact PASS")
     print("DENOMINATOR=capability_passes+capability_failures;infra disclosed separately PASS")
+    print("PHASE_G_BUDGET_EXHAUSTION=CAPABILITY_FAIL/FAILED_SUBJECT")
+    print("PHASE_G_AMBIGUOUS_TIMEOUT=INFRA_FAILURE/FAILED_INFRA")
+    print("EXECUTION_BUDGET_DENOMINATOR=INCLUDED")
     print("P_LANE=controlled-keyless COMPARABLE;actual-route-mismatch NOT_COMPARABLE PASS")
     print("ABLATION=reasoning_effort declared;observed-model limitation surfaced PASS")
     return ExitCode.PASS

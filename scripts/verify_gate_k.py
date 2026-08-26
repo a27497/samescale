@@ -102,6 +102,8 @@ CRITICAL_TESTS = {
     "test_post_r5_smoke_history_is_safe_immutable_and_truthful",
     "test_post_r6_smoke_history_is_safe_immutable_and_truthful",
     "test_post_r7_smoke_history_is_safe_immutable_and_truthful",
+    "test_post_r9_attempt_6_history_is_safe_immutable_and_truthful",
+    "test_post_r9_attempt_7_history_is_safe_immutable_and_truthful",
     "test_production_smoke_persists_codex_precapture_infrastructure_evidence",
     "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
     "test_v2_credential_preflight_prints_presence_only",
@@ -109,6 +111,10 @@ CRITICAL_TESTS = {
     "test_smoke_missing_config_stops_before_first_call",
     "test_smoke_abort_on_first_failure_never_invokes_calls_four_through_eight",
     "test_smoke_typed_codex_infrastructure_failure_stops_without_retry_or_fallback",
+    "test_smoke_codex_execution_budget_exhaustion_continues_to_call_five",
+    "test_smoke_codex_ambiguous_timeout_stops_at_call_four",
+    "test_smoke_budget_exhaustion_rejects_exposed_wrong_model",
+    "test_smoke_multi_harness_model_turn_failure_is_capability_result",
     "test_smoke_one_judge_call_only",
     "test_smoke_ninth_call_is_rejected_before_execution",
     "test_smoke_provider_fallbacks_are_rejected_in_production_assertions",
@@ -265,6 +271,12 @@ def verify_contract_mode() -> bool:
     post_r7_history = json.loads(
         (ROOT / "release/history/core-real-v2-attempt-5.json").read_text(encoding="utf-8")
     )
+    post_r9_attempt_6 = json.loads(
+        (ROOT / "release/history/core-real-v2-attempt-6.json").read_text(encoding="utf-8")
+    )
+    post_r9_attempt_7 = json.loads(
+        (ROOT / "release/history/core-real-v2-attempt-7.json").read_text(encoding="utf-8")
+    )
     snapshot = json.loads(
         (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
     )
@@ -338,6 +350,41 @@ def verify_contract_mode() -> bool:
         != {"relay_base_url_present": "NO", "api_key_present": "NO"}
     ):
         print("FAIL: immutable post-R7 smoke history drifted")
+        return False
+    if (
+        post_r9_attempt_6.get("source_commit") != "14d18f9ac00cff18395c951a52c65f3469c199ad"
+        or post_r9_attempt_6.get("receipt_digest")
+        != "sha256:ba773df2c0b75d256ce5477e1ec4950286103031ebdd114bb33d730c45a28175"
+        or post_r9_attempt_6.get("attempted_top_level_launches") != 1
+        or post_r9_attempt_6.get("calls", [{}])[0].get("provider_failure") != "timeout"
+        or post_r9_attempt_6.get("calls", [{}])[0].get("timeout_phase") != "read"
+        or post_r9_attempt_6.get("calls_2_to_8") != "NOT_RUN"
+        or post_r9_attempt_6.get("retry_count") != 0
+        or post_r9_attempt_6.get("fallback_count") != 0
+    ):
+        print("FAIL: immutable post-R9 attempt 6 history drifted")
+        return False
+    if (
+        post_r9_attempt_7.get("source_commit") != "14d18f9ac00cff18395c951a52c65f3469c199ad"
+        or post_r9_attempt_7.get("receipt_digest")
+        != "sha256:fc77340afe9b71988c005af6bdbe519944287927767ff43f4a100743b8db02ed"
+        or post_r9_attempt_7.get("attempted_top_level_launches") != 4
+        or [call.get("outcome") for call in post_r9_attempt_7.get("calls", ())]
+        != ["verified_pass", "verified_pass", "verified_pass", "harness_error"]
+        or post_r9_attempt_7.get("calls", [{}, {}, {}, {}])[3].get(
+            "original_persisted_harness_failure"
+        )
+        != "timeout"
+        or post_r9_attempt_7.get("r10_classification_review")
+        != "CLEAN_EXECUTION_BUDGET_EXHAUSTION_CANDIDATE"
+        or post_r9_attempt_7.get("safe_r9_diagnostics", {}).get("successful_command_count") != 1
+        or post_r9_attempt_7.get("safe_r9_diagnostics", {}).get("failed_command_count") != 0
+        or post_r9_attempt_7.get("security_profile", {}).get("status") != "PASS"
+        or post_r9_attempt_7.get("calls_5_to_8") != "NOT_RUN"
+        or post_r9_attempt_7.get("retry_count") != 0
+        or post_r9_attempt_7.get("fallback_count") != 0
+    ):
+        print("FAIL: immutable post-R9 attempt 7 history drifted")
         return False
     if (
         snapshot.get("provider_provenance") != "THIRD_PARTY_INFERENCE_PLATFORM"
@@ -425,6 +472,11 @@ def verify_contract_mode() -> bool:
     print("POST_R5_SMOKE_HISTORY_PRESERVED=PASS")
     print("POST_R6_SMOKE_HISTORY_PRESERVED=PASS")
     print("POST_R7_SMOKE_HISTORY_PRESERVED=PASS")
+    print("POST_R9_ATTEMPT_6_HISTORY=PRESERVED")
+    print("POST_R9_ATTEMPT_7_HISTORY=PRESERVED")
+    print("SMOKE_CAPABILITY_TIMEOUT_CONTINUES=PASS")
+    print("SMOKE_INFRA_TIMEOUT_STOPS=PASS")
+    print("SMOKE_NULL_OBSERVED_MODEL_ON_BUDGET_EXHAUSTION=PASS")
     print("R8_LEGACY_LANDLOCK_WORKSPACE_WRITE=REJECTED_BY_PINNED_0_149_0")
     print("CODEX_STARTUP_FAILURE_EVIDENCE=PASS")
     print("CODEX_EARLY_EXIT_PHASE_CLASSIFICATION=PASS")

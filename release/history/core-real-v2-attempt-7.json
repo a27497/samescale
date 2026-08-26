@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-7",
+  "source_commit": "14d18f9ac00cff18395c951a52c65f3469c199ad",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:fc77340afe9b71988c005af6bdbe519944287927767ff43f4a100743b8db02ed",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 4,
+  "failing_call_id": "smoke-4-harness-codex-gpt56-medium",
+  "failure_category": "HARNESS_FAILURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": "gpt-5.6-sol",
+      "latency_ms": 76356,
+      "attempt_count": 1,
+      "verifier_passed": true,
+      "verifier_score": 1.0,
+      "outcome": "verified_pass"
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "requested_model": "qwen3.8-max",
+      "observed_model": "qwen3.8-max",
+      "latency_ms": 37034,
+      "attempt_count": 1,
+      "verifier_passed": true,
+      "verifier_score": 1.0,
+      "outcome": "verified_pass"
+    },
+    {
+      "call_id": "smoke-3-model-deepseek-v4pro-chat",
+      "requested_model": "deepseek-v4-pro",
+      "observed_model": "deepseek-v4-pro",
+      "latency_ms": 2669,
+      "attempt_count": 1,
+      "verifier_passed": true,
+      "verifier_score": 1.0,
+      "outcome": "verified_pass"
+    },
+    {
+      "call_id": "smoke-4-harness-codex-gpt56-medium",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": null,
+      "observed_model_status": "not_exposed",
+      "duration_ms": 90580,
+      "original_persisted_process_exit_code": 0,
+      "timed_out": true,
+      "attempt_count": 1,
+      "outcome": "harness_error",
+      "original_persisted_harness_failure": "timeout",
+      "trace_coverage": "FULL_STREAM",
+      "trace_event_count": 5,
+      "terminal_native_event": null,
+      "verifier": "NOT_RUN"
+    }
+  ],
+  "calls_5_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "r10_classification_review": "CLEAN_EXECUTION_BUDGET_EXHAUSTION_CANDIDATE",
+  "safe_r9_diagnostics": {
+    "bwrap_namespace_error_present": "NO",
+    "provider_proxy_403_present": "NO",
+    "websocket_fallback_present": "NO",
+    "successful_command_count": 1,
+    "failed_command_count": 0
+  },
+  "security_profile": {
+    "status": "PASS",
+    "effective_filesystem_policy": "workspace-write",
+    "filesystem_enforcement": "outer-docker",
+    "codex_inner_filesystem_policy": "unrestricted",
+    "tool_network_policy": "deny",
+    "codex_inner_network_policy": "deny",
+    "codex_inner_network_enforcement": "seccomp"
+  },
+  "runtime_value_hygiene": {
+    "relay_base_url_present": "NO",
+    "relay_api_key_present": "NO",
+    "all_runtime_value_match_file_count": 0
+  },
+  "interpretation": "Calls 1 through 3 passed their isolated verifiers. Call 4 made positively verified healthy command progress under the exact R9 security profile, emitted no terminal event, and exhausted the frozen 90-second execution budget under the original timeout taxonomy.",
+  "limitations": [
+    "The immutable original Call 4 manifest remains harness_error/timeout; this summary does not rewrite it.",
+    "The missing observed model and verifier result keep formal Pair comparability NOT_COMPARABLE and do not support a Harness uplift claim.",
+    "No operator-local paths, runtime configuration values, credentials, raw provider content, agent messages, commands, or private reasoning are tracked here."
+  ]
+}

@@ -39,6 +39,7 @@ from harnesslab.harness_lane.models import (
     CodexInnerNetworkEnforcement,
     CodexProcessCapture,
     HarnessFailureCategory,
+    HarnessLaneEvidence,
     HarnessLaneOutcome,
     ObservedModelStatus,
     TraceEventType,
@@ -99,6 +100,50 @@ def all_artifact_text(root: Path) -> str:
         path.read_text(encoding="utf-8", errors="replace")
         for path in root.rglob("*")
         if path.is_file()
+    )
+
+
+def clean_budget_timeout_lines(*, observed_model: str | None = None) -> tuple[str, ...]:
+    thread: dict[str, object] = {"type": "thread.started", "thread_id": "budget-thread"}
+    if observed_model is not None:
+        thread["observed_model"] = observed_model
+    return (
+        json.dumps(thread),
+        json.dumps({"type": "turn.started"}),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "message-1",
+                    "type": "agent_message",
+                    "text": "Inspecting the workspace.",
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "item.started",
+                "item": {
+                    "id": "command-1",
+                    "type": "command_execution",
+                    "command": "python -m pytest",
+                    "status": "in_progress",
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-1",
+                    "type": "command_execution",
+                    "command": "python -m pytest",
+                    "aggregated_output": "tests passed",
+                    "status": "completed",
+                    "exit_code": 0,
+                },
+            }
+        ),
     )
 
 
@@ -391,6 +436,55 @@ async def test_codex_timeout_and_cancellation_remain_capture_states(
 
     assert timed_out.timed_out and not timed_out.cancelled
     assert cancelled.cancelled and not cancelled.timed_out
+    assert timed_out.exit_code is None
+    assert cancelled.exit_code is None
+
+
+@pytest.mark.asyncio
+async def test_codex_timeout_capture_does_not_claim_natural_container_exit_code(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    inspected_exit_state = False
+
+    async def preflight() -> tuple[SimpleNamespace, dict[str, str]]:
+        return SimpleNamespace(cli_path="docker"), {}
+
+    class FakeCLI:
+        def __init__(self, **_: object) -> None:
+            pass
+
+        async def run(self, *arguments: str, **_: object) -> SimpleNamespace:
+            nonlocal inspected_exit_state
+            if arguments and arguments[0] == "inspect" and "State.ExitCode" in arguments:
+                inspected_exit_state = True
+            return SimpleNamespace(returncode=0, stdout=b"0")
+
+    class TimedOutBackend(DockerCodexBackend):
+        async def _verify_effective_security(self, *_: object) -> None:
+            return None
+
+        async def _execute_attached_process(self, *_: object, **__: object) -> CodexProcessCapture:
+            return CodexProcessCapture(
+                clean_budget_timeout_lines(),
+                0,
+                90_001,
+                timed_out=True,
+            )
+
+        async def _collect_cleanup_failures(
+            self, *_: object, **__: object
+        ) -> tuple[CodexCleanupFailure, ...]:
+            return ()
+
+    monkeypatch.setattr(
+        "harnesslab.harness_lane.docker_backend._docker_runtime_preflight", preflight
+    )
+    monkeypatch.setattr("harnesslab.harness_lane.docker_backend._DockerCLI", FakeCLI)
+    capture = await TimedOutBackend(explicitly_enabled=True)._run(_execution_plan(tmp_path))
+
+    assert capture.timed_out
+    assert capture.exit_code is None
+    assert not inspected_exit_state
 
 
 @pytest.mark.asyncio
@@ -611,6 +705,134 @@ async def test_harness_failure_taxonomy_is_structurally_distinct(
     collection = adapter.collect(capture)
 
     assert collection.failure_category is expected
+
+
+def test_clean_codex_timeout_after_successful_command_is_execution_budget_exhausted() -> None:
+    collection = collect_codex_jsonl(
+        CodexProcessCapture(
+            clean_budget_timeout_lines(),
+            None,
+            90_580,
+            timed_out=True,
+        )
+    )
+
+    assert collection.failure_category is HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED
+    assert collection.terminal_event is None
+    assert [event.type for event in collection.trace.events] == [
+        TraceEventType.THREAD_STARTED,
+        TraceEventType.TURN_STARTED,
+        TraceEventType.AGENT_MESSAGE,
+        TraceEventType.COMMAND_EXECUTION,
+        TraceEventType.COMMAND_EXECUTION,
+    ]
+
+
+def test_codex_timeout_without_useful_progress_remains_ambiguous_timeout() -> None:
+    collection = collect_codex_jsonl(
+        CodexProcessCapture(
+            clean_budget_timeout_lines()[:2],
+            None,
+            90_001,
+            timed_out=True,
+        )
+    )
+
+    assert collection.failure_category is HarnessFailureCategory.TIMEOUT
+
+
+def test_codex_timeout_after_successful_command_and_error_remains_infra_timeout() -> None:
+    lines = (
+        *clean_budget_timeout_lines(),
+        json.dumps({"type": "error", "error": {"message": "safe provider failure"}}),
+    )
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_001, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.TIMEOUT
+
+
+def test_codex_timeout_after_failed_command_remains_infra_timeout() -> None:
+    lines = (
+        *clean_budget_timeout_lines()[:3],
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "command-1",
+                    "type": "command_execution",
+                    "command": "false",
+                    "aggregated_output": "operation not permitted",
+                    "status": "failed",
+                    "exit_code": 1,
+                },
+            }
+        ),
+    )
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_001, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.TIMEOUT
+
+
+def test_codex_timeout_with_malformed_event_is_protocol_error() -> None:
+    lines = (*clean_budget_timeout_lines(), "{malformed")
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, None, 90_001, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.PROTOCOL_ERROR
+
+
+def test_codex_cancelled_clean_progress_is_cancelled() -> None:
+    collection = collect_codex_jsonl(
+        CodexProcessCapture(
+            clean_budget_timeout_lines(),
+            None,
+            10,
+            timed_out=True,
+            cancelled=True,
+        )
+    )
+
+    assert collection.failure_category is HarnessFailureCategory.CANCELLED
+
+
+@pytest.mark.asyncio
+async def test_codex_budget_exhaustion_persists_typed_manifest_without_verifier(
+    tmp_path: Path,
+) -> None:
+    class CleanBudgetBackend(FakeCodexBackend):
+        async def run(self, plan: CodexExecutionPlan) -> CodexProcessCapture:
+            self.plans.append(plan)
+            return CodexProcessCapture(
+                clean_budget_timeout_lines(),
+                None,
+                90_580,
+                timed_out=True,
+            )
+
+    result = await CodexHarnessRunner(
+        artifact_root=tmp_path / "artifacts",
+        runtime_root=tmp_path / "runtime",
+    ).run(
+        TASKS[0],
+        fake_profile(),
+        backend=CleanBudgetBackend(),
+        run_id="clean-budget-timeout",
+    )
+    persisted = json.loads(
+        (result.artifact_directory / "manifest.json").read_text(encoding="utf-8")
+    )
+
+    assert result.evidence.outcome is HarnessLaneOutcome.HARNESS_ERROR
+    assert result.evidence.harness_failure is HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED
+    assert result.evidence.process_exit_code is None
+    assert result.evidence.observed_model is None
+    assert result.evidence.observed_model_status is ObservedModelStatus.NOT_EXPOSED
+    assert result.evidence.verifier_passed is None
+    assert persisted["harness_failure"] == "execution_budget_exhausted"
+    assert persisted["process_exit_code"] is None
+    assert persisted["verifier_passed"] is None
+    persisted["process_exit_code"] = 0
+    with pytest.raises(ValidationError, match="cannot claim a natural exit code"):
+        HarnessLaneEvidence.model_validate(persisted)
 
 
 def test_structured_authentication_error_is_not_guessed_from_free_text() -> None:

@@ -6,7 +6,11 @@ from enum import StrEnum
 from typing import Any
 
 from harnesslab.contracts.run import RunStatus
-from harnesslab.harness_lane.models import HarnessFailureCategory, HarnessLaneOutcome
+from harnesslab.harness_lane.models import (
+    HarnessFailureCategory,
+    HarnessLaneOutcome,
+    is_capability_harness_failure,
+)
 from harnesslab.model_lane.models import DirectModelOutcome
 
 
@@ -67,7 +71,7 @@ def normalize_source_evidence(
     }:
         normalized = StatisticalOutcome.CAPABILITY_FAIL
     elif source_outcome == HarnessLaneOutcome.HARNESS_ERROR.value:
-        if harness_failure == HarnessFailureCategory.MODEL_TURN_FAILED.value:
+        if is_capability_harness_failure(harness_failure):
             normalized = StatisticalOutcome.CAPABILITY_FAIL
         elif harness_failure == HarnessFailureCategory.CANCELLED.value:
             normalized = StatisticalOutcome.CANCELLED
