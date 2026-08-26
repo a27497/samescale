@@ -241,6 +241,7 @@ def test_codex_runtime_url_is_environment_only_and_ephemeral(
     assert RUNTIME_URL in runtime_config
     assert "supports_websockets = false" in runtime_config
     assert f'default_permissions = "{CODEX_PERMISSION_PROFILE}"' in runtime_config
+    assert runtime_config.index("default_permissions") < runtime_config.index("[model_providers.")
     assert f"[permissions.{CODEX_PERMISSION_PROFILE}.filesystem]" in runtime_config
     assert '":root" = "write"' in runtime_config
     assert f"[permissions.{CODEX_PERMISSION_PROFILE}.network]" in runtime_config

@@ -60,6 +60,8 @@ def _materialize_runtime_profile(base_url: str) -> None:
     config = "\n".join(
         (
             'model_provider = "harnesslab_gpt56_relay"',
+            f'default_permissions = "{PERMISSION_PROFILE}"',
+            "",
             "[model_providers.harnesslab_gpt56_relay]",
             'name = "HarnessLab trusted GPT relay"',
             f"base_url = {json.dumps(base_url)}",
@@ -67,7 +69,6 @@ def _materialize_runtime_profile(base_url: str) -> None:
             'wire_api = "responses"',
             "supports_websockets = false",
             "",
-            f'default_permissions = "{PERMISSION_PROFILE}"',
             f"[permissions.{PERMISSION_PROFILE}.filesystem]",
             '":root" = "write"',
             f"[permissions.{PERMISSION_PROFILE}.network]",
