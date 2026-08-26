@@ -214,6 +214,10 @@ def test_opencode_go_claude_qwen_uses_typed_api_key_transport(tmp_path: Path) ->
     assert execution.environment_literals == (
         ("ANTHROPIC_BASE_URL", OPENCODE_GO_BASE_URL),
         ("ANTHROPIC_MODEL", "qwen3.8-max"),
+        ("CLAUDE_CODE_DISABLE_AUTO_MEMORY", "1"),
+        ("CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC", "1"),
+        ("CLAUDE_CODE_NO_MODEL_FALLBACK", "1"),
+        ("CLAUDE_CONFIG_DIR", "/tmp/claude-config"),
     )
     assert "api.anthropic.com" not in json.dumps(profile.model_dump(mode="json"))
     assert SENTINEL not in execution.argv

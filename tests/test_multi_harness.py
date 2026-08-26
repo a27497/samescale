@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import shutil
 import stat
 from pathlib import Path
@@ -28,6 +29,8 @@ from harnesslab.multi_harness.models import (
     DeepSeekSessionExtraction,
     HarnessKind,
     HarnessProcessCapture,
+    ProcessDiagnosticCategory,
+    StartupFailureCategory,
     TraceCoverage,
 )
 from harnesslab.multi_harness.profile import (
@@ -229,7 +232,9 @@ async def test_claude_failed_attempts_preserve_taxonomy_and_skip_verifier(
     assert result.evidence.verifier_sandbox_manifest is None
 
 
-def test_claude_plan_is_bare_headless_stream_json_with_minimal_tools(tmp_path: Path) -> None:
+def test_claude_plan_is_non_bare_isolated_stream_json_with_canonical_tools(
+    tmp_path: Path,
+) -> None:
     profile = fake_profile(HarnessKind.CLAUDE_CODE)
     prompt = render_harness_prompt(
         HarnessKind.CLAUDE_CODE,
@@ -243,7 +248,8 @@ def test_claude_plan_is_bare_headless_stream_json_with_minimal_tools(tmp_path: P
         profile, prompt, workspace=tmp_path, context=None, task_id="micro-python-clamp"
     )
 
-    assert plan.argv[:4] == ("claude", "--bare", "-p", prompt.text)
+    assert plan.argv[:3] == ("claude", "-p", prompt.text)
+    assert "--bare" not in plan.argv
     assert (
         plan.argv[plan.argv.index("--output-format")],
         plan.argv[plan.argv.index("--output-format") + 1],
@@ -251,10 +257,66 @@ def test_claude_plan_is_bare_headless_stream_json_with_minimal_tools(tmp_path: P
     assert "--verbose" in plan.argv
     assert "--forward-subagent-text" not in plan.argv
     assert plan.argv[plan.argv.index("--tools") + 1] == "Read,Edit,Write,Bash"
-    assert "--mcp-config" in plan.argv and "{}" in plan.argv
+    assert plan.argv[plan.argv.index("--setting-sources") + 1] == ""
+    assert plan.argv[plan.argv.index("--mcp-config") + 1] == '{"mcpServers":{}}'
     assert "--disable-slash-commands" in plan.argv
     assert "AskUserQuestion" not in plan.argv
     assert "WebSearch" not in plan.argv
+    assert dict(plan.environment_literals) == {
+        "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+        "CLAUDE_CODE_NO_MODEL_FALLBACK": "1",
+        "CLAUDE_CONFIG_DIR": "/tmp/claude-config",
+    }
+
+
+@pytest.mark.asyncio
+async def test_phase_f_zero_stdout_exit_one_persists_only_redacted_safe_diagnostics(
+    tmp_path: Path,
+) -> None:
+    secret = "r12-fake-stderr-secret"
+    runtime_url = "https://r12-private-runtime.example.test"
+    raw_stderr = (
+        "Error: Invalid MCP configuration: mcpServers: Invalid input "
+        f"credential={secret} runtime={runtime_url}"
+    )
+
+    class StartupFailureBackend(FakeMultiHarnessBackend):
+        @property
+        def artifact_secret_values(self) -> tuple[str, ...]:
+            return (secret, runtime_url)
+
+        async def run(self, plan: HarnessExecutionPlan) -> HarnessProcessCapture:
+            return HarnessProcessCapture((), raw_stderr, 1, 1658)
+
+    result = await MultiHarnessRunner(
+        artifact_root=tmp_path / "artifacts", runtime_root=tmp_path / "runtime"
+    ).run(
+        TASKS["python"],
+        fake_profile(HarnessKind.CLAUDE_CODE),
+        adapter=ClaudeCodeAdapter(),
+        backend=StartupFailureBackend(),
+        run_id="safe-startup-failure",
+    )
+
+    persisted = artifact_text(result.artifact_directory)
+    redacted = raw_stderr.replace(secret, "[REDACTED]").replace(runtime_url, "[REDACTED]")
+    assert result.evidence.outcome is HarnessLaneOutcome.HARNESS_ERROR
+    assert result.evidence.harness_failure is HarnessFailureCategory.PROCESS_ERROR
+    assert result.evidence.process_exit_code == 1
+    assert result.evidence.trace_event_count == 0
+    assert result.evidence.stdout_line_count == 0
+    assert result.evidence.stderr_category is ProcessDiagnosticCategory.PRESENT
+    assert result.evidence.stderr_digest == (
+        "sha256:" + hashlib.sha256(redacted.encode()).hexdigest()
+    )
+    assert (
+        result.evidence.startup_failure_category is StartupFailureCategory.PROVIDER_BOOTSTRAP_ERROR
+    )
+    assert raw_stderr not in persisted
+    assert "Invalid MCP configuration" not in persisted
+    assert secret not in persisted
+    assert runtime_url not in persisted
 
 
 def test_deepseek_plan_uses_only_public_headless_contract(tmp_path: Path) -> None:

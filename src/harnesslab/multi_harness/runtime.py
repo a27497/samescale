@@ -21,7 +21,6 @@ from harnesslab.sandbox.preflight import _docker_runtime_preflight
 from harnesslab.sandbox.subprocess_loop import run_on_subprocess_loop
 
 CLAUDE_REQUIRED_HELP = (
-    "--bare",
     "--print",
     "--output-format",
     "--verbose",
@@ -29,6 +28,7 @@ CLAUDE_REQUIRED_HELP = (
     "--permission-mode",
     "--model",
     "--tools",
+    "--setting-sources",
     "--mcp-config",
     "--disable-slash-commands",
     "--no-chrome",

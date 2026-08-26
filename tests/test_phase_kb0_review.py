@@ -500,6 +500,44 @@ def test_post_r10_attempt_8_history_is_safe_immutable_and_truthful() -> None:
     assert "reasoning_content" not in serialized
 
 
+def test_post_r11_attempt_9_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-9.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "9f7ac3836da83d6009e2caa5eade07683ed68c7f"
+    assert history["receipt_digest"] == (
+        "sha256:750cb6a6d396bc49c43d07b9912bb5a84f016849d6e799faac435a750a0516bb"
+    )
+    assert history["attempted_top_level_launches"] == 6
+    assert [call["outcome"] for call in history["calls"]] == [
+        "verified_fail",
+        "subject_output_error",
+        "subject_output_error",
+        "harness_error",
+        "harness_error",
+        "harness_error",
+    ]
+    assert [call["statistical_outcome"] for call in history["calls"][:5]] == ["capability_fail"] * 5
+    claude = history["calls"][5]
+    assert claude["harness"] == "claude-code"
+    assert claude["cli_version"] == "2.1.241"
+    assert claude["harness_failure"] == "process_error"
+    assert claude["process_exit_code"] == 1
+    assert claude["duration_ms"] == 1658
+    assert claude["trace_event_count"] == 0
+    assert claude["observed_model"] is None
+    assert claude["verifier"] == "NOT_RUN"
+    assert history["calls_7_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert history["runtime_value_hygiene"]["status"] == "PASS"
+    assert history["runtime_value_hygiene"]["all_runtime_value_match_file_count"] == 0
+    assert "/home/dev/harnesslab-evidence" not in serialized
+    assert all(value not in serialized for name, value in SAFE_ENVIRONMENT.items() if "KEY" in name)
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
 def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
     control = SmokeControlPlane.load(ROOT)
     receipt = control.preflight()

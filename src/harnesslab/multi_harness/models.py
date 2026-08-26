@@ -44,6 +44,22 @@ class DeepSeekSessionExtraction(StrEnum):
     DEFERRED_NOT_VERIFIED = "DEFERRED_NOT_VERIFIED"
 
 
+class ProcessDiagnosticCategory(StrEnum):
+    UNAVAILABLE = "UNAVAILABLE"
+    EMPTY = "EMPTY"
+    PRESENT = "PRESENT"
+    TRUNCATED = "TRUNCATED"
+    READ_FAILED = "READ_FAILED"
+
+
+class StartupFailureCategory(StrEnum):
+    CLI_USAGE_ERROR = "CLI_USAGE_ERROR"
+    PERMISSION_CONFIGURATION_ERROR = "PERMISSION_CONFIGURATION_ERROR"
+    AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR"
+    PROVIDER_BOOTSTRAP_ERROR = "PROVIDER_BOOTSTRAP_ERROR"
+    UNKNOWN = "UNKNOWN"
+
+
 class MultiHarnessProfile(BaseModel):
     """Frozen identity of either Phase F subject harness profile."""
 
@@ -142,6 +158,7 @@ class HarnessProcessCapture:
     duration_ms: int
     timed_out: bool = False
     cancelled: bool = False
+    stderr_category: ProcessDiagnosticCategory | None = None
 
 
 @dataclass(frozen=True)
@@ -191,6 +208,10 @@ class MultiHarnessEvidence(BaseModel):
     trace_event_count: int = Field(ge=0)
     trace_event_types: tuple[TraceEventType, ...]
     terminal_native_event: str | None = None
+    stderr_category: ProcessDiagnosticCategory
+    stderr_digest: Sha256Digest | None
+    stdout_line_count: int = Field(ge=0)
+    startup_failure_category: StartupFailureCategory | None = None
     process_exit_code: int | None = None
     duration_ms: int = Field(ge=0)
     timed_out: bool = False
@@ -218,6 +239,18 @@ class MultiHarnessEvidence(BaseModel):
             raise ValueError("provider route does not match harness profile")
         if self.trace_coverage is not self.profile.trace_coverage:
             raise ValueError("trace coverage does not match harness profile")
+        digest_unavailable = self.stderr_category in {
+            ProcessDiagnosticCategory.UNAVAILABLE,
+            ProcessDiagnosticCategory.READ_FAILED,
+        }
+        if digest_unavailable == (self.stderr_digest is not None):
+            raise ValueError("stderr diagnostic availability and digest disagree")
+        has_classifiable_stderr = self.stderr_category in {
+            ProcessDiagnosticCategory.PRESENT,
+            ProcessDiagnosticCategory.TRUNCATED,
+        }
+        if self.startup_failure_category is not None and not has_classifiable_stderr:
+            raise ValueError("stderr category and startup failure classification disagree")
         if self.observed_model_status is ObservedModelStatus.NOT_EXPOSED:
             if self.observed_model is not None:
                 raise ValueError("unexposed observed model must remain null")

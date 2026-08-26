@@ -16,6 +16,7 @@ from harnesslab.harness_lane.models import (
 from harnesslab.harness_lane.runner import changed_path_evidence, workspace_inventory
 from harnesslab.model_lane.patch import copy_workspace_snapshot
 from harnesslab.multi_harness.adapter import MultiHarnessAdapter, MultiHarnessBackend
+from harnesslab.multi_harness.diagnostics import safe_process_diagnostics
 from harnesslab.multi_harness.models import (
     HarnessProcessCapture,
     MultiHarnessCollection,
@@ -140,6 +141,7 @@ class MultiHarnessRunner:
                     collection,
                     HarnessLaneOutcome.HARNESS_ERROR,
                     f"{profile.harness.value} attempt failed: {failure.value}",
+                    secret_values=secrets,
                     harness_failure=failure,
                 )
                 return self._persist(
@@ -172,6 +174,7 @@ class MultiHarnessRunner:
                     collection,
                     HarnessLaneOutcome.INFRA_ERROR,
                     f"isolated Hidden Verifier failed: {type(exc).__name__}",
+                    secret_values=secrets,
                 )
                 return self._persist(evidence, collection, materialized.workspace, secrets)
             outcome = (
@@ -194,6 +197,7 @@ class MultiHarnessRunner:
                 "isolated Hidden Verifier passed"
                 if verifier.passed
                 else "isolated Hidden Verifier rejected the final workspace",
+                secret_values=secrets,
                 verifier_sandbox_manifest=verifier.run.manifest,
                 verifier_artifact_digest=verifier_digest,
                 verifier_passed=verifier.passed,
@@ -227,12 +231,14 @@ class MultiHarnessRunner:
         outcome: HarnessLaneOutcome,
         summary: str,
         *,
+        secret_values: tuple[str, ...],
         harness_failure: HarnessFailureCategory | None = None,
         verifier_sandbox_manifest: SandboxArtifactManifest | None = None,
         verifier_artifact_digest: str | None = None,
         verifier_passed: bool | None = None,
         verifier_score: float | None = None,
     ) -> MultiHarnessEvidence:
+        diagnostics = safe_process_diagnostics(capture, secret_values=secret_values)
         return MultiHarnessEvidence(
             run_id=run_id,
             task_id=package.definition.id,
@@ -259,6 +265,10 @@ class MultiHarnessRunner:
             trace_event_count=len(collection.trace.events),
             trace_event_types=tuple(event.type for event in collection.trace.events),
             terminal_native_event=collection.terminal_event,
+            stderr_category=diagnostics.stderr_category,
+            stderr_digest=diagnostics.stderr_digest,
+            stdout_line_count=diagnostics.stdout_line_count,
+            startup_failure_category=diagnostics.startup_failure_category,
             process_exit_code=capture.exit_code,
             duration_ms=capture.duration_ms,
             timed_out=capture.timed_out,

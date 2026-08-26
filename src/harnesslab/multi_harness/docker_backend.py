@@ -10,7 +10,11 @@ from harnesslab.contracts.provider import validate_provider_base_url
 from harnesslab.egress import ProviderScopedDockerBoundary, ProxySecurityAttestation
 from harnesslab.harness_lane.adapter import HarnessAdapterError
 from harnesslab.multi_harness.adapter import HarnessExecutionPlan
-from harnesslab.multi_harness.models import HarnessKind, HarnessProcessCapture
+from harnesslab.multi_harness.models import (
+    HarnessKind,
+    HarnessProcessCapture,
+    ProcessDiagnosticCategory,
+)
 from harnesslab.multi_harness.profile import CLAUDE_IMAGE, DEEPSEEK_IMAGE
 from harnesslab.sandbox.docker_cli import _DockerCLI, docker_environment
 from harnesslab.sandbox.preflight import _docker_runtime_preflight
@@ -117,6 +121,7 @@ class DockerMultiHarnessBackend:
         started = time.monotonic()
         lines: list[str] = []
         stderr_parts: list[bytes] = []
+        stderr_category = ProcessDiagnosticCategory.EMPTY
         timed_out = False
         cancelled = False
         exit_code: int | None = None
@@ -156,13 +161,16 @@ class DockerMultiHarnessBackend:
                         return
 
             async def read_stderr() -> None:
-                total = 0
+                nonlocal stderr_category
                 while chunk := await stderr.read(65_536):
-                    total += len(chunk)
-                    if total > MAX_CAPTURE_BYTES:
+                    remaining = MAX_CAPTURE_BYTES - sum(len(part) for part in stderr_parts)
+                    if remaining > 0:
+                        stderr_parts.append(chunk[:remaining])
+                    stderr_category = ProcessDiagnosticCategory.PRESENT
+                    if len(chunk) > remaining:
+                        stderr_category = ProcessDiagnosticCategory.TRUNCATED
                         process.kill()
                         return
-                    stderr_parts.append(chunk)
 
             try:
                 async with asyncio.timeout(plan.timeout_seconds):
@@ -186,6 +194,7 @@ class DockerMultiHarnessBackend:
             stderr_text = b"".join(stderr_parts).decode(errors="strict")
         except UnicodeDecodeError:
             stderr_text = ""
+            stderr_category = ProcessDiagnosticCategory.READ_FAILED
         return HarnessProcessCapture(
             tuple(lines),
             stderr_text,
@@ -193,6 +202,7 @@ class DockerMultiHarnessBackend:
             int((time.monotonic() - started) * 1000),
             timed_out,
             cancelled,
+            stderr_category,
         )
 
     async def _cleanup_execution(

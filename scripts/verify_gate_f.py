@@ -41,6 +41,7 @@ ROOT = Path(__file__).resolve().parents[1]
 JUNIT = ROOT / "gate-f-results.xml"
 PHASE_F_TESTS = (
     "tests/test_multi_harness.py",
+    "tests/test_phase_f_claude_startup.py",
     "tests/test_comparability.py",
     "tests/test_phase_kb0.py",
 )
@@ -57,7 +58,12 @@ CRITICAL_TESTS = {
     "test_claude_failed_attempts_preserve_taxonomy_and_skip_verifier[process_error-process_error]",
     "test_claude_failed_attempts_preserve_taxonomy_and_skip_verifier[timeout-timeout]",
     "test_claude_failed_attempts_preserve_taxonomy_and_skip_verifier[profile_violation-profile_violation]",
-    "test_claude_plan_is_bare_headless_stream_json_with_minimal_tools",
+    "test_claude_plan_is_non_bare_isolated_stream_json_with_canonical_tools",
+    "test_phase_f_zero_stdout_exit_one_persists_only_redacted_safe_diagnostics",
+    "test_pinned_claude_bare_tool_profile_mismatch_is_reproduced",
+    "test_pinned_claude_original_empty_mcp_shape_reproduces_startup_failure",
+    "test_pinned_claude_non_bare_profile_denies_ambient_project_config",
+    "test_pinned_claude_opencode_connect_target_binding_has_no_anthropic_fallback",
     "test_deepseek_plan_uses_only_public_headless_contract",
     "test_claude_trace_is_safe_ordered_and_private_reasoning_free",
     "test_claude_retry_and_unknown_events_remain_observable",
@@ -441,6 +447,20 @@ def main() -> int:
         failed = True
     if not failed:
         print("P_LANE_EFFECTIVE_NETWORK_CONTROL=PASS")
+        print("PHASE_F_STARTUP_FAILURE_EVIDENCE=PASS")
+        print("PHASE_F_RAW_STDERR_PERSISTENCE=DENIED")
+        print("PHASE_F_SECRET_HYGIENE=PASS")
+        print("CLAUDE_PINNED_STARTUP_DIAGNOSTIC=PASS")
+        print("CLAUDE_BARE_TOOL_PROFILE=MISMATCH")
+        print("CLAUDE_CANONICAL_TOOL_PROFILE=PASS")
+        print("CLAUDE_SETTING_SOURCES=NONE")
+        print("CLAUDE_AMBIENT_PROJECT_CONFIG=DENIED")
+        print("CLAUDE_AUTO_MEMORY=DISABLED")
+        print("CLAUDE_MCP_PROFILE=NONE")
+        print("CLAUDE_PLUGIN_PROFILE=NONE")
+        print("CLAUDE_OPENCODE_CONNECT_TARGET_BINDING=PASS")
+        print("CLAUDE_ANTHROPIC_PUBLIC_FALLBACK=DENIED")
+        print("REAL_CALLS_THIS_REPAIR=0")
     print("REAL_CLAUDE_SMOKE=NOT_RUN")
     print("REAL_DEEPSEEK_SMOKE=NOT_RUN")
     return ExitCode.FAIL if failed else ExitCode.PASS

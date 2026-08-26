@@ -82,7 +82,6 @@ class ClaudeCodeAdapter:
         _safe_paths(workspace, context)
         argv = (
             "claude",
-            "--bare",
             "-p",
             prompt.text,
             "--output-format",
@@ -95,14 +94,21 @@ class ClaudeCodeAdapter:
             profile.requested_model,
             "--tools",
             "Read,Edit,Write,Bash",
+            "--setting-sources",
+            "",
             "--mcp-config",
-            "{}",
+            '{"mcpServers":{}}',
             "--strict-mcp-config",
             "--disable-slash-commands",
             "--no-chrome",
         )
         environment_references: tuple[tuple[str, str], ...] = ()
-        environment_literals: tuple[tuple[str, str], ...] = ()
+        environment_literals: tuple[tuple[str, str], ...] = (
+            ("CLAUDE_CODE_DISABLE_AUTO_MEMORY", "1"),
+            ("CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC", "1"),
+            ("CLAUDE_CODE_NO_MODEL_FALLBACK", "1"),
+            ("CLAUDE_CONFIG_DIR", "/tmp/claude-config"),
+        )
         if profile.provider_credential_reference is not None:
             assert profile.provider_credential_reference is not None
             assert profile.provider_credential_transport is not None
@@ -121,7 +127,10 @@ class ClaudeCodeAdapter:
                     *environment_references,
                 )
                 base_url = None
-            literal_values = [("ANTHROPIC_MODEL", profile.requested_model)]
+            literal_values = [
+                ("ANTHROPIC_MODEL", profile.requested_model),
+                *environment_literals,
+            ]
             if base_url is not None:
                 literal_values.insert(0, ("ANTHROPIC_BASE_URL", base_url))
             environment_literals = tuple(literal_values)

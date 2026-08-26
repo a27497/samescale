@@ -105,6 +105,7 @@ CRITICAL_TESTS = {
     "test_post_r9_attempt_6_history_is_safe_immutable_and_truthful",
     "test_post_r9_attempt_7_history_is_safe_immutable_and_truthful",
     "test_post_r10_attempt_8_history_is_safe_immutable_and_truthful",
+    "test_post_r11_attempt_9_history_is_safe_immutable_and_truthful",
     "test_production_smoke_persists_codex_precapture_infrastructure_evidence",
     "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
     "test_v2_credential_preflight_prints_presence_only",
@@ -283,6 +284,9 @@ def verify_contract_mode() -> bool:
     post_r10_attempt_8 = json.loads(
         (ROOT / "release/history/core-real-v2-attempt-8.json").read_text(encoding="utf-8")
     )
+    post_r11_attempt_9 = json.loads(
+        (ROOT / "release/history/core-real-v2-attempt-9.json").read_text(encoding="utf-8")
+    )
     snapshot = json.loads(
         (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
     )
@@ -426,6 +430,31 @@ def verify_contract_mode() -> bool:
         print("FAIL: immutable post-R10 attempt 8 history drifted")
         return False
     if (
+        post_r11_attempt_9.get("source_commit") != "9f7ac3836da83d6009e2caa5eade07683ed68c7f"
+        or post_r11_attempt_9.get("receipt_digest")
+        != "sha256:750cb6a6d396bc49c43d07b9912bb5a84f016849d6e799faac435a750a0516bb"
+        or post_r11_attempt_9.get("attempted_top_level_launches") != 6
+        or [call.get("outcome") for call in post_r11_attempt_9.get("calls", ())]
+        != [
+            "verified_fail",
+            "subject_output_error",
+            "subject_output_error",
+            "harness_error",
+            "harness_error",
+            "harness_error",
+        ]
+        or post_r11_attempt_9.get("calls", [{}, {}, {}, {}, {}, {}])[5].get("harness_failure")
+        != "process_error"
+        or post_r11_attempt_9.get("calls", [{}, {}, {}, {}, {}, {}])[5].get("trace_event_count")
+        != 0
+        or post_r11_attempt_9.get("calls_7_to_8") != "NOT_RUN"
+        or post_r11_attempt_9.get("retry_count") != 0
+        or post_r11_attempt_9.get("fallback_count") != 0
+        or post_r11_attempt_9.get("runtime_value_hygiene", {}).get("status") != "PASS"
+    ):
+        print("FAIL: immutable post-R11 attempt 9 history drifted")
+        return False
+    if (
         snapshot.get("provider_provenance") != "THIRD_PARTY_INFERENCE_PLATFORM"
         or snapshot.get("fixed_base_url") != "https://opencode.ai/zen/go"
         or snapshot.get("live_model_probe_performed") is not False
@@ -514,6 +543,7 @@ def verify_contract_mode() -> bool:
     print("POST_R9_ATTEMPT_6_HISTORY=PRESERVED")
     print("POST_R9_ATTEMPT_7_HISTORY=PRESERVED")
     print("POST_R10_ATTEMPT_8_HISTORY=PRESERVED")
+    print("POST_R11_ATTEMPT_9_HISTORY=PRESERVED")
     print("SMOKE_CAPABILITY_TIMEOUT_CONTINUES=PASS")
     print("SMOKE_SUBJECT_COMMAND_FAILURE_CONTINUES=PASS")
     print("SMOKE_INFRA_TIMEOUT_STOPS=PASS")
