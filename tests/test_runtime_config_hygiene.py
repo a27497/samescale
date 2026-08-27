@@ -3,7 +3,10 @@ from __future__ import annotations
 import asyncio
 import importlib.util
 import json
+import os
 import stat
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any, cast
 from uuid import uuid4
@@ -52,6 +55,17 @@ from harnesslab.sandbox.models import ImageIdentity
 from harnesslab.sandbox.preflight import _docker_runtime_preflight
 
 ROOT = Path(__file__).resolve().parents[1]
+_GATE_D_SPEC = importlib.util.spec_from_file_location(
+    "verify_gate_d", ROOT / "scripts/verify_gate_d.py"
+)
+assert _GATE_D_SPEC is not None and _GATE_D_SPEC.loader is not None
+_GATE_D_MODULE = importlib.util.module_from_spec(_GATE_D_SPEC)
+sys.modules[_GATE_D_SPEC.name] = _GATE_D_MODULE
+_GATE_D_SPEC.loader.exec_module(_GATE_D_MODULE)
+REAL_PROVIDER_ENVIRONMENT_REFERENCES = cast(
+    tuple[str, ...], _GATE_D_MODULE.REAL_PROVIDER_ENVIRONMENT_REFERENCES
+)
+gate_d_subprocess_environment = cast(Any, _GATE_D_MODULE.gate_d_subprocess_environment)
 TASK = ROOT / "tasks" / "micro-python-clamp" / "1.0.0"
 BASE_URL_REFERENCE = "HARNESSLAB_GPT56_RELAY_BASE_URL"
 API_KEY_REFERENCE = "HARNESSLAB_GPT56_RELAY_API_KEY"
@@ -60,6 +74,47 @@ FAKE_KEY = "r6-fake-api-key-sentinel"
 SAFE_ROUTE_IDENTITY = "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses"
 R7_RUNTIME_URL = "https://r7-relay-sentinel.example.test/v1"
 R7_FAKE_KEY = "r7-fake-api-key-sentinel"
+GATE_D_ENV_SENTINEL = "gate-d-ambient-provider-sentinel-must-not-escape"
+
+
+def test_gate_d_subprocess_environment_isolates_real_provider_configuration() -> None:
+    source = {
+        **os.environ,
+        **{name: GATE_D_ENV_SENTINEL for name in REAL_PROVIDER_ENVIRONMENT_REFERENCES},
+        "DATABASE_URL": "postgresql+psycopg://preserved.example/test",
+        "GATE_D_UNRELATED_ENV": "preserved",
+    }
+    child = gate_d_subprocess_environment(source)
+    assert all(name not in child for name in REAL_PROVIDER_ENVIRONMENT_REFERENCES)
+    assert child["DATABASE_URL"] == source["DATABASE_URL"]
+    assert child["GATE_D_UNRELATED_ENV"] == "preserved"
+    assert GATE_D_ENV_SENTINEL not in json.dumps(child, sort_keys=True)
+
+
+def test_gate_d_sanitized_subprocess_keeps_missing_credential_tests_keyless() -> None:
+    source = {
+        **os.environ,
+        **{name: GATE_D_ENV_SENTINEL for name in REAL_PROVIDER_ENVIRONMENT_REFERENCES},
+    }
+    completed = subprocess.run(
+        (
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "tests/test_phase_kb0_review.py::test_v2_credential_preflight_prints_presence_only",
+            "tests/test_provider_adapters.py::test_missing_credential_fails_before_http_request",
+        ),
+        cwd=ROOT,
+        env=gate_d_subprocess_environment(source),
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    output = completed.stdout + completed.stderr
+    assert completed.returncode == 0, output
+    assert GATE_D_ENV_SENTINEL not in output
 
 
 def _direct_profile() -> ModelProfile:

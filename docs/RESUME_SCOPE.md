@@ -135,14 +135,15 @@ This file separates repository evidence from intended design. A capability moves
   persisted manifests/report/AblationSpec; 22 focused tests with zero skips
 - Before/after proof that analysis leaves experiment/cell/pair/ablation/run rows, outcomes,
   artifact digests/mtimes, Judge state, and fake execution-backend call counts unchanged
-- Immutable safe summaries for `core-real-smoke-v2` attempts 1-11. Attempt 9 reached Claude Call 6
+- Immutable safe summaries for `core-real-smoke-v2` attempts 1-12. Attempt 9 reached Claude Call 6
   and exposed the startup/process failure that led to R12.
 - R12 keyless diagnosis of the pinned Claude 2.1.241 invalid MCP shape and bare/tool-surface
   contradiction, plus the isolated non-bare startup-profile repair. R12 made zero real calls.
-- Post-R12 Attempts 10 and 11 both stopped at GPT Call 1 on relay read timeouts; Calls 2-8 were
+- Post-R12 Attempts 10-12 stopped at GPT Call 1 on relay read timeouts; Calls 2-8 were
   `NOT_RUN` and Claude was not reached; post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`,
-  so neither attempt validates nor invalidates the R12 repair and no complete smoke exists.
-  Attempts 3, 6, 10, and 11 establish a recurring Call-1 relay read-timeout reliability
+  so none of these attempts validates or invalidates the R12 repair and no complete smoke exists.
+  Attempt 12 specifically records that no HTTP response headers became available before the
+  frozen read timeout. Attempts 3, 6, 10, 11, and 12 establish a recurring Call-1 reliability
   problem near the frozen 90-second boundary; root cause remains `NOT_DETERMINED`.
 - Exact-head keyless GitHub Actions Gates A-K and fresh-setup success for R12 head
   `6abac258e81d89f7ad45aa51dce2541f911a6033` (run `32996166257`). This engineering CI evidence is
@@ -154,7 +155,7 @@ fresh-setup evidence are separately bound to exact head
 `6abac258e81d89f7ad45aa51dce2541f911a6033` and CI run `32996166257`; that R12 engineering CI does
 not satisfy final-release `remote_ci` verification. Phase D provider contracts are
 MockTransport/fake-provider verified; Phase E/F harness behavior and the R12 Claude startup repair
-are deterministic or controlled keyless verified. Attempts 10 and 11 are post-R12 real provider
+are deterministic or controlled keyless verified. Attempts 10-12 are post-R12 real provider
 timeouts, but no post-R12 Claude observation exists; none of this implies complete smoke, Matrix evidence,
 release verification, or VM-level isolation.
 
@@ -185,8 +186,8 @@ internal-network/CONNECT-proxy boundary is deterministically configured and nega
 not operationally smoked with a real Harness. Future capabilities remain `DESIGN_ONLY` until their
 own gates exist.
 
-All eleven immutable v2 attempts aborted before completing the eight-call smoke. Successful
-observations within attempts 1-11 remain single observations and do not change any `REAL_*` state,
+All twelve immutable v2 attempts aborted before completing the eight-call smoke. Successful
+observations within attempts 1-12 remain single observations and do not change any `REAL_*` state,
 authorize the Matrix or Judge, or establish release readiness.
 
 ## Phase K-B0 release preparation

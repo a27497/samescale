@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-12",
+  "source_commit": "8d87c641e847c1b3bd0d53a96ef2655ed102d2d4",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:056d49742a27557c47c2e74be5befc32661332b08232398c4f91019495d02999",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 1,
+  "failing_call_id": "smoke-1-model-gpt56-relay-responses",
+  "failure_category": "PROVIDER_FAILURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": null,
+      "latency_ms": 90358,
+      "attempt_count": 1,
+      "provider_failure": "timeout",
+      "timeout_phase": "read",
+      "read_timeout_stage": "waiting_for_response_headers",
+      "outcome": "provider_error",
+      "verifier": "NOT_RUN",
+      "evidence_digest": "sha256:18a15f8724e0b06b758ae01f72a222bb60ed51f9ecf228523323abbfa46f8168"
+    }
+  ],
+  "calls_2_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "runtime_value_hygiene": {
+    "status": "PASS",
+    "relay_base_url_present": "NO",
+    "relay_api_key_present": "NO",
+    "opencode_go_api_key_present": "NO",
+    "deepseek_api_key_present": "NO",
+    "all_runtime_value_match_file_count": 0,
+    "recognized_credential_pattern_match_file_count": 0,
+    "scan_error_count": 0
+  },
+  "interpretation": "Call 1 timed out while waiting for HTTP response headers. No HTTP response headers became available to HarnessLab before the frozen read timeout. This is operational provider failure evidence, not model capability evidence. Attempt 12 never reached Calls 2-8 and therefore does not validate or invalidate the R12 Claude repair. Together, Attempts 3, 6, 10, 11, and 12 establish a recurring Call-1 relay read-timeout reliability problem near the frozen 90-second boundary without establishing root cause.",
+  "limitations": [
+    "The immutable Attempt 12 evidence predates direct-provider transport-phase tracing and contains no CONNECT_TCP, START_TLS, request-write, or response-header phase trace.",
+    "Root cause remains NOT_DETERMINED; the evidence does not prove which relay, upstream model, network, timeout-policy, or provider component caused the delay.",
+    "No operator-local paths, runtime configuration values, credentials, raw headers, raw provider content, prompts, agent messages, stderr, or private reasoning are tracked here."
+  ]
+}

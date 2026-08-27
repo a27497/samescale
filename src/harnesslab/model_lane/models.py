@@ -15,6 +15,10 @@ from harnesslab.contracts.task import ResourceBudget
 from harnesslab.sandbox.models import SandboxArtifactManifest, SandboxStatus
 
 MAX_PUBLIC_OUTPUT_BYTES = 1_100_000
+MAX_PROVIDER_TRANSPORT_PHASES = 5
+PROVIDER_TRANSPORT_TRACE_SCHEMA_VERSION = 1
+PROVIDER_TRANSPORT_TRACE_SOURCE = "httpcore"
+PROVIDER_TRANSPORT_TRACE_SOURCE_VERSION = "1.0.9"
 
 
 class ProviderFailureCategory(StrEnum):
@@ -41,6 +45,66 @@ class ProviderReadTimeoutStage(StrEnum):
     READING_RESPONSE_BODY = "reading_response_body"
 
 
+class ProviderTransportPhase(StrEnum):
+    CONNECT_TCP = "connect_tcp"
+    START_TLS = "start_tls"
+    SEND_REQUEST_HEADERS = "send_request_headers"
+    SEND_REQUEST_BODY = "send_request_body"
+    RECEIVE_RESPONSE_HEADERS = "receive_response_headers"
+
+
+class ProviderTransportPhaseTrace(BaseModel):
+    """Safe phase timing derived from event names; never from trace payloads."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    phase: ProviderTransportPhase
+    started_ms: int = Field(ge=0)
+    completed_ms: int | None = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def completion_follows_start(self) -> ProviderTransportPhaseTrace:
+        if self.completed_ms is not None and self.completed_ms < self.started_ms:
+            raise ValueError("transport phase completion precedes its start")
+        return self
+
+
+class ProviderTransportTrace(BaseModel):
+    """Bounded, normalized direct-provider transport timing evidence."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: int = PROVIDER_TRANSPORT_TRACE_SCHEMA_VERSION
+    source: str = PROVIDER_TRANSPORT_TRACE_SOURCE
+    source_version: str = PROVIDER_TRANSPORT_TRACE_SOURCE_VERSION
+    phases: tuple[ProviderTransportPhaseTrace, ...] = Field(
+        default=(), max_length=MAX_PROVIDER_TRANSPORT_PHASES
+    )
+
+    @model_validator(mode="after")
+    def trace_is_stable_and_chronological(self) -> ProviderTransportTrace:
+        if self.schema_version != PROVIDER_TRANSPORT_TRACE_SCHEMA_VERSION:
+            raise ValueError("unsupported provider transport trace schema")
+        if self.source != PROVIDER_TRANSPORT_TRACE_SOURCE:
+            raise ValueError("unsupported provider transport trace source")
+        if self.source_version != PROVIDER_TRANSPORT_TRACE_SOURCE_VERSION:
+            raise ValueError("unsupported provider transport trace source version")
+        phases = tuple(item.phase for item in self.phases)
+        if len(set(phases)) != len(phases):
+            raise ValueError("provider transport phases must be unique")
+        if any(
+            current.started_ms < previous.started_ms
+            for previous, current in zip(self.phases, self.phases[1:], strict=False)
+        ):
+            raise ValueError("provider transport phases must be chronological")
+        if any(
+            previous.completed_ms is not None and current.started_ms < previous.completed_ms
+            for previous, current in zip(self.phases, self.phases[1:], strict=False)
+        ):
+            raise ValueError("provider transport phases cannot overlap")
+        return self
+
+
 class ProviderInvocationError(RuntimeError):
     """Safe provider failure that never includes response bodies or credentials."""
 
@@ -57,6 +121,7 @@ class ProviderInvocationError(RuntimeError):
         read_timeout_stage: ProviderReadTimeoutStage | None = None,
         response_header_latency_ms: int | None = None,
         response_body_bytes_received: int | None = None,
+        transport_trace: ProviderTransportTrace | None = None,
     ) -> None:
         if category is not ProviderFailureCategory.TIMEOUT and timeout_phase is not None:
             raise ValueError("timeout phase requires a timeout provider failure")
@@ -69,6 +134,8 @@ class ProviderInvocationError(RuntimeError):
             status_code=status_code,
             request_id=request_id,
         )
+        if transport_trace is not None and category is not ProviderFailureCategory.TIMEOUT:
+            raise ValueError("provider transport trace requires a timeout provider failure")
         super().__init__(detail)
         self.category = category
         self.status_code = status_code
@@ -79,6 +146,7 @@ class ProviderInvocationError(RuntimeError):
         self.read_timeout_stage = read_timeout_stage
         self.response_header_latency_ms = response_header_latency_ms
         self.response_body_bytes_received = response_body_bytes_received
+        self.transport_trace = transport_trace
 
 
 def _validate_read_timeout_diagnostics(
@@ -132,6 +200,7 @@ class ProviderError(BaseModel):
     response_status: str | None = Field(default=None, max_length=200)
     latency_ms: int | None = Field(default=None, ge=0)
     attempt_count: Literal[1] = 1
+    transport_trace: ProviderTransportTrace | None = None
 
     @model_validator(mode="after")
     def timeout_phase_matches_category(self) -> ProviderError:
@@ -146,6 +215,11 @@ class ProviderError(BaseModel):
             status_code=self.status_code,
             request_id=self.request_id,
         )
+        if (
+            self.transport_trace is not None
+            and self.category is not ProviderFailureCategory.TIMEOUT
+        ):
+            raise ValueError("provider transport trace requires a timeout provider failure")
         return self
 
 

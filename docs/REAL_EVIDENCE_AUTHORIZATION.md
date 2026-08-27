@@ -1,6 +1,6 @@
 # Real Evidence Authorization
 
-R15 stop state: `PHASE_K_ATTEMPT_11_IMMUTABLE_EVIDENCE_INGESTION_AND_READ_TIMEOUT_OBSERVABILITY_KEYLESS`.
+R16 stop state: `PHASE_K_ATTEMPT_12_IMMUTABLE_EVIDENCE_INGESTION_AND_DIRECT_TRANSPORT_OBSERVABILITY_KEYLESS`.
 
 Three real top-level v1 K-B1 attempts occurred before this redesign. On the first, call 1 invoked the configured GPT relay successfully and completed with requested and observed model `gpt-5.6-sol` in approximately 16,773 ms; the overall smoke then aborted with `INFRASTRUCTURE` because the non-root Hidden Verifier could not read restrictive host bind mounts. The K-B1-R1 permission-portability repair addressed that infrastructure defect.
 
@@ -32,7 +32,11 @@ After R12, a tenth authorized v2 attempt executed only Call 1. Direct GPT throug
 
 After R14, an eleventh authorized v2 attempt also executed only Call 1. Direct GPT through the configured relay ended after 90,405 ms with a provider timeout in the HTTP read phase, no observed model, and no verifier run. Calls 2-8 were `NOT_RUN`, with no retry or fallback, so Attempt 11 also did not reach Codex, Claude, DeepSeek Harness, or Judge. `release/history/core-real-v2-attempt-11.json` preserves the safe immutable observation. Attempts 3, 6, 10, and 11 independently observed Call-1 GPT relay read timeouts near the frozen 90-second boundary, establishing a recurring reliability problem without determining whether any timeout occurred before response headers or while reading a response body. Root cause remains `NOT_DETERMINED`.
 
-The R4-R15 repairs do not change the 2,000-token subject budget, 90-second timeout, eight-call order, 14,256-token smoke ceiling, no-retry rule, or no-fallback rule. OpenCode Go automated benchmark use remains operator-confirmed (`OPENCODE_GO_AUTOMATED_BENCHMARK_PERMISSION=OPERATOR_CONFIRMED_PROVIDER_PERMISSION`); the 630-run Matrix and 63 Judge calls still require later authorization. Individual successful observations in attempts 1-11 are not complete smoke or release verification.
+After R15, a twelfth authorized v2 attempt also executed only Call 1. Direct GPT ended after 90,358 ms with `timeout_phase=read` and `read_timeout_stage=waiting_for_response_headers`; no HTTP response headers became available to HarnessLab before the frozen read timeout. Calls 2-8 were `NOT_RUN`, with no retry or fallback. `release/history/core-real-v2-attempt-12.json` preserves the safe immutable observation. Attempts 3, 6, 10, 11, and 12 establish recurring Call-1 relay read-timeout evidence, while root cause remains `NOT_DETERMINED`; the evidence does not identify which component caused the delay.
+
+R16 is a keyless observability repair. Future direct-provider timeout evidence may contain only a bounded normalized trace for `CONNECT_TCP`, `START_TLS`, request headers/body writes, and response headers, with request-relative timing and locked httpcore source/version. Raw trace payloads are ignored and never persisted. Attempt 12 predates this instrumentation, so no trace is retrofitted into any of Attempts 1-12.
+
+The R4-R16 repairs do not change the 2,000-token subject budget, 90-second timeout, eight-call order, 14,256-token smoke ceiling, no-retry rule, or no-fallback rule. OpenCode Go automated benchmark use remains operator-confirmed (`OPENCODE_GO_AUTOMATED_BENCHMARK_PERMISSION=OPERATOR_CONFIRMED_PROVIDER_PERMISSION`); the 630-run Matrix and 63 Judge calls still require later authorization. Individual successful observations in attempts 1-12 are not complete smoke or release verification.
 
 ## Frozen Core scope
 

@@ -25,6 +25,9 @@ from harnesslab.model_lane.models import (
     ProviderRequest,
     ProviderResult,
     ProviderTimeoutPhase,
+    ProviderTransportPhase,
+    ProviderTransportPhaseTrace,
+    ProviderTransportTrace,
 )
 from harnesslab.model_lane.patch import parse_direct_patch
 from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
@@ -95,6 +98,20 @@ class SafeTimeoutProvider:
             read_timeout_stage=ProviderReadTimeoutStage.READING_RESPONSE_BODY,
             response_header_latency_ms=31,
             response_body_bytes_received=127,
+            transport_trace=ProviderTransportTrace(
+                phases=(
+                    ProviderTransportPhaseTrace(
+                        phase=ProviderTransportPhase.CONNECT_TCP,
+                        started_ms=0,
+                        completed_ms=4,
+                    ),
+                    ProviderTransportPhaseTrace(
+                        phase=ProviderTransportPhase.RECEIVE_RESPONSE_HEADERS,
+                        started_ms=5,
+                        completed_ms=31,
+                    ),
+                )
+            ),
         )
 
 
@@ -412,10 +429,16 @@ async def test_timeout_phase_is_persisted_in_canonical_evidence_without_raw_deta
     assert error.response_status is None
     assert error.latency_ms == 90_454
     assert error.attempt_count == 1
+    assert error.transport_trace is not None
+    assert tuple(item.phase for item in error.transport_trace.phases) == (
+        ProviderTransportPhase.CONNECT_TCP,
+        ProviderTransportPhase.RECEIVE_RESPONSE_HEADERS,
+    )
     assert '"timeout_phase":"read"' in canonical
     assert '"read_timeout_stage":"reading_response_body"' in canonical
     assert '"response_header_latency_ms":31' in canonical
     assert '"response_body_bytes_received":127' in canonical
+    assert '"source":"httpcore"' in canonical
     assert FAKE_KEY not in canonical
     assert "unsafe timeout detail" not in canonical
     artifacts = all_file_bytes(result.artifact_directory)

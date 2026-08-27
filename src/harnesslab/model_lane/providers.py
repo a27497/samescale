@@ -19,10 +19,84 @@ from harnesslab.model_lane.models import (
     ProviderRequest,
     ProviderResult,
     ProviderTimeoutPhase,
+    ProviderTransportPhase,
+    ProviderTransportPhaseTrace,
+    ProviderTransportTrace,
     ProviderUsage,
 )
 
 MAX_PROVIDER_RESPONSE_BYTES = 2_000_000
+MAX_PROVIDER_TRANSPORT_TRACE_EVENTS = 16
+
+_TRANSPORT_EVENT_PHASES = {
+    "connection.connect_tcp": ProviderTransportPhase.CONNECT_TCP,
+    "connection.start_tls": ProviderTransportPhase.START_TLS,
+    "http11.send_request_headers": ProviderTransportPhase.SEND_REQUEST_HEADERS,
+    "http2.send_request_headers": ProviderTransportPhase.SEND_REQUEST_HEADERS,
+    "http11.send_request_body": ProviderTransportPhase.SEND_REQUEST_BODY,
+    "http2.send_request_body": ProviderTransportPhase.SEND_REQUEST_BODY,
+    "http11.receive_response_headers": ProviderTransportPhase.RECEIVE_RESPONSE_HEADERS,
+    "http2.receive_response_headers": ProviderTransportPhase.RECEIVE_RESPONSE_HEADERS,
+}
+
+
+class _ProviderTransportTraceCollector:
+    """Collect only stable httpcore event names and request-relative timing."""
+
+    def __init__(self, started: float) -> None:
+        self._started = started
+        self._records: dict[ProviderTransportPhase, tuple[int, int | None]] = {}
+        self._event_count = 0
+        self._failed = False
+
+    async def __call__(self, name: str, _raw_info: object) -> None:
+        # The raw info payload is intentionally ignored in full. It can contain
+        # transport objects and is not part of HarnessLab's stable evidence contract.
+        try:
+            self._record_event(name)
+        except Exception:
+            self._failed = True
+            self._records.clear()
+
+    def _record_event(self, name: str) -> None:
+        if self._failed:
+            return
+        self._event_count += 1
+        if self._event_count > MAX_PROVIDER_TRANSPORT_TRACE_EVENTS:
+            self._failed = True
+            self._records.clear()
+            return
+        event, separator, state = name.rpartition(".")
+        if not separator or state not in {"started", "complete", "failed"}:
+            return
+        phase = _TRANSPORT_EVENT_PHASES.get(event)
+        if phase is None:
+            return
+        elapsed_ms = int((time.perf_counter() - self._started) * 1000)
+        previous = self._records.get(phase)
+        if state == "started":
+            if previous is None:
+                self._records[phase] = (elapsed_ms, None)
+            return
+        if state == "complete" and previous is not None and previous[1] is None:
+            self._records[phase] = (previous[0], elapsed_ms)
+
+    def snapshot(self) -> ProviderTransportTrace | None:
+        if self._failed:
+            return None
+        try:
+            return ProviderTransportTrace(
+                phases=tuple(
+                    ProviderTransportPhaseTrace(
+                        phase=phase,
+                        started_ms=started_ms,
+                        completed_ms=completed_ms,
+                    )
+                    for phase, (started_ms, completed_ms) in self._records.items()
+                )
+            )
+        except (ValidationError, ValueError):
+            return None
 
 
 def _timeout_phase(exc: httpx.TimeoutException) -> ProviderTimeoutPhase:
@@ -127,6 +201,7 @@ class _HTTPProviderAdapter:
         payload = self._payload(request)
         headers = self._headers(credential)
         started = time.perf_counter()
+        transport_trace = _ProviderTransportTraceCollector(started)
 
         async def send(client: httpx.AsyncClient) -> tuple[httpx.Response, bytes, int]:
             response: httpx.Response | None = None
@@ -140,6 +215,7 @@ class _HTTPProviderAdapter:
                     json=payload,
                     timeout=request.profile.request_timeout_seconds,
                     follow_redirects=False,
+                    extensions={"trace": transport_trace},
                 ) as response:
                     header_latency_ms = int((time.perf_counter() - started) * 1000)
                     self._raise_for_status(response, header_latency_ms)
@@ -164,6 +240,7 @@ class _HTTPProviderAdapter:
                         latency_ms=int((time.perf_counter() - started) * 1000),
                         timeout_phase=ProviderTimeoutPhase.READ,
                         read_timeout_stage=(ProviderReadTimeoutStage.WAITING_FOR_RESPONSE_HEADERS),
+                        transport_trace=transport_trace.snapshot(),
                     ) from exc
                 assert header_latency_ms is not None
                 raise ProviderInvocationError(
@@ -176,6 +253,7 @@ class _HTTPProviderAdapter:
                     read_timeout_stage=ProviderReadTimeoutStage.READING_RESPONSE_BODY,
                     response_header_latency_ms=header_latency_ms,
                     response_body_bytes_received=total,
+                    transport_trace=transport_trace.snapshot(),
                 ) from exc
 
         try:
@@ -198,6 +276,7 @@ class _HTTPProviderAdapter:
                     if timeout_phase is ProviderTimeoutPhase.READ
                     else None
                 ),
+                transport_trace=transport_trace.snapshot(),
             ) from exc
         except httpx.RequestError as exc:
             raise ProviderInvocationError(

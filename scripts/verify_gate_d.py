@@ -27,12 +27,22 @@ ROOT = Path(__file__).resolve().parents[1]
 JUNIT = ROOT / "gate-d-results.xml"
 PHASE_D_TESTS = (
     "tests/test_provider_adapters.py",
+    "tests/test_provider_transport_trace.py",
     "tests/test_direct_patch.py",
     "tests/test_model_lane.py",
     "tests/test_cli.py",
     "tests/test_contracts.py",
     "tests/test_phase_kb0.py",
     "tests/test_runtime_config_hygiene.py",
+)
+REAL_PROVIDER_ENVIRONMENT_REFERENCES = (
+    "HARNESSLAB_GPT56_RELAY_BASE_URL",
+    "HARNESSLAB_GPT56_RELAY_API_KEY",
+    "HARNESSLAB_OPENCODE_GO_API_KEY",
+    "DEEPSEEK_API_KEY",
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
 )
 CRITICAL_TESTS = {
     "test_anthropic_messages_adapter_contract_and_thinking_exclusion",
@@ -131,6 +141,14 @@ CRITICAL_TESTS = {
     "test_direct_success_uses_runtime_url_but_persists_only_route_identity",
     "test_direct_failure_uses_runtime_url_without_persisting_value",
     "test_smoke_result_and_receipt_exclude_runtime_url_value",
+    "test_transport_trace_ignores_raw_info_and_persists_only_normalized_fields",
+    "test_transport_phase_mapping_timing_and_http1_http2",
+    "test_real_httpx_httpcore_timeout_captures_completed_prior_phases_and_open_headers",
+    "test_transport_trace_callback_failure_preserves_original_timeout",
+    "test_transport_trace_event_bound_fails_closed",
+    "test_transport_trace_schema_rejects_bad_chronology_duplicates_and_phase_overflow",
+    "test_gate_d_subprocess_environment_isolates_real_provider_configuration",
+    "test_gate_d_sanitized_subprocess_keeps_missing_credential_tests_keyless",
 }
 PHASE_J_MODULE_NAMES = {
     "analyst.py",
@@ -159,6 +177,17 @@ def phase_j_violation(relative: str, content: str) -> str | None:
     return None
 
 
+def gate_d_subprocess_environment(
+    source: dict[str, str] | None = None,
+) -> dict[str, str]:
+    """Return the one hermetic environment used by every Gate D subprocess."""
+
+    environment = dict(os.environ if source is None else source)
+    for reference in REAL_PROVIDER_ENVIRONMENT_REFERENCES:
+        environment.pop(reference, None)
+    return environment
+
+
 def run(check: Check) -> bool:
     print(f"\n=== {check.name} ===", flush=True)
     print("COMMAND:", subprocess.list2cmdline(check.command), flush=True)
@@ -168,6 +197,7 @@ def run(check: Check) -> bool:
             cwd=ROOT,
             check=False,
             timeout=check.timeout_seconds,
+            env=gate_d_subprocess_environment(),
         )
     except subprocess.TimeoutExpired:
         print(f"FAIL: command exceeded {check.timeout_seconds}s")
@@ -182,13 +212,15 @@ def verify_environment() -> ExitCode:
     if missing:
         print(f"NOT_VERIFIED: required Gate D tools unavailable: {missing}")
         return ExitCode.NOT_VERIFIED
-    if not os.environ.get("DATABASE_URL"):
+    environment = gate_d_subprocess_environment()
+    if not environment.get("DATABASE_URL"):
         print("NOT_VERIFIED: DATABASE_URL is required for Gate A/B/C regressions")
         return ExitCode.NOT_VERIFIED
     preflight = subprocess.run(
         ("uv", "run", "--locked", "harnesslab", "sandbox", "doctor"),
         cwd=ROOT,
         check=False,
+        env=environment,
     )
     if preflight.returncode == ExitCode.NOT_VERIFIED:
         print("NOT_VERIFIED: Docker preflight cannot establish the isolated verifier boundary")
@@ -237,10 +269,20 @@ def verify_source_and_scope() -> bool:
         print(f"FAIL: imported HarnessLab is not the working-tree package at {expected_package}")
         return False
     identity = subprocess.run(
-        ("git", "rev-parse", "HEAD"), cwd=ROOT, check=False, capture_output=True, text=True
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+        env=gate_d_subprocess_environment(),
     )
     worktree = subprocess.run(
-        ("git", "status", "--porcelain"), cwd=ROOT, check=False, capture_output=True, text=True
+        ("git", "status", "--porcelain"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+        env=gate_d_subprocess_environment(),
     )
     if identity.returncode != 0 or worktree.returncode != 0:
         print("FAIL: unable to record Git source identity")
@@ -294,6 +336,7 @@ def verify_repository_secret_hygiene() -> bool:
         cwd=ROOT,
         check=False,
         capture_output=True,
+        env=gate_d_subprocess_environment(),
     )
     if listed.returncode != 0:
         print("FAIL: unable to enumerate candidate repository files for credential hygiene")
@@ -336,6 +379,23 @@ def verify_repository_secret_hygiene() -> bool:
     print("DYNAMIC_ENDPOINT_EVIDENCE_HYGIENE=PASS")
     print("GPT_RELAY_BASE_URL_VALUE_PERSISTENCE=DENIED")
     print("SAFE_PROVIDER_ROUTE_IDENTITY=PASS")
+    print("DIRECT_TRANSPORT_TRACE=PASS")
+    print("CONNECT_PHASE_TRACE=PASS")
+    print("TLS_PHASE_TRACE=PASS")
+    print("REQUEST_WRITE_PHASE_TRACE=PASS")
+    print("RESPONSE_HEADERS_PHASE_TRACE=PASS")
+    print("TRANSPORT_TRACE_RAW_INFO_PERSISTENCE=DENIED")
+    print("GATE_D_PROVIDER_ENV_ISOLATION=PASS")
+    return True
+
+
+def verify_httpcore_trace_compatibility() -> bool:
+    import httpcore
+
+    if httpcore.__version__ != "1.0.9":
+        print(f"FAIL: locked httpcore trace API drifted: {httpcore.__version__}")
+        return False
+    print("HTTPCORE_TRACE_API_VERSION=1.0.9")
     return True
 
 
@@ -374,6 +434,8 @@ def main() -> int:
     if evidence is ExitCode.NOT_VERIFIED:
         return ExitCode.NOT_VERIFIED
     if not verify_source_and_scope():
+        failed = True
+    if not verify_httpcore_trace_compatibility():
         failed = True
     if not verify_repository_secret_hygiene():
         failed = True
