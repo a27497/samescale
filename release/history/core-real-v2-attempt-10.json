@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-10",
+  "source_commit": "faf3b506c88421717c80a6848acbb08451e4314a",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:be06f9eff5303db4f808b61dcf7da98d8a76a574a469f4bec474a8de95bff1df",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 1,
+  "failing_call_id": "smoke-1-model-gpt56-relay-responses",
+  "failure_category": "PROVIDER_FAILURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": null,
+      "latency_ms": 90277,
+      "attempt_count": 1,
+      "provider_failure": "timeout",
+      "timeout_phase": "read",
+      "outcome": "provider_error",
+      "verifier": "NOT_RUN",
+      "evidence_digest": "sha256:97a9aa721a2c0d16eb80cf8a03be05ea944b86d18a3c48be58876f7b79dc6057"
+    }
+  ],
+  "calls_2_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "runtime_value_hygiene": {
+    "status": "PASS",
+    "relay_base_url_present": "NO",
+    "relay_api_key_present": "NO",
+    "opencode_go_api_key_present": "NO",
+    "deepseek_api_key_present": "NO",
+    "all_runtime_value_match_file_count": 0,
+    "recognized_credential_pattern_match_file_count": 0,
+    "scan_error_count": 0
+  },
+  "interpretation": "Call 1 timed out during response reading. This is an operational provider failure, not model capability evidence. Attempt 10 did not reach Codex, Claude, DeepSeek Harness, or Judge, so it neither validates nor invalidates the R12 Claude repair and no complete smoke exists.",
+  "limitations": [
+    "This is one smoke observation, not aggregate model performance evidence.",
+    "Post-R12 real Claude verification remains NOT_RUN / NOT_REACHED because Attempt 10 stopped at Call 1.",
+    "No operator-local paths, runtime configuration values, credentials, raw provider content, prompts, agent messages, stderr, or private reasoning are tracked here."
+  ]
+}

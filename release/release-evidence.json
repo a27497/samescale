@@ -17,7 +17,7 @@
     "state": "NOT_VERIFIED",
     "identity": "core-real-evidence-v2",
     "digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
-    "limitation": "The OpenCode Go v2 routes are configured. All nine immutable v2 attempts aborted before completing the frozen smoke. Attempt 9 stopped at Call 6 after Claude Code 2.1.241 exited with a startup/process failure before any normalized event; Calls 7-8 were NOT_RUN. R12 completed a keyless startup-profile diagnosis and repair, but no post-R12 real smoke has run. Individual successful observations are not complete smoke, Matrix, or release verification."
+    "limitation": "The OpenCode Go v2 routes are configured. All ten immutable v2 attempts aborted before completing the frozen smoke. Attempt 9 reached Claude Call 6 and exposed the startup/process failure that led to the zero-real-call, keyless-verified R12 repair. Post-R12 Attempt 10 stopped at GPT Call 1 on a relay read timeout; Calls 2-8 were NOT_RUN, so it did not reach Claude and provides no post-R12 real Claude result. No complete smoke, Matrix, or release verification exists."
   },
   "release_history": {
     "smoke_plan_id": "core-real-smoke-v2",
@@ -30,18 +30,29 @@
       "release/history/core-real-v2-attempt-6.json",
       "release/history/core-real-v2-attempt-7.json",
       "release/history/core-real-v2-attempt-8.json",
-      "release/history/core-real-v2-attempt-9.json"
+      "release/history/core-real-v2-attempt-9.json",
+      "release/history/core-real-v2-attempt-10.json"
     ],
-    "latest_attempt_id": "core-real-smoke-v2-attempt-9",
+    "latest_attempt_id": "core-real-smoke-v2-attempt-10",
     "latest_attempt_status": "ABORTED",
-    "latest_failing_call_id": "smoke-6-harness-claude-qwen38-opencode-go",
+    "latest_failing_call_id": "smoke-1-model-gpt56-relay-responses",
     "latest_not_run_call_ids": [
+      "smoke-2-model-qwen38-opencode-go-messages",
+      "smoke-3-model-deepseek-v4pro-chat",
+      "smoke-4-harness-codex-gpt56-medium",
+      "smoke-5-harness-codex-gpt56-high",
+      "smoke-6-harness-claude-qwen38-opencode-go",
       "smoke-7-harness-deepseek-v4flash",
       "smoke-8-judge-glm52-opencode-go"
     ],
-    "post_latest_repair_id": "R12",
-    "post_latest_repair_state": "KEYLESS_VERIFIED",
-    "post_repair_real_smoke": "NOT_RUN",
+    "keyless_repairs": [
+      {
+        "repair_id": "R12",
+        "after_attempt_id": "core-real-smoke-v2-attempt-9",
+        "state": "KEYLESS_VERIFIED",
+        "real_calls": 0
+      }
+    ],
     "complete_smoke": "NOT_VERIFIED",
     "matrix_evidence": "NOT_RUN",
     "release_verification": "NOT_VERIFIED"

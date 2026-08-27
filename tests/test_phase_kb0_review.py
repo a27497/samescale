@@ -11,6 +11,7 @@ from typing import cast
 from uuid import uuid4
 
 import pytest
+from pydantic import ValidationError
 from typer.testing import CliRunner
 
 from harnesslab.cli import app
@@ -53,8 +54,12 @@ from harnesslab.multi_harness.profile import (
 )
 from harnesslab.multi_harness.runtime import _validate_deepseek_effective_config
 from harnesslab.multi_harness.trace import collect_deepseek_final
-from harnesslab.release.contracts import load_release_evidence
-from harnesslab.release.models import EvidenceState
+from harnesslab.release.contracts import (
+    load_contiguous_v2_histories,
+    load_release_evidence,
+    validate_dynamic_v2_history,
+)
+from harnesslab.release.models import EvidenceState, ReleaseHistorySummary
 from harnesslab.release.smoke import (
     EXPECTED_ADAPTERS,
     EXPECTED_CALL_IDS,
@@ -243,17 +248,13 @@ def test_smoke_production_control_plane_exact_eight_call_binding() -> None:
     assert control.smoke_plan.release_plan_digest == control.release_plan.digest
 
 
-def test_top_level_release_history_covers_repository_attempts_through_r12() -> None:
-    history_paths = sorted(
-        (ROOT / "release/history").glob("core-real-v2-attempt-*.json"),
-        key=lambda path: int(path.stem.rsplit("-", 1)[1]),
-    )
-    histories = tuple(json.loads(path.read_text(encoding="utf-8")) for path in history_paths)
-    expected_attempts = tuple(range(1, 10))
-    expected_references = tuple(path.relative_to(ROOT).as_posix() for path in history_paths)
+def test_top_level_release_history_covers_repository_attempts_through_r14() -> None:
+    histories, expected_references = load_contiguous_v2_histories(ROOT / "release/history", ROOT)
+    expected_attempts = tuple(range(1, len(histories) + 1))
     manifest = load_release_evidence(ROOT / "release/release-evidence.json")
     summary = manifest.release_history
 
+    assert len(histories) == 10
     assert (
         tuple(int(item["attempt_id"].rsplit("-", 1)[1]) for item in histories) == expected_attempts
     )
@@ -261,11 +262,14 @@ def test_top_level_release_history_covers_repository_attempts_through_r12() -> N
     assert summary.latest_attempt_id == histories[-1]["attempt_id"]
     assert summary.latest_attempt_status == histories[-1]["status"] == "ABORTED"
     assert summary.latest_failing_call_id == histories[-1]["failing_call_id"]
-    assert histories[-1]["calls_7_to_8"] == "NOT_RUN"
-    assert summary.latest_not_run_call_ids == EXPECTED_CALL_IDS[6:]
-    assert summary.post_latest_repair_id == "R12"
-    assert summary.post_latest_repair_state == "KEYLESS_VERIFIED"
-    assert summary.post_repair_real_smoke is EvidenceState.NOT_RUN
+    assert histories[-1]["calls_2_to_8"] == "NOT_RUN"
+    assert summary.latest_not_run_call_ids == EXPECTED_CALL_IDS[1:]
+    assert len(summary.keyless_repairs) == 1
+    repair = summary.keyless_repairs[0]
+    assert repair.repair_id == "R12"
+    assert repair.after_attempt_id == "core-real-smoke-v2-attempt-9"
+    assert repair.state == "KEYLESS_VERIFIED"
+    assert repair.real_calls == 0
     assert summary.complete_smoke is EvidenceState.NOT_VERIFIED
     assert summary.matrix_evidence is EvidenceState.NOT_RUN
     assert summary.release_verification is EvidenceState.NOT_VERIFIED
@@ -286,10 +290,79 @@ def test_top_level_release_history_covers_repository_attempts_through_r12() -> N
         basename = Path(reference).name
         assert basename in release_docs
         assert reference in authorization_docs
-    assert "post-R12 real smoke remains `NOT_RUN`" in release_docs
-    assert "Calls 7-8 were `NOT_RUN`" in authorization_docs
-    assert "attempts 1-9" in resume_docs
-    assert "post-R12 real smoke remains `NOT_RUN`" in resume_docs
+    assert "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" in release_docs
+    assert "Calls 2-8 were `NOT_RUN`" in authorization_docs
+    assert "attempts 1-10" in resume_docs
+    assert "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" in resume_docs
+
+
+def test_release_history_summary_accepts_a_future_contiguous_attempt() -> None:
+    raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
+        "release_history"
+    ]
+    raw["attempt_references"].append("release/history/core-real-v2-attempt-11.json")
+    raw["latest_attempt_id"] = "core-real-smoke-v2-attempt-11"
+    raw["latest_attempt_status"] = "SUCCEEDED"
+    raw["latest_failing_call_id"] = None
+    raw["latest_not_run_call_ids"] = []
+
+    summary = ReleaseHistorySummary.model_validate(raw)
+
+    assert summary.latest_attempt_id.endswith("attempt-11")
+    assert summary.latest_attempt_status == "SUCCEEDED"
+    assert summary.keyless_repairs[0].after_attempt_id == "core-real-smoke-v2-attempt-9"
+
+
+def test_release_history_summary_rejects_a_removed_attempt_reference() -> None:
+    raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
+        "release_history"
+    ]
+    raw["attempt_references"].pop()
+
+    with pytest.raises(ValidationError, match="latest attempt id"):
+        ReleaseHistorySummary.model_validate(raw)
+
+
+def test_release_history_summary_rejects_a_gap() -> None:
+    raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
+        "release_history"
+    ]
+    del raw["attempt_references"][4]
+
+    with pytest.raises(ValidationError, match="contiguous"):
+        ReleaseHistorySummary.model_validate(raw)
+
+
+def test_release_history_summary_rejects_latest_attempt_id_mismatch() -> None:
+    raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
+        "release_history"
+    ]
+    raw["latest_attempt_id"] = "core-real-smoke-v2-attempt-9"
+
+    with pytest.raises(ValidationError, match="latest attempt id"):
+        ReleaseHistorySummary.model_validate(raw)
+
+
+def test_gate_k_dynamic_history_rejects_latest_failing_call_mismatch() -> None:
+    histories, references = load_contiguous_v2_histories(ROOT / "release/history", ROOT)
+    manifest = load_release_evidence(ROOT / "release/release-evidence.json")
+    summary = manifest.release_history.model_copy(
+        update={"latest_failing_call_id": EXPECTED_CALL_IDS[1]}
+    )
+
+    with pytest.raises(ValueError, match="latest-attempt summary"):
+        validate_dynamic_v2_history(
+            histories,
+            references,
+            summary,
+            smoke_plan_digest=(
+                "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a"
+            ),
+            release_plan_digest=(
+                "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb"
+            ),
+            smoke_call_ids=EXPECTED_CALL_IDS,
+        )
 
 
 def test_post_r4_smoke_history_is_safe_immutable_and_truthful() -> None:
@@ -585,6 +658,56 @@ def test_post_r11_attempt_9_history_is_safe_immutable_and_truthful() -> None:
     assert history["runtime_value_hygiene"]["all_runtime_value_match_file_count"] == 0
     assert "/home/dev/harnesslab-evidence" not in serialized
     assert all(value not in serialized for name, value in SAFE_ENVIRONMENT.items() if "KEY" in name)
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
+def test_post_r12_attempt_10_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-10.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "faf3b506c88421717c80a6848acbb08451e4314a"
+    assert history["receipt_digest"] == (
+        "sha256:be06f9eff5303db4f808b61dcf7da98d8a76a574a469f4bec474a8de95bff1df"
+    )
+    assert history["status"] == "ABORTED"
+    assert history["attempted_top_level_launches"] == 1
+    assert history["failing_call_id"] == EXPECTED_CALL_IDS[0]
+    assert history["failure_category"] == "PROVIDER_FAILURE"
+    call = history["calls"][0]
+    assert call == {
+        "call_id": EXPECTED_CALL_IDS[0],
+        "requested_model": "gpt-5.6-sol",
+        "observed_model": None,
+        "latency_ms": 90277,
+        "attempt_count": 1,
+        "provider_failure": "timeout",
+        "timeout_phase": "read",
+        "outcome": "provider_error",
+        "verifier": "NOT_RUN",
+        "evidence_digest": (
+            "sha256:97a9aa721a2c0d16eb80cf8a03be05ea944b86d18a3c48be58876f7b79dc6057"
+        ),
+    }
+    assert "capability" not in call
+    assert history["calls_2_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert history["runtime_value_hygiene"] == {
+        "status": "PASS",
+        "relay_base_url_present": "NO",
+        "relay_api_key_present": "NO",
+        "opencode_go_api_key_present": "NO",
+        "deepseek_api_key_present": "NO",
+        "all_runtime_value_match_file_count": 0,
+        "recognized_credential_pattern_match_file_count": 0,
+        "scan_error_count": 0,
+    }
+    assert "operational provider failure" in history["interpretation"]
+    assert "not model capability evidence" in history["interpretation"]
+    assert "did not reach Codex, Claude, DeepSeek Harness, or Judge" in history["interpretation"]
+    assert "/home/dev/harnesslab-operator-evidence" not in serialized
+    assert all(value not in serialized for value in SAFE_ENVIRONMENT.values())
     assert "response_body" not in serialized
     assert "reasoning_content" not in serialized
 

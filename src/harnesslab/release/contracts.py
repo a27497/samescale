@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -15,6 +16,7 @@ from harnesslab.release.models import (
     RealEvidencePlan,
     RealSmokePlan,
     ReleaseEvidenceManifest,
+    ReleaseHistorySummary,
     ReleaseReadiness,
     ResumeClaimMap,
     SemanticReleaseReceipt,
@@ -116,6 +118,100 @@ def load_resume_claim_map(path: Path) -> ResumeClaimMap:
 
 def load_badcase_plan(path: Path) -> BadCasePlan:
     return _load_json(path, BadCasePlan.model_validate, "BadCase plan")
+
+
+def load_contiguous_v2_histories(
+    history_directory: Path, repository_root: Path
+) -> tuple[tuple[dict[str, Any], ...], tuple[str, ...]]:
+    pattern = re.compile(r"^core-real-v2-attempt-([1-9][0-9]*)\.json$")
+    numbered_paths: list[tuple[int, Path]] = []
+    for path in history_directory.glob("core-real-v2-attempt-*.json"):
+        match = pattern.fullmatch(path.name)
+        if match is None:
+            raise CoreReleaseError(f"invalid v2 attempt history filename: {path.name}")
+        numbered_paths.append((int(match.group(1)), path))
+    numbered_paths.sort(key=lambda item: item[0])
+    attempt_numbers = tuple(number for number, _ in numbered_paths)
+    if not attempt_numbers:
+        raise CoreReleaseError("immutable v2 history must contain at least one attempt")
+    if len(set(attempt_numbers)) != len(attempt_numbers):
+        raise CoreReleaseError("immutable v2 history contains duplicate attempt numbers")
+    if attempt_numbers != tuple(range(1, attempt_numbers[-1] + 1)):
+        raise CoreReleaseError("immutable v2 history must be contiguous beginning at attempt 1")
+    paths = tuple(path for _, path in numbered_paths)
+    try:
+        histories = tuple(json.loads(path.read_text(encoding="utf-8")) for path in paths)
+        references = tuple(path.relative_to(repository_root).as_posix() for path in paths)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+        raise CoreReleaseError("invalid immutable v2 history artifact") from exc
+    if any(not isinstance(history, dict) for history in histories):
+        raise CoreReleaseError("immutable v2 history artifact must be an object")
+    return histories, references
+
+
+def validate_dynamic_v2_history(
+    histories: tuple[dict[str, Any], ...],
+    references: tuple[str, ...],
+    summary: ReleaseHistorySummary,
+    *,
+    smoke_plan_digest: str,
+    release_plan_digest: str,
+    smoke_call_ids: tuple[str, ...],
+) -> None:
+    if not histories or len(histories) != len(references):
+        raise CoreReleaseError("v2 history and reference sets must be non-empty and aligned")
+    for attempt_number, (history, reference) in enumerate(
+        zip(histories, references, strict=True), start=1
+    ):
+        expected_attempt_id = f"core-real-smoke-v2-attempt-{attempt_number}"
+        if history.get("attempt_id") != expected_attempt_id:
+            raise CoreReleaseError("v2 history attempt identity disagrees with its sequence")
+        if reference != f"release/history/core-real-v2-attempt-{attempt_number}.json":
+            raise CoreReleaseError("v2 history reference disagrees with its sequence")
+        if (
+            history.get("smoke_plan_digest") != smoke_plan_digest
+            or history.get("release_plan_digest") != release_plan_digest
+        ):
+            raise CoreReleaseError("v2 history frozen plan digest drifted")
+        if history.get("retry_count") != 0 or history.get("fallback_count") != 0:
+            raise CoreReleaseError("v2 history retry/fallback invariant drifted")
+        attempted = history.get("attempted_top_level_launches")
+        if not isinstance(attempted, int) or not 1 <= attempted <= len(smoke_call_ids):
+            raise CoreReleaseError("v2 history attempted launch count is invalid")
+        calls = history.get("calls")
+        if (
+            not isinstance(calls, list)
+            or any(not isinstance(call, dict) for call in calls)
+            or tuple(call.get("call_id") for call in calls) != smoke_call_ids[:attempted]
+        ):
+            raise CoreReleaseError("v2 history call sequence disagrees with the frozen smoke order")
+        status = history.get("status")
+        if status == "ABORTED":
+            if history.get("failing_call_id") != smoke_call_ids[attempted - 1]:
+                raise CoreReleaseError("aborted v2 history failing call disagrees with call order")
+        elif status == "SUCCEEDED":
+            if attempted != len(smoke_call_ids) or history.get("failing_call_id") is not None:
+                raise CoreReleaseError("successful v2 history must complete every frozen call")
+        else:
+            raise CoreReleaseError("v2 history has an unsupported terminal status")
+        if attempted < len(smoke_call_ids):
+            marker = f"calls_{attempted + 1}_to_{len(smoke_call_ids)}"
+            if history.get(marker) != "NOT_RUN":
+                raise CoreReleaseError("v2 history NOT_RUN marker disagrees with attempted calls")
+
+    latest = histories[-1]
+    attempted = int(latest["attempted_top_level_launches"])
+    expected_not_run = smoke_call_ids[attempted:]
+    if (
+        summary.attempt_references != references
+        or summary.latest_attempt_id != latest.get("attempt_id")
+        or summary.latest_attempt_status != latest.get("status")
+        or summary.latest_failing_call_id != latest.get("failing_call_id")
+        or summary.latest_not_run_call_ids != expected_not_run
+    ):
+        raise CoreReleaseError(
+            "top-level latest-attempt summary disagrees with immutable v2 history"
+        )
 
 
 def evaluate_release_readiness(manifest: ReleaseEvidenceManifest) -> ReleaseReadiness:

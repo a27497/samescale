@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from enum import StrEnum
 from typing import Literal
 
@@ -469,30 +470,55 @@ class EvidenceBinding(StrictModel):
         return self
 
 
+class KeylessRepairSummary(StrictModel):
+    repair_id: Identifier
+    after_attempt_id: str = Field(pattern=r"^core-real-smoke-v2-attempt-[1-9][0-9]*$")
+    state: Literal["KEYLESS_VERIFIED"]
+    real_calls: Literal[0] = 0
+
+
 class ReleaseHistorySummary(StrictModel):
     smoke_plan_id: Literal["core-real-smoke-v2"] = "core-real-smoke-v2"
     attempt_references: tuple[str, ...]
-    latest_attempt_id: Literal["core-real-smoke-v2-attempt-9"]
-    latest_attempt_status: Literal["ABORTED"]
-    latest_failing_call_id: Literal["smoke-6-harness-claude-qwen38-opencode-go"]
-    latest_not_run_call_ids: tuple[
-        Literal["smoke-7-harness-deepseek-v4flash"],
-        Literal["smoke-8-judge-glm52-opencode-go"],
-    ]
-    post_latest_repair_id: Literal["R12"]
-    post_latest_repair_state: Literal["KEYLESS_VERIFIED"]
-    post_repair_real_smoke: Literal[EvidenceState.NOT_RUN] = EvidenceState.NOT_RUN
+    latest_attempt_id: str = Field(pattern=r"^core-real-smoke-v2-attempt-[1-9][0-9]*$")
+    latest_attempt_status: Literal["ABORTED", "SUCCEEDED"]
+    latest_failing_call_id: Identifier | None
+    latest_not_run_call_ids: tuple[Identifier, ...]
+    keyless_repairs: tuple[KeylessRepairSummary, ...]
     complete_smoke: Literal[EvidenceState.NOT_VERIFIED] = EvidenceState.NOT_VERIFIED
     matrix_evidence: Literal[EvidenceState.NOT_RUN] = EvidenceState.NOT_RUN
     release_verification: Literal[EvidenceState.NOT_VERIFIED] = EvidenceState.NOT_VERIFIED
 
     @model_validator(mode="after")
-    def attempt_references_are_exact_and_contiguous(self) -> ReleaseHistorySummary:
-        expected = tuple(
-            f"release/history/core-real-v2-attempt-{attempt}.json" for attempt in range(1, 10)
-        )
-        if self.attempt_references != expected:
-            raise ValueError("release history must cover the exact contiguous v2 attempt 1-9 set")
+    def history_shape_is_generic_and_contiguous(self) -> ReleaseHistorySummary:
+        pattern = re.compile(r"^release/history/core-real-v2-attempt-([1-9][0-9]*)\.json$")
+        attempt_numbers: list[int] = []
+        for reference in self.attempt_references:
+            match = pattern.fullmatch(reference)
+            if match is None:
+                raise ValueError("release history contains an invalid v2 attempt reference")
+            attempt_numbers.append(int(match.group(1)))
+        if not attempt_numbers:
+            raise ValueError("release history must contain at least one v2 attempt")
+        if attempt_numbers != list(range(1, attempt_numbers[-1] + 1)):
+            raise ValueError("release history must be contiguous beginning at v2 attempt 1")
+        expected_latest = f"{self.smoke_plan_id}-attempt-{attempt_numbers[-1]}"
+        if self.latest_attempt_id != expected_latest:
+            raise ValueError("latest attempt id must agree with the final attempt reference")
+        if len(set(self.latest_not_run_call_ids)) != len(self.latest_not_run_call_ids):
+            raise ValueError("latest NOT_RUN call ids must be unique")
+        if self.latest_attempt_status == "SUCCEEDED":
+            if self.latest_failing_call_id is not None or self.latest_not_run_call_ids:
+                raise ValueError("successful latest attempt cannot carry failure or NOT_RUN calls")
+        elif self.latest_failing_call_id is None:
+            raise ValueError("aborted latest attempt requires a failing call id")
+        attempt_ids = {
+            f"{self.smoke_plan_id}-attempt-{attempt_number}" for attempt_number in attempt_numbers
+        }
+        if len({repair.repair_id for repair in self.keyless_repairs}) != len(self.keyless_repairs):
+            raise ValueError("keyless repair ids must be unique")
+        if any(repair.after_attempt_id not in attempt_ids for repair in self.keyless_repairs):
+            raise ValueError("keyless repair must reference an ingested prior attempt")
         return self
 
 

@@ -1,6 +1,6 @@
 # Real Evidence Authorization
 
-R13 stop state: `PHASE_K_RELEASE_EVIDENCE_MANIFEST_CONSISTENCY_REPAIR_KEYLESS`.
+R14 stop state: `PHASE_K_ATTEMPT_10_IMMUTABLE_EVIDENCE_INGESTION_KEYLESS`.
 
 Three real top-level v1 K-B1 attempts occurred before this redesign. On the first, call 1 invoked the configured GPT relay successfully and completed with requested and observed model `gpt-5.6-sol` in approximately 16,773 ms; the overall smoke then aborted with `INFRASTRUCTURE` because the non-root Hidden Verifier could not read restrictive host bind mounts. The K-B1-R1 permission-portability repair addressed that infrastructure defect.
 
@@ -26,9 +26,11 @@ After R10, an eighth authorized v2 attempt executed Calls 1-4. The three direct 
 
 After R11, a ninth authorized v2 attempt executed Calls 1-6. Calls 1-5 were capability observations, including Codex medium/high correctly classified as `execution_budget_exhausted`. Call 6 then stopped the smoke: Claude Code 2.1.241 exited with `process_error` in 1,658 ms before any normalized stream event or observed model. Calls 7-8 were `NOT_RUN`, with no retry or fallback. `release/history/core-real-v2-attempt-9.json` preserves the immutable failure without claiming its then-unknown root cause.
 
-R12 made zero real calls. Pinned keyless reproduction identified the invalid empty MCP configuration and the `--bare`/required-`Write` tool-surface contradiction, then verified the repaired isolated non-bare startup profile with fake credentials, local controlled services, and egress recording. Exact-head keyless GitHub Actions run `32996166257` succeeded at `6abac258e81d89f7ad45aa51dce2541f911a6033`. No post-R12 real smoke has run, so `REAL_CLAUDE_SMOKE` remains `NOT_RUN`; Calls 7-8, the Matrix, and real Judge smoke also remain `NOT_RUN`.
+R12 made zero real calls. Pinned keyless reproduction identified the invalid empty MCP configuration and the `--bare`/required-`Write` tool-surface contradiction, then verified the repaired isolated non-bare startup profile with fake credentials, local controlled services, and egress recording. Exact-head keyless GitHub Actions run `32996166257` succeeded at `6abac258e81d89f7ad45aa51dce2541f911a6033`.
 
-The R4-R12 repairs do not change the 2,000-token subject budget, 90-second timeout, eight-call order, 14,256-token smoke ceiling, no-retry rule, or no-fallback rule. OpenCode Go automated benchmark use remains operator-confirmed (`OPENCODE_GO_AUTOMATED_BENCHMARK_PERMISSION=OPERATOR_CONFIRMED_PROVIDER_PERMISSION`); the 630-run Matrix and 63 Judge calls still require later authorization. Individual successful observations in attempts 1-9 are not complete smoke or release verification.
+After R12, a tenth authorized v2 attempt executed only Call 1. Direct GPT through the configured relay ended after 90,277 ms with a provider timeout during response reading, no observed model, and no verifier run. This is an operational provider failure, not model capability evidence. Calls 2-8 were `NOT_RUN`, with no retry or fallback, so Attempt 10 did not reach Codex, Claude, DeepSeek Harness, or Judge. `release/history/core-real-v2-attempt-10.json` preserves the safe immutable observation. Post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`; Attempt 10 neither validates nor invalidates the R12 repair, and no complete smoke exists.
+
+The R4-R12 repairs do not change the 2,000-token subject budget, 90-second timeout, eight-call order, 14,256-token smoke ceiling, no-retry rule, or no-fallback rule. OpenCode Go automated benchmark use remains operator-confirmed (`OPENCODE_GO_AUTOMATED_BENCHMARK_PERMISSION=OPERATOR_CONFIRMED_PROVIDER_PERMISSION`); the 630-run Matrix and 63 Judge calls still require later authorization. Individual successful observations in attempts 1-10 are not complete smoke or release verification.
 
 ## Frozen Core scope
 

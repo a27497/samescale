@@ -135,11 +135,13 @@ This file separates repository evidence from intended design. A capability moves
   persisted manifests/report/AblationSpec; 22 focused tests with zero skips
 - Before/after proof that analysis leaves experiment/cell/pair/ablation/run rows, outcomes,
   artifact digests/mtimes, Judge state, and fake execution-backend call counts unchanged
-- Immutable safe summaries for `core-real-smoke-v2` attempts 1-9. Attempt 9 stopped at Claude Call
-  6 with a startup/process failure before any normalized event; Calls 7-8 remain `NOT_RUN`.
+- Immutable safe summaries for `core-real-smoke-v2` attempts 1-10. Attempt 9 reached Claude Call 6
+  and exposed the startup/process failure that led to R12.
 - R12 keyless diagnosis of the pinned Claude 2.1.241 invalid MCP shape and bare/tool-surface
-  contradiction, plus the isolated non-bare startup-profile repair. R12 made zero real calls and
-  post-R12 real smoke remains `NOT_RUN`.
+  contradiction, plus the isolated non-bare startup-profile repair. R12 made zero real calls.
+- Post-R12 Attempt 10 stopped at GPT Call 1 on a relay read timeout; Calls 2-8 were `NOT_RUN` and
+  Claude was not reached; post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`, so Attempt 10
+  neither validates nor invalidates the R12 repair and no complete smoke exists.
 - Exact-head keyless GitHub Actions Gates A-K and fresh-setup success for R12 head
   `6abac258e81d89f7ad45aa51dce2541f911a6033` (run `32996166257`). This engineering CI evidence is
   distinct from the prospective manifest's final-release `remote_ci` binding.
@@ -150,8 +152,9 @@ fresh-setup evidence are separately bound to exact head
 `6abac258e81d89f7ad45aa51dce2541f911a6033` and CI run `32996166257`; that R12 engineering CI does
 not satisfy final-release `remote_ci` verification. Phase D provider contracts are
 MockTransport/fake-provider verified; Phase E/F harness behavior and the R12 Claude startup repair
-are deterministic or controlled keyless verified. None implies a post-R12 real provider/model call,
-complete smoke, Matrix evidence, release verification, or VM-level isolation.
+are deterministic or controlled keyless verified. Attempt 10 is a post-R12 real provider timeout,
+but no post-R12 Claude observation exists; none of this implies complete smoke, Matrix evidence,
+release verification, or VM-level isolation.
 
 ## IMPLEMENTED_NOT_YET_MASTERED
 
@@ -180,8 +183,8 @@ internal-network/CONNECT-proxy boundary is deterministically configured and nega
 not operationally smoked with a real Harness. Future capabilities remain `DESIGN_ONLY` until their
 own gates exist.
 
-All nine immutable v2 attempts aborted before completing the eight-call smoke. Successful
-observations within attempts 1-9 remain single observations and do not change any `REAL_*` state,
+All ten immutable v2 attempts aborted before completing the eight-call smoke. Successful
+observations within attempts 1-10 remain single observations and do not change any `REAL_*` state,
 authorize the Matrix or Judge, or establish release readiness.
 
 ## Phase K-B0 release preparation
