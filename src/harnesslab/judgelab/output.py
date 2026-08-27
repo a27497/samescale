@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from harnesslab.judgelab.models import (
     JudgeDefinition,
     JudgeMode,
+    JudgeOutputFailureKind,
     LabelJudgment,
     PairwiseJudgment,
     ParsedJudgment,
@@ -22,12 +23,16 @@ PRIVATE_FIELDS = {"reasoning", "analysis", "scratchpad", "thinking", "hidden_rat
 class JudgeOutputError(ValueError):
     """Public Judge output violated the strict mode-specific contract."""
 
+    def __init__(self, kind: JudgeOutputFailureKind) -> None:
+        super().__init__(kind.value)
+        self.kind = kind
+
 
 def _reject_duplicate_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for key, value in pairs:
         if key in result:
-            raise JudgeOutputError(f"duplicate JSON key: {key}")
+            raise JudgeOutputError(JudgeOutputFailureKind.DUPLICATE_KEY)
         result[key] = value
     return result
 
@@ -36,45 +41,45 @@ def parse_judge_output(text: str, case: PublicCase, definition: JudgeDefinition)
     try:
         encoded = text.encode("utf-8")
     except UnicodeEncodeError as exc:
-        raise JudgeOutputError("Judge output is not valid UTF-8") from exc
+        raise JudgeOutputError(JudgeOutputFailureKind.NON_UTF8) from exc
     if len(encoded) > MAX_JUDGE_OUTPUT_BYTES:
-        raise JudgeOutputError("Judge output exceeds byte limit")
+        raise JudgeOutputError(JudgeOutputFailureKind.TOO_LARGE)
     if text != text.strip() or text.startswith("```"):
-        raise JudgeOutputError("Judge output must be one bare JSON object")
+        raise JudgeOutputError(JudgeOutputFailureKind.NOT_BARE_JSON)
     try:
         raw = json.loads(text, object_pairs_hook=_reject_duplicate_pairs)
     except (json.JSONDecodeError, RecursionError, UnicodeDecodeError) as exc:
-        raise JudgeOutputError("Judge output is malformed JSON") from exc
+        raise JudgeOutputError(JudgeOutputFailureKind.MALFORMED_JSON) from exc
     if not isinstance(raw, dict):
-        raise JudgeOutputError("Judge output must be a JSON object")
+        raise JudgeOutputError(JudgeOutputFailureKind.NOT_JSON_OBJECT)
     if PRIVATE_FIELDS.intersection(raw):
-        raise JudgeOutputError("private-reasoning fields are forbidden")
+        raise JudgeOutputError(JudgeOutputFailureKind.PRIVATE_FIELD_PRESENT)
     try:
         if case.mode is JudgeMode.LABEL:
             label_judgment = LabelJudgment.model_validate(raw)
             if label_judgment.label not in case.allowed_labels and not (
                 definition.allow_abstention and label_judgment.label == "UNKNOWN"
             ):
-                raise JudgeOutputError("Judge label is not allowed")
+                raise JudgeOutputError(JudgeOutputFailureKind.LABEL_NOT_ALLOWED)
             parsed: ParsedJudgment = label_judgment
         elif case.mode is JudgeMode.SCORE:
             score_judgment = ScoreJudgment.model_validate(raw)
             if score_judgment.abstain != (score_judgment.score is None):
-                raise JudgeOutputError("score abstention and null invariant violated")
+                raise JudgeOutputError(JudgeOutputFailureKind.SCORE_INVARIANT)
             if score_judgment.score is not None and not (
                 case.score_min <= score_judgment.score <= case.score_max  # type: ignore[operator]
             ):
-                raise JudgeOutputError("Judge score is outside the declared range")
+                raise JudgeOutputError(JudgeOutputFailureKind.SCORE_OUT_OF_RANGE)
             if score_judgment.abstain and not definition.allow_abstention:
-                raise JudgeOutputError("Judge definition does not allow abstention")
+                raise JudgeOutputError(JudgeOutputFailureKind.ABSTENTION_NOT_ALLOWED)
             parsed = score_judgment
         else:
             pairwise_judgment = PairwiseJudgment.model_validate(raw)
             if pairwise_judgment.preference == "UNKNOWN" and not definition.allow_abstention:
-                raise JudgeOutputError("Judge definition does not allow abstention")
+                raise JudgeOutputError(JudgeOutputFailureKind.ABSTENTION_NOT_ALLOWED)
             parsed = pairwise_judgment
     except ValidationError as exc:
-        raise JudgeOutputError("Judge output failed strict schema validation") from exc
+        raise JudgeOutputError(JudgeOutputFailureKind.STRICT_SCHEMA_VALIDATION) from exc
     if len(parsed.reason) > definition.maximum_public_justification_length:
-        raise JudgeOutputError("public justification exceeds configured length")
+        raise JudgeOutputError(JudgeOutputFailureKind.JUSTIFICATION_TOO_LONG)
     return parsed

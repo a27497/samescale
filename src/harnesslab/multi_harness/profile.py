@@ -23,6 +23,8 @@ DEEPSEEK_PACKAGE_INTEGRITY = (
     "xWPtFw6ICsN3wg=="
 )
 DEEPSEEK_IMAGE = f"harnesslab-phase-f-deepseek:{DEEPSEEK_CLI_VERSION}"
+DEEPSEEK_NODE_ENTRYPOINT = "/usr/local/bin/dsh"
+DEEPSEEK_NODE_FLAG = "--expose-internals"
 DEEPSEEK_DEFAULT_MODEL = "deepseek-v4-flash"
 DEEPSEEK_DEFAULT_PROVIDER = "deepseek-official"
 SUBJECT_TOOLCHAIN_PROFILE = "python3.12.11+temurin21-jdk+node24-bookworm"

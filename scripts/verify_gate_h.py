@@ -38,6 +38,7 @@ CRITICAL_TESTS = {
     "test_public_suite_no_answer_key_and_hidden_gold_mutation_preserves_request_bytes",
     "test_adversarial_candidate_remains_delimited_untrusted_data",
     "test_score_parser_rejects_range_and_abstain_invariant",
+    "test_judge_safe_output_failure_subtypes_are_bounded",
     "test_refusal_malformed_provider_failure_and_private_reasoning_taxonomy",
     "test_artifact_persistence_failure_is_explicit_artifact_error",
     "test_l0_authority_cannot_be_overridden_by_l2_judge",

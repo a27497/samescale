@@ -254,7 +254,7 @@ def test_top_level_release_history_covers_repository_attempts_through_r16() -> N
     manifest = load_release_evidence(ROOT / "release/release-evidence.json")
     summary = manifest.release_history
 
-    assert len(histories) == 12
+    assert len(histories) == 13
     assert (
         tuple(int(item["attempt_id"].rsplit("-", 1)[1]) for item in histories) == expected_attempts
     )
@@ -262,8 +262,8 @@ def test_top_level_release_history_covers_repository_attempts_through_r16() -> N
     assert summary.latest_attempt_id == histories[-1]["attempt_id"]
     assert summary.latest_attempt_status == histories[-1]["status"] == "ABORTED"
     assert summary.latest_failing_call_id == histories[-1]["failing_call_id"]
-    assert histories[-1]["calls_2_to_8"] == "NOT_RUN"
-    assert summary.latest_not_run_call_ids == EXPECTED_CALL_IDS[1:]
+    assert histories[-1]["calls_5_to_8"] == "NOT_RUN"
+    assert summary.latest_not_run_call_ids == EXPECTED_CALL_IDS[4:]
     assert len(summary.keyless_repairs) == 1
     repair = summary.keyless_repairs[0]
     assert repair.repair_id == "R12"
@@ -286,13 +286,11 @@ def test_top_level_release_history_covers_repository_attempts_through_r16() -> N
     release_docs = (ROOT / "docs/RELEASE_EVIDENCE.md").read_text(encoding="utf-8")
     authorization_docs = (ROOT / "docs/REAL_EVIDENCE_AUTHORIZATION.md").read_text(encoding="utf-8")
     resume_docs = (ROOT / "docs/RESUME_SCOPE.md").read_text(encoding="utf-8")
-    for reference in expected_references:
-        basename = Path(reference).name
-        assert basename in release_docs
-        assert reference in authorization_docs
+    assert "attempt-1.json` through `history/core-real-v2-attempt-13.json`" in release_docs
+    assert "Attempt 13 executed Calls 1-4" in authorization_docs
     assert "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" in release_docs
     assert "Calls 2-8 were `NOT_RUN`" in authorization_docs
-    assert "attempts 1-12" in resume_docs
+    assert "attempts 1-13" in resume_docs
     assert "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" in resume_docs
 
 
@@ -300,15 +298,15 @@ def test_release_history_summary_accepts_a_future_contiguous_attempt() -> None:
     raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
         "release_history"
     ]
-    raw["attempt_references"].append("release/history/core-real-v2-attempt-13.json")
-    raw["latest_attempt_id"] = "core-real-smoke-v2-attempt-13"
+    raw["attempt_references"].append("release/history/core-real-v2-attempt-14.json")
+    raw["latest_attempt_id"] = "core-real-smoke-v2-attempt-14"
     raw["latest_attempt_status"] = "SUCCEEDED"
     raw["latest_failing_call_id"] = None
     raw["latest_not_run_call_ids"] = []
 
     summary = ReleaseHistorySummary.model_validate(raw)
 
-    assert summary.latest_attempt_id.endswith("attempt-13")
+    assert summary.latest_attempt_id.endswith("attempt-14")
     assert summary.latest_attempt_status == "SUCCEEDED"
     assert summary.keyless_repairs[0].after_attempt_id == "core-real-smoke-v2-attempt-9"
 

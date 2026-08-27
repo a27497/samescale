@@ -14,6 +14,7 @@ from harnesslab.judgelab.models import (
     JudgeCalibrationSpec,
     JudgeDefinition,
     JudgeMode,
+    JudgeOutputFailureKind,
     JudgeRunOutcome,
     JudgeSuite,
     OrderVariant,
@@ -259,6 +260,69 @@ def test_parser_rejects_duplicate_extra_wrapped_and_private_fields(raw: str) -> 
         parse_judge_output(raw, case, definition)
 
 
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("\ud800", JudgeOutputFailureKind.NON_UTF8),
+        ("x" * 16_385, JudgeOutputFailureKind.TOO_LARGE),
+        ('```json\n{"schema_version":1}\n```', JudgeOutputFailureKind.NOT_BARE_JSON),
+        ("{not-json", JudgeOutputFailureKind.MALFORMED_JSON),
+        (
+            '{"schema_version":1,"label":"PASS","label":"FAIL","reason":"x"}',
+            JudgeOutputFailureKind.DUPLICATE_KEY,
+        ),
+        ("[]", JudgeOutputFailureKind.NOT_JSON_OBJECT),
+        (
+            '{"schema_version":1,"label":"PASS","reason":"x","thinking":"x"}',
+            JudgeOutputFailureKind.PRIVATE_FIELD_PRESENT,
+        ),
+        (
+            '{"schema_version":1,"label":"PASS","reason":"x","extra":1}',
+            JudgeOutputFailureKind.STRICT_SCHEMA_VALIDATION,
+        ),
+        (
+            '{"schema_version":1,"label":"OTHER","reason":"x"}',
+            JudgeOutputFailureKind.LABEL_NOT_ALLOWED,
+        ),
+    ],
+)
+def test_judge_output_errors_expose_only_bounded_safe_kind(
+    raw: str, expected: JudgeOutputFailureKind
+) -> None:
+    _suite, definition, _spec = _dependencies()
+    case = PublicCase(
+        case_id="typed-label",
+        mode=JudgeMode.LABEL,
+        question="Q",
+        rubric="R",
+        candidate="C",
+        allowed_labels=("PASS", "FAIL"),
+    )
+    with pytest.raises(JudgeOutputError) as caught:
+        parse_judge_output(raw, case, definition)
+    assert caught.value.kind is expected
+    assert str(caught.value) == expected.value
+
+
+def test_judge_safe_output_failure_subtypes_are_bounded() -> None:
+    assert {item.value for item in JudgeOutputFailureKind} == {
+        "NON_UTF8",
+        "TOO_LARGE",
+        "NOT_BARE_JSON",
+        "MALFORMED_JSON",
+        "DUPLICATE_KEY",
+        "NOT_JSON_OBJECT",
+        "PRIVATE_FIELD_PRESENT",
+        "STRICT_SCHEMA_VALIDATION",
+        "LABEL_NOT_ALLOWED",
+        "SCORE_INVARIANT",
+        "SCORE_OUT_OF_RANGE",
+        "ABSTENTION_NOT_ALLOWED",
+        "JUSTIFICATION_TOO_LONG",
+        "UNKNOWN",
+    }
+
+
 def test_score_parser_rejects_range_and_abstain_invariant() -> None:
     _suite, definition, _spec = _dependencies()
     case = PublicCase(
@@ -270,12 +334,36 @@ def test_score_parser_rejects_range_and_abstain_invariant() -> None:
         score_min=1,
         score_max=5,
     )
-    for raw in (
-        '{"schema_version":1,"score":9,"abstain":false,"reason":"x"}',
-        '{"schema_version":1,"score":null,"abstain":false,"reason":"x"}',
+    for raw, expected in (
+        (
+            '{"schema_version":1,"score":9,"abstain":false,"reason":"x"}',
+            JudgeOutputFailureKind.SCORE_OUT_OF_RANGE,
+        ),
+        (
+            '{"schema_version":1,"score":null,"abstain":false,"reason":"x"}',
+            JudgeOutputFailureKind.SCORE_INVARIANT,
+        ),
     ):
-        with pytest.raises(JudgeOutputError):
+        with pytest.raises(JudgeOutputError) as caught:
             parse_judge_output(raw, case, definition)
+        assert caught.value.kind is expected
+
+    no_abstention = definition.model_copy(update={"allow_abstention": False})
+    with pytest.raises(JudgeOutputError) as caught:
+        parse_judge_output(
+            '{"schema_version":1,"score":null,"abstain":true,"reason":"x"}',
+            case,
+            no_abstention,
+        )
+    assert caught.value.kind is JudgeOutputFailureKind.ABSTENTION_NOT_ALLOWED
+
+    with pytest.raises(JudgeOutputError) as caught:
+        parse_judge_output(
+            '{"schema_version":1,"score":3,"abstain":false,"reason":"long"}',
+            case,
+            definition.model_copy(update={"maximum_public_justification_length": 3}),
+        )
+    assert caught.value.kind is JudgeOutputFailureKind.JUSTIFICATION_TOO_LONG
 
 
 @pytest.mark.asyncio
@@ -288,15 +376,27 @@ async def test_refusal_malformed_provider_failure_and_private_reasoning_taxonomy
     case = next(item for item in suite.public.cases if item.case_id == slot.case_id)
     runner = JudgeRunner(tmp_path)
     expected = {
-        "refusal": JudgeRunOutcome.ABSTAINED,
-        "malformed": JudgeRunOutcome.JUDGE_OUTPUT_ERROR,
-        "duplicate": JudgeRunOutcome.JUDGE_OUTPUT_ERROR,
-        "extra_field": JudgeRunOutcome.JUDGE_OUTPUT_ERROR,
-        "private_reasoning": JudgeRunOutcome.JUDGE_OUTPUT_ERROR,
-        "provider_timeout": JudgeRunOutcome.PROVIDER_ERROR,
+        "refusal": (JudgeRunOutcome.ABSTAINED, None),
+        "malformed": (
+            JudgeRunOutcome.JUDGE_OUTPUT_ERROR,
+            JudgeOutputFailureKind.MALFORMED_JSON,
+        ),
+        "duplicate": (
+            JudgeRunOutcome.JUDGE_OUTPUT_ERROR,
+            JudgeOutputFailureKind.DUPLICATE_KEY,
+        ),
+        "extra_field": (
+            JudgeRunOutcome.JUDGE_OUTPUT_ERROR,
+            JudgeOutputFailureKind.STRICT_SCHEMA_VALIDATION,
+        ),
+        "private_reasoning": (
+            JudgeRunOutcome.JUDGE_OUTPUT_ERROR,
+            JudgeOutputFailureKind.PRIVATE_FIELD_PRESENT,
+        ),
+        "provider_timeout": (JudgeRunOutcome.PROVIDER_ERROR, None),
     }
     cell = spec.judge_cells[0]
-    for scenario, outcome in expected.items():
+    for scenario, (outcome, failure_kind) in expected.items():
         changed_slot = slot.model_copy(
             update={
                 "slot_order": slot.slot_order + len(scenario),
@@ -315,6 +415,7 @@ async def test_refusal_malformed_provider_failure_and_private_reasoning_taxonomy
             adapter=FakeJudgeProvider(scenario=scenario),
         )
         assert result.evidence.outcome is outcome
+        assert result.evidence.judge_output_failure_kind is failure_kind
         assert result.artifact_path is not None
         artifact = result.artifact_path.read_text(encoding="utf-8")
         assert "PRIVATE_REASONING_SENTINEL" not in artifact

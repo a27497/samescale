@@ -42,6 +42,7 @@ JUNIT = ROOT / "gate-f-results.xml"
 PHASE_F_TESTS = (
     "tests/test_multi_harness.py",
     "tests/test_phase_f_claude_startup.py",
+    "tests/test_phase_f_deepseek_startup.py",
     "tests/test_comparability.py",
     "tests/test_phase_kb0.py",
 )
@@ -65,6 +66,7 @@ CRITICAL_TESTS = {
     "test_pinned_claude_non_bare_profile_denies_ambient_project_config",
     "test_pinned_claude_opencode_connect_target_binding_has_no_anthropic_fallback",
     "test_deepseek_plan_uses_only_public_headless_contract",
+    "test_pinned_deepseek_profile_completes_against_keyless_local_transport",
     "test_claude_trace_is_safe_ordered_and_private_reasoning_free",
     "test_claude_retry_and_unknown_events_remain_observable",
     "test_claude_unexpected_init_tool_is_profile_violation",

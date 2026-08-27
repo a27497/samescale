@@ -46,6 +46,23 @@ class JudgeRunOutcome(StrEnum):
     ARTIFACT_ERROR = "ARTIFACT_ERROR"
 
 
+class JudgeOutputFailureKind(StrEnum):
+    NON_UTF8 = "NON_UTF8"
+    TOO_LARGE = "TOO_LARGE"
+    NOT_BARE_JSON = "NOT_BARE_JSON"
+    MALFORMED_JSON = "MALFORMED_JSON"
+    DUPLICATE_KEY = "DUPLICATE_KEY"
+    NOT_JSON_OBJECT = "NOT_JSON_OBJECT"
+    PRIVATE_FIELD_PRESENT = "PRIVATE_FIELD_PRESENT"
+    STRICT_SCHEMA_VALIDATION = "STRICT_SCHEMA_VALIDATION"
+    LABEL_NOT_ALLOWED = "LABEL_NOT_ALLOWED"
+    SCORE_INVARIANT = "SCORE_INVARIANT"
+    SCORE_OUT_OF_RANGE = "SCORE_OUT_OF_RANGE"
+    ABSTENTION_NOT_ALLOWED = "ABSTENTION_NOT_ALLOWED"
+    JUSTIFICATION_TOO_LONG = "JUSTIFICATION_TOO_LONG"
+    UNKNOWN = "UNKNOWN"
+
+
 class QualificationStatus(StrEnum):
     QUALIFIED_FOR_SUITE = "QUALIFIED_FOR_SUITE"
     LIMITED = "LIMITED"
@@ -414,12 +431,24 @@ class JudgeEvidence(BaseModel):
     public_response_digest: Sha256Digest | None
     parsed_judgment: dict[str, object] | None
     outcome: JudgeRunOutcome
+    judge_output_failure_kind: JudgeOutputFailureKind | None = None
     provider_failure: ProviderFailureCategory | None
     provider_error: ProviderError | None
     evidence_content_digest: Sha256Digest | None = None
 
+    @model_validator(mode="after")
+    def output_failure_kind_is_safe_and_coherent(self) -> JudgeEvidence:
+        if (
+            self.judge_output_failure_kind is not None
+            and self.outcome is not JudgeRunOutcome.JUDGE_OUTPUT_ERROR
+        ):
+            raise ValueError("Judge output failure kind requires JUDGE_OUTPUT_ERROR")
+        return self
+
     def canonical_json(self, *, include_content_digest: bool = True) -> str:
         raw = self.model_dump(mode="json")
+        if self.judge_output_failure_kind is None:
+            raw.pop("judge_output_failure_kind")
         if not include_content_digest:
             raw["evidence_content_digest"] = None
         return canonical_json(raw)

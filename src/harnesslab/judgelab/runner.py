@@ -11,6 +11,7 @@ from harnesslab.judgelab.models import (
     JudgeEvaluationSlot,
     JudgeEvidence,
     JudgeMode,
+    JudgeOutputFailureKind,
     JudgeRunOutcome,
     LabelJudgment,
     PairwiseJudgment,
@@ -84,6 +85,7 @@ class JudgeRunner:
         provider_result = None
         provider_error = None
         parsed = None
+        judge_output_failure_kind: JudgeOutputFailureKind | None = None
         outcome = JudgeRunOutcome.JUDGED
         try:
             provider_result = await adapter.invoke(request)
@@ -94,8 +96,9 @@ class JudgeRunner:
                     judgment = parse_judge_output(
                         provider_result.public_output_text, case, definition
                     )
-                except JudgeOutputError:
+                except JudgeOutputError as exc:
                     outcome = JudgeRunOutcome.JUDGE_OUTPUT_ERROR
+                    judge_output_failure_kind = exc.kind
                 else:
                     parsed = judgment.model_dump(mode="json")
                     if (
@@ -164,6 +167,7 @@ class JudgeRunner:
             ),
             parsed_judgment=parsed,
             outcome=outcome,
+            judge_output_failure_kind=judge_output_failure_kind,
             provider_failure=(provider_error.category if provider_error else None),
             provider_error=provider_error,
         )

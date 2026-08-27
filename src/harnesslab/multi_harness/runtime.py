@@ -14,6 +14,8 @@ from harnesslab.multi_harness.profile import (
     DEEPSEEK_DEFAULT_MODEL,
     DEEPSEEK_DEFAULT_PROVIDER,
     DEEPSEEK_IMAGE,
+    DEEPSEEK_NODE_ENTRYPOINT,
+    DEEPSEEK_NODE_FLAG,
 )
 from harnesslab.sandbox.docker_cli import _DockerCLI
 from harnesslab.sandbox.models import ImageIdentity
@@ -167,7 +169,11 @@ class MultiHarnessRuntime:
                 "--rm",
                 "--network",
                 "none",
+                "--entrypoint",
+                "node",
                 self.image,
+                DEEPSEEK_NODE_FLAG,
+                DEEPSEEK_NODE_ENTRYPOINT,
                 "--profile",
                 "headless",
                 "--dump-config",

@@ -11,7 +11,12 @@ from harnesslab.multi_harness.models import (
     MultiHarnessCollection,
     MultiHarnessProfile,
 )
-from harnesslab.multi_harness.profile import CLAUDE_CLI_VERSION, DEEPSEEK_CLI_VERSION
+from harnesslab.multi_harness.profile import (
+    CLAUDE_CLI_VERSION,
+    DEEPSEEK_CLI_VERSION,
+    DEEPSEEK_NODE_ENTRYPOINT,
+    DEEPSEEK_NODE_FLAG,
+)
 from harnesslab.multi_harness.prompt import MultiHarnessPrompt
 from harnesslab.multi_harness.trace import collect_claude_stream, collect_deepseek_final
 
@@ -180,7 +185,14 @@ class DeepSeekHarnessAdapter:
         _safe_paths(workspace, context)
         return HarnessExecutionPlan(
             HarnessKind.DEEPSEEK,
-            ("dsh", "--profile", "headless", prompt.text),
+            (
+                "node",
+                DEEPSEEK_NODE_FLAG,
+                DEEPSEEK_NODE_ENTRYPOINT,
+                "--profile",
+                "headless",
+                prompt.text,
+            ),
             prompt.text,
             workspace,
             context,

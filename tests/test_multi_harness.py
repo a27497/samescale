@@ -333,7 +333,14 @@ def test_deepseek_plan_uses_only_public_headless_contract(tmp_path: Path) -> Non
         profile, prompt, workspace=tmp_path, context=None, task_id="micro-python-clamp"
     )
 
-    assert plan.argv == ("dsh", "--profile", "headless", prompt.text)
+    assert plan.argv == (
+        "node",
+        "--expose-internals",
+        "/usr/local/bin/dsh",
+        "--profile",
+        "headless",
+        prompt.text,
+    )
     assert "jsonl" not in " ".join(plan.argv).lower()
     assert profile.trace_coverage is TraceCoverage.FINAL_OUTPUT_ONLY
     assert profile.session_extraction is DeepSeekSessionExtraction.DEFERRED_NOT_VERIFIED

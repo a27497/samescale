@@ -26,6 +26,7 @@ class SafeCallFacts(BaseModel):
     observed_model: str | None = None
     observed_model_status: str | None = None
     outcome: str | None = None
+    judge_output_failure_kind: str | None = None
     provider_failure: str | None = None
     timeout_phase: str | None = None
     read_timeout_stage: str | None = None
@@ -219,6 +220,7 @@ def _artifact_facts(call_id: str, artifact: Path) -> SafeCallFacts:
         observed_model=_safe_text(raw.get("observed_model", raw.get("observed_judge_model"))),
         observed_model_status=_safe_text(raw.get("observed_model_status")),
         outcome=_safe_text(raw.get("outcome")),
+        judge_output_failure_kind=_safe_text(raw.get("judge_output_failure_kind")),
         provider_failure=_safe_text(raw.get("provider_failure")),
         timeout_phase=_safe_text(provider_error.get("timeout_phase")),
         read_timeout_stage=_safe_text(provider_error.get("read_timeout_stage")),

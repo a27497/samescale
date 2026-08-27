@@ -17,7 +17,7 @@
     "state": "NOT_VERIFIED",
     "identity": "core-real-evidence-v2",
     "digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
-    "limitation": "The OpenCode Go v2 routes are configured. All twelve immutable v2 attempts aborted before completing the frozen smoke. Attempt 9 reached Claude Call 6 and exposed the startup/process failure that led to the zero-real-call, keyless-verified R12 repair. Post-R12 Attempts 10-12 stopped at GPT Call 1 on relay read timeouts; Calls 2-8 were NOT_RUN, so none reached Claude or provides a post-R12 real Claude result. No complete smoke, Matrix, or release verification exists."
+    "limitation": "The OpenCode Go v2 routes are configured. All thirteen immutable v2 attempts aborted before completing the frozen smoke. Attempt 13 reached Calls 1-4: GPT produced a subject-output error, Qwen passed, DeepSeek scored 0.8, and Codex medium timed out after THREAD_STARTED and TURN_STARTED without meaningful agent progress. Calls 5-8 were NOT_RUN in the release smoke and exist only in a separately namespaced DIAGNOSTIC_ONLY report. No complete smoke, Matrix, or release verification exists."
   },
   "release_history": {
     "smoke_plan_id": "core-real-smoke-v2",
@@ -33,15 +33,13 @@
       "release/history/core-real-v2-attempt-9.json",
       "release/history/core-real-v2-attempt-10.json",
       "release/history/core-real-v2-attempt-11.json",
-      "release/history/core-real-v2-attempt-12.json"
+      "release/history/core-real-v2-attempt-12.json",
+      "release/history/core-real-v2-attempt-13.json"
     ],
-    "latest_attempt_id": "core-real-smoke-v2-attempt-12",
+    "latest_attempt_id": "core-real-smoke-v2-attempt-13",
     "latest_attempt_status": "ABORTED",
-    "latest_failing_call_id": "smoke-1-model-gpt56-relay-responses",
+    "latest_failing_call_id": "smoke-4-harness-codex-gpt56-medium",
     "latest_not_run_call_ids": [
-      "smoke-2-model-qwen38-opencode-go-messages",
-      "smoke-3-model-deepseek-v4pro-chat",
-      "smoke-4-harness-codex-gpt56-medium",
       "smoke-5-harness-codex-gpt56-high",
       "smoke-6-harness-claude-qwen38-opencode-go",
       "smoke-7-harness-deepseek-v4flash",
