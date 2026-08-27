@@ -62,7 +62,9 @@ from harnesslab.release.smoke import (
 from harnesslab.sandbox.models import ImageIdentity
 from harnesslab.tasks.package import TaskPackage
 
-MATRIX_ID = "core-real-matrix-v2"
+MATRIX_IDS = {"v2": "core-real-matrix-v2", "v3": "core-real-matrix-v3"}
+MATRIX_CANARY_ID = "core-real-matrix-v3-canary"
+MATRIX_CANARY_TASK_ID = "core-python-deduplicate"
 MATRIX_CELL_COUNT = 7
 MATRIX_TASK_COUNT = 18
 MATRIX_REPEAT_COUNT = 5
@@ -99,7 +101,7 @@ class MatrixPreflightReceipt(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     schema_version: Literal[1] = 1
-    matrix_id: Literal["core-real-matrix-v2"] = "core-real-matrix-v2"
+    matrix_id: str
     cells: Literal[7] = 7
     tasks: Literal[18] = 18
     repeats: Literal[5] = 5
@@ -129,8 +131,14 @@ class MatrixControlPlane:
         self.release_plan = smoke.release_plan
 
     @classmethod
-    def load(cls, repository_root: Path) -> MatrixControlPlane:
-        return cls(SmokeControlPlane.load(repository_root))
+    def load(cls, repository_root: Path, *, plan_version: str = "v2") -> MatrixControlPlane:
+        if plan_version not in MATRIX_IDS:
+            raise MatrixControlPlaneError("plan version must be v2 or v3")
+        return cls(SmokeControlPlane.load(repository_root, plan_version=plan_version))
+
+    @property
+    def matrix_id(self) -> str:
+        return self.release_plan.experiment_id
 
     def _profiles(
         self, runtime: RuntimeIdentities
@@ -221,8 +229,8 @@ class MatrixControlPlane:
                 )
             )
         spec = ExperimentSpec(
-            experiment_id=MATRIX_ID,
-            name="HarnessLab Core Real Matrix v2",
+            experiment_id=self.matrix_id,
+            name=f"HarnessLab Core Real Matrix {self.matrix_id.rsplit('-', 1)[-1]}",
             task_packages=task_paths,
             cells=tuple(cells),
             repeat_count=MATRIX_REPEAT_COUNT,
@@ -250,7 +258,7 @@ class MatrixControlPlane:
 
     def _validate_plan(self, plan: ExperimentPlan) -> None:
         if (
-            plan.experiment_id != MATRIX_ID
+            plan.experiment_id != self.matrix_id
             or len(plan.cells) != MATRIX_CELL_COUNT
             or len(plan.tasks) != MATRIX_TASK_COUNT
             or plan.repeat_count != MATRIX_REPEAT_COUNT
@@ -294,10 +302,50 @@ class MatrixControlPlane:
             for cell in plan.cells
         )
         return MatrixPreflightReceipt(
+            matrix_id=self.matrix_id,
             release_plan_digest=self.release_plan.digest,
             experiment_plan_digest=plan.digest,
             cells_detail=detail,
         )
+
+    def build_canary_plan(self, runtime: RuntimeIdentities) -> ExperimentPlan:
+        """Expand one fixed task across every v3 production cell exactly once."""
+
+        if self.matrix_id != MATRIX_IDS["v3"]:
+            raise MatrixControlPlaneError("Matrix canary is defined only for v3")
+        full = self.build_plan(runtime)
+        representative = tuple(
+            task.package_path for task in full.tasks if task.task_id == MATRIX_CANARY_TASK_ID
+        )
+        if len(representative) != 1:
+            raise MatrixControlPlaneError("frozen Matrix canary task is unavailable")
+        spec = ExperimentSpec(
+            experiment_id=MATRIX_CANARY_ID,
+            name="HarnessLab Core Real Matrix v3 Canary",
+            task_packages=representative,
+            cells=tuple(
+                ExperimentCellSpec.model_validate(cell.model_dump(mode="json"))
+                for cell in full.cells
+            ),
+            repeat_count=1,
+            execution_seed=self.release_plan.execution_seed,
+            comparison_intent=ComparabilityIntent.HARNESS_UPLIFT,
+            paired_comparisons=full.paired_comparisons,
+            ablations=full.ablations,
+        )
+        canary = build_experiment_plan(spec, self.repository_root)
+        if (
+            canary.experiment_id != MATRIX_CANARY_ID
+            or len(canary.tasks) != 1
+            or canary.tasks[0].task_id != MATRIX_CANARY_TASK_ID
+            or len(canary.cells) != MATRIX_CELL_COUNT
+            or canary.repeat_count != 1
+            or len(canary.run_slots) != MATRIX_CELL_COUNT
+            or {slot.cell_id for slot in canary.run_slots} != {cell.id for cell in full.cells}
+            or any(slot.repeat_index != 0 for slot in canary.run_slots)
+        ):
+            raise MatrixControlPlaneError("Matrix canary expansion is not exactly 1x7x1=7")
+        return canary
 
 
 class _DirectProductionBinding:
@@ -477,10 +525,31 @@ def production_matrix_bindings(
 
 @dataclass(frozen=True)
 class MatrixExecutionResult:
+    matrix_id: str
     plan_digest: str
     logical_runs: int
     executed_runs: int
     concurrency: int
+
+
+@dataclass(frozen=True)
+class MatrixCanaryRunResult:
+    cell_id: str
+    task_id: str
+    status: str
+    normalized_outcome: str | None
+    source_outcome: str | None
+    evidence_digest: str | None
+
+
+@dataclass(frozen=True)
+class MatrixCanaryExecutionResult:
+    matrix_id: str
+    plan_digest: str
+    logical_runs: int
+    executed_runs: int
+    technical_pass: bool
+    results: tuple[MatrixCanaryRunResult, ...]
 
 
 async def execute_real_matrix(
@@ -492,6 +561,7 @@ async def execute_real_matrix(
     artifact_root: Path,
     runtime_root: Path,
     environment: Mapping[str, str] | None = None,
+    plan_version: str = "v2",
 ) -> MatrixExecutionResult:
     if not allow_real_matrix:
         raise MatrixControlPlaneError("real Matrix requires --allow-real-matrix")
@@ -502,7 +572,7 @@ async def execute_real_matrix(
     if not 1 <= concurrency <= 8:
         raise MatrixControlPlaneError("--concurrency must be between 1 and 8")
     selected_environment = environment if environment is not None else os.environ
-    control = MatrixControlPlane.load(repository_root)
+    control = MatrixControlPlane.load(repository_root, plan_version=plan_version)
     control.smoke.validate_real_environment(selected_environment)
     await preflight_egress_network_isolation()
     runtime = await resolve_runtime_identities()
@@ -531,10 +601,92 @@ async def execute_real_matrix(
             concurrency=concurrency,
         )
         return MatrixExecutionResult(
+            matrix_id=control.matrix_id,
             plan_digest=plan.digest,
             logical_runs=enqueued.logical_run_count,
             executed_runs=len(executed),
             concurrency=concurrency,
+        )
+    finally:
+        await engine.dispose()
+
+
+async def execute_real_matrix_canary(
+    repository_root: Path,
+    *,
+    allow_real_matrix_canary: bool,
+    concurrency: int = 1,
+    artifact_root: Path,
+    runtime_root: Path,
+    environment: Mapping[str, str] | None = None,
+) -> MatrixCanaryExecutionResult:
+    if not allow_real_matrix_canary:
+        raise MatrixControlPlaneError("real Matrix canary requires --allow-real-matrix-canary")
+    if not 1 <= concurrency <= 7:
+        raise MatrixControlPlaneError("--concurrency must be between 1 and 7")
+    selected_environment = environment if environment is not None else os.environ
+    control = MatrixControlPlane.load(repository_root, plan_version="v3")
+    control.smoke.validate_real_environment(selected_environment)
+    await preflight_egress_network_isolation()
+    runtime = await resolve_runtime_identities()
+    plan = control.build_canary_plan(runtime)
+    bindings = production_matrix_bindings(
+        control,
+        runtime,
+        selected_environment,
+        artifact_root=artifact_root,
+        runtime_root=runtime_root,
+    )
+    engine = create_engine(Settings())
+    factory = create_session_factory(engine)
+    try:
+        async with factory() as session, session.begin():
+            enqueued = await enqueue_plan(session, plan)
+        worker = ExperimentRunExecutor(
+            repository_root=control.repository_root,
+            session_factory=factory,
+            bindings=bindings,
+            owner="harnesslab-phase-k-matrix-canary",
+        )
+        executed = await worker.run_bounded(
+            plan.experiment_id,
+            max_runs=MATRIX_CELL_COUNT,
+            concurrency=concurrency,
+        )
+        safe_results = tuple(
+            MatrixCanaryRunResult(
+                cell_id=item.cell_id,
+                task_id=item.slot.task.task_id,
+                status=item.status.value,
+                normalized_outcome=(
+                    item.normalized_outcome.value if item.normalized_outcome is not None else None
+                ),
+                source_outcome=item.source_outcome,
+                evidence_digest=item.evidence_digest,
+            )
+            for item in sorted(executed, key=lambda snapshot: snapshot.cell_id)
+        )
+        expected_cells = {cell.id for cell in plan.cells}
+        technical_pass = (
+            enqueued.logical_run_count == MATRIX_CELL_COUNT
+            and len(executed) == MATRIX_CELL_COUNT
+            and {item.cell_id for item in executed} == expected_cells
+            and all(
+                item.slot.task.task_id == MATRIX_CANARY_TASK_ID
+                and item.slot.repeat_index == 0
+                and item.status.value in {"completed", "failed_subject"}
+                and item.artifact_manifest_path is not None
+                and item.evidence_digest is not None
+                for item in executed
+            )
+        )
+        return MatrixCanaryExecutionResult(
+            matrix_id=MATRIX_CANARY_ID,
+            plan_digest=plan.digest,
+            logical_runs=enqueued.logical_run_count,
+            executed_runs=len(executed),
+            technical_pass=technical_pass,
+            results=safe_results,
         )
     finally:
         await engine.dispose()

@@ -237,15 +237,17 @@ class CallPreflight(StrictModel):
 
 class RealEvidencePlan(CanonicalModel):
     schema_version: Literal[3] = 3
-    plan_id: Literal["core-real-evidence-v2"] = "core-real-evidence-v2"
-    supersedes_plan_id: Literal["core-real-evidence-v1"] = "core-real-evidence-v1"
+    plan_id: Literal["core-real-evidence-v2", "core-real-evidence-v3"] = "core-real-evidence-v2"
+    supersedes_plan_id: Literal["core-real-evidence-v1", "core-real-evidence-v2"] = (
+        "core-real-evidence-v1"
+    )
     history_reference: Literal["release/history/core-real-v1.json"]
     history_digest: Sha256Digest
     official_route_snapshot_reference: Literal["release/opencode-go-route-snapshot.json"]
     official_route_snapshot_digest: Sha256Digest
     corpus_reference: str
     corpus_digest: Sha256Digest
-    experiment_id: Literal["core-real-matrix-v2"] = "core-real-matrix-v2"
+    experiment_id: Literal["core-real-matrix-v2", "core-real-matrix-v3"] = "core-real-matrix-v2"
     execution_seed: int
     selected_profiles: tuple[ProviderProfile, ...]
     model_profile_slots: tuple[ModelProfileSlot, ...]
@@ -261,6 +263,13 @@ class RealEvidencePlan(CanonicalModel):
 
     @model_validator(mode="after")
     def release_plan_is_complete_but_unexecuted(self) -> RealEvidencePlan:
+        expected_version_binding = {
+            "core-real-evidence-v2": ("core-real-evidence-v1", "core-real-matrix-v2", 90),
+            "core-real-evidence-v3": ("core-real-evidence-v2", "core-real-matrix-v3", 180),
+        }
+        supersedes, experiment_id, subject_timeout = expected_version_binding[self.plan_id]
+        if self.supersedes_plan_id != supersedes or self.experiment_id != experiment_id:
+            raise ValueError("Core real plan version binding drifted")
         if len(self.selected_profiles) != 8:
             raise ValueError("Core v2 release plan requires exactly eight configured profiles")
         profile_ids = {profile.profile_id for profile in self.selected_profiles}
@@ -282,6 +291,16 @@ class RealEvidencePlan(CanonicalModel):
             for profile_id, profile in profiles.items()
         ):
             raise ValueError("Core v2 selected requested model drifted")
+        if any(
+            profile.timeout_seconds
+            != (90 if profile_id == "judge-glm52-opencode-go-chat" else subject_timeout)
+            for profile_id, profile in profiles.items()
+        ):
+            raise ValueError("Core real selected profile timeout budget drifted")
+        if any(
+            slot.request_timeout_seconds != subject_timeout for slot in self.model_profile_slots
+        ):
+            raise ValueError("Core real Model-only slot timeout budget drifted")
         expected_provenance = {
             "model-gpt56-relay-responses": "TRUSTED_THIRD_PARTY_RELAY",
             "model-qwen38-opencode-go-messages": "THIRD_PARTY_INFERENCE_PLATFORM",
@@ -410,9 +429,12 @@ class RealSmokeCall(StrictModel):
 
 
 class RealSmokePlan(CanonicalModel):
-    schema_version: Literal[2] = 2
-    plan_id: Literal["core-real-smoke-v2"] = "core-real-smoke-v2"
-    release_plan_reference: Literal["release/core-real-evidence-plan.json"]
+    schema_version: Literal[2, 3] = 2
+    plan_id: Literal["core-real-smoke-v2", "core-real-smoke-v3"] = "core-real-smoke-v2"
+    release_plan_reference: Literal[
+        "release/core-real-evidence-plan.json",
+        "release/core-real-evidence-plan-v3.json",
+    ]
     release_plan_digest: Sha256Digest
     calls: tuple[RealSmokeCall, ...]
     max_top_level_launch_count: Literal[8] = 8
@@ -424,12 +446,24 @@ class RealSmokePlan(CanonicalModel):
 
     @model_validator(mode="after")
     def bounded_smoke_is_exact(self) -> RealSmokePlan:
+        expected = {
+            "core-real-smoke-v2": (2, "release/core-real-evidence-plan.json", 90),
+            "core-real-smoke-v3": (3, "release/core-real-evidence-plan-v3.json", 180),
+        }
+        schema_version, plan_reference, subject_timeout = expected[self.plan_id]
+        if self.schema_version != schema_version or self.release_plan_reference != plan_reference:
+            raise ValueError("Core real smoke version binding drifted")
         if len(self.calls) != 8 or len({item.call_id for item in self.calls}) != 8:
             raise ValueError("Core v2 smoke plan requires exactly eight unique top-level calls")
         if sum(item.max_output_tokens for item in self.calls) != 14_256:
             raise ValueError("Core v2 smoke output-token ceiling drifted")
         if {item.lane for item in self.calls} != {"M", "H", "J"}:
             raise ValueError("Core v2 smoke omits a required lane")
+        if any(
+            call.timeout_seconds != (90 if call.lane == "J" else subject_timeout)
+            for call in self.calls
+        ):
+            raise ValueError("Core real smoke timeout budget drifted")
         required_abort_conditions = {
             "auth error",
             "route mismatch",

@@ -2,12 +2,27 @@
 
 The Phase K hard stop is implemented by strict models in `src/harnesslab/release`, canonical JSON artifacts in `release/`, and `scripts/verify_gate_k.py`. Documentation does not make evidence true; identities, digests, authoritative source references, state, and independent validation do.
 
+## Core real-evidence v3 convergence contract
+
+`core-real-evidence-plan-v3.json` (`core-real-evidence-v3` / `core-real-matrix-v3`) and
+`core-real-smoke-plan-v3.json` (`core-real-smoke-v3`) supersede v2 for final real validation without
+rewriting v2. They retain the same eight calls, order, task, models, providers, routes, reasoning
+efforts, credentials, token ceilings, verifier, security boundaries, and no-retry/no-fallback
+policy. The only subject-budget change is a uniform 180-second wall-clock timeout for Calls 1-7;
+the Judge remains 90 seconds. Select them explicitly with `--plan-version v3`.
+
+The v3 Matrix still expands to 7 cells × 18 tasks × 5 repeats = 630 logical runs with zero calls
+during preflight, and every subject profile carries the same 180-second timeout. The separately
+gated `harnesslab release matrix canary --allow-real-matrix-canary` uses the normal PostgreSQL
+queue, executor, and production bindings for exactly `core-python-deduplicate` × all seven cells ×
+repeat zero. It is not a substitute for the full Matrix and cannot authorize one.
+
 ## Core real-evidence v2 artifacts
 
 - `core-corpus.json` binds the 18 package, task, semantic-family, benchmark-role, workspace, verifier, lane, toolchain, baseline, and oracle identities. Exactly one clamp control spans all three languages; the other 15 families are independent.
 - `core-real-evidence-plan.json` is `core-real-evidence-v2` / `core-real-matrix-v2`. It binds eight configured-not-smoked profiles, seven cells, truthful provider provenance, the unchanged Pair and ablation, frozen Judge profile/suite, exact call/token ceilings, four runtime configuration references, and authorization blockers.
 - `core-real-smoke-plan.json` is `core-real-smoke-v2` and freezes seven one-task subject smokes and one Judge case: eight top-level launches, 14,256 maximum output tokens, exact evidence expectations, credential references, and sixteen fail-closed abort conditions. `harnesslab release smoke preflight` validates it keylessly; only an authorized `execute --allow-real-smoke` can enter the shared production orchestrator. The first v2 attempt executed calls 1-2 and aborted at call 2 after Qwen reached the configured output-token budget; calls 3-8 were not run. R4 preserves future output-budget-truncated public results for subject-output evaluation without changing the frozen budget.
-- `history/core-real-v2-attempt-1.json`, `history/core-real-v2-attempt-2.json`, `history/core-real-v2-attempt-3.json`, `history/core-real-v2-attempt-4.json`, `history/core-real-v2-attempt-5.json`, `history/core-real-v2-attempt-6.json`, `history/core-real-v2-attempt-7.json`, `history/core-real-v2-attempt-8.json`, `history/core-real-v2-attempt-9.json`, `history/core-real-v2-attempt-10.json`, `history/core-real-v2-attempt-11.json`, and `history/core-real-v2-attempt-12.json` preserve the complete immutable v2 attempt 1-12 history. Attempts 1-8 record the successive output-budget, provider-timeout, Codex startup/route/sandbox, and execution-budget classification observations without promoting any individual success to complete smoke evidence.
+- `history/core-real-v2-attempt-1.json` through `history/core-real-v2-attempt-13.json` preserve the complete immutable v2 attempt history. Attempts 1-8 record the successive output-budget, provider-timeout, Codex startup/route/sandbox, and execution-budget classification observations without promoting any individual success to complete smoke evidence. Attempt 13 reached Calls 1-4 and stopped at a Codex timeout; its Calls 5-8 sweep is preserved separately at `diagnostics/core-real-v2-attempt-13.json` as `DIAGNOSTIC_ONLY` and `release_promotable=false`.
 
 Release-history digest values are derived with
 `harnesslab release smoke evidence-summary --artifact-root <root>`. The receipt digest domain is
@@ -32,6 +47,7 @@ eight. Completed logical slots are resumed idempotently and are not duplicated.
 latency, usage, request-count, trace, and verifier facts. When the repository has no authoritative
 price snapshot, it reports `PRICE_INPUT_REQUIRED` rather than inventing cost data.
 - Attempt 9 reached Claude Call 6 and stopped fail-closed when Claude Code 2.1.241 exited with `process_error` before any normalized event or observed model. R12 then made zero real calls while diagnosing the invalid MCP shape and bare/tool-surface contradiction and keylessly verifying the isolated non-bare startup profile. Post-R12 Attempts 10-12 stopped at GPT Call 1 on relay read timeouts near the frozen 90-second boundary; Calls 2-8 were `NOT_RUN`, so none reached Claude. Attempt 12 specifically timed out while waiting for response headers; no HTTP response headers became available to HarnessLab before the frozen timeout. Accordingly, post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`: none validates or invalidates the R12 repair. Attempts 3, 6, 10, 11, and 12 independently establish a recurring Call-1 relay read-timeout reliability problem, but root cause remains `NOT_DETERMINED`. No v2 attempt completed all eight calls, and no attempt is Matrix or release verification.
+- Attempt 13 established that both Codex medium and the separately diagnostic Codex high reached only `THREAD_STARTED` and `TURN_STARTED` before the v2 timeout, with no agent message, command/tool activity, or workspace mutation. Exact persisted Call-6 workspace replay executed the same Hidden Verifier successfully at score 1.0, so the original verifier error is transient infrastructure or not determined. Controlled keyless Call-7 reproduction found and repaired the pinned DeepSeek CLI's missing Node `--expose-internals` startup requirement. No provider root cause is inferred from these facts.
 - R16 adds bounded direct-provider transport-phase traces for future timeout evidence: `CONNECT_TCP`, `START_TLS`, `SEND_REQUEST_HEADERS`, `SEND_REQUEST_BODY`, and `RECEIVE_RESPONSE_HEADERS`. The trace records only request-relative start/completion milliseconds and the locked httpcore source/version; raw callback payloads are ignored and never persisted. Attempt 12 predates R16, so no phase trace is retrofitted into Attempts 1-12.
 - `history/core-real-v1.json` preserves the v1 plan IDs and canonical digests through the authoritative starting commit and exact Git blob/byte identities. It truthfully records all three v1 attempts without copying operator-local artifacts.
 - `opencode-go-route-snapshot.json` freezes the selected official Qwen3.8 Max Messages and GLM-5.2 Chat Completions model IDs/endpoints, OpenCode Go third-party provenance, operator-confirmed benchmark permission, and the absence of a live model probe.

@@ -1,6 +1,8 @@
 # Real Evidence Authorization
 
-R16 stop state: `PHASE_K_ATTEMPT_12_IMMUTABLE_EVIDENCE_INGESTION_AND_DIRECT_TRANSPORT_OBSERVABILITY_KEYLESS`.
+K-FAST-2 convergence state: Attempt 13 is immutable v2 history, its Calls 5-8 sweep is separately
+`DIAGNOSTIC_ONLY`, and v3 is the active bounded validation contract. V2 remains historical and is
+not mutated into an Attempt 14.
 
 Three real top-level v1 K-B1 attempts occurred before this redesign. On the first, call 1 invoked the configured GPT relay successfully and completed with requested and observed model `gpt-5.6-sol` in approximately 16,773 ms; the overall smoke then aborted with `INFRASTRUCTURE` because the non-root Hidden Verifier could not read restrictive host bind mounts. The K-B1-R1 permission-portability repair addressed that infrastructure defect.
 
@@ -38,6 +40,14 @@ R16 is a keyless observability repair. Future direct-provider timeout evidence m
 
 The R4-R16 repairs do not change the 2,000-token subject budget, 90-second timeout, eight-call order, 14,256-token smoke ceiling, no-retry rule, or no-fallback rule. OpenCode Go automated benchmark use remains operator-confirmed (`OPENCODE_GO_AUTOMATED_BENCHMARK_PERMISSION=OPERATOR_CONFIRMED_PROVIDER_PERMISSION`); the 630-run Matrix and 63 Judge calls still require later authorization. Individual successful observations in attempts 1-12 are not complete smoke or release verification.
 
+Attempt 13 executed Calls 1-4 and aborted at Codex medium after the frozen v2 90-second boundary.
+Calls 5-8 were not part of that release smoke; their independent sweep is non-promotable diagnostic
+evidence. Keyless forensics support a versioned budget change, not provider blame: v3 holds every
+subject call and all seven Matrix cells to 180 seconds, while Judge remains 90 seconds. It preserves
+the v2 call order, task, routes, models, reasoning treatments, credentials, token settings, verifier,
+and security boundary. A v3 diagnostic continuation may execute only the unattempted suffix of an
+aborted receipt and never satisfies release evidence.
+
 ## Frozen Core scope
 
 - Corpus: `harnesslab-core-18-v1`, 18 tasks (6 Python, 6 Java, 6 TypeScript).
@@ -64,7 +74,7 @@ OpenCode Go is `THIRD_PARTY_INFERENCE_PLATFORM`, with `provider_id=opencode-go`,
 | Judge maximum output tokens | 16,128 |
 | Total maximum output tokens | 1,276,128 |
 
-The 360 Harness launches may issue internal provider requests whose count is `NOT_CALCULATED_UNTIL_REAL_SMOKE`. Monetary cost is `NOT_CALCULATED_UNTIL_REAL_SMOKE_USAGE_AND_RELAY_PRICE`; no relay price table or usage evidence is frozen. Per-subject maximum output is 2,000 tokens and timeout is 90 seconds. Judge maximum output is 256 tokens per call.
+The 360 Harness launches may issue internal provider requests whose count is `NOT_CALCULATED_UNTIL_REAL_SMOKE`. Monetary cost is `NOT_CALCULATED_UNTIL_REAL_SMOKE_USAGE_AND_RELAY_PRICE`; no relay price table or usage evidence is frozen. Per-subject maximum output is 2,000 tokens; the active v3 subject timeout is 180 seconds. Judge maximum output is 256 tokens per call with a 90-second timeout.
 
 V2 configuration references are only `HARNESSLAB_GPT56_RELAY_BASE_URL`, `HARNESSLAB_GPT56_RELAY_API_KEY`, `HARNESSLAB_OPENCODE_GO_API_KEY`, and `DEEPSEEK_API_KEY`. Values must not enter Git, argv, logs, traces, manifests, reports, or evidence artifacts. Presence diagnostics print only `VAR=SET` or `VAR=MISSING`.
 
@@ -87,7 +97,7 @@ The `codex-gpt56-reasoning-effort` ablation compares Codex medium with Codex hig
 - `REAL_MATRIX_EVIDENCE`
 - `REAL_JUDGE_SMOKE`
 
-`REAL_PROVIDER_SMOKE=NOT_VERIFIED` and `REAL_CODEX_SMOKE=NOT_VERIFIED`; the other four states remain `NOT_RUN`. Any new authorization must name `core-real-smoke-v2`, approve exactly eight top-level launches and the 14,256-token ceiling, supply the four declared configuration references, and accept every predefined abort condition. It does not authorize the Matrix, full Judge run, tag, or uplift claim.
+`REAL_PROVIDER_SMOKE=NOT_VERIFIED` and `REAL_CODEX_SMOKE=NOT_VERIFIED`; the other four states remain `NOT_RUN`. The standing K-FAST-2 authorization names `core-real-smoke-v3`, approves exactly eight top-level launches and the 14,256-token ceiling, supplies the same four configuration references, and accepts every predefined abort condition. It authorizes only the explicitly bounded v3 smoke cycles and, after a complete smoke, the exact seven-run Matrix canary. It does not authorize the full Matrix, full Judge run, tag, or uplift claim.
 
 The smoke must stop on authentication, route/schema/observed-model/alias drift, any secret leak, proxy bypass or unrestricted network, verifier networking, P-Lane route mismatch, task/artifact binding failure, provider fallback, or Judge persistence/integrity failure. Only successful separately authorized smoke may support a later Matrix authorization decision.
 

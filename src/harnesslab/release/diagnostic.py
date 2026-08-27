@@ -55,7 +55,7 @@ class ComponentDiagnosticReport(BaseModel):
     smoke_plan_digest: str
     release_plan_digest: str
     attempt_receipt_reference: str
-    attempt13_attempted_call_ids: tuple[str, ...]
+    smoke_attempted_call_ids: tuple[str, ...]
     diagnostic_call_ids: tuple[str, ...]
     diagnostic_top_level_launches: int = Field(ge=0, le=8)
     retry_count: Literal[0] = 0
@@ -193,7 +193,7 @@ async def execute_component_diagnostics(
             smoke_plan_digest=control.smoke_plan_digest,
             release_plan_digest=control.release_plan.digest,
             attempt_receipt_reference=attempt_receipt_path.name,
-            attempt13_attempted_call_ids=attempted,
+            smoke_attempted_call_ids=attempted,
             diagnostic_call_ids=tuple(item.call_id for item in records),
             diagnostic_top_level_launches=len(records),
             status="IN_PROGRESS",
@@ -207,7 +207,7 @@ async def execute_component_diagnostics(
         smoke_plan_digest=control.smoke_plan_digest,
         release_plan_digest=control.release_plan.digest,
         attempt_receipt_reference=attempt_receipt_path.name,
-        attempt13_attempted_call_ids=attempted,
+        smoke_attempted_call_ids=attempted,
         diagnostic_call_ids=tuple(item.call_id for item in records),
         diagnostic_top_level_launches=len(records),
         results=tuple(records),
@@ -223,16 +223,22 @@ async def execute_real_component_diagnostics(
     attempt_receipt_path: Path,
     artifact_root: Path,
     environment: Mapping[str, str] | None = None,
+    plan_version: str = "v2",
 ) -> ComponentDiagnosticReport:
     if not allow_real_diagnostic:
         raise ComponentDiagnosticError("real diagnostic requires --allow-real-diagnostic")
     selected_environment = environment if environment is not None else os.environ
-    control = SmokeControlPlane.load(repository_root)
+    control = SmokeControlPlane.load(repository_root, plan_version=plan_version)
     control.validate_real_environment(selected_environment)
     await preflight_egress_network_isolation()
     runtime = await resolve_runtime_identities()
     bindings = control.resolve_real_bindings(selected_environment, runtime)
-    invoker = ProductionSmokeInvoker(repository_root, selected_environment, artifact_root)
+    invoker = ProductionSmokeInvoker(
+        repository_root,
+        selected_environment,
+        artifact_root,
+        smoke_plan_id=control.smoke_plan.plan_id,
+    )
     return await execute_component_diagnostics(
         control,
         bindings,

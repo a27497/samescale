@@ -39,6 +39,7 @@ from harnesslab.release.matrix import (
     MatrixControlPlane,
     MatrixControlPlaneError,
     execute_real_matrix,
+    execute_real_matrix_canary,
 )
 from harnesslab.release.smoke import (
     SmokeControlPlane,
@@ -103,11 +104,12 @@ def preflight_release_smoke(
     repository_root: str = typer.Option(
         ".", "--repository-root", help="Repository containing the frozen release plans."
     ),
+    plan_version: str = typer.Option("v2", "--plan-version", help="Frozen plan version."),
 ) -> None:
     """Validate the exact eight-call plan keylessly, without resolving secrets or networking."""
 
     try:
-        control = SmokeControlPlane.load(Path(repository_root))
+        control = SmokeControlPlane.load(Path(repository_root), plan_version=plan_version)
         receipt = control.preflight()
     except SmokeControlPlaneError as exc:
         typer.echo(f"FAIL smoke preflight: {exc}")
@@ -132,6 +134,7 @@ def execute_release_smoke(
     artifact_root: str | None = typer.Option(
         None, "--artifact-root", help="Safe immutable smoke evidence destination."
     ),
+    plan_version: str = typer.Option("v2", "--plan-version", help="Frozen plan version."),
 ) -> None:
     """Execute the exact smoke plan; it is inert unless the explicit authorization flag is set."""
 
@@ -141,6 +144,7 @@ def execute_release_smoke(
                 Path(repository_root),
                 allow_real_smoke=allow_real_smoke,
                 artifact_root=Path(artifact_root) if artifact_root is not None else None,
+                plan_version=plan_version,
             )
         )
     except (SmokeControlPlaneError, EgressNetworkIsolationUnavailable) as exc:
@@ -157,11 +161,18 @@ def execute_release_smoke(
 
 
 @release_smoke_app.command("credential-preflight")
-def preflight_release_smoke_credentials() -> None:
-    """Report only presence of v2 runtime references; never print credential values."""
+def preflight_release_smoke_credentials(
+    plan_version: str = typer.Option("v2", "--plan-version", help="Frozen plan version."),
+) -> None:
+    """Report only presence of frozen runtime references; never print credential values."""
 
     from harnesslab.release.smoke import REQUIRED_CONFIGURATION_REFERENCES
 
+    if plan_version not in {"v2", "v3"}:
+        typer.echo("FAIL credential preflight: plan version must be v2 or v3")
+        raise typer.Exit(code=2)
+    if plan_version == "v3":
+        typer.echo("PLAN_VERSION=v3")
     missing = False
     for reference in REQUIRED_CONFIGURATION_REFERENCES:
         present = bool(os.environ.get(reference, "").strip())
@@ -213,6 +224,7 @@ def execute_release_component_smoke(
     repository_root: str = typer.Option(
         ".", "--repository-root", help="Repository containing the frozen release plans."
     ),
+    plan_version: str = typer.Option("v2", "--plan-version", help="Frozen plan version."),
 ) -> None:
     """Continue across independent unattempted components; never produce release evidence."""
 
@@ -223,6 +235,7 @@ def execute_release_component_smoke(
                 allow_real_diagnostic=allow_real_diagnostic,
                 attempt_receipt_path=Path(skip_attempted_from),
                 artifact_root=Path(artifact_root),
+                plan_version=plan_version,
             )
         )
     except (ComponentDiagnosticError, EgressNetworkIsolationUnavailable) as exc:
@@ -239,12 +252,15 @@ def preflight_release_matrix(
     repository_root: str = typer.Option(
         ".", "--repository-root", help="Repository containing the frozen release plans."
     ),
+    plan_version: str = typer.Option("v2", "--plan-version", help="Frozen plan version."),
 ) -> None:
     """Inspect local runtime identities and validate the exact 630-slot plan keylessly."""
 
     try:
         runtime = asyncio.run(resolve_runtime_identities())
-        receipt = MatrixControlPlane.load(Path(repository_root)).preflight(runtime)
+        receipt = MatrixControlPlane.load(
+            Path(repository_root), plan_version=plan_version
+        ).preflight(runtime)
     except MatrixControlPlaneError as exc:
         typer.echo(f"FAIL Matrix preflight: {exc}")
         raise typer.Exit(code=1) from exc
@@ -278,6 +294,7 @@ def execute_release_matrix(
     repository_root: str = typer.Option(
         ".", "--repository-root", help="Repository containing the frozen release plans."
     ),
+    plan_version: str = typer.Option("v2", "--plan-version", help="Frozen plan version."),
 ) -> None:
     """Run a resumable bounded slice of the strict Matrix; inert without both explicit gates."""
 
@@ -290,16 +307,81 @@ def execute_release_matrix(
                 concurrency=concurrency,
                 artifact_root=Path(artifact_root),
                 runtime_root=Path(runtime_root),
+                plan_version=plan_version,
             )
         )
     except (MatrixControlPlaneError, EgressNetworkIsolationUnavailable, ValueError) as exc:
         typer.echo(f"FAIL Matrix execution: {exc}")
         raise typer.Exit(code=2) from exc
-    typer.echo("MATRIX_ID=core-real-matrix-v2")
+    typer.echo(f"MATRIX_ID={result.matrix_id}")
     typer.echo(f"PLAN_DIGEST={result.plan_digest}")
     typer.echo(f"LOGICAL_RUNS={result.logical_runs}")
     typer.echo(f"EXECUTED_RUNS={result.executed_runs}")
     typer.echo(f"CONCURRENCY={result.concurrency}")
+
+
+@release_matrix_app.command("canary")
+def execute_release_matrix_canary(
+    allow_real_matrix_canary: bool = typer.Option(
+        False,
+        "--allow-real-matrix-canary",
+        help="Explicitly authorize the exact seven-cell v3 Matrix canary.",
+    ),
+    concurrency: int = typer.Option(
+        1, "--concurrency", min=1, max=7, help="Bounded canary worker concurrency."
+    ),
+    artifact_root: str = typer.Option(
+        "artifacts/core-real-matrix-v3-canary",
+        "--artifact-root",
+        help="Immutable Matrix canary artifacts.",
+    ),
+    runtime_root: str = typer.Option(
+        ".runtime/core-real-matrix-v3-canary",
+        "--runtime-root",
+        help="Ephemeral Matrix canary runtime root.",
+    ),
+    repository_root: str = typer.Option(
+        ".", "--repository-root", help="Repository containing the frozen release plans."
+    ),
+) -> None:
+    """Run one fixed task once through all seven v3 production bindings."""
+
+    try:
+        result = asyncio.run(
+            execute_real_matrix_canary(
+                Path(repository_root),
+                allow_real_matrix_canary=allow_real_matrix_canary,
+                concurrency=concurrency,
+                artifact_root=Path(artifact_root),
+                runtime_root=Path(runtime_root),
+            )
+        )
+    except (MatrixControlPlaneError, EgressNetworkIsolationUnavailable, ValueError) as exc:
+        typer.echo(f"FAIL Matrix canary execution: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo(f"MATRIX_ID={result.matrix_id}")
+    typer.echo(f"PLAN_DIGEST={result.plan_digest}")
+    typer.echo(f"LOGICAL_RUNS={result.logical_runs}")
+    typer.echo(f"EXECUTED_RUNS={result.executed_runs}")
+    typer.echo(f"REAL_MATRIX_PLANE_CANARY={'PASS' if result.technical_pass else 'FAIL'}")
+    for item in result.results:
+        typer.echo(
+            "CANARY_RESULT="
+            + json.dumps(
+                {
+                    "cell_id": item.cell_id,
+                    "task_id": item.task_id,
+                    "status": item.status,
+                    "normalized_outcome": item.normalized_outcome,
+                    "source_outcome": item.source_outcome,
+                    "evidence_digest": item.evidence_digest,
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+        )
+    if not result.technical_pass:
+        raise typer.Exit(code=1)
 
 
 @release_telemetry_app.command("summarize")

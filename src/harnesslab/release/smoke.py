@@ -120,6 +120,16 @@ REQUIRED_CONFIGURATION_REFERENCES = (
 )
 SUBJECT_TASK_ID = "core-python-deduplicate"
 JUDGE_CASE_REFERENCE = "judge_suites/core-calibration/1.0.0#label-l0-pass"
+PLAN_PATHS = {
+    "v2": (
+        "release/core-real-evidence-plan.json",
+        "release/core-real-smoke-plan.json",
+    ),
+    "v3": (
+        "release/core-real-evidence-plan-v3.json",
+        "release/core-real-smoke-plan-v3.json",
+    ),
+}
 
 
 class SmokeControlPlaneError(CoreReleaseError):
@@ -275,14 +285,24 @@ class SmokeControlPlane:
         self.bindings = bindings
 
     @classmethod
-    def load(cls, repository_root: Path) -> SmokeControlPlane:
+    def load(cls, repository_root: Path, *, plan_version: str = "v2") -> SmokeControlPlane:
         root = repository_root.resolve()
         try:
-            release_plan = load_real_evidence_plan(root / "release/core-real-evidence-plan.json")
-            smoke_plan = load_real_smoke_plan(root / "release/core-real-smoke-plan.json")
+            release_reference, smoke_reference = PLAN_PATHS[plan_version]
+        except KeyError as exc:
+            raise SmokeControlPlaneError("plan version must be v2 or v3") from exc
+        try:
+            release_plan = load_real_evidence_plan(root / release_reference)
+            smoke_plan = load_real_smoke_plan(root / smoke_reference)
             corpus = load_core_corpus(root / "release/core-corpus.json")
         except CoreReleaseError as exc:
             raise SmokeControlPlaneError(str(exc)) from exc
+        expected_ids = (
+            f"core-real-evidence-{plan_version}",
+            f"core-real-smoke-{plan_version}",
+        )
+        if (release_plan.plan_id, smoke_plan.plan_id) != expected_ids:
+            raise SmokeControlPlaneError("selected smoke/release plan version drifted")
         if smoke_plan.release_plan_digest != release_plan.digest:
             raise SmokeControlPlaneError("smoke/release plan digest mismatch")
         for reference, expected_digest, label in (
@@ -615,10 +635,12 @@ class ProductionSmokeInvoker:
         repository_root: Path,
         environment: Mapping[str, str],
         artifact_root: Path,
+        smoke_plan_id: str = "core-real-smoke-v2",
     ) -> None:
         self.repository_root = repository_root.resolve()
         self.environment = dict(environment)
         self.artifact_root = artifact_root.resolve()
+        self.smoke_plan_id = smoke_plan_id
 
     async def invoke(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
         call_id = binding.frozen.call.call_id
@@ -833,7 +855,7 @@ class ProductionSmokeInvoker:
             )
         profile_identity = judge_digest(profile)
         slot_identity = {
-            "calibration_id": "core-real-smoke-v2",
+            "calibration_id": self.smoke_plan_id,
             "judge_cell_id": "judge-glm52-opencode-go-chat",
             "suite_digest": suite.suite_digest,
             "definition_digest": definition.definition_digest,
@@ -846,7 +868,7 @@ class ProductionSmokeInvoker:
         slot = JudgeEvaluationSlot(
             slot_id=judge_digest(slot_identity),
             slot_order=0,
-            calibration_id="core-real-smoke-v2",
+            calibration_id=self.smoke_plan_id,
             judge_cell_id="judge-glm52-opencode-go-chat",
             case_id=case.case_id,
             case_mode=case.mode,
@@ -978,13 +1000,14 @@ async def execute_real_smoke(
     allow_real_smoke: bool,
     environment: Mapping[str, str] | None = None,
     artifact_root: Path | None = None,
+    plan_version: str = "v2",
 ) -> SmokeExecutionReceipt:
     """Future K-B1 entry point. Calling it without explicit authorization fails closed."""
 
     if not allow_real_smoke:
         raise SmokeControlPlaneError("real smoke requires --allow-real-smoke")
     selected_environment = environment if environment is not None else os.environ
-    control = SmokeControlPlane.load(repository_root)
+    control = SmokeControlPlane.load(repository_root, plan_version=plan_version)
     control.validate_real_environment(selected_environment)
     await preflight_egress_network_isolation()
     runtime = await resolve_runtime_identities()
@@ -994,7 +1017,12 @@ async def execute_real_smoke(
         if artifact_root is not None
         else Path(tempfile.gettempdir()) / "harnesslab-phase-k-smoke"
     ).resolve()
-    invoker = ProductionSmokeInvoker(repository_root, selected_environment, output)
+    invoker = ProductionSmokeInvoker(
+        repository_root,
+        selected_environment,
+        output,
+        smoke_plan_id=control.smoke_plan.plan_id,
+    )
     return await control.execute(
         bindings,
         invoker,

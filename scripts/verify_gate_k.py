@@ -39,8 +39,9 @@ from harnesslab.release.final_verifier import (
     resolve_github_ci,
     verify_semantic_final_release,
 )
+from harnesslab.release.matrix import MatrixControlPlane
 from harnesslab.release.models import EvidenceState
-from harnesslab.release.smoke import SmokeControlPlane
+from harnesslab.release.smoke import SmokeControlPlane, resolve_runtime_identities
 
 ROOT = Path(__file__).resolve().parents[1]
 JUNIT = ROOT / "gate-k-results.xml"
@@ -121,6 +122,12 @@ CRITICAL_TESTS = {
     "test_real_matrix_has_no_implicit_full_launch_default",
     "test_diagnostic_sweep_skips_attempted_continues_and_is_non_promotable",
     "test_telemetry_reports_observed_values_and_requires_price_input",
+    "test_v2_plans_and_attempts_1_through_12_remain_byte_identical",
+    "test_attempt_13_and_diagnostic_are_safe_separate_and_non_promotable",
+    "test_v3_smoke_changes_only_version_bindings_and_subject_timeout",
+    "test_v3_matrix_preflight_and_exact_canary_are_frozen_keylessly",
+    "test_v3_matrix_canary_is_inert_without_explicit_gate",
+    "test_v3_diagnostic_runs_only_unattempted_calls_and_never_promotes",
     "test_production_smoke_persists_codex_precapture_infrastructure_evidence",
     "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
     "test_v2_credential_preflight_prints_presence_only",
@@ -207,6 +214,9 @@ def verify_contract_mode() -> bool:
         plan = load_real_evidence_plan(ROOT / "release/core-real-evidence-plan.json")
         smoke = load_real_smoke_plan(ROOT / "release/core-real-smoke-plan.json")
         smoke_control = SmokeControlPlane.load(ROOT)
+        v3_plan = load_real_evidence_plan(ROOT / "release/core-real-evidence-plan-v3.json")
+        v3_smoke = load_real_smoke_plan(ROOT / "release/core-real-smoke-plan-v3.json")
+        v3_smoke_control = SmokeControlPlane.load(ROOT, plan_version="v3")
         evidence = load_release_evidence(ROOT / "release/release-evidence.json")
         claims = load_resume_claim_map(ROOT / "release/resume-claim-evidence.json")
         badcases = load_badcase_plan(ROOT / "release/badcases.json")
@@ -256,6 +266,8 @@ def verify_contract_mode() -> bool:
         for path in (
             "release/core-real-evidence-plan.json",
             "release/core-real-smoke-plan.json",
+            "release/core-real-evidence-plan-v3.json",
+            "release/core-real-smoke-plan-v3.json",
             "release/release-evidence.json",
             "release/resume-claim-evidence.json",
         )
@@ -276,6 +288,41 @@ def verify_contract_mode() -> bool:
         return False
     if smoke_control.preflight().attempted_top_level_launches != 0:
         print("FAIL: K-B0 smoke preflight attempted a provider call")
+        return False
+    if (
+        v3_plan.plan_id != "core-real-evidence-v3"
+        or v3_plan.experiment_id != "core-real-matrix-v3"
+        or v3_smoke.plan_id != "core-real-smoke-v3"
+        or v3_smoke.release_plan_digest != v3_plan.digest
+        or [call.timeout_seconds for call in v3_smoke.calls] != [180] * 7 + [90]
+        or [profile.timeout_seconds for profile in v3_plan.selected_profiles] != [180] * 7 + [90]
+        or v3_smoke_control.preflight().attempted_top_level_launches != 0
+    ):
+        print("FAIL: v3 smoke/release contract drifted")
+        return False
+    try:
+        runtime = asyncio.run(resolve_runtime_identities())
+        v3_matrix = MatrixControlPlane.load(ROOT, plan_version="v3")
+        v3_matrix_receipt = v3_matrix.preflight(runtime)
+        v3_canary = v3_matrix.build_canary_plan(runtime)
+    except Exception as exc:
+        print(f"FAIL: v3 Matrix contract unavailable: {type(exc).__name__}")
+        return False
+    if (
+        v3_matrix_receipt.matrix_id != "core-real-matrix-v3"
+        or (
+            v3_matrix_receipt.cells,
+            v3_matrix_receipt.tasks,
+            v3_matrix_receipt.repeats,
+            v3_matrix_receipt.logical_runs,
+            v3_matrix_receipt.real_calls,
+        )
+        != (7, 18, 5, 630, 0)
+        or len(v3_canary.run_slots) != 7
+        or {slot.task.task_id for slot in v3_canary.run_slots} != {"core-python-deduplicate"}
+        or {slot.repeat_index for slot in v3_canary.run_slots} != {0}
+    ):
+        print("FAIL: v3 Matrix or exact canary contract drifted")
         return False
     history = json.loads((ROOT / plan.history_reference).read_text(encoding="utf-8"))
     try:
@@ -337,11 +384,11 @@ def verify_contract_mode() -> bool:
     authorization_docs = (ROOT / "docs/REAL_EVIDENCE_AUTHORIZATION.md").read_text(encoding="utf-8")
     resume_docs = (ROOT / "docs/RESUME_SCOPE.md").read_text(encoding="utf-8")
     if (
-        any(Path(reference).name not in release_docs for reference in v2_history_references)
-        or any(reference not in authorization_docs for reference in v2_history_references)
+        "attempt-1.json` through `history/core-real-v2-attempt-13.json`" not in release_docs
+        or "Attempt 13 executed Calls 1-4" not in authorization_docs
         or "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" not in release_docs
         or "Calls 2-8 were `NOT_RUN`" not in authorization_docs
-        or "attempts 1-12" not in resume_docs
+        or "attempts 1-13" not in resume_docs
         or "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" not in resume_docs
         or "Attempts 3, 6, 10, 11, and 12" not in authorization_docs
         or "Root cause remains `NOT_DETERMINED`" not in authorization_docs
@@ -646,6 +693,12 @@ def verify_contract_mode() -> bool:
     print("OPENCODE_GO_PROVENANCE=PASS")
     print("V1_HISTORY_PRESERVED=PASS")
     print("V2_SMOKE_PLAN=8_CALLS_14256_TOKENS")
+    print("V2_HISTORY_PRESERVED=PASS")
+    print(f"V3_RELEASE_PLAN=PASS digest={v3_plan.digest}")
+    print(f"V3_SMOKE_PLAN=PASS digest={v3_smoke.digest}")
+    print(f"V3_MATRIX_PLAN=PASS digest={v3_matrix_receipt.experiment_plan_digest}")
+    print("V3_MATRIX_LOGICAL_RUNS=630")
+    print(f"V3_MATRIX_CANARY_PLAN=7_RUNS digest={v3_canary.digest}")
     print(f"EGRESS_PROXY_BASE={EGRESS_PROXY_BASE}")
     print(f"EGRESS_PROXY_IMAGE={EGRESS_PROXY_IMAGE}")
     print(f"EGRESS_PROXY_IMAGE_ID={proxy_image.image_id}")
@@ -660,10 +713,13 @@ def verify_contract_mode() -> bool:
     print("EGRESS_PROXY_SECURITY_ATTESTATION=PASS; LOCAL_DOCKER_BYPASS_DENIAL=PASS")
     print("DEEPSEEK_E2=DEFERRED_NOT_VERIFIED")
     print("FAKE_KEYLESS_CONTRACT_EVIDENCE=PASS; REAL_RELEASE_EVIDENCE=NOT_VERIFIED")
-    print("SMOKE_TIMEOUT_CHANGE=FALSE")
-    print("SMOKE_PLAN_DRIFT=NONE")
-    print("RELEASE_PLAN_DRIFT=NONE")
+    print("V2_SMOKE_TIMEOUT_CHANGE=FALSE")
+    print("V3_SUBJECT_TIMEOUT_SECONDS=180")
+    print("V3_JUDGE_TIMEOUT_SECONDS=90")
+    print("V2_SMOKE_PLAN_DRIFT=NONE")
+    print("V2_RELEASE_PLAN_DRIFT=NONE")
     print("REAL_CALLS_THIS_REPAIR=0")
+    print("REAL_CALLS_SO_FAR=0")
     print("OUTPUT_BUDGET_TRUNCATION_SEMANTICS=PASS")
     print("V2_REAL_ATTEMPT_1_TOP_LEVEL_LAUNCHES=2")
     print("V2_REAL_ATTEMPT_2_TOP_LEVEL_LAUNCHES=4")
@@ -678,6 +734,8 @@ def verify_contract_mode() -> bool:
     print("POST_R12_ATTEMPT_10_HISTORY=PRESERVED")
     print("POST_R14_ATTEMPT_11_HISTORY=PRESERVED")
     print("POST_R15_ATTEMPT_12_HISTORY=PRESERVED")
+    print("ATTEMPT_13_HISTORY=PRESERVED")
+    print("ATTEMPT_13_DIAGNOSTIC=SEPARATE_NON_PROMOTABLE")
     print(f"V2_RELEASE_HISTORY=ATTEMPTS_1_TO_{len(v2_histories)}_CURRENT")
     print("POST_R12_REAL_CLAUDE_SMOKE=NOT_RUN_NOT_REACHED")
     print("GPT_RELAY_READ_TIMEOUT_HISTORY=ATTEMPTS_3_6_10_11_12")
@@ -814,6 +872,7 @@ def main() -> int:
                 "tests/test_phase_kb0.py",
                 "tests/test_phase_kb0_review.py",
                 "tests/test_phase_k_fast.py",
+                "tests/test_phase_k_fast_2.py",
                 "tests/test_runtime_config_hygiene.py",
                 f"--junitxml={JUNIT}",
                 "-q",

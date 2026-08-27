@@ -135,7 +135,7 @@ This file separates repository evidence from intended design. A capability moves
   persisted manifests/report/AblationSpec; 22 focused tests with zero skips
 - Before/after proof that analysis leaves experiment/cell/pair/ablation/run rows, outcomes,
   artifact digests/mtimes, Judge state, and fake execution-backend call counts unchanged
-- Immutable safe summaries for `core-real-smoke-v2` attempts 1-12. Attempt 9 reached Claude Call 6
+- Immutable safe summaries for `core-real-smoke-v2` attempts 1-13. Attempt 9 reached Claude Call 6
   and exposed the startup/process failure that led to R12.
 - R12 keyless diagnosis of the pinned Claude 2.1.241 invalid MCP shape and bare/tool-surface
   contradiction, plus the isolated non-bare startup-profile repair. R12 made zero real calls.
@@ -145,6 +145,11 @@ This file separates repository evidence from intended design. A capability moves
   Attempt 12 specifically records that no HTTP response headers became available before the
   frozen read timeout. Attempts 3, 6, 10, 11, and 12 establish a recurring Call-1 reliability
   problem near the frozen 90-second boundary; root cause remains `NOT_DETERMINED`.
+- Attempt 13 reached Calls 1-4 and stopped on a pre-progress Codex-medium timeout. Its separately
+  preserved Calls 5-8 sweep is `DIAGNOSTIC_ONLY`. Exact Call-6 workspace replay passed the same
+  isolated verifier at score 1.0, and controlled keyless Call-7 reproduction identified the pinned
+  DeepSeek CLI's missing Node `--expose-internals` startup flag. V3 supersedes v2 for bounded final
+  validation with uniform 180-second subject timeouts and a separately gated exact seven-cell canary.
 - Exact-head keyless GitHub Actions Gates A-K and fresh-setup success for R12 head
   `6abac258e81d89f7ad45aa51dce2541f911a6033` (run `32996166257`). This engineering CI evidence is
   distinct from the prospective manifest's final-release `remote_ci` binding.
@@ -186,8 +191,8 @@ internal-network/CONNECT-proxy boundary is deterministically configured and nega
 not operationally smoked with a real Harness. Future capabilities remain `DESIGN_ONLY` until their
 own gates exist.
 
-All twelve immutable v2 attempts aborted before completing the eight-call smoke. Successful
-observations within attempts 1-12 remain single observations and do not change any `REAL_*` state,
+All thirteen immutable v2 attempts aborted before completing the eight-call smoke. Successful
+observations within attempts 1-13 remain single observations and do not change any `REAL_*` state,
 authorize the Matrix or Judge, or establish release readiness.
 
 ## Phase K-B0 release preparation
