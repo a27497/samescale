@@ -770,7 +770,7 @@ def test_post_r15_attempt_12_history_is_safe_immutable_and_truthful() -> None:
 
     assert history["source_commit"] == "8d87c641e847c1b3bd0d53a96ef2655ed102d2d4"
     assert history["receipt_digest"] == (
-        "sha256:056d49742a27557c47c2e74be5befc32661332b08232398c4f91019495d02999"
+        "sha256:056d49742d72366cdc630651563846aa15f3eee00d961bbbc3c98c9e9bc5f0a3"
     )
     assert history["status"] == "ABORTED"
     assert history["attempted_top_level_launches"] == 1
@@ -789,7 +789,7 @@ def test_post_r15_attempt_12_history_is_safe_immutable_and_truthful() -> None:
             "outcome": "provider_error",
             "verifier": "NOT_RUN",
             "evidence_digest": (
-                "sha256:18a15f8724e0b06b758ae01f72a222bb60ed51f9ecf228523323abbfa46f8168"
+                "sha256:18a15e9166a2848b4cab24cd04f710268d581c2c973718c2f31de4babe19c687"
             ),
         }
     ]

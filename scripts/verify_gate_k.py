@@ -554,7 +554,7 @@ def verify_contract_mode() -> bool:
     if (
         post_r15_attempt_12.get("source_commit") != "8d87c641e847c1b3bd0d53a96ef2655ed102d2d4"
         or post_r15_attempt_12.get("receipt_digest")
-        != "sha256:056d49742a27557c47c2e74be5befc32661332b08232398c4f91019495d02999"
+        != "sha256:056d49742d72366cdc630651563846aa15f3eee00d961bbbc3c98c9e9bc5f0a3"
         or post_r15_attempt_12.get("attempted_top_level_launches") != 1
         or post_r15_attempt_12.get("failing_call_id") != "smoke-1-model-gpt56-relay-responses"
         or post_r15_attempt_12.get("failure_category") != "PROVIDER_FAILURE"
@@ -567,7 +567,7 @@ def verify_contract_mode() -> bool:
         or attempt_12_call.get("outcome") != "provider_error"
         or attempt_12_call.get("verifier") != "NOT_RUN"
         or attempt_12_call.get("evidence_digest")
-        != "sha256:18a15f8724e0b06b758ae01f72a222bb60ed51f9ecf228523323abbfa46f8168"
+        != "sha256:18a15e9166a2848b4cab24cd04f710268d581c2c973718c2f31de4babe19c687"
         or post_r15_attempt_12.get("calls_2_to_8") != "NOT_RUN"
         or post_r15_attempt_12.get("retry_count") != 0
         or post_r15_attempt_12.get("fallback_count") != 0

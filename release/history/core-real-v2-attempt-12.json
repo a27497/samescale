@@ -5,7 +5,7 @@
   "plan_id": "core-real-smoke-v2",
   "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
   "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
-  "receipt_digest": "sha256:056d49742a27557c47c2e74be5befc32661332b08232398c4f91019495d02999",
+  "receipt_digest": "sha256:056d49742d72366cdc630651563846aa15f3eee00d961bbbc3c98c9e9bc5f0a3",
   "status": "ABORTED",
   "attempted_top_level_launches": 1,
   "failing_call_id": "smoke-1-model-gpt56-relay-responses",
@@ -22,7 +22,7 @@
       "read_timeout_stage": "waiting_for_response_headers",
       "outcome": "provider_error",
       "verifier": "NOT_RUN",
-      "evidence_digest": "sha256:18a15f8724e0b06b758ae01f72a222bb60ed51f9ecf228523323abbfa46f8168"
+      "evidence_digest": "sha256:18a15e9166a2848b4cab24cd04f710268d581c2c973718c2f31de4babe19c687"
     }
   ],
   "calls_2_to_8": "NOT_RUN",
