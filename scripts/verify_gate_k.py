@@ -100,7 +100,7 @@ CRITICAL_TESTS = {
     "test_kb0_smoke_plan_is_exact_bounded_and_unexecuted",
     "test_kb0_matrix_preflight_and_release_hard_stop_are_unchanged",
     "test_smoke_production_control_plane_exact_eight_call_binding",
-    "test_top_level_release_history_covers_repository_attempts_through_r14",
+    "test_top_level_release_history_covers_repository_attempts_through_r15",
     "test_release_history_summary_accepts_a_future_contiguous_attempt",
     "test_release_history_summary_rejects_a_removed_attempt_reference",
     "test_release_history_summary_rejects_a_gap",
@@ -115,6 +115,7 @@ CRITICAL_TESTS = {
     "test_post_r10_attempt_8_history_is_safe_immutable_and_truthful",
     "test_post_r11_attempt_9_history_is_safe_immutable_and_truthful",
     "test_post_r12_attempt_10_history_is_safe_immutable_and_truthful",
+    "test_post_r14_attempt_11_history_is_safe_immutable_and_truthful",
     "test_production_smoke_persists_codex_precapture_infrastructure_evidence",
     "test_smoke_dry_run_preflight_performs_zero_provider_invocations",
     "test_v2_credential_preflight_prints_presence_only",
@@ -297,6 +298,7 @@ def verify_contract_mode() -> bool:
     post_r10_attempt_8 = v2_histories[7]
     post_r11_attempt_9 = v2_histories[8]
     post_r12_attempt_10 = histories_by_id.get("core-real-smoke-v2-attempt-10", {})
+    post_r14_attempt_11 = histories_by_id.get("core-real-smoke-v2-attempt-11", {})
     snapshot = json.loads(
         (ROOT / plan.official_route_snapshot_reference).read_text(encoding="utf-8")
     )
@@ -333,8 +335,10 @@ def verify_contract_mode() -> bool:
         or any(reference not in authorization_docs for reference in v2_history_references)
         or "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" not in release_docs
         or "Calls 2-8 were `NOT_RUN`" not in authorization_docs
-        or "attempts 1-10" not in resume_docs
+        or "attempts 1-11" not in resume_docs
         or "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" not in resume_docs
+        or "Attempts 3, 6, 10, and 11" not in authorization_docs
+        or "Root cause remains `NOT_DETERMINED`" not in authorization_docs
     ):
         print("FAIL: top-level release documentation lags immutable v2 history")
         return False
@@ -516,6 +520,33 @@ def verify_contract_mode() -> bool:
     ):
         print("FAIL: immutable post-R12 attempt 10 history drifted")
         return False
+    attempt_11_call = post_r14_attempt_11.get("calls", [{}])[0]
+    attempt_11_hygiene = post_r14_attempt_11.get("runtime_value_hygiene", {})
+    if (
+        post_r14_attempt_11.get("source_commit") != "a8800c1c5143743f23903cdc84f2fe2390d55604"
+        or post_r14_attempt_11.get("receipt_digest")
+        != "sha256:72cc8eb4d076fe2d25fa8aabdbc23b4a69b865aaa492f30a6849be6f72d4c0b0"
+        or post_r14_attempt_11.get("attempted_top_level_launches") != 1
+        or post_r14_attempt_11.get("failing_call_id") != "smoke-1-model-gpt56-relay-responses"
+        or post_r14_attempt_11.get("failure_category") != "PROVIDER_FAILURE"
+        or attempt_11_call.get("provider_failure") != "timeout"
+        or attempt_11_call.get("timeout_phase") != "read"
+        or attempt_11_call.get("latency_ms") != 90405
+        or attempt_11_call.get("attempt_count") != 1
+        or attempt_11_call.get("observed_model") is not None
+        or attempt_11_call.get("outcome") != "provider_error"
+        or attempt_11_call.get("verifier") != "NOT_RUN"
+        or "read_timeout_stage" in attempt_11_call
+        or post_r14_attempt_11.get("calls_2_to_8") != "NOT_RUN"
+        or post_r14_attempt_11.get("retry_count") != 0
+        or post_r14_attempt_11.get("fallback_count") != 0
+        or attempt_11_hygiene.get("status") != "PASS"
+        or attempt_11_hygiene.get("all_runtime_value_match_file_count") != 0
+        or attempt_11_hygiene.get("recognized_credential_pattern_match_file_count") != 0
+        or attempt_11_hygiene.get("scan_error_count") != 0
+    ):
+        print("FAIL: immutable post-R14 attempt 11 history drifted")
+        return False
     if (
         snapshot.get("provider_provenance") != "THIRD_PARTY_INFERENCE_PLATFORM"
         or snapshot.get("fixed_base_url") != "https://opencode.ai/zen/go"
@@ -607,8 +638,11 @@ def verify_contract_mode() -> bool:
     print("POST_R10_ATTEMPT_8_HISTORY=PRESERVED")
     print("POST_R11_ATTEMPT_9_HISTORY=PRESERVED")
     print("POST_R12_ATTEMPT_10_HISTORY=PRESERVED")
+    print("POST_R14_ATTEMPT_11_HISTORY=PRESERVED")
     print(f"V2_RELEASE_HISTORY=ATTEMPTS_1_TO_{len(v2_histories)}_CURRENT")
     print("POST_R12_REAL_CLAUDE_SMOKE=NOT_RUN_NOT_REACHED")
+    print("GPT_RELAY_READ_TIMEOUT_HISTORY=ATTEMPTS_3_6_10_11")
+    print("GPT_RELAY_READ_TIMEOUT_ROOT_CAUSE=NOT_DETERMINED")
     print("SMOKE_CAPABILITY_TIMEOUT_CONTINUES=PASS")
     print("SMOKE_SUBJECT_COMMAND_FAILURE_CONTINUES=PASS")
     print("SMOKE_INFRA_TIMEOUT_STOPS=PASS")

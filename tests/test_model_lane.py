@@ -21,6 +21,7 @@ from harnesslab.model_lane.models import (
     ProviderError,
     ProviderFailureCategory,
     ProviderInvocationError,
+    ProviderReadTimeoutStage,
     ProviderRequest,
     ProviderResult,
     ProviderTimeoutPhase,
@@ -87,8 +88,13 @@ class SafeTimeoutProvider:
         raise ProviderInvocationError(
             ProviderFailureCategory.TIMEOUT,
             f"unsafe timeout detail {FAKE_KEY}",
+            status_code=200,
+            request_id="safe-read-timeout-id",
             latency_ms=90_454,
             timeout_phase=ProviderTimeoutPhase.READ,
+            read_timeout_stage=ProviderReadTimeoutStage.READING_RESPONSE_BODY,
+            response_header_latency_ms=31,
+            response_body_bytes_received=127,
         )
 
 
@@ -398,12 +404,18 @@ async def test_timeout_phase_is_persisted_in_canonical_evidence_without_raw_deta
     assert error is not None
     assert error.category is ProviderFailureCategory.TIMEOUT
     assert error.timeout_phase is ProviderTimeoutPhase.READ
-    assert error.status_code is None
-    assert error.request_id is None
+    assert error.read_timeout_stage is ProviderReadTimeoutStage.READING_RESPONSE_BODY
+    assert error.response_header_latency_ms == 31
+    assert error.response_body_bytes_received == 127
+    assert error.status_code == 200
+    assert error.request_id == "safe-read-timeout-id"
     assert error.response_status is None
     assert error.latency_ms == 90_454
     assert error.attempt_count == 1
     assert '"timeout_phase":"read"' in canonical
+    assert '"read_timeout_stage":"reading_response_body"' in canonical
+    assert '"response_header_latency_ms":31' in canonical
+    assert '"response_body_bytes_received":127' in canonical
     assert FAKE_KEY not in canonical
     assert "unsafe timeout detail" not in canonical
     artifacts = all_file_bytes(result.artifact_directory)
@@ -425,6 +437,60 @@ def test_provider_error_timeout_phase_schema_fails_closed() -> None:
         ProviderError.model_validate(
             {"category": "timeout", "timeout_phase": "not-a-timeout-phase"}
         )
+
+
+def test_provider_error_read_timeout_diagnostics_fail_closed() -> None:
+    waiting = ProviderError(
+        category=ProviderFailureCategory.TIMEOUT,
+        timeout_phase=ProviderTimeoutPhase.READ,
+        read_timeout_stage=ProviderReadTimeoutStage.WAITING_FOR_RESPONSE_HEADERS,
+    )
+    assert waiting.response_header_latency_ms is None
+    assert waiting.response_body_bytes_received is None
+
+    body = ProviderError(
+        category=ProviderFailureCategory.TIMEOUT,
+        timeout_phase=ProviderTimeoutPhase.READ,
+        read_timeout_stage=ProviderReadTimeoutStage.READING_RESPONSE_BODY,
+        response_header_latency_ms=12,
+        response_body_bytes_received=34,
+        status_code=200,
+        request_id="safe-id",
+    )
+    assert body.response_body_bytes_received == 34
+
+    invalid_payloads = (
+        {
+            "category": "rate_limit",
+            "read_timeout_stage": "waiting_for_response_headers",
+        },
+        {
+            "category": "timeout",
+            "timeout_phase": "connect",
+            "read_timeout_stage": "waiting_for_response_headers",
+        },
+        {
+            "category": "timeout",
+            "timeout_phase": "read",
+            "read_timeout_stage": "waiting_for_response_headers",
+            "response_header_latency_ms": 1,
+        },
+        {
+            "category": "timeout",
+            "timeout_phase": "read",
+            "read_timeout_stage": "waiting_for_response_headers",
+            "status_code": 200,
+        },
+        {
+            "category": "timeout",
+            "timeout_phase": "read",
+            "read_timeout_stage": "reading_response_body",
+            "response_header_latency_ms": 1,
+        },
+    )
+    for payload in invalid_payloads:
+        with pytest.raises(ValidationError):
+            ProviderError.model_validate(payload)
 
 
 @pytest.mark.asyncio

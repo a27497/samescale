@@ -36,6 +36,11 @@ class ProviderTimeoutPhase(StrEnum):
     UNKNOWN = "unknown"
 
 
+class ProviderReadTimeoutStage(StrEnum):
+    WAITING_FOR_RESPONSE_HEADERS = "waiting_for_response_headers"
+    READING_RESPONSE_BODY = "reading_response_body"
+
+
 class ProviderInvocationError(RuntimeError):
     """Safe provider failure that never includes response bodies or credentials."""
 
@@ -49,9 +54,21 @@ class ProviderInvocationError(RuntimeError):
         response_status: str | None = None,
         latency_ms: int | None = None,
         timeout_phase: ProviderTimeoutPhase | None = None,
+        read_timeout_stage: ProviderReadTimeoutStage | None = None,
+        response_header_latency_ms: int | None = None,
+        response_body_bytes_received: int | None = None,
     ) -> None:
         if category is not ProviderFailureCategory.TIMEOUT and timeout_phase is not None:
             raise ValueError("timeout phase requires a timeout provider failure")
+        _validate_read_timeout_diagnostics(
+            category=category,
+            timeout_phase=timeout_phase,
+            read_timeout_stage=read_timeout_stage,
+            response_header_latency_ms=response_header_latency_ms,
+            response_body_bytes_received=response_body_bytes_received,
+            status_code=status_code,
+            request_id=request_id,
+        )
         super().__init__(detail)
         self.category = category
         self.status_code = status_code
@@ -59,6 +76,45 @@ class ProviderInvocationError(RuntimeError):
         self.response_status = response_status
         self.latency_ms = latency_ms
         self.timeout_phase = timeout_phase
+        self.read_timeout_stage = read_timeout_stage
+        self.response_header_latency_ms = response_header_latency_ms
+        self.response_body_bytes_received = response_body_bytes_received
+
+
+def _validate_read_timeout_diagnostics(
+    *,
+    category: ProviderFailureCategory,
+    timeout_phase: ProviderTimeoutPhase | None,
+    read_timeout_stage: ProviderReadTimeoutStage | None,
+    response_header_latency_ms: int | None,
+    response_body_bytes_received: int | None,
+    status_code: int | None,
+    request_id: str | None,
+) -> None:
+    diagnostics = (
+        read_timeout_stage,
+        response_header_latency_ms,
+        response_body_bytes_received,
+    )
+    if any(value is not None for value in diagnostics) and (
+        category is not ProviderFailureCategory.TIMEOUT
+        or timeout_phase is not ProviderTimeoutPhase.READ
+    ):
+        raise ValueError("read-timeout diagnostics require a read timeout provider failure")
+    if read_timeout_stage is None:
+        if response_header_latency_ms is not None or response_body_bytes_received is not None:
+            raise ValueError("read-timeout metrics require a read timeout stage")
+        return
+    if read_timeout_stage is ProviderReadTimeoutStage.WAITING_FOR_RESPONSE_HEADERS:
+        if response_header_latency_ms is not None or response_body_bytes_received is not None:
+            raise ValueError("pre-header read timeout cannot contain response metrics")
+        if status_code is not None or request_id is not None:
+            raise ValueError("pre-header read timeout cannot contain response metadata")
+        return
+    if response_header_latency_ms is None or response_body_bytes_received is None:
+        raise ValueError("body read timeout requires response timing and byte count")
+    if response_header_latency_ms < 0 or response_body_bytes_received < 0:
+        raise ValueError("body read timeout diagnostics must be nonnegative")
 
 
 class ProviderError(BaseModel):
@@ -68,6 +124,9 @@ class ProviderError(BaseModel):
 
     category: ProviderFailureCategory
     timeout_phase: ProviderTimeoutPhase | None = None
+    read_timeout_stage: ProviderReadTimeoutStage | None = None
+    response_header_latency_ms: int | None = Field(default=None, ge=0)
+    response_body_bytes_received: int | None = Field(default=None, ge=0)
     status_code: int | None = Field(default=None, ge=100, le=599)
     request_id: str | None = Field(default=None, max_length=300)
     response_status: str | None = Field(default=None, max_length=200)
@@ -78,6 +137,15 @@ class ProviderError(BaseModel):
     def timeout_phase_matches_category(self) -> ProviderError:
         if self.category is not ProviderFailureCategory.TIMEOUT and self.timeout_phase is not None:
             raise ValueError("timeout phase requires a timeout provider failure")
+        _validate_read_timeout_diagnostics(
+            category=self.category,
+            timeout_phase=self.timeout_phase,
+            read_timeout_stage=self.read_timeout_stage,
+            response_header_latency_ms=self.response_header_latency_ms,
+            response_body_bytes_received=self.response_body_bytes_received,
+            status_code=self.status_code,
+            request_id=self.request_id,
+        )
         return self
 
 

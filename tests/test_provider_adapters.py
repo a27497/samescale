@@ -13,6 +13,7 @@ from harnesslab.contracts.model import ModelProfile, ReasoningProfile
 from harnesslab.model_lane.models import (
     ProviderFailureCategory,
     ProviderInvocationError,
+    ProviderReadTimeoutStage,
     ProviderRequest,
     ProviderTimeoutPhase,
 )
@@ -443,9 +444,117 @@ async def test_http_timeout_subtypes_are_preserved_without_retry(
 
     assert caught.value.category is ProviderFailureCategory.TIMEOUT
     assert caught.value.timeout_phase is expected_phase
+    assert caught.value.read_timeout_stage is (
+        ProviderReadTimeoutStage.WAITING_FOR_RESPONSE_HEADERS
+        if expected_phase is ProviderTimeoutPhase.READ
+        else None
+    )
     assert caught.value.latency_ms is not None
     assert caught.value.latency_ms >= 0
     assert attempts == 1
+
+
+class ReadTimeoutResponseStream(httpx.AsyncByteStream):
+    def __init__(self, chunks: tuple[bytes, ...]) -> None:
+        self.chunks = chunks
+
+    async def __aiter__(self) -> AsyncIterator[bytes]:
+        for chunk in self.chunks:
+            yield chunk
+        raise httpx.ReadTimeout(
+            f"unsafe body timeout detail {FAKE_KEY}",
+            request=httpx.Request("POST", "https://unsafe-provider-url.invalid/v1/responses"),
+        )
+
+
+@pytest.mark.asyncio
+async def test_read_timeout_before_response_headers_has_safe_stage() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ReadTimeout(f"unsafe pre-header timeout detail {FAKE_KEY}", request=request)
+
+    async with await client_for(handler) as client:
+        with pytest.raises(ProviderInvocationError) as caught:
+            await OpenAIResponsesAdapter(
+                client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+            ).invoke(provider_request(Protocol.RESPONSES))
+
+    error = caught.value
+    assert error.category is ProviderFailureCategory.TIMEOUT
+    assert error.timeout_phase is ProviderTimeoutPhase.READ
+    assert error.read_timeout_stage is ProviderReadTimeoutStage.WAITING_FOR_RESPONSE_HEADERS
+    assert error.response_header_latency_ms is None
+    assert error.response_body_bytes_received is None
+    assert error.status_code is None
+    assert error.request_id is None
+
+
+@pytest.mark.asyncio
+async def test_read_timeout_after_headers_before_body_has_safe_stage() -> None:
+    async with await client_for(
+        lambda request: httpx.Response(
+            200,
+            headers={"x-request-id": "safe-body-timeout-id"},
+            stream=ReadTimeoutResponseStream(()),
+        )
+    ) as client:
+        with pytest.raises(ProviderInvocationError) as caught:
+            await OpenAIResponsesAdapter(
+                client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+            ).invoke(provider_request(Protocol.RESPONSES))
+
+    error = caught.value
+    assert error.category is ProviderFailureCategory.TIMEOUT
+    assert error.timeout_phase is ProviderTimeoutPhase.READ
+    assert error.read_timeout_stage is ProviderReadTimeoutStage.READING_RESPONSE_BODY
+    assert error.response_header_latency_ms is not None
+    assert error.response_header_latency_ms >= 0
+    assert error.response_body_bytes_received == 0
+    assert error.status_code == 200
+    assert error.request_id == "safe-body-timeout-id"
+
+
+@pytest.mark.asyncio
+async def test_read_timeout_after_partial_body_counts_bytes_without_content() -> None:
+    partial = b"PRIVATE_PARTIAL_PROVIDER_BODY"
+    async with await client_for(
+        lambda request: httpx.Response(
+            200,
+            stream=ReadTimeoutResponseStream((partial,)),
+        )
+    ) as client:
+        with pytest.raises(ProviderInvocationError) as caught:
+            await OpenAIResponsesAdapter(
+                client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+            ).invoke(provider_request(Protocol.RESPONSES))
+
+    error = caught.value
+    assert error.read_timeout_stage is ProviderReadTimeoutStage.READING_RESPONSE_BODY
+    assert error.response_body_bytes_received == len(partial)
+    serialized = json.dumps(error.__dict__, sort_keys=True, default=str)
+    assert partial.decode() not in serialized
+    assert FAKE_KEY not in serialized
+    assert "unsafe-provider-url.invalid" not in serialized
+    assert "authorization" not in serialized.casefold()
+
+
+@pytest.mark.asyncio
+async def test_body_read_timeout_request_id_remains_bounded() -> None:
+    async with await client_for(
+        lambda request: httpx.Response(
+            200,
+            headers={
+                "request-id": "x" * 301,
+                "x-request-id": "safe-bounded-request-id",
+            },
+            stream=ReadTimeoutResponseStream(()),
+        )
+    ) as client:
+        with pytest.raises(ProviderInvocationError) as caught:
+            await OpenAIResponsesAdapter(
+                client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+            ).invoke(provider_request(Protocol.RESPONSES))
+
+    assert caught.value.request_id == "safe-bounded-request-id"
 
 
 @pytest.mark.asyncio

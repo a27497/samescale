@@ -248,13 +248,13 @@ def test_smoke_production_control_plane_exact_eight_call_binding() -> None:
     assert control.smoke_plan.release_plan_digest == control.release_plan.digest
 
 
-def test_top_level_release_history_covers_repository_attempts_through_r14() -> None:
+def test_top_level_release_history_covers_repository_attempts_through_r15() -> None:
     histories, expected_references = load_contiguous_v2_histories(ROOT / "release/history", ROOT)
     expected_attempts = tuple(range(1, len(histories) + 1))
     manifest = load_release_evidence(ROOT / "release/release-evidence.json")
     summary = manifest.release_history
 
-    assert len(histories) == 10
+    assert len(histories) == 11
     assert (
         tuple(int(item["attempt_id"].rsplit("-", 1)[1]) for item in histories) == expected_attempts
     )
@@ -292,7 +292,7 @@ def test_top_level_release_history_covers_repository_attempts_through_r14() -> N
         assert reference in authorization_docs
     assert "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" in release_docs
     assert "Calls 2-8 were `NOT_RUN`" in authorization_docs
-    assert "attempts 1-10" in resume_docs
+    assert "attempts 1-11" in resume_docs
     assert "post-R12 real Claude verification remains `NOT_RUN` / `NOT_REACHED`" in resume_docs
 
 
@@ -300,15 +300,15 @@ def test_release_history_summary_accepts_a_future_contiguous_attempt() -> None:
     raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
         "release_history"
     ]
-    raw["attempt_references"].append("release/history/core-real-v2-attempt-11.json")
-    raw["latest_attempt_id"] = "core-real-smoke-v2-attempt-11"
+    raw["attempt_references"].append("release/history/core-real-v2-attempt-12.json")
+    raw["latest_attempt_id"] = "core-real-smoke-v2-attempt-12"
     raw["latest_attempt_status"] = "SUCCEEDED"
     raw["latest_failing_call_id"] = None
     raw["latest_not_run_call_ids"] = []
 
     summary = ReleaseHistorySummary.model_validate(raw)
 
-    assert summary.latest_attempt_id.endswith("attempt-11")
+    assert summary.latest_attempt_id.endswith("attempt-12")
     assert summary.latest_attempt_status == "SUCCEEDED"
     assert summary.keyless_repairs[0].after_attempt_id == "core-real-smoke-v2-attempt-9"
 
@@ -706,6 +706,57 @@ def test_post_r12_attempt_10_history_is_safe_immutable_and_truthful() -> None:
     assert "operational provider failure" in history["interpretation"]
     assert "not model capability evidence" in history["interpretation"]
     assert "did not reach Codex, Claude, DeepSeek Harness, or Judge" in history["interpretation"]
+    assert "/home/dev/harnesslab-operator-evidence" not in serialized
+    assert all(value not in serialized for value in SAFE_ENVIRONMENT.values())
+    assert "response_body" not in serialized
+    assert "reasoning_content" not in serialized
+
+
+def test_post_r14_attempt_11_history_is_safe_immutable_and_truthful() -> None:
+    path = ROOT / "release/history/core-real-v2-attempt-11.json"
+    history = json.loads(path.read_text(encoding="utf-8"))
+    serialized = json.dumps(history, sort_keys=True)
+
+    assert history["source_commit"] == "a8800c1c5143743f23903cdc84f2fe2390d55604"
+    assert history["receipt_digest"] == (
+        "sha256:72cc8eb4d076fe2d25fa8aabdbc23b4a69b865aaa492f30a6849be6f72d4c0b0"
+    )
+    assert history["status"] == "ABORTED"
+    assert history["attempted_top_level_launches"] == 1
+    assert history["failing_call_id"] == EXPECTED_CALL_IDS[0]
+    assert history["failure_category"] == "PROVIDER_FAILURE"
+    call = history["calls"][0]
+    assert call == {
+        "call_id": EXPECTED_CALL_IDS[0],
+        "requested_model": "gpt-5.6-sol",
+        "observed_model": None,
+        "latency_ms": 90405,
+        "attempt_count": 1,
+        "provider_failure": "timeout",
+        "timeout_phase": "read",
+        "outcome": "provider_error",
+        "verifier": "NOT_RUN",
+        "evidence_digest": (
+            "sha256:5ea824fbcae24ee3b4ad6ccedd3c5f51167c7628dc7278509ef6aecf44a88259"
+        ),
+    }
+    assert "read_timeout_stage" not in call
+    assert history["calls_2_to_8"] == "NOT_RUN"
+    assert history["retry_count"] == history["fallback_count"] == 0
+    assert history["runtime_value_hygiene"] == {
+        "status": "PASS",
+        "relay_base_url_present": "NO",
+        "relay_api_key_present": "NO",
+        "opencode_go_api_key_present": "NO",
+        "deepseek_api_key_present": "NO",
+        "all_runtime_value_match_file_count": 0,
+        "recognized_credential_pattern_match_file_count": 0,
+        "scan_error_count": 0,
+    }
+    assert "operational provider failure evidence" in history["interpretation"]
+    assert "not model capability evidence" in history["interpretation"]
+    assert "Attempt 11 never reached Calls 2-8" in history["interpretation"]
+    assert "NOT_DETERMINED" in serialized
     assert "/home/dev/harnesslab-operator-evidence" not in serialized
     assert all(value not in serialized for value in SAFE_ENVIRONMENT.values())
     assert "response_body" not in serialized

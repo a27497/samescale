@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v2-attempt-11",
+  "source_commit": "a8800c1c5143743f23903cdc84f2fe2390d55604",
+  "plan_id": "core-real-smoke-v2",
+  "smoke_plan_digest": "sha256:8e0b6482dac4ccb0312d881eff3ab68f741d2b22b085557b1f9315e99fd1a18a",
+  "release_plan_digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
+  "receipt_digest": "sha256:72cc8eb4d076fe2d25fa8aabdbc23b4a69b865aaa492f30a6849be6f72d4c0b0",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 1,
+  "failing_call_id": "smoke-1-model-gpt56-relay-responses",
+  "failure_category": "PROVIDER_FAILURE",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "observed_model": null,
+      "latency_ms": 90405,
+      "attempt_count": 1,
+      "provider_failure": "timeout",
+      "timeout_phase": "read",
+      "outcome": "provider_error",
+      "verifier": "NOT_RUN",
+      "evidence_digest": "sha256:5ea824fbcae24ee3b4ad6ccedd3c5f51167c7628dc7278509ef6aecf44a88259"
+    }
+  ],
+  "calls_2_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "runtime_value_hygiene": {
+    "status": "PASS",
+    "relay_base_url_present": "NO",
+    "relay_api_key_present": "NO",
+    "opencode_go_api_key_present": "NO",
+    "deepseek_api_key_present": "NO",
+    "all_runtime_value_match_file_count": 0,
+    "recognized_credential_pattern_match_file_count": 0,
+    "scan_error_count": 0
+  },
+  "interpretation": "Call 1 timed out in the HTTP read phase. This is operational provider failure evidence, not model capability evidence. Attempt 11 never reached Calls 2-8 and therefore does not validate or invalidate the R12 Claude repair. Together, Attempts 3, 6, 10, and 11 establish a recurring Call-1 relay read-timeout reliability problem near the frozen 90-second boundary without establishing root cause.",
+  "limitations": [
+    "The immutable Attempt 11 evidence predates staged read-timeout diagnostics and cannot distinguish waiting for response headers from reading the response body.",
+    "Root cause remains NOT_DETERMINED; the evidence does not prove a relay, upstream model, network, timeout-policy, or provider-SLA defect.",
+    "No operator-local paths, runtime configuration values, credentials, raw headers, raw provider content, prompts, agent messages, stderr, or private reasoning are tracked here."
+  ]
+}

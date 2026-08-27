@@ -151,6 +151,9 @@ class DirectModelRunner:
                     provider_error=ProviderError(
                         category=exc.category,
                         timeout_phase=exc.timeout_phase,
+                        read_timeout_stage=exc.read_timeout_stage,
+                        response_header_latency_ms=exc.response_header_latency_ms,
+                        response_body_bytes_received=exc.response_body_bytes_received,
                         status_code=exc.status_code,
                         request_id=exc.request_id,
                         response_status=exc.response_status,

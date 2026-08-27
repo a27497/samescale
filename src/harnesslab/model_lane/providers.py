@@ -15,6 +15,7 @@ from harnesslab.model_lane.models import (
     ProviderAdapter,
     ProviderFailureCategory,
     ProviderInvocationError,
+    ProviderReadTimeoutStage,
     ProviderRequest,
     ProviderResult,
     ProviderTimeoutPhase,
@@ -128,30 +129,54 @@ class _HTTPProviderAdapter:
         started = time.perf_counter()
 
         async def send(client: httpx.AsyncClient) -> tuple[httpx.Response, bytes, int]:
-            async with client.stream(
-                "POST",
-                url,
-                headers=headers,
-                json=payload,
-                timeout=request.profile.request_timeout_seconds,
-                follow_redirects=False,
-            ) as response:
-                header_latency_ms = int((time.perf_counter() - started) * 1000)
-                self._raise_for_status(response, header_latency_ms)
-                chunks: list[bytes] = []
-                total = 0
-                async for chunk in response.aiter_bytes():
-                    total += len(chunk)
-                    if total > MAX_PROVIDER_RESPONSE_BYTES:
-                        raise ProviderInvocationError(
-                            ProviderFailureCategory.MALFORMED_RESPONSE,
-                            "provider response exceeds the byte limit",
-                            request_id=_response_request_id(response),
-                            latency_ms=int((time.perf_counter() - started) * 1000),
-                        )
-                    chunks.append(chunk)
-                latency_ms = int((time.perf_counter() - started) * 1000)
-                return response, b"".join(chunks), latency_ms
+            response: httpx.Response | None = None
+            header_latency_ms: int | None = None
+            total = 0
+            try:
+                async with client.stream(
+                    "POST",
+                    url,
+                    headers=headers,
+                    json=payload,
+                    timeout=request.profile.request_timeout_seconds,
+                    follow_redirects=False,
+                ) as response:
+                    header_latency_ms = int((time.perf_counter() - started) * 1000)
+                    self._raise_for_status(response, header_latency_ms)
+                    chunks: list[bytes] = []
+                    async for chunk in response.aiter_bytes():
+                        total += len(chunk)
+                        if total > MAX_PROVIDER_RESPONSE_BYTES:
+                            raise ProviderInvocationError(
+                                ProviderFailureCategory.MALFORMED_RESPONSE,
+                                "provider response exceeds the byte limit",
+                                request_id=_response_request_id(response),
+                                latency_ms=int((time.perf_counter() - started) * 1000),
+                            )
+                        chunks.append(chunk)
+                    latency_ms = int((time.perf_counter() - started) * 1000)
+                    return response, b"".join(chunks), latency_ms
+            except httpx.ReadTimeout as exc:
+                if response is None:
+                    raise ProviderInvocationError(
+                        ProviderFailureCategory.TIMEOUT,
+                        "provider request timed out",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                        timeout_phase=ProviderTimeoutPhase.READ,
+                        read_timeout_stage=(ProviderReadTimeoutStage.WAITING_FOR_RESPONSE_HEADERS),
+                    ) from exc
+                assert header_latency_ms is not None
+                raise ProviderInvocationError(
+                    ProviderFailureCategory.TIMEOUT,
+                    "provider request timed out",
+                    status_code=response.status_code,
+                    request_id=_response_request_id(response),
+                    latency_ms=int((time.perf_counter() - started) * 1000),
+                    timeout_phase=ProviderTimeoutPhase.READ,
+                    read_timeout_stage=ProviderReadTimeoutStage.READING_RESPONSE_BODY,
+                    response_header_latency_ms=header_latency_ms,
+                    response_body_bytes_received=total,
+                ) from exc
 
         try:
             if self._client is None:
@@ -162,11 +187,17 @@ class _HTTPProviderAdapter:
             else:
                 response, content, latency_ms = await send(self._client)
         except httpx.TimeoutException as exc:
+            timeout_phase = _timeout_phase(exc)
             raise ProviderInvocationError(
                 ProviderFailureCategory.TIMEOUT,
                 "provider request timed out",
                 latency_ms=int((time.perf_counter() - started) * 1000),
-                timeout_phase=_timeout_phase(exc),
+                timeout_phase=timeout_phase,
+                read_timeout_stage=(
+                    ProviderReadTimeoutStage.WAITING_FOR_RESPONSE_HEADERS
+                    if timeout_phase is ProviderTimeoutPhase.READ
+                    else None
+                ),
             ) from exc
         except httpx.RequestError as exc:
             raise ProviderInvocationError(

@@ -76,6 +76,10 @@ CRITICAL_TESTS = {
     "test_http_timeout_subtypes_are_preserved_without_retry[read]",
     "test_http_timeout_subtypes_are_preserved_without_retry[unknown]",
     "test_http_timeout_subtypes_are_preserved_without_retry[write]",
+    "test_read_timeout_before_response_headers_has_safe_stage",
+    "test_read_timeout_after_headers_before_body_has_safe_stage",
+    "test_read_timeout_after_partial_body_counts_bytes_without_content",
+    "test_body_read_timeout_request_id_remains_bounded",
     "test_injected_client_uses_profile_timeout",
     "test_invalid_model_profile_does_not_echo_rejected_credential",
     "test_malformed_patch_fails_closed_without_workspace_snapshot",
@@ -98,6 +102,7 @@ CRITICAL_TESTS = {
     "test_openai_responses_supports_max_reasoning_effort",
     "test_provider_failure_category_is_preserved_in_evidence",
     "test_provider_error_timeout_phase_schema_fails_closed",
+    "test_provider_error_read_timeout_diagnostics_fail_closed",
     "test_prompt_template_version_in_evidence_comes_from_rendered_prompt",
     "test_prompt_containing_exact_credential_is_not_sent_to_provider",
     "test_provider_latency_includes_response_body_consumption",
@@ -317,6 +322,10 @@ def verify_repository_secret_hygiene() -> bool:
     print("TIMEOUT_DIAGNOSTICS=PASS")
     print("CONNECT_TIMEOUT_MAPPING=PASS")
     print("READ_TIMEOUT_MAPPING=PASS")
+    print("READ_TIMEOUT_STAGE_DIAGNOSTICS=PASS")
+    print("READ_TIMEOUT_PRE_HEADERS=PASS")
+    print("READ_TIMEOUT_BODY_STREAM=PASS")
+    print("PARTIAL_BODY_CONTENT_PERSISTENCE=DENIED")
     print("WRITE_TIMEOUT_MAPPING=PASS")
     print("POOL_TIMEOUT_MAPPING=PASS")
     print("UNKNOWN_TIMEOUT_MAPPING=PASS")
