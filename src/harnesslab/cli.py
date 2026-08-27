@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import sys
 from dataclasses import dataclass
@@ -29,12 +30,24 @@ from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
 from harnesslab.multi_harness.models import DeepSeekSessionExtraction, HarnessKind
 from harnesslab.multi_harness.profile import canonical_claude_profile, canonical_deepseek_profile
 from harnesslab.multi_harness.runtime import MultiHarnessRuntime
+from harnesslab.release.diagnostic import (
+    ComponentDiagnosticError,
+    execute_real_component_diagnostics,
+)
+from harnesslab.release.evidence import EvidenceSummaryError, summarize_smoke_evidence
+from harnesslab.release.matrix import (
+    MatrixControlPlane,
+    MatrixControlPlaneError,
+    execute_real_matrix,
+)
 from harnesslab.release.smoke import (
     SmokeControlPlane,
     SmokeControlPlaneError,
     SmokeExecutionStatus,
     execute_real_smoke,
+    resolve_runtime_identities,
 )
+from harnesslab.release.telemetry import summarize_smoke_telemetry
 from harnesslab.sandbox.preflight import DockerPreflightError, docker_preflight
 from harnesslab.tasks.package import TaskPackageError
 from harnesslab.tasks.validation import validate_task_package
@@ -55,6 +68,15 @@ release_app = typer.Typer(no_args_is_help=True, help="Prepare bounded Core relea
 release_smoke_app = typer.Typer(
     no_args_is_help=True, help="Preflight or explicitly execute the exact K-B1 smoke plan."
 )
+release_component_smoke_app = typer.Typer(
+    no_args_is_help=True, help="Diagnose only frozen calls not attempted by a release smoke."
+)
+release_matrix_app = typer.Typer(
+    no_args_is_help=True, help="Preflight or explicitly execute the frozen Core real Matrix."
+)
+release_telemetry_app = typer.Typer(
+    no_args_is_help=True, help="Summarize safe K-B2 smoke telemetry and cost inputs."
+)
 app.add_typer(task_app, name="task")
 app.add_typer(sandbox_app, name="sandbox")
 app.add_typer(model_app, name="model")
@@ -71,6 +93,9 @@ harness_app.add_typer(codex_harness_app, name="codex")
 harness_app.add_typer(claude_harness_app, name="claude")
 harness_app.add_typer(deepseek_harness_app, name="deepseek")
 release_app.add_typer(release_smoke_app, name="smoke")
+release_app.add_typer(release_component_smoke_app, name="component-smoke")
+release_app.add_typer(release_matrix_app, name="matrix")
+release_app.add_typer(release_telemetry_app, name="telemetry")
 
 
 @release_smoke_app.command("preflight")
@@ -144,6 +169,151 @@ def preflight_release_smoke_credentials() -> None:
         missing = missing or not present
     if missing:
         raise typer.Exit(code=2)
+
+
+@release_smoke_app.command("evidence-summary")
+def summarize_release_smoke_evidence(
+    artifact_root: str = typer.Option(
+        ..., "--artifact-root", help="Operator evidence root containing smoke-execution.json."
+    ),
+    candidate_history: bool = typer.Option(
+        False, "--candidate-history", help="Emit a safe candidate history object."
+    ),
+) -> None:
+    """Derive receipt and call-artifact digest domains without provider access or writes."""
+
+    try:
+        summary = summarize_smoke_evidence(Path(artifact_root))
+    except EvidenceSummaryError as exc:
+        typer.echo(f"FAIL smoke evidence summary: {exc}")
+        raise typer.Exit(code=1) from exc
+    content = (
+        summary.candidate_history_summary()
+        if candidate_history
+        else summary.model_dump(mode="json")
+    )
+    typer.echo(json.dumps(content, sort_keys=True, separators=(",", ":"), ensure_ascii=False))
+
+
+@release_component_smoke_app.command("execute")
+def execute_release_component_smoke(
+    allow_real_diagnostic: bool = typer.Option(
+        False,
+        "--allow-real-diagnostic",
+        help="Explicitly authorize only unattempted frozen diagnostic calls.",
+    ),
+    skip_attempted_from: str = typer.Option(
+        ...,
+        "--skip-attempted-from",
+        help="Authoritative release smoke receipt whose attempted calls must never repeat.",
+    ),
+    artifact_root: str = typer.Option(
+        ..., "--artifact-root", help="Unique DIAGNOSTIC_ONLY evidence destination."
+    ),
+    repository_root: str = typer.Option(
+        ".", "--repository-root", help="Repository containing the frozen release plans."
+    ),
+) -> None:
+    """Continue across independent unattempted components; never produce release evidence."""
+
+    try:
+        report = asyncio.run(
+            execute_real_component_diagnostics(
+                Path(repository_root),
+                allow_real_diagnostic=allow_real_diagnostic,
+                attempt_receipt_path=Path(skip_attempted_from),
+                artifact_root=Path(artifact_root),
+            )
+        )
+    except (ComponentDiagnosticError, EgressNetworkIsolationUnavailable) as exc:
+        typer.echo(f"FAIL component diagnostic: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo("EVIDENCE_CLASS=DIAGNOSTIC_ONLY")
+    typer.echo("RELEASE_PROMOTABLE=false")
+    typer.echo(f"DIAGNOSTIC_TOP_LEVEL_LAUNCHES={report.diagnostic_top_level_launches}")
+    typer.echo(f"DIAGNOSTIC_CALL_IDS={','.join(report.diagnostic_call_ids)}")
+
+
+@release_matrix_app.command("preflight")
+def preflight_release_matrix(
+    repository_root: str = typer.Option(
+        ".", "--repository-root", help="Repository containing the frozen release plans."
+    ),
+) -> None:
+    """Inspect local runtime identities and validate the exact 630-slot plan keylessly."""
+
+    try:
+        runtime = asyncio.run(resolve_runtime_identities())
+        receipt = MatrixControlPlane.load(Path(repository_root)).preflight(runtime)
+    except MatrixControlPlaneError as exc:
+        typer.echo(f"FAIL Matrix preflight: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo("MATRIX_PREFLIGHT=PASS")
+    typer.echo(f"MATRIX_ID={receipt.matrix_id}")
+    typer.echo(f"CELLS={receipt.cells}")
+    typer.echo(f"TASKS={receipt.tasks}")
+    typer.echo(f"REPEATS={receipt.repeats}")
+    typer.echo(f"LOGICAL_RUNS={receipt.logical_runs}")
+    typer.echo(f"EXPERIMENT_PLAN_DIGEST={receipt.experiment_plan_digest}")
+    typer.echo("REAL_CALLS=0")
+
+
+@release_matrix_app.command("execute")
+def execute_release_matrix(
+    allow_real_matrix: bool = typer.Option(
+        False, "--allow-real-matrix", help="Explicitly authorize the frozen real Matrix plane."
+    ),
+    max_runs: int | None = typer.Option(
+        None, "--max-runs", help="Required bound from 1 to 630; there is no launch default."
+    ),
+    concurrency: int = typer.Option(
+        1, "--concurrency", min=1, max=8, help="Bounded worker concurrency."
+    ),
+    artifact_root: str = typer.Option(
+        "artifacts/core-real-matrix-v2", "--artifact-root", help="Immutable Matrix artifacts."
+    ),
+    runtime_root: str = typer.Option(
+        ".runtime/core-real-matrix-v2", "--runtime-root", help="Ephemeral Matrix runtime root."
+    ),
+    repository_root: str = typer.Option(
+        ".", "--repository-root", help="Repository containing the frozen release plans."
+    ),
+) -> None:
+    """Run a resumable bounded slice of the strict Matrix; inert without both explicit gates."""
+
+    try:
+        result = asyncio.run(
+            execute_real_matrix(
+                Path(repository_root),
+                allow_real_matrix=allow_real_matrix,
+                max_runs=max_runs,
+                concurrency=concurrency,
+                artifact_root=Path(artifact_root),
+                runtime_root=Path(runtime_root),
+            )
+        )
+    except (MatrixControlPlaneError, EgressNetworkIsolationUnavailable, ValueError) as exc:
+        typer.echo(f"FAIL Matrix execution: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo("MATRIX_ID=core-real-matrix-v2")
+    typer.echo(f"PLAN_DIGEST={result.plan_digest}")
+    typer.echo(f"LOGICAL_RUNS={result.logical_runs}")
+    typer.echo(f"EXECUTED_RUNS={result.executed_runs}")
+    typer.echo(f"CONCURRENCY={result.concurrency}")
+
+
+@release_telemetry_app.command("summarize")
+def summarize_release_telemetry(
+    artifact_root: str = typer.Option(..., "--artifact-root", help="Operator smoke evidence root."),
+) -> None:
+    """Aggregate only observed smoke telemetry; missing price input remains explicit."""
+
+    try:
+        summary = summarize_smoke_telemetry(Path(artifact_root))
+    except EvidenceSummaryError as exc:
+        typer.echo(f"FAIL telemetry summary: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(summary.canonical_json())
 
 
 @compare_app.command("assess")

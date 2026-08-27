@@ -7,7 +7,7 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 
 from harnesslab.contracts.run import RunStatus
 from harnesslab.core.config import Settings
@@ -50,6 +50,18 @@ class RaisingBinding:
 
 def _single_run_plan(experiment_id: str) -> ExperimentPlan:
     base = basic_spec(repeat_count=1)
+    spec = base.model_copy(
+        update={
+            "experiment_id": experiment_id,
+            "cells": (base.cells[0],),
+            "paired_comparisons": (),
+        }
+    )
+    return build_experiment_plan(spec, ROOT)
+
+
+def _three_run_plan(experiment_id: str) -> ExperimentPlan:
+    base = basic_spec(repeat_count=3)
     spec = base.model_copy(
         update={
             "experiment_id": experiment_id,
@@ -207,6 +219,63 @@ async def test_reclaimed_attempt_passes_unique_attempt_artifact_identity(databas
         assert attempt_execution_id(first) != attempt_execution_id(reclaimed)
         assert binding.run_ids == [attempt_execution_id(reclaimed)]
         assert finished.status is RunStatus.FAILED_INFRA
+    finally:
+        async with factory() as cleanup, cleanup.begin():
+            await cleanup.execute(
+                delete(ExperimentRecord).where(ExperimentRecord.id == experiment_id)
+            )
+        await engine.dispose()
+
+
+@pytest.mark.integration
+async def test_bounded_executor_resumes_without_duplicate_logical_runs(database_url: str) -> None:
+    engine = create_engine(Settings.without_dotenv(database_url=database_url))
+    factory = create_session_factory(engine)
+    experiment_id = f"phase-k-bounded-resume-{uuid4().hex[:12]}"
+    binding = RaisingBinding()
+    try:
+        async with factory() as session, session.begin():
+            await enqueue_plan(session, _three_run_plan(experiment_id))
+        executor = ExperimentRunExecutor(
+            repository_root=ROOT,
+            session_factory=factory,
+            bindings={"model": binding},
+            owner="phase-k-bounded-worker",
+        )
+
+        first_slice = await executor.run_bounded(
+            experiment_id,
+            max_runs=2,
+            concurrency=2,
+        )
+        resumed_slice = await executor.run_bounded(
+            experiment_id,
+            max_runs=3,
+            concurrency=2,
+        )
+        exhausted_slice = await executor.run_bounded(
+            experiment_id,
+            max_runs=3,
+            concurrency=2,
+        )
+
+        assert len(first_slice) == 2
+        assert len(resumed_slice) == 1
+        assert exhausted_slice == ()
+        assert len(binding.run_ids) == 3
+        assert len(set(binding.run_ids)) == 3
+        async with factory() as session:
+            snapshots = tuple(
+                (
+                    await session.scalars(
+                        select(ExperimentRunRecord).where(
+                            ExperimentRunRecord.experiment_id == experiment_id
+                        )
+                    )
+                ).all()
+            )
+        assert len(snapshots) == 3
+        assert {item.attempt for item in snapshots} == {1}
     finally:
         async with factory() as cleanup, cleanup.begin():
             await cleanup.execute(

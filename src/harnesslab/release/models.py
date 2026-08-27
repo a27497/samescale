@@ -461,6 +461,12 @@ class EvidenceBinding(StrictModel):
 
     @model_validator(mode="after")
     def state_matches_evidence(self) -> EvidenceBinding:
+        if (
+            self.state is EvidenceState.VERIFIED
+            and self.identity is not None
+            and "DIAGNOSTIC_ONLY" in self.identity.upper()
+        ):
+            raise ValueError("DIAGNOSTIC_ONLY evidence is never release-promotable")
         if self.state is EvidenceState.VERIFIED and (not self.identity or not self.digest):
             raise ValueError("VERIFIED evidence requires identity and digest")
         if self.state in {EvidenceState.NOT_RUN, EvidenceState.DEFERRED_NOT_VERIFIED} and (

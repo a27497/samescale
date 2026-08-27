@@ -869,10 +869,11 @@ class ProductionSmokeInvoker:
             raise SmokeCallFailure(
                 SmokeFailureCategory.JUDGE_PERSISTENCE, "bounded Judge evidence was not persisted"
             )
+        artifact_directory = result.artifact_path.parent
         artifact = SmokeCallResult(
             call_id=binding.frozen.call.call_id,
-            evidence_references=(str(result.artifact_path.resolve()),),
-            evidence_digests=(result.artifact_digest,),
+            evidence_references=(str(artifact_directory.resolve()),),
+            evidence_digests=(digest_tree(artifact_directory),),
         )
         if result.evidence.outcome is JudgeRunOutcome.PROVIDER_ERROR:
             assert result.evidence.provider_failure is not None

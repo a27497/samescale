@@ -373,6 +373,41 @@ class ExperimentRunExecutor:
         await self._refresh_experiment_status(experiment_id)
         return tuple(completed)
 
+    async def run_bounded(
+        self,
+        experiment_id: str,
+        *,
+        max_runs: int,
+        concurrency: int = 1,
+    ) -> tuple[RunSnapshot, ...]:
+        """Execute at most ``max_runs`` claimable slots with bounded concurrent workers."""
+
+        if max_runs < 1:
+            raise ValueError("max_runs must be positive")
+        if not 1 <= concurrency <= 8:
+            raise ValueError("concurrency must be between 1 and 8")
+        reservation_lock = asyncio.Lock()
+        reserved = 0
+        completed: list[RunSnapshot] = []
+
+        async def worker() -> None:
+            nonlocal reserved
+            while True:
+                async with reservation_lock:
+                    if reserved >= max_runs:
+                        return
+                    claimed = await self.claim(experiment_id)
+                    if claimed is None:
+                        return
+                    reserved += 1
+                result = await self.execute(claimed)
+                async with reservation_lock:
+                    completed.append(result)
+
+        await asyncio.gather(*(worker() for _ in range(min(concurrency, max_runs))))
+        await self._refresh_experiment_status(experiment_id)
+        return tuple(completed)
+
     async def _refresh_experiment_status(self, experiment_id: str) -> None:
         terminal = (
             RunStatus.COMPLETED.value,
