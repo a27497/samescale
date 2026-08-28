@@ -26,8 +26,13 @@ POSIX relative path and the logical prompt is hashed with its template version.
 All adapters use async httpx with one attempt. They preserve requested and observed model identity,
 safe request ID, public output, usage counts, status/stop reason, endpoint/protocol, and latency.
 Only 2xx responses with protocol-defined terminal public-text or refusal signals complete an
-attempt; redirects, tool continuations, truncation, filtering without a refusal signal, malformed
-UTF-8 text, and provider failures are normalized without persisting response bodies. OpenAI
+attempt. OpenAI Responses `status=incomplete` is read only through the bounded
+`incomplete_details.reason`: `max_output_tokens` is a successful provider result that terminates
+as the capability outcome `subject_output_error`, while content filtering, provider interruption,
+missing reasons, and unknown reasons remain conservative provider failures. The max-token case is
+never parsed as a patch, never invokes the verifier, and never retries. Redirects, tool
+continuations, other truncation, filtering without a refusal signal, malformed UTF-8 text, and
+provider failures are normalized without persisting response bodies. OpenAI
 Responses refusal content, Anthropic `stop_reason=refusal`, and a generic compatible
 `message.refusal` are successful model refusals, not provider or infrastructure failures.
 They never persist raw response bodies, authorization headers, OpenAI reasoning items, or Anthropic
@@ -58,9 +63,10 @@ Before evidence is published, the final workspace and staged artifact tree are s
 credential values in both relative paths and regular-file bytes. A match withholds the artifact.
 The M-Lane manifest stores the public response and digest, parsed-patch digest, input/output
 workspace digests, prompt identity, safe provider facts, verifier result, score, and outcome.
-Failure manifests retain only normalized safe facts when available (category, timeout phase,
-status code, request ID, response/stop status, bounded latency, and the single attempt count), never
-a raw body. Timeout phase is the typed `connect`, `read`, `write`, `pool`, or `unknown` transport
+Failure manifests retain only normalized safe facts when available (category, bounded incomplete
+reason, timeout phase, status code, request ID, response/stop status, bounded latency, and the
+single attempt count), never a raw body. Timeout phase is the typed `connect`, `read`, `write`,
+`pool`, or `unknown` transport
 stage; it is null for non-timeout failures and for historical timeout evidence collected before the
 phase field existed. It never contains an exception message, URL, header, credential, body, or
 traceback.

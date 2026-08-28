@@ -45,6 +45,13 @@ def validate_manifest_against_slot(
             continue
         if actual != value:
             mismatches.append(name)
+    if (
+        raw.get("verifier_sandbox_manifest") is not None
+        and raw.get("verifier_definition_digest") != slot.task.verifier_identity
+    ):
+        mismatches.append("verifier_control_identity")
+    if facts.verifier_control_execution_status == "MISMATCH":
+        mismatches.append("verifier_control_execution_identity")
     profile_hash = raw.get("profile_hash")
     if profile_hash is not None and profile_hash != slot.harness_config_identity:
         mismatches.append("harness_config_identity")

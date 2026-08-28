@@ -43,9 +43,9 @@ likewise requires five `COMPARABLE` capability pairs for every intended task.
 Infrastructure failure is not model-capability failure. Capability success rate and Wilson 95%
 use `capability_passes + capability_failures`. Planned slots, infrastructure failures, and
 cancellations are separately disclosed. There is no default replacement run.
-Harness `MODEL_TURN_FAILED` is capability failure; configuration, authentication, timeout,
-process, protocol, profile-violation, and artifact failures are infrastructure. Cancellation is
-reported separately.
+Harness `MODEL_TURN_FAILED` and strictly evidenced `EXECUTION_BUDGET_EXHAUSTED` are capability
+failures; ambiguous timeout, configuration, authentication, process, protocol, profile-violation,
+and artifact failures are infrastructure. Cancellation is reported separately.
 
 ## Statistical evidence
 
@@ -61,10 +61,17 @@ claims of proof or superiority.
 
 ## P-Lane and ablation
 
-P-Lane binds M-Lane and H-Lane runs by task identity, initial workspace, verifier, and repeat slot.
+P-Lane binds M-Lane and H-Lane runs by task identity, initial workspace, frozen verifier control,
+and repeat slot. Verifier execution is reported separately. An early capability terminal with
+`NOT_EXECUTED` verifier status remains pair-eligible when its frozen control and every other hard
+control match; this does not claim that its unverified output was correct. Actual verifier drift is
+blocking.
 Every pair invokes the Phase F ComparabilityEngine. `NOT_COMPARABLE` remains execution evidence but
 is excluded from formal paired statistics. `PARTIALLY_COMPARABLE` is exploratory and surfaces its
-reason codes. Only `COMPARABLE` pairs can become formal after repetition requirements.
+reason codes. Unblocked partial capability pairs remain in exploratory paired binary
+success/failure counts so early capability failures are not removed by survivorship bias. Only
+`COMPARABLE` pairs contribute to repetition tiering, paired continuous statistics, or formal
+eligibility.
 
 An Ablation names base/variant cells and one treatment dimension. Phase G currently supports a
 controlled reasoning-effort treatment. Undeclared hard-control drift is rejected, and

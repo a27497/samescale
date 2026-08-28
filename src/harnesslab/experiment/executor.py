@@ -320,7 +320,10 @@ class ExperimentRunExecutor:
             raw = json.loads(manifest.read_text(encoding="utf-8"))
             if not isinstance(raw, dict):
                 raise ValueError("persisted manifest must contain an object")
-            facts = load_manifest_facts(manifest)
+            facts = load_manifest_facts(
+                manifest,
+                verifier_control_identity=claimed.slot.task.verifier_identity,
+            )
             validate_manifest_against_slot(raw, facts, claimed.slot)
             digest = sha256_file(manifest)
         except ManifestControlMismatch as exc:

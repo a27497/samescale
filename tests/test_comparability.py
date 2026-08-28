@@ -7,7 +7,7 @@ import pytest
 from typer.testing import CliRunner
 
 from harnesslab.cli import app
-from harnesslab.comparability.engine import ComparabilityEngine
+from harnesslab.comparability.engine import ComparabilityEngine, capability_pair_eligible
 from harnesslab.comparability.manifest import facts_from_manifest, load_manifest_facts
 from harnesslab.comparability.models import (
     ComparabilityIntent,
@@ -92,6 +92,7 @@ def test_harness_uplift_treatments_are_comparable_when_controls_match() -> None:
         "workspace_input_digest",
         "context_identity",
         "verifier_identity",
+        "verifier_control_identity",
         "requested_model",
         "provider_route",
         "budget_identity",
@@ -102,9 +103,99 @@ def test_harness_uplift_hard_control_mutation_is_not_comparable(field: str) -> N
     right = facts(evidence_identity="sha256:" + "8" * 64, **{field: "mutated"})
     report = ComparabilityEngine().assess(facts(), right, intent=ComparabilityIntent.HARNESS_UPLIFT)
     assert report.status is ComparabilityStatus.NOT_COMPARABLE
+    expected_field = "verifier_control_identity" if field == "verifier_identity" else field
     assert any(
-        reason.code is ReasonCode.HARD_CONTROL_MISMATCH and reason.field == field
+        reason.code is ReasonCode.HARD_CONTROL_MISMATCH and reason.field == expected_field
         for reason in report.reasons
+    )
+
+
+def test_early_capability_without_verifier_execution_remains_pair_eligible() -> None:
+    control = "sha256:" + "4" * 64
+    execution = "sha256:" + "a" * 64
+    early_failure = facts(
+        verifier_identity=None,
+        verifier_control_identity=control,
+        verifier_execution_identity=None,
+        verifier_execution_status="NOT_EXECUTED",
+        verifier_control_execution_status="NOT_EXECUTED",
+    )
+    verified = facts(
+        evidence_identity="sha256:" + "8" * 64,
+        verifier_identity=execution,
+        verifier_control_identity=control,
+        verifier_execution_identity=execution,
+        verifier_execution_status="EXECUTED",
+        verifier_control_execution_status="MATCH",
+    )
+
+    report = ComparabilityEngine().assess(
+        early_failure, verified, intent=ComparabilityIntent.HARNESS_UPLIFT
+    )
+
+    assert report.status is ComparabilityStatus.COMPARABLE
+    assert capability_pair_eligible(report)
+    execution_field = next(
+        field for field in report.fields if field.field == "verifier_execution_status"
+    )
+    assert execution_field.state is FieldState.DIFFER
+
+
+def test_missing_verifier_control_remains_conservatively_blocking() -> None:
+    missing_control = facts(
+        verifier_identity=None,
+        verifier_control_identity=None,
+        verifier_execution_identity=None,
+        verifier_execution_status="NOT_EXECUTED",
+        verifier_control_execution_status="NOT_EXECUTED",
+    )
+    report = ComparabilityEngine().assess(
+        missing_control,
+        facts(evidence_identity="sha256:" + "8" * 64),
+        intent=ComparabilityIntent.HARNESS_UPLIFT,
+    )
+
+    assert report.status is ComparabilityStatus.NOT_COMPARABLE
+    assert not capability_pair_eligible(report)
+    assert any(
+        reason.code is ReasonCode.HARD_CONTROL_MISSING
+        and reason.field == "verifier_control_identity"
+        for reason in report.reasons
+    )
+
+
+def test_actual_verifier_drift_blocks_even_when_frozen_controls_match() -> None:
+    control = "sha256:" + "4" * 64
+    left = facts(
+        verifier_control_identity=control,
+        verifier_execution_identity="sha256:" + "a" * 64,
+        verifier_execution_status="EXECUTED",
+        verifier_control_execution_status="MATCH",
+    )
+    right = facts(
+        evidence_identity="sha256:" + "8" * 64,
+        verifier_control_identity=control,
+        verifier_execution_identity="sha256:" + "b" * 64,
+        verifier_execution_status="EXECUTED",
+        verifier_control_execution_status="MATCH",
+    )
+    report = ComparabilityEngine().assess(left, right, intent=ComparabilityIntent.HARNESS_UPLIFT)
+
+    assert report.status is ComparabilityStatus.NOT_COMPARABLE
+    assert not capability_pair_eligible(report)
+    assert any(reason.code is ReasonCode.VERIFIER_EXECUTION_MISMATCH for reason in report.reasons)
+
+
+def test_executed_verifier_disagreeing_with_control_blocks() -> None:
+    report = ComparabilityEngine().assess(
+        facts(verifier_control_execution_status="MISMATCH"),
+        facts(evidence_identity="sha256:" + "8" * 64),
+        intent=ComparabilityIntent.HARNESS_UPLIFT,
+    )
+
+    assert report.status is ComparabilityStatus.NOT_COMPARABLE
+    assert any(
+        reason.code is ReasonCode.VERIFIER_CONTROL_EXECUTION_MISMATCH for reason in report.reasons
     )
 
 
@@ -262,9 +353,23 @@ def test_manifest_loader_consumes_phase_f_and_older_lane_shapes_without_inferenc
     assert parsed.verifier_identity is None
     assert parsed.network_policy is None
     assert parsed.trace_coverage is None
+    planned = facts_from_manifest(old_direct, verifier_control_identity="sha256:" + "a" * 64)
+    assert planned.verifier_control_identity == "sha256:" + "a" * 64
+    assert planned.verifier_execution_identity is None
+    assert planned.verifier_execution_status == "NOT_EXECUTED"
+    assert planned.verifier_control_execution_status == "NOT_EXECUTED"
     path = tmp_path / "manifest.json"
     path.write_text(json.dumps(phase_f_manifest("left")), encoding="utf-8")
     assert load_manifest_facts(path).verifier_identity is not None
+
+
+def test_manifest_loader_exposes_executed_verifier_control_drift() -> None:
+    manifest = phase_f_manifest("left")
+    facts = facts_from_manifest(manifest, verifier_control_identity="sha256:" + "a" * 64)
+
+    assert facts.verifier_execution_identity is not None
+    assert facts.verifier_execution_status == "EXECUTED"
+    assert facts.verifier_control_execution_status == "MISMATCH"
 
 
 def test_new_codex_manifest_trace_coverage_is_consumed_without_inference() -> None:

@@ -4,7 +4,7 @@ import json
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from harnesslab.contracts.common import Sha256Digest
 
@@ -44,6 +44,8 @@ class ReasonCode(StrEnum):
     TRACE_COVERAGE_LIMITED = "TRACE_COVERAGE_LIMITED"
     INTENDED_TREATMENT_DIFFERENCE = "INTENDED_TREATMENT_DIFFERENCE"
     GENERAL_EVIDENCE_GAP = "GENERAL_EVIDENCE_GAP"
+    VERIFIER_EXECUTION_MISMATCH = "VERIFIER_EXECUTION_MISMATCH"
+    VERIFIER_CONTROL_EXECUTION_MISMATCH = "VERIFIER_CONTROL_EXECUTION_MISMATCH"
 
 
 class ComparisonFacts(BaseModel):
@@ -58,7 +60,12 @@ class ComparisonFacts(BaseModel):
     task_digest: str | None = None
     workspace_input_digest: str | None = None
     context_identity: str | None = None
+    # Legacy observed verifier identity retained for historical readers.
     verifier_identity: str | None = None
+    verifier_control_identity: str | None = None
+    verifier_execution_identity: str | None = None
+    verifier_execution_status: Literal["EXECUTED", "NOT_EXECUTED"] | None = None
+    verifier_control_execution_status: Literal["MATCH", "MISMATCH", "NOT_EXECUTED"] | None = None
     requested_model: str | None = None
     observed_model: str | None = None
     provider_route: str | None = None
@@ -69,6 +76,20 @@ class ComparisonFacts(BaseModel):
     harness_profile_identity: str | None = None
     prompt_identity: str | None = None
     trace_coverage: str | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def legacy_verifier_identity_remains_a_control(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        normalized = dict(value)
+        legacy = normalized.get("verifier_identity")
+        if legacy is not None and normalized.get("verifier_control_identity") is None:
+            normalized["verifier_control_identity"] = legacy
+            normalized.setdefault("verifier_execution_identity", legacy)
+            normalized.setdefault("verifier_execution_status", "EXECUTED")
+            normalized.setdefault("verifier_control_execution_status", "MATCH")
+        return normalized
 
 
 class FieldComparison(BaseModel):

@@ -12,6 +12,7 @@ from harnesslab.contracts.common import Protocol
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
 from harnesslab.model_lane.models import (
     ProviderFailureCategory,
+    ProviderIncompleteReason,
     ProviderInvocationError,
     ProviderReadTimeoutStage,
     ProviderRequest,
@@ -136,6 +137,90 @@ async def test_openai_responses_adapter_contract_and_private_reasoning_exclusion
     assert result.attempt_count == 1
     assert "PRIVATE_OPENAI_REASONING" not in serialized
     assert FAKE_KEY not in serialized
+
+
+@pytest.mark.asyncio
+async def test_openai_responses_max_output_incomplete_is_a_safe_provider_result() -> None:
+    attempts = 0
+    body = {
+        "id": "resp-budget-id",
+        "status": "incomplete",
+        "incomplete_details": {"reason": "max_output_tokens"},
+        "model": "observed-budget-model",
+        "output": [
+            {"type": "reasoning", "summary": "PRIVATE_BUDGET_REASONING"},
+            {
+                "type": "message",
+                "content": [{"type": "output_text", "text": '{"schema_version":1'}],
+            },
+        ],
+        "usage": {
+            "input_tokens": 11,
+            "output_tokens": 4000,
+            "total_tokens": 4011,
+            "output_tokens_details": {"reasoning_tokens": 37},
+        },
+    }
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal attempts
+        attempts += 1
+        return httpx.Response(200, json=body)
+
+    async with await client_for(handler) as client:
+        result = await OpenAIResponsesAdapter(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(provider_request(Protocol.RESPONSES))
+
+    serialized = result.model_dump_json()
+    assert result.incomplete_reason is ProviderIncompleteReason.MAX_OUTPUT_TOKENS
+    assert result.stop_reason == "max_output_tokens"
+    assert result.response_status == "incomplete"
+    assert result.observed_model == "observed-budget-model"
+    assert result.usage.output_tokens == 4000
+    assert result.usage.reasoning_tokens == 37
+    assert result.attempt_count == attempts == 1
+    assert "PRIVATE_BUDGET_REASONING" not in serialized
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("raw_reason", "expected"),
+    (
+        ("content_filter", ProviderIncompleteReason.CONTENT_FILTER),
+        ("future_provider_reason", ProviderIncompleteReason.UNKNOWN),
+        (None, ProviderIncompleteReason.UNKNOWN),
+    ),
+)
+async def test_openai_responses_non_budget_incomplete_remains_provider_failure(
+    raw_reason: str | None, expected: ProviderIncompleteReason
+) -> None:
+    attempts = 0
+    details = {} if raw_reason is None else {"reason": raw_reason}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal attempts
+        attempts += 1
+        return httpx.Response(
+            200,
+            json={
+                "status": "incomplete",
+                "incomplete_details": details,
+                "output": [],
+            },
+        )
+
+    async with await client_for(handler) as client:
+        with pytest.raises(ProviderInvocationError) as caught:
+            await OpenAIResponsesAdapter(
+                client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+            ).invoke(provider_request(Protocol.RESPONSES))
+
+    assert caught.value.category is ProviderFailureCategory.INCOMPLETE_RESPONSE
+    assert caught.value.incomplete_reason is expected
+    assert caught.value.response_status == "incomplete"
+    assert attempts == 1
+    assert raw_reason is None or raw_reason not in str(caught.value)
 
 
 @pytest.mark.asyncio

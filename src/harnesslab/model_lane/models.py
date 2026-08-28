@@ -32,6 +32,15 @@ class ProviderFailureCategory(StrEnum):
     INCOMPLETE_RESPONSE = "incomplete_response"
 
 
+class ProviderIncompleteReason(StrEnum):
+    """Bounded safe reasons for a provider-declared incomplete response."""
+
+    MAX_OUTPUT_TOKENS = "max_output_tokens"
+    CONTENT_FILTER = "content_filter"
+    PROVIDER_INTERRUPTED = "provider_interrupted"
+    UNKNOWN = "unknown"
+
+
 class ProviderTimeoutPhase(StrEnum):
     CONNECT = "connect"
     READ = "read"
@@ -122,6 +131,7 @@ class ProviderInvocationError(RuntimeError):
         response_header_latency_ms: int | None = None,
         response_body_bytes_received: int | None = None,
         transport_trace: ProviderTransportTrace | None = None,
+        incomplete_reason: ProviderIncompleteReason | None = None,
     ) -> None:
         if category is not ProviderFailureCategory.TIMEOUT and timeout_phase is not None:
             raise ValueError("timeout phase requires a timeout provider failure")
@@ -136,6 +146,11 @@ class ProviderInvocationError(RuntimeError):
         )
         if transport_trace is not None and category is not ProviderFailureCategory.TIMEOUT:
             raise ValueError("provider transport trace requires a timeout provider failure")
+        if (
+            incomplete_reason is not None
+            and category is not ProviderFailureCategory.INCOMPLETE_RESPONSE
+        ):
+            raise ValueError("incomplete reason requires an incomplete provider response")
         super().__init__(detail)
         self.category = category
         self.status_code = status_code
@@ -147,6 +162,7 @@ class ProviderInvocationError(RuntimeError):
         self.response_header_latency_ms = response_header_latency_ms
         self.response_body_bytes_received = response_body_bytes_received
         self.transport_trace = transport_trace
+        self.incomplete_reason = incomplete_reason
 
 
 def _validate_read_timeout_diagnostics(
@@ -201,6 +217,7 @@ class ProviderError(BaseModel):
     latency_ms: int | None = Field(default=None, ge=0)
     attempt_count: Literal[1] = 1
     transport_trace: ProviderTransportTrace | None = None
+    incomplete_reason: ProviderIncompleteReason | None = None
 
     @model_validator(mode="after")
     def timeout_phase_matches_category(self) -> ProviderError:
@@ -220,6 +237,11 @@ class ProviderError(BaseModel):
             and self.category is not ProviderFailureCategory.TIMEOUT
         ):
             raise ValueError("provider transport trace requires a timeout provider failure")
+        if (
+            self.incomplete_reason is not None
+            and self.category is not ProviderFailureCategory.INCOMPLETE_RESPONSE
+        ):
+            raise ValueError("incomplete reason requires an incomplete provider response")
         return self
 
 
@@ -266,6 +288,7 @@ class ProviderResult(BaseModel):
     usage: ProviderUsage = Field(default_factory=ProviderUsage)
     stop_reason: str | None = Field(default=None, max_length=200)
     response_status: str | None = Field(default=None, max_length=200)
+    incomplete_reason: ProviderIncompleteReason | None = None
     latency_ms: int = Field(ge=0)
     attempt_count: Literal[1] = 1
 
@@ -279,6 +302,20 @@ class ProviderResult(BaseModel):
         if len(encoded) > MAX_PUBLIC_OUTPUT_BYTES:
             raise ValueError("public output text exceeds the evidence byte limit")
         return value
+
+    @model_validator(mode="after")
+    def incomplete_semantics_are_coherent(self) -> ProviderResult:
+        if self.response_status == "incomplete" and self.incomplete_reason is None:
+            raise ValueError("incomplete provider result requires a bounded reason")
+        if self.incomplete_reason is None:
+            return self
+        if (
+            self.response_status != "incomplete"
+            or self.incomplete_reason is not ProviderIncompleteReason.MAX_OUTPUT_TOKENS
+            or self.stop_reason != ProviderIncompleteReason.MAX_OUTPUT_TOKENS.value
+        ):
+            raise ValueError("only max-output-token incomplete responses are provider results")
+        return self
 
 
 class ProviderAdapter(TypingProtocol):
@@ -384,6 +421,12 @@ class DirectModelEvidence(BaseModel):
                 )
         elif self.provider_result is not None and self.provider_result.refused:
             raise ValueError("refused provider result requires subject_refusal outcome")
+        if (
+            self.provider_result is not None
+            and self.provider_result.incomplete_reason is ProviderIncompleteReason.MAX_OUTPUT_TOKENS
+            and self.outcome is not DirectModelOutcome.SUBJECT_OUTPUT_ERROR
+        ):
+            raise ValueError("max-output-token incomplete response requires subject_output_error")
         verifier_artifact_fields = (
             self.verifier_sandbox_manifest,
             self.verifier_artifact_namespace,

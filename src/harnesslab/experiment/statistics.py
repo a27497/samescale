@@ -414,6 +414,11 @@ def summarize_pair(
     comparable = tuple(
         item for item in observations if item.comparability is ComparabilityStatus.COMPARABLE
     )
+    pair_eligible = tuple(
+        item
+        for item in observations
+        if item.comparability is not ComparabilityStatus.NOT_COMPARABLE
+    )
     partial = sum(
         item.comparability is ComparabilityStatus.PARTIALLY_COMPARABLE for item in observations
     )
@@ -452,7 +457,7 @@ def summarize_pair(
         evidence_tier=tier,
         formal_eligible=tier is EvidenceTier.FORMAL,
         binary=paired_binary_statistics(
-            tuple((item.left_pass, item.right_pass) for item in comparable)
+            tuple((item.left_pass, item.right_pass) for item in pair_eligible)
         ),
         duration_ms=paired_continuous_statistics(
             typed_latency_pairs,

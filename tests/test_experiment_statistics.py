@@ -331,3 +331,5 @@ def test_pair_repetition_eligibility_requires_comparable_pairs_per_task() -> Non
     lost_summary = summarize_pair("lost", lost_pair, intended_task_ids=("a", "b"))
     assert not lost_summary.formal_eligible
     assert [item.comparable_pairs for item in lost_summary.per_task_evidence] == [5, 4]
+    assert lost_summary.binary is not None
+    assert lost_summary.binary.paired_count == 10

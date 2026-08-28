@@ -93,6 +93,40 @@ def _failure_from_capture(capture: HarnessProcessCapture) -> HarnessFailureCateg
     return None
 
 
+def claude_execution_budget_exhausted_from_safe_progress(
+    *,
+    timed_out: bool,
+    cancelled: bool,
+    terminal_event: str | None,
+    observed_model: str | None,
+    retry_count: int,
+    events: tuple[SanitizedNativeEvent, ...],
+) -> bool:
+    """Recognize a healthy-progress Claude timeout without inspecting raw provider data."""
+
+    if (
+        not timed_out
+        or cancelled
+        or terminal_event is not None
+        or observed_model is None
+        or retry_count != 0
+    ):
+        return False
+    event_types = {event.event_type for event in events}
+    if "system.init" not in event_types or event_types & {"result.error", "system.api_retry"}:
+        return False
+    if any(event.error_code is not None for event in events):
+        return False
+    tool_starts = sum(
+        event.event_type in {"tool.Bash", "tool.Read", "tool.Edit", "tool.Write"}
+        for event in events
+    )
+    completed_results = sum(
+        event.event_type == "user.tool_result" and event.status == "completed" for event in events
+    )
+    return tool_starts > 0 and completed_results > 0
+
+
 def _protocol_failure(capture: HarnessProcessCapture) -> MultiHarnessCollection:
     event = SanitizedNativeEvent(ordinal=1, event_type="protocol.error", error_code="malformed")
     sanitized = event.canonical_json() + "\n"
@@ -338,6 +372,20 @@ def collect_claude_stream(
     sanitized = "".join(event.canonical_json() + "\n" for event in events)
     native_digest, trace_digest = _digest(sanitized, trace)
     failure = _failure_from_capture(capture)
+    if (
+        failure is HarnessFailureCategory.TIMEOUT
+        and not profile_violation
+        and structured_failure is None
+        and claude_execution_budget_exhausted_from_safe_progress(
+            timed_out=capture.timed_out,
+            cancelled=capture.cancelled,
+            terminal_event=terminal,
+            observed_model=observed_model,
+            retry_count=retries,
+            events=tuple(events),
+        )
+    ):
+        failure = HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED
     if failure is None and profile_violation:
         failure = HarnessFailureCategory.PROFILE_VIOLATION
     if failure is None and structured_failure is not None:

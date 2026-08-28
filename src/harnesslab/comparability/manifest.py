@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from harnesslab.comparability.models import ComparisonFacts, canonical_digest
 
@@ -34,7 +34,7 @@ def _context_identity(raw: dict[str, Any]) -> str | None:
     return _string(raw.get("context_digest")) or "NONE"
 
 
-def _verifier_identity(raw: dict[str, Any]) -> str | None:
+def _verifier_execution_identity(raw: dict[str, Any]) -> str | None:
     definition = _string(raw.get("verifier_definition_digest"))
     manifest = _mapping(raw.get("verifier_sandbox_manifest"))
     image = _mapping(manifest.get("image"))
@@ -84,7 +84,9 @@ def _effective_network_policy(profile: dict[str, Any]) -> str | None:
     return declared
 
 
-def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
+def facts_from_manifest(
+    raw: dict[str, Any], *, verifier_control_identity: str | None = None
+) -> ComparisonFacts:
     profile = _mapping(raw.get("profile"))
     generation = _mapping(raw.get("generation_settings"))
     harness = _string(raw.get("harness"))
@@ -122,6 +124,21 @@ def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
         if profile_network != network:
             network = None
     observed = _string(raw.get("observed_model"))
+    verifier_definition = _string(raw.get("verifier_definition_digest"))
+    verifier_execution = _verifier_execution_identity(raw)
+    effective_verifier_control: str | None
+    verifier_control_execution_status: Literal["MATCH", "MISMATCH", "NOT_EXECUTED"]
+    if verifier_control_identity is None and verifier_execution is not None:
+        effective_verifier_control = verifier_execution
+        verifier_control_execution_status = "MATCH"
+    else:
+        effective_verifier_control = verifier_control_identity
+        if verifier_execution is None:
+            verifier_control_execution_status = "NOT_EXECUTED"
+        elif verifier_definition == verifier_control_identity:
+            verifier_control_execution_status = "MATCH"
+        else:
+            verifier_control_execution_status = "MISMATCH"
     return ComparisonFacts(
         evidence_identity=canonical_digest(raw),
         task_id=_string(raw.get("task_id")),
@@ -129,7 +146,13 @@ def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
         task_digest=_string(raw.get("task_digest")),
         workspace_input_digest=_string(raw.get("workspace_input_digest")),
         context_identity=_context_identity(raw),
-        verifier_identity=_verifier_identity(raw),
+        verifier_identity=verifier_execution,
+        verifier_control_identity=effective_verifier_control,
+        verifier_execution_identity=verifier_execution,
+        verifier_execution_status=(
+            "EXECUTED" if verifier_execution is not None else "NOT_EXECUTED"
+        ),
+        verifier_control_execution_status=verifier_control_execution_status,
         requested_model=_string(raw.get("requested_model")),
         observed_model=observed,
         provider_route=route,
@@ -143,7 +166,9 @@ def facts_from_manifest(raw: dict[str, Any]) -> ComparisonFacts:
     )
 
 
-def load_manifest_facts(path: Path) -> ComparisonFacts:
+def load_manifest_facts(
+    path: Path, *, verifier_control_identity: str | None = None
+) -> ComparisonFacts:
     try:
         raw = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=_unique_object)
     except ComparabilityInputError:
@@ -153,6 +178,6 @@ def load_manifest_facts(path: Path) -> ComparisonFacts:
     if not isinstance(raw, dict):
         raise ComparabilityInputError("evidence manifest must contain a JSON object")
     try:
-        return facts_from_manifest(raw)
+        return facts_from_manifest(raw, verifier_control_identity=verifier_control_identity)
     except (TypeError, ValueError) as exc:
         raise ComparabilityInputError(f"invalid evidence facts: {type(exc).__name__}") from exc

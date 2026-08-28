@@ -19,6 +19,7 @@ from harnesslab.model_lane.models import (
     ProviderAdapter,
     ProviderError,
     ProviderFailureCategory,
+    ProviderIncompleteReason,
     ProviderInvocationError,
     ProviderRequest,
     ProviderResult,
@@ -155,6 +156,7 @@ class DirectModelRunner:
                         response_header_latency_ms=exc.response_header_latency_ms,
                         response_body_bytes_received=exc.response_body_bytes_received,
                         transport_trace=exc.transport_trace,
+                        incomplete_reason=exc.incomplete_reason,
                         status_code=exc.status_code,
                         request_id=exc.request_id,
                         response_status=exc.response_status,
@@ -165,6 +167,19 @@ class DirectModelRunner:
 
             public_digest = sha256_bytes(provider_result.public_output_text.encode("utf-8"))
             _assert_text_has_no_run_secrets(provider_result.public_output_text, protected_values)
+            if provider_result.incomplete_reason is ProviderIncompleteReason.MAX_OUTPUT_TOKENS:
+                evidence = self._base_evidence(
+                    effective_run_id,
+                    package,
+                    profile,
+                    prompt,
+                    outcome=DirectModelOutcome.SUBJECT_OUTPUT_ERROR,
+                    summary="public model output exhausted the frozen output-token budget",
+                    provider_result=provider_result,
+                    public_response_digest=public_digest,
+                    public_response_text=provider_result.public_output_text,
+                )
+                return self._persist(evidence, None, protected_values)
             if provider_result.refused:
                 evidence = self._base_evidence(
                     effective_run_id,
@@ -202,7 +217,11 @@ class DirectModelRunner:
                 )
                 return self._persist(evidence, None, protected_values)
             except DirectPatchError:
-                output_budget_exhausted = provider_result.stop_reason in {"max_tokens", "length"}
+                output_budget_exhausted = provider_result.stop_reason in {
+                    "max_tokens",
+                    "max_output_tokens",
+                    "length",
+                }
                 evidence = self._base_evidence(
                     effective_run_id,
                     package,

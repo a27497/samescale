@@ -56,6 +56,15 @@ Provider identity and model identity are separate controls. Replacing an unavail
 never allowed under the same experiment identity; a changed provider route or profile changes
 slot/plan identity and is rejected as substitution when recovering an existing treatment.
 
+Verifier control and verifier execution are distinct evidence. The verifier control identity is
+frozen by the task/experiment plan before subject execution and is the hard control used for model
+and harness comparisons. The verifier execution identity proves that the verifier actually ran;
+it may be `NOT_EXECUTED` for an early capability terminal such as subject-output error, refusal, or
+execution-budget exhaustion. Missing execution does not invent correctness and does not remove a
+controlled failure from paired capability analysis. When execution exists, disagreement with the
+frozen verifier definition or between executed verifier runtime identities is a blocking integrity
+failure. Historical evidence without a frozen verifier control remains conservative.
+
 ## Keyless task health gate
 
 Before a schema-v2 paid experiment can be planned, every selected task undergoes five baseline
@@ -155,6 +164,14 @@ capability_n = capability_pass + capability_fail
 Infrastructure outcomes stay excluded, but every report must show `planned`, `capability_n`,
 `infra_count`, `missing_count`, and `recovery_attempt_count`. This keeps operational reliability
 visible beside capability.
+
+Provider-declared output-budget exhaustion is capability evidence. For OpenAI Responses this
+requires the persisted bounded reason `max_output_tokens`; absent or unknown incomplete reasons
+remain infrastructure and are never guessed retroactively. A Harness wall-clock timeout is also
+capability evidence only when bounded safe trace evidence proves model startup, tool execution,
+completed healthy progress, no retry or structured provider failure, and expiry without a terminal
+event. Otherwise it remains an infrastructure timeout. These v2.1 interpretations do not rewrite
+the original manifest or its source taxonomy.
 
 ## Infrastructure recovery
 

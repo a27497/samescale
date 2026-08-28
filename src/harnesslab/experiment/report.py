@@ -232,6 +232,7 @@ def _manifest_metrics(raw: dict[str, Any]) -> dict[str, float | None]:
 
 def _load_persisted_manifest(
     run: ExperimentRunRecord,
+    slot: ExperimentRunSlot,
     artifact_path_guard: Callable[[Path], Path] | None = None,
 ) -> tuple[dict[str, Any], ComparisonFacts]:
     if run.artifact_manifest_path is None or run.evidence_digest is None:
@@ -247,7 +248,10 @@ def _load_persisted_manifest(
         raise ExperimentReportError(f"run {run.run_id} manifest is unreadable") from exc
     if not isinstance(raw, dict):
         raise ExperimentReportError(f"run {run.run_id} manifest must contain an object")
-    return raw, load_manifest_facts(path)
+    return raw, load_manifest_facts(
+        path,
+        verifier_control_identity=slot.task.verifier_identity,
+    )
 
 
 async def load_verified_experiment_evidence(
@@ -294,8 +298,8 @@ async def load_verified_experiment_evidence(
         facts: ComparisonFacts | None = None
         has_artifact = run.artifact_manifest_path is not None or run.evidence_digest is not None
         if has_artifact:
-            raw, facts = _load_persisted_manifest(run, artifact_path_guard)
             slot = ExperimentRunSlot.model_validate(run.slot_json)
+            raw, facts = _load_persisted_manifest(run, slot, artifact_path_guard)
             try:
                 validate_manifest_against_slot(raw, facts, slot)
             except ManifestControlMismatch as exc:

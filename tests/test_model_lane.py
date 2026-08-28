@@ -20,6 +20,7 @@ from harnesslab.model_lane.models import (
     GenerationSettings,
     ProviderError,
     ProviderFailureCategory,
+    ProviderIncompleteReason,
     ProviderInvocationError,
     ProviderReadTimeoutStage,
     ProviderRequest,
@@ -115,6 +116,16 @@ class SafeTimeoutProvider:
         )
 
 
+class SafeUnknownIncompleteProvider:
+    async def invoke(self, request: ProviderRequest) -> ProviderResult:
+        raise ProviderInvocationError(
+            ProviderFailureCategory.INCOMPLETE_RESPONSE,
+            "provider response is incomplete",
+            response_status="incomplete",
+            incomplete_reason=ProviderIncompleteReason.UNKNOWN,
+        )
+
+
 class OutputBudgetExhaustedProvider:
     async def invoke(self, request: ProviderRequest) -> ProviderResult:
         return ProviderResult(
@@ -128,6 +139,28 @@ class OutputBudgetExhaustedProvider:
             usage={"input_tokens": 10, "output_tokens": 2000, "total_tokens": 2010},
             stop_reason="max_tokens",
             response_status="truncated",
+            latency_ms=17,
+        )
+
+
+class ResponsesBudgetIncompleteProvider:
+    def __init__(self) -> None:
+        self.requests: list[ProviderRequest] = []
+
+    async def invoke(self, request: ProviderRequest) -> ProviderResult:
+        self.requests.append(request)
+        return ProviderResult(
+            requested_model=request.profile.requested_model,
+            observed_model="safe-observed-budget-model",
+            provider=request.profile.provider,
+            endpoint_identity=request.profile.provider_route_identity,
+            protocol=request.profile.protocol,
+            request_id="responses-budget-id",
+            public_output_text=correct_patch(),
+            usage={"input_tokens": 10, "output_tokens": 2000, "total_tokens": 2010},
+            stop_reason="max_output_tokens",
+            response_status="incomplete",
+            incomplete_reason=ProviderIncompleteReason.MAX_OUTPUT_TOKENS,
             latency_ms=17,
         )
 
@@ -320,6 +353,41 @@ async def test_output_budget_exhaustion_is_subject_output_failure(tmp_path: Path
 
 
 @pytest.mark.asyncio
+async def test_responses_budget_incomplete_is_subject_failure_without_verifier(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def reject_patch_parsing(public_output: str) -> None:
+        raise AssertionError(f"budget-incomplete response reached patch parsing: {public_output}")
+
+    monkeypatch.setattr(runner_contract, "parse_direct_patch", reject_patch_parsing)
+    provider = ResponsesBudgetIncompleteProvider()
+    result = await DirectModelRunner(
+        artifact_root=tmp_path / "artifacts",
+        runtime_root=tmp_path / "runtime",
+        environment={"GATE_D_FAKE_API_KEY": FAKE_KEY},
+    ).run(
+        TASK_ROOT,
+        fake_profile(),
+        adapter=provider,
+        run_id="responses-budget-incomplete",
+    )
+
+    evidence = result.evidence
+    assert evidence.outcome is DirectModelOutcome.SUBJECT_OUTPUT_ERROR
+    assert evidence.provider_result is not None
+    assert evidence.provider_result.incomplete_reason is ProviderIncompleteReason.MAX_OUTPUT_TOKENS
+    assert evidence.provider_result.observed_model == "safe-observed-budget-model"
+    assert evidence.provider_result.usage.output_tokens == 2000
+    assert evidence.provider_failure is None
+    assert evidence.verifier_passed is None
+    assert evidence.verifier_score is None
+    assert evidence.verifier_sandbox_manifest is None
+    assert len(provider.requests) == 1
+    assert not (result.artifact_directory / "workspace").exists()
+    assert not (result.artifact_directory / "verifier").exists()
+
+
+@pytest.mark.asyncio
 async def test_model_refusal_bypasses_patch_workspace_and_verifier(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -396,6 +464,29 @@ async def test_provider_failure_category_is_preserved_in_evidence(tmp_path: Path
     assert result.evidence.provider_error.category is ProviderFailureCategory.TIMEOUT
     assert result.evidence.provider_error.attempt_count == 1
     assert result.evidence.provider_result is None
+
+
+@pytest.mark.asyncio
+async def test_unknown_incomplete_reason_is_persisted_as_bounded_provider_error(
+    tmp_path: Path,
+) -> None:
+    result = await DirectModelRunner(
+        artifact_root=tmp_path / "artifacts",
+        runtime_root=tmp_path / "runtime",
+        environment={"GATE_D_FAKE_API_KEY": FAKE_KEY},
+    ).run(
+        TASK_ROOT,
+        fake_profile(),
+        adapter=SafeUnknownIncompleteProvider(),
+        run_id="unknown-incomplete",
+    )
+
+    assert result.evidence.outcome is DirectModelOutcome.PROVIDER_ERROR
+    assert result.evidence.provider_failure is ProviderFailureCategory.INCOMPLETE_RESPONSE
+    assert result.evidence.provider_error is not None
+    assert result.evidence.provider_error.incomplete_reason is ProviderIncompleteReason.UNKNOWN
+    assert result.evidence.provider_error.attempt_count == 1
+    assert result.evidence.verifier_sandbox_manifest is None
 
 
 @pytest.mark.asyncio

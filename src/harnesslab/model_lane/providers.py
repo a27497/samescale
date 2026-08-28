@@ -14,6 +14,7 @@ from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
 from harnesslab.model_lane.models import (
     ProviderAdapter,
     ProviderFailureCategory,
+    ProviderIncompleteReason,
     ProviderInvocationError,
     ProviderReadTimeoutStage,
     ProviderRequest,
@@ -393,12 +394,30 @@ class OpenAIResponsesAdapter(_HTTPProviderAdapter):
         response: httpx.Response,
     ) -> ProviderResult:
         status = body.get("status")
+        incomplete_reason: ProviderIncompleteReason | None = None
         if status == "incomplete":
+            details = body.get("incomplete_details")
+            raw_reason = details.get("reason") if isinstance(details, dict) else None
+            safe_reason = raw_reason if isinstance(raw_reason, str) else None
+            incomplete_reason = (
+                {
+                    "max_output_tokens": ProviderIncompleteReason.MAX_OUTPUT_TOKENS,
+                    "content_filter": ProviderIncompleteReason.CONTENT_FILTER,
+                    "provider_interrupted": ProviderIncompleteReason.PROVIDER_INTERRUPTED,
+                }.get(safe_reason, ProviderIncompleteReason.UNKNOWN)
+                if safe_reason is not None
+                else ProviderIncompleteReason.UNKNOWN
+            )
+        if status == "incomplete" and (
+            incomplete_reason is not ProviderIncompleteReason.MAX_OUTPUT_TOKENS
+        ):
             raise ProviderInvocationError(
                 ProviderFailureCategory.INCOMPLETE_RESPONSE,
                 "provider response is incomplete",
+                response_status="incomplete",
+                incomplete_reason=incomplete_reason,
             )
-        if status != "completed":
+        if status not in {"completed", "incomplete"}:
             raise ProviderInvocationError(
                 ProviderFailureCategory.PROVIDER_ERROR,
                 "provider response did not complete",
@@ -430,7 +449,7 @@ class OpenAIResponsesAdapter(_HTTPProviderAdapter):
                 elif block.get("type") == "refusal" and isinstance(block.get("refusal"), str):
                     public_parts.append(block["refusal"])
                     refused = True
-        if not public_parts and not refused:
+        if not public_parts and not refused and status == "completed":
             raise ProviderInvocationError(
                 ProviderFailureCategory.MALFORMED_RESPONSE,
                 "provider response contains no public output or refusal text",
@@ -456,8 +475,13 @@ class OpenAIResponsesAdapter(_HTTPProviderAdapter):
                     details.get("reasoning_tokens"), "reasoning tokens"
                 ),
             ),
-            stop_reason=None,
+            stop_reason=(
+                ProviderIncompleteReason.MAX_OUTPUT_TOKENS.value
+                if incomplete_reason is ProviderIncompleteReason.MAX_OUTPUT_TOKENS
+                else None
+            ),
             response_status=status,
+            incomplete_reason=incomplete_reason,
             latency_ms=latency_ms,
         )
 

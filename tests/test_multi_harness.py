@@ -476,6 +476,41 @@ def test_claude_retry_and_unknown_events_remain_observable() -> None:
     )
 
 
+def test_claude_healthy_progress_timeout_is_execution_budget_exhausted() -> None:
+    from harnesslab.multi_harness.models import HarnessProcessCapture
+    from harnesslab.multi_harness.trace import collect_claude_stream
+
+    lines = (
+        '{"type":"system","subtype":"init","model":"observed-model",'
+        '"tools":["Read","Edit","Write","Bash"],"mcp_servers":[],"plugins":[]}',
+        '{"type":"assistant","message":{"content":[{"type":"tool_use",'
+        '"name":"Bash","input":{"command":"pytest -q"}}]}}',
+        '{"type":"user","message":{"content":[{"type":"tool_result",'
+        '"content":"tests passed","is_error":false}]}}',
+    )
+    collection = collect_claude_stream(HarnessProcessCapture(lines, "", 0, 90_000, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.EXECUTION_BUDGET_EXHAUSTED
+    assert collection.terminal_event is None
+    assert collection.observed_model == "observed-model"
+    assert collection.retry_count == 0
+
+
+def test_claude_timeout_without_completed_progress_remains_infra_timeout() -> None:
+    from harnesslab.multi_harness.models import HarnessProcessCapture
+    from harnesslab.multi_harness.trace import collect_claude_stream
+
+    lines = (
+        '{"type":"system","subtype":"init","model":"observed-model",'
+        '"tools":["Read","Edit","Write","Bash"],"mcp_servers":[],"plugins":[]}',
+        '{"type":"assistant","message":{"content":[{"type":"tool_use",'
+        '"name":"Bash","input":{"command":"pytest -q"}}]}}',
+    )
+    collection = collect_claude_stream(HarnessProcessCapture(lines, "", 0, 90_000, timed_out=True))
+
+    assert collection.failure_category is HarnessFailureCategory.TIMEOUT
+
+
 def test_claude_unexpected_init_tool_is_profile_violation() -> None:
     from harnesslab.multi_harness.models import HarnessProcessCapture
     from harnesslab.multi_harness.trace import collect_claude_stream

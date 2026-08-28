@@ -19,6 +19,10 @@ FIELDS = (
     "workspace_input_digest",
     "context_identity",
     "verifier_identity",
+    "verifier_control_identity",
+    "verifier_execution_identity",
+    "verifier_execution_status",
+    "verifier_control_execution_status",
     "requested_model",
     "observed_model",
     "provider_route",
@@ -37,7 +41,7 @@ CORE_CONTROLS = {
     "task_digest",
     "workspace_input_digest",
     "context_identity",
-    "verifier_identity",
+    "verifier_control_identity",
 }
 UPLIFT_CONTROLS = CORE_CONTROLS | {
     "requested_model",
@@ -76,6 +80,12 @@ class ComparabilityEngine:
             controls, treatments = CORE_CONTROLS, set()
         fields: list[FieldComparison] = []
         reasons: list[ComparabilityReason] = []
+        verifier_diagnostics = {
+            "verifier_identity",
+            "verifier_execution_identity",
+            "verifier_execution_status",
+            "verifier_control_execution_status",
+        }
         for name in FIELDS:
             left_value = getattr(left, name)
             right_value = getattr(right, name)
@@ -111,6 +121,8 @@ class ComparabilityEngine:
                             ),
                         )
                     )
+                elif name in verifier_diagnostics:
+                    pass
                 elif name in controls:
                     reasons.append(
                         ComparabilityReason(
@@ -153,6 +165,8 @@ class ComparabilityEngine:
                             detail="Observed model identities differ.",
                         )
                     )
+                elif name in verifier_diagnostics:
+                    pass
                 elif name in controls:
                     reasons.append(
                         ComparabilityReason(
@@ -192,6 +206,29 @@ class ComparabilityEngine:
                         detail="The difference is the declared treatment for this intent.",
                     )
                 )
+        for side, facts in (("left", left), ("right", right)):
+            if facts.verifier_control_execution_status == "MISMATCH":
+                reasons.append(
+                    ComparabilityReason(
+                        code=ReasonCode.VERIFIER_CONTROL_EXECUTION_MISMATCH,
+                        severity=ReasonSeverity.BLOCKING,
+                        field="verifier_control_execution_status",
+                        detail=(f"The {side} executed verifier disagrees with its frozen control."),
+                    )
+                )
+        if (
+            left.verifier_execution_identity is not None
+            and right.verifier_execution_identity is not None
+            and left.verifier_execution_identity != right.verifier_execution_identity
+        ):
+            reasons.append(
+                ComparabilityReason(
+                    code=ReasonCode.VERIFIER_EXECUTION_MISMATCH,
+                    severity=ReasonSeverity.BLOCKING,
+                    field="verifier_execution_identity",
+                    detail="Executed verifier identities differ.",
+                )
+            )
         if intent is ComparabilityIntent.HARNESS_UPLIFT:
             for side, facts in (("left", left), ("right", right)):
                 if (
@@ -222,3 +259,9 @@ class ComparabilityEngine:
             fields=tuple(fields),
             reasons=tuple(reasons),
         )
+
+
+def capability_pair_eligible(report: ComparabilityReport) -> bool:
+    """Allow controlled partial evidence while excluding every blocking comparison."""
+
+    return all(reason.severity is not ReasonSeverity.BLOCKING for reason in report.reasons)
