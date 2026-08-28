@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "view_id": "core-real-matrix-v3-portfolio-view",
+  "source_matrix_id": "core-real-matrix-v3",
+  "source_plan_digest": "sha256:5b91aea8c2cf812e911358b3a39f75d8d0eada153188c219eaf5176d3b3b107d",
+  "evidence_class": "REPRESENTATIVE_SUBSET",
+  "full_matrix_complete": false,
+  "selection_status": "PLANNING_ONLY",
+  "selection_is_outcome_independent": true,
+  "selection_method": {
+    "priority_order": [
+      "balance three tasks per language",
+      "use distinct semantic scenario families",
+      "maximize already-terminal logical slots at the durable 177-terminal checkpoint",
+      "preserve all seven source Matrix cells",
+      "use repeat indices 0 through 2"
+    ],
+    "coverage_measure": "terminal logical slot count within repeats 0 through 2",
+    "forbidden_inputs": [
+      "capability score",
+      "capability pass rate",
+      "verifier score",
+      "model ranking"
+    ],
+    "deterministic_tie_break": "task_id ascending"
+  },
+  "cells": [
+    "harness-claude-qwen38-opencode-go",
+    "harness-codex-gpt56-high",
+    "harness-codex-gpt56-medium",
+    "harness-deepseek-v4flash",
+    "model-deepseek-v4pro-chat",
+    "model-gpt56-relay-responses",
+    "model-qwen38-opencode-go-messages"
+  ],
+  "repeat_indices": [
+    0,
+    1,
+    2
+  ],
+  "tasks": [
+    {
+      "task_id": "core-python-deduplicate",
+      "language": "python",
+      "scenario_family": "retry-ledger-idempotency",
+      "task_digest": "sha256:af65f5f3a7e7e0f8c28fa1690c7416314b819d3e246b21d1c433e81dcaacd7f8"
+    },
+    {
+      "task_id": "core-python-feature-flag",
+      "language": "python",
+      "scenario_family": "integer-window-expression-parser",
+      "task_digest": "sha256:d0ca1b3af8cb4f08aa4b3e4470616e26ea1aefc06b23d256c67c8e080149fc16"
+    },
+    {
+      "task_id": "core-python-quota",
+      "language": "python",
+      "scenario_family": "lru-cache-recency-eviction",
+      "task_digest": "sha256:5fa5cb703339e936d2bc27bc3d7179bf79c4e0b2639aa728a771ca427df094a0"
+    },
+    {
+      "task_id": "core-java-deduplicate",
+      "language": "java",
+      "scenario_family": "length-prefixed-record-codec",
+      "task_digest": "sha256:479c5e1a3bb264d7a3107053ae0917f91a43a5ed84ef30a864182088df314e89"
+    },
+    {
+      "task_id": "core-java-feature-flag",
+      "language": "java",
+      "scenario_family": "service-exception-cause-propagation",
+      "task_digest": "sha256:aae0574a52561a8cc4fda40ad834cc51be8eed9ab4ad986be62caeba7d2c75b6"
+    },
+    {
+      "task_id": "core-java-quota",
+      "language": "java",
+      "scenario_family": "reservation-transition-state-machine",
+      "task_digest": "sha256:438a6da5276e2908b93fc9fa1aa8608d740d390d1308f4b5cc284ef821e3a37e"
+    },
+    {
+      "task_id": "core-typescript-deduplicate",
+      "language": "typescript",
+      "scenario_family": "canonical-pagination-cursor",
+      "task_digest": "sha256:5940ab7e673c065317f1877c9993a4780da453dac72757933445279943e78ff8"
+    },
+    {
+      "task_id": "core-typescript-feature-flag",
+      "language": "typescript",
+      "scenario_family": "discriminated-request-union-validation",
+      "task_digest": "sha256:e16b402441c5b33be4d3dc49afbde7919e4eeddef9e281af88da0d94ac317b38"
+    },
+    {
+      "task_id": "core-typescript-quota",
+      "language": "typescript",
+      "scenario_family": "capped-exponential-retry-schedule",
+      "task_digest": "sha256:a92e883d7ed46e7252732894d69513090711066d8b1959185a7395a6c1ce3048"
+    }
+  ],
+  "logical_slot_rule": "cells x tasks x repeat_indices over existing source Matrix slots",
+  "logical_slot_count": 189,
+  "selected_slot_ids_digest": "sha256:f2d323bdac97f31d3cd16c108848258acb9f01a15f43464fdc1b7f658e65f24c",
+  "selection_definition_digest": "sha256:e7dd0c9a85f1522f4c80cdab30b0964b1df915d5d1400928f788f810a45afd41",
+  "selection_definition_digest_scope": "canonical deterministic selection definition including the ordered selected slot ID list; not the digest of this presentation file",
+  "coverage_at_creation": {
+    "source_matrix_terminal": 177,
+    "portfolio_view_total_slots": 189,
+    "portfolio_view_already_terminal": 69,
+    "portfolio_view_missing": 120,
+    "portfolio_view_opencode_go_missing": 24,
+    "portfolio_view_non_opencode_missing": 96,
+    "portfolio_view_running": 0
+  },
+  "formal_matrix": {
+    "cells": 7,
+    "tasks": 18,
+    "repeats": 5,
+    "logical_slots": 630,
+    "complete": false,
+    "resumable": true
+  }
+}
