@@ -3,8 +3,9 @@ from __future__ import annotations
 from harnesslab.contracts.common import Protocol
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
 from harnesslab.registry.seeds import (
-    ALIBABA_BASE_URL_REFERENCE,
+    ALIBABA_ANTHROPIC_BASE_URL_REFERENCE,
     ALIBABA_CREDENTIAL_REFERENCE,
+    ALIBABA_OPENAI_BASE_URL_REFERENCE,
 )
 
 
@@ -26,17 +27,20 @@ def configured_alibaba_bailian_profile(
     ):
         raise ValueError("Alibaba requested model must be explicitly configured and safe")
     routes = {
-        Protocol.CHAT_COMPLETIONS: "/chat/completions",
-        Protocol.RESPONSES: "/responses",
+        Protocol.CHAT_COMPLETIONS: (ALIBABA_OPENAI_BASE_URL_REFERENCE, "/chat/completions"),
+        Protocol.RESPONSES: (ALIBABA_OPENAI_BASE_URL_REFERENCE, "/responses"),
+        Protocol.MESSAGES: (ALIBABA_ANTHROPIC_BASE_URL_REFERENCE, "/v1/messages"),
     }
     try:
-        route = routes[protocol]
+        base_url_reference, route = routes[protocol]
     except KeyError as exc:
-        raise ValueError("Alibaba supports only OpenAI-compatible Chat or Responses") from exc
+        raise ValueError(
+            "Alibaba supports only OpenAI-compatible Chat/Responses or Anthropic Messages"
+        ) from exc
     return ModelProfile(
         requested_model=requested_model,
         provider="alibaba-bailian",
-        base_url_reference=ALIBABA_BASE_URL_REFERENCE,
+        base_url_reference=base_url_reference,
         route=route,
         protocol=protocol,
         reasoning=ReasoningProfile(max_output_tokens=max_output_tokens),

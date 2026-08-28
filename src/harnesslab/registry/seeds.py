@@ -38,7 +38,8 @@ from harnesslab.registry.models import (
     freeze_provider_model_profile,
 )
 
-ALIBABA_BASE_URL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_BASE_URL"
+ALIBABA_OPENAI_BASE_URL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL"
+ALIBABA_ANTHROPIC_BASE_URL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL"
 ALIBABA_CREDENTIAL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_API_KEY"
 ALIBABA_MODEL_IDS_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_MODEL_IDS"
 METHODOLOGY_PATH = Path("release/evaluation-methodology-v2.json")
@@ -70,22 +71,53 @@ def _enabled(environment: Mapping[str, str], provider_id: str) -> bool:
 
 
 def _fingerprint(
-    environment: Mapping[str, str], reference: str, *, alibaba: bool = False
+    environment: Mapping[str, str],
+    reference: str,
+    *,
+    alibaba_path: str | None = None,
 ) -> tuple[str | None, tuple[str, ...]]:
     raw = environment.get(reference)
     if raw is None or not raw.strip():
         return None, ("RUNTIME_ENDPOINT_REFERENCE_MISSING",)
     try:
         normalized = validate_provider_base_url(raw)
-        if alibaba:
+        if alibaba_path is not None:
             parsed = urlsplit(normalized)
             if not parsed.hostname or not parsed.hostname.endswith(".cn-beijing.maas.aliyuncs.com"):
                 raise ValueError("Alibaba endpoint is not in the cn-beijing workspace domain")
-            if parsed.path != "/compatible-mode/v1":
-                raise ValueError("Alibaba endpoint path is not compatible-mode/v1")
+            if parsed.path != alibaba_path:
+                raise ValueError("Alibaba endpoint path is not the required endpoint class")
     except ValueError:
         return None, ("RUNTIME_ENDPOINT_INVALID",)
     return canonical_digest({"runtime_endpoint": normalized}), ()
+
+
+def _alibaba_endpoint_fingerprints(
+    environment: Mapping[str, str],
+) -> tuple[dict[Protocol, str], tuple[str, ...]]:
+    openai_fingerprint, openai_reasons = _fingerprint(
+        environment,
+        ALIBABA_OPENAI_BASE_URL_REFERENCE,
+        alibaba_path="/compatible-mode/v1",
+    )
+    anthropic_fingerprint, anthropic_reasons = _fingerprint(
+        environment,
+        ALIBABA_ANTHROPIC_BASE_URL_REFERENCE,
+        alibaba_path="/apps/anthropic",
+    )
+    reasons = tuple(dict.fromkeys((*openai_reasons, *anthropic_reasons)))
+    if not reasons:
+        openai = validate_provider_base_url(environment[ALIBABA_OPENAI_BASE_URL_REFERENCE])
+        anthropic = validate_provider_base_url(environment[ALIBABA_ANTHROPIC_BASE_URL_REFERENCE])
+        if urlsplit(openai).hostname != urlsplit(anthropic).hostname:
+            reasons = ("RUNTIME_ENDPOINT_WORKSPACE_MISMATCH",)
+    if reasons or openai_fingerprint is None or anthropic_fingerprint is None:
+        return {}, reasons
+    return {
+        Protocol.CHAT_COMPLETIONS: openai_fingerprint,
+        Protocol.RESPONSES: openai_fingerprint,
+        Protocol.MESSAGES: anthropic_fingerprint,
+    }, ()
 
 
 def _alibaba_model_ids(environment: Mapping[str, str]) -> tuple[str, ...]:
@@ -107,13 +139,19 @@ def _alibaba_model_ids(environment: Mapping[str, str]) -> tuple[str, ...]:
 
 def _provider_definitions(environment: Mapping[str, str]) -> tuple[ProviderDefinition, ...]:
     relay_fingerprint, relay_reasons = _fingerprint(environment, "HARNESSLAB_GPT56_RELAY_BASE_URL")
-    alibaba_fingerprint, alibaba_endpoint_reasons = _fingerprint(
-        environment, ALIBABA_BASE_URL_REFERENCE, alibaba=True
+    alibaba_fingerprints, alibaba_endpoint_reasons = _alibaba_endpoint_fingerprints(environment)
+    alibaba_fingerprint = (
+        canonical_digest(
+            {
+                protocol.value: fingerprint
+                for protocol, fingerprint in sorted(
+                    alibaba_fingerprints.items(), key=lambda item: item[0].value
+                )
+            }
+        )
+        if alibaba_fingerprints
+        else None
     )
-    alibaba_models = _alibaba_model_ids(environment)
-    alibaba_reasons = list(alibaba_endpoint_reasons)
-    if not alibaba_models:
-        alibaba_reasons.append("CONFIGURED_MODEL_ID_REQUIRED")
     return (
         ProviderDefinition(
             provider_id="gpt56-relay",
@@ -166,17 +204,29 @@ def _provider_definitions(environment: Mapping[str, str]) -> tuple[ProviderDefin
             display_name="Alibaba Bailian",
             provider_family="Alibaba Cloud Model Studio",
             region="cn-beijing",
-            protocols=(Protocol.CHAT_COMPLETIONS, Protocol.RESPONSES),
+            protocols=(Protocol.CHAT_COMPLETIONS, Protocol.RESPONSES, Protocol.MESSAGES),
             endpoint_class=EndpointClass.WORKSPACE_DEDICATED,
-            base_url_reference=ALIBABA_BASE_URL_REFERENCE,
+            base_url_reference=ALIBABA_OPENAI_BASE_URL_REFERENCE,
+            protocol_base_url_references={
+                Protocol.CHAT_COMPLETIONS: ALIBABA_OPENAI_BASE_URL_REFERENCE,
+                Protocol.RESPONSES: ALIBABA_OPENAI_BASE_URL_REFERENCE,
+                Protocol.MESSAGES: ALIBABA_ANTHROPIC_BASE_URL_REFERENCE,
+            },
             credential_reference=ALIBABA_CREDENTIAL_REFERENCE,
             billing_mode=BillingMode.PAY_AS_YOU_GO,
             automation_allowed=True,
             enabled=_enabled(environment, "alibaba-bailian"),
             health_status=_status(environment, "alibaba-bailian"),
-            capabilities=("openai-compatible", "chat-completions", "responses"),
+            capabilities=(
+                "openai-compatible",
+                "anthropic-compatible",
+                "chat-completions",
+                "responses",
+                "messages",
+            ),
             runtime_endpoint_fingerprint=alibaba_fingerprint,
-            configuration_reason_codes=tuple(alibaba_reasons),
+            runtime_endpoint_fingerprints=alibaba_fingerprints,
+            configuration_reason_codes=alibaba_endpoint_reasons,
         ),
     )
 
@@ -199,7 +249,7 @@ def _model_definitions(environment: Mapping[str, str]) -> tuple[ModelDefinition,
             capabilities=("coding",),
             context_metadata_status="NOT_AVAILABLE",
             reasoning_controls=ReasoningControls(),
-            supported_protocols=(Protocol.MESSAGES,),
+            supported_protocols=(Protocol.MESSAGES, Protocol.RESPONSES),
         ),
         ModelDefinition(
             model_id="glm-5.2",
@@ -217,7 +267,7 @@ def _model_definitions(environment: Mapping[str, str]) -> tuple[ModelDefinition,
             capabilities=("coding", "thinking-control"),
             context_metadata_status="NOT_AVAILABLE",
             reasoning_controls=ReasoningControls(thinking_toggle=True),
-            supported_protocols=(Protocol.CHAT_COMPLETIONS,),
+            supported_protocols=(Protocol.CHAT_COMPLETIONS, Protocol.RESPONSES),
         ),
         ModelDefinition(
             model_id="deepseek-v4-flash",
@@ -338,31 +388,47 @@ def _profiles(environment: Mapping[str, str]) -> tuple[ProviderModelProfile, ...
             enabled=provider_by_id["deepseek-official"].enabled,
         ),
     ]
-    for model_id in _alibaba_model_ids(environment):
+    official_alibaba_profiles = (
+        ("qwen3.8-max", Protocol.RESPONSES, "responses", "/responses"),
+        ("qwen3.8-max", Protocol.MESSAGES, "messages", "/v1/messages"),
+        ("deepseek-v4-pro", Protocol.RESPONSES, "responses", "/responses"),
+        ("glm-5.2", Protocol.CHAT_COMPLETIONS, "chat", "/chat/completions"),
+    )
+    configured_alibaba_profiles = tuple(
+        (model_id, protocol, suffix, route)
+        for model_id in _alibaba_model_ids(environment)
+        if model_id not in {"qwen3.8-max", "deepseek-v4-pro", "glm-5.2"}
         for protocol, suffix, route in (
             (Protocol.CHAT_COMPLETIONS, "chat", "/chat/completions"),
             (Protocol.RESPONSES, "responses", "/responses"),
-        ):
-            profiles.append(
-                freeze_provider_model_profile(
-                    profile_id=f"alibaba-bailian-{model_id}-{suffix}",
-                    model_id=model_id,
-                    provider_id="alibaba-bailian",
-                    requested_model=model_id,
-                    protocol=protocol,
-                    route=route,
-                    provider_route_identity=(
-                        f"alibaba-bailian|{protocol.value}|env:{ALIBABA_BASE_URL_REFERENCE}{route}"
-                    ),
-                    credential_reference=ALIBABA_CREDENTIAL_REFERENCE,
-                    max_output_tokens=2000,
-                    request_timeout_seconds=180,
-                    observed_model_capability=ObservedModelCapability.RUN_EVIDENCE_ONLY,
-                    automation_allowed=True,
-                    enabled=alibaba.enabled,
-                    runtime_endpoint_fingerprint=alibaba.runtime_endpoint_fingerprint,
-                )
+        )
+    )
+    for model_id, protocol, suffix, route in (
+        *official_alibaba_profiles,
+        *configured_alibaba_profiles,
+    ):
+        base_url_reference = alibaba.protocol_base_url_references[protocol]
+        runtime_fingerprint = alibaba.runtime_endpoint_fingerprints.get(protocol)
+        profiles.append(
+            freeze_provider_model_profile(
+                profile_id=f"alibaba-bailian-{model_id}-{suffix}",
+                model_id=model_id,
+                provider_id="alibaba-bailian",
+                requested_model=model_id,
+                protocol=protocol,
+                route=route,
+                provider_route_identity=(
+                    f"alibaba-bailian|{protocol.value}|env:{base_url_reference}{route}"
+                ),
+                credential_reference=ALIBABA_CREDENTIAL_REFERENCE,
+                max_output_tokens=2000 if model_id != "glm-5.2" else 256,
+                request_timeout_seconds=180 if model_id != "glm-5.2" else 90,
+                observed_model_capability=ObservedModelCapability.RUN_EVIDENCE_ONLY,
+                automation_allowed=True,
+                enabled=alibaba.enabled,
+                runtime_endpoint_fingerprint=runtime_fingerprint,
             )
+        )
     return tuple(profiles)
 
 
@@ -461,6 +527,18 @@ def _harnesses(environment: Mapping[str, str]) -> tuple[HarnessDefinition, ...]:
                             "runtime": CLAUDE_CLI_VERSION,
                             "package_integrity": CLAUDE_PACKAGE_INTEGRITY,
                             "provider_profile": "opencode-go-qwen38-messages",
+                        }
+                    ),
+                ),
+                HarnessProfileDefinition(
+                    profile_id="claude-qwen38-alibaba-bailian",
+                    profile_reference="builtin:registry.claude-qwen38-alibaba-bailian",
+                    supported_provider_profile_ids=("alibaba-bailian-qwen3.8-max-messages",),
+                    harness_config_identity=canonical_digest(
+                        {
+                            "runtime": CLAUDE_CLI_VERSION,
+                            "package_integrity": CLAUDE_PACKAGE_INTEGRITY,
+                            "provider_profile": "alibaba-bailian-qwen3.8-max-messages",
                         }
                     ),
                 ),

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 from uuid import uuid4
 
 import httpx
@@ -37,7 +38,14 @@ from harnesslab.experiment.queue import enqueue_plan
 from harnesslab.harness_lane.profile import CODEX_IMAGE
 from harnesslab.model_lane.models import ProviderRequest
 from harnesslab.model_lane.providers import adapter_for_profile
-from harnesslab.multi_harness.profile import CLAUDE_IMAGE, DEEPSEEK_IMAGE
+from harnesslab.multi_harness.adapter import ClaudeCodeAdapter
+from harnesslab.multi_harness.models import HarnessKind
+from harnesslab.multi_harness.profile import (
+    CLAUDE_IMAGE,
+    DEEPSEEK_IMAGE,
+    configured_qwen_alibaba_bailian_claude_profile,
+)
+from harnesslab.multi_harness.prompt import render_harness_prompt
 from harnesslab.registry.alibaba import configured_alibaba_bailian_profile
 from harnesslab.registry.models import (
     BillingMode,
@@ -59,7 +67,12 @@ from harnesslab.sandbox.models import ImageIdentity
 from tests.phase_g_helpers import ROOT
 
 METHODOLOGY = load_evaluation_methodology(ROOT / "release/evaluation-methodology-v2.json")
-ALIBABA_RUNTIME_URL = "https://workspace-sentinel.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+ALIBABA_OPENAI_RUNTIME_URL = (
+    "https://workspace-sentinel.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+)
+ALIBABA_ANTHROPIC_RUNTIME_URL = (
+    "https://workspace-sentinel.cn-beijing.maas.aliyuncs.com/apps/anthropic"
+)
 ALIBABA_KEY = "fake-alibaba-key-sentinel"
 
 
@@ -155,7 +168,8 @@ def relay_environment(*, status: str = "AVAILABLE") -> dict[str, str]:
 
 def alibaba_environment(*, model_id: str = "operator-model-a") -> dict[str, str]:
     return {
-        "HARNESSLAB_ALIBABA_BAILIAN_BASE_URL": ALIBABA_RUNTIME_URL,
+        "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL": ALIBABA_OPENAI_RUNTIME_URL,
+        "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL": ALIBABA_ANTHROPIC_RUNTIME_URL,
         "HARNESSLAB_ALIBABA_BAILIAN_API_KEY": ALIBABA_KEY,
         "HARNESSLAB_ALIBABA_BAILIAN_MODEL_IDS": model_id,
         "HARNESSLAB_ALIBABA_BAILIAN_STATUS": "AVAILABLE",
@@ -213,10 +227,17 @@ def test_registry_seeds_four_providers_and_keeps_model_provider_separate() -> No
     alibaba = next(item for item in catalog.providers if item.provider_id == "alibaba-bailian")
     assert alibaba.billing_mode is BillingMode.PAY_AS_YOU_GO
     assert alibaba.region == "cn-beijing"
-    assert "CONFIGURED_MODEL_ID_REQUIRED" in alibaba.configuration_reason_codes
-    assert not any(
-        item.provider_id == "alibaba-bailian" for item in catalog.provider_model_profiles
-    )
+    assert "RUNTIME_ENDPOINT_REFERENCE_MISSING" in alibaba.configuration_reason_codes
+    assert {
+        item.profile_id
+        for item in catalog.provider_model_profiles
+        if item.provider_id == "alibaba-bailian"
+    } == {
+        "alibaba-bailian-qwen3.8-max-responses",
+        "alibaba-bailian-qwen3.8-max-messages",
+        "alibaba-bailian-deepseek-v4-pro-responses",
+        "alibaba-bailian-glm-5.2-chat",
+    }
 
 
 def test_registry_and_settings_never_serialize_runtime_values_or_credentials() -> None:
@@ -226,7 +247,8 @@ def test_registry_and_settings_never_serialize_runtime_values_or_credentials() -
     serialized = json.dumps(
         {"catalog": catalog.model_dump(mode="json"), "settings": settings.model_dump(mode="json")}
     )
-    assert ALIBABA_RUNTIME_URL not in serialized
+    assert ALIBABA_OPENAI_RUNTIME_URL not in serialized
+    assert ALIBABA_ANTHROPIC_RUNTIME_URL not in serialized
     assert ALIBABA_KEY not in serialized
     assert "workspace-sentinel" not in serialized
     assert "HARNESSLAB_ALIBABA_BAILIAN_API_KEY" in serialized
@@ -239,6 +261,60 @@ def test_registry_and_settings_never_serialize_runtime_values_or_credentials() -
         )
         == "SET"
     )
+
+
+def test_alibaba_claude_profile_uses_only_protected_bailian_references(
+    tmp_path: Path,
+) -> None:
+    profile = configured_qwen_alibaba_bailian_claude_profile(
+        ImageIdentity(reference=CLAUDE_IMAGE, image_id="sha256:" + "2" * 64)
+    )
+    prompt = render_harness_prompt(
+        HarnessKind.CLAUDE_CODE,
+        task_instruction="Fix retry deduplication.",
+        task_digest="sha256:" + "1" * 64,
+        workspace_input_digest="sha256:" + "2" * 64,
+        context_digest=None,
+        network_policy=profile.network_policy,
+    )
+    plan = ClaudeCodeAdapter().prepare(
+        profile,
+        prompt,
+        workspace=tmp_path,
+        context=None,
+        task_id="core-python-deduplicate",
+    )
+
+    assert profile.provider_fixed_base_url is None
+    assert profile.provider_base_url_reference == ("HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL")
+    assert profile.provider_credential_reference == "HARNESSLAB_ALIBABA_BAILIAN_API_KEY"
+    assert dict(plan.environment_references) == {
+        "ANTHROPIC_BASE_URL": "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL",
+        "ANTHROPIC_API_KEY": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+    }
+    literals = dict(plan.environment_literals)
+    assert literals["ANTHROPIC_MODEL"] == "qwen3.8-max"
+    assert literals["CLAUDE_CODE_NO_MODEL_FALLBACK"] == "1"
+    assert "api.anthropic.com" not in profile.canonical_json()
+
+
+def test_alibaba_preflight_rejects_cross_workspace_endpoint_binding() -> None:
+    environment = alibaba_environment(model_id="qwen3.8-max")
+    environment["HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL"] = (
+        "https://workspace-other.cn-beijing.maas.aliyuncs.com/apps/anthropic"
+    )
+    request = builder_request(
+        comparison=ComparisonType.END_TO_END_SYSTEM_COMPARISON,
+        left_profile="alibaba-bailian-qwen3.8-max-responses",
+        left_harness="direct-alibaba-bailian-qwen3.8-max-responses",
+        right_profile="alibaba-bailian-qwen3.8-max-messages",
+        right_harness="claude-qwen38-alibaba-bailian",
+    )
+
+    result = preflight_experiment(request, ROOT, environment)
+
+    assert result.status is PreflightStatus.BLOCKED
+    assert any(item.reason_code == "RUNTIME_ENDPOINT_WORKSPACE_MISMATCH" for item in result.checks)
 
 
 def test_capability_registry_fails_closed_and_exposes_trace_limits() -> None:
@@ -338,10 +414,10 @@ def test_provider_switch_and_runtime_endpoint_change_snapshot_identity() -> None
     )
     alibaba = builder_request(
         comparison=ComparisonType.END_TO_END_SYSTEM_COMPARISON,
-        left_profile="alibaba-bailian-qwen3.8-max-chat",
-        left_harness="direct-alibaba-bailian-qwen3.8-max-chat",
-        right_profile="alibaba-bailian-qwen3.8-max-chat",
-        right_harness="direct-alibaba-bailian-qwen3.8-max-chat",
+        left_profile="alibaba-bailian-qwen3.8-max-responses",
+        left_harness="direct-alibaba-bailian-qwen3.8-max-responses",
+        right_profile="alibaba-bailian-qwen3.8-max-responses",
+        right_harness="direct-alibaba-bailian-qwen3.8-max-responses",
     )
     opencode_snapshot = build_experiment_snapshot(opencode, ROOT, opencode_environment)
     environment = alibaba_environment(model_id="qwen3.8-max")
@@ -353,13 +429,17 @@ def test_provider_switch_and_runtime_endpoint_change_snapshot_identity() -> None
     }
 
     changed = dict(environment)
-    changed["HARNESSLAB_ALIBABA_BAILIAN_BASE_URL"] = (
+    changed["HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL"] = (
         "https://workspace-second.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+    )
+    changed["HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL"] = (
+        "https://workspace-second.cn-beijing.maas.aliyuncs.com/apps/anthropic"
     )
     changed_snapshot = build_experiment_snapshot(alibaba, ROOT, changed)
     assert changed_snapshot.snapshot_id != alibaba_snapshot.snapshot_id
     serialized = changed_snapshot.model_dump_json()
-    assert changed["HARNESSLAB_ALIBABA_BAILIAN_BASE_URL"] not in serialized
+    assert changed["HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL"] not in serialized
+    assert changed["HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL"] not in serialized
     assert "workspace-second" not in serialized
 
 
@@ -401,17 +481,37 @@ def test_methodology_recovery_contract_remains_authoritative() -> None:
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("protocol", (Protocol.CHAT_COMPLETIONS, Protocol.RESPONSES))
+@pytest.mark.parametrize(
+    "protocol", (Protocol.CHAT_COMPLETIONS, Protocol.RESPONSES, Protocol.MESSAGES)
+)
 async def test_fake_alibaba_profile_uses_openai_shapes_and_reference_only_bearer_auth(
     protocol: Protocol,
 ) -> None:
     profile = configured_alibaba_bailian_profile("operator-model-a", protocol)
 
     async def handler(request: httpx.Request) -> httpx.Response:
-        assert str(request.url).startswith(ALIBABA_RUNTIME_URL)
-        assert request.headers["Authorization"] == f"Bearer {ALIBABA_KEY}"
+        expected_base = (
+            ALIBABA_ANTHROPIC_RUNTIME_URL
+            if protocol is Protocol.MESSAGES
+            else ALIBABA_OPENAI_RUNTIME_URL
+        )
+        assert str(request.url).startswith(expected_base)
         body = json.loads(request.content)
         assert body["model"] == "operator-model-a"
+        if protocol is Protocol.MESSAGES:
+            assert request.headers["x-api-key"] == ALIBABA_KEY
+            assert body["system"] == "system"
+            return httpx.Response(
+                200,
+                json={
+                    "id": "messages-local",
+                    "model": "observed-alibaba-model",
+                    "content": [{"type": "text", "text": "ok"}],
+                    "stop_reason": "end_turn",
+                    "usage": {},
+                },
+            )
+        assert request.headers["Authorization"] == f"Bearer {ALIBABA_KEY}"
         if protocol is Protocol.CHAT_COMPLETIONS:
             assert [item["role"] for item in body["messages"]] == ["system", "user"]
             return httpx.Response(
@@ -447,7 +547,8 @@ async def test_fake_alibaba_profile_uses_openai_shapes_and_reference_only_bearer
             request,
             client=client,
             environment={
-                "HARNESSLAB_ALIBABA_BAILIAN_BASE_URL": ALIBABA_RUNTIME_URL,
+                "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL": ALIBABA_OPENAI_RUNTIME_URL,
+                "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL": (ALIBABA_ANTHROPIC_RUNTIME_URL),
                 "HARNESSLAB_ALIBABA_BAILIAN_API_KEY": ALIBABA_KEY,
             },
         ).invoke(request)
@@ -455,7 +556,8 @@ async def test_fake_alibaba_profile_uses_openai_shapes_and_reference_only_bearer
     assert result.requested_model == "operator-model-a"
     assert result.observed_model == "observed-alibaba-model"
     serialized = profile.model_dump_json() + result.model_dump_json()
-    assert ALIBABA_RUNTIME_URL not in serialized
+    assert ALIBABA_OPENAI_RUNTIME_URL not in serialized
+    assert ALIBABA_ANTHROPIC_RUNTIME_URL not in serialized
     assert ALIBABA_KEY not in serialized
 
 

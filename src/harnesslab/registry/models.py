@@ -90,6 +90,7 @@ class ProviderDefinition(RegistryModel):
     protocols: tuple[Protocol, ...] = Field(min_length=1)
     endpoint_class: EndpointClass
     base_url_reference: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
+    protocol_base_url_references: dict[Protocol, str] = Field(default_factory=dict)
     credential_reference: str = Field(
         pattern=r"^[A-Z][A-Z0-9_]*$", serialization_alias="credential_ref"
     )
@@ -100,6 +101,7 @@ class ProviderDefinition(RegistryModel):
     capabilities: tuple[str, ...]
     pricing_snapshot_reference: str | None = Field(default=None, max_length=300)
     runtime_endpoint_fingerprint: Sha256Digest | None = None
+    runtime_endpoint_fingerprints: dict[Protocol, Sha256Digest] = Field(default_factory=dict)
     configuration_reason_codes: tuple[str, ...] = ()
 
     @model_validator(mode="after")
@@ -109,7 +111,13 @@ class ProviderDefinition(RegistryModel):
         expected = (
             self.region == "cn-beijing",
             self.endpoint_class is EndpointClass.WORKSPACE_DEDICATED,
-            self.base_url_reference == "HARNESSLAB_ALIBABA_BAILIAN_BASE_URL",
+            self.base_url_reference == "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+            self.protocol_base_url_references
+            == {
+                Protocol.CHAT_COMPLETIONS: "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+                Protocol.RESPONSES: "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+                Protocol.MESSAGES: "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL",
+            },
             self.credential_reference == "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
             self.billing_mode is BillingMode.PAY_AS_YOU_GO,
             self.automation_allowed,

@@ -101,6 +101,31 @@ def configured_qwen_opencode_go_claude_profile(
     )
 
 
+def configured_qwen_alibaba_bailian_claude_profile(
+    image: ImageIdentity, *, execution_timeout_seconds: float = 180
+) -> MultiHarnessProfile:
+    return MultiHarnessProfile(
+        harness=HarnessKind.CLAUDE_CODE,
+        cli_version=CLAUDE_CLI_VERSION,
+        package_integrity=CLAUDE_PACKAGE_INTEGRITY,
+        requested_model="qwen3.8-max",
+        provider_route=(
+            "alibaba-bailian|messages|env:HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL/v1/messages"
+        ),
+        provider_provenance=ProviderProvenance.ALIBABA_HOSTED_MODEL,
+        provider_base_url_reference="HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL",
+        provider_credential_reference="HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        provider_credential_transport=ClaudeCredentialTransport.ANTHROPIC_API_KEY,
+        prompt_template_version=CLAUDE_PROMPT_VERSION,
+        tool_profile=("Read", "Edit", "Write", "Bash"),
+        output_format="stream-json+verbose",
+        trace_coverage=TraceCoverage.FULL_STREAM,
+        image=image,
+        subject_toolchain_profile=SUBJECT_TOOLCHAIN_PROFILE,
+        execution_timeout_seconds=execution_timeout_seconds,
+    )
+
+
 def configured_deepseek_v4flash_profile(
     image: ImageIdentity,
     config_digest: str,
