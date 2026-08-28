@@ -10,6 +10,32 @@ const router = createRouter({
       component: () => import('@/views/ExperimentsView.vue'),
     },
     {
+      path: '/experiments/new',
+      name: 'experiment-new',
+      component: () => import('@/views/ExperimentBuilderView.vue'),
+    },
+    { path: '/models', name: 'models', component: () => import('@/views/ModelsView.vue') },
+    {
+      path: '/providers',
+      name: 'providers',
+      component: () => import('@/views/ProvidersView.vue'),
+    },
+    {
+      path: '/harnesses',
+      name: 'harnesses',
+      component: () => import('@/views/HarnessesView.vue'),
+    },
+    {
+      path: '/capabilities',
+      name: 'capabilities',
+      component: () => import('@/views/CapabilitiesView.vue'),
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: () => import('@/views/SettingsView.vue'),
+    },
+    {
       path: '/experiments/:id',
       name: 'experiment-detail',
       component: () => import('@/views/ExperimentDetailView.vue'),

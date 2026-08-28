@@ -14,6 +14,19 @@ import type {
   RunListResponse,
   TraceResponse,
 } from '@/types/workbench'
+import type {
+  CapabilityAssessment,
+  ExperimentBuilderRequest,
+  ExperimentPreflight,
+  ExperimentSnapshot,
+  HarnessDefinition,
+  MethodologyRegistryItem,
+  ModelDefinition,
+  ProviderDefinition,
+  ProviderModelProfile,
+  RegistrySettings,
+  TaskRegistryItem,
+} from '@/types/registry'
 
 export const apiClient = axios.create({
   baseURL: '/api/workbench',
@@ -67,4 +80,39 @@ export const workbenchApi = {
       })
     ).data,
   readiness: async () => (await apiClient.get<CoreReadiness>('/core-readiness')).data,
+}
+
+export const registryApiClient = axios.create({
+  baseURL: '/api',
+  timeout: 30_000,
+  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+})
+
+export const registryApi = {
+  providers: async () =>
+    (await registryApiClient.get<{ items: ProviderDefinition[] }>('/registry/providers')).data,
+  models: async () =>
+    (
+      await registryApiClient.get<{
+        models: ModelDefinition[]
+        provider_profiles: ProviderModelProfile[]
+      }>('/registry/models')
+    ).data,
+  harnesses: async () =>
+    (await registryApiClient.get<{ items: HarnessDefinition[] }>('/registry/harnesses')).data,
+  capabilities: async () =>
+    (await registryApiClient.get<{ items: CapabilityAssessment[] }>('/registry/capabilities')).data,
+  settings: async () => (await registryApiClient.get<RegistrySettings>('/registry/settings')).data,
+  tasks: async () =>
+    (await registryApiClient.get<{ items: TaskRegistryItem[] }>('/registry/tasks')).data,
+  methodologies: async () =>
+    (
+      await registryApiClient.get<{ items: MethodologyRegistryItem[] }>(
+        '/registry/methodologies',
+      )
+    ).data,
+  preflight: async (request: ExperimentBuilderRequest) =>
+    (await registryApiClient.post<ExperimentPreflight>('/experiments/preflight', request)).data,
+  snapshot: async (request: ExperimentBuilderRequest) =>
+    (await registryApiClient.post<ExperimentSnapshot>('/experiments/snapshot', request)).data,
 }

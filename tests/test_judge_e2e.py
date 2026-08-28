@@ -625,7 +625,7 @@ def test_phase_g_to_phase_h_migration_preserves_experiment_evidence(
             ).fetchone()
             revision = connection.execute("SELECT version_num FROM alembic_version").fetchone()
         assert row == ("preserved-phase-g", "completed", "sha256:" + "1" * 64)
-        assert revision == ("20260823_0004",)
+        assert revision == ("20260828_0005",)
     finally:
         if previous is None:
             os.environ.pop("DATABASE_URL", None)

@@ -13,6 +13,7 @@ onMounted(() => void store.fetchList())
     <div class="page-heading">
       <div><h2>Experiments</h2><p>Browse durable Phase G experiment plans and outcomes.</p></div>
       <div class="toolbar">
+        <RouterLink class="primary-button" to="/experiments/new">New keyless plan</RouterLink>
         <input v-model="store.search" aria-label="Search experiments" placeholder="Search id or name" @keyup.enter="store.fetchList" />
         <select v-model="store.statusFilter" aria-label="Filter by status" @change="store.fetchList">
           <option value="">All statuses</option><option value="queued">queued</option><option value="running">running</option><option value="completed">completed</option>

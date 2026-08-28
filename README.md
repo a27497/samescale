@@ -15,6 +15,9 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 - An exact Python 3.12.14 runtime and uv lockfile
 - A Typer CLI with `--help`, `--version`, `doctor`, and `serve`
 - A FastAPI control API with a database-aware `GET /api/health` and typed read-only Workbench API
+- A keyless Unified Registry Lite control plane with separate Provider, Model/Profile, Harness,
+  and fail-closed Capability registries; safe Settings references; Methodology-v2 preflight; and
+  PostgreSQL-backed immutable planning snapshots that create no experiment runs
 - Secret-safe settings loaded with Pydantic Settings
 - PostgreSQL 18 development service, SQLAlchemy 2 async access, psycopg 3, and Alembic
 - Pydantic v2 contracts for Task, Model, Harness, Experiment, and Run
@@ -96,9 +99,11 @@ JudgeLab is an L2 annotation and comparison layer. Evidence authority is
 
 ## Workbench boundary
 
-Phase I implements a read-only evidence Workbench. Experiment and Judge execution remains in the
-approved CLI/operator paths. The browser cannot mutate outcomes, cancel runs, change task/gold
-data, or trigger provider execution. Phase J does not add an Analyst browser route.
+Phase I evidence pages remain read-only. Unified Registry Lite adds backend-validated planning
+pages for models, providers, Harnesses, capabilities, settings, and new experiment snapshots.
+The browser still cannot mutate outcomes, cancel runs, change task/gold data, read secrets or
+private runtime URLs, or trigger provider/Harness/Judge execution. Phase J does not add an Analyst
+browser route. See [Unified Registry Lite](docs/UNIFIED_REGISTRY_LITE.md).
 
 ## Analyst boundary
 

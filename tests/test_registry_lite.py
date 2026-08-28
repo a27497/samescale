@@ -1,0 +1,490 @@
+from __future__ import annotations
+
+import json
+from collections.abc import AsyncIterator
+
+import httpx
+import pytest
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy import delete, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from harnesslab.api.app import create_app
+from harnesslab.api.workbench_dependencies import workbench_session
+from harnesslab.contracts.common import Protocol
+from harnesslab.core.config import Settings
+from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
+from harnesslab.db.models.registry import RegistryExperimentSnapshotRecord
+from harnesslab.db.session import create_engine, create_session_factory
+from harnesslab.experiment.methodology import (
+    BudgetContract,
+    BudgetDimension,
+    BudgetDimensionStatus,
+    ComparisonType,
+    EvaluationMode,
+    RecoveryEligibility,
+    load_evaluation_methodology,
+    recovery_authorization,
+)
+from harnesslab.experiment.outcomes import StatisticalOutcome
+from harnesslab.model_lane.models import ProviderRequest
+from harnesslab.model_lane.providers import adapter_for_profile
+from harnesslab.registry.alibaba import configured_alibaba_bailian_profile
+from harnesslab.registry.models import (
+    BillingMode,
+    CompatibilityStatus,
+    ExperimentBuilderRequest,
+    ExperimentCellSelection,
+    PreflightStatus,
+)
+from harnesslab.registry.seeds import build_registry_catalog
+from harnesslab.registry.service import (
+    assess_capability,
+    build_experiment_snapshot,
+    preflight_experiment,
+    registry_settings,
+)
+from tests.phase_g_helpers import ROOT
+
+METHODOLOGY = load_evaluation_methodology(ROOT / "release/evaluation-methodology-v2.json")
+ALIBABA_RUNTIME_URL = "https://workspace-sentinel.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+ALIBABA_KEY = "fake-alibaba-key-sentinel"
+
+
+def budget() -> BudgetContract:
+    unavailable = BudgetDimension(
+        status=BudgetDimensionStatus.NOT_AVAILABLE, value=None, unit="count"
+    )
+    return BudgetContract(
+        max_wall_time=BudgetDimension(
+            status=BudgetDimensionStatus.ENFORCED, value=90, unit="seconds"
+        ),
+        max_output_tokens=BudgetDimension(
+            status=BudgetDimensionStatus.ENFORCED, value=2000, unit="tokens"
+        ),
+        max_model_turns=unavailable,
+        max_tool_calls=unavailable,
+        max_provider_requests=unavailable,
+        max_cost=BudgetDimension(
+            status=BudgetDimensionStatus.NOT_AVAILABLE, value=None, unit="USD"
+        ),
+    )
+
+
+def relay_environment(*, status: str = "AVAILABLE") -> dict[str, str]:
+    return {
+        "HARNESSLAB_GPT56_RELAY_BASE_URL": "https://relay.registry.test/v1",
+        "HARNESSLAB_GPT56_RELAY_API_KEY": "fake-relay-key",
+        "HARNESSLAB_GPT56_RELAY_STATUS": status,
+    }
+
+
+def alibaba_environment(*, model_id: str = "operator-model-a") -> dict[str, str]:
+    return {
+        "HARNESSLAB_ALIBABA_BAILIAN_BASE_URL": ALIBABA_RUNTIME_URL,
+        "HARNESSLAB_ALIBABA_BAILIAN_API_KEY": ALIBABA_KEY,
+        "HARNESSLAB_ALIBABA_BAILIAN_MODEL_IDS": model_id,
+        "HARNESSLAB_ALIBABA_BAILIAN_STATUS": "AVAILABLE",
+    }
+
+
+def builder_request(
+    *,
+    mode: EvaluationMode = EvaluationMode.QUICK,
+    comparison: ComparisonType = ComparisonType.HARNESS_UPLIFT,
+    left_profile: str = "gpt56-relay-gpt56-responses",
+    left_harness: str = "direct-gpt56-relay-gpt56-responses",
+    right_profile: str = "gpt56-relay-gpt56-responses",
+    right_harness: str = "codex-gpt56-medium",
+    billing_modes: dict[str, BillingMode] | None = None,
+) -> ExperimentBuilderRequest:
+    return ExperimentBuilderRequest(
+        name="Registry Lite keyless plan",
+        methodology_id=METHODOLOGY.methodology_id,
+        methodology_digest=METHODOLOGY.digest,
+        evaluation_mode=mode,
+        comparison_type=comparison,
+        task_ids=("core-python-deduplicate",),
+        cells=(
+            ExperimentCellSelection(
+                cell_id="left",
+                provider_model_profile_id=left_profile,
+                harness_profile_id=left_harness,
+            ),
+            ExperimentCellSelection(
+                cell_id="right",
+                provider_model_profile_id=right_profile,
+                harness_profile_id=right_harness,
+            ),
+        ),
+        budget=budget(),
+        schedule_seed=20260828,
+        max_parallel_runs=1,
+        billing_modes=billing_modes or {},
+    )
+
+
+def test_registry_seeds_four_providers_and_keeps_model_provider_separate() -> None:
+    catalog = build_registry_catalog(ROOT, {})
+    assert {item.provider_id for item in catalog.providers} == {
+        "gpt56-relay",
+        "opencode-go",
+        "deepseek-official",
+        "alibaba-bailian",
+    }
+    assert len(catalog.tasks) == 18
+    assert all(
+        profile.model_id != profile.provider_id for profile in catalog.provider_model_profiles
+    )
+    alibaba = next(item for item in catalog.providers if item.provider_id == "alibaba-bailian")
+    assert alibaba.billing_mode is BillingMode.PAY_AS_YOU_GO
+    assert alibaba.region == "cn-beijing"
+    assert "CONFIGURED_MODEL_ID_REQUIRED" in alibaba.configuration_reason_codes
+    assert not any(
+        item.provider_id == "alibaba-bailian" for item in catalog.provider_model_profiles
+    )
+
+
+def test_registry_and_settings_never_serialize_runtime_values_or_credentials() -> None:
+    environment = alibaba_environment()
+    catalog = build_registry_catalog(ROOT, environment)
+    settings = registry_settings(catalog, environment)
+    serialized = json.dumps(
+        {"catalog": catalog.model_dump(mode="json"), "settings": settings.model_dump(mode="json")}
+    )
+    assert ALIBABA_RUNTIME_URL not in serialized
+    assert ALIBABA_KEY not in serialized
+    assert "workspace-sentinel" not in serialized
+    assert "HARNESSLAB_ALIBABA_BAILIAN_API_KEY" in serialized
+    assert settings.secret_editing_supported is False
+    assert (
+        next(
+            item.status.value
+            for item in settings.credentials
+            if item.credential_reference == "HARNESSLAB_ALIBABA_BAILIAN_API_KEY"
+        )
+        == "SET"
+    )
+
+
+def test_capability_registry_fails_closed_and_exposes_trace_limits() -> None:
+    catalog = build_registry_catalog(ROOT, relay_environment())
+    supported = assess_capability(catalog, "gpt56-relay-gpt56-responses", "codex-gpt56-medium")
+    unsupported = assess_capability(catalog, "opencode-go-qwen38-messages", "codex-gpt56-medium")
+    limited = assess_capability(
+        catalog,
+        "deepseek-official-v4flash-chat",
+        "deepseek-harness-v4flash",
+    )
+    assert supported.status is CompatibilityStatus.SUPPORTED
+    assert supported.trace_coverage.value == "FULL_STREAM"
+    assert unsupported.status is CompatibilityStatus.UNSUPPORTED
+    assert "PROVIDER_MODEL_PROFILE_UNSUPPORTED_BY_HARNESS" in unsupported.reason_codes
+    assert limited.status is CompatibilityStatus.PARTIALLY_SUPPORTED
+    assert "TRACE_COVERAGE_LIMITED" in limited.reason_codes
+
+
+@pytest.mark.parametrize(
+    ("mode", "expected_repeats", "expected_slots"),
+    (
+        (EvaluationMode.QUICK, 1, 2),
+        (EvaluationMode.INFORMAL, 3, 6),
+        (EvaluationMode.FORMAL_EXHAUSTIVE, 5, 10),
+    ),
+)
+def test_builder_enforces_mode_repeats_and_blocked_interleaving(
+    mode: EvaluationMode, expected_repeats: int, expected_slots: int
+) -> None:
+    result = preflight_experiment(builder_request(mode=mode), ROOT, relay_environment())
+    assert result.status is PreflightStatus.READY_WITH_WARNINGS
+    assert result.repeat_count == expected_repeats
+    assert result.estimated_logical_slots == expected_slots
+    assert len(result.schedule_preview) == expected_repeats
+    assert all(
+        set(item.cell_execution_order) == {"left", "right"} for item in result.schedule_preview
+    )
+
+
+def test_builder_blocks_false_harness_uplift_and_allows_controlled_ablation() -> None:
+    deepseek_env = {"DEEPSEEK_API_KEY": "fake", "HARNESSLAB_DEEPSEEK_OFFICIAL_STATUS": "AVAILABLE"}
+    false_uplift = builder_request(
+        left_profile="deepseek-official-v4pro-chat",
+        left_harness="direct-deepseek-official-v4pro-chat",
+        right_profile="deepseek-official-v4flash-chat",
+        right_harness="deepseek-harness-v4flash",
+    )
+    blocked = preflight_experiment(false_uplift, ROOT, deepseek_env)
+    assert blocked.status is PreflightStatus.BLOCKED
+    assert any(item.reason_code == "INVALID_EXPERIMENT_SELECTION" for item in blocked.checks)
+
+    ablation = builder_request(
+        comparison=ComparisonType.CONTROLLED_ABLATION,
+        left_harness="codex-gpt56-medium",
+        right_harness="codex-gpt56-high",
+    )
+    allowed = preflight_experiment(ablation, ROOT, relay_environment())
+    assert allowed.status is PreflightStatus.READY_WITH_WARNINGS
+    assert allowed.candidate_plan_digest is not None
+
+
+def test_alibaba_requires_payg_and_quota_blocks_new_blocks() -> None:
+    environment = alibaba_environment()
+    request = builder_request(
+        comparison=ComparisonType.END_TO_END_SYSTEM_COMPARISON,
+        left_profile="alibaba-bailian-operator-model-a-chat",
+        left_harness="direct-alibaba-bailian-operator-model-a-chat",
+        right_profile="alibaba-bailian-operator-model-a-responses",
+        right_harness="direct-alibaba-bailian-operator-model-a-responses",
+        billing_modes={"alibaba-bailian": BillingMode.CODING_PLAN},
+    )
+    result = preflight_experiment(request, ROOT, environment)
+    assert result.status is PreflightStatus.BLOCKED
+    assert any(
+        item.reason_code == "AUTOMATION_NOT_ALLOWED_FOR_BILLING_PLAN" for item in result.checks
+    )
+
+    quota_environment = relay_environment(status="QUOTA_EXHAUSTED")
+    quota = preflight_experiment(builder_request(), ROOT, quota_environment)
+    assert quota.status is PreflightStatus.BLOCKED
+    assert any(item.reason_code == "QUOTA_EXHAUSTED" for item in quota.checks)
+    assert all(item.provider_status == "PROVIDER_UNAVAILABLE" for item in quota.schedule_preview)
+
+
+def test_provider_switch_and_runtime_endpoint_change_snapshot_identity() -> None:
+    opencode_environment = {
+        "HARNESSLAB_OPENCODE_GO_API_KEY": "fake",
+        "HARNESSLAB_OPENCODE_GO_STATUS": "AVAILABLE",
+    }
+    opencode = builder_request(
+        comparison=ComparisonType.END_TO_END_SYSTEM_COMPARISON,
+        left_profile="opencode-go-qwen38-messages",
+        left_harness="direct-opencode-go-qwen38-messages",
+        right_profile="opencode-go-qwen38-messages",
+        right_harness="direct-opencode-go-qwen38-messages",
+    )
+    alibaba = builder_request(
+        comparison=ComparisonType.END_TO_END_SYSTEM_COMPARISON,
+        left_profile="alibaba-bailian-qwen3.8-max-chat",
+        left_harness="direct-alibaba-bailian-qwen3.8-max-chat",
+        right_profile="alibaba-bailian-qwen3.8-max-chat",
+        right_harness="direct-alibaba-bailian-qwen3.8-max-chat",
+    )
+    opencode_snapshot = build_experiment_snapshot(opencode, ROOT, opencode_environment)
+    environment = alibaba_environment(model_id="qwen3.8-max")
+    alibaba_snapshot = build_experiment_snapshot(alibaba, ROOT, environment)
+    assert opencode_snapshot.snapshot_id != alibaba_snapshot.snapshot_id
+    assert opencode_snapshot.plan.run_slots[0].slot_id != alibaba_snapshot.plan.run_slots[0].slot_id
+    assert {item.provider_id for item in alibaba_snapshot.provider_selections} == {
+        "alibaba-bailian"
+    }
+
+    changed = dict(environment)
+    changed["HARNESSLAB_ALIBABA_BAILIAN_BASE_URL"] = (
+        "https://workspace-second.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+    )
+    changed_snapshot = build_experiment_snapshot(alibaba, ROOT, changed)
+    assert changed_snapshot.snapshot_id != alibaba_snapshot.snapshot_id
+    serialized = changed_snapshot.model_dump_json()
+    assert changed["HARNESSLAB_ALIBABA_BAILIAN_BASE_URL"] not in serialized
+    assert "workspace-second" not in serialized
+
+
+def test_provider_status_change_does_not_change_experiment_identity() -> None:
+    available = build_experiment_snapshot(builder_request(), ROOT, relay_environment())
+    unavailable = build_experiment_snapshot(
+        builder_request(), ROOT, relay_environment(status="UNAVAILABLE")
+    )
+    assert available.snapshot_id == unavailable.snapshot_id
+    assert {item.slot_id for item in available.plan.run_slots} == {
+        item.slot_id for item in unavailable.plan.run_slots
+    }
+    assert available.preflight.status is PreflightStatus.READY_WITH_WARNINGS
+    assert unavailable.preflight.status is PreflightStatus.BLOCKED
+
+
+def test_methodology_recovery_contract_remains_authoritative() -> None:
+    capability = recovery_authorization(
+        slot_id="sha256:" + "1" * 64,
+        original_attempt_identity="sha256:" + "2" * 64,
+        outcome=StatisticalOutcome.CAPABILITY_FAIL,
+        recovery_attempt_count=0,
+    )
+    first = recovery_authorization(
+        slot_id="sha256:" + "1" * 64,
+        original_attempt_identity="sha256:" + "2" * 64,
+        outcome=StatisticalOutcome.INFRA_FAILURE,
+        recovery_attempt_count=0,
+    )
+    second = recovery_authorization(
+        slot_id="sha256:" + "1" * 64,
+        original_attempt_identity="sha256:" + "2" * 64,
+        outcome=StatisticalOutcome.INFRA_FAILURE,
+        recovery_attempt_count=1,
+    )
+    assert capability.eligibility is RecoveryEligibility.CAPABILITY_TERMINAL_NO_RETRY
+    assert first.eligibility is RecoveryEligibility.ELIGIBLE
+    assert second.eligibility is RecoveryEligibility.INFRA_RECOVERY_EXHAUSTED
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("protocol", (Protocol.CHAT_COMPLETIONS, Protocol.RESPONSES))
+async def test_fake_alibaba_profile_uses_openai_shapes_and_reference_only_bearer_auth(
+    protocol: Protocol,
+) -> None:
+    profile = configured_alibaba_bailian_profile("operator-model-a", protocol)
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        assert str(request.url).startswith(ALIBABA_RUNTIME_URL)
+        assert request.headers["Authorization"] == f"Bearer {ALIBABA_KEY}"
+        body = json.loads(request.content)
+        assert body["model"] == "operator-model-a"
+        if protocol is Protocol.CHAT_COMPLETIONS:
+            assert [item["role"] for item in body["messages"]] == ["system", "user"]
+            return httpx.Response(
+                200,
+                json={
+                    "id": "chat-local",
+                    "model": "observed-alibaba-model",
+                    "choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
+                    "usage": {},
+                },
+            )
+        assert body["instructions"] == "system"
+        assert body["input"] == "user"
+        return httpx.Response(
+            200,
+            json={
+                "id": "responses-local",
+                "model": "observed-alibaba-model",
+                "status": "completed",
+                "output": [
+                    {
+                        "type": "message",
+                        "content": [{"type": "output_text", "text": "ok"}],
+                    }
+                ],
+                "usage": {},
+            },
+        )
+
+    request = ProviderRequest(profile=profile, instructions="system", input="user")
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        result = await adapter_for_profile(
+            request,
+            client=client,
+            environment={
+                "HARNESSLAB_ALIBABA_BAILIAN_BASE_URL": ALIBABA_RUNTIME_URL,
+                "HARNESSLAB_ALIBABA_BAILIAN_API_KEY": ALIBABA_KEY,
+            },
+        ).invoke(request)
+    assert result.provider == "alibaba-bailian"
+    assert result.requested_model == "operator-model-a"
+    assert result.observed_model == "observed-alibaba-model"
+    serialized = profile.model_dump_json() + result.model_dump_json()
+    assert ALIBABA_RUNTIME_URL not in serialized
+    assert ALIBABA_KEY not in serialized
+
+
+@pytest.mark.integration
+async def test_registry_api_persists_only_immutable_snapshot_and_preserves_matrix(
+    database_url: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    environment = relay_environment()
+    for key, value in environment.items():
+        monkeypatch.setenv(key, value)
+    request = builder_request()
+    expected = build_experiment_snapshot(request, ROOT, environment)
+    engine = create_engine(Settings.without_dotenv(database_url=database_url))
+    factory = create_session_factory(engine)
+    async with factory() as cleanup, cleanup.begin():
+        await cleanup.execute(
+            delete(RegistryExperimentSnapshotRecord).where(
+                RegistryExperimentSnapshotRecord.id == expected.snapshot_id
+            )
+        )
+    async with factory() as session:
+        matrix_before = await session.scalar(
+            select(func.count())
+            .select_from(ExperimentRunRecord)
+            .where(ExperimentRunRecord.experiment_id == "core-real-matrix-v3")
+        )
+
+    app = create_app()
+
+    async def override_session() -> AsyncIterator[AsyncSession]:
+        async with factory() as session:
+            yield session
+
+    app.dependency_overrides[workbench_session] = override_session
+    try:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            providers = await client.get("/api/registry/providers")
+            preflight = await client.post(
+                "/api/experiments/preflight", json=request.model_dump(mode="json")
+            )
+            first = await client.post(
+                "/api/experiments/snapshot", json=request.model_dump(mode="json")
+            )
+            second = await client.post(
+                "/api/experiments/snapshot", json=request.model_dump(mode="json")
+            )
+            malicious = request.model_dump(mode="json")
+            malicious["base_url"] = "https://raw-url-sentinel.invalid"
+            rejected = await client.post("/api/experiments/preflight", json=malicious)
+            unknown_selection = request.model_dump(mode="json")
+            unknown_selection["cells"][0]["provider_model_profile_id"] = "unknown-profile"
+            rejected_snapshot = await client.post(
+                "/api/experiments/snapshot", json=unknown_selection
+            )
+        assert providers.status_code == 200
+        assert all("credential_ref" in item for item in providers.json()["items"])
+        assert "credential_reference" not in providers.text
+        assert preflight.status_code == 200
+        assert first.status_code == second.status_code == 200
+        assert first.json()["snapshot_digest"] == second.json()["snapshot_digest"]
+        assert rejected.status_code == 422
+        assert "raw-url-sentinel" not in rejected.text
+        assert rejected_snapshot.status_code == 422
+        assert rejected_snapshot.json() == {
+            "error": {
+                "code": "INVALID_REGISTRY_SELECTION",
+                "message": "snapshot selection failed backend validation",
+            }
+        }
+        response_text = providers.text + first.text
+        assert environment["HARNESSLAB_GPT56_RELAY_BASE_URL"] not in response_text
+        assert environment["HARNESSLAB_GPT56_RELAY_API_KEY"] not in response_text
+
+        async with factory() as session:
+            persisted = await session.scalar(
+                select(RegistryExperimentSnapshotRecord).where(
+                    RegistryExperimentSnapshotRecord.id == expected.snapshot_id
+                )
+            )
+            snapshot_count = await session.scalar(
+                select(func.count())
+                .select_from(RegistryExperimentSnapshotRecord)
+                .where(RegistryExperimentSnapshotRecord.id == expected.snapshot_id)
+            )
+            matrix_after = await session.scalar(
+                select(func.count())
+                .select_from(ExperimentRunRecord)
+                .where(ExperimentRunRecord.experiment_id == "core-real-matrix-v3")
+            )
+            no_run_experiment = await session.get(ExperimentRecord, expected.plan.experiment_id)
+        assert persisted is not None
+        persisted_json = json.dumps(persisted.snapshot_json)
+        assert environment["HARNESSLAB_GPT56_RELAY_BASE_URL"] not in persisted_json
+        assert environment["HARNESSLAB_GPT56_RELAY_API_KEY"] not in persisted_json
+        assert snapshot_count == 1
+        assert matrix_before == matrix_after == 630
+        assert no_run_experiment is None
+    finally:
+        app.dependency_overrides.clear()
+        async with factory() as cleanup, cleanup.begin():
+            await cleanup.execute(
+                delete(RegistryExperimentSnapshotRecord).where(
+                    RegistryExperimentSnapshotRecord.id == expected.snapshot_id
+                )
+            )
+        await engine.dispose()
