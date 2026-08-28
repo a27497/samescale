@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Collection, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -208,7 +208,9 @@ class ExperimentRunExecutor:
             raise ValueError("heartbeat cadence must not exceed one third of the lease ttl")
         self.clock = clock
 
-    async def claim(self, experiment_id: str) -> RunSnapshot | None:
+    async def claim(
+        self, experiment_id: str, *, slot_ids: Collection[str] | None = None
+    ) -> RunSnapshot | None:
         async with self.session_factory() as session, session.begin():
             return await claim_next_run(
                 session,
@@ -216,6 +218,7 @@ class ExperimentRunExecutor:
                 self.owner,
                 now=self.clock(),
                 ttl=self.lease_ttl,
+                slot_ids=slot_ids,
             )
 
     async def _transition(self, run_id: str, status: RunStatus) -> RunSnapshot:
@@ -379,6 +382,7 @@ class ExperimentRunExecutor:
         *,
         max_runs: int,
         concurrency: int = 1,
+        slot_ids: Collection[str] | None = None,
     ) -> tuple[RunSnapshot, ...]:
         """Execute at most ``max_runs`` claimable slots with bounded concurrent workers."""
 
@@ -396,7 +400,7 @@ class ExperimentRunExecutor:
                 async with reservation_lock:
                     if reserved >= max_runs:
                         return
-                    claimed = await self.claim(experiment_id)
+                    claimed = await self.claim(experiment_id, slot_ids=slot_ids)
                     if claimed is None:
                         return
                     reserved += 1

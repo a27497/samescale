@@ -44,6 +44,54 @@ class PairedClaimPolicy(StrEnum):
     NO_HARNESS_UPLIFT_CLAIM = "NO_HARNESS_UPLIFT_CLAIM"
 
 
+class TechnicalReadinessState(StrEnum):
+    REACHED = "REACHED"
+    NOT_REACHED = "NOT_REACHED"
+
+
+class TechnicalReadinessObservation(StrictModel):
+    call_id: Identifier
+    evidence_class: Literal["RELEASE_SMOKE", "DIAGNOSTIC_ONLY"]
+    terminal_outcome: str
+    classification: Literal[
+        "PROJECT_DETERMINISTIC",
+        "CAPABILITY_OUTCOME",
+        "EXTERNAL_OPERATIONAL",
+        "NOT_DETERMINED",
+    ]
+    evidence_digest: Sha256Digest
+
+
+class TechnicalReadinessManifest(CanonicalModel):
+    """Non-release execution readiness; it can never satisfy a REAL_* release binding."""
+
+    schema_version: Literal[1] = 1
+    plan_id: Literal["core-real-evidence-v3"] = "core-real-evidence-v3"
+    subject_plane_technical_ready: TechnicalReadinessState
+    judge_plane_reached: TechnicalReadinessState
+    complete_release_smoke: TechnicalReadinessState
+    core_release_ready: Literal[False] = False
+    observations: tuple[TechnicalReadinessObservation, ...]
+    unresolved_project_deterministic_blockers: tuple[str, ...] = ()
+    release_state_effect: Literal["NONE"] = "NONE"
+
+    @model_validator(mode="after")
+    def readiness_is_non_promotional(self) -> TechnicalReadinessManifest:
+        subject_ids = {item.call_id for item in self.observations if "judge" not in item.call_id}
+        if (
+            self.subject_plane_technical_ready is TechnicalReadinessState.REACHED
+            and len(subject_ids) != 7
+        ):
+            raise ValueError("subject technical readiness requires all seven subject identities")
+        if self.unresolved_project_deterministic_blockers and (
+            self.subject_plane_technical_ready is TechnicalReadinessState.REACHED
+        ):
+            raise ValueError("subject readiness cannot hide a deterministic project blocker")
+        if self.complete_release_smoke is TechnicalReadinessState.REACHED:
+            raise ValueError("technical readiness cannot retrofit an aborted release smoke")
+        return self
+
+
 class ValidationResult(StrictModel):
     passed: bool
     score: float = Field(ge=0, le=1)

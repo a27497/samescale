@@ -12,10 +12,18 @@ policy. The only subject-budget change is a uniform 180-second wall-clock timeou
 the Judge remains 90 seconds. Select them explicitly with `--plan-version v3`.
 
 The v3 Matrix still expands to 7 cells × 18 tasks × 5 repeats = 630 logical runs with zero calls
-during preflight, and every subject profile carries the same 180-second timeout. The separately
-gated `harnesslab release matrix canary --allow-real-matrix-canary` uses the normal PostgreSQL
-queue, executor, and production bindings for exactly `core-python-deduplicate` × all seven cells ×
-repeat zero. It is not a substitute for the full Matrix and cannot authorize one.
+during preflight, and every subject profile carries the same 180-second timeout. Canary and pilot
+are strict selections over that one immutable plan, not separate experiments. `--selection canary`
+selects `core-python-deduplicate` × seven cells × repeat zero (7 slots); `--selection pilot` adds
+`core-java-deduplicate` and `core-typescript-deduplicate` (21 slots total). The queue always contains
+all 630 original slot IDs, so completed canary/pilot slots are already complete for the full Matrix.
+Campaign concurrency defaults to two and is capped at four.
+
+V3 Cycle 1 is preserved at `history/core-real-v3-attempt-1.json`; its Calls 6–8 continuation is
+separate at `diagnostics/core-real-v3-attempt-1.json` and remains `DIAGNOSTIC_ONLY`. The smoke
+aborted after Call 5 and is not represented as complete. `technical-readiness-v3.json` records the
+non-release subject-plane and Judge-plane reachability result without changing any strict
+`REAL_*` state or `CORE_RELEASE_READY`.
 
 ## Core real-evidence v2 artifacts
 
@@ -37,11 +45,20 @@ calls not attempted by the supplied smoke receipt. Such reports declare `release
 and cannot satisfy any `REAL_*` release state. They exist to expose independent component defects
 without repeating a release-smoke call.
 
+`component-smoke evidence-summary` validates a diagnostic report and emits an allowlisted candidate
+history object. It does not merge diagnostic observations into a release receipt.
+
 The production Matrix plane is the existing Phase G PostgreSQL queue and executor, bound strictly
 to `core-real-matrix-v2`. `harnesslab release matrix preflight` expands 7 cells by 18 frozen tasks by
 5 repeats (630 logical runs) with zero provider calls. Execution requires both
-`--allow-real-matrix` and an explicit `--max-runs`; concurrency defaults to one and is bounded at
-eight. Completed logical slots are resumed idempotently and are not duplicated.
+`--allow-real-matrix` and an explicit `--max-runs`; the v3 campaign accepts strict
+`canary`/`pilot`/`remaining` selections, defaults to concurrency two, and is bounded at four.
+Completed logical slots are resumed idempotently and are not duplicated.
+
+`harnesslab release judge preflight` derives the 63-slot `core-real-judge-v3` plan from the existing
+v3 GLM-5.2 profile, `core-calibration@1.0.0` suite/definition, repeat count, and unmodified
+qualification thresholds. `release judge calibrate --allow-real-judge` resumes pending Judge slots;
+schema/output failures and abstentions are calibration outcomes rather than campaign stop reasons.
 
 `harnesslab release telemetry summarize --artifact-root <root>` aggregates only safe observed
 latency, usage, request-count, trace, and verifier facts. When the repository has no authoritative

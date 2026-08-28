@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "plan_id": "core-real-evidence-v3",
+  "subject_plane_technical_ready": "REACHED",
+  "judge_plane_reached": "REACHED",
+  "complete_release_smoke": "NOT_REACHED",
+  "core_release_ready": false,
+  "observations": [
+    {"call_id":"smoke-1-model-gpt56-relay-responses","evidence_class":"RELEASE_SMOKE","terminal_outcome":"verified_pass","classification":"CAPABILITY_OUTCOME","evidence_digest":"sha256:f5a2943b6479fa1fc734d6b714eba3b0b9e6be59fe7d36f67ecf1aa54719be4d"},
+    {"call_id":"smoke-2-model-qwen38-opencode-go-messages","evidence_class":"RELEASE_SMOKE","terminal_outcome":"verified_pass","classification":"CAPABILITY_OUTCOME","evidence_digest":"sha256:d748f6e0e58ed28d1eb9e6d58ff57a3f0de497d92a712590c016364e8facf074"},
+    {"call_id":"smoke-3-model-deepseek-v4pro-chat","evidence_class":"RELEASE_SMOKE","terminal_outcome":"verified_fail","classification":"CAPABILITY_OUTCOME","evidence_digest":"sha256:88541bf0fd6ed3f5301738ada86c7ab814f6d2fcb0563fa13a750f5592ce38ee"},
+    {"call_id":"smoke-4-harness-codex-gpt56-medium","evidence_class":"RELEASE_SMOKE","terminal_outcome":"execution_budget_exhausted","classification":"CAPABILITY_OUTCOME","evidence_digest":"sha256:a5bf195f3182ea9e34e05a9307683f131cd0c0859917582771c5100fb94a9156"},
+    {"call_id":"smoke-5-harness-codex-gpt56-high","evidence_class":"RELEASE_SMOKE","terminal_outcome":"infra_error","classification":"NOT_DETERMINED","evidence_digest":"sha256:8f4ab0b1da465567e95fdea34d121c72c38b0a8b25f1a86304829ad6b747a2bc"},
+    {"call_id":"smoke-6-harness-claude-qwen38-opencode-go","evidence_class":"DIAGNOSTIC_ONLY","terminal_outcome":"infra_error","classification":"NOT_DETERMINED","evidence_digest":"sha256:a57acf50954b7fe123102523cb747b5edcb593c5d213310309b46351dc4cfe24"},
+    {"call_id":"smoke-7-harness-deepseek-v4flash","evidence_class":"DIAGNOSTIC_ONLY","terminal_outcome":"harness_error","classification":"CAPABILITY_OUTCOME","evidence_digest":"sha256:1f06f67aeee09f164356cc106d56f8bb6dc1db67ade8bb60df61dccee13381d2"},
+    {"call_id":"smoke-8-judge-glm52-opencode-go","evidence_class":"DIAGNOSTIC_ONLY","terminal_outcome":"JUDGE_OUTPUT_ERROR:NOT_BARE_JSON","classification":"CAPABILITY_OUTCOME","evidence_digest":"sha256:7c071a7c71b63ea071f708203aba2dc3a57c0375f2046a70e7359db949562f77"}
+  ],
+  "unresolved_project_deterministic_blockers": [],
+  "release_state_effect": "NONE"
+}

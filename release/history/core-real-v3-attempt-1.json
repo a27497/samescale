@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "attempt_id": "core-real-smoke-v3-attempt-1",
+  "source_commit": "27997c1b765c561dc901884c049112a547c9a1bd",
+  "plan_id": "core-real-smoke-v3",
+  "smoke_plan_digest": "sha256:4676bcd5146128389a756b6ce0913c306c57cbd97fbee54b92cd7697ead71158",
+  "release_plan_digest": "sha256:f943690cad1bb9815dc6a5e59a0fb1f244b414d97e9f8d85f86c7c7736acbff2",
+  "receipt_digest": "sha256:5928dda2f65388eee1452340539c90740139c731bd86eb57fe6150135aae5f6e",
+  "receipt_digest_domain": "RAW_FILE_SHA256",
+  "status": "ABORTED",
+  "attempted_top_level_launches": 5,
+  "failing_call_id": "smoke-5-harness-codex-gpt56-high",
+  "failure_category": "INFRASTRUCTURE",
+  "calls": [
+    {"call_id":"smoke-1-model-gpt56-relay-responses","requested_model":"gpt-5.6-sol","observed_model":"gpt-5.6-sol","latency_ms":88167,"input_tokens":346,"output_tokens":363,"total_tokens":709,"provider_request_count":1,"outcome":"verified_pass","workspace_mutated":true,"verifier_status":"PASS","verifier_score":1.0,"evidence_digest":"sha256:f5a2943b6479fa1fc734d6b714eba3b0b9e6be59fe7d36f67ecf1aa54719be4d","evidence_digest_domain":"ARTIFACT_TREE_DIGEST"},
+    {"call_id":"smoke-2-model-qwen38-opencode-go-messages","requested_model":"qwen3.8-max","observed_model":"qwen3.8-max","latency_ms":35903,"input_tokens":403,"output_tokens":1396,"total_tokens":1799,"provider_request_count":1,"outcome":"verified_pass","workspace_mutated":true,"verifier_status":"PASS","verifier_score":1.0,"evidence_digest":"sha256:d748f6e0e58ed28d1eb9e6d58ff57a3f0de497d92a712590c016364e8facf074","evidence_digest_domain":"ARTIFACT_TREE_DIGEST"},
+    {"call_id":"smoke-3-model-deepseek-v4pro-chat","requested_model":"deepseek-v4-pro","observed_model":"deepseek-v4-pro","latency_ms":3001,"input_tokens":379,"output_tokens":233,"total_tokens":612,"provider_request_count":1,"outcome":"verified_fail","workspace_mutated":true,"verifier_status":"FAIL","verifier_score":0.8,"evidence_digest":"sha256:88541bf0fd6ed3f5301738ada86c7ab814f6d2fcb0563fa13a750f5592ce38ee","evidence_digest_domain":"ARTIFACT_TREE_DIGEST"},
+    {"call_id":"smoke-4-harness-codex-gpt56-medium","requested_model":"gpt-5.6-sol","observed_model_status":"not_exposed","duration_ms":180556,"outcome":"harness_error","harness_failure":"execution_budget_exhausted","timed_out":true,"trace_coverage":"FULL_STREAM","trace_event_count":19,"workspace_mutated":true,"verifier_status":"NOT_RUN","evidence_digest":"sha256:a5bf195f3182ea9e34e05a9307683f131cd0c0859917582771c5100fb94a9156","evidence_digest_domain":"ARTIFACT_TREE_DIGEST"},
+    {"call_id":"smoke-5-harness-codex-gpt56-high","requested_model":"gpt-5.6-sol","observed_model_status":"not_exposed","duration_ms":85485,"input_tokens":82122,"output_tokens":1720,"process_exit_code":0,"outcome":"infra_error","timed_out":false,"trace_coverage":"FULL_STREAM","trace_event_count":17,"workspace_mutated":true,"verifier_status":"NOT_RUN","root_cause":"NOT_DETERMINED","evidence_digest":"sha256:8f4ab0b1da465567e95fdea34d121c72c38b0a8b25f1a86304829ad6b747a2bc","evidence_digest_domain":"ARTIFACT_TREE_DIGEST"}
+  ],
+  "calls_6_to_8": "NOT_RUN",
+  "retry_count": 0,
+  "fallback_count": 0,
+  "complete_release_smoke": false,
+  "limitations": [
+    "Calls 6-8 are preserved only in the separately namespaced DIAGNOSTIC_ONLY continuation.",
+    "The aborted receipt does not promote any REAL_* release state.",
+    "The Call 5 infrastructure classification remains NOT_DETERMINED; no deterministic project defect is claimed."
+  ]
+}

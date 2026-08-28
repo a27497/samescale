@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Collection
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
@@ -186,6 +187,7 @@ async def claim_next_run(
     *,
     now: datetime,
     ttl: timedelta,
+    slot_ids: Collection[str] | None = None,
 ) -> RunSnapshot | None:
     if not owner or len(owner) > 100:
         raise ValueError("lease owner must be a non-empty bounded identity")
@@ -195,13 +197,19 @@ async def claim_next_run(
         ExperimentRunRecord.status.in_(ACTIVE_STATUSES),
         ExperimentRunRecord.lease_expires_at <= now,
     )
+    filters = [
+        ExperimentRunRecord.experiment_id == experiment_id,
+        ExperimentRunRecord.cancellation_requested.is_(False),
+        or_(ExperimentRunRecord.status == RunStatus.QUEUED.value, reclaimable),
+    ]
+    if slot_ids is not None:
+        selected = tuple(slot_ids)
+        if not selected:
+            return None
+        filters.append(ExperimentRunRecord.slot_id.in_(selected))
     run = await session.scalar(
         select(ExperimentRunRecord)
-        .where(
-            ExperimentRunRecord.experiment_id == experiment_id,
-            ExperimentRunRecord.cancellation_requested.is_(False),
-            or_(ExperimentRunRecord.status == RunStatus.QUEUED.value, reclaimable),
-        )
+        .where(*filters)
         .order_by(ExperimentRunRecord.slot_order)
         .limit(1)
         .with_for_update(skip_locked=True)

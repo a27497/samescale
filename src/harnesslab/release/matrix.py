@@ -13,6 +13,7 @@ from harnesslab.comparability.models import ComparabilityIntent, canonical_diges
 from harnesslab.contracts.common import EvaluationLane
 from harnesslab.contracts.model import ModelProfile
 from harnesslab.core.config import Settings
+from harnesslab.db.models.experiment import ExperimentRunRecord
 from harnesslab.db.session import create_engine, create_session_factory
 from harnesslab.egress import (
     ProviderScopedDockerBoundary,
@@ -63,8 +64,12 @@ from harnesslab.sandbox.models import ImageIdentity
 from harnesslab.tasks.package import TaskPackage
 
 MATRIX_IDS = {"v2": "core-real-matrix-v2", "v3": "core-real-matrix-v3"}
-MATRIX_CANARY_ID = "core-real-matrix-v3-canary"
 MATRIX_CANARY_TASK_ID = "core-python-deduplicate"
+MATRIX_PILOT_TASK_IDS = (
+    MATRIX_CANARY_TASK_ID,
+    "core-java-deduplicate",
+    "core-typescript-deduplicate",
+)
 MATRIX_CELL_COUNT = 7
 MATRIX_TASK_COUNT = 18
 MATRIX_REPEAT_COUNT = 5
@@ -109,8 +114,8 @@ class MatrixPreflightReceipt(BaseModel):
     real_calls: Literal[0] = 0
     resume_idempotent: Literal[True] = True
     queue_executor: Literal["POSTGRESQL_EXISTING_PHASE_G"] = "POSTGRESQL_EXISTING_PHASE_G"
-    default_concurrency: Literal[1] = 1
-    max_concurrency: Literal[8] = 8
+    default_concurrency: Literal[2] = 2
+    max_concurrency: Literal[4] = 4
     max_runs_required_for_execution: Literal[True] = True
     release_plan_digest: str
     experiment_plan_digest: str
@@ -308,44 +313,41 @@ class MatrixControlPlane:
             cells_detail=detail,
         )
 
-    def build_canary_plan(self, runtime: RuntimeIdentities) -> ExperimentPlan:
-        """Expand one fixed task across every v3 production cell exactly once."""
+    def select_slots(
+        self,
+        runtime: RuntimeIdentities,
+        selection: Literal["canary", "pilot", "remaining"],
+    ) -> tuple[str, tuple[str, ...]]:
+        """Select logical slots from the immutable 630-slot v3 plan without re-identifying them."""
 
         if self.matrix_id != MATRIX_IDS["v3"]:
-            raise MatrixControlPlaneError("Matrix canary is defined only for v3")
+            raise MatrixControlPlaneError("Matrix slot selection is defined only for v3")
         full = self.build_plan(runtime)
-        representative = tuple(
-            task.package_path for task in full.tasks if task.task_id == MATRIX_CANARY_TASK_ID
+        if selection == "canary":
+            task_ids = {MATRIX_CANARY_TASK_ID}
+            expected = MATRIX_CELL_COUNT
+        elif selection == "pilot":
+            task_ids = set(MATRIX_PILOT_TASK_IDS)
+            expected = MATRIX_CELL_COUNT * len(MATRIX_PILOT_TASK_IDS)
+        elif selection == "remaining":
+            task_ids = {task.task_id for task in full.tasks}
+            expected = MATRIX_LOGICAL_RUNS
+        else:  # pragma: no cover - Literal is also checked at the CLI boundary
+            raise MatrixControlPlaneError("selection must be canary, pilot, or remaining")
+        available = {task.task_id for task in full.tasks}
+        if not task_ids <= available:
+            raise MatrixControlPlaneError("frozen Matrix representative task is unavailable")
+        selected = tuple(
+            slot.slot_id
+            for slot in full.run_slots
+            if slot.task.task_id in task_ids
+            and (selection == "remaining" or slot.repeat_index == 0)
         )
-        if len(representative) != 1:
-            raise MatrixControlPlaneError("frozen Matrix canary task is unavailable")
-        spec = ExperimentSpec(
-            experiment_id=MATRIX_CANARY_ID,
-            name="HarnessLab Core Real Matrix v3 Canary",
-            task_packages=representative,
-            cells=tuple(
-                ExperimentCellSpec.model_validate(cell.model_dump(mode="json"))
-                for cell in full.cells
-            ),
-            repeat_count=1,
-            execution_seed=self.release_plan.execution_seed,
-            comparison_intent=ComparabilityIntent.HARNESS_UPLIFT,
-            paired_comparisons=full.paired_comparisons,
-            ablations=full.ablations,
-        )
-        canary = build_experiment_plan(spec, self.repository_root)
-        if (
-            canary.experiment_id != MATRIX_CANARY_ID
-            or len(canary.tasks) != 1
-            or canary.tasks[0].task_id != MATRIX_CANARY_TASK_ID
-            or len(canary.cells) != MATRIX_CELL_COUNT
-            or canary.repeat_count != 1
-            or len(canary.run_slots) != MATRIX_CELL_COUNT
-            or {slot.cell_id for slot in canary.run_slots} != {cell.id for cell in full.cells}
-            or any(slot.repeat_index != 0 for slot in canary.run_slots)
-        ):
-            raise MatrixControlPlaneError("Matrix canary expansion is not exactly 1x7x1=7")
-        return canary
+        if len(selected) != expected or len(set(selected)) != expected:
+            raise MatrixControlPlaneError(
+                "Matrix selection does not contain the exact logical slots"
+            )
+        return full.digest, selected
 
 
 class _DirectProductionBinding:
@@ -530,6 +532,10 @@ class MatrixExecutionResult:
     logical_runs: int
     executed_runs: int
     concurrency: int
+    selection: str
+    selected_slots: int
+    terminal_selected_slots: int
+    pending_selected_slots: int
 
 
 @dataclass(frozen=True)
@@ -562,6 +568,7 @@ async def execute_real_matrix(
     runtime_root: Path,
     environment: Mapping[str, str] | None = None,
     plan_version: str = "v2",
+    selection: Literal["canary", "pilot", "remaining"] = "remaining",
 ) -> MatrixExecutionResult:
     if not allow_real_matrix:
         raise MatrixControlPlaneError("real Matrix requires --allow-real-matrix")
@@ -569,14 +576,22 @@ async def execute_real_matrix(
         raise MatrixControlPlaneError("real Matrix requires an explicit --max-runs bound")
     if not 1 <= max_runs <= MATRIX_LOGICAL_RUNS:
         raise MatrixControlPlaneError("--max-runs must be between 1 and 630")
-    if not 1 <= concurrency <= 8:
-        raise MatrixControlPlaneError("--concurrency must be between 1 and 8")
+    if not 1 <= concurrency <= 4:
+        raise MatrixControlPlaneError("--concurrency must be between 1 and 4")
     selected_environment = environment if environment is not None else os.environ
     control = MatrixControlPlane.load(repository_root, plan_version=plan_version)
     control.smoke.validate_real_environment(selected_environment)
     await preflight_egress_network_isolation()
     runtime = await resolve_runtime_identities()
     plan = control.build_plan(runtime)
+    if plan_version == "v3":
+        selection_digest, selected_slot_ids = control.select_slots(runtime, selection)
+        if selection_digest != plan.digest:
+            raise MatrixControlPlaneError("Matrix selection plan identity drifted")
+    elif selection != "remaining":
+        raise MatrixControlPlaneError("subset selection is defined only for v3")
+    else:
+        selected_slot_ids = tuple(slot.slot_id for slot in plan.run_slots)
     bindings = production_matrix_bindings(
         control,
         runtime,
@@ -599,6 +614,17 @@ async def execute_real_matrix(
             plan.experiment_id,
             max_runs=max_runs,
             concurrency=concurrency,
+            slot_ids=selected_slot_ids,
+        )
+        terminal_statuses = {"completed", "failed_infra", "failed_subject", "cancelled"}
+        async with factory() as session:
+            persisted: list[ExperimentRunRecord | None] = []
+            for slot_id in selected_slot_ids:
+                persisted.append(
+                    await session.get(ExperimentRunRecord, f"run-{slot_id.removeprefix('sha256:')}")
+                )
+        terminal_selected = sum(
+            record is not None and record.status in terminal_statuses for record in persisted
         )
         return MatrixExecutionResult(
             matrix_id=control.matrix_id,
@@ -606,6 +632,10 @@ async def execute_real_matrix(
             logical_runs=enqueued.logical_run_count,
             executed_runs=len(executed),
             concurrency=concurrency,
+            selection=selection,
+            selected_slots=len(selected_slot_ids),
+            terminal_selected_slots=terminal_selected,
+            pending_selected_slots=len(selected_slot_ids) - terminal_selected,
         )
     finally:
         await engine.dispose()
@@ -629,7 +659,10 @@ async def execute_real_matrix_canary(
     control.smoke.validate_real_environment(selected_environment)
     await preflight_egress_network_isolation()
     runtime = await resolve_runtime_identities()
-    plan = control.build_canary_plan(runtime)
+    plan = control.build_plan(runtime)
+    selection_digest, selected_slot_ids = control.select_slots(runtime, "canary")
+    if selection_digest != plan.digest:
+        raise MatrixControlPlaneError("Matrix canary selection plan identity drifted")
     bindings = production_matrix_bindings(
         control,
         runtime,
@@ -652,6 +685,7 @@ async def execute_real_matrix_canary(
             plan.experiment_id,
             max_runs=MATRIX_CELL_COUNT,
             concurrency=concurrency,
+            slot_ids=selected_slot_ids,
         )
         safe_results = tuple(
             MatrixCanaryRunResult(
@@ -668,7 +702,7 @@ async def execute_real_matrix_canary(
         )
         expected_cells = {cell.id for cell in plan.cells}
         technical_pass = (
-            enqueued.logical_run_count == MATRIX_CELL_COUNT
+            enqueued.logical_run_count == MATRIX_LOGICAL_RUNS
             and len(executed) == MATRIX_CELL_COUNT
             and {item.cell_id for item in executed} == expected_cells
             and all(
@@ -681,9 +715,9 @@ async def execute_real_matrix_canary(
             )
         )
         return MatrixCanaryExecutionResult(
-            matrix_id=MATRIX_CANARY_ID,
+            matrix_id=control.matrix_id,
             plan_digest=plan.digest,
-            logical_runs=enqueued.logical_run_count,
+            logical_runs=len(selected_slot_ids),
             executed_runs=len(executed),
             technical_pass=technical_pass,
             results=safe_results,

@@ -71,6 +71,34 @@ class ComponentDiagnosticReport(BaseModel):
             ensure_ascii=False,
         )
 
+    def candidate_history_summary(self, source_commit: str) -> dict[str, object]:
+        if self.status != "COMPLETE":
+            raise ComponentDiagnosticError("diagnostic report is not complete")
+        return {
+            "schema_version": 1,
+            "diagnostic_id": f"{self.plan_id}-attempt-1-diagnostic",
+            "source_commit": source_commit,
+            "evidence_class": self.evidence_class,
+            "release_promotable": self.release_promotable,
+            "plan_id": self.plan_id,
+            "smoke_plan_digest": self.smoke_plan_digest,
+            "release_plan_digest": self.release_plan_digest,
+            "status": self.status,
+            "smoke_attempted_call_ids": list(self.smoke_attempted_call_ids),
+            "diagnostic_top_level_launches": self.diagnostic_top_level_launches,
+            "retry_count": self.retry_count,
+            "fallback_count": self.fallback_count,
+            "calls": [item.model_dump(mode="json") for item in self.results],
+            "release_state_effect": "NONE",
+        }
+
+
+def summarize_component_diagnostic_report(path: Path) -> ComponentDiagnosticReport:
+    try:
+        return ComponentDiagnosticReport.model_validate_json(path.read_bytes())
+    except (OSError, ValidationError) as exc:
+        raise ComponentDiagnosticError("invalid component diagnostic report") from exc
+
 
 def _load_attempt_receipt(path: Path, control: SmokeControlPlane) -> SmokeExecutionReceipt:
     try:

@@ -1,6 +1,6 @@
 # Real Evidence Authorization
 
-K-FAST-2 convergence state: Attempt 13 is immutable v2 history, its Calls 5-8 sweep is separately
+K-FAST-3 landing state: Attempt 13 is immutable v2 history, its Calls 5-8 sweep is separately
 `DIAGNOSTIC_ONLY`, and v3 is the active bounded validation contract. V2 remains historical and is
 not mutated into an Attempt 14.
 
@@ -38,7 +38,7 @@ After R15, a twelfth authorized v2 attempt also executed only Call 1. Direct GPT
 
 R16 is a keyless observability repair. Future direct-provider timeout evidence may contain only a bounded normalized trace for `CONNECT_TCP`, `START_TLS`, request headers/body writes, and response headers, with request-relative timing and locked httpcore source/version. Raw trace payloads are ignored and never persisted. Attempt 12 predates this instrumentation, so no trace is retrofitted into any of Attempts 1-12.
 
-The R4-R16 repairs do not change the 2,000-token subject budget, 90-second timeout, eight-call order, 14,256-token smoke ceiling, no-retry rule, or no-fallback rule. OpenCode Go automated benchmark use remains operator-confirmed (`OPENCODE_GO_AUTOMATED_BENCHMARK_PERMISSION=OPERATOR_CONFIRMED_PROVIDER_PERMISSION`); the 630-run Matrix and 63 Judge calls still require later authorization. Individual successful observations in attempts 1-12 are not complete smoke or release verification.
+The R4-R16 repairs do not change the 2,000-token subject budget, eight-call order, 14,256-token smoke ceiling, no-retry rule, or no-fallback rule. OpenCode Go automated benchmark use remains operator-confirmed (`OPENCODE_GO_AUTOMATED_BENCHMARK_PERMISSION=OPERATOR_CONFIRMED_PROVIDER_PERMISSION`). K-FAST-3 supplies standing authorization for the exact v3 Matrix and 63-call Judge campaign; no additional authorization prompt is required. Individual successful observations are not complete smoke or release verification.
 
 Attempt 13 executed Calls 1-4 and aborted at Codex medium after the frozen v2 90-second boundary.
 Calls 5-8 were not part of that release smoke; their independent sweep is non-promotable diagnostic
@@ -88,7 +88,7 @@ The configured P-Lane `gpt56-relay-direct-vs-codex` uses direct `gpt-5.6-sol` an
 
 The `codex-gpt56-reasoning-effort` ablation compares Codex medium with Codex high, changing only `reasoning_effort`. It is `CONFIGURED_NOT_RUN`, plans 90 paired observations and formal per-task n=5 evidence, and may support only the treatment association justified by completed comparable observations.
 
-## USER AUTHORIZATION REQUIRED BEFORE
+## Standing K-FAST-3 authorization
 
 - `REAL_PROVIDER_SMOKE`
 - `REAL_CODEX_SMOKE`
@@ -97,7 +97,7 @@ The `codex-gpt56-reasoning-effort` ablation compares Codex medium with Codex hig
 - `REAL_MATRIX_EVIDENCE`
 - `REAL_JUDGE_SMOKE`
 
-`REAL_PROVIDER_SMOKE=NOT_VERIFIED` and `REAL_CODEX_SMOKE=NOT_VERIFIED`; the other four states remain `NOT_RUN`. The standing K-FAST-2 authorization names `core-real-smoke-v3`, approves exactly eight top-level launches and the 14,256-token ceiling, supplies the same four configuration references, and accepts every predefined abort condition. It authorizes only the explicitly bounded v3 smoke cycles and, after a complete smoke, the exact seven-run Matrix canary. It does not authorize the full Matrix, full Judge run, tag, or uplift claim.
+`REAL_PROVIDER_SMOKE=NOT_VERIFIED` and `REAL_CODEX_SMOKE=NOT_VERIFIED`; the other four strict release states remain unchanged until evidence-driven promotion. The standing authorization covers bounded real model/harness calls, the exact 630-slot `core-real-matrix-v3` campaign, and the frozen 63-call GLM-5.2 calibration. It does not convert capability failure into engineering failure, relax a threshold, permit semantic retry/fallback, or authorize a tag unless the strict final verifier returns `CORE_RELEASE_READY=true`.
 
 The smoke must stop on authentication, route/schema/observed-model/alias drift, any secret leak, proxy bypass or unrestricted network, verifier networking, P-Lane route mismatch, task/artifact binding failure, provider fallback, or Judge persistence/integrity failure. Only successful separately authorized smoke may support a later Matrix authorization decision.
 

@@ -11,11 +11,12 @@ import pytest
 from harnesslab.egress import EGRESS_PROXY_IMAGE
 from harnesslab.harness_lane.profile import CODEX_IMAGE
 from harnesslab.multi_harness.profile import CLAUDE_IMAGE, DEEPSEEK_IMAGE
-from harnesslab.release.contracts import load_release_evidence
+from harnesslab.release.contracts import load_release_evidence, load_technical_readiness
 from harnesslab.release.diagnostic import execute_component_diagnostics
+from harnesslab.release.judge import build_real_judge_plan
 from harnesslab.release.matrix import (
-    MATRIX_CANARY_ID,
     MATRIX_CANARY_TASK_ID,
+    MATRIX_PILOT_TASK_IDS,
     MatrixControlPlane,
     MatrixControlPlaneError,
     execute_real_matrix_canary,
@@ -137,6 +138,38 @@ def test_attempt_13_and_diagnostic_are_safe_separate_and_non_promotable() -> Non
     assert manifest.real_matrix.state.value == "NOT_RUN"
 
 
+def test_v3_cycle_one_is_separate_and_technical_readiness_is_non_promotional() -> None:
+    history = json.loads((ROOT / "release/history/core-real-v3-attempt-1.json").read_text())
+    diagnostic = json.loads((ROOT / "release/diagnostics/core-real-v3-attempt-1.json").read_text())
+    readiness = load_technical_readiness(ROOT / "release/technical-readiness-v3.json")
+
+    assert history["status"] == "ABORTED"
+    assert history["attempted_top_level_launches"] == 5
+    assert history["calls_6_to_8"] == "NOT_RUN"
+    assert diagnostic["evidence_class"] == "DIAGNOSTIC_ONLY"
+    assert diagnostic["release_promotable"] is False
+    assert [item["call_id"] for item in diagnostic["calls"]] == list(EXPECTED_CALL_IDS[5:])
+    assert readiness.subject_plane_technical_ready.value == "REACHED"
+    assert readiness.judge_plane_reached.value == "REACHED"
+    assert readiness.complete_release_smoke.value == "NOT_REACHED"
+    assert readiness.core_release_ready is False
+    assert readiness.release_state_effect == "NONE"
+    assert len(readiness.observations) == 8
+
+
+def test_real_judge_plan_reuses_frozen_v3_profile_suite_and_thresholds() -> None:
+    plan, _suite, _definitions = build_real_judge_plan(
+        ROOT, {"HARNESSLAB_OPENCODE_GO_API_KEY": "REFERENCE_ONLY"}
+    )
+
+    assert plan.calibration_id == "core-real-judge-v3"
+    assert len(plan.judge_cells) == 1
+    assert len(plan.slots) == 63
+    assert plan.judge_cells[0].model_profile.requested_model == "glm-5.2"
+    assert plan.judge_cells[0].runner_contract == "provider-adapter-v1"
+    assert plan.qualification_policy.minimum_macro_f1 == 0.95
+
+
 def test_v3_smoke_changes_only_version_bindings_and_subject_timeout() -> None:
     v2 = SmokeControlPlane.load(ROOT, plan_version="v2")
     v3 = SmokeControlPlane.load(ROOT, plan_version="v3")
@@ -165,18 +198,25 @@ def test_v3_smoke_changes_only_version_bindings_and_subject_timeout() -> None:
 def test_v3_matrix_preflight_and_exact_canary_are_frozen_keylessly() -> None:
     control = MatrixControlPlane.load(ROOT, plan_version="v3")
     receipt = control.preflight(_runtime())
-    canary = control.build_canary_plan(_runtime())
+    full = control.build_plan(_runtime())
+    canary_digest, canary_ids = control.select_slots(_runtime(), "canary")
+    pilot_digest, pilot_ids = control.select_slots(_runtime(), "pilot")
 
     assert receipt.matrix_id == "core-real-matrix-v3"
     assert (receipt.cells, receipt.tasks, receipt.repeats, receipt.logical_runs) == (7, 18, 5, 630)
     assert receipt.real_calls == 0
-    assert len(canary.run_slots) == 7
-    assert canary.experiment_id == MATRIX_CANARY_ID
-    assert {slot.cell_id for slot in canary.run_slots} == {
-        cell.cell_id for cell in receipt.cells_detail
-    }
-    assert {slot.task.task_id for slot in canary.run_slots} == {MATRIX_CANARY_TASK_ID}
-    assert {slot.repeat_index for slot in canary.run_slots} == {0}
+    canary = tuple(slot for slot in full.run_slots if slot.slot_id in set(canary_ids))
+    pilot = tuple(slot for slot in full.run_slots if slot.slot_id in set(pilot_ids))
+    assert canary_digest == pilot_digest == full.digest
+    assert len(canary) == 7
+    assert full.experiment_id == "core-real-matrix-v3"
+    assert {slot.cell_id for slot in canary} == {cell.cell_id for cell in receipt.cells_detail}
+    assert {slot.task.task_id for slot in canary} == {MATRIX_CANARY_TASK_ID}
+    assert {slot.repeat_index for slot in canary} == {0}
+    assert len(pilot) == 21
+    assert {slot.task.task_id for slot in pilot} == set(MATRIX_PILOT_TASK_IDS)
+    assert {slot.repeat_index for slot in pilot} == {0}
+    assert set(canary_ids) < set(pilot_ids)
     profiles = control._profiles(_runtime())
     assert {
         (

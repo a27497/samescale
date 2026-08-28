@@ -149,7 +149,11 @@ This file separates repository evidence from intended design. A capability moves
   preserved Calls 5-8 sweep is `DIAGNOSTIC_ONLY`. Exact Call-6 workspace replay passed the same
   isolated verifier at score 1.0, and controlled keyless Call-7 reproduction identified the pinned
   DeepSeek CLI's missing Node `--expose-internals` startup flag. V3 supersedes v2 for bounded final
-  validation with uniform 180-second subject timeouts and a separately gated exact seven-cell canary.
+  validation with uniform 180-second subject timeouts. V3 Cycle 1 exercised Calls 1-5 and its
+  separate diagnostic suffix exercised Calls 6-8. The release smoke remains aborted, while the
+  non-release readiness manifest records all seven subject identities reached, the Judge route
+  reached, and no proven deterministic project blocker. Canary/pilot now select original 630-slot
+  Matrix identities, so their work is durable full-Matrix work.
 - Exact-head keyless GitHub Actions Gates A-K and fresh-setup success for R12 head
   `6abac258e81d89f7ad45aa51dce2541f911a6033` (run `32996166257`). This engineering CI evidence is
   distinct from the prospective manifest's final-release `remote_ci` binding.

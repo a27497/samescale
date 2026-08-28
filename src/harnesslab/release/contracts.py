@@ -20,6 +20,7 @@ from harnesslab.release.models import (
     ReleaseReadiness,
     ResumeClaimMap,
     SemanticReleaseReceipt,
+    TechnicalReadinessManifest,
     ValidationResult,
 )
 from harnesslab.tasks.package import TaskPackage, TaskPackageError
@@ -110,6 +111,12 @@ def load_real_smoke_plan(path: Path) -> RealSmokePlan:
 
 def load_release_evidence(path: Path) -> ReleaseEvidenceManifest:
     return _load_json(path, ReleaseEvidenceManifest.model_validate, "release evidence")
+
+
+def load_technical_readiness(path: Path) -> TechnicalReadinessManifest:
+    return _load_json(
+        path, TechnicalReadinessManifest.model_validate, "technical readiness evidence"
+    )
 
 
 def load_resume_claim_map(path: Path) -> ResumeClaimMap:

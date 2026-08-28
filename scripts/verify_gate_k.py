@@ -304,7 +304,11 @@ def verify_contract_mode() -> bool:
         runtime = asyncio.run(resolve_runtime_identities())
         v3_matrix = MatrixControlPlane.load(ROOT, plan_version="v3")
         v3_matrix_receipt = v3_matrix.preflight(runtime)
-        v3_canary = v3_matrix.build_canary_plan(runtime)
+        v3_full = v3_matrix.build_plan(runtime)
+        v3_canary_digest, v3_canary_ids = v3_matrix.select_slots(runtime, "canary")
+        v3_pilot_digest, v3_pilot_ids = v3_matrix.select_slots(runtime, "pilot")
+        v3_canary = tuple(slot for slot in v3_full.run_slots if slot.slot_id in set(v3_canary_ids))
+        v3_pilot = tuple(slot for slot in v3_full.run_slots if slot.slot_id in set(v3_pilot_ids))
     except Exception as exc:
         print(f"FAIL: v3 Matrix contract unavailable: {type(exc).__name__}")
         return False
@@ -318,9 +322,14 @@ def verify_contract_mode() -> bool:
             v3_matrix_receipt.real_calls,
         )
         != (7, 18, 5, 630, 0)
-        or len(v3_canary.run_slots) != 7
-        or {slot.task.task_id for slot in v3_canary.run_slots} != {"core-python-deduplicate"}
-        or {slot.repeat_index for slot in v3_canary.run_slots} != {0}
+        or v3_canary_digest != v3_full.digest
+        or v3_pilot_digest != v3_full.digest
+        or len(v3_canary) != 7
+        or {slot.task.task_id for slot in v3_canary} != {"core-python-deduplicate"}
+        or {slot.repeat_index for slot in v3_canary} != {0}
+        or len(v3_pilot) != 21
+        or {slot.repeat_index for slot in v3_pilot} != {0}
+        or not set(v3_canary_ids) < set(v3_pilot_ids)
     ):
         print("FAIL: v3 Matrix or exact canary contract drifted")
         return False
@@ -698,7 +707,8 @@ def verify_contract_mode() -> bool:
     print(f"V3_SMOKE_PLAN=PASS digest={v3_smoke.digest}")
     print(f"V3_MATRIX_PLAN=PASS digest={v3_matrix_receipt.experiment_plan_digest}")
     print("V3_MATRIX_LOGICAL_RUNS=630")
-    print(f"V3_MATRIX_CANARY_PLAN=7_RUNS digest={v3_canary.digest}")
+    print(f"V3_MATRIX_CANARY_SELECTION=7_EXISTING_SLOTS digest={v3_canary_digest}")
+    print(f"V3_MATRIX_PILOT_SELECTION=21_EXISTING_SLOTS digest={v3_pilot_digest}")
     print(f"EGRESS_PROXY_BASE={EGRESS_PROXY_BASE}")
     print(f"EGRESS_PROXY_IMAGE={EGRESS_PROXY_IMAGE}")
     print(f"EGRESS_PROXY_IMAGE_ID={proxy_image.image_id}")

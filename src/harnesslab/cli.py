@@ -33,8 +33,14 @@ from harnesslab.multi_harness.runtime import MultiHarnessRuntime
 from harnesslab.release.diagnostic import (
     ComponentDiagnosticError,
     execute_real_component_diagnostics,
+    summarize_component_diagnostic_report,
 )
 from harnesslab.release.evidence import EvidenceSummaryError, summarize_smoke_evidence
+from harnesslab.release.judge import (
+    RealJudgeControlPlaneError,
+    build_real_judge_plan,
+    execute_real_judge_calibration,
+)
 from harnesslab.release.matrix import (
     MatrixControlPlane,
     MatrixControlPlaneError,
@@ -78,6 +84,9 @@ release_matrix_app = typer.Typer(
 release_telemetry_app = typer.Typer(
     no_args_is_help=True, help="Summarize safe K-B2 smoke telemetry and cost inputs."
 )
+release_judge_app = typer.Typer(
+    no_args_is_help=True, help="Preflight or execute the frozen real Judge campaign."
+)
 app.add_typer(task_app, name="task")
 app.add_typer(sandbox_app, name="sandbox")
 app.add_typer(model_app, name="model")
@@ -97,6 +106,7 @@ release_app.add_typer(release_smoke_app, name="smoke")
 release_app.add_typer(release_component_smoke_app, name="component-smoke")
 release_app.add_typer(release_matrix_app, name="matrix")
 release_app.add_typer(release_telemetry_app, name="telemetry")
+release_app.add_typer(release_judge_app, name="judge")
 
 
 @release_smoke_app.command("preflight")
@@ -247,6 +257,28 @@ def execute_release_component_smoke(
     typer.echo(f"DIAGNOSTIC_CALL_IDS={','.join(report.diagnostic_call_ids)}")
 
 
+@release_component_smoke_app.command("evidence-summary")
+def summarize_release_component_evidence(
+    report: str = typer.Option(..., "--report", help="Component diagnostic report path."),
+    source_commit: str = typer.Option(..., "--source-commit", help="Exact execution HEAD."),
+) -> None:
+    """Validate and emit a safe candidate DIAGNOSTIC_ONLY history object."""
+
+    try:
+        summary = summarize_component_diagnostic_report(Path(report))
+    except ComponentDiagnosticError as exc:
+        typer.echo(f"FAIL component evidence summary: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(
+        json.dumps(
+            summary.candidate_history_summary(source_commit),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+    )
+
+
 @release_matrix_app.command("preflight")
 def preflight_release_matrix(
     repository_root: str = typer.Option(
@@ -283,7 +315,12 @@ def execute_release_matrix(
         None, "--max-runs", help="Required bound from 1 to 630; there is no launch default."
     ),
     concurrency: int = typer.Option(
-        1, "--concurrency", min=1, max=8, help="Bounded worker concurrency."
+        2, "--concurrency", min=1, max=4, help="Bounded worker concurrency (campaign max 4)."
+    ),
+    selection: str = typer.Option(
+        "remaining",
+        "--selection",
+        help="v3 full-plan slot selection: canary, pilot, or remaining.",
     ),
     artifact_root: str = typer.Option(
         "artifacts/core-real-matrix-v2", "--artifact-root", help="Immutable Matrix artifacts."
@@ -308,6 +345,7 @@ def execute_release_matrix(
                 artifact_root=Path(artifact_root),
                 runtime_root=Path(runtime_root),
                 plan_version=plan_version,
+                selection=selection,  # type: ignore[arg-type]
             )
         )
     except (MatrixControlPlaneError, EgressNetworkIsolationUnavailable, ValueError) as exc:
@@ -318,6 +356,10 @@ def execute_release_matrix(
     typer.echo(f"LOGICAL_RUNS={result.logical_runs}")
     typer.echo(f"EXECUTED_RUNS={result.executed_runs}")
     typer.echo(f"CONCURRENCY={result.concurrency}")
+    typer.echo(f"SELECTION={result.selection}")
+    typer.echo(f"SELECTED_SLOTS={result.selected_slots}")
+    typer.echo(f"TERMINAL_SELECTED_SLOTS={result.terminal_selected_slots}")
+    typer.echo(f"PENDING_SELECTED_SLOTS={result.pending_selected_slots}")
 
 
 @release_matrix_app.command("canary")
@@ -382,6 +424,61 @@ def execute_release_matrix_canary(
         )
     if not result.technical_pass:
         raise typer.Exit(code=1)
+
+
+@release_judge_app.command("preflight")
+def preflight_release_judge(
+    repository_root: str = typer.Option(
+        ".", "--repository-root", help="Repository containing the frozen release plans."
+    ),
+) -> None:
+    """Resolve the existing v3 GLM profile and exact 63-slot suite without provider calls."""
+
+    try:
+        plan, _suite, _definitions = build_real_judge_plan(Path(repository_root))
+    except (RealJudgeControlPlaneError, ValueError) as exc:
+        typer.echo(f"FAIL real Judge preflight: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo("REAL_JUDGE_PREFLIGHT=PASS")
+    typer.echo(f"CALIBRATION_ID={plan.calibration_id}")
+    typer.echo(f"PLAN_DIGEST={plan.plan_digest}")
+    typer.echo(f"EVALUATION_SLOTS={len(plan.slots)}")
+    typer.echo("REAL_CALLS=0")
+
+
+@release_judge_app.command("calibrate")
+def calibrate_release_judge(
+    allow_real_judge: bool = typer.Option(
+        False, "--allow-real-judge", help="Explicitly authorize the exact 63-call campaign."
+    ),
+    artifact_root: str = typer.Option(
+        "artifacts/core-real-judge-v3", "--artifact-root", help="Immutable Judge artifacts."
+    ),
+    repository_root: str = typer.Option(
+        ".", "--repository-root", help="Repository containing the frozen release plans."
+    ),
+) -> None:
+    """Resume the frozen real calibration; output/schema failures are terminal observations."""
+
+    try:
+        report = asyncio.run(
+            execute_real_judge_calibration(
+                Path(repository_root),
+                allow_real_judge=allow_real_judge,
+                artifact_root=Path(artifact_root),
+            )
+        )
+    except (RealJudgeControlPlaneError, ValueError) as exc:
+        typer.echo(f"FAIL real Judge calibration: {exc}")
+        raise typer.Exit(code=2) from exc
+    cell = report.cells[0]
+    typer.echo(f"CALIBRATION_ID={report.calibration_id}")
+    typer.echo(f"PLAN_DIGEST={report.plan_digest}")
+    typer.echo(f"REPORT_DIGEST={report.report_digest}")
+    qualification = (
+        "QUALIFIED" if cell.qualification_status.value == "QUALIFIED_FOR_SUITE" else "NOT_QUALIFIED"
+    )
+    typer.echo(f"REAL_JUDGE_CALIBRATION={qualification}")
 
 
 @release_telemetry_app.command("summarize")
