@@ -31,8 +31,8 @@ from harnesslab.sandbox.artifacts import (
     make_tree_readable,
     make_tree_writable,
 )
-from harnesslab.sandbox.models import SandboxArtifactManifest
-from harnesslab.sandbox.runner import DockerSandbox
+from harnesslab.sandbox.models import SandboxArtifactManifest, VerifierLifecycleDiagnostics
+from harnesslab.sandbox.runner import DockerSandbox, SandboxExecutionError
 from harnesslab.tasks.package import TaskPackage, digest_tree
 
 
@@ -161,6 +161,9 @@ class MultiHarnessRunner:
                     raise MultiHarnessRunError("verifier workspace identity mismatch")
                 verifier_digest = digest_tree(verifier.run.artifact_directory)
             except Exception as exc:
+                verifier_lifecycle = (
+                    exc.diagnostics if isinstance(exc, SandboxExecutionError) else None
+                )
                 evidence = self._evidence(
                     effective_run_id,
                     package,
@@ -175,6 +178,7 @@ class MultiHarnessRunner:
                     HarnessLaneOutcome.INFRA_ERROR,
                     f"isolated Hidden Verifier failed: {type(exc).__name__}",
                     secret_values=secrets,
+                    verifier_lifecycle=verifier_lifecycle,
                 )
                 return self._persist(evidence, collection, materialized.workspace, secrets)
             outcome = (
@@ -202,6 +206,7 @@ class MultiHarnessRunner:
                 verifier_artifact_digest=verifier_digest,
                 verifier_passed=verifier.passed,
                 verifier_score=verifier.score,
+                verifier_lifecycle=verifier.lifecycle,
             )
             return self._persist(
                 evidence,
@@ -237,6 +242,7 @@ class MultiHarnessRunner:
         verifier_artifact_digest: str | None = None,
         verifier_passed: bool | None = None,
         verifier_score: float | None = None,
+        verifier_lifecycle: VerifierLifecycleDiagnostics | None = None,
     ) -> MultiHarnessEvidence:
         diagnostics = safe_process_diagnostics(capture, secret_values=secret_values)
         return MultiHarnessEvidence(
@@ -281,6 +287,7 @@ class MultiHarnessRunner:
             verifier_artifact_digest=verifier_artifact_digest,
             verifier_passed=verifier_passed,
             verifier_score=verifier_score,
+            verifier_lifecycle=verifier_lifecycle,
             outcome=outcome,
             summary=summary,
         )

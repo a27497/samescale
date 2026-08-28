@@ -91,11 +91,15 @@ def make_tree_readable(root: Path) -> str:
         for directory, _, file_names in os.walk(root, followlinks=False):
             directory_path = Path(directory)
             directory_mode = stat.S_IMODE(directory_path.stat(follow_symlinks=False).st_mode)
-            directory_path.chmod(directory_mode | 0o555, follow_symlinks=False)
+            readable_directory_mode = directory_mode | 0o555
+            if readable_directory_mode != directory_mode:
+                directory_path.chmod(readable_directory_mode, follow_symlinks=False)
             for name in file_names:
                 path = directory_path / name
                 file_mode = stat.S_IMODE(path.stat(follow_symlinks=False).st_mode)
-                path.chmod(file_mode | 0o444, follow_symlinks=False)
+                readable_file_mode = file_mode | 0o444
+                if readable_file_mode != file_mode:
+                    path.chmod(readable_file_mode, follow_symlinks=False)
     after_digest = digest_tree(root)
     if after_digest != before_digest:
         raise ArtifactError("permission normalization changed tree identity")

@@ -29,6 +29,10 @@ from harnesslab.sandbox.models import (
     SandboxArtifactManifest,
     SandboxStatus,
     SecurityEvidence,
+    VerifierFailureSubtype,
+    VerifierLifecycleStage,
+    VerifierLifecycleStageEvidence,
+    VerifierLifecycleStageStatus,
 )
 from harnesslab.sandbox.preflight import (
     DockerPreflightError,
@@ -336,6 +340,29 @@ def test_make_tree_readable_preserves_digest_and_execute_bits(tmp_path: Path) ->
     assert stat.S_IMODE(executable.stat().st_mode) == 0o744
 
 
+def test_make_tree_readable_does_not_chmod_an_already_portable_foreign_tree(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "foreign-workspace"
+    root.mkdir(mode=0o755)
+    root.chmod(0o755)
+    source = root / "events.py"
+    source.write_text("value = 1\n", encoding="utf-8")
+    source.chmod(0o644)
+    before = digest_tree(root)
+    original_chmod = Path.chmod
+
+    def reject_workspace_chmod(path: Path, mode: int, *, follow_symlinks: bool = True) -> None:
+        if path == root or root in path.parents:
+            raise PermissionError("synthetic foreign ownership")
+        original_chmod(path, mode, follow_symlinks=follow_symlinks)
+
+    monkeypatch.setattr(Path, "chmod", reject_workspace_chmod)
+
+    assert make_tree_readable(root) == before
+    assert digest_tree(root) == before
+
+
 @pytest.mark.integration
 async def test_restrictive_task_permissions_are_portable_to_non_root_hidden_verifier(
     tmp_path: Path,
@@ -385,6 +412,12 @@ async def test_restrictive_task_permissions_are_portable_to_non_root_hidden_veri
     assert not mounts["/workspace"].read_write
     assert not mounts["/verifier"].read_write
     assert result.run.manifest.cleanup_verified
+    assert result.lifecycle is not None
+    assert result.lifecycle.failure_subtype is None
+    assert {item.stage for item in result.lifecycle.stages} == set(VerifierLifecycleStage)
+    assert all(
+        item.status is VerifierLifecycleStageStatus.COMPLETED for item in result.lifecycle.stages
+    )
     assert not runner.runtime_root.joinpath("restrictive-permission-portability").exists()
     assert not container_exists(result.run.container_name)
     assert await no_harnesslab_containers()
@@ -448,6 +481,50 @@ async def test_verifier_staging_rejects_source_digest_drift_before_container(
     assert not (runner.artifact_root / "source-verifier-drift").exists()
     assert not runner.runtime_root.joinpath("source-verifier-drift").exists()
     assert await no_harnesslab_containers()
+
+
+@pytest.mark.asyncio
+async def test_verifier_permission_handoff_failure_has_bounded_safe_subtype(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package = TaskPackage.load(PYTHON_TASK)
+    managed = package.materialize(tmp_path / "materialized")
+    runner = sandbox(tmp_path)
+
+    def deny_permission_normalization(root: Path) -> str:
+        raise PermissionError("synthetic foreign ownership")
+
+    monkeypatch.setattr(
+        "harnesslab.sandbox.runner.make_tree_readable", deny_permission_normalization
+    )
+    try:
+        with pytest.raises(SandboxExecutionError) as captured:
+            await runner.run_hidden_verifier_workspace(
+                package,
+                managed.workspace,
+                run_id="permission-handoff-failure",
+            )
+    finally:
+        managed.cleanup()
+
+    diagnostics = captured.value.diagnostics
+    assert diagnostics is not None
+    assert diagnostics.failure_subtype is VerifierFailureSubtype.WORKSPACE_PERMISSION_HANDOFF_FAILED
+    failed = next(
+        item for item in diagnostics.stages if item.status is VerifierLifecycleStageStatus.FAILED
+    )
+    assert failed == VerifierLifecycleStageEvidence(
+        stage=VerifierLifecycleStage.WORKSPACE_PREPARE,
+        status=VerifierLifecycleStageStatus.FAILED,
+        duration_ms=failed.duration_ms,
+        exception_class="PermissionError",
+        reason_code="VERIFIER_WORKSPACE_PERMISSION_NORMALIZATION_DENIED",
+    )
+    serialized = json.dumps(diagnostics.model_dump(mode="json"), sort_keys=True)
+    assert "command" not in serialized
+    assert "path" not in serialized
+    assert "stderr" not in serialized
+    assert "environment" not in serialized
 
 
 @pytest.mark.integration

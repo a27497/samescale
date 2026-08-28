@@ -4,6 +4,7 @@ import json
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -17,6 +18,84 @@ class SandboxStatus(StrEnum):
     CANCELLED = "cancelled"
     ARTIFACT_ERROR = "artifact_error"
     CLEANUP_ERROR = "cleanup_error"
+
+
+class VerifierLifecycleStage(StrEnum):
+    WORKSPACE_PREPARE = "VERIFIER_WORKSPACE_PREPARE"
+    SANDBOX_CREATE = "VERIFIER_SANDBOX_CREATE"
+    WORKSPACE_ATTACH = "VERIFIER_WORKSPACE_ATTACH"
+    SANDBOX_START = "VERIFIER_SANDBOX_START"
+    PROCESS_START = "VERIFIER_PROCESS_START"
+    PROCESS_WAIT = "VERIFIER_PROCESS_WAIT"
+    RESULT_COLLECT = "VERIFIER_RESULT_COLLECT"
+    ARTIFACT_PERSIST = "VERIFIER_ARTIFACT_PERSIST"
+    SANDBOX_CLEANUP = "VERIFIER_SANDBOX_CLEANUP"
+    STAGING_CLEANUP = "VERIFIER_STAGING_CLEANUP"
+
+
+class VerifierLifecycleStageStatus(StrEnum):
+    STARTED = "STARTED"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class VerifierFailureSubtype(StrEnum):
+    WORKSPACE_PREPARE_FAILED = "WORKSPACE_PREPARE_FAILED"
+    WORKSPACE_PERMISSION_HANDOFF_FAILED = "WORKSPACE_PERMISSION_HANDOFF_FAILED"
+    SANDBOX_CREATE_FAILED = "SANDBOX_CREATE_FAILED"
+    SANDBOX_START_FAILED = "SANDBOX_START_FAILED"
+    WORKSPACE_ATTACH_FAILED = "WORKSPACE_ATTACH_FAILED"
+    VERIFIER_PROCESS_START_FAILED = "VERIFIER_PROCESS_START_FAILED"
+    VERIFIER_PROCESS_NONZERO = "VERIFIER_PROCESS_NONZERO"
+    VERIFIER_TIMEOUT = "VERIFIER_TIMEOUT"
+    RESULT_COLLECTION_FAILED = "RESULT_COLLECTION_FAILED"
+    ARTIFACT_PERSIST_FAILED = "ARTIFACT_PERSIST_FAILED"
+    SANDBOX_CLEANUP_FAILED = "SANDBOX_CLEANUP_FAILED"
+    STAGING_CLEANUP_FAILED = "STAGING_CLEANUP_FAILED"
+    UNKNOWN_VERIFIER_LIFECYCLE_FAILURE = "UNKNOWN_VERIFIER_LIFECYCLE_FAILURE"
+
+
+class VerifierLifecycleStageEvidence(BaseModel):
+    """Bounded lifecycle facts; commands, paths, streams, and environment are excluded."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    stage: VerifierLifecycleStage
+    status: VerifierLifecycleStageStatus
+    duration_ms: int = Field(ge=0)
+    exception_class: str | None = Field(default=None, pattern=r"^[A-Za-z][A-Za-z0-9_]{0,99}$")
+    reason_code: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{0,99}$")
+    container_exit_code: int | None = None
+    timeout: bool = False
+
+    @model_validator(mode="after")
+    def failure_fields_are_bounded(self) -> VerifierLifecycleStageEvidence:
+        if self.status is VerifierLifecycleStageStatus.FAILED and self.reason_code is None:
+            raise ValueError("failed verifier lifecycle stage requires a safe reason code")
+        if self.status is not VerifierLifecycleStageStatus.FAILED and (
+            self.exception_class is not None or self.reason_code is not None or self.timeout
+        ):
+            raise ValueError("only a failed verifier lifecycle stage may carry failure facts")
+        return self
+
+
+class VerifierLifecycleDiagnostics(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: Literal[1] = 1
+    stages: tuple[VerifierLifecycleStageEvidence, ...]
+    failure_subtype: VerifierFailureSubtype | None = None
+
+    @model_validator(mode="after")
+    def stages_are_unique_and_failure_is_coherent(self) -> VerifierLifecycleDiagnostics:
+        if len({item.stage for item in self.stages}) != len(self.stages):
+            raise ValueError("verifier lifecycle stages must be unique")
+        failed = tuple(
+            item for item in self.stages if item.status is VerifierLifecycleStageStatus.FAILED
+        )
+        if (self.failure_subtype is None) != (not failed):
+            raise ValueError("verifier lifecycle subtype and failed stage disagree")
+        return self
 
 
 class DockerPreflight(BaseModel):
@@ -182,3 +261,4 @@ class IsolatedVerifierResult(BaseModel):
     run: SandboxRunResult
     passed: bool
     score: float = Field(ge=0.0, le=1.0)
+    lifecycle: VerifierLifecycleDiagnostics | None = None

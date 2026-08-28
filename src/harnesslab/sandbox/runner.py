@@ -35,6 +35,11 @@ from harnesslab.sandbox.models import (
     SandboxRunResult,
     SandboxStatus,
     SecurityEvidence,
+    VerifierFailureSubtype,
+    VerifierLifecycleDiagnostics,
+    VerifierLifecycleStage,
+    VerifierLifecycleStageEvidence,
+    VerifierLifecycleStageStatus,
 )
 from harnesslab.sandbox.preflight import _docker_runtime_preflight
 from harnesslab.sandbox.subprocess_loop import run_on_subprocess_loop
@@ -48,6 +53,94 @@ OUTPUT_LIMIT_BYTES = 65_536
 
 class SandboxExecutionError(RuntimeError):
     """The trusted Docker lifecycle could not produce a run result."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        diagnostics: VerifierLifecycleDiagnostics | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.diagnostics = diagnostics
+
+
+class _VerifierLifecycleRecorder:
+    """In-memory bounded stage recorder; raw commands and paths cannot enter its schema."""
+
+    def __init__(self) -> None:
+        self._order: list[VerifierLifecycleStage] = []
+        self._started: dict[VerifierLifecycleStage, float] = {}
+        self._records: dict[VerifierLifecycleStage, VerifierLifecycleStageEvidence] = {}
+        self._failure_subtype: VerifierFailureSubtype | None = None
+
+    def begin(self, stage: VerifierLifecycleStage) -> None:
+        if stage not in self._order:
+            self._order.append(stage)
+        self._started[stage] = time.monotonic()
+        self._records[stage] = VerifierLifecycleStageEvidence(
+            stage=stage,
+            status=VerifierLifecycleStageStatus.STARTED,
+            duration_ms=0,
+        )
+
+    def complete(
+        self,
+        stage: VerifierLifecycleStage,
+        *,
+        container_exit_code: int | None = None,
+    ) -> None:
+        self._records[stage] = VerifierLifecycleStageEvidence(
+            stage=stage,
+            status=VerifierLifecycleStageStatus.COMPLETED,
+            duration_ms=self._duration(stage),
+            container_exit_code=container_exit_code,
+        )
+
+    def fail(
+        self,
+        stage: VerifierLifecycleStage,
+        subtype: VerifierFailureSubtype,
+        reason_code: str,
+        *,
+        exception: BaseException | None = None,
+        container_exit_code: int | None = None,
+        timeout: bool = False,
+    ) -> None:
+        if stage not in self._order:
+            self._order.append(stage)
+        if stage not in self._started:
+            self._started[stage] = time.monotonic()
+        self._records[stage] = VerifierLifecycleStageEvidence(
+            stage=stage,
+            status=VerifierLifecycleStageStatus.FAILED,
+            duration_ms=self._duration(stage),
+            exception_class=type(exception).__name__ if exception is not None else None,
+            reason_code=reason_code,
+            container_exit_code=container_exit_code,
+            timeout=timeout,
+        )
+        if self._failure_subtype is None:
+            self._failure_subtype = subtype
+
+    def snapshot(self) -> VerifierLifecycleDiagnostics:
+        now = time.monotonic()
+        records: list[VerifierLifecycleStageEvidence] = []
+        for stage in self._order:
+            record = self._records[stage]
+            if record.status is VerifierLifecycleStageStatus.STARTED:
+                record = record.model_copy(
+                    update={"duration_ms": int((now - self._started[stage]) * 1000)}
+                )
+            records.append(record)
+        return VerifierLifecycleDiagnostics(
+            stages=tuple(records), failure_subtype=self._failure_subtype
+        )
+
+    def has_failed(self) -> bool:
+        return self._failure_subtype is not None
+
+    def _duration(self, stage: VerifierLifecycleStage) -> int:
+        return int((time.monotonic() - self._started[stage]) * 1000)
 
 
 def _trusted_subject_script(request: FakeSubjectRequest) -> str:
@@ -275,17 +368,26 @@ class DockerSandbox:
         run_id: str,
         secret_values: tuple[str, ...],
     ) -> IsolatedVerifierResult:
-        if not workspace.is_dir() or workspace.is_symlink():
-            raise ArtifactError("verifier workspace is unavailable or unsafe")
-        package_root = package.root.resolve()
-        if workspace == package_root or package_root in workspace.parents:
-            raise ArtifactError("task package source cannot be normalized for container access")
-        assert_tree_has_no_run_secrets(workspace, secret_values)
-        verifier_root = package.root / "verifier"
-        entrypoint = package.verifier_entrypoint.relative_to(verifier_root).as_posix()
-        run_root = self._reserve_run_root(run_id)
+        lifecycle = _VerifierLifecycleRecorder()
+        run_root: Path | None = None
+        run: SandboxRunResult | None = None
+        report: VerifierReport | None = None
+        pending_error: BaseException | None = None
+
+        lifecycle.begin(VerifierLifecycleStage.WORKSPACE_PREPARE)
         try:
             try:
+                if not workspace.is_dir() or workspace.is_symlink():
+                    raise ArtifactError("verifier workspace is unavailable or unsafe")
+                package_root = package.root.resolve()
+                if workspace == package_root or package_root in workspace.parents:
+                    raise ArtifactError(
+                        "task package source cannot be normalized for container access"
+                    )
+                assert_tree_has_no_run_secrets(workspace, secret_values)
+                verifier_root = package.root / "verifier"
+                entrypoint = package.verifier_entrypoint.relative_to(verifier_root).as_posix()
+                run_root = self._reserve_run_root(run_id)
                 workspace_input_digest = make_tree_readable(workspace)
                 source_digest = digest_tree(verifier_root)
                 if source_digest != package.verifier_digest:
@@ -299,8 +401,35 @@ class DockerSandbox:
                 if normalized_digest != package.verifier_digest:
                     raise ArtifactError("verifier identity changed during permission normalization")
             except (ArtifactError, OSError, TaskPackageError) as exc:
-                raise SandboxExecutionError("permission-portable verifier staging failed") from exc
-            writer = ArtifactWriter(self.artifact_root, run_id)
+                permission_handoff = isinstance(exc, PermissionError)
+                lifecycle.fail(
+                    VerifierLifecycleStage.WORKSPACE_PREPARE,
+                    VerifierFailureSubtype.WORKSPACE_PERMISSION_HANDOFF_FAILED
+                    if permission_handoff
+                    else VerifierFailureSubtype.WORKSPACE_PREPARE_FAILED,
+                    "VERIFIER_WORKSPACE_PERMISSION_NORMALIZATION_DENIED"
+                    if permission_handoff
+                    else "VERIFIER_WORKSPACE_PREPARE_FAILED",
+                    exception=exc,
+                )
+                raise SandboxExecutionError(
+                    "permission-portable verifier staging failed",
+                    diagnostics=lifecycle.snapshot(),
+                ) from exc
+            lifecycle.complete(VerifierLifecycleStage.WORKSPACE_PREPARE)
+            try:
+                writer = ArtifactWriter(self.artifact_root, run_id)
+            except (ArtifactError, OSError) as exc:
+                lifecycle.fail(
+                    VerifierLifecycleStage.ARTIFACT_PERSIST,
+                    VerifierFailureSubtype.ARTIFACT_PERSIST_FAILED,
+                    "VERIFIER_ARTIFACT_RESERVATION_FAILED",
+                    exception=exc,
+                )
+                raise SandboxExecutionError(
+                    "verifier artifact destination could not be reserved",
+                    diagnostics=lifecycle.snapshot(),
+                ) from exc
             run = await self._execute_container(
                 package=package,
                 role="verifier",
@@ -313,23 +442,120 @@ class DockerSandbox:
                 secrets={},
                 workspace_input_digest=workspace_input_digest,
                 writer=writer,
+                verifier_lifecycle=lifecycle,
             )
-        finally:
+            lifecycle.begin(VerifierLifecycleStage.RESULT_COLLECT)
+            if run.manifest.status is not SandboxStatus.SUCCEEDED:
+                if not lifecycle.has_failed():
+                    stage, subtype, reason_code = self._verifier_status_failure(run.manifest.status)
+                    lifecycle.fail(
+                        stage,
+                        subtype,
+                        reason_code,
+                        container_exit_code=run.manifest.exit_code,
+                        timeout=run.manifest.timed_out,
+                    )
+                raise SandboxExecutionError(
+                    f"isolated verifier sandbox did not succeed: {run.manifest.status.value}",
+                    diagnostics=lifecycle.snapshot(),
+                )
+            try:
+                report = VerifierReport.model_validate_json(run.stdout)
+            except ValidationError as exc:
+                lifecycle.fail(
+                    VerifierLifecycleStage.RESULT_COLLECT,
+                    VerifierFailureSubtype.RESULT_COLLECTION_FAILED,
+                    "VERIFIER_RESULT_MALFORMED",
+                    exception=exc,
+                    container_exit_code=run.manifest.exit_code,
+                )
+                raise SandboxExecutionError(
+                    "isolated verifier returned malformed output",
+                    diagnostics=lifecycle.snapshot(),
+                ) from exc
+            lifecycle.complete(
+                VerifierLifecycleStage.RESULT_COLLECT,
+                container_exit_code=run.manifest.exit_code,
+            )
+        except BaseException as exc:
+            pending_error = exc
+
+        if run_root is not None:
+            lifecycle.begin(VerifierLifecycleStage.STAGING_CLEANUP)
             try:
                 self._cleanup_run_root(run_root)
             except (ArtifactError, OSError) as exc:
+                lifecycle.fail(
+                    VerifierLifecycleStage.STAGING_CLEANUP,
+                    VerifierFailureSubtype.STAGING_CLEANUP_FAILED,
+                    "VERIFIER_STAGING_CLEANUP_NOT_VERIFIED",
+                    exception=exc,
+                )
                 raise SandboxExecutionError(
-                    "verifier staging cleanup could not be verified"
+                    "verifier staging cleanup could not be verified",
+                    diagnostics=lifecycle.snapshot(),
                 ) from exc
-        if run.manifest.status is not SandboxStatus.SUCCEEDED:
+            lifecycle.complete(VerifierLifecycleStage.STAGING_CLEANUP)
+
+        if pending_error is not None:
+            if isinstance(pending_error, SandboxExecutionError):
+                raise SandboxExecutionError(
+                    str(pending_error), diagnostics=lifecycle.snapshot()
+                ) from pending_error.__cause__
+            if isinstance(pending_error, asyncio.CancelledError):
+                raise pending_error
+            if not lifecycle.has_failed():
+                lifecycle.fail(
+                    VerifierLifecycleStage.RESULT_COLLECT,
+                    VerifierFailureSubtype.UNKNOWN_VERIFIER_LIFECYCLE_FAILURE,
+                    "UNKNOWN_VERIFIER_LIFECYCLE_FAILURE",
+                    exception=pending_error,
+                )
             raise SandboxExecutionError(
-                f"isolated verifier sandbox did not succeed: {run.manifest.status.value}"
+                "unknown verifier lifecycle failure", diagnostics=lifecycle.snapshot()
+            ) from pending_error
+
+        assert run is not None and report is not None
+        return IsolatedVerifierResult(
+            run=run,
+            passed=report.passed,
+            score=report.score,
+            lifecycle=lifecycle.snapshot(),
+        )
+
+    @staticmethod
+    def _verifier_status_failure(
+        status: SandboxStatus,
+    ) -> tuple[VerifierLifecycleStage, VerifierFailureSubtype, str]:
+        if status is SandboxStatus.TIMEOUT:
+            return (
+                VerifierLifecycleStage.PROCESS_WAIT,
+                VerifierFailureSubtype.VERIFIER_TIMEOUT,
+                "VERIFIER_PROCESS_TIMEOUT",
             )
-        try:
-            report = VerifierReport.model_validate_json(run.stdout)
-        except ValidationError as exc:
-            raise SandboxExecutionError("isolated verifier returned malformed output") from exc
-        return IsolatedVerifierResult(run=run, passed=report.passed, score=report.score)
+        if status is SandboxStatus.FAILED:
+            return (
+                VerifierLifecycleStage.PROCESS_WAIT,
+                VerifierFailureSubtype.VERIFIER_PROCESS_NONZERO,
+                "VERIFIER_PROCESS_EXITED_NONZERO",
+            )
+        if status is SandboxStatus.ARTIFACT_ERROR:
+            return (
+                VerifierLifecycleStage.ARTIFACT_PERSIST,
+                VerifierFailureSubtype.ARTIFACT_PERSIST_FAILED,
+                "VERIFIER_ARTIFACT_PERSIST_FAILED",
+            )
+        if status is SandboxStatus.CLEANUP_ERROR:
+            return (
+                VerifierLifecycleStage.SANDBOX_CLEANUP,
+                VerifierFailureSubtype.SANDBOX_CLEANUP_FAILED,
+                "VERIFIER_SANDBOX_CLEANUP_NOT_VERIFIED",
+            )
+        return (
+            VerifierLifecycleStage.RESULT_COLLECT,
+            VerifierFailureSubtype.UNKNOWN_VERIFIER_LIFECYCLE_FAILURE,
+            "UNKNOWN_VERIFIER_LIFECYCLE_FAILURE",
+        )
 
     async def _execute_container(
         self,
@@ -345,8 +571,21 @@ class DockerSandbox:
         secrets: Mapping[str, str],
         workspace_input_digest: str,
         writer: ArtifactWriter,
+        verifier_lifecycle: _VerifierLifecycleRecorder | None = None,
     ) -> SandboxRunResult:
-        image, docker_cli_environment = await self._prepare_image()
+        if verifier_lifecycle is not None:
+            verifier_lifecycle.begin(VerifierLifecycleStage.SANDBOX_CREATE)
+        try:
+            image, docker_cli_environment = await self._prepare_image()
+        except BaseException as exc:
+            if verifier_lifecycle is not None:
+                verifier_lifecycle.fail(
+                    VerifierLifecycleStage.SANDBOX_CREATE,
+                    VerifierFailureSubtype.SANDBOX_CREATE_FAILED,
+                    "VERIFIER_IMAGE_PREPARE_FAILED",
+                    exception=exc,
+                )
+            raise
         cli = _DockerCLI(
             output_limit=OUTPUT_LIMIT_BYTES,
             environment=docker_cli_environment,
@@ -354,6 +593,13 @@ class DockerSandbox:
         try:
             create_environment = docker_environment(docker_cli_environment, secrets)
         except ValueError as exc:
+            if verifier_lifecycle is not None:
+                verifier_lifecycle.fail(
+                    VerifierLifecycleStage.SANDBOX_CREATE,
+                    VerifierFailureSubtype.SANDBOX_CREATE_FAILED,
+                    "VERIFIER_CREATE_ENVIRONMENT_INVALID",
+                    exception=exc,
+                )
             raise SandboxExecutionError(str(exc)) from exc
         container_name = f"harnesslab-{role}-{run_id}"
         security: SecurityEvidence | None = None
@@ -391,17 +637,52 @@ class DockerSandbox:
                 *create_arguments,
                 environment=create_environment,
             )
-            security = await self._inspect_security(cli, container_name)
+            if verifier_lifecycle is not None:
+                verifier_lifecycle.complete(VerifierLifecycleStage.SANDBOX_CREATE)
+                verifier_lifecycle.begin(VerifierLifecycleStage.WORKSPACE_ATTACH)
             try:
+                security = await self._inspect_security(cli, container_name)
+            except BaseException as exc:
+                if verifier_lifecycle is not None:
+                    verifier_lifecycle.fail(
+                        VerifierLifecycleStage.WORKSPACE_ATTACH,
+                        VerifierFailureSubtype.WORKSPACE_ATTACH_FAILED,
+                        "VERIFIER_WORKSPACE_MOUNT_INSPECTION_FAILED",
+                        exception=exc,
+                    )
+                raise
+            if verifier_lifecycle is not None:
+                verifier_lifecycle.complete(VerifierLifecycleStage.WORKSPACE_ATTACH)
+            try:
+                if verifier_lifecycle is not None:
+                    verifier_lifecycle.begin(VerifierLifecycleStage.SANDBOX_START)
+                    verifier_lifecycle.begin(VerifierLifecycleStage.PROCESS_START)
+                    verifier_lifecycle.begin(VerifierLifecycleStage.PROCESS_WAIT)
                 attached = await cli.run(
                     "start", "--attach", container_name, timeout=timeout_seconds, check=False
                 )
+                if verifier_lifecycle is not None:
+                    verifier_lifecycle.complete(VerifierLifecycleStage.SANDBOX_START)
+                    verifier_lifecycle.complete(VerifierLifecycleStage.PROCESS_START)
                 stdout, stderr = attached.stdout, attached.stderr
                 stdout_stream_digest = attached.stdout_digest
                 stderr_stream_digest = attached.stderr_digest
                 stdout_truncated = attached.stdout_truncated
                 stderr_truncated = attached.stderr_truncated
                 exit_code = await self._container_exit_code(cli, container_name)
+                if verifier_lifecycle is not None:
+                    if exit_code == 0:
+                        verifier_lifecycle.complete(
+                            VerifierLifecycleStage.PROCESS_WAIT,
+                            container_exit_code=exit_code,
+                        )
+                    else:
+                        verifier_lifecycle.fail(
+                            VerifierLifecycleStage.PROCESS_WAIT,
+                            VerifierFailureSubtype.VERIFIER_PROCESS_NONZERO,
+                            "VERIFIER_PROCESS_EXITED_NONZERO",
+                            container_exit_code=exit_code,
+                        )
                 status = SandboxStatus.SUCCEEDED if exit_code == 0 else SandboxStatus.FAILED
                 summary = "container completed" if exit_code == 0 else "container exited non-zero"
             except DockerCommandTimeout as exc:
@@ -413,11 +694,26 @@ class DockerSandbox:
                 status = SandboxStatus.TIMEOUT
                 timed_out = True
                 summary = "container execution timed out"
+                if verifier_lifecycle is not None:
+                    verifier_lifecycle.fail(
+                        VerifierLifecycleStage.PROCESS_WAIT,
+                        VerifierFailureSubtype.VERIFIER_TIMEOUT,
+                        "VERIFIER_PROCESS_TIMEOUT",
+                        exception=exc,
+                        timeout=True,
+                    )
             except asyncio.CancelledError as exc:
                 status = SandboxStatus.CANCELLED
                 cancelled = True
                 summary = "container execution cancelled"
                 cancellation = exc
+                if verifier_lifecycle is not None:
+                    verifier_lifecycle.fail(
+                        VerifierLifecycleStage.PROCESS_WAIT,
+                        VerifierFailureSubtype.UNKNOWN_VERIFIER_LIFECYCLE_FAILURE,
+                        "VERIFIER_PROCESS_CANCELLED",
+                        exception=exc,
+                    )
         except DockerCommandError as exc:
             stdout, stderr = exc.result.stdout, exc.result.stderr
             stdout_stream_digest = exc.result.stdout_digest
@@ -425,6 +721,19 @@ class DockerSandbox:
             stdout_truncated = exc.result.stdout_truncated
             stderr_truncated = exc.result.stderr_truncated
             summary = redact_exact(str(exc), secrets.values())
+            if verifier_lifecycle is not None and not verifier_lifecycle.has_failed():
+                verifier_lifecycle.fail(
+                    VerifierLifecycleStage.SANDBOX_CREATE
+                    if security is None
+                    else VerifierLifecycleStage.SANDBOX_START,
+                    VerifierFailureSubtype.SANDBOX_CREATE_FAILED
+                    if security is None
+                    else VerifierFailureSubtype.SANDBOX_START_FAILED,
+                    "VERIFIER_SANDBOX_CREATE_FAILED"
+                    if security is None
+                    else "VERIFIER_SANDBOX_START_FAILED",
+                    exception=exc,
+                )
         except asyncio.CancelledError as exc:
             status = SandboxStatus.CANCELLED
             cancelled = True
@@ -436,9 +745,30 @@ class DockerSandbox:
                 security = await self._inspect_security(cli, container_name)
         finally:
             if create_attempted:
-                cleanup_verified = await self._remove_and_verify(
-                    cli, container_name, run_id=run_id, role=role
-                )
+                if verifier_lifecycle is not None:
+                    verifier_lifecycle.begin(VerifierLifecycleStage.SANDBOX_CLEANUP)
+                try:
+                    cleanup_verified = await self._remove_and_verify(
+                        cli, container_name, run_id=run_id, role=role
+                    )
+                except BaseException as exc:
+                    if verifier_lifecycle is not None:
+                        verifier_lifecycle.fail(
+                            VerifierLifecycleStage.SANDBOX_CLEANUP,
+                            VerifierFailureSubtype.SANDBOX_CLEANUP_FAILED,
+                            "VERIFIER_SANDBOX_CLEANUP_FAILED",
+                            exception=exc,
+                        )
+                    raise
+                if verifier_lifecycle is not None:
+                    if cleanup_verified:
+                        verifier_lifecycle.complete(VerifierLifecycleStage.SANDBOX_CLEANUP)
+                    else:
+                        verifier_lifecycle.fail(
+                            VerifierLifecycleStage.SANDBOX_CLEANUP,
+                            VerifierFailureSubtype.SANDBOX_CLEANUP_FAILED,
+                            "VERIFIER_SANDBOX_CLEANUP_NOT_VERIFIED",
+                        )
 
         if security is None:
             if cancellation is not None:
@@ -449,29 +779,50 @@ class DockerSandbox:
                 raise cancellation
             raise SandboxExecutionError(redact_exact(summary, secrets.values()))
         duration_ms = int((time.monotonic() - started) * 1000)
-        result = writer.finalize(
-            package=package,
-            role=role,
-            container_name=container_name,
-            workspace=workspace,
-            workspace_input_digest=workspace_input_digest,
-            image=image,
-            security=security,
-            status=status,
-            exit_code=exit_code,
-            duration_ms=duration_ms,
-            timed_out=timed_out,
-            cancelled=cancelled,
-            cleanup_verified=cleanup_verified,
-            stdout=stdout,
-            stderr=stderr,
-            stdout_stream_digest=stdout_stream_digest,
-            stderr_stream_digest=stderr_stream_digest,
-            stdout_truncated=stdout_truncated,
-            stderr_truncated=stderr_truncated,
-            summary=summary,
-            secrets=secrets.values(),
-        )
+        if verifier_lifecycle is not None:
+            verifier_lifecycle.begin(VerifierLifecycleStage.ARTIFACT_PERSIST)
+        try:
+            result = writer.finalize(
+                package=package,
+                role=role,
+                container_name=container_name,
+                workspace=workspace,
+                workspace_input_digest=workspace_input_digest,
+                image=image,
+                security=security,
+                status=status,
+                exit_code=exit_code,
+                duration_ms=duration_ms,
+                timed_out=timed_out,
+                cancelled=cancelled,
+                cleanup_verified=cleanup_verified,
+                stdout=stdout,
+                stderr=stderr,
+                stdout_stream_digest=stdout_stream_digest,
+                stderr_stream_digest=stderr_stream_digest,
+                stdout_truncated=stdout_truncated,
+                stderr_truncated=stderr_truncated,
+                summary=summary,
+                secrets=secrets.values(),
+            )
+        except BaseException as exc:
+            if verifier_lifecycle is not None:
+                verifier_lifecycle.fail(
+                    VerifierLifecycleStage.ARTIFACT_PERSIST,
+                    VerifierFailureSubtype.ARTIFACT_PERSIST_FAILED,
+                    "VERIFIER_ARTIFACT_PERSIST_FAILED",
+                    exception=exc,
+                )
+            raise
+        if verifier_lifecycle is not None:
+            if result.manifest.status is SandboxStatus.ARTIFACT_ERROR:
+                verifier_lifecycle.fail(
+                    VerifierLifecycleStage.ARTIFACT_PERSIST,
+                    VerifierFailureSubtype.ARTIFACT_PERSIST_FAILED,
+                    "VERIFIER_ARTIFACT_PERSIST_FAILED",
+                )
+            else:
+                verifier_lifecycle.complete(VerifierLifecycleStage.ARTIFACT_PERSIST)
         if cancellation is not None:
             if not cleanup_verified:
                 raise SandboxExecutionError(

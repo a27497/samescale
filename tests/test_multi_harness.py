@@ -49,8 +49,16 @@ from harnesslab.multi_harness.runtime import (
     DEEPSEEK_REQUIRED_HELP,
     MultiHarnessRuntime,
 )
-from harnesslab.sandbox.models import ImageIdentity
-from harnesslab.sandbox.runner import DockerSandbox
+from harnesslab.sandbox.models import (
+    ImageIdentity,
+    IsolatedVerifierResult,
+    VerifierFailureSubtype,
+    VerifierLifecycleDiagnostics,
+    VerifierLifecycleStage,
+    VerifierLifecycleStageEvidence,
+    VerifierLifecycleStageStatus,
+)
+from harnesslab.sandbox.runner import DockerSandbox, SandboxExecutionError
 from harnesslab.tasks.package import TaskPackage, digest_tree
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -201,6 +209,60 @@ async def test_phase_f_self_report_cannot_override_hidden_verifier(
     assert result.evidence.outcome is HarnessLaneOutcome.VERIFIED_FAIL
     assert result.evidence.verifier_passed is False
     assert result.evidence.changed_paths == ()
+
+
+@pytest.mark.asyncio
+async def test_h_lane_persists_bounded_verifier_lifecycle_failure_evidence(
+    tmp_path: Path,
+) -> None:
+    diagnostics = VerifierLifecycleDiagnostics(
+        stages=(
+            VerifierLifecycleStageEvidence(
+                stage=VerifierLifecycleStage.WORKSPACE_PREPARE,
+                status=VerifierLifecycleStageStatus.FAILED,
+                duration_ms=2,
+                exception_class="PermissionError",
+                reason_code="VERIFIER_WORKSPACE_PERMISSION_NORMALIZATION_DENIED",
+            ),
+        ),
+        failure_subtype=VerifierFailureSubtype.WORKSPACE_PERMISSION_HANDOFF_FAILED,
+    )
+
+    class PermissionFailureSandbox(DockerSandbox):
+        async def run_hidden_verifier_workspace(
+            self,
+            package: TaskPackage,
+            workspace: Path,
+            *,
+            timeout_seconds: float = 15,
+            run_id: str | None = None,
+            secret_values: tuple[str, ...] = (),
+        ) -> IsolatedVerifierResult:
+            raise SandboxExecutionError(
+                "permission-portable verifier staging failed", diagnostics=diagnostics
+            )
+
+    result = await MultiHarnessRunner(
+        artifact_root=tmp_path / "artifacts",
+        runtime_root=tmp_path / "runtime",
+        sandbox=PermissionFailureSandbox(
+            artifact_root=tmp_path / "sandbox-artifacts",
+            runtime_root=tmp_path / "sandbox-runtime",
+        ),
+    ).run(
+        TASKS["python"],
+        fake_profile(HarnessKind.CLAUDE_CODE),
+        adapter=ClaudeCodeAdapter(),
+        backend=FakeMultiHarnessBackend(),
+        run_id="permission-handoff-evidence",
+    )
+
+    persisted = (result.artifact_directory / "manifest.json").read_text(encoding="utf-8")
+    assert result.evidence.outcome is HarnessLaneOutcome.INFRA_ERROR
+    assert result.evidence.verifier_lifecycle == diagnostics
+    assert "WORKSPACE_PERMISSION_HANDOFF_FAILED" in persisted
+    assert "VERIFIER_WORKSPACE_PERMISSION_NORMALIZATION_DENIED" in persisted
+    assert "synthetic foreign ownership" not in persisted
 
 
 @pytest.mark.asyncio
