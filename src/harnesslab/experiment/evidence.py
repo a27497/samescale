@@ -36,7 +36,15 @@ def validate_manifest_against_slot(
         "harness_version": slot.harness_version,
         "harness_profile_identity": slot.profile_identity,
     }
-    mismatches = [name for name, value in expected.items() if getattr(facts, name) != value]
+    mismatches: list[str] = []
+    for name, value in expected.items():
+        actual = getattr(facts, name)
+        if name == "harness" and value == "deepseek" and actual == "deepseek-harness":
+            # The frozen release plan names the runtime family; Phase F evidence carries the
+            # producer's HarnessKind value. This one-way alias does not change logical slot IDs.
+            continue
+        if actual != value:
+            mismatches.append(name)
     profile_hash = raw.get("profile_hash")
     if profile_hash is not None and profile_hash != slot.harness_config_identity:
         mismatches.append("harness_config_identity")

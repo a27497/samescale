@@ -26,6 +26,7 @@ from harnesslab.experiment.queue import (
     heartbeat_run,
     release_run,
     request_run_cancellation,
+    requeue_failed_infra_after_repair,
     transition_run,
 )
 from harnesslab.experiment.report import build_experiment_report
@@ -208,6 +209,7 @@ async def test_postgresql_durable_queue_skip_locked_lease_and_idempotency(
                 source_outcome="queue_test_infra",
                 artifact_manifest_path=None,
                 evidence_digest=None,
+                failure_detail="controlled repair fixture",
             )
         assert lifecycle.status is RunStatus.FAILED_INFRA
         assert lifecycle.normalized_outcome is StatisticalOutcome.INFRA_FAILURE
@@ -216,6 +218,27 @@ async def test_postgresql_durable_queue_skip_locked_lease_and_idempotency(
         assert sum(cell.infra_failures for cell in report.cells) == 1
         assert sum(cell.completed_capability_runs for cell in report.cells) == 0
         assert sum(cell.cancelled_runs for cell in report.cells) == 2
+        async with factory() as session, session.begin():
+            repaired = await requeue_failed_infra_after_repair(
+                session,
+                lifecycle.run_id,
+                expected_source_outcome="queue_test_infra",
+                expected_failure_detail="controlled repair fixture",
+            )
+        assert repaired.status is RunStatus.QUEUED
+        assert repaired.attempt == lifecycle.attempt
+        async with factory() as session, session.begin():
+            repaired_attempt = await claim_next_run(
+                session,
+                experiment_id,
+                "worker-repair",
+                now=now + timedelta(seconds=41),
+                ttl=ttl,
+                slot_ids=(repaired.slot_id,),
+            )
+        assert repaired_attempt is not None
+        assert repaired_attempt.run_id == lifecycle.run_id
+        assert repaired_attempt.attempt == lifecycle.attempt + 1
     finally:
         async with factory() as cleanup, cleanup.begin():
             await cleanup.execute(

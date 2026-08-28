@@ -300,6 +300,45 @@ async def request_run_cancellation(
     return _snapshot(run)
 
 
+async def requeue_failed_infra_after_repair(
+    session: AsyncSession,
+    run_id: str,
+    *,
+    expected_source_outcome: str,
+    expected_failure_detail: str,
+) -> RunSnapshot:
+    """Authorize one new physical attempt without changing the logical slot or old artifacts."""
+
+    run = await _locked_run(session, run_id)
+    if (
+        run.status != RunStatus.FAILED_INFRA.value
+        or run.normalized_outcome != StatisticalOutcome.INFRA_FAILURE.value
+        or run.source_outcome != expected_source_outcome
+        or run.failure_detail != expected_failure_detail
+        or run.attempt < 1
+        or run.artifact_manifest_path is not None
+        or run.evidence_digest is not None
+    ):
+        raise ExperimentConflict("run is not the exact repair-affected infrastructure failure")
+    run.status = RunStatus.QUEUED.value
+    run.normalized_outcome = None
+    run.source_outcome = None
+    run.failure_detail = None
+    run.duration_ms = None
+    run.input_tokens = None
+    run.output_tokens = None
+    run.tool_calls = None
+    run.steps = None
+    run.explicit_cost = None
+    run.lease_owner = None
+    run.lease_expires_at = None
+    run.heartbeat_at = None
+    run.started_at = None
+    run.finished_at = None
+    await session.flush()
+    return _snapshot(run)
+
+
 async def transition_run(
     session: AsyncSession,
     run_id: str,

@@ -8,7 +8,9 @@ from pathlib import Path
 
 import pytest
 
+from harnesslab.comparability.models import ComparisonFacts, canonical_digest
 from harnesslab.egress import EGRESS_PROXY_IMAGE
+from harnesslab.experiment.evidence import validate_manifest_against_slot
 from harnesslab.harness_lane.profile import CODEX_IMAGE
 from harnesslab.multi_harness.profile import CLAUDE_IMAGE, DEEPSEEK_IMAGE
 from harnesslab.release.contracts import load_release_evidence, load_technical_readiness
@@ -226,6 +228,41 @@ def test_v3_matrix_preflight_and_exact_canary_are_frozen_keylessly() -> None:
         )
         for profile in profiles.values()
     } == {180}
+
+
+def test_v3_deepseek_runtime_family_accepts_only_its_phase_f_producer_alias() -> None:
+    slot = next(
+        item
+        for item in MatrixControlPlane.load(ROOT, plan_version="v3")
+        .build_plan(_runtime())
+        .run_slots
+        if item.cell_id == "harness-deepseek-v4flash"
+    )
+    facts = ComparisonFacts(
+        evidence_identity=canonical_digest({"fixture": "deepseek-alias"}),
+        task_id=slot.task.task_id,
+        task_version=slot.task.task_version,
+        task_digest=slot.task.task_digest,
+        workspace_input_digest=slot.task.workspace_input_digest,
+        context_identity=slot.task.context_identity or "NONE",
+        verifier_identity=slot.task.verifier_identity,
+        requested_model=slot.requested_model,
+        observed_model=None,
+        provider_route=slot.provider_route,
+        budget_identity=slot.task.budget_identity,
+        network_policy=slot.task.network_policy.value,
+        harness="deepseek-harness",
+        harness_version=slot.harness_version,
+        harness_profile_identity=slot.profile_identity,
+        prompt_identity=None,
+        trace_coverage="FINAL_OUTPUT_ONLY",
+    )
+    raw = {
+        "profile_hash": slot.harness_config_identity,
+        "profile": {"reasoning_effort": slot.reasoning_effort},
+    }
+
+    validate_manifest_against_slot(raw, facts, slot)
 
 
 @pytest.mark.asyncio
