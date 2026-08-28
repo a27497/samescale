@@ -2,20 +2,25 @@ from __future__ import annotations
 
 import json
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from uuid import uuid4
 
 import httpx
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import delete, func, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.schema import CreateSchema, DropSchema
 
 from harnesslab.api.app import create_app
 from harnesslab.api.workbench_dependencies import workbench_session
 from harnesslab.contracts.common import Protocol
 from harnesslab.core.config import Settings
+from harnesslab.db.base import Base
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
 from harnesslab.db.models.registry import RegistryExperimentSnapshotRecord
 from harnesslab.db.session import create_engine, create_session_factory
+from harnesslab.egress import EGRESS_PROXY_IMAGE
 from harnesslab.experiment.methodology import (
     BudgetContract,
     BudgetDimension,
@@ -27,8 +32,12 @@ from harnesslab.experiment.methodology import (
     recovery_authorization,
 )
 from harnesslab.experiment.outcomes import StatisticalOutcome
+from harnesslab.experiment.plan import ExperimentPlan
+from harnesslab.experiment.queue import enqueue_plan
+from harnesslab.harness_lane.profile import CODEX_IMAGE
 from harnesslab.model_lane.models import ProviderRequest
 from harnesslab.model_lane.providers import adapter_for_profile
+from harnesslab.multi_harness.profile import CLAUDE_IMAGE, DEEPSEEK_IMAGE
 from harnesslab.registry.alibaba import configured_alibaba_bailian_profile
 from harnesslab.registry.models import (
     BillingMode,
@@ -44,11 +53,76 @@ from harnesslab.registry.service import (
     preflight_experiment,
     registry_settings,
 )
+from harnesslab.release.matrix import MatrixControlPlane
+from harnesslab.release.smoke import RuntimeIdentities
+from harnesslab.sandbox.models import ImageIdentity
 from tests.phase_g_helpers import ROOT
 
 METHODOLOGY = load_evaluation_methodology(ROOT / "release/evaluation-methodology-v2.json")
 ALIBABA_RUNTIME_URL = "https://workspace-sentinel.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
 ALIBABA_KEY = "fake-alibaba-key-sentinel"
+
+
+def frozen_matrix_plan() -> ExperimentPlan:
+    runtime = RuntimeIdentities(
+        codex_image=ImageIdentity(reference=CODEX_IMAGE, image_id="sha256:" + "1" * 64),
+        claude_image=ImageIdentity(reference=CLAUDE_IMAGE, image_id="sha256:" + "2" * 64),
+        deepseek_image=ImageIdentity(reference=DEEPSEEK_IMAGE, image_id="sha256:" + "3" * 64),
+        egress_proxy_image=ImageIdentity(
+            reference=EGRESS_PROXY_IMAGE, image_id="sha256:" + "4" * 64
+        ),
+        deepseek_config_digest="sha256:" + "5" * 64,
+    )
+    return MatrixControlPlane.load(ROOT, plan_version="v3").build_plan(runtime)
+
+
+@asynccontextmanager
+async def isolated_registry_database(
+    database_url: str,
+) -> AsyncIterator[async_sessionmaker[AsyncSession]]:
+    """Create a fresh test-only schema without touching operator campaign rows."""
+
+    schema = f"registry_lite_{uuid4().hex}"
+    administrative = create_engine(Settings.without_dotenv(database_url=database_url))
+    try:
+        async with administrative.begin() as connection:
+            await connection.execute(CreateSchema(schema))
+    finally:
+        await administrative.dispose()
+
+    engine = create_engine(Settings.without_dotenv(database_url=database_url)).execution_options(
+        schema_translate_map={None: schema}
+    )
+    try:
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+        yield create_session_factory(engine)
+    finally:
+        await engine.dispose()
+        cleanup = create_engine(Settings.without_dotenv(database_url=database_url))
+        try:
+            async with cleanup.begin() as connection:
+                await connection.execute(DropSchema(schema, cascade=True))
+        finally:
+            await cleanup.dispose()
+
+
+@asynccontextmanager
+async def registry_client(
+    factory: async_sessionmaker[AsyncSession],
+) -> AsyncIterator[AsyncClient]:
+    app = create_app()
+
+    async def override_session() -> AsyncIterator[AsyncSession]:
+        async with factory() as session:
+            yield session
+
+    app.dependency_overrides[workbench_session] = override_session
+    try:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            yield client
+    finally:
+        app.dependency_overrides.clear()
 
 
 def budget() -> BudgetContract:
@@ -386,38 +460,32 @@ async def test_fake_alibaba_profile_uses_openai_shapes_and_reference_only_bearer
 
 
 @pytest.mark.integration
-async def test_registry_api_persists_only_immutable_snapshot_and_preserves_matrix(
+async def test_registry_api_does_not_seed_or_mutate_real_matrix_on_fresh_database(
     database_url: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     environment = relay_environment()
     for key, value in environment.items():
         monkeypatch.setenv(key, value)
+    monkeypatch.setenv("REAL_CALLS_ALLOWED", "0")
     request = builder_request()
     expected = build_experiment_snapshot(request, ROOT, environment)
-    engine = create_engine(Settings.without_dotenv(database_url=database_url))
-    factory = create_session_factory(engine)
-    async with factory() as cleanup, cleanup.begin():
-        await cleanup.execute(
-            delete(RegistryExperimentSnapshotRecord).where(
-                RegistryExperimentSnapshotRecord.id == expected.snapshot_id
-            )
-        )
-    async with factory() as session:
-        matrix_before = await session.scalar(
-            select(func.count())
-            .select_from(ExperimentRunRecord)
-            .where(ExperimentRunRecord.experiment_id == "core-real-matrix-v3")
-        )
+    matrix_plan = frozen_matrix_plan()
+    assert matrix_plan.experiment_id == "core-real-matrix-v3"
+    assert (len(matrix_plan.cells), len(matrix_plan.tasks), matrix_plan.repeat_count) == (7, 18, 5)
+    assert len(matrix_plan.run_slots) == 630
 
-    app = create_app()
-
-    async def override_session() -> AsyncIterator[AsyncSession]:
+    async with isolated_registry_database(database_url) as factory:
         async with factory() as session:
-            yield session
+            matrix_before = await session.scalar(
+                select(func.count())
+                .select_from(ExperimentRunRecord)
+                .where(ExperimentRunRecord.experiment_id == matrix_plan.experiment_id)
+            )
+            existing_matrix = await session.get(ExperimentRecord, matrix_plan.experiment_id)
+        assert matrix_before == 0
+        assert existing_matrix is None
 
-    app.dependency_overrides[workbench_session] = override_session
-    try:
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        async with registry_client(factory) as client:
             providers = await client.get("/api/registry/providers")
             preflight = await client.post(
                 "/api/experiments/preflight", json=request.model_dump(mode="json")
@@ -469,22 +537,115 @@ async def test_registry_api_persists_only_immutable_snapshot_and_preserves_matri
             matrix_after = await session.scalar(
                 select(func.count())
                 .select_from(ExperimentRunRecord)
-                .where(ExperimentRunRecord.experiment_id == "core-real-matrix-v3")
+                .where(ExperimentRunRecord.experiment_id == matrix_plan.experiment_id)
             )
+            matrix_experiment_after = await session.get(ExperimentRecord, matrix_plan.experiment_id)
             no_run_experiment = await session.get(ExperimentRecord, expected.plan.experiment_id)
         assert persisted is not None
         persisted_json = json.dumps(persisted.snapshot_json)
         assert environment["HARNESSLAB_GPT56_RELAY_BASE_URL"] not in persisted_json
         assert environment["HARNESSLAB_GPT56_RELAY_API_KEY"] not in persisted_json
         assert snapshot_count == 1
-        assert matrix_before == matrix_after == 630
+        assert matrix_before == matrix_after == 0
+        assert matrix_experiment_after is None
         assert no_run_experiment is None
-    finally:
-        app.dependency_overrides.clear()
-        async with factory() as cleanup, cleanup.begin():
-            await cleanup.execute(
-                delete(RegistryExperimentSnapshotRecord).where(
-                    RegistryExperimentSnapshotRecord.id == expected.snapshot_id
+
+
+@pytest.mark.integration
+async def test_registry_snapshot_preserves_explicitly_enqueued_real_matrix_fixture(
+    database_url: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    environment = relay_environment()
+    for key, value in environment.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.setenv("REAL_CALLS_ALLOWED", "0")
+    request = builder_request()
+    expected = build_experiment_snapshot(request, ROOT, environment)
+    matrix_plan = frozen_matrix_plan()
+    assert expected.plan.experiment_id != matrix_plan.experiment_id
+    assert len(matrix_plan.run_slots) == 630
+
+    async with isolated_registry_database(database_url) as factory:
+        async with factory() as session, session.begin():
+            enqueued = await enqueue_plan(session, matrix_plan)
+        assert enqueued.logical_run_count == 630
+        assert enqueued.created is True
+
+        async with factory() as session:
+            existing_before = await session.get(ExperimentRecord, matrix_plan.experiment_id)
+            rows_before = tuple(
+                (
+                    row.run_id,
+                    row.slot_id,
+                    row.cell_id,
+                    row.task_id,
+                    row.task_version,
+                    row.task_digest,
+                    row.repeat_index,
+                    row.paired_slot_identity,
+                    row.status,
+                    row.normalized_outcome,
+                    row.source_outcome,
+                    row.attempt,
+                    row.evidence_digest,
                 )
+                for row in (
+                    await session.scalars(
+                        select(ExperimentRunRecord)
+                        .where(ExperimentRunRecord.experiment_id == matrix_plan.experiment_id)
+                        .order_by(ExperimentRunRecord.slot_order)
+                    )
+                ).all()
             )
-        await engine.dispose()
+        assert existing_before is not None
+        assert existing_before.plan_digest == matrix_plan.digest
+        assert len(rows_before) == 630
+        assert {item[1] for item in rows_before} == {slot.slot_id for slot in matrix_plan.run_slots}
+        assert {item[8] for item in rows_before} == {"queued"}
+        assert {item[9] for item in rows_before} == {None}
+        assert {item[11] for item in rows_before} == {0}
+
+        async with registry_client(factory) as client:
+            response = await client.post(
+                "/api/experiments/snapshot", json=request.model_dump(mode="json")
+            )
+        assert response.status_code == 200
+        assert response.json()["snapshot_id"] == expected.snapshot_id
+
+        async with factory() as session:
+            existing_after = await session.get(ExperimentRecord, matrix_plan.experiment_id)
+            rows_after = tuple(
+                (
+                    row.run_id,
+                    row.slot_id,
+                    row.cell_id,
+                    row.task_id,
+                    row.task_version,
+                    row.task_digest,
+                    row.repeat_index,
+                    row.paired_slot_identity,
+                    row.status,
+                    row.normalized_outcome,
+                    row.source_outcome,
+                    row.attempt,
+                    row.evidence_digest,
+                )
+                for row in (
+                    await session.scalars(
+                        select(ExperimentRunRecord)
+                        .where(ExperimentRunRecord.experiment_id == matrix_plan.experiment_id)
+                        .order_by(ExperimentRunRecord.slot_order)
+                    )
+                ).all()
+            )
+            registry_snapshot = await session.get(
+                RegistryExperimentSnapshotRecord, expected.snapshot_id
+            )
+            no_registry_experiment = await session.get(
+                ExperimentRecord, expected.plan.experiment_id
+            )
+        assert existing_after is not None
+        assert existing_after.plan_digest == matrix_plan.digest
+        assert rows_after == rows_before
+        assert registry_snapshot is not None
+        assert no_registry_experiment is None
