@@ -1,0 +1,305 @@
+{
+  "schema_version": 2,
+  "methodology_id": "harnesslab-evaluation-methodology-v2",
+  "active": true,
+  "task_tiers": [
+    {
+      "id": "tier-a-micro-contract",
+      "description": "Cheap deterministic micro-contract evaluation. The current frozen 18-task corpus remains here and is not a universal coding-agent benchmark.",
+      "tier": "TIER_A_MICRO_CONTRACT",
+      "current_task_ids": [
+        "core-java-deduplicate",
+        "core-java-feature-flag",
+        "core-java-quota",
+        "core-java-settings-merge",
+        "core-java-slugify",
+        "core-python-deduplicate",
+        "core-python-feature-flag",
+        "core-python-quota",
+        "core-python-settings-merge",
+        "core-python-slugify",
+        "core-typescript-deduplicate",
+        "core-typescript-feature-flag",
+        "core-typescript-quota",
+        "core-typescript-settings-merge",
+        "core-typescript-slugify",
+        "micro-java-clamp",
+        "micro-python-clamp",
+        "micro-typescript-clamp"
+      ],
+      "universal_agent_benchmark": false
+    },
+    {
+      "id": "tier-b-repo-engineering",
+      "description": "Future repository-scale engineering tasks with broader context, integration surfaces, and deterministic verification.",
+      "tier": "TIER_B_REPO_ENGINEERING",
+      "current_task_ids": [],
+      "universal_agent_benchmark": false
+    },
+    {
+      "id": "tier-c-long-horizon-agentic",
+      "description": "Future long-horizon agentic tasks with explicit milestones, durable state, and deterministic terminal contracts.",
+      "tier": "TIER_C_LONG_HORIZON_AGENTIC",
+      "current_task_ids": [],
+      "universal_agent_benchmark": false
+    }
+  ],
+  "evaluation_modes": [
+    {
+      "id": "quick",
+      "description": "Cheapest breadth-first representative comparison.",
+      "mode": "QUICK",
+      "repeat_count": 1,
+      "selection_scope": "Representative tasks and cells selected before execution."
+    },
+    {
+      "id": "informal",
+      "description": "Portfolio-grade repeated evidence for selected important comparisons and ablations.",
+      "mode": "INFORMAL",
+      "repeat_count": 3,
+      "selection_scope": "Only preregistered critical pairs, ablations, and representative tasks."
+    },
+    {
+      "id": "formal-exhaustive",
+      "description": "Expensive research-grade exhaustive execution over preregistered tasks and cells.",
+      "mode": "FORMAL_EXHAUSTIVE",
+      "repeat_count": 5,
+      "selection_scope": "All preregistered tasks and cells or an explicitly preregistered formal comparison."
+    }
+  ],
+  "comparison_types": [
+    {
+      "id": "end-to-end-system-comparison",
+      "description": "Different model, harness, or provider identities may vary together.",
+      "comparison_type": "END_TO_END_SYSTEM_COMPARISON",
+      "required_controls": ["task", "context", "verifier", "declared budget"],
+      "declared_treatment": "complete evaluated system",
+      "claim_boundary": "System-level association only; never claim pure model or harness uplift."
+    },
+    {
+      "id": "model-comparison",
+      "description": "Only model identity is the declared treatment.",
+      "comparison_type": "MODEL_COMPARISON",
+      "required_controls": ["harness", "scaffold", "task", "budget", "provider route", "network"],
+      "declared_treatment": "model identity",
+      "claim_boundary": "Model comparison only while every declared hard control remains comparable."
+    },
+    {
+      "id": "harness-uplift",
+      "description": "Harness or profile is the declared treatment under a shared model and provider route.",
+      "comparison_type": "HARNESS_UPLIFT",
+      "required_controls": ["model", "provider route", "task", "context", "verifier", "budget", "network"],
+      "declared_treatment": "harness/profile",
+      "claim_boundary": "A model or provider identity difference blocks a harness-uplift claim."
+    },
+    {
+      "id": "controlled-ablation",
+      "description": "Exactly one preregistered treatment dimension changes.",
+      "comparison_type": "CONTROLLED_ABLATION",
+      "required_controls": ["all dimensions except the single declared treatment"],
+      "declared_treatment": "one named dimension",
+      "claim_boundary": "Any undeclared drift reclassifies the comparison as end-to-end system evidence."
+    }
+  ],
+  "task_health": {
+    "baseline_expected": "FAIL",
+    "oracle_expected": "PASS",
+    "oracle_health_repeats": 5,
+    "verifier_health_repeats": 5,
+    "identical_terminal_result_required": true,
+    "task_version_change_required_for_semantic_change": true
+  },
+  "funnel": [
+    {
+      "id": "stage-0-preflight",
+      "description": "Keyless identity, task-health, route, budget, and scheduling validation.",
+      "stage": "PREFLIGHT",
+      "repeat_count": null,
+      "selection_scope": "No subject execution.",
+      "explicit_decision_required": true,
+      "auto_promote": false
+    },
+    {
+      "id": "stage-1-smoke",
+      "description": "Small representative route and schema exercise.",
+      "stage": "SMOKE",
+      "repeat_count": 1,
+      "selection_scope": "Small representative subset.",
+      "explicit_decision_required": true,
+      "auto_promote": false
+    },
+    {
+      "id": "stage-2-breadth",
+      "description": "Breadth-first execution across every selected task.",
+      "stage": "BREADTH",
+      "repeat_count": 1,
+      "selection_scope": "All selected tasks and system cells.",
+      "explicit_decision_required": true,
+      "auto_promote": false
+    },
+    {
+      "id": "stage-3-informal",
+      "description": "Repeated selected critical pairs and ablations.",
+      "stage": "INFORMAL",
+      "repeat_count": 3,
+      "selection_scope": "Preregistered important comparisons only.",
+      "explicit_decision_required": true,
+      "auto_promote": false
+    },
+    {
+      "id": "stage-4-formal",
+      "description": "Research-grade repeated evidence for preregistered important comparisons.",
+      "stage": "FORMAL",
+      "repeat_count": 5,
+      "selection_scope": "Preregistered formal comparisons or explicit exhaustive mode.",
+      "explicit_decision_required": true,
+      "auto_promote": false
+    },
+    {
+      "id": "stage-5-discriminative-stress",
+      "description": "Optional future discriminative or stress extension.",
+      "stage": "DISCRIMINATIVE_STRESS",
+      "repeat_count": null,
+      "selection_scope": "Separately versioned future extension.",
+      "explicit_decision_required": true,
+      "auto_promote": false
+    }
+  ],
+  "scheduling": {
+    "id": "BLOCKED_INTERLEAVED_SCHEDULING",
+    "block_key": ["task_id", "repeat_index"],
+    "deterministic_seed_required": true,
+    "persist_block_identity": true,
+    "persist_cell_execution_order": true,
+    "provider_check_before_block": true,
+    "unavailable_provider_state": "PROVIDER_UNAVAILABLE",
+    "provider_substitution_allowed": false,
+    "pause_entire_affected_block": true
+  },
+  "infra_recovery": {
+    "maximum_recovery_attempts": 1,
+    "capability_retry_allowed": false,
+    "semantic_retry_allowed": false,
+    "fallback_allowed": false,
+    "original_attempt_immutable": true,
+    "recovery_attempt_new_identity": true,
+    "exhausted_state": "INFRA_RECOVERY_EXHAUSTED"
+  },
+  "budget": {
+    "dimensions": [
+      "max_wall_time",
+      "max_output_tokens",
+      "max_model_turns",
+      "max_tool_calls",
+      "max_provider_requests",
+      "max_cost"
+    ],
+    "missing_metric_state": "NOT_AVAILABLE",
+    "formal_comparability_required": true
+  },
+  "metrics": {
+    "primary_portfolio_metric": "PASS_AT_1",
+    "repeated_trial_metric": "TRIAL_SUCCESS_RATE",
+    "supported_metrics": [
+      "capability_success",
+      "pass_at_1",
+      "trial_success_rate",
+      "latency",
+      "tokens",
+      "model_turns",
+      "tool_calls",
+      "provider_requests",
+      "explicit_cost",
+      "cost_per_successful_task",
+      "wilson_95",
+      "paired_binary_exact",
+      "paired_continuous_bootstrap"
+    ],
+    "capability_denominator": "capability_pass+capability_fail",
+    "required_operational_counts": [
+      "planned",
+      "capability_n",
+      "infra_count",
+      "missing_count",
+      "recovery_attempt_count"
+    ],
+    "immutable_price_evidence_required_for_cost_claims": true,
+    "pricing_snapshot_is_retroactive_truth": false,
+    "unrelated_task_pooling_allowed": false
+  },
+  "judge_funnel": {
+    "pilot_id": "JUDGE_PILOT",
+    "pilot_slots": 21,
+    "formal_id": "JUDGE_FORMAL",
+    "formal_slots": 63,
+    "auto_promote": false,
+    "formal_entry_requirements": [
+      "provider route works",
+      "strict schema conformance is usable",
+      "coverage is sufficient",
+      "no deterministic infrastructure blocker"
+    ],
+    "post_output_schema_relaxation_allowed": false
+  },
+  "default_portfolio": {
+    "breadth_task_count": 18,
+    "breadth_cell_ids": [
+      "harness-claude-qwen38-opencode-go",
+      "harness-codex-gpt56-high",
+      "harness-codex-gpt56-medium",
+      "harness-deepseek-v4flash",
+      "model-deepseek-v4pro-chat",
+      "model-gpt56-relay-responses",
+      "model-qwen38-opencode-go-messages"
+    ],
+    "breadth_repeats": 1,
+    "critical_task_ids": [
+      "core-python-deduplicate",
+      "core-python-feature-flag",
+      "core-python-quota",
+      "core-java-deduplicate",
+      "core-java-feature-flag",
+      "core-java-quota",
+      "core-typescript-deduplicate",
+      "core-typescript-feature-flag",
+      "core-typescript-quota"
+    ],
+    "critical_comparisons": [
+      {
+        "id": "gpt-direct-vs-codex-medium",
+        "comparison_type": "HARNESS_UPLIFT",
+        "left_cell_id": "model-gpt56-relay-responses",
+        "right_cell_id": "harness-codex-gpt56-medium"
+      },
+      {
+        "id": "qwen-direct-vs-claude-qwen",
+        "comparison_type": "HARNESS_UPLIFT",
+        "left_cell_id": "model-qwen38-opencode-go-messages",
+        "right_cell_id": "harness-claude-qwen38-opencode-go"
+      },
+      {
+        "id": "codex-medium-vs-high",
+        "comparison_type": "CONTROLLED_ABLATION",
+        "left_cell_id": "harness-codex-gpt56-medium",
+        "right_cell_id": "harness-codex-gpt56-high"
+      }
+    ],
+    "critical_repeats": 3,
+    "reuse_existing_logical_slots": true,
+    "breadth_subject_runs": 126,
+    "critical_comparison_memberships": 162,
+    "critical_unique_subject_runs": 135,
+    "breadth_overlap_subject_runs": 45,
+    "incremental_critical_subject_runs": 90,
+    "projected_unique_subject_runs": 216,
+    "reduction_subject_runs": 414,
+    "formal_exhaustive_subject_runs": 630
+  },
+  "backward_compatibility": {
+    "historical_experiment_id": "core-real-matrix-v3",
+    "historical_plan_digest": "sha256:5b91aea8c2cf812e911358b3a39f75d8d0eada153188c219eaf5176d3b3b107d",
+    "historical_methodology": "FORMAL_EXHAUSTIVE_MODE",
+    "rewrite_historical_plans": false,
+    "preserve_existing_evidence": true
+  }
+}

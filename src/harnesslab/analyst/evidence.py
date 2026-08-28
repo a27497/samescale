@@ -31,8 +31,9 @@ from harnesslab.evidence.reader import (
     load_normalized_trace,
     load_verified_manifest,
 )
-from harnesslab.experiment.plan import ExperimentPlan
+from harnesslab.experiment.plan import AnyExperimentPlan, load_experiment_plan_payload
 from harnesslab.experiment.report import ExperimentReportError, build_experiment_report
+from harnesslab.experiment.spec import ExperimentSpecError
 from harnesslab.tasks.package import TaskPackage, TaskPackageError
 
 
@@ -90,7 +91,7 @@ class AnalystEvidenceRepository:
         self._repository_root = repository_root.resolve()
         self._artifact_roots = artifact_roots
         self._read_only_started = False
-        self._plan: ExperimentPlan | None = None
+        self._plan: AnyExperimentPlan | None = None
 
     async def _ensure_read_only(self) -> None:
         if self._read_only_started:
@@ -100,7 +101,7 @@ class AnalystEvidenceRepository:
             await self._session.execute(text("SET TRANSACTION READ ONLY"))
         self._read_only_started = True
 
-    async def _load_plan(self) -> ExperimentPlan:
+    async def _load_plan(self) -> AnyExperimentPlan:
         await self._ensure_read_only()
         if self._plan is not None:
             return self._plan
@@ -108,8 +109,8 @@ class AnalystEvidenceRepository:
         if record is None:
             raise AnalystEvidenceError("bound experiment does not exist")
         try:
-            plan = ExperimentPlan.model_validate(record.plan_json)
-        except ValidationError as exc:
+            plan = load_experiment_plan_payload(record.plan_json)
+        except (ValidationError, ExperimentSpecError) as exc:
             raise AnalystEvidenceError("persisted experiment plan is invalid") from exc
         if plan.experiment_id != record.id or plan.digest != record.plan_digest:
             raise AnalystEvidenceError("persisted experiment plan identity does not match")

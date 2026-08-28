@@ -1,5 +1,10 @@
 # Evaluation methodology
 
+> **Active methodology:** New experiments use [Evaluation Methodology v2](EVAL_METHODOLOGY_V2.md)
+> and its canonical `release/evaluation-methodology-v2.json` artifact. The Phase A–K material
+> below remains the historical architecture and evidence explanation. Existing schema-v1 plans,
+> including the frozen 630-slot `core-real-matrix-v3`, are not rewritten.
+
 Phase A establishes vocabulary and contracts. Phase B implements deterministic task validation,
 Phase C isolates untrusted workspace verification, Phase D implements the first M-Lane direct
 model path, Phase E implements the Codex H-Lane, and Phase F adds Claude/DeepSeek H-Lanes plus
@@ -91,11 +96,13 @@ when controls are valid. Observations from unrelated tasks are never pooled to u
 An n=1-per-task smoke cannot enter formal ranking, paired claims, or confidence-interval
 conclusions. Formal paired evidence similarly requires five `COMPARABLE` pairs per intended task.
 
-Infrastructure failures (service outage, sandbox startup, credential routing, worker, verifier,
+Under the historical schema-v1 Phase G policy, infrastructure failures (service outage, sandbox startup, credential routing, worker, verifier,
 or artifact failure) are classified separately from capability failures. The capability success
 rate denominator is capability passes plus capability failures, never all planned slots. A
 five-slot cell with one infrastructure failure reports planned=5, capability n=4, and infra=1
-without a replacement run.
+without a replacement run. Methodology v2 preserves this denominator but permits at most one
+identity-bound infrastructure recovery attempt for new schema-v2 experiments; capability-terminal
+slots remain permanently ineligible for retry.
 
 Harness configuration, authentication, timeout, process, protocol, profile-violation, and artifact
 failures are infrastructure/control failures rather than subject capability failures. Only a

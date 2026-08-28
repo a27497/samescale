@@ -23,7 +23,7 @@ from harnesslab.experiment.outcomes import (
     StatisticalOutcome,
     validate_terminal_run_lifecycle,
 )
-from harnesslab.experiment.plan import ExperimentPlan
+from harnesslab.experiment.plan import AnyExperimentPlan
 from harnesslab.experiment.report import (
     ExperimentReport,
     build_experiment_report,
@@ -95,7 +95,7 @@ class AblationEvidenceSummary(CanonicalModel):
 class ExperimentEvidenceSummary(StrictModel):
     experiment_id: str
     record_status: str
-    plan: ExperimentPlan
+    plan: AnyExperimentPlan
     runs: tuple[RunEvidenceSummary, ...]
     report_experiment_id: str
     report_plan_digest: str
@@ -169,7 +169,7 @@ def _ablation_source_digest(report: ExperimentReport, ablation_id: str) -> str:
 
 
 def _summarize_pair(
-    report: ExperimentReport, plan: ExperimentPlan, pair_id: str
+    report: ExperimentReport, plan: AnyExperimentPlan, pair_id: str
 ) -> PairEvidenceSummary:
     definition = next(item for item in plan.paired_comparisons if item.id == pair_id)
     statistics = next(item for item in report.pairs if item.pair_id == pair_id)
@@ -190,7 +190,7 @@ def _summarize_pair(
 
 
 def _summarize_ablation(
-    report: ExperimentReport, plan: ExperimentPlan, ablation_id: str
+    report: ExperimentReport, plan: AnyExperimentPlan, ablation_id: str
 ) -> AblationEvidenceSummary:
     definition = next(item for item in plan.ablations if item.id == ablation_id)
     statistics = next(item for item in report.ablations if item.ablation_id == ablation_id)

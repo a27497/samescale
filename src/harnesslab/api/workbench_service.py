@@ -53,13 +53,14 @@ from harnesslab.evidence.reader import (
     trusted_artifact_path,
 )
 from harnesslab.experiment.outcomes import StatisticalOutcome
-from harnesslab.experiment.plan import ExperimentPlan
+from harnesslab.experiment.plan import AnyExperimentPlan, load_experiment_plan_payload
 from harnesslab.experiment.report import (
     ExperimentReport,
     ExperimentReportError,
     build_experiment_report,
     load_verified_experiment_evidence,
 )
+from harnesslab.experiment.spec import ExperimentSpecError
 from harnesslab.experiment.statistics import summarize_cell
 from harnesslab.judgelab.report import JudgeCalibrationReport
 from harnesslab.release.contracts import (
@@ -108,10 +109,10 @@ def _comparability_value(value: str) -> ComparabilityValue:
     raise WorkbenchAPIError(409, "ARTIFACT_INTEGRITY_ERROR", "invalid comparability value")
 
 
-def _plan(record: ExperimentRecord) -> ExperimentPlan:
+def _plan(record: ExperimentRecord) -> AnyExperimentPlan:
     try:
-        plan = ExperimentPlan.model_validate(record.plan_json)
-    except ValidationError as exc:
+        plan = load_experiment_plan_payload(record.plan_json)
+    except (ValidationError, ExperimentSpecError) as exc:
         raise WorkbenchAPIError(
             409, "ARTIFACT_INTEGRITY_ERROR", "experiment plan is invalid"
         ) from exc
@@ -205,7 +206,7 @@ async def _run_counts(
 
 
 def _summary(
-    record: ExperimentRecord, plan: ExperimentPlan, counts: Counter[str]
+    record: ExperimentRecord, plan: AnyExperimentPlan, counts: Counter[str]
 ) -> ExperimentSummary:
     capability = counts["outcome:capability_pass"] + counts["outcome:capability_fail"]
     return ExperimentSummary(
@@ -326,7 +327,7 @@ async def experiment_status(session: AsyncSession, experiment_id: str) -> Experi
 
 
 def _task_cell_comparability(
-    plan: ExperimentPlan, report: ExperimentReport
+    plan: AnyExperimentPlan, report: ExperimentReport
 ) -> dict[tuple[str, str], tuple[MatrixComparabilityValue, tuple[str, ...]]]:
     pair_cells = {
         pair.id: (pair.left_cell_id, pair.right_cell_id) for pair in plan.paired_comparisons

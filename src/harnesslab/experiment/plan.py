@@ -4,12 +4,19 @@ import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.common import EvaluationLane, NetworkPolicy, Sha256Digest
+from harnesslab.experiment.methodology import (
+    BudgetContract,
+    EvaluationMethodologyV2,
+    EvaluationMode,
+    FunnelStage,
+    ProviderAvailability,
+)
 from harnesslab.experiment.spec import (
     AblationSpec,
     ExperimentCellSpec,
@@ -17,6 +24,7 @@ from harnesslab.experiment.spec import (
     ExperimentSpecError,
     PairedComparisonSpec,
 )
+from harnesslab.tasks.health import TaskHealthAttestation, validate_task_health
 from harnesslab.tasks.package import TaskPackage, TaskPackageError
 
 
@@ -106,6 +114,65 @@ class ExperimentPlan(BaseModel):
     @property
     def digest(self) -> str:
         return "sha256:" + hashlib.sha256(self.canonical_json().encode()).hexdigest()
+
+
+class ScheduleBlock(BaseModel):
+    """One reproducible task/repeat block with interleaved cell execution."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    block_identity: Sha256Digest
+    task_id: str
+    task_version: str
+    task_digest: Sha256Digest
+    repeat_index: int
+    provider_availability: ProviderAvailability
+    unavailable_provider_routes: tuple[str, ...] = ()
+    cell_execution_order: tuple[str, ...]
+    slot_ids: tuple[Sha256Digest, ...]
+
+
+class MethodologyV2ExperimentPlan(BaseModel):
+    """Schema-v2 plan with frozen methodology, budget, health, and schedule identity."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: Literal[2] = 2
+    experiment_id: str
+    name: str
+    methodology_id: str
+    methodology_digest: Sha256Digest
+    evaluation_mode: EvaluationMode
+    funnel_stage: FunnelStage
+    execution_seed: int
+    schedule_seed: int
+    scheduling_policy: Literal["BLOCKED_INTERLEAVED_SCHEDULING"] = "BLOCKED_INTERLEAVED_SCHEDULING"
+    repeat_count: Literal[1, 3, 5]
+    comparison_intent: str
+    budget_contract: BudgetContract
+    budget_contract_identity: Sha256Digest
+    task_health_attestations: tuple[TaskHealthAttestation, ...]
+    tasks: tuple[PlannedTask, ...]
+    cells: tuple[PlannedCell, ...]
+    paired_comparisons: tuple[PairedComparisonSpec, ...]
+    ablations: tuple[AblationSpec, ...]
+    schedule_blocks: tuple[ScheduleBlock, ...]
+    run_slots: tuple[ExperimentRunSlot, ...]
+
+    def canonical_json(self) -> str:
+        return json.dumps(
+            self.model_dump(mode="json"),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+
+    @property
+    def digest(self) -> str:
+        return "sha256:" + hashlib.sha256(self.canonical_json().encode()).hexdigest()
+
+
+type AnyExperimentPlan = ExperimentPlan | MethodologyV2ExperimentPlan
 
 
 @dataclass(frozen=True)
@@ -234,3 +301,182 @@ def build_experiment_plan(spec: ExperimentSpec, repository_root: Path) -> Experi
         ablations=tuple(sorted(spec.ablations, key=lambda ablation: ablation.id)),
         run_slots=tuple(slots),
     )
+
+
+def build_blocked_interleaved_schedule(
+    plan: ExperimentPlan,
+    *,
+    schedule_seed: int,
+    provider_availability: dict[str, ProviderAvailability] | None = None,
+) -> tuple[tuple[ScheduleBlock, ...], tuple[ExperimentRunSlot, ...]]:
+    """Order immutable slots by task/repeat blocks and seeded cell permutations."""
+
+    availability = provider_availability or {}
+    slots_by_key = {
+        (
+            slot.task.task_id,
+            slot.task.task_version,
+            slot.task.task_digest,
+            slot.repeat_index,
+            slot.cell_id,
+        ): slot
+        for slot in plan.run_slots
+    }
+    blocks: list[ScheduleBlock] = []
+    ordered_slots: list[ExperimentRunSlot] = []
+    for repeat_index in range(plan.repeat_count):
+        for task in plan.tasks:
+            block_identity = canonical_digest(
+                {
+                    "methodology": "harnesslab-evaluation-methodology-v2",
+                    "experiment_id": plan.experiment_id,
+                    "task_id": task.task_id,
+                    "task_version": task.task_version,
+                    "task_digest": task.task_digest,
+                    "repeat_index": repeat_index,
+                }
+            )
+            cell_ids = sorted(
+                (cell.id for cell in plan.cells),
+                key=lambda cell_id: hashlib.sha256(
+                    f"{schedule_seed}:{block_identity}:{cell_id}".encode()
+                ).hexdigest(),
+            )
+            routes = {cell.id: cell.provider_route for cell in plan.cells}
+            unavailable = tuple(
+                sorted(
+                    {
+                        routes[cell_id]
+                        for cell_id in cell_ids
+                        if availability.get(routes[cell_id], ProviderAvailability.AVAILABLE)
+                        is ProviderAvailability.PROVIDER_UNAVAILABLE
+                    }
+                )
+            )
+            block_slots = tuple(
+                slots_by_key[
+                    (
+                        task.task_id,
+                        task.task_version,
+                        task.task_digest,
+                        repeat_index,
+                        cell_id,
+                    )
+                ]
+                for cell_id in cell_ids
+            )
+            blocks.append(
+                ScheduleBlock(
+                    block_identity=block_identity,
+                    task_id=task.task_id,
+                    task_version=task.task_version,
+                    task_digest=task.task_digest,
+                    repeat_index=repeat_index,
+                    provider_availability=(
+                        ProviderAvailability.PROVIDER_UNAVAILABLE
+                        if unavailable
+                        else ProviderAvailability.AVAILABLE
+                    ),
+                    unavailable_provider_routes=unavailable,
+                    cell_execution_order=tuple(cell_ids),
+                    slot_ids=tuple(slot.slot_id for slot in block_slots),
+                )
+            )
+            ordered_slots.extend(block_slots)
+    scheduled_slots = tuple(
+        slot.model_copy(update={"slot_order": slot_order})
+        for slot_order, slot in enumerate(ordered_slots)
+    )
+    if {slot.slot_id for slot in scheduled_slots} != {slot.slot_id for slot in plan.run_slots}:
+        raise ExperimentSpecError("blocked scheduling changed logical slot identity")
+    return tuple(blocks), scheduled_slots
+
+
+def build_methodology_v2_plan(
+    spec: ExperimentSpec,
+    repository_root: Path,
+    *,
+    methodology: EvaluationMethodologyV2,
+    evaluation_mode: EvaluationMode,
+    funnel_stage: FunnelStage,
+    schedule_seed: int,
+    budget_contract: BudgetContract,
+    provider_availability: dict[str, ProviderAvailability] | None = None,
+) -> MethodologyV2ExperimentPlan:
+    """Build a health-gated schema-v2 plan without altering schema-v1 semantics."""
+
+    if spec.repeat_count != evaluation_mode.repeat_count:
+        raise ExperimentSpecError("repeat count does not match explicit evaluation mode")
+    allowed_stage = {
+        EvaluationMode.QUICK: {FunnelStage.SMOKE, FunnelStage.BREADTH},
+        EvaluationMode.INFORMAL: {FunnelStage.INFORMAL},
+        EvaluationMode.FORMAL_EXHAUSTIVE: {FunnelStage.FORMAL},
+    }
+    if funnel_stage not in allowed_stage[evaluation_mode]:
+        raise ExperimentSpecError("funnel stage does not match explicit evaluation mode")
+
+    base = build_experiment_plan(spec, repository_root)
+    tier_a = next(
+        policy for policy in methodology.task_tiers if policy.tier.value == "TIER_A_MICRO_CONTRACT"
+    )
+    planned_task_ids = {task.task_id for task in base.tasks}
+    if not planned_task_ids <= set(tier_a.current_task_ids):
+        raise ExperimentSpecError("task tier assignment is missing from methodology v2")
+    repeats = methodology.task_health.verifier_health_repeats
+    attestations = tuple(
+        sorted(
+            (
+                validate_task_health(repository_root / task.package_path, repeats=repeats)
+                for task in base.tasks
+            ),
+            key=lambda item: (item.task_id, item.task_version, item.task_digest),
+        )
+    )
+    blocks, scheduled_slots = build_blocked_interleaved_schedule(
+        base,
+        schedule_seed=schedule_seed,
+        provider_availability=provider_availability,
+    )
+    return MethodologyV2ExperimentPlan(
+        experiment_id=base.experiment_id,
+        name=base.name,
+        methodology_id=methodology.methodology_id,
+        methodology_digest=methodology.digest,
+        evaluation_mode=evaluation_mode,
+        funnel_stage=funnel_stage,
+        execution_seed=base.execution_seed,
+        schedule_seed=schedule_seed,
+        repeat_count=evaluation_mode.repeat_count,
+        comparison_intent=base.comparison_intent,
+        budget_contract=budget_contract,
+        budget_contract_identity=budget_contract.identity,
+        task_health_attestations=attestations,
+        tasks=base.tasks,
+        cells=base.cells,
+        paired_comparisons=base.paired_comparisons,
+        ablations=base.ablations,
+        schedule_blocks=blocks,
+        run_slots=scheduled_slots,
+    )
+
+
+def executable_block_slot_ids(block: ScheduleBlock) -> tuple[str, ...]:
+    """Fail closed before acquisition when any provider in a block is unavailable."""
+
+    if block.provider_availability is ProviderAvailability.PROVIDER_UNAVAILABLE:
+        return ()
+    return block.slot_ids
+
+
+def load_experiment_plan_payload(raw: Any) -> AnyExperimentPlan:
+    if not isinstance(raw, dict):
+        raise ExperimentSpecError("experiment plan must contain a mapping")
+    schema_version = raw.get("schema_version")
+    try:
+        if schema_version == 1:
+            return ExperimentPlan.model_validate(raw)
+        if schema_version == 2:
+            return MethodologyV2ExperimentPlan.model_validate(raw)
+    except ValidationError as exc:
+        raise ExperimentSpecError(f"invalid experiment plan: {exc}") from exc
+    raise ExperimentSpecError("unsupported experiment plan schema version")

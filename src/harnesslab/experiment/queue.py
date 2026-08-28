@@ -16,8 +16,14 @@ from harnesslab.db.models.experiment import (
     ExperimentRecord,
     ExperimentRunRecord,
 )
+from harnesslab.experiment.methodology import ProviderAvailability
 from harnesslab.experiment.outcomes import StatisticalOutcome, terminal_status_for_outcome
-from harnesslab.experiment.plan import ExperimentPlan, ExperimentRunSlot
+from harnesslab.experiment.plan import (
+    AnyExperimentPlan,
+    ExperimentRunSlot,
+    MethodologyV2ExperimentPlan,
+    load_experiment_plan_payload,
+)
 
 
 class ExperimentConflict(RuntimeError):
@@ -96,7 +102,7 @@ def _snapshot(run: ExperimentRunRecord) -> RunSnapshot:
     )
 
 
-async def enqueue_plan(session: AsyncSession, plan: ExperimentPlan) -> EnqueueResult:
+async def enqueue_plan(session: AsyncSession, plan: AnyExperimentPlan) -> EnqueueResult:
     existing = await session.get(ExperimentRecord, plan.experiment_id, with_for_update=True)
     if existing is not None:
         if existing.plan_digest != plan.digest:
@@ -202,6 +208,24 @@ async def claim_next_run(
         ExperimentRunRecord.cancellation_requested.is_(False),
         or_(ExperimentRunRecord.status == RunStatus.QUEUED.value, reclaimable),
     ]
+    experiment = await session.get(ExperimentRecord, experiment_id)
+    if experiment is None:
+        return None
+    if experiment.schema_version >= 2:
+        try:
+            plan = load_experiment_plan_payload(experiment.plan_json)
+        except ValueError as exc:
+            raise ExperimentConflict("persisted experiment plan is invalid") from exc
+        if not isinstance(plan, MethodologyV2ExperimentPlan):
+            raise ExperimentConflict("schema-v2 experiment lacks methodology-v2 plan")
+        blocked_slot_ids = tuple(
+            slot_id
+            for block in plan.schedule_blocks
+            if block.provider_availability is ProviderAvailability.PROVIDER_UNAVAILABLE
+            for slot_id in block.slot_ids
+        )
+        if blocked_slot_ids:
+            filters.append(ExperimentRunRecord.slot_id.not_in(blocked_slot_ids))
     if slot_ids is not None:
         selected = tuple(slot_ids)
         if not selected:
@@ -310,6 +334,11 @@ async def requeue_failed_infra_after_repair(
     """Authorize one new physical attempt without changing the logical slot or old artifacts."""
 
     run = await _locked_run(session, run_id)
+    experiment = await session.get(ExperimentRecord, run.experiment_id)
+    if experiment is None:
+        raise ExperimentConflict("experiment does not exist")
+    if experiment.schema_version >= 2:
+        raise ExperimentConflict("methodology v2 recovery requires immutable new attempt evidence")
     if (
         run.status != RunStatus.FAILED_INFRA.value
         or run.normalized_outcome != StatisticalOutcome.INFRA_FAILURE.value

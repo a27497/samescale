@@ -45,3 +45,17 @@ def test_phase_g_nested_cli_help() -> None:
     ):
         result = runner.invoke(app, command)
         assert result.exit_code == 0
+
+
+def test_methodology_v2_cli_is_strictly_planning_only() -> None:
+    result = runner.invoke(app, ["experiment", "methodology-v2"])
+
+    assert result.exit_code == 0
+    assert "methodology_id=harnesslab-evaluation-methodology-v2" in result.stdout
+    assert "methodology_digest=sha256:" in result.stdout
+    assert "breadth_subject_runs=126" in result.stdout
+    assert "incremental_critical_subject_runs=90" in result.stdout
+    assert "projected_subject_runs=216" in result.stdout
+    assert "formal_exhaustive_subject_runs=630" in result.stdout
+    assert "reduction_subject_runs=414" in result.stdout
+    assert "real_calls=0" in result.stdout

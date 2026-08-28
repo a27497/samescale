@@ -28,7 +28,12 @@ from harnesslab.experiment.outcomes import (
     StatisticalOutcome,
     normalize_manifest_evidence,
 )
-from harnesslab.experiment.plan import ExperimentPlan, ExperimentRunSlot
+from harnesslab.experiment.plan import (
+    AnyExperimentPlan,
+    ExperimentRunSlot,
+    load_experiment_plan_payload,
+)
+from harnesslab.experiment.spec import ExperimentSpecError
 from harnesslab.experiment.statistics import (
     CellStatistics,
     PairObservation,
@@ -57,7 +62,7 @@ class VerifiedRunObservation:
 class VerifiedExperimentEvidence:
     """Shared verified-observation input for reports and read-only consumers."""
 
-    plan: ExperimentPlan
+    plan: AnyExperimentPlan
     runs: tuple[ExperimentRunRecord, ...]
     observations: tuple[VerifiedRunObservation, ...]
 
@@ -256,7 +261,10 @@ async def load_verified_experiment_evidence(
     experiment = await session.get(ExperimentRecord, experiment_id)
     if experiment is None:
         raise ExperimentReportError("experiment does not exist")
-    plan = ExperimentPlan.model_validate(experiment.plan_json)
+    try:
+        plan = load_experiment_plan_payload(experiment.plan_json)
+    except ExperimentSpecError as exc:
+        raise ExperimentReportError("persisted experiment plan is invalid") from exc
     if plan.digest != experiment.plan_digest:
         raise ExperimentReportError("persisted plan digest does not match plan bytes")
     runs = tuple(

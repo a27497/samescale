@@ -21,7 +21,16 @@ from harnesslab.experiment.executor import (
     ExperimentRunExecutor,
     resolved_comparison_profile_identity,
 )
-from harnesslab.experiment.plan import ExperimentPlan, build_experiment_plan
+from harnesslab.experiment.methodology import (
+    MethodologyError,
+    load_evaluation_methodology,
+    project_default_portfolio,
+)
+from harnesslab.experiment.plan import (
+    AnyExperimentPlan,
+    build_experiment_plan,
+    load_experiment_plan_payload,
+)
 from harnesslab.experiment.queue import ExperimentConflict, enqueue_plan, inspect_run
 from harnesslab.experiment.report import ExperimentReportError, build_experiment_report
 from harnesslab.experiment.spec import ExperimentSpecError, load_experiment_spec
@@ -55,7 +64,7 @@ def _write_or_echo(content: str, output: Path | None) -> None:
     typer.echo(f"output={output}")
 
 
-def _load_plan(path: Path) -> ExperimentPlan:
+def _load_plan(path: Path) -> AnyExperimentPlan:
     try:
         raw: Any = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
@@ -65,8 +74,8 @@ def _load_plan(path: Path) -> ExperimentPlan:
         raise ExperimentSpecError(f"cannot read experiment input: {type(exc).__name__}") from exc
     if isinstance(raw, dict) and "run_slots" in raw:
         try:
-            return ExperimentPlan.model_validate(raw)
-        except ValidationError as exc:
+            return load_experiment_plan_payload(raw)
+        except (ValidationError, ExperimentSpecError) as exc:
             raise ExperimentSpecError(f"invalid experiment plan: {exc}") from exc
     spec = load_experiment_spec(path)
     return build_experiment_plan(spec, _repository_root())
@@ -93,6 +102,32 @@ def plan_experiment(
     typer.echo(f"cells={len(plan.cells)} tasks={len(plan.tasks)} runs={len(plan.run_slots)}")
 
 
+@experiment_app.command("methodology-v2")
+def methodology_v2_projection(
+    methodology_path: str = typer.Option(
+        "release/evaluation-methodology-v2.json",
+        "--methodology",
+        help="Strict methodology-v2 JSON artifact.",
+    ),
+) -> None:
+    """Validate methodology v2 and print its planning-only portfolio projection."""
+
+    try:
+        methodology = load_evaluation_methodology(_repository_root() / methodology_path)
+        projection = project_default_portfolio(methodology.default_portfolio)
+    except MethodologyError as exc:
+        typer.echo(f"FAIL evaluation methodology: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"methodology_id={methodology.methodology_id}")
+    typer.echo(f"methodology_digest={methodology.digest}")
+    typer.echo(f"breadth_subject_runs={projection.breadth_subject_runs}")
+    typer.echo(f"incremental_critical_subject_runs={projection.incremental_critical_subject_runs}")
+    typer.echo(f"projected_subject_runs={projection.projected_unique_subject_runs}")
+    typer.echo(f"formal_exhaustive_subject_runs={projection.formal_exhaustive_subject_runs}")
+    typer.echo(f"reduction_subject_runs={projection.reduction_subject_runs}")
+    typer.echo("real_calls=0")
+
+
 def _phase_g_fake_image() -> ImageIdentity:
     return ImageIdentity(
         reference="phase-g-keyless-codex:1",
@@ -101,7 +136,7 @@ def _phase_g_fake_image() -> ImageIdentity:
 
 
 def _keyless_bindings(
-    plan: ExperimentPlan, artifact_root: Path, runtime_root: Path
+    plan: AnyExperimentPlan, artifact_root: Path, runtime_root: Path
 ) -> dict[str, ExperimentLaneBinding]:
     bindings: dict[str, ExperimentLaneBinding] = {}
     for cell in plan.cells:
@@ -165,7 +200,7 @@ def _keyless_bindings(
 
 
 async def _run_experiment(
-    plan: ExperimentPlan,
+    plan: AnyExperimentPlan,
     *,
     execute: bool,
     artifact_root: Path,
