@@ -59,17 +59,19 @@ class _LocalBoundary:
 LOCAL_CHAT_SERVER = r"""
 import http.server
 import json
+import os
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         length = int(self.headers.get("content-length", "0"))
         payload = json.loads(self.rfile.read(length))
-        print(json.dumps({
+        record = json.dumps({
             "authorization_present": bool(self.headers.get("authorization")),
             "model": payload.get("model"),
             "path": self.path,
             "stream": payload.get("stream"),
-        }, sort_keys=True), flush=True)
+        }, sort_keys=True)
+        os.write(1, (record + "\n").encode())
         chunks = [
             {
                 "id": "chatcmpl-keyless",
