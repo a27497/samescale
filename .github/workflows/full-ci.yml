@@ -23,6 +23,8 @@ jobs:
             command: uv run --locked python scripts/verify_tier_a_verifier_robustness_v2.py
           - id: model-chat-v3
             command: uv run --locked python scripts/freeze_model_chat_v3.py
+          - id: model-chat-v3r1
+            command: uv run --locked python scripts/freeze_model_chat_v3r1.py
     services:
       postgres:
         image: postgres:18

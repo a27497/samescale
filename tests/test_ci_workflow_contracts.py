@@ -131,5 +131,6 @@ def test_full_workflow_is_keyless_and_fast_ci_preserves_legacy_gate_status() -> 
     assert fast["jobs"]["gates"]["name"] == "gates"
     assert "verify_tier_a_verifier_robustness_v2.py" in full_text
     assert "freeze_model_chat_v3.py" in full_text
+    assert "freeze_model_chat_v3r1.py" in full_text
     assert "HARNESSLAB_ENABLE_REAL" not in full_text
     assert "--allow-real" not in full_text

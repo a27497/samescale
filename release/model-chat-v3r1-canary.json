@@ -1,0 +1,95 @@
+{
+  "canary_id": "portfolio-alibaba-model-chat-v3r1-canary",
+  "execution_status": "NOT_RUN",
+  "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+  "plan_digest": "sha256:b20865518f6531fdf2db3cacfeef9b33afbf4614f43aee8b850f8135e59d7548",
+  "provider_infra_policy": "OPERATIONAL_STOP_AND_REVIEW_NO_SEMANTIC_RETRY",
+  "real_provider_calls": 0,
+  "schedule_seed": 20260830,
+  "schema_version": 1,
+  "selection_policy": "THREE_LANGUAGE_FIXED_SIX_SLOT_CANARY",
+  "slots": [
+    {
+      "cell_id": "Q",
+      "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+      "requested_model": "qwen3.8-max",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:06827136e7606b167d59f73ea4f9a90af3e738db3220dd6848b6adc30eabf3e6",
+      "slot_order": 4,
+      "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+      "task_id": "core-java-quota",
+      "task_version": "1.0.2",
+      "verifier_identity": "sha256:3df38ecadc317a23b9fede3dfafd9ef6d443d877e0fc77644c486a0aa3c7e465"
+    },
+    {
+      "cell_id": "D",
+      "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+      "requested_model": "deepseek-v4-pro",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:7895488986803c0b5cc0f5e811be021f275b0aac3b12ece1276754baf3eb90fc",
+      "slot_order": 5,
+      "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+      "task_id": "core-java-quota",
+      "task_version": "1.0.2",
+      "verifier_identity": "sha256:3df38ecadc317a23b9fede3dfafd9ef6d443d877e0fc77644c486a0aa3c7e465"
+    },
+    {
+      "cell_id": "Q",
+      "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+      "requested_model": "qwen3.8-max",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:132d3e537551535555cdad3cd72aa8746e10614060f0ca7954fe608ac50a175e",
+      "slot_order": 14,
+      "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+      "task_id": "core-python-quota",
+      "task_version": "1.0.2",
+      "verifier_identity": "sha256:a9d4129b205e0b750a21f183c882e82b16c432eb2390135c586a9a3f834896b6"
+    },
+    {
+      "cell_id": "D",
+      "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+      "requested_model": "deepseek-v4-pro",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:8fe49086723e6ea385ae36ca1c75d6758b2addd8993eecc51aecee4fe26266c9",
+      "slot_order": 15,
+      "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+      "task_id": "core-python-quota",
+      "task_version": "1.0.2",
+      "verifier_identity": "sha256:a9d4129b205e0b750a21f183c882e82b16c432eb2390135c586a9a3f834896b6"
+    },
+    {
+      "cell_id": "Q",
+      "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+      "requested_model": "qwen3.8-max",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:679d6289fb85d8a82cd69674dbb11aebdb977cdf8a307127792626ed4e3c0591",
+      "slot_order": 24,
+      "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+      "task_id": "core-typescript-quota",
+      "task_version": "1.0.2",
+      "verifier_identity": "sha256:d51bb52c000c76c2f1893c18fb93cb30ffdc6e056176fcb7f082462c4d3fd4b1"
+    },
+    {
+      "cell_id": "D",
+      "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+      "requested_model": "deepseek-v4-pro",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:3203154b9486308f7ffea7b2aa5de41477f79ee832458db5cb2ebe5ed0883d40",
+      "slot_order": 25,
+      "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+      "task_id": "core-typescript-quota",
+      "task_version": "1.0.2",
+      "verifier_identity": "sha256:d51bb52c000c76c2f1893c18fb93cb30ffdc6e056176fcb7f082462c4d3fd4b1"
+    }
+  ],
+  "success_gates": [
+    "OBSERVED_PROVIDER_MODEL_IDENTITY_MATCH",
+    "NO_CONTROL_DRIFT",
+    "NO_VERIFIER_INFRA",
+    "NO_SECRET_LEAKAGE",
+    "TRACE_AND_EVIDENCE_VALID",
+    "TASK_VERSION_EXACTLY_1.0.2",
+    "VERIFIER_IDENTITY_EXACTLY_FROZEN",
+    "CAPABILITY_PASS_OR_FAIL_ACCEPTABLE"
+  ]
+}

@@ -1,0 +1,2338 @@
+{
+  "comparison_type": "MODEL_COMPARISON",
+  "freeze": {
+    "common_resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+    "deepseek_runtime_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+    "endpoint_fingerprint": "sha256:235ea65d1faa3e89d3107c248054c7d8b5c3cae743452d79128c73fa54469b2d",
+    "predecessor_experiment_id": "portfolio-alibaba-model-chat-v3",
+    "predecessor_status": "PRE_ACQUISITION_ABORTED_CONTROL_IDENTITY_MISMATCH",
+    "qwen_runtime_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+    "real_provider_calls": 0,
+    "schedule_seed": 20260830,
+    "strategy": "MODEL_CHAT_V3R1_ENDPOINT_RECONCILED_FULL_REACQUISITION",
+    "task_version": "1.0.2"
+  },
+  "methodology_digest": "sha256:cd476e0161a7934afa6cb20160246ecb1a01c5895260e3be72092b01574372b8",
+  "methodology_id": "harnesslab-evaluation-methodology-v2",
+  "plan": {
+    "ablations": [],
+    "budget_contract": {
+      "max_cost": {
+        "scopes": [
+          "NOT_AVAILABLE"
+        ],
+        "status": "NOT_AVAILABLE",
+        "unit": "USD",
+        "value": null
+      },
+      "max_model_turns": {
+        "scopes": [
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "turns",
+        "value": 1
+      },
+      "max_output_tokens": {
+        "scopes": [
+          "PER_PROVIDER_REQUEST",
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "tokens",
+        "value": 4000
+      },
+      "max_provider_requests": {
+        "scopes": [
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "requests",
+        "value": 1
+      },
+      "max_tool_calls": {
+        "scopes": [
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "calls",
+        "value": 0
+      },
+      "max_wall_time": {
+        "scopes": [
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "seconds",
+        "value": 240
+      }
+    },
+    "budget_contract_identity": "sha256:9058d4be0849c51506a0c46e99fe5cd72c821def10306260677912532baab3fb",
+    "cells": [
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "id": "D",
+        "lane": "M",
+        "network_policy": "deny",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "profile_reference": "builtin:registry.direct.alibaba-bailian-deepseek-v4-pro-chat",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "requested_model": "deepseek-v4-pro",
+        "resource_budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1"
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "id": "Q",
+        "lane": "M",
+        "network_policy": "deny",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "profile_reference": "builtin:registry.direct.alibaba-bailian-qwen3.8-max-chat",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "requested_model": "qwen3.8-max",
+        "resource_budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1"
+      }
+    ],
+    "comparison_intent": "MODEL_COMPARISON",
+    "evaluation_mode": "QUICK",
+    "execution_seed": 20260830,
+    "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+    "funnel_stage": "BREADTH",
+    "methodology_digest": "sha256:cd476e0161a7934afa6cb20160246ecb1a01c5895260e3be72092b01574372b8",
+    "methodology_id": "harnesslab-evaluation-methodology-v2",
+    "name": "Alibaba Qwen3.8 Max vs DeepSeek V4 Pro Chat v3r1 n=1",
+    "paired_comparisons": [],
+    "repeat_count": 1,
+    "run_slots": [
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:3a06e2ca14143af8441146e81955352180e3b3f91c96f76d08191ee189778909",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:ffeb9737f9fc4d733ae572fb0506dab0ed3b5544a0206a73a3002a7355b0ef3e",
+        "slot_order": 0,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-deduplicate/1.0.2",
+          "task_digest": "sha256:fa98fe75e89f7a3051200af71e7869a0d01333a2e6ba8b7565934d882a8862c4",
+          "task_id": "core-java-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:c35bca0195d7b0c4bbf5f8fc0a7fe62d3d6bf498d6f4ebacc9940637c961e699",
+          "workspace_input_digest": "sha256:86c02d6e8c301f55c826ece4c70b00a2539966295d90a6508bac96c191793f12"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:3a06e2ca14143af8441146e81955352180e3b3f91c96f76d08191ee189778909",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:64b09ccf9d300f7e921480b082e14e4849c71e6b61ae32b17db7830e6df13a7d",
+        "slot_order": 1,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-deduplicate/1.0.2",
+          "task_digest": "sha256:fa98fe75e89f7a3051200af71e7869a0d01333a2e6ba8b7565934d882a8862c4",
+          "task_id": "core-java-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:c35bca0195d7b0c4bbf5f8fc0a7fe62d3d6bf498d6f4ebacc9940637c961e699",
+          "workspace_input_digest": "sha256:86c02d6e8c301f55c826ece4c70b00a2539966295d90a6508bac96c191793f12"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:6cfaff2134666764bc6201da9a84f0779aedb5c6ad53f9e84619411119103cf4",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:d54e60536307d7643f7d478f3fd5f509719654511ecdd5bd7726fb418f86dd92",
+        "slot_order": 2,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-feature-flag/1.0.2",
+          "task_digest": "sha256:2666e71704d3a21cf1155b8ea10ffca6f0c19a8ed55ca7f6105b15b29e3e2d42",
+          "task_id": "core-java-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:1abf8a46369dbbc08ba32c7a8f89dc44fdba70ec932bcfb5240a54b1d1094724",
+          "workspace_input_digest": "sha256:5aa14e3cf1083b95c10e7aaa267e93ac9e9a3efde9302552d2c0e2fa5ea2f190"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:6cfaff2134666764bc6201da9a84f0779aedb5c6ad53f9e84619411119103cf4",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:412b54b5603f49fb59077a936640a55c26ba4a2163749310d5732b0a9cb75547",
+        "slot_order": 3,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-feature-flag/1.0.2",
+          "task_digest": "sha256:2666e71704d3a21cf1155b8ea10ffca6f0c19a8ed55ca7f6105b15b29e3e2d42",
+          "task_id": "core-java-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:1abf8a46369dbbc08ba32c7a8f89dc44fdba70ec932bcfb5240a54b1d1094724",
+          "workspace_input_digest": "sha256:5aa14e3cf1083b95c10e7aaa267e93ac9e9a3efde9302552d2c0e2fa5ea2f190"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:14ba0fd6b8fcc5be4480ca4b1593f9c14601092db61fff029bf9712258ff77dc",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:06827136e7606b167d59f73ea4f9a90af3e738db3220dd6848b6adc30eabf3e6",
+        "slot_order": 4,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-quota/1.0.2",
+          "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+          "task_id": "core-java-quota",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:3df38ecadc317a23b9fede3dfafd9ef6d443d877e0fc77644c486a0aa3c7e465",
+          "workspace_input_digest": "sha256:e4100bd5d966558f86e830dc5cf964460dd01b942b396c4580684e3b5e3db0b6"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:14ba0fd6b8fcc5be4480ca4b1593f9c14601092db61fff029bf9712258ff77dc",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:7895488986803c0b5cc0f5e811be021f275b0aac3b12ece1276754baf3eb90fc",
+        "slot_order": 5,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-quota/1.0.2",
+          "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+          "task_id": "core-java-quota",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:3df38ecadc317a23b9fede3dfafd9ef6d443d877e0fc77644c486a0aa3c7e465",
+          "workspace_input_digest": "sha256:e4100bd5d966558f86e830dc5cf964460dd01b942b396c4580684e3b5e3db0b6"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:3e51637fe8ef242444a0e889193d8074a6323a571ff4e5fa46b8034ce2019edf",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:02c7fc936f027c43e7fc93ae5a8e5e20c6ad4423523e42591cc284cab0946615",
+        "slot_order": 6,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-settings-merge/1.0.2",
+          "task_digest": "sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+          "task_id": "core-java-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:e10c25e47889d60f7fc56a8324028ff8e82646c6cddec78d4aa62cab1425e871",
+          "workspace_input_digest": "sha256:7b888545e7872e402c37157efaf096975df5d61616c511dbd65323695dab594a"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:3e51637fe8ef242444a0e889193d8074a6323a571ff4e5fa46b8034ce2019edf",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:0aef6b51f710c3d14a2bcbe71a05a6b5756f0f11b6caa90224f86451e8314c2b",
+        "slot_order": 7,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-settings-merge/1.0.2",
+          "task_digest": "sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+          "task_id": "core-java-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:e10c25e47889d60f7fc56a8324028ff8e82646c6cddec78d4aa62cab1425e871",
+          "workspace_input_digest": "sha256:7b888545e7872e402c37157efaf096975df5d61616c511dbd65323695dab594a"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:be120a60c34d8ee373ea59b8dc1bf30f6d37cf2324b03b8b1d493a64fc38495d",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:788e5b31a1cee0efad404461bbac54f557bbb4126bfcf3093010beccf4d4f437",
+        "slot_order": 8,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-slugify/1.0.2",
+          "task_digest": "sha256:f8b28b8a3c9bdf5bd75c6a90392adcd321ff4a1f4d19500180de41547f6751dd",
+          "task_id": "core-java-slugify",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:ab31a3c1f109058c056127b08c9fd2e55015d1fe067ba519038be74124fa2266",
+          "workspace_input_digest": "sha256:d8b45b3a35728d6b8ebb40b9e2630f4c9a9b0a680368e5d1e933977b413f450d"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:be120a60c34d8ee373ea59b8dc1bf30f6d37cf2324b03b8b1d493a64fc38495d",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:aa409e1668985923a68f4a706c4b3155752da9daee8ac1c052072efdc1489cbd",
+        "slot_order": 9,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-java-slugify/1.0.2",
+          "task_digest": "sha256:f8b28b8a3c9bdf5bd75c6a90392adcd321ff4a1f4d19500180de41547f6751dd",
+          "task_id": "core-java-slugify",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:ab31a3c1f109058c056127b08c9fd2e55015d1fe067ba519038be74124fa2266",
+          "workspace_input_digest": "sha256:d8b45b3a35728d6b8ebb40b9e2630f4c9a9b0a680368e5d1e933977b413f450d"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:f78e31fe668b67bea45abba6dc550933777fc5f71e9ae2045106a6da265c5bf8",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:46b90837d84e7e34f85f62023fb9c72b6a36395720d1ae1d945d2a8d085b9bb7",
+        "slot_order": 10,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-deduplicate/1.0.2",
+          "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+          "task_id": "core-python-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+          "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:f78e31fe668b67bea45abba6dc550933777fc5f71e9ae2045106a6da265c5bf8",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:77bde8e9dde796b32f7f70e55a85aff32876385ad30bee55f02de56a6d79798d",
+        "slot_order": 11,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-deduplicate/1.0.2",
+          "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+          "task_id": "core-python-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+          "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:f59f3a3d3f0d0f0f9b417b6e83dc0140946219bc5b0bb1c6cf1625ccbdbf077f",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:355e94615da6ee27df7618b02232498bf365e25106cf09940b39bc5824d73f4d",
+        "slot_order": 12,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-feature-flag/1.0.2",
+          "task_digest": "sha256:92fdb8dd6796d4890b57b2be9fd1ef0049b28da10969c3694453d0e327bb41dc",
+          "task_id": "core-python-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:cf870fecb06d8d351b9b175b86ba74b00b5578cd941c9e07f2c894f8996ce691",
+          "workspace_input_digest": "sha256:d9ed3ea18266ee8f6ff45e06db91fd00757148a883d5ce122e8e52f1f9c7d821"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:f59f3a3d3f0d0f0f9b417b6e83dc0140946219bc5b0bb1c6cf1625ccbdbf077f",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:5332a914208763658b341dc8b517d68fe95ee8ef555ce769541437c250bd3ad5",
+        "slot_order": 13,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-feature-flag/1.0.2",
+          "task_digest": "sha256:92fdb8dd6796d4890b57b2be9fd1ef0049b28da10969c3694453d0e327bb41dc",
+          "task_id": "core-python-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:cf870fecb06d8d351b9b175b86ba74b00b5578cd941c9e07f2c894f8996ce691",
+          "workspace_input_digest": "sha256:d9ed3ea18266ee8f6ff45e06db91fd00757148a883d5ce122e8e52f1f9c7d821"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:69b096d34432ba27b8ee9b811632893d852cd26a23a3b2b866a7aa1cf474a127",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:132d3e537551535555cdad3cd72aa8746e10614060f0ca7954fe608ac50a175e",
+        "slot_order": 14,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-quota/1.0.2",
+          "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+          "task_id": "core-python-quota",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:a9d4129b205e0b750a21f183c882e82b16c432eb2390135c586a9a3f834896b6",
+          "workspace_input_digest": "sha256:3261aaabd4c8387ef737461c3f0e453a03de8dbaf7f21015aae7c16bbbe7f5c2"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:69b096d34432ba27b8ee9b811632893d852cd26a23a3b2b866a7aa1cf474a127",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:8fe49086723e6ea385ae36ca1c75d6758b2addd8993eecc51aecee4fe26266c9",
+        "slot_order": 15,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-quota/1.0.2",
+          "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+          "task_id": "core-python-quota",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:a9d4129b205e0b750a21f183c882e82b16c432eb2390135c586a9a3f834896b6",
+          "workspace_input_digest": "sha256:3261aaabd4c8387ef737461c3f0e453a03de8dbaf7f21015aae7c16bbbe7f5c2"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:55b0f34a1df01d48e259f7f7ec51b30b4579fc7dfb547ec557387af5ad612341",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:4b197af1527c3fbe91c4904f4a0131590a94d5e8bd48f4c60aeb32fa23e638d4",
+        "slot_order": 16,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-settings-merge/1.0.2",
+          "task_digest": "sha256:ecf6c3666533d8ccb7cab4b947b439bd4780024ac03a4ef414cee47654705ac5",
+          "task_id": "core-python-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:d536f7ec77e2c27ba36620d07a17db92aad8a3569317715bbaaec5c7f78e172a",
+          "workspace_input_digest": "sha256:9b0e4c281bc1b21273429a104ed9d24e53227bfa2f3d006fd4af4ed55be1d8d0"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:55b0f34a1df01d48e259f7f7ec51b30b4579fc7dfb547ec557387af5ad612341",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:061e96ab967177dfa07cf434ba02bb589dae154ae1de7556aa3b3b4525b64b1f",
+        "slot_order": 17,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-settings-merge/1.0.2",
+          "task_digest": "sha256:ecf6c3666533d8ccb7cab4b947b439bd4780024ac03a4ef414cee47654705ac5",
+          "task_id": "core-python-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:d536f7ec77e2c27ba36620d07a17db92aad8a3569317715bbaaec5c7f78e172a",
+          "workspace_input_digest": "sha256:9b0e4c281bc1b21273429a104ed9d24e53227bfa2f3d006fd4af4ed55be1d8d0"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:9ef16deca20075faf05047a731b14b87be968cd3f15029deb54ab6e809d94b72",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:529f4b291015066a49e330d934b2b8d62d5e8265dcc21f9bd22647183f686447",
+        "slot_order": 18,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-slugify/1.0.2",
+          "task_digest": "sha256:565ce44fca6fc76909382df6f46a46d7306cda3d0da40e5e1522745fde9e7cc3",
+          "task_id": "core-python-slugify",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:e5810b14068935553f6fc93a429e5c38f1a6b5c21b4623d444e5ddec1590e781",
+          "workspace_input_digest": "sha256:9f78419af52d4a0e7baced19d08d5abdea5f2a55397491b681b9ed56c8ce4e94"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:9ef16deca20075faf05047a731b14b87be968cd3f15029deb54ab6e809d94b72",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:c0fd19a9592a6bd8c0aee7b3a7fd08df9759a1b645b92c94df327f0a33d1a7e0",
+        "slot_order": 19,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-python-slugify/1.0.2",
+          "task_digest": "sha256:565ce44fca6fc76909382df6f46a46d7306cda3d0da40e5e1522745fde9e7cc3",
+          "task_id": "core-python-slugify",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:e5810b14068935553f6fc93a429e5c38f1a6b5c21b4623d444e5ddec1590e781",
+          "workspace_input_digest": "sha256:9f78419af52d4a0e7baced19d08d5abdea5f2a55397491b681b9ed56c8ce4e94"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:5670683d988ce010b31196e6987187c4c8b8a07f0d3ea0de448bf43ffdda15bb",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:456eb7f655a19668e4eb66e542a8eb67a46b1641d7baad047b8ae0c4582f6477",
+        "slot_order": 20,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-deduplicate/1.0.2",
+          "task_digest": "sha256:d987c52866294dc3df41e55dc48e080e16359d1259c5cd7cacc82010872b4987",
+          "task_id": "core-typescript-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:7f5517f13ac2cb1e98918b4c361530c5970df00ae7fe875630a9492faa923725",
+          "workspace_input_digest": "sha256:935b5579534bb9d3b464008fff6c34b32945dc22a74962aa81d605f8503fa5f5"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:5670683d988ce010b31196e6987187c4c8b8a07f0d3ea0de448bf43ffdda15bb",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:f89dabc863e241b4a67c3e86cd579b0dbbfd1f389bb57e5141d3b6dab1c6f8cb",
+        "slot_order": 21,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-deduplicate/1.0.2",
+          "task_digest": "sha256:d987c52866294dc3df41e55dc48e080e16359d1259c5cd7cacc82010872b4987",
+          "task_id": "core-typescript-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:7f5517f13ac2cb1e98918b4c361530c5970df00ae7fe875630a9492faa923725",
+          "workspace_input_digest": "sha256:935b5579534bb9d3b464008fff6c34b32945dc22a74962aa81d605f8503fa5f5"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:92563fd81931b68b4e8a9a0ae087b2d792767ae1ac583e0186371460a11644e7",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:d11228970e156b58cd8c4434551910ff79c21052a90e2cf78f29486f886db856",
+        "slot_order": 22,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-feature-flag/1.0.2",
+          "task_digest": "sha256:577490584252656803af23f76ee59546d0bcfa1d08f7a398906356552a79b615",
+          "task_id": "core-typescript-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:1fd666a40b4660eb624ef56519600da29a3eecaba3bfad347a143e75b17e51b5",
+          "workspace_input_digest": "sha256:fd982de77d159f10ce4fddc1c97185383aea5b99d5b2f3dc6673a9765bf4f610"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:92563fd81931b68b4e8a9a0ae087b2d792767ae1ac583e0186371460a11644e7",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:333cf2b4e4bc39a34559be44c02c14b5ab237c7122f6a3c952b3e74e9dc6f865",
+        "slot_order": 23,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-feature-flag/1.0.2",
+          "task_digest": "sha256:577490584252656803af23f76ee59546d0bcfa1d08f7a398906356552a79b615",
+          "task_id": "core-typescript-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:1fd666a40b4660eb624ef56519600da29a3eecaba3bfad347a143e75b17e51b5",
+          "workspace_input_digest": "sha256:fd982de77d159f10ce4fddc1c97185383aea5b99d5b2f3dc6673a9765bf4f610"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:4ee3cf090e0c37470d2401ce22a32d55106dac399bd0834add40e8243fa5daea",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:679d6289fb85d8a82cd69674dbb11aebdb977cdf8a307127792626ed4e3c0591",
+        "slot_order": 24,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-quota/1.0.2",
+          "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+          "task_id": "core-typescript-quota",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:d51bb52c000c76c2f1893c18fb93cb30ffdc6e056176fcb7f082462c4d3fd4b1",
+          "workspace_input_digest": "sha256:8ac984147b60c89188614e325fb33f6bba69503797f9b2254459fe250dc25dd7"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:4ee3cf090e0c37470d2401ce22a32d55106dac399bd0834add40e8243fa5daea",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:3203154b9486308f7ffea7b2aa5de41477f79ee832458db5cb2ebe5ed0883d40",
+        "slot_order": 25,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-quota/1.0.2",
+          "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+          "task_id": "core-typescript-quota",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:d51bb52c000c76c2f1893c18fb93cb30ffdc6e056176fcb7f082462c4d3fd4b1",
+          "workspace_input_digest": "sha256:8ac984147b60c89188614e325fb33f6bba69503797f9b2254459fe250dc25dd7"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:4ac30b1a34298f238e41040ee01da669430faabb0244f2fb640397a4a6d0eb25",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:9c0cfc34231e905c305684ed7e07176c5d77602e12624771e92258b965d09f0a",
+        "slot_order": 26,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-settings-merge/1.0.2",
+          "task_digest": "sha256:18e0c8e81b7b8682f3f3e6e674736388af835d1e471d99d6f1e43ff83387bbad",
+          "task_id": "core-typescript-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:e4d4a840854d2fe0ec4159d4d3379e4167604197ee1dfcf06669662bbfc32fb3",
+          "workspace_input_digest": "sha256:4a16e177fc7c1887538d7fba773ff9426fa03121786acfa8cbbbd1a463737e8a"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:4ac30b1a34298f238e41040ee01da669430faabb0244f2fb640397a4a6d0eb25",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:a275bd99f3f247edacb4f89ca96a2997e8d4d783222ee86ecfd81d56492fe0e4",
+        "slot_order": 27,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-settings-merge/1.0.2",
+          "task_digest": "sha256:18e0c8e81b7b8682f3f3e6e674736388af835d1e471d99d6f1e43ff83387bbad",
+          "task_id": "core-typescript-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:e4d4a840854d2fe0ec4159d4d3379e4167604197ee1dfcf06669662bbfc32fb3",
+          "workspace_input_digest": "sha256:4a16e177fc7c1887538d7fba773ff9426fa03121786acfa8cbbbd1a463737e8a"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:e98e42d2225e27656998a3a4442ceb73ac121f993ba330b8b41577216af34734",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:1ca9c132417f9fd356ccd914fc5ee338c24aca1590f44eb710817dd864ccb08b",
+        "slot_order": 28,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-slugify/1.0.2",
+          "task_digest": "sha256:d7de51fe56f8fd472e90bae9b1842f4165a9931a47a21f251d71a86205c514c9",
+          "task_id": "core-typescript-slugify",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:b527c9496a57e86b5890bb70368710ee99569d9f9d55e0e659fbb457377030a8",
+          "workspace_input_digest": "sha256:3e23765a05dbd17d7d4447f017f95041d7b35707870931a2ee67add290d1bb55"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:e98e42d2225e27656998a3a4442ceb73ac121f993ba330b8b41577216af34734",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:644e22150535dfa97cf25bff01ea13f0950b9c84520ed7ec6e7e0cf7228ee646",
+        "slot_order": 29,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/core-typescript-slugify/1.0.2",
+          "task_digest": "sha256:d7de51fe56f8fd472e90bae9b1842f4165a9931a47a21f251d71a86205c514c9",
+          "task_id": "core-typescript-slugify",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:b527c9496a57e86b5890bb70368710ee99569d9f9d55e0e659fbb457377030a8",
+          "workspace_input_digest": "sha256:3e23765a05dbd17d7d4447f017f95041d7b35707870931a2ee67add290d1bb55"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:493cb5423d21a710ed76d038ca8e75d10825e8465286d1ea6591dbc9d1a90bc7",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:8aa4887aa198ec8f4b203d6f9904ed17e65ce60410061ea7c507b00fd1884ebc",
+        "slot_order": 30,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/micro-java-clamp/1.0.2",
+          "task_digest": "sha256:a57f7dbbbd0ce2087fc409c706c78052761631ba2ab44e9467bb98198bf40558",
+          "task_id": "micro-java-clamp",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:c4ad0f8f2e2df3a791fbbe292e2b8bac858db6b0fda6a4066274b2db20adc537",
+          "workspace_input_digest": "sha256:b60bdd77053ebd3c115d4f05e07f53d1593c158fe62ea00d6d8371bbe5d98c05"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:493cb5423d21a710ed76d038ca8e75d10825e8465286d1ea6591dbc9d1a90bc7",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:01cc3f3967f082ffca3552844b3b998048eefd6aba15e17f46b47028b06d0831",
+        "slot_order": 31,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/micro-java-clamp/1.0.2",
+          "task_digest": "sha256:a57f7dbbbd0ce2087fc409c706c78052761631ba2ab44e9467bb98198bf40558",
+          "task_id": "micro-java-clamp",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:c4ad0f8f2e2df3a791fbbe292e2b8bac858db6b0fda6a4066274b2db20adc537",
+          "workspace_input_digest": "sha256:b60bdd77053ebd3c115d4f05e07f53d1593c158fe62ea00d6d8371bbe5d98c05"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:3a3c8301e9c54d7cc9b66f33596afa4a9e0f8f73961d6eaea14e4231f709e935",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:f036dec4c9ca968edf7bb473606e3abf60e65d5220efa5f5ad9d82dc450ac647",
+        "slot_order": 32,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/micro-python-clamp/1.0.2",
+          "task_digest": "sha256:ed33a19d23a2a0233f2b20ed754bc373f807cfa19db22291cc6c2af875e291bf",
+          "task_id": "micro-python-clamp",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:55f8158f938fca41038050a53356e5ae1be8a06083364de7b0272712e69fced1",
+          "workspace_input_digest": "sha256:3d8015dfb283950af119b9a89da1e070580ed1a85174e2ee8d3110e6bb6dfa65"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:3a3c8301e9c54d7cc9b66f33596afa4a9e0f8f73961d6eaea14e4231f709e935",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:93791c018981e5ae97c8041201cb7cb64c850c9a953544fb10b393dc12d48bda",
+        "slot_order": 33,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/micro-python-clamp/1.0.2",
+          "task_digest": "sha256:ed33a19d23a2a0233f2b20ed754bc373f807cfa19db22291cc6c2af875e291bf",
+          "task_id": "micro-python-clamp",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:55f8158f938fca41038050a53356e5ae1be8a06083364de7b0272712e69fced1",
+          "workspace_input_digest": "sha256:3d8015dfb283950af119b9a89da1e070580ed1a85174e2ee8d3110e6bb6dfa65"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:d4400565ae2b63d026ecc84d6f8629b21b1e0deac256f64d4b6e06a5b032326c",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:c002a2cda6c599dbe32e514cfcabcce41446b0a9bfbf93a8e8f2d84eeee36802",
+        "slot_order": 34,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": "sha256:daf17833616a240ca71d70e382c5d8dd0f9b58047b7d5f8f5028f92b05a2ae62",
+          "network_policy": "deny",
+          "package_path": "tasks/micro-typescript-clamp/1.0.2",
+          "task_digest": "sha256:201aec0dbece5a7167fb6390f3e6e39297e71b1f79d03b1038b1bd27f1c33847",
+          "task_id": "micro-typescript-clamp",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:90b41761c29a14b1fc14c7ffdf5a50316091a9129aa272b9a46f8ac3f7496d7c",
+          "workspace_input_digest": "sha256:f1eaeb0669e89fa0b2449129f06d622832829d26973b8b9ce787ddcab7b32c1e"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:d4400565ae2b63d026ecc84d6f8629b21b1e0deac256f64d4b6e06a5b032326c",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:503f8b82ec809b5dd6540be4fd21109b3c8b20614810819a968c8b2ef180cd7a",
+        "slot_order": 35,
+        "task": {
+          "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+          "context_identity": "sha256:daf17833616a240ca71d70e382c5d8dd0f9b58047b7d5f8f5028f92b05a2ae62",
+          "network_policy": "deny",
+          "package_path": "tasks/micro-typescript-clamp/1.0.2",
+          "task_digest": "sha256:201aec0dbece5a7167fb6390f3e6e39297e71b1f79d03b1038b1bd27f1c33847",
+          "task_id": "micro-typescript-clamp",
+          "task_version": "1.0.2",
+          "verifier_identity": "sha256:90b41761c29a14b1fc14c7ffdf5a50316091a9129aa272b9a46f8ac3f7496d7c",
+          "workspace_input_digest": "sha256:f1eaeb0669e89fa0b2449129f06d622832829d26973b8b9ce787ddcab7b32c1e"
+        }
+      }
+    ],
+    "schedule_blocks": [
+      {
+        "block_identity": "sha256:3358e9716f7dbef3d3c1efade91ff604e8f9141e3beb8ba93143deef29b43d56",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:ffeb9737f9fc4d733ae572fb0506dab0ed3b5544a0206a73a3002a7355b0ef3e",
+          "sha256:64b09ccf9d300f7e921480b082e14e4849c71e6b61ae32b17db7830e6df13a7d"
+        ],
+        "task_digest": "sha256:fa98fe75e89f7a3051200af71e7869a0d01333a2e6ba8b7565934d882a8862c4",
+        "task_id": "core-java-deduplicate",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:117413ebf6690754af8886f0149cbfa8e374efdbcdf11643e8439f724ed896b7",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:d54e60536307d7643f7d478f3fd5f509719654511ecdd5bd7726fb418f86dd92",
+          "sha256:412b54b5603f49fb59077a936640a55c26ba4a2163749310d5732b0a9cb75547"
+        ],
+        "task_digest": "sha256:2666e71704d3a21cf1155b8ea10ffca6f0c19a8ed55ca7f6105b15b29e3e2d42",
+        "task_id": "core-java-feature-flag",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:9a982a2a4b363705fc2bea80519f3c27c32f6c155dc918d2508dc6f4a8a08e22",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:06827136e7606b167d59f73ea4f9a90af3e738db3220dd6848b6adc30eabf3e6",
+          "sha256:7895488986803c0b5cc0f5e811be021f275b0aac3b12ece1276754baf3eb90fc"
+        ],
+        "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+        "task_id": "core-java-quota",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:3e275eb329f5cdcb02649aeac7f10d8b287c5229f86d3ec83bb4567116681a3c",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:02c7fc936f027c43e7fc93ae5a8e5e20c6ad4423523e42591cc284cab0946615",
+          "sha256:0aef6b51f710c3d14a2bcbe71a05a6b5756f0f11b6caa90224f86451e8314c2b"
+        ],
+        "task_digest": "sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+        "task_id": "core-java-settings-merge",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:000f156cd607f7b963a76cf3c9648f366ffe16186b8a3a361562b7edb3a41a91",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:788e5b31a1cee0efad404461bbac54f557bbb4126bfcf3093010beccf4d4f437",
+          "sha256:aa409e1668985923a68f4a706c4b3155752da9daee8ac1c052072efdc1489cbd"
+        ],
+        "task_digest": "sha256:f8b28b8a3c9bdf5bd75c6a90392adcd321ff4a1f4d19500180de41547f6751dd",
+        "task_id": "core-java-slugify",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:9f8015587710099391efaee439f981893a2197d0c3bdf2b2094ea6c5fcace804",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:46b90837d84e7e34f85f62023fb9c72b6a36395720d1ae1d945d2a8d085b9bb7",
+          "sha256:77bde8e9dde796b32f7f70e55a85aff32876385ad30bee55f02de56a6d79798d"
+        ],
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:ccdcb084856e48ed2ee60c158dfd9ba081954559aee3a5b577d712f74ecf5a93",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:355e94615da6ee27df7618b02232498bf365e25106cf09940b39bc5824d73f4d",
+          "sha256:5332a914208763658b341dc8b517d68fe95ee8ef555ce769541437c250bd3ad5"
+        ],
+        "task_digest": "sha256:92fdb8dd6796d4890b57b2be9fd1ef0049b28da10969c3694453d0e327bb41dc",
+        "task_id": "core-python-feature-flag",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:bea05b849113c4d1c35fc506438f46bebe4b9a47e3d2a8d3686fa5572da09cb6",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:132d3e537551535555cdad3cd72aa8746e10614060f0ca7954fe608ac50a175e",
+          "sha256:8fe49086723e6ea385ae36ca1c75d6758b2addd8993eecc51aecee4fe26266c9"
+        ],
+        "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+        "task_id": "core-python-quota",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:9e21b95bbf482117fcc20651147bc7f326c55d4a176703b6c1d32eadc971e392",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:4b197af1527c3fbe91c4904f4a0131590a94d5e8bd48f4c60aeb32fa23e638d4",
+          "sha256:061e96ab967177dfa07cf434ba02bb589dae154ae1de7556aa3b3b4525b64b1f"
+        ],
+        "task_digest": "sha256:ecf6c3666533d8ccb7cab4b947b439bd4780024ac03a4ef414cee47654705ac5",
+        "task_id": "core-python-settings-merge",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:3977f1ba22e54949f7dceec96643597a9f69be7f76791fcb8082c322aa6fe6cc",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:529f4b291015066a49e330d934b2b8d62d5e8265dcc21f9bd22647183f686447",
+          "sha256:c0fd19a9592a6bd8c0aee7b3a7fd08df9759a1b645b92c94df327f0a33d1a7e0"
+        ],
+        "task_digest": "sha256:565ce44fca6fc76909382df6f46a46d7306cda3d0da40e5e1522745fde9e7cc3",
+        "task_id": "core-python-slugify",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:46a2b93d89d26a28478ae816858d0d76dc19c2ddd23de703945da6f3a6a939fb",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:456eb7f655a19668e4eb66e542a8eb67a46b1641d7baad047b8ae0c4582f6477",
+          "sha256:f89dabc863e241b4a67c3e86cd579b0dbbfd1f389bb57e5141d3b6dab1c6f8cb"
+        ],
+        "task_digest": "sha256:d987c52866294dc3df41e55dc48e080e16359d1259c5cd7cacc82010872b4987",
+        "task_id": "core-typescript-deduplicate",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:24ae9bb6ce3169a0a5a55bbadba20690796662e142c703502278f4c81d53af59",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:d11228970e156b58cd8c4434551910ff79c21052a90e2cf78f29486f886db856",
+          "sha256:333cf2b4e4bc39a34559be44c02c14b5ab237c7122f6a3c952b3e74e9dc6f865"
+        ],
+        "task_digest": "sha256:577490584252656803af23f76ee59546d0bcfa1d08f7a398906356552a79b615",
+        "task_id": "core-typescript-feature-flag",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:00aa8cd9da88ccce2f1cc79899bf424efb5f37df0d929df9dac0dc4f89d4cef7",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:679d6289fb85d8a82cd69674dbb11aebdb977cdf8a307127792626ed4e3c0591",
+          "sha256:3203154b9486308f7ffea7b2aa5de41477f79ee832458db5cb2ebe5ed0883d40"
+        ],
+        "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+        "task_id": "core-typescript-quota",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:283067178d5ec3346f44d9407263d7a1e02541dae09f7a75feeede17527468c9",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:9c0cfc34231e905c305684ed7e07176c5d77602e12624771e92258b965d09f0a",
+          "sha256:a275bd99f3f247edacb4f89ca96a2997e8d4d783222ee86ecfd81d56492fe0e4"
+        ],
+        "task_digest": "sha256:18e0c8e81b7b8682f3f3e6e674736388af835d1e471d99d6f1e43ff83387bbad",
+        "task_id": "core-typescript-settings-merge",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:7c07a4ebf69f9df6d695bd468cabfde55b197dfe2f490fc5f39dc29fa480ac42",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:1ca9c132417f9fd356ccd914fc5ee338c24aca1590f44eb710817dd864ccb08b",
+          "sha256:644e22150535dfa97cf25bff01ea13f0950b9c84520ed7ec6e7e0cf7228ee646"
+        ],
+        "task_digest": "sha256:d7de51fe56f8fd472e90bae9b1842f4165a9931a47a21f251d71a86205c514c9",
+        "task_id": "core-typescript-slugify",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:09536f8a5b95e1a4316b48ef7ab4a9e60ecbd730762bc71b68cbef082d85c32a",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:8aa4887aa198ec8f4b203d6f9904ed17e65ce60410061ea7c507b00fd1884ebc",
+          "sha256:01cc3f3967f082ffca3552844b3b998048eefd6aba15e17f46b47028b06d0831"
+        ],
+        "task_digest": "sha256:a57f7dbbbd0ce2087fc409c706c78052761631ba2ab44e9467bb98198bf40558",
+        "task_id": "micro-java-clamp",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:a222eaabe4caa63da911221b8c17b38d5010554a0b549f40bdf95189a50596b0",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:f036dec4c9ca968edf7bb473606e3abf60e65d5220efa5f5ad9d82dc450ac647",
+          "sha256:93791c018981e5ae97c8041201cb7cb64c850c9a953544fb10b393dc12d48bda"
+        ],
+        "task_digest": "sha256:ed33a19d23a2a0233f2b20ed754bc373f807cfa19db22291cc6c2af875e291bf",
+        "task_id": "micro-python-clamp",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:0cee82a7b1bba8fab4ab17000e5cc22e7731dbe307d84da9e933bd6d21925e87",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:c002a2cda6c599dbe32e514cfcabcce41446b0a9bfbf93a8e8f2d84eeee36802",
+          "sha256:503f8b82ec809b5dd6540be4fd21109b3c8b20614810819a968c8b2ef180cd7a"
+        ],
+        "task_digest": "sha256:201aec0dbece5a7167fb6390f3e6e39297e71b1f79d03b1038b1bd27f1c33847",
+        "task_id": "micro-typescript-clamp",
+        "task_version": "1.0.2",
+        "unavailable_provider_routes": []
+      }
+    ],
+    "schedule_seed": 20260830,
+    "scheduling_policy": "BLOCKED_INTERLEAVED_SCHEDULING",
+    "schema_version": 2,
+    "task_health_attestations": [
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:d621abba143db99345463b1c402f002a2f72d0e5a1cf47a897a24fa4682cff22",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:7a98dd39d1c1d639ca847083af5c2b82e525229b20ba2b6b5c43e42ba5d9d212",
+        "task_digest": "sha256:fa98fe75e89f7a3051200af71e7869a0d01333a2e6ba8b7565934d882a8862c4",
+        "task_id": "core-java-deduplicate",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:cf49711c205e96b294d0abfbf7f73e7d84bc29c5a3ef69b6a1334fac409362c6",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:ca62b920efe3d390aa81bb62b50cb1d5bb48f5bb3dee8e3e2732e4ebc1070894",
+        "task_digest": "sha256:2666e71704d3a21cf1155b8ea10ffca6f0c19a8ed55ca7f6105b15b29e3e2d42",
+        "task_id": "core-java-feature-flag",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:a47841e4117cb8d4d5d5518bf995736d29971a4bbe5ad85be8a8c429ee1458c5",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:c4f8de9dcea4d01a4ae6a63cc00cbb4a2af4fa7b01a7a938fbb45b25fd158131",
+        "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+        "task_id": "core-java-quota",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:4a6231d1247a52b589c3d3c23485a9e97159249d4877d92081cdef9127006c1d",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:400fb3889cca8a277c0672148c9daaa80d9c5dc328fc0b24fa848ff1225dbc36",
+        "task_digest": "sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+        "task_id": "core-java-settings-merge",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:58ad6080f20df9bd04e3f6df3095bb75fa2b24020f62d639b796a5b443aa86ff",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:3bff3186ef4d76bf626c19800c6331cf7b67f681f3b6c5bbe2c2d486a73f2876",
+        "task_digest": "sha256:f8b28b8a3c9bdf5bd75c6a90392adcd321ff4a1f4d19500180de41547f6751dd",
+        "task_id": "core-java-slugify",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:a74026ec0c27b1f6ab77870267c861a175d0dcd17bd8ead6fed9afdcc4892d31",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:1f035116bbe379ddc3137cd8bd7c96054d8572ddce430fc7d22208d9768de801",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:4d6f9199a85fad607f7730c1ab92fa1d7dec77527319c61580b044a1f62112ba",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:e844b77bd8d1e3a3305b592f462e1b2bd27d8ca08a2fcbca56636cd779ab1304",
+        "task_digest": "sha256:92fdb8dd6796d4890b57b2be9fd1ef0049b28da10969c3694453d0e327bb41dc",
+        "task_id": "core-python-feature-flag",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:296b351fd5d127e76c0007c252c3ca80a67ebaec9b8a7448a1f83bf9807c12fe",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:c5c767d85288d4d077f94fe197167eb070a119da804937b3a0871eb2184350ac",
+        "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+        "task_id": "core-python-quota",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:f5388fa5df402340f62191c7da5730978ad0b65de9eb099f0932299a40188b78",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:0637d8d55a5bf81ed855b74feb828ac34b5bed8509062545cdc610653a97b6e5",
+        "task_digest": "sha256:ecf6c3666533d8ccb7cab4b947b439bd4780024ac03a4ef414cee47654705ac5",
+        "task_id": "core-python-settings-merge",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:83bb5d2705250e102c3d204dacdf5548de422971320197391d798aa21756a0d0",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:6da82abcaafe58b472f30caea67c52a72442ee8ddede59f9c40cf85e841232aa",
+        "task_digest": "sha256:565ce44fca6fc76909382df6f46a46d7306cda3d0da40e5e1522745fde9e7cc3",
+        "task_id": "core-python-slugify",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:0268ed283ad29f9bfdde69435dc539bad60e68bc6d56204b96d7cc0173d1e81c",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:e6dad7b88034b582835d69c1457562a820d2cf9293e334b61d8c27febdae36a5",
+        "task_digest": "sha256:d987c52866294dc3df41e55dc48e080e16359d1259c5cd7cacc82010872b4987",
+        "task_id": "core-typescript-deduplicate",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:ad234aa5f30a492568c9d6b36c5c01bf2696f5e139dc6f48bb6710b0ffc8d126",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:0e1659507f6b9b4d88050f769404b1a604b03a1cf82b99281e87fc88841969c6",
+        "task_digest": "sha256:577490584252656803af23f76ee59546d0bcfa1d08f7a398906356552a79b615",
+        "task_id": "core-typescript-feature-flag",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:d126e6eebc3c1d0a0bced92dc81bebf48a474d64ce24c61d11bcfc3ef3e9f0b1",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:b296a4bcae01f06699aabe8b2ff8c13114dc5336133f9ddc3a1e2b8f0e067d5b",
+        "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+        "task_id": "core-typescript-quota",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:1c35ee8158a38ee4be7a141165db94ce5e9cf23eae40310a218f83fab4110136",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:0e377a39fd63eec87892b9d249e5779e25f6b8fc8ecc51853ee769ca5b178b05",
+        "task_digest": "sha256:18e0c8e81b7b8682f3f3e6e674736388af835d1e471d99d6f1e43ff83387bbad",
+        "task_id": "core-typescript-settings-merge",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:2ea54b9124882804dd477dd3e9d06748f7fe9900ffef857ccfe9a36c57311e8b",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:ce566285bd37a39bf3f615fd1c87ae174a107c8ae68fcbe9c34046618a929b86",
+        "task_digest": "sha256:d7de51fe56f8fd472e90bae9b1842f4165a9931a47a21f251d71a86205c514c9",
+        "task_id": "core-typescript-slugify",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:8825feb1234545c48a7e9249a1d485f8b7fd1092fc49eaeae1ab3c31c7f973bc",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:53088f97c14c2fbe17b291cc7d040f697483a639ce38f7ccc54e1f2530fc6e1d",
+        "task_digest": "sha256:a57f7dbbbd0ce2087fc409c706c78052761631ba2ab44e9467bb98198bf40558",
+        "task_id": "micro-java-clamp",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:1f26af87509a040a9da066dadb4308da62fa041574b5c730ad17a31147990e20",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:6dcd942f054fe200239a6fe3370f5e5f1cf19208bdc7d9cea4aba68db2926368",
+        "task_digest": "sha256:ed33a19d23a2a0233f2b20ed754bc373f807cfa19db22291cc6c2af875e291bf",
+        "task_id": "micro-python-clamp",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:d9f07f0f3f6ed1ba89b2ade4141b68c8054fdd3c44f29440d7f8845639758f28",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:82bbf7a8d92a6b2fa0da9bb1fcab16102109ff77670b8f81dc738dd0611f3712",
+        "task_digest": "sha256:201aec0dbece5a7167fb6390f3e6e39297e71b1f79d03b1038b1bd27f1c33847",
+        "task_id": "micro-typescript-clamp",
+        "task_version": "1.0.2",
+        "valid": true,
+        "verifier_health_repeats": 5
+      }
+    ],
+    "tasks": [
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-java-deduplicate/1.0.2",
+        "task_digest": "sha256:fa98fe75e89f7a3051200af71e7869a0d01333a2e6ba8b7565934d882a8862c4",
+        "task_id": "core-java-deduplicate",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:c35bca0195d7b0c4bbf5f8fc0a7fe62d3d6bf498d6f4ebacc9940637c961e699",
+        "workspace_input_digest": "sha256:86c02d6e8c301f55c826ece4c70b00a2539966295d90a6508bac96c191793f12"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-java-feature-flag/1.0.2",
+        "task_digest": "sha256:2666e71704d3a21cf1155b8ea10ffca6f0c19a8ed55ca7f6105b15b29e3e2d42",
+        "task_id": "core-java-feature-flag",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:1abf8a46369dbbc08ba32c7a8f89dc44fdba70ec932bcfb5240a54b1d1094724",
+        "workspace_input_digest": "sha256:5aa14e3cf1083b95c10e7aaa267e93ac9e9a3efde9302552d2c0e2fa5ea2f190"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-java-quota/1.0.2",
+        "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+        "task_id": "core-java-quota",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:3df38ecadc317a23b9fede3dfafd9ef6d443d877e0fc77644c486a0aa3c7e465",
+        "workspace_input_digest": "sha256:e4100bd5d966558f86e830dc5cf964460dd01b942b396c4580684e3b5e3db0b6"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-java-settings-merge/1.0.2",
+        "task_digest": "sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+        "task_id": "core-java-settings-merge",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:e10c25e47889d60f7fc56a8324028ff8e82646c6cddec78d4aa62cab1425e871",
+        "workspace_input_digest": "sha256:7b888545e7872e402c37157efaf096975df5d61616c511dbd65323695dab594a"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-java-slugify/1.0.2",
+        "task_digest": "sha256:f8b28b8a3c9bdf5bd75c6a90392adcd321ff4a1f4d19500180de41547f6751dd",
+        "task_id": "core-java-slugify",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:ab31a3c1f109058c056127b08c9fd2e55015d1fe067ba519038be74124fa2266",
+        "workspace_input_digest": "sha256:d8b45b3a35728d6b8ebb40b9e2630f4c9a9b0a680368e5d1e933977b413f450d"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-python-deduplicate/1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-python-feature-flag/1.0.2",
+        "task_digest": "sha256:92fdb8dd6796d4890b57b2be9fd1ef0049b28da10969c3694453d0e327bb41dc",
+        "task_id": "core-python-feature-flag",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:cf870fecb06d8d351b9b175b86ba74b00b5578cd941c9e07f2c894f8996ce691",
+        "workspace_input_digest": "sha256:d9ed3ea18266ee8f6ff45e06db91fd00757148a883d5ce122e8e52f1f9c7d821"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-python-quota/1.0.2",
+        "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+        "task_id": "core-python-quota",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:a9d4129b205e0b750a21f183c882e82b16c432eb2390135c586a9a3f834896b6",
+        "workspace_input_digest": "sha256:3261aaabd4c8387ef737461c3f0e453a03de8dbaf7f21015aae7c16bbbe7f5c2"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-python-settings-merge/1.0.2",
+        "task_digest": "sha256:ecf6c3666533d8ccb7cab4b947b439bd4780024ac03a4ef414cee47654705ac5",
+        "task_id": "core-python-settings-merge",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:d536f7ec77e2c27ba36620d07a17db92aad8a3569317715bbaaec5c7f78e172a",
+        "workspace_input_digest": "sha256:9b0e4c281bc1b21273429a104ed9d24e53227bfa2f3d006fd4af4ed55be1d8d0"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-python-slugify/1.0.2",
+        "task_digest": "sha256:565ce44fca6fc76909382df6f46a46d7306cda3d0da40e5e1522745fde9e7cc3",
+        "task_id": "core-python-slugify",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:e5810b14068935553f6fc93a429e5c38f1a6b5c21b4623d444e5ddec1590e781",
+        "workspace_input_digest": "sha256:9f78419af52d4a0e7baced19d08d5abdea5f2a55397491b681b9ed56c8ce4e94"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-typescript-deduplicate/1.0.2",
+        "task_digest": "sha256:d987c52866294dc3df41e55dc48e080e16359d1259c5cd7cacc82010872b4987",
+        "task_id": "core-typescript-deduplicate",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:7f5517f13ac2cb1e98918b4c361530c5970df00ae7fe875630a9492faa923725",
+        "workspace_input_digest": "sha256:935b5579534bb9d3b464008fff6c34b32945dc22a74962aa81d605f8503fa5f5"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-typescript-feature-flag/1.0.2",
+        "task_digest": "sha256:577490584252656803af23f76ee59546d0bcfa1d08f7a398906356552a79b615",
+        "task_id": "core-typescript-feature-flag",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:1fd666a40b4660eb624ef56519600da29a3eecaba3bfad347a143e75b17e51b5",
+        "workspace_input_digest": "sha256:fd982de77d159f10ce4fddc1c97185383aea5b99d5b2f3dc6673a9765bf4f610"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-typescript-quota/1.0.2",
+        "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+        "task_id": "core-typescript-quota",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:d51bb52c000c76c2f1893c18fb93cb30ffdc6e056176fcb7f082462c4d3fd4b1",
+        "workspace_input_digest": "sha256:8ac984147b60c89188614e325fb33f6bba69503797f9b2254459fe250dc25dd7"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-typescript-settings-merge/1.0.2",
+        "task_digest": "sha256:18e0c8e81b7b8682f3f3e6e674736388af835d1e471d99d6f1e43ff83387bbad",
+        "task_id": "core-typescript-settings-merge",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:e4d4a840854d2fe0ec4159d4d3379e4167604197ee1dfcf06669662bbfc32fb3",
+        "workspace_input_digest": "sha256:4a16e177fc7c1887538d7fba773ff9426fa03121786acfa8cbbbd1a463737e8a"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/core-typescript-slugify/1.0.2",
+        "task_digest": "sha256:d7de51fe56f8fd472e90bae9b1842f4165a9931a47a21f251d71a86205c514c9",
+        "task_id": "core-typescript-slugify",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:b527c9496a57e86b5890bb70368710ee99569d9f9d55e0e659fbb457377030a8",
+        "workspace_input_digest": "sha256:3e23765a05dbd17d7d4447f017f95041d7b35707870931a2ee67add290d1bb55"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/micro-java-clamp/1.0.2",
+        "task_digest": "sha256:a57f7dbbbd0ce2087fc409c706c78052761631ba2ab44e9467bb98198bf40558",
+        "task_id": "micro-java-clamp",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:c4ad0f8f2e2df3a791fbbe292e2b8bac858db6b0fda6a4066274b2db20adc537",
+        "workspace_input_digest": "sha256:b60bdd77053ebd3c115d4f05e07f53d1593c158fe62ea00d6d8371bbe5d98c05"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/micro-python-clamp/1.0.2",
+        "task_digest": "sha256:ed33a19d23a2a0233f2b20ed754bc373f807cfa19db22291cc6c2af875e291bf",
+        "task_id": "micro-python-clamp",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:55f8158f938fca41038050a53356e5ae1be8a06083364de7b0272712e69fced1",
+        "workspace_input_digest": "sha256:3d8015dfb283950af119b9a89da1e070580ed1a85174e2ee8d3110e6bb6dfa65"
+      },
+      {
+        "budget_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "context_identity": "sha256:daf17833616a240ca71d70e382c5d8dd0f9b58047b7d5f8f5028f92b05a2ae62",
+        "network_policy": "deny",
+        "package_path": "tasks/micro-typescript-clamp/1.0.2",
+        "task_digest": "sha256:201aec0dbece5a7167fb6390f3e6e39297e71b1f79d03b1038b1bd27f1c33847",
+        "task_id": "micro-typescript-clamp",
+        "task_version": "1.0.2",
+        "verifier_identity": "sha256:90b41761c29a14b1fc14c7ffdf5a50316091a9129aa272b9a46f8ac3f7496d7c",
+        "workspace_input_digest": "sha256:f1eaeb0669e89fa0b2449129f06d622832829d26973b8b9ce787ddcab7b32c1e"
+      }
+    ]
+  },
+  "preflight": {
+    "candidate_experiment_id": "portfolio-alibaba-model-chat-v3r1",
+    "candidate_plan_digest": "sha256:b20865518f6531fdf2db3cacfeef9b33afbf4614f43aee8b850f8135e59d7548",
+    "checks": [
+      {
+        "detail": "Active v2 identity matches",
+        "key": "methodology",
+        "reason_code": "METHODOLOGY_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "18 task identities passed 5x health",
+        "key": "task-health",
+        "reason_code": "TASK_HEALTH_ATTESTED",
+        "status": "PASS"
+      },
+      {
+        "detail": "18 deterministic blocks are frozen",
+        "key": "schedule",
+        "reason_code": "BLOCKED_INTERLEAVED_SCHEDULE_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "QUICK fixes n=1",
+        "key": "repeat-policy",
+        "reason_code": "MODE_REPEAT_POLICY_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "Direct selections re-resolve to their frozen runtime identities",
+        "key": "runtime-contract",
+        "reason_code": "FROZEN_RUNTIME_IDENTITIES_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY=SET",
+        "key": "credential:alibaba-bailian-qwen3.8-max-chat",
+        "reason_code": "CREDENTIAL_REFERENCE_SET",
+        "status": "PASS"
+      },
+      {
+        "detail": "No provider probe was performed; operator status is UNKNOWN",
+        "key": "provider:alibaba-bailian",
+        "reason_code": "PROVIDER_STATUS_UNKNOWN",
+        "status": "WARNING"
+      },
+      {
+        "detail": "Billing mode PAY_AS_YOU_GO permits this planning contract",
+        "key": "billing:alibaba-bailian",
+        "reason_code": "BILLING_AUTOMATION_ALLOWED",
+        "status": "PASS"
+      },
+      {
+        "detail": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY=SET",
+        "key": "credential:alibaba-bailian-deepseek-v4-pro-chat",
+        "reason_code": "CREDENTIAL_REFERENCE_SET",
+        "status": "PASS"
+      },
+      {
+        "detail": "No provider probe was performed; operator status is UNKNOWN",
+        "key": "provider:alibaba-bailian",
+        "reason_code": "PROVIDER_STATUS_UNKNOWN",
+        "status": "WARNING"
+      },
+      {
+        "detail": "Billing mode PAY_AS_YOU_GO permits this planning contract",
+        "key": "billing:alibaba-bailian",
+        "reason_code": "BILLING_AUTOMATION_ALLOWED",
+        "status": "PASS"
+      },
+      {
+        "detail": "The strict methodology-v2 budget contract is persisted",
+        "key": "budget",
+        "reason_code": "BUDGET_CONTRACT_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "Unavailable dimensions remain explicitly NOT_AVAILABLE",
+        "key": "budget-availability",
+        "reason_code": "BUDGET_METRIC_NOT_AVAILABLE",
+        "status": "WARNING"
+      },
+      {
+        "detail": "No immutable price/input evidence is registered; cost estimate is unavailable",
+        "key": "pricing",
+        "reason_code": "PRICING_NOT_AVAILABLE",
+        "status": "WARNING"
+      }
+    ],
+    "cost_estimate": {
+      "currency": "USD",
+      "evidence_reference": null,
+      "status": "NOT_AVAILABLE",
+      "value": null
+    },
+    "estimated_logical_slots": 36,
+    "estimated_maximum_wall_time_seconds": 8640,
+    "evaluation_mode": "QUICK",
+    "max_parallel_runs": 1,
+    "repeat_count": 1,
+    "schedule_preview": [
+      {
+        "block_identity": "sha256:3358e9716f7dbef3d3c1efade91ff604e8f9141e3beb8ba93143deef29b43d56",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-java-deduplicate"
+      },
+      {
+        "block_identity": "sha256:117413ebf6690754af8886f0149cbfa8e374efdbcdf11643e8439f724ed896b7",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-java-feature-flag"
+      },
+      {
+        "block_identity": "sha256:9a982a2a4b363705fc2bea80519f3c27c32f6c155dc918d2508dc6f4a8a08e22",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-java-quota"
+      },
+      {
+        "block_identity": "sha256:3e275eb329f5cdcb02649aeac7f10d8b287c5229f86d3ec83bb4567116681a3c",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-java-settings-merge"
+      },
+      {
+        "block_identity": "sha256:000f156cd607f7b963a76cf3c9648f366ffe16186b8a3a361562b7edb3a41a91",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-java-slugify"
+      },
+      {
+        "block_identity": "sha256:9f8015587710099391efaee439f981893a2197d0c3bdf2b2094ea6c5fcace804",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-python-deduplicate"
+      },
+      {
+        "block_identity": "sha256:ccdcb084856e48ed2ee60c158dfd9ba081954559aee3a5b577d712f74ecf5a93",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-python-feature-flag"
+      },
+      {
+        "block_identity": "sha256:bea05b849113c4d1c35fc506438f46bebe4b9a47e3d2a8d3686fa5572da09cb6",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-python-quota"
+      },
+      {
+        "block_identity": "sha256:9e21b95bbf482117fcc20651147bc7f326c55d4a176703b6c1d32eadc971e392",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-python-settings-merge"
+      },
+      {
+        "block_identity": "sha256:3977f1ba22e54949f7dceec96643597a9f69be7f76791fcb8082c322aa6fe6cc",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-python-slugify"
+      },
+      {
+        "block_identity": "sha256:46a2b93d89d26a28478ae816858d0d76dc19c2ddd23de703945da6f3a6a939fb",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-typescript-deduplicate"
+      },
+      {
+        "block_identity": "sha256:24ae9bb6ce3169a0a5a55bbadba20690796662e142c703502278f4c81d53af59",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-typescript-feature-flag"
+      },
+      {
+        "block_identity": "sha256:00aa8cd9da88ccce2f1cc79899bf424efb5f37df0d929df9dac0dc4f89d4cef7",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-typescript-quota"
+      },
+      {
+        "block_identity": "sha256:283067178d5ec3346f44d9407263d7a1e02541dae09f7a75feeede17527468c9",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-typescript-settings-merge"
+      },
+      {
+        "block_identity": "sha256:7c07a4ebf69f9df6d695bd468cabfde55b197dfe2f490fc5f39dc29fa480ac42",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "core-typescript-slugify"
+      },
+      {
+        "block_identity": "sha256:09536f8a5b95e1a4316b48ef7ab4a9e60ecbd730762bc71b68cbef082d85c32a",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "micro-java-clamp"
+      },
+      {
+        "block_identity": "sha256:a222eaabe4caa63da911221b8c17b38d5010554a0b549f40bdf95189a50596b0",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "micro-python-clamp"
+      },
+      {
+        "block_identity": "sha256:0cee82a7b1bba8fab4ab17000e5cc22e7731dbe307d84da9e933bd6d21925e87",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "micro-typescript-clamp"
+      }
+    ],
+    "status": "READY_WITH_WARNINGS"
+  },
+  "provider_selections": [
+    {
+      "base_provider_profile_identity": "sha256:0908a058526af129074748503e53dfb0671188c89c2cd1298756a90f53dcb23a",
+      "billing_mode": "PAY_AS_YOU_GO",
+      "cell_id": "Q",
+      "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+      "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+      "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+      "harness_id": "direct-model",
+      "harness_profile_id": "direct-alibaba-bailian-qwen3.8-max-chat",
+      "model_id": "qwen3.8-max",
+      "pricing_snapshot_reference": null,
+      "provider_id": "alibaba-bailian",
+      "provider_profile_id": "alibaba-bailian-qwen3.8-max-chat",
+      "provider_profile_identity": "sha256:8130e809fb109bedcb9225fe4c686ba373f9934c5b8e064f8ab43236bc8be518",
+      "requested_model": "qwen3.8-max",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "runtime_endpoint_fingerprint": "sha256:235ea65d1faa3e89d3107c248054c7d8b5c3cae743452d79128c73fa54469b2d",
+      "runtime_profile_control_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+      "runtime_profile_source": {
+        "base_url_reference": "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+        "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        "protocol": "chat_completions",
+        "provider": "alibaba-bailian",
+        "reasoning_effort": null,
+        "request_timeout_seconds": 180,
+        "requested_model": "qwen3.8-max",
+        "route": "/chat/completions"
+      },
+      "safe_route_identity": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions"
+    },
+    {
+      "base_provider_profile_identity": "sha256:79d368ca2e20a252ca1ceff821f946beeb93f77b1878e3691dd3a24e5f170600",
+      "billing_mode": "PAY_AS_YOU_GO",
+      "cell_id": "D",
+      "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+      "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+      "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+      "harness_id": "direct-model",
+      "harness_profile_id": "direct-alibaba-bailian-deepseek-v4-pro-chat",
+      "model_id": "deepseek-v4-pro",
+      "pricing_snapshot_reference": null,
+      "provider_id": "alibaba-bailian",
+      "provider_profile_id": "alibaba-bailian-deepseek-v4-pro-chat",
+      "provider_profile_identity": "sha256:44add66eccd6a7575d8b0dd24600447fb8e2cc328b394fa70fe786bedbf6d6ce",
+      "requested_model": "deepseek-v4-pro",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "runtime_endpoint_fingerprint": "sha256:235ea65d1faa3e89d3107c248054c7d8b5c3cae743452d79128c73fa54469b2d",
+      "runtime_profile_control_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+      "runtime_profile_source": {
+        "base_url_reference": "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+        "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        "protocol": "chat_completions",
+        "provider": "alibaba-bailian",
+        "reasoning_effort": null,
+        "request_timeout_seconds": 180,
+        "requested_model": "deepseek-v4-pro",
+        "route": "/chat/completions"
+      },
+      "safe_route_identity": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions"
+    }
+  ],
+  "registry_digest": "sha256:e3e6832fdb703b54f635b6c4d7c658660c89f00e6b5ad5a81f29c7c05d5518c4",
+  "registry_id": "harnesslab-unified-registry-lite-v1",
+  "schema_version": 1,
+  "snapshot_digest": "sha256:95aa3fd908d6f9e6a2be7be127a6f746fdf701dd7c1b49eb80267ad61d0b6d5f",
+  "snapshot_id": "snapshot-portfolio-alibaba-model-chat-v3r1"
+}

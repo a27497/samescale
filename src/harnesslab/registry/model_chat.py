@@ -25,6 +25,14 @@ MODEL_CHAT_V3_SCHEDULE_SEED = 20260830
 MODEL_CHAT_V3_PLAN_DIGEST = (
     "sha256:100ab920df1eee16f9a9cd754cf8b3454de446445518dbb5c86d326aa20b2042"
 )
+MODEL_CHAT_V3R1_EXPERIMENT_ID = "portfolio-alibaba-model-chat-v3r1"
+MODEL_CHAT_V3R1_SCHEDULE_SEED = MODEL_CHAT_V3_SCHEDULE_SEED
+MODEL_CHAT_V3R1_ENDPOINT_FINGERPRINT = (
+    "sha256:235ea65d1faa3e89d3107c248054c7d8b5c3cae743452d79128c73fa54469b2d"
+)
+MODEL_CHAT_V3R1_PLAN_DIGEST = (
+    "sha256:b20865518f6531fdf2db3cacfeef9b33afbf4614f43aee8b850f8135e59d7548"
+)
 
 
 def model_chat_v2_budget() -> BudgetContract:
@@ -127,4 +135,19 @@ def model_chat_v3_builder_request(
         schedule_seed=MODEL_CHAT_V3_SCHEDULE_SEED,
         max_parallel_runs=1,
         billing_modes={"alibaba-bailian": BillingMode.PAY_AS_YOU_GO},
+    )
+
+
+def model_chat_v3r1_builder_request(
+    catalog: RegistryCatalog,
+    methodology: EvaluationMethodologyV2,
+) -> ExperimentBuilderRequest:
+    """Build the endpoint-reconciled successor without mutating frozen v3."""
+
+    return model_chat_v3_builder_request(catalog, methodology).model_copy(
+        update={
+            "experiment_id": MODEL_CHAT_V3R1_EXPERIMENT_ID,
+            "name": "Alibaba Qwen3.8 Max vs DeepSeek V4 Pro Chat v3r1 n=1",
+            "schedule_seed": MODEL_CHAT_V3R1_SCHEDULE_SEED,
+        }
     )
