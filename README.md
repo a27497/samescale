@@ -139,6 +139,8 @@ and source snapshots.
 Tier-B corpus qualification is also fully keyless. It repeats baseline/oracle and known-defect
 verification, checks workspace isolation and failure attribution, and never invokes a provider or
 Judge. See [Tier-B repo engineering](docs/TIER_B_REPO_ENGINEERING.md).
+The operator-blocked six-slot preregistration is documented in
+[Tier-B keyless smoke experiment](docs/TIER_B_SMOKE_EXPERIMENT.md).
 
 ```powershell
 Copy-Item .env.example .env

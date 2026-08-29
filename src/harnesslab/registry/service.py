@@ -397,9 +397,14 @@ def _resolve_cells(
         canonical_digest(item.definition.budget.model_dump(mode="json")) for item in packages
     }
     network_policies = {item.definition.budget.network_policy for item in packages}
-    if len(budget_identities) != 1 or len(network_policies) != 1:
-        raise RegistryError("selected tasks do not share one enforceable execution budget")
-    resource_budget_identity = next(iter(budget_identities))
+    if len(network_policies) != 1:
+        raise RegistryError("selected tasks do not share one enforceable network policy")
+    ordered_budget_identities = tuple(sorted(budget_identities))
+    resource_budget_identity = (
+        ordered_budget_identities[0]
+        if len(ordered_budget_identities) == 1
+        else canonical_digest({"task_budget_identities": ordered_budget_identities})
+    )
     network_policy = next(iter(network_policies))
 
     cells: list[ExperimentCellSpec] = []
@@ -569,6 +574,8 @@ def _build_candidate(
     request: ExperimentBuilderRequest,
     catalog: RegistryCatalog,
     repository_root: Path,
+    *,
+    tier_b_qualification_path: Path | None = None,
 ) -> _Candidate:
     methodology = load_evaluation_methodology(repository_root / METHODOLOGY_PATH)
     if (
@@ -622,6 +629,7 @@ def _build_candidate(
         provider_availability={
             route: ProviderAvailability.PROVIDER_UNAVAILABLE for route in unavailable_routes
         },
+        tier_b_qualification_path=tier_b_qualification_path,
     )
     validate_frozen_runtime_contract(plan, selections)
     return _Candidate(plan=plan, selections=selections)
@@ -637,6 +645,7 @@ def preflight_experiment(
     environment: Mapping[str, str],
     *,
     task_corpus_path: Path | None = None,
+    tier_b_qualification_path: Path | None = None,
 ) -> ExperimentPreflight:
     catalog = registry_catalog(repository_root, environment, task_corpus_path=task_corpus_path)
     checks: list[PreflightCheck] = []
@@ -662,7 +671,12 @@ def preflight_experiment(
 
     candidate: _Candidate | None = None
     try:
-        candidate = _build_candidate(request, catalog, repository_root)
+        candidate = _build_candidate(
+            request,
+            catalog,
+            repository_root,
+            tier_b_qualification_path=tier_b_qualification_path,
+        )
     except (RegistryError, ExperimentSpecError, ValueError) as exc:
         checks.append(
             _check("builder", CheckStatus.BLOCKED, "INVALID_EXPERIMENT_SELECTION", str(exc))
@@ -894,14 +908,21 @@ def build_experiment_snapshot(
     environment: Mapping[str, str],
     *,
     task_corpus_path: Path | None = None,
+    tier_b_qualification_path: Path | None = None,
 ) -> ExperimentSnapshot:
     catalog = registry_catalog(repository_root, environment, task_corpus_path=task_corpus_path)
-    candidate = _build_candidate(request, catalog, repository_root)
+    candidate = _build_candidate(
+        request,
+        catalog,
+        repository_root,
+        tier_b_qualification_path=tier_b_qualification_path,
+    )
     preflight = preflight_experiment(
         request,
         repository_root,
         environment,
         task_corpus_path=task_corpus_path,
+        tier_b_qualification_path=tier_b_qualification_path,
     )
     snapshot_id = "snapshot-" + candidate.plan.experiment_id.removeprefix("registry-")
     snapshot = freeze_experiment_snapshot(

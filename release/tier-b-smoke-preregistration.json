@@ -1,0 +1,225 @@
+{
+  "benchmark_tier": "TIER_B_REPO_ENGINEERING",
+  "capability_failure_policy": "TERMINAL_NO_RETRY",
+  "cost": "NOT_AVAILABLE",
+  "endpoint_binding_rule": "Operator reconciliation must produce and re-freeze the endpoint fingerprint before execution; no endpoint URL or fingerprint is guessed by this plan.",
+  "endpoint_binding_status": "PENDING_OPERATOR_ENDPOINT_RECONCILIATION",
+  "evaluation_mode": "QUICK",
+  "evidence_projection": {
+    "changed_file_identity": "manifest.parsed_patch_digest plus paths parsed from persisted direct-patch-v1 operations",
+    "engineering_shape": "qualification.tasks[].engineering_shape",
+    "latency": "manifest.provider_result.latency_ms when reported",
+    "outcome_classification": "capability versus verifier/provider infrastructure",
+    "qualification_digest": "plan.tier_b_qualification_digest",
+    "repository_snapshot_identity": "plan.tasks[].workspace_input_digest",
+    "task_language": "qualification.tasks[].language",
+    "task_tier": "plan.benchmark_tier",
+    "usage": "manifest.provider_result.usage when reported",
+    "workspace_output_identity": "manifest.workspace_output_digest"
+  },
+  "execution_status": "NOT_RUN",
+  "experiment_id": "tier-b-keyless-smoke-v1",
+  "experiment_intent": "MODEL_COMPARISON",
+  "funnel_stage": "BREADTH",
+  "historical_evidence_changed": 0,
+  "infrastructure_failure_policy": "PRESERVE_IMMUTABLE_FIRST_ATTEMPT_NO_IMMEDIATE_SEMANTIC_RETRY",
+  "model_scores": "NOT_AVAILABLE",
+  "models": [
+    {
+      "cell_id": "Q",
+      "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+      "provider": "alibaba-bailian",
+      "provider_profile_id": "alibaba-bailian-qwen3.8-max-chat",
+      "requested_model": "qwen3.8-max",
+      "runtime_endpoint_fingerprint": null
+    },
+    {
+      "cell_id": "D",
+      "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+      "provider": "alibaba-bailian",
+      "provider_profile_id": "alibaba-bailian-deepseek-v4-pro-chat",
+      "requested_model": "deepseek-v4-pro",
+      "runtime_endpoint_fingerprint": null
+    }
+  ],
+  "plan_digest": "sha256:7c05ba81e67fba6df388c4511bf0ba7df5a84b07aaf5e27baa2a1b61e886186e",
+  "preregistration_id": "tier-b-keyless-smoke-preregistration-v1",
+  "prompt_workspace_analysis": [
+    {
+      "direct_prompt_total_limit_bytes": 1000000,
+      "direct_prompt_tree_limit_bytes": 512000,
+      "prompt_contract_status": "PASS",
+      "rendered_prompt_bytes": 3872,
+      "task_id": "repo-java-widget-update",
+      "task_version": "1.0.0",
+      "workspace_file_count": 7,
+      "workspace_utf8_bytes": 2489
+    },
+    {
+      "direct_prompt_total_limit_bytes": 1000000,
+      "direct_prompt_tree_limit_bytes": 512000,
+      "prompt_contract_status": "PASS",
+      "rendered_prompt_bytes": 6231,
+      "task_id": "repo-python-ledger-transfer",
+      "task_version": "1.0.0",
+      "workspace_file_count": 6,
+      "workspace_utf8_bytes": 4907
+    },
+    {
+      "direct_prompt_total_limit_bytes": 1000000,
+      "direct_prompt_tree_limit_bytes": 512000,
+      "prompt_contract_status": "PASS",
+      "rendered_prompt_bytes": 3343,
+      "task_id": "repo-typescript-resilient-client",
+      "task_version": "1.0.0",
+      "workspace_file_count": 5,
+      "workspace_utf8_bytes": 2069
+    }
+  ],
+  "provider_observations": "NOT_AVAILABLE",
+  "qualification_digest": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88",
+  "qualification_id": "tier-b-repo-engineering-v1",
+  "real_provider_calls": 0,
+  "repeat_count": 1,
+  "resource_envelope": {
+    "identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+    "logical_wall_time_seconds": 240,
+    "max_output_tokens": 4000,
+    "model_turns_per_logical_run": 1,
+    "provider_request_timeout_seconds": 180,
+    "provider_requests_per_logical_run": 1,
+    "symmetric_between_cells": true,
+    "tool_calls_per_logical_run": 0
+  },
+  "resource_envelope_change_reason": "UNCHANGED: every frozen Tier-B workspace is below 5 KiB and every rendered Direct prompt is below 7 KiB, within the existing one-turn Direct prompt contract; the smoke intentionally tests the established 4000-token output bound.",
+  "resource_envelope_changed_from_tier_a_direct": false,
+  "schedule_seed": 20260831,
+  "scheduling_policy": "BLOCKED_INTERLEAVED_SCHEDULING",
+  "schema_version": 1,
+  "score_based_stop_condition": "PROHIBITED",
+  "smoke_slots": [
+    {
+      "cell_id": "Q",
+      "paired_slot_identity": "sha256:1e995abd3b71c054ad491320a7672390ae59881adff06d0880ffebf95371389a",
+      "repository_snapshot_identity": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9",
+      "requested_model": "qwen3.8-max",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:64da32d41b8aa636e76f2c6be56869dedce375daa3ef980f138c536102abde3e",
+      "slot_order": 0,
+      "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+      "task_id": "repo-java-widget-update",
+      "task_version": "1.0.0",
+      "verifier_identity": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73"
+    },
+    {
+      "cell_id": "D",
+      "paired_slot_identity": "sha256:1e995abd3b71c054ad491320a7672390ae59881adff06d0880ffebf95371389a",
+      "repository_snapshot_identity": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9",
+      "requested_model": "deepseek-v4-pro",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:1c4607fece302066460f1d2584c53a64d65fab23f634c4b97d12c78f553a5d0e",
+      "slot_order": 1,
+      "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+      "task_id": "repo-java-widget-update",
+      "task_version": "1.0.0",
+      "verifier_identity": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73"
+    },
+    {
+      "cell_id": "D",
+      "paired_slot_identity": "sha256:81232acfd717713464caefac5e60b6763346fa42a0253e7b1a86a280701aaae1",
+      "repository_snapshot_identity": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480",
+      "requested_model": "deepseek-v4-pro",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:2d91934bdcce7fbe4226412d0cbf4e394fb2023b0d9008984769095c598e2946",
+      "slot_order": 2,
+      "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+      "task_id": "repo-python-ledger-transfer",
+      "task_version": "1.0.0",
+      "verifier_identity": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652"
+    },
+    {
+      "cell_id": "Q",
+      "paired_slot_identity": "sha256:81232acfd717713464caefac5e60b6763346fa42a0253e7b1a86a280701aaae1",
+      "repository_snapshot_identity": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480",
+      "requested_model": "qwen3.8-max",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:c725eb6bb1d88eb66395c39d39a16afea1d14242dbff0e02d547076807094558",
+      "slot_order": 3,
+      "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+      "task_id": "repo-python-ledger-transfer",
+      "task_version": "1.0.0",
+      "verifier_identity": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652"
+    },
+    {
+      "cell_id": "D",
+      "paired_slot_identity": "sha256:bdad739a64f6a4b0f9234d4e8601305c60f4aab1668429170a9efe19213f2524",
+      "repository_snapshot_identity": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e",
+      "requested_model": "deepseek-v4-pro",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:1115497e81fe506ff479571de6a4f32bedd64dff9c7510efbbf2f0ce42139e62",
+      "slot_order": 4,
+      "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+      "task_id": "repo-typescript-resilient-client",
+      "task_version": "1.0.0",
+      "verifier_identity": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02"
+    },
+    {
+      "cell_id": "Q",
+      "paired_slot_identity": "sha256:bdad739a64f6a4b0f9234d4e8601305c60f4aab1668429170a9efe19213f2524",
+      "repository_snapshot_identity": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e",
+      "requested_model": "qwen3.8-max",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "slot_id": "sha256:d7317d97180576639fc6b56d740aec35eb5574b5982de29eedc7d5cd5d9327ce",
+      "slot_order": 5,
+      "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+      "task_id": "repo-typescript-resilient-client",
+      "task_version": "1.0.0",
+      "verifier_identity": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02"
+    }
+  ],
+  "success_gates": [
+    "TIER_B_QUALIFICATION_IDENTITY_EXACT",
+    "TASK_SNAPSHOT_AND_VERIFIER_IDENTITIES_EXACT",
+    "OPERATOR_ENDPOINT_BINDING_RECONCILED",
+    "OBSERVED_PROVIDER_MODEL_IDENTITY_MATCH",
+    "NO_CONTROL_DRIFT",
+    "NO_VERIFIER_INFRASTRUCTURE",
+    "NO_HIDDEN_TEST_LEAKAGE",
+    "NO_SECRET_LEAKAGE",
+    "TRACE_AND_EVIDENCE_PERSISTENCE_VALID",
+    "CAPABILITY_PASS_OR_FAIL_ACCEPTABLE"
+  ],
+  "tasks": [
+    {
+      "engineering_shape": "cross-module-api-service-persistence-change",
+      "language": "java",
+      "repository_snapshot_identity": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9",
+      "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+      "task_id": "repo-java-widget-update",
+      "task_tier": "TIER_B_REPO_ENGINEERING",
+      "task_version": "1.0.0",
+      "verifier_identity": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73"
+    },
+    {
+      "engineering_shape": "multi-file-backend-persistence-bugfix",
+      "language": "python",
+      "repository_snapshot_identity": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480",
+      "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+      "task_id": "repo-python-ledger-transfer",
+      "task_tier": "TIER_B_REPO_ENGINEERING",
+      "task_version": "1.0.0",
+      "verifier_identity": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652"
+    },
+    {
+      "engineering_shape": "multi-module-config-and-dependency-interaction",
+      "language": "typescript",
+      "repository_snapshot_identity": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e",
+      "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+      "task_id": "repo-typescript-resilient-client",
+      "task_tier": "TIER_B_REPO_ENGINEERING",
+      "task_version": "1.0.0",
+      "verifier_identity": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02"
+    }
+  ],
+  "total_logical_slots": 6
+}

@@ -257,6 +257,12 @@ def build_experiment_plan(spec: ExperimentSpec, repository_root: Path) -> Experi
     cells = tuple(
         sorted((PlannedCell.from_spec(cell) for cell in spec.cells), key=lambda cell: cell.id)
     )
+    task_budget_identities = tuple(sorted({task.budget_identity for task in tasks}))
+    matrix_budget_identity = (
+        task_budget_identities[0]
+        if len(task_budget_identities) == 1
+        else canonical_digest({"task_budget_identities": task_budget_identities})
+    )
     slots: list[ExperimentRunSlot] = []
     for cell in cells:
         for task in tasks:
@@ -264,9 +270,9 @@ def build_experiment_plan(spec: ExperimentSpec, repository_root: Path) -> Experi
                 raise ExperimentSpecError(
                     f"task {task.task_id} does not support cell {cell.id} lane {cell.lane.value}"
                 )
-            if cell.resource_budget_identity != task.budget_identity:
+            if cell.resource_budget_identity != matrix_budget_identity:
                 raise ExperimentSpecError(
-                    f"cell {cell.id} budget identity does not match task {task.task_id}"
+                    f"cell {cell.id} budget identity does not match the task matrix"
                 )
             if cell.network_policy is not task.network_policy:
                 raise ExperimentSpecError(
@@ -458,6 +464,15 @@ def build_methodology_v2_plan(
     }
     if funnel_stage not in allowed_stage[evaluation_mode]:
         raise ExperimentSpecError("funnel stage does not match explicit evaluation mode")
+
+    selected_packages = tuple(
+        TaskPackage.load(repository_root / package_path) for package_path in spec.task_packages
+    )
+    selected_repo_engineering = tuple(
+        package.manifest.repo_engineering is not None for package in selected_packages
+    )
+    if any(selected_repo_engineering) and not all(selected_repo_engineering):
+        raise ExperimentSpecError("one plan cannot aggregate Tier-A and Tier-B task outcomes")
 
     base = build_experiment_plan(spec, repository_root)
     tier_a = next(
