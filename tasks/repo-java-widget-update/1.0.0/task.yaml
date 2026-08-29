@@ -1,0 +1,27 @@
+schema_version: 1
+id: repo-java-widget-update
+version: 1.0.0
+domain: software-engineering
+lane_support: [M, H]
+instruction_path: instruction.md
+workspace_path: workspace
+verifier: {kind: python, version: "repo-v1", entrypoint: verifier/verify.py, timeout_seconds: 45}
+oracle: {path: oracle}
+repo_engineering:
+  tier: TIER_B_REPO_ENGINEERING
+  snapshot_kind: frozen_workspace
+  robustness_path: robustness
+  minimum_oracle_files: 3
+  minimum_robustness_variants: 2
+budget: {timeout_seconds: 900, max_output_tokens: 8000, network_policy: deny}
+expected_tools:
+  - {name: java, version: "21"}
+  - {name: javac, version: "21"}
+protected_paths: [contract.md]
+metadata:
+  language: java
+  category: service-api-persistence-contract
+  scenario_family: optimistic-versioned-widget-update
+  benchmark_role: INDEPENDENT
+  difficulty: repo-advanced
+  engineering_shape: cross-module-api-service-persistence-change

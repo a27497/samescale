@@ -49,6 +49,11 @@ from harnesslab.tasks.package import TaskPackage, digest_tree
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 PYTHON_TASK = REPOSITORY_ROOT / "tasks" / "micro-python-clamp" / "1.0.0"
 TYPESCRIPT_TASK = REPOSITORY_ROOT / "tasks" / "micro-typescript-clamp" / "1.0.0"
+TIER_B_TASKS = (
+    REPOSITORY_ROOT / "tasks" / "repo-python-ledger-transfer" / "1.0.0",
+    REPOSITORY_ROOT / "tasks" / "repo-java-widget-update" / "1.0.0",
+    REPOSITORY_ROOT / "tasks" / "repo-typescript-resilient-client" / "1.0.0",
+)
 
 
 def sandbox(tmp_path: Path) -> DockerSandbox:
@@ -420,6 +425,34 @@ async def test_restrictive_task_permissions_are_portable_to_non_root_hidden_veri
     )
     assert not runner.runtime_root.joinpath("restrictive-permission-portability").exists()
     assert not container_exists(result.run.container_name)
+    assert await no_harnesslab_containers()
+
+
+@pytest.mark.integration
+async def test_tier_b_oracles_pass_in_networkless_isolated_sandbox(tmp_path: Path) -> None:
+    runner = sandbox(tmp_path)
+    for task_path in TIER_B_TASKS:
+        package = TaskPackage.load(task_path)
+        managed = package.materialize(tmp_path / f"materialized-{package.definition.id}")
+        try:
+            package.apply_oracle(managed)
+            result = await runner.run_hidden_verifier_workspace(
+                package,
+                managed.workspace,
+                timeout_seconds=60,
+                run_id=f"tier-b-oracle-{package.definition.id}",
+            )
+        finally:
+            managed.cleanup()
+
+        assert result.passed
+        assert result.score == 1.0
+        assert result.run.manifest.status is SandboxStatus.SUCCEEDED
+        assert result.run.manifest.security.network_mode == "none"
+        assert result.run.manifest.security.read_only_rootfs
+        assert result.run.manifest.cleanup_verified
+        assert result.lifecycle is not None
+        assert result.lifecycle.failure_subtype is None
     assert await no_harnesslab_containers()
 
 

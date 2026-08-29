@@ -1,0 +1,31 @@
+schema_version: 1
+id: repo-python-ledger-transfer
+version: 1.0.0
+domain: software-engineering
+lane_support: [M, H]
+instruction_path: instruction.md
+workspace_path: workspace
+verifier:
+  kind: python
+  version: "repo-v1"
+  entrypoint: verifier/verify.py
+  timeout_seconds: 30
+oracle: {path: oracle}
+repo_engineering:
+  tier: TIER_B_REPO_ENGINEERING
+  snapshot_kind: frozen_workspace
+  robustness_path: robustness
+  minimum_oracle_files: 2
+  minimum_robustness_variants: 2
+budget: {timeout_seconds: 600, max_output_tokens: 8000, network_policy: deny}
+expected_tools:
+  - {name: python, version: "3.12"}
+  - {name: sqlite, version: "3"}
+protected_paths: [contract.md, tests/test_public.py]
+metadata:
+  language: python
+  category: persistence-transaction-regression
+  scenario_family: sqlite-atomic-idempotent-transfer
+  benchmark_role: INDEPENDENT
+  difficulty: repo-intermediate
+  engineering_shape: multi-file-backend-persistence-bugfix
