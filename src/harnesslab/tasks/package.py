@@ -130,6 +130,22 @@ class TaskPackage:
     def oracle_path(self) -> Path:
         return resolve_package_path(self.root, self.manifest.oracle.path)
 
+    @property
+    def robustness_path(self) -> Path | None:
+        definition = self.manifest.repo_engineering
+        if definition is None:
+            return None
+        return resolve_package_path(self.root, definition.robustness_path)
+
+    @property
+    def robustness_variants(self) -> tuple[Path, ...]:
+        root = self.robustness_path
+        if root is None:
+            return ()
+        return tuple(
+            sorted((path for path in root.iterdir() if path.is_dir()), key=lambda p: p.name)
+        )
+
     @classmethod
     def load(cls, root: Path) -> TaskPackage:
         root = root.resolve()
@@ -205,6 +221,12 @@ class TaskPackage:
         }
         if manifest.context_path is not None:
             paths["context"] = (manifest.context_path, "directory", "context")
+        if manifest.repo_engineering is not None:
+            paths["robustness"] = (
+                manifest.repo_engineering.robustness_path,
+                "directory",
+                "robustness",
+            )
         for label, (relative, expected_kind, expected_top_level) in paths.items():
             if PurePosixPath(relative).parts[0] != expected_top_level:
                 raise TaskPackageError(f"{label} must be under {expected_top_level}/")
@@ -218,6 +240,22 @@ class TaskPackage:
             path = resolve_package_path(workspace, protected)
             if not path.is_file():
                 raise TaskPackageError(f"protected file does not exist: {protected}")
+        repo_engineering = manifest.repo_engineering
+        if repo_engineering is not None:
+            oracle = resolve_package_path(root, manifest.oracle.path)
+            oracle_files = _package_files(oracle)
+            if len(oracle_files) < repo_engineering.minimum_oracle_files:
+                raise TaskPackageError(
+                    "Tier-B oracle does not meet the declared multi-file minimum"
+                )
+            robustness = resolve_package_path(root, repo_engineering.robustness_path)
+            variants = tuple(path for path in robustness.iterdir() if path.is_dir())
+            if len(variants) < repo_engineering.minimum_robustness_variants:
+                raise TaskPackageError(
+                    "Tier-B package does not meet the declared robustness-variant minimum"
+                )
+            if any(not _package_files(variant) for variant in variants):
+                raise TaskPackageError("Tier-B robustness variants must contain an overlay")
 
     def materialize(self, parent: Path | None = None) -> MaterializedTask:
         if parent is not None:
@@ -241,8 +279,15 @@ class TaskPackage:
         )
 
     def apply_oracle(self, materialized: MaterializedTask) -> None:
-        for source in _package_files(self.oracle_path):
-            relative = source.relative_to(self.oracle_path)
+        self.apply_overlay(materialized, self.oracle_path)
+
+    def apply_overlay(self, materialized: MaterializedTask, overlay: Path) -> None:
+        resolved_overlay = overlay.resolve()
+        resolved_root = self.root.resolve()
+        if resolved_root not in resolved_overlay.parents:
+            raise TaskPackageError("overlay must be contained by the task package")
+        for source in _package_files(resolved_overlay):
+            relative = source.relative_to(resolved_overlay)
             target = materialized.workspace / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)

@@ -49,3 +49,15 @@ A valid package must satisfy both conditions:
 The Java and TypeScript fixtures require Java 21 and Node.js 24, respectively. Their host execution
 is a controlled contract fixture, not a sandbox for untrusted code. Docker sandboxing, provider
 adapters, and experiment workers are later-phase work.
+
+## Optional Tier-B repository contract
+
+Repo-scale tasks reuse the same package, digest, materialization, oracle, and evidence contracts.
+They add `repo_engineering` to `task.yaml` with the fixed tier, frozen-workspace snapshot model,
+an in-package hidden `robustness/` directory, and minimum multi-file oracle/negative-variant
+counts. Existing packages omit this field, so their bytes and identities do not change.
+
+Every `robustness/<variant>/` directory is an overlay representing a plausible incomplete repair.
+It is trusted qualification input, never subject-visible material. Tier-B qualification requires
+each overlay to terminate as a deterministic subject failure rather than verifier/platform
+failure. See `docs/TIER_B_REPO_ENGINEERING.md` for the complete boundary.

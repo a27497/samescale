@@ -44,6 +44,20 @@ class OraclePackageDefinition(BaseModel):
     _path_is_safe = field_validator("path")(validate_relative_path)
 
 
+class RepoEngineeringDefinition(BaseModel):
+    """Optional Tier-B package contract; absent packages retain their Tier-A identity."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    tier: Literal["TIER_B_REPO_ENGINEERING"] = "TIER_B_REPO_ENGINEERING"
+    snapshot_kind: Literal["frozen_workspace"] = "frozen_workspace"
+    robustness_path: str = "robustness"
+    minimum_oracle_files: int = Field(default=2, ge=2, le=100)
+    minimum_robustness_variants: int = Field(default=2, ge=1, le=20)
+
+    _robustness_path_is_safe = field_validator("robustness_path")(validate_relative_path)
+
+
 class TaskPackageManifest(BaseModel):
     """Strict on-disk task.yaml schema that resolves into the TaskDefinition contract."""
 
@@ -59,6 +73,7 @@ class TaskPackageManifest(BaseModel):
     context_path: str | None = None
     verifier: VerifierPackageDefinition
     oracle: OraclePackageDefinition
+    repo_engineering: RepoEngineeringDefinition | None = None
     budget: ResourceBudget
     expected_tools: tuple[ExpectedToolContract, ...] = ()
     protected_paths: tuple[str, ...] = ()
