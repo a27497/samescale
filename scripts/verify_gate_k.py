@@ -243,7 +243,7 @@ def verify_contract_mode() -> bool:
     ):
         print("FAIL: K-A BadCase placeholders are not fail-closed")
         return False
-    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    workflow = (ROOT / ".github/workflows/full-ci.yml").read_text(encoding="utf-8")
     if workflow.index("scripts/verify_gate_j.py") >= workflow.index("scripts/verify_gate_k.py"):
         print("FAIL: Gate K is not ordered after Gate J")
         return False

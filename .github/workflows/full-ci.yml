@@ -1,0 +1,164 @@
+name: HarnessLab Full Release CI
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: harnesslab-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  qualification:
+    name: qualification (${{ matrix.id }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: robustness-v2
+            command: uv run --locked python scripts/verify_tier_a_verifier_robustness_v2.py
+          - id: model-chat-v3
+            command: uv run --locked python scripts/freeze_model_chat_v3.py
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: harnesslab
+          POSTGRES_USER: harnesslab
+          POSTGRES_PASSWORD: harnesslab_ci_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U harnesslab -d harnesslab"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      HARNESSLAB_ENVIRONMENT: test
+      DATABASE_URL: postgresql+psycopg://harnesslab:harnesslab_ci_only@127.0.0.1:5432/harnesslab
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.12.5
+          enable-cache: true
+      - name: Install pinned Python
+        run: uv python install 3.12.14
+      - name: Install Java 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Run keyless qualification
+        run: ${{ matrix.command }}
+
+  gates:
+    name: gate-${{ matrix.gate }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - gate: A
+            command: uv run --locked python scripts/verify_gate_a.py
+          - gate: B
+            command: uv run --locked python scripts/verify_gate_b.py
+          - gate: C
+            command: uv run --locked python scripts/verify_gate_c.py --leaf-only
+          - gate: D
+            command: uv run --locked python scripts/verify_gate_d.py --leaf-only
+          - gate: E
+            command: uv run --locked python scripts/verify_gate_e.py
+          - gate: F
+            command: uv run --locked python scripts/verify_gate_f.py
+          - gate: G
+            command: uv run --locked python scripts/verify_gate_g.py
+          - gate: H
+            command: uv run --locked python scripts/verify_gate_h.py
+          - gate: I
+            command: uv run --locked python scripts/verify_gate_i.py
+          - gate: J
+            command: uv run --locked python scripts/verify_gate_j.py
+          - gate: K
+            command: uv run --locked python scripts/verify_gate_k.py
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: harnesslab
+          POSTGRES_USER: harnesslab
+          POSTGRES_PASSWORD: harnesslab_ci_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U harnesslab -d harnesslab"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      HARNESSLAB_ENVIRONMENT: test
+      HARNESSLAB_CI_LEAF_MODE: "1"
+      DATABASE_URL: postgresql+psycopg://harnesslab:harnesslab_ci_only@127.0.0.1:5432/harnesslab
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.12.5
+          enable-cache: true
+      - name: Install pinned Python
+        run: uv python install 3.12.14
+      - name: Install Java 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Run authoritative Gate ${{ matrix.gate }} verification
+        run: ${{ matrix.command }}
+
+  fresh-setup:
+    name: fresh-setup
+    needs:
+      - qualification
+      - gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.12.5
+          enable-cache: true
+      - name: Install pinned Python
+        run: uv python install 3.12.14
+      - name: Install Java 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Attest clean Actions fresh-setup reproduction
+        run: >-
+          uv run --locked python scripts/verify_fresh_setup.py
+          --check-runtime --actions-reproduction

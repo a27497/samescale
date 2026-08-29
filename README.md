@@ -211,6 +211,11 @@ deterministic prompt and patch safety, credential withholding, and the fake-prov
 uv run --locked python scripts/verify_gate_d.py
 ```
 
+Those standalone commands retain their complete prerequisite regressions. The full-release GitHub
+Actions workflow runs A-K in isolated parallel jobs and uses the guarded `--leaf-only` option for
+C and D only after declaring independent A/B/C jobs in the same workflow. Leaf mode is restricted
+to GitHub Actions and is not an authoritative standalone gate.
+
 Real provider calls are optional and were not used as Gate D evidence. See the safe example
 profiles under `profiles/`; they contain environment-variable names, never credential values.
 
@@ -330,9 +335,11 @@ uv run --locked python scripts/verify_fresh_setup.py --check-runtime
 ```
 
 That command is a non-mutating setup preflight contract, not proof that a clean checkout was fully
-reproduced. GitHub Actions supplies the authoritative clean-checkout reproduction: after its ordered
-Gates A-K succeed, `--actions-reproduction` verifies the exact `GITHUB_SHA`, pinned runtimes, and an
-unmodified tracked checkout. That mode is CI-only and does not invoke any gate recursively.
+reproduced. The default push/pull-request workflow is bounded development CI. The manually
+dispatched full-release workflow supplies the authoritative clean-checkout reproduction: after its
+isolated A-K and qualification jobs succeed, `--actions-reproduction` verifies the exact
+`GITHUB_SHA`, pinned runtimes, and an unmodified tracked checkout. That mode is CI-only and does not
+invoke any gate recursively.
 
 Run `scripts/verify_gate_a.py` through `scripts/verify_gate_k.py` in order for the full keyless gate
 chain; Gates H-J also require `DATABASE_URL` pointing at PostgreSQL. Future real execution uses only

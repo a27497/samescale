@@ -50,11 +50,11 @@ def verify_repository_contract() -> None:
     require_text("pyproject.toml", 'requires-python = "==3.12.14"')
     require_text("pyproject.toml", 'required-version = "==0.12.5"')
     require_text("docker-compose.yml", "postgres:18")
-    require_text(".github/workflows/ci.yml", "Java 21")
-    require_text(".github/workflows/ci.yml", 'node-version: "24"')
-    require_text(".github/workflows/ci.yml", "scripts/verify_gate_k.py")
-    require_text(".github/workflows/ci.yml", "scripts/verify_tier_a_verifier_robustness_v2.py")
-    require_text(".github/workflows/ci.yml", "scripts/freeze_model_chat_v3.py")
+    require_text(".github/workflows/full-ci.yml", "Java 21")
+    require_text(".github/workflows/full-ci.yml", 'node-version: "24"')
+    require_text(".github/workflows/full-ci.yml", "scripts/verify_gate_k.py")
+    require_text(".github/workflows/full-ci.yml", "scripts/verify_tier_a_verifier_robustness_v2.py")
+    require_text(".github/workflows/full-ci.yml", "scripts/freeze_model_chat_v3.py")
     require_text("README.md", "uv sync --locked")
     require_text("README.md", "alembic upgrade head")
     if not (ROOT / ".gitignore").is_file() or ".env" not in (ROOT / ".gitignore").read_text():
@@ -80,7 +80,7 @@ def verify_runtime() -> None:
 
 
 def verify_actions_reproduction() -> None:
-    """Attest the clean checkout only after the ordered Actions gate chain succeeds."""
+    """Attest the clean checkout only after the isolated full Actions jobs succeed."""
 
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise RuntimeError("actual reproduction attestation is restricted to GitHub Actions")

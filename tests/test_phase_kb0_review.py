@@ -820,7 +820,7 @@ def test_smoke_dry_run_preflight_performs_zero_provider_invocations() -> None:
     disabled = RUNNER.invoke(app, ["release", "smoke", "execute", "--repository-root", str(ROOT)])
     assert disabled.exit_code == 2
     assert "real smoke requires --allow-real-smoke" in disabled.stdout
-    workflow = (ROOT / ".github/workflows/ci.yml").read_text()
+    workflow = (ROOT / ".github/workflows/full-ci.yml").read_text()
     assert "--allow-real-smoke" not in workflow
     assert "release smoke execute" not in workflow
 

@@ -235,7 +235,7 @@ def test_release_docs_and_fresh_setup_contract_exist() -> None:
 
 
 def test_ci_runs_keyless_gate_k_after_gate_j_without_real_execution() -> None:
-    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    workflow = (ROOT / ".github/workflows/full-ci.yml").read_text(encoding="utf-8")
     assert workflow.index("scripts/verify_gate_j.py") < workflow.index("scripts/verify_gate_k.py")
     assert workflow.index("scripts/verify_gate_k.py") < workflow.index("--actions-reproduction")
     assert "--clean-reproduction" not in workflow

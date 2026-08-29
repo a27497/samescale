@@ -45,7 +45,7 @@ from harnesslab.release.models import (
     StrictModel,
 )
 
-EXPECTED_WORKFLOW = " + ".join(f"Gate {letter}" for letter in "ABCDEFGHIJK")
+EXPECTED_WORKFLOW = "HarnessLab Full Release CI"
 EXPECTED_GATES = tuple(f"Gate {letter}" for letter in "ABCDEFGHIJK")
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import os
 import re
 import shutil
@@ -44,6 +45,7 @@ REAL_PROVIDER_ENVIRONMENT_REFERENCES = (
     "ANTHROPIC_API_KEY",
     "ANTHROPIC_AUTH_TOKEN",
 )
+CI_LEAF_MODE_ENV = "HARNESSLAB_CI_LEAF_MODE"
 CRITICAL_TESTS = {
     "test_anthropic_messages_adapter_contract_and_thinking_exclusion",
     "test_anthropic_refusal_is_successful_public_result",
@@ -399,16 +401,18 @@ def verify_httpcore_trace_compatibility() -> bool:
     return True
 
 
-def main() -> int:
-    environment = verify_environment()
-    if environment is not ExitCode.PASS:
-        return environment
-    checks = (
+def build_checks(*, leaf_only: bool) -> tuple[Check, ...]:
+    prerequisite_checks: tuple[Check, ...] = ()
+    if not leaf_only:
+        prerequisite_checks = (
+            Check(
+                "Gate C regression (includes Gate A and Gate B)",
+                ("uv", "run", "--locked", "python", "scripts/verify_gate_c.py"),
+            ),
+        )
+    return (
         Check("locked dependency sync", ("uv", "sync", "--locked")),
-        Check(
-            "Gate C regression (includes Gate A and Gate B)",
-            ("uv", "run", "--locked", "python", "scripts/verify_gate_c.py"),
-        ),
+        *prerequisite_checks,
         Check(
             "Phase D pytest",
             (
@@ -426,6 +430,40 @@ def main() -> int:
         Check("mypy", ("uv", "run", "--locked", "mypy", "src", "tests", "scripts")),
         Check("git whitespace", ("git", "diff", "--check")),
     )
+
+
+def ci_leaf_mode_authorized() -> bool:
+    return (
+        os.environ.get("CI") == "true"
+        and os.environ.get("GITHUB_ACTIONS") == "true"
+        and os.environ.get(CI_LEAF_MODE_ENV) == "1"
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="HarnessLab authoritative Gate D verifier")
+    parser.add_argument(
+        "--leaf-only",
+        action="store_true",
+        help=(
+            "CI-only: run Gate D evidence after independent A/B/C jobs; "
+            "not authoritative standalone"
+        ),
+    )
+    arguments = parser.parse_args(argv)
+    if arguments.leaf_only and not ci_leaf_mode_authorized():
+        print(
+            "NOT_VERIFIED: --leaf-only is restricted to the full GitHub Actions workflow; "
+            "run without it for authoritative standalone Gate D"
+        )
+        return ExitCode.NOT_VERIFIED
+    if arguments.leaf_only:
+        print("CI_LEAF_MODE=NON_AUTHORITATIVE_STANDALONE")
+        print("PREREQUISITE_REGRESSIONS=DELEGATED_TO_INDEPENDENT_GATE_A_B_C_JOBS")
+    environment = verify_environment()
+    if environment is not ExitCode.PASS:
+        return environment
+    checks = build_checks(leaf_only=arguments.leaf_only)
     failed = False
     for check in checks:
         if not run(check):

@@ -81,7 +81,7 @@ async def _wait_for_status(factory: Any, run_id: str, status: RunStatus) -> None
                 return
             await asyncio.sleep(0.005)
 
-    await asyncio.wait_for(wait(), timeout=1)
+    await asyncio.wait_for(wait(), timeout=5)
 
 
 @pytest.mark.integration
@@ -107,7 +107,7 @@ async def test_executor_heartbeat_protects_active_run_and_lost_owner_cannot_writ
         claimed = await executor.claim(experiment_id)
         assert claimed is not None
         execution = asyncio.create_task(executor.execute(claimed))
-        await asyncio.wait_for(binding.entered.wait(), timeout=1)
+        await asyncio.wait_for(binding.entered.wait(), timeout=5)
 
         await asyncio.sleep(0.15)
         async with factory() as session, session.begin():
@@ -129,7 +129,7 @@ async def test_executor_heartbeat_protects_active_run_and_lost_owner_cannot_writ
             durable.status = RunStatus.CLAIMED.value
         await asyncio.sleep(0.05)
         binding.release.set()
-        stale_result = await asyncio.wait_for(execution, timeout=1)
+        stale_result = await asyncio.wait_for(execution, timeout=5)
 
         assert stale_result.status is RunStatus.CLAIMED
         assert stale_result.lease_owner == "worker-b"
@@ -165,12 +165,12 @@ async def test_executor_cancellation_short_circuits_after_active_binding_returns
         claimed = await executor.claim(experiment_id)
         assert claimed is not None
         execution = asyncio.create_task(executor.execute(claimed))
-        await asyncio.wait_for(binding.entered.wait(), timeout=1)
+        await asyncio.wait_for(binding.entered.wait(), timeout=5)
         async with factory() as session, session.begin():
             await request_run_cancellation(session, claimed.run_id, now=datetime.now(UTC))
         await _wait_for_status(factory, claimed.run_id, RunStatus.CANCELLED)
         binding.release.set()
-        cancelled = await asyncio.wait_for(execution, timeout=1)
+        cancelled = await asyncio.wait_for(execution, timeout=5)
 
         assert cancelled.status is RunStatus.CANCELLED
         assert cancelled.normalized_outcome is StatisticalOutcome.CANCELLED

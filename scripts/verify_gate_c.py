@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import shutil
@@ -57,6 +58,7 @@ CRITICAL_TESTS = {
 }
 IMAGE = "harnesslab-phase-c:0.3.0"
 RUN_LABEL = "com.harnesslab.phase=C"
+CI_LEAF_MODE_ENV = "HARNESSLAB_CI_LEAF_MODE"
 
 
 def run(check: Check) -> bool:
@@ -215,20 +217,27 @@ def verify_source_and_scope() -> bool:
     return True
 
 
-def main() -> int:
-    environment = verify_environment()
-    if environment is not ExitCode.PASS:
-        return environment
-
-    checks = (
+def build_checks(*, leaf_only: bool) -> tuple[Check, ...]:
+    prerequisite_checks: tuple[Check, ...] = ()
+    if not leaf_only:
+        prerequisite_checks = (
+            Check(
+                "Gate A regression",
+                ("uv", "run", "--locked", "python", "scripts/verify_gate_a.py"),
+            ),
+            Check(
+                "Gate B regression",
+                ("uv", "run", "--locked", "python", "scripts/verify_gate_b.py"),
+            ),
+        )
+    return (
         Check("locked dependency sync", ("uv", "sync", "--locked")),
         Check("Docker version", ("docker", "version")),
         Check(
             "Docker sandbox doctor", ("uv", "run", "--locked", "harnesslab", "sandbox", "doctor")
         ),
         Check("Alembic Phase C head", ("uv", "run", "--locked", "alembic", "upgrade", "head")),
-        Check("Gate A regression", ("uv", "run", "--locked", "python", "scripts/verify_gate_a.py")),
-        Check("Gate B regression", ("uv", "run", "--locked", "python", "scripts/verify_gate_b.py")),
+        *prerequisite_checks,
         Check(
             "Phase C pytest",
             (
@@ -246,6 +255,38 @@ def main() -> int:
         Check("mypy", ("uv", "run", "--locked", "mypy", "src", "tests", "scripts")),
         Check("git whitespace", ("git", "diff", "--check")),
     )
+
+
+def ci_leaf_mode_authorized() -> bool:
+    return (
+        os.environ.get("CI") == "true"
+        and os.environ.get("GITHUB_ACTIONS") == "true"
+        and os.environ.get(CI_LEAF_MODE_ENV) == "1"
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="HarnessLab authoritative Gate C verifier")
+    parser.add_argument(
+        "--leaf-only",
+        action="store_true",
+        help="CI-only Gate C evidence; standalone use is not authoritative",
+    )
+    arguments = parser.parse_args(argv)
+    if arguments.leaf_only and not ci_leaf_mode_authorized():
+        print(
+            "NOT_VERIFIED: --leaf-only is restricted to the full GitHub Actions workflow; "
+            "run without it for authoritative standalone Gate C"
+        )
+        return ExitCode.NOT_VERIFIED
+    if arguments.leaf_only:
+        print("CI_LEAF_MODE=NON_AUTHORITATIVE_STANDALONE")
+        print("PREREQUISITE_REGRESSIONS=DELEGATED_TO_INDEPENDENT_GATE_A_AND_GATE_B_JOBS")
+    environment = verify_environment()
+    if environment is not ExitCode.PASS:
+        return environment
+
+    checks = build_checks(leaf_only=arguments.leaf_only)
     failed = False
     for check in checks:
         if not run(check):
