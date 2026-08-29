@@ -33,10 +33,12 @@ from harnesslab.api.workbench_service import (
     list_judge_calibrations,
     list_runs,
     matrix,
+    model_comparison_analysis,
     regression_compare,
     run_detail,
     trace_detail,
 )
+from harnesslab.experiment.model_comparison import ModelComparisonCloseout
 
 router = APIRouter(prefix="/workbench", tags=["workbench"])
 Session = Annotated[AsyncSession, Depends(workbench_session)]
@@ -106,6 +108,16 @@ async def get_report(
     experiment_id: str, session: Session, artifact_roots: ArtifactRoots
 ) -> ExperimentReportResponse:
     return await experiment_report(session, experiment_id, artifact_roots)
+
+
+@router.get(
+    "/experiments/{experiment_id}/model-comparison-analysis",
+    response_model=ModelComparisonCloseout,
+)
+async def get_model_comparison_analysis(
+    experiment_id: str, session: Session, artifact_roots: ArtifactRoots
+) -> ModelComparisonCloseout:
+    return await model_comparison_analysis(session, experiment_id, artifact_roots)
 
 
 @router.get("/experiments/{experiment_id}/status", response_model=ExperimentStatusResponse)

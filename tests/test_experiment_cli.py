@@ -42,6 +42,7 @@ def test_phase_g_nested_cli_help() -> None:
         ["experiment", "run", "--help"],
         ["run", "inspect", "--help"],
         ["report", "compare", "--help"],
+        ["report", "model-comparison", "--help"],
     ):
         result = runner.invoke(app, command)
         assert result.exit_code == 0

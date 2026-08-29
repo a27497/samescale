@@ -11,6 +11,7 @@ import router from '@/router'
 import { useExperimentStore } from '@/stores/experiments'
 import CoreReadinessView from '@/views/CoreReadinessView.vue'
 import ExperimentsView from '@/views/ExperimentsView.vue'
+import ExperimentDetailView from '@/views/ExperimentDetailView.vue'
 import JudgeDetailView from '@/views/JudgeDetailView.vue'
 import JudgeLabView from '@/views/JudgeLabView.vue'
 import RegressionView from '@/views/RegressionView.vue'
@@ -20,6 +21,7 @@ const api = vi.hoisted(() => ({
   listExperiments: vi.fn(),
   getExperiment: vi.fn(),
   getMatrix: vi.fn(),
+  getModelComparisonAnalysis: vi.fn(),
   getRuns: vi.fn(),
   getStatus: vi.fn(),
   getRun: vi.fn(),
@@ -98,17 +100,43 @@ const trace = {
   events: [{ ordinal: 1, type: 'REASONING_PRESENT', status: null, summary: 'NATIVE_REASONING_CONTENT_MUST_STAY_HIDDEN', exit_code: null }],
 }
 
+const modelComparison = {
+  schema_version: 1 as const,
+  analysis_digest: 'sha256:analysis',
+  analysis: {
+    schema_version: 1 as const, report_kind: 'MODEL_COMPARISON_CLOSEOUT' as const,
+    experiment_id: 'matrix-keyless', plan_digest: 'sha256:plan', comparison_intent: 'MODEL_COMPARISON' as const,
+    evidence_source: 'PERSISTED_IMMUTABLE_EXPERIMENT_EVIDENCE' as const,
+    conclusion_semantics: { scope: 'EXPLORATORY_DESCRIPTIVE' as const, evaluation_mode: 'QUICK', repeat_count: 1, permitted_interpretation: 'QUICK n=1 results are exploratory/descriptive only.' },
+    overall: { planned_slots: 8, acquired_slots: 7, unacquired_slots: 1, capability_denominator: 5, passed: 3, failed: 2, infra: 2, cancelled: 0, failure_categories: { CAPABILITY_FAILURE: 1, PROVIDER_INFRASTRUCTURE: 1, VERIFIER_INFRASTRUCTURE: 1, BUDGET_EXHAUSTION: 1, INCOMPLETE_PROVIDER_OUTPUT: 1, CONTROL_DRIFT: 1, UNACQUIRED_SLOT: 1 } },
+    models: [
+      { model_label: 'MODEL_A' as const, cell_id: 'a', requested_model: 'fixture-a', provider_route: 'fixture-route', planned_slots: 4, acquired_slots: 4, unacquired_slots: 0, capability_denominator: 3, passed: 2, failed: 1, infra: 1, cancelled: 0, pass_rate: { status: 'AVAILABLE' as const, value: 2 / 3, numerator: 2, denominator: 3 }, evidence_tier: 'SMOKE', failure_categories: {}, observed_models: { status: 'AVAILABLE' as const, counts: { 'fixture-a': 4 }, missing_slots: 0 }, observed_providers: { status: 'AVAILABLE' as const, counts: { fixture: 4 }, missing_slots: 0 }, trace_coverage: { status: 'PARTIAL' as const, counts: { FULL_STREAM: 3 }, missing_slots: 1 }, usage_and_cost: { input_tokens: { status: 'AVAILABLE' as const, known_slots: 4, expected_slots: 4, known_total: 100, total: 100, unit: 'tokens', reason: null }, output_tokens: { status: 'AVAILABLE' as const, known_slots: 4, expected_slots: 4, known_total: 40, total: 40, unit: 'tokens', reason: null }, explicit_cost: { status: 'NOT_AVAILABLE' as const, known_slots: 0, expected_slots: 4, known_total: null, total: null, unit: 'USD', reason: 'incomplete' } } },
+      { model_label: 'MODEL_B' as const, cell_id: 'b', requested_model: 'fixture-b', provider_route: 'fixture-route', planned_slots: 4, acquired_slots: 3, unacquired_slots: 1, capability_denominator: 2, passed: 1, failed: 1, infra: 1, cancelled: 0, pass_rate: { status: 'AVAILABLE' as const, value: .5, numerator: 1, denominator: 2 }, evidence_tier: 'SMOKE', failure_categories: {}, observed_models: { status: 'PARTIAL' as const, counts: { 'fixture-b': 2 }, missing_slots: 1 }, observed_providers: { status: 'AVAILABLE' as const, counts: { fixture: 3 }, missing_slots: 0 }, trace_coverage: { status: 'PARTIAL' as const, counts: { FINAL_OUTPUT_ONLY: 2 }, missing_slots: 1 }, usage_and_cost: { input_tokens: { status: 'PARTIAL' as const, known_slots: 2, expected_slots: 3, known_total: 50, total: null, unit: 'tokens', reason: null }, output_tokens: { status: 'PARTIAL' as const, known_slots: 2, expected_slots: 3, known_total: 20, total: null, unit: 'tokens', reason: null }, explicit_cost: { status: 'NOT_AVAILABLE' as const, known_slots: 0, expected_slots: 3, known_total: null, total: null, unit: 'USD', reason: 'incomplete' } } },
+    ],
+    pairs: { planned_pairs: 4, matched_capability_pairs: 2, both_pass: 1, model_a_only_pass: 1, model_b_only_pass: 0, both_fail: 0, infra_pairs: 1, missing_pairs: 1, infra_or_missing_pairs: 2, raw_percentage_point_difference: -50, raw_difference_direction: 'MODEL_A_HIGHER' as const },
+    comparability: { category: 'PARTIALLY_COMPARABLE' as const, assessed_pairs: 3, category_counts: { COMPARABLE: 2, PARTIALLY_COMPARABLE: 1 }, reason_counts: { TRACE_COVERAGE_LIMITED: 1 }, unassessed_planned_pairs: 1 },
+    control_drift: { status: 'DETECTED' as const, affected_pairs: 0, affected_runs: 1, assessed_pairs: 3, reason_counts: {} },
+    trace_coverage: { status: 'PARTIAL' as const, counts: { FULL_STREAM: 3, FINAL_OUTPUT_ONLY: 2 }, missing_slots: 2 },
+    observed_models: { status: 'PARTIAL' as const, counts: { 'fixture-a': 4, 'fixture-b': 2 }, missing_slots: 1 },
+    observed_providers: { status: 'AVAILABLE' as const, counts: { fixture: 7 }, missing_slots: 0 },
+    recovery_attempts: { status: 'NOT_AVAILABLE' as const, explicitly_marked_primary_acquisitions: 0, explicitly_marked_recovery_acquisitions: 0, unmarked_acquisitions: 7, lease_claim_attempts: 7, note: 'Lease claims are not recovery evidence.' },
+    breakdowns: [{ dimension: 'language' as const, value: 'python', planned_pairs: 2, matched_capability_pairs: 1, both_pass: 1, model_a_only_pass: 0, model_b_only_pass: 0, both_fail: 0, infra_pairs: 1, missing_pairs: 0, model_a_pass_rate: { status: 'AVAILABLE' as const, value: 1, numerator: 1, denominator: 1 }, model_b_pass_rate: { status: 'AVAILABLE' as const, value: 1, numerator: 1, denominator: 1 } }],
+  },
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
   setActivePinia(createPinia())
   api.listExperiments.mockResolvedValue({ items: [experiment], total: 1, limit: 25, offset: 0 })
   api.getExperiment.mockResolvedValue({
     ...experiment, repeat_count: 3, execution_seed: 1, evidence_tiers: ['INFORMAL'],
+    comparison_intent: 'HARNESS_UPLIFT', evaluation_mode: 'NOT_AVAILABLE',
     comparability_summary: { NOT_COMPARABLE: 3 }, report_digest: 'sha256:report',
     cells: [], tasks: [],
   })
   api.getMatrix.mockResolvedValue(matrix)
   api.getRuns.mockResolvedValue({ items: [run], total: 1, limit: 100, offset: 0 })
+  api.getModelComparisonAnalysis.mockResolvedValue(modelComparison)
   api.getStatus.mockResolvedValue({ experiment_id: 'matrix-keyless', status: 'completed', terminal: true, run_status_counts: { completed: 6 }, refreshed_at: '2026-08-23T00:01:00Z' })
   api.getRun.mockResolvedValue(run)
   api.getTrace.mockResolvedValue(trace)
@@ -142,6 +170,27 @@ describe('Workbench contracts', () => {
     expect(wrapper.text()).toContain('PARTIALLY_COMPARABLE')
     expect(wrapper.text()).toContain('micro-typescript-clamp')
     expect(wrapper.text()).toContain('INFORMAL')
+  })
+
+  it('renders descriptive model-comparison closeout without unsupported claims', async () => {
+    api.getExperiment.mockResolvedValueOnce({
+      ...experiment, repeat_count: 1, execution_seed: 1, evaluation_mode: 'QUICK',
+      comparison_intent: 'MODEL_COMPARISON', evidence_tiers: ['SMOKE'],
+      comparability_summary: {}, report_digest: 'sha256:report', cells: [], tasks: [],
+    })
+    await router.push('/experiments/matrix-keyless')
+    const wrapper = mount(ExperimentDetailView, { global: { plugins: [createPinia(), router] } })
+    await flushPromises()
+    await wrapper.findAll('.tab-button')[3].trigger('click')
+    const text = wrapper.text()
+    expect(text).toContain('exploratory/descriptive only')
+    expect(text).toContain('Matched capability pairs')
+    expect(text).toContain('BUDGET_EXHAUSTION')
+    expect(text).toContain('NOT_AVAILABLE')
+    expect(text).toContain('Lease claims')
+    expect(text.toLowerCase()).not.toContain('statistically significant')
+    expect(text.toLowerCase()).not.toContain('universally better')
+    expect(text.toLowerCase()).not.toContain('causal uplift')
   })
 
   it('HTML-encodes persisted Matrix labels before ECharts tooltip rendering', () => {

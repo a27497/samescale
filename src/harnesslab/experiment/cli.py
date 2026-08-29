@@ -26,13 +26,21 @@ from harnesslab.experiment.methodology import (
     load_evaluation_methodology,
     project_default_portfolio,
 )
+from harnesslab.experiment.model_comparison import (
+    ModelComparisonAnalysisError,
+    analyze_model_comparison,
+)
 from harnesslab.experiment.plan import (
     AnyExperimentPlan,
     build_experiment_plan,
     load_experiment_plan_payload,
 )
 from harnesslab.experiment.queue import ExperimentConflict, enqueue_plan, inspect_run
-from harnesslab.experiment.report import ExperimentReportError, build_experiment_report
+from harnesslab.experiment.report import (
+    ExperimentReportError,
+    build_experiment_report,
+    load_verified_experiment_evidence,
+)
 from harnesslab.experiment.spec import ExperimentSpecError, load_experiment_spec
 from harnesslab.harness_lane.fake import FakeCodexBackend
 from harnesslab.harness_lane.profile import canonical_codex_profile
@@ -323,3 +331,30 @@ def compare_experiment(
         raise typer.Exit(code=1) from exc
     content = report.canonical_json() if json_output else report.markdown()
     _write_or_echo(content, Path(output) if output else None)
+
+
+async def _model_comparison_closeout(experiment_id: str) -> Any:
+    settings = Settings()
+    engine = create_engine(settings)
+    factory = create_session_factory(engine)
+    try:
+        async with factory() as session:
+            evidence = await load_verified_experiment_evidence(session, experiment_id)
+            return analyze_model_comparison(evidence, repository_root=_repository_root())
+    finally:
+        await engine.dispose()
+
+
+@report_app.command("model-comparison")
+def model_comparison_closeout(
+    experiment_id: str = typer.Argument(help="Persisted MODEL_COMPARISON experiment id."),
+    output: str | None = typer.Option(None, "--output", help="Write canonical closeout JSON."),
+) -> None:
+    """Generate a deterministic machine-readable closeout without executing any run."""
+
+    try:
+        closeout = asyncio.run(_model_comparison_closeout(experiment_id))
+    except (ExperimentReportError, ModelComparisonAnalysisError) as exc:
+        typer.echo(f"FAIL report model-comparison: {exc}")
+        raise typer.Exit(code=1) from exc
+    _write_or_echo(closeout.canonical_json(), Path(output) if output else None)
