@@ -26,6 +26,7 @@ from harnesslab.experiment.methodology import (
     BudgetContract,
     BudgetDimension,
     BudgetDimensionStatus,
+    BudgetScope,
     ComparisonType,
     EvaluationMode,
     RecoveryEligibility,
@@ -139,21 +140,42 @@ async def registry_client(
 
 
 def budget() -> BudgetContract:
-    unavailable = BudgetDimension(
-        status=BudgetDimensionStatus.NOT_AVAILABLE, value=None, unit="count"
-    )
     return BudgetContract(
         max_wall_time=BudgetDimension(
-            status=BudgetDimensionStatus.ENFORCED, value=90, unit="seconds"
+            status=BudgetDimensionStatus.ENFORCED,
+            value=90,
+            unit="seconds",
+            scopes=(BudgetScope.PER_LOGICAL_RUN,),
         ),
         max_output_tokens=BudgetDimension(
-            status=BudgetDimensionStatus.ENFORCED, value=2000, unit="tokens"
+            status=BudgetDimensionStatus.ENFORCED,
+            value=2000,
+            unit="tokens",
+            scopes=(BudgetScope.PER_PROVIDER_REQUEST, BudgetScope.PER_LOGICAL_RUN),
         ),
-        max_model_turns=unavailable,
-        max_tool_calls=unavailable,
-        max_provider_requests=unavailable,
+        max_model_turns=BudgetDimension(
+            status=BudgetDimensionStatus.ENFORCED,
+            value=1,
+            unit="turns",
+            scopes=(BudgetScope.PER_LOGICAL_RUN,),
+        ),
+        max_tool_calls=BudgetDimension(
+            status=BudgetDimensionStatus.ENFORCED,
+            value=0,
+            unit="calls",
+            scopes=(BudgetScope.PER_LOGICAL_RUN,),
+        ),
+        max_provider_requests=BudgetDimension(
+            status=BudgetDimensionStatus.ENFORCED,
+            value=1,
+            unit="requests",
+            scopes=(BudgetScope.PER_LOGICAL_RUN,),
+        ),
         max_cost=BudgetDimension(
-            status=BudgetDimensionStatus.NOT_AVAILABLE, value=None, unit="USD"
+            status=BudgetDimensionStatus.NOT_AVAILABLE,
+            value=None,
+            unit="USD",
+            scopes=(BudgetScope.NOT_AVAILABLE,),
         ),
     )
 

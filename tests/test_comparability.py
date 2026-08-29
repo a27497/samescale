@@ -50,6 +50,7 @@ def facts(**changes: str | None) -> ComparisonFacts:
         "observed_model": "same-model",
         "provider_route": "same-provider-route",
         "budget_identity": "sha256:" + "5" * 64,
+        "resource_envelope_identity": "sha256:" + "b" * 64,
         "network_policy": "deny",
         "harness": "left-harness",
         "harness_version": "1.0.0",
@@ -139,6 +140,29 @@ def test_early_capability_without_verifier_execution_remains_pair_eligible() -> 
         field for field in report.fields if field.field == "verifier_execution_status"
     )
     assert execution_field.state is FieldState.DIFFER
+
+
+def test_harness_uplift_requires_matching_scoped_resource_envelope_identity() -> None:
+    missing = ComparabilityEngine().assess(
+        facts(resource_envelope_identity=None),
+        facts(evidence_identity="sha256:" + "8" * 64, resource_envelope_identity=None),
+        intent=ComparabilityIntent.HARNESS_UPLIFT,
+    )
+    mismatched = ComparabilityEngine().assess(
+        facts(),
+        facts(
+            evidence_identity="sha256:" + "8" * 64,
+            resource_envelope_identity="sha256:" + "c" * 64,
+        ),
+        intent=ComparabilityIntent.HARNESS_UPLIFT,
+    )
+
+    assert missing.status is ComparabilityStatus.NOT_COMPARABLE
+    assert mismatched.status is ComparabilityStatus.NOT_COMPARABLE
+    assert any(reason.code is ReasonCode.RESOURCE_ENVELOPE_MISSING for reason in missing.reasons)
+    assert any(
+        reason.code is ReasonCode.RESOURCE_ENVELOPE_MISMATCH for reason in mismatched.reasons
+    )
 
 
 def test_missing_verifier_control_remains_conservatively_blocking() -> None:
@@ -268,6 +292,24 @@ def test_trace_coverage_mismatch_is_partial_not_automatic_invalidation() -> None
     assert any(reason.code is ReasonCode.TRACE_COVERAGE_LIMITED for reason in report.reasons)
 
 
+def test_native_harness_system_comparison_remains_reportable_without_aggregate_envelope() -> None:
+    report = ComparabilityEngine().assess(
+        facts(resource_envelope_identity=None),
+        facts(
+            evidence_identity="sha256:" + "8" * 64,
+            harness="right-harness",
+            harness_version="2.0.0",
+            harness_profile_identity="sha256:" + "9" * 64,
+            prompt_identity="sha256:" + "a" * 64,
+            resource_envelope_identity=None,
+        ),
+        intent=ComparabilityIntent.NATIVE_HARNESS_SYSTEM_COMPARISON,
+    )
+
+    assert report.status is not ComparabilityStatus.NOT_COMPARABLE
+    assert not any(reason.code is ReasonCode.RESOURCE_ENVELOPE_MISSING for reason in report.reasons)
+
+
 def test_model_comparison_treats_model_identity_difference_as_intended() -> None:
     report = ComparabilityEngine().assess(
         facts(),
@@ -307,6 +349,44 @@ def phase_f_manifest(harness: str) -> dict[str, object]:
             "timeout_seconds": 60,
             "max_output_tokens": 1000,
             "network_policy": "deny",
+        },
+        "resource_budget_contract": {
+            "max_wall_time": {
+                "status": "ENFORCED",
+                "value": 60,
+                "unit": "seconds",
+                "scopes": ["PER_LOGICAL_RUN"],
+            },
+            "max_output_tokens": {
+                "status": "ENFORCED",
+                "value": 1000,
+                "unit": "tokens",
+                "scopes": ["PER_PROVIDER_REQUEST", "PER_LOGICAL_RUN"],
+            },
+            "max_model_turns": {
+                "status": "ENFORCED",
+                "value": 1,
+                "unit": "turns",
+                "scopes": ["PER_LOGICAL_RUN"],
+            },
+            "max_tool_calls": {
+                "status": "ENFORCED",
+                "value": 0,
+                "unit": "calls",
+                "scopes": ["PER_LOGICAL_RUN"],
+            },
+            "max_provider_requests": {
+                "status": "ENFORCED",
+                "value": 1,
+                "unit": "requests",
+                "scopes": ["PER_LOGICAL_RUN"],
+            },
+            "max_cost": {
+                "status": "NOT_AVAILABLE",
+                "value": None,
+                "unit": "USD",
+                "scopes": ["NOT_AVAILABLE"],
+            },
         },
         "workspace_input_digest": "sha256:" + "4" * 64,
         "context_digest": None,

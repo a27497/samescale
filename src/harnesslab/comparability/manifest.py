@@ -5,6 +5,11 @@ from pathlib import Path
 from typing import Any, Literal
 
 from harnesslab.comparability.models import ComparisonFacts, canonical_digest
+from harnesslab.experiment.methodology import (
+    BudgetContract,
+    BudgetFairnessClass,
+    classify_budget_fairness,
+)
 
 
 class ComparabilityInputError(ValueError):
@@ -84,6 +89,22 @@ def _effective_network_policy(profile: dict[str, Any]) -> str | None:
     return declared
 
 
+def _resource_envelope_identity(raw: dict[str, Any]) -> str | None:
+    envelope = raw.get("resource_budget_contract")
+    if not isinstance(envelope, dict):
+        return None
+    try:
+        contract = BudgetContract.model_validate(envelope)
+    except ValueError:
+        return None
+    if (
+        classify_budget_fairness(contract, contract)
+        is not BudgetFairnessClass.RESOURCE_NORMALIZED_COMPARISON
+    ):
+        return None
+    return contract.identity
+
+
 def facts_from_manifest(
     raw: dict[str, Any], *, verifier_control_identity: str | None = None
 ) -> ComparisonFacts:
@@ -157,6 +178,7 @@ def facts_from_manifest(
         observed_model=observed,
         provider_route=route,
         budget_identity=canonical_digest(budget) if isinstance(budget, dict) else None,
+        resource_envelope_identity=_resource_envelope_identity(raw),
         network_policy=network,
         harness=harness,
         harness_version=version,

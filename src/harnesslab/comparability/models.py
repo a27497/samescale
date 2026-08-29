@@ -17,6 +17,7 @@ class ComparabilityStatus(StrEnum):
 
 class ComparabilityIntent(StrEnum):
     HARNESS_UPLIFT = "HARNESS_UPLIFT"
+    NATIVE_HARNESS_SYSTEM_COMPARISON = "NATIVE_HARNESS_SYSTEM_COMPARISON"
     MODEL_COMPARISON = "MODEL_COMPARISON"
     GENERAL = "GENERAL"
 
@@ -46,6 +47,8 @@ class ReasonCode(StrEnum):
     GENERAL_EVIDENCE_GAP = "GENERAL_EVIDENCE_GAP"
     VERIFIER_EXECUTION_MISMATCH = "VERIFIER_EXECUTION_MISMATCH"
     VERIFIER_CONTROL_EXECUTION_MISMATCH = "VERIFIER_CONTROL_EXECUTION_MISMATCH"
+    RESOURCE_ENVELOPE_MISSING = "RESOURCE_ENVELOPE_MISSING"
+    RESOURCE_ENVELOPE_MISMATCH = "RESOURCE_ENVELOPE_MISMATCH"
 
 
 class ComparisonFacts(BaseModel):
@@ -70,6 +73,7 @@ class ComparisonFacts(BaseModel):
     observed_model: str | None = None
     provider_route: str | None = None
     budget_identity: str | None = None
+    resource_envelope_identity: str | None = None
     network_policy: str | None = None
     harness: str | None = None
     harness_version: str | None = None

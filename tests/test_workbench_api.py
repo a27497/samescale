@@ -780,10 +780,10 @@ async def test_regression_compare_accepts_declared_treatments_and_blocks_hard_co
     assert model_response.status_code == 200, model_response.text
     model = model_response.json()
     assert model["intent"] == "MODEL_COMPARISON"
-    assert model["comparisons"][0]["comparability"] in {
-        "COMPARABLE",
-        "PARTIALLY_COMPARABLE",
-    }, json.dumps(model["comparisons"][0], sort_keys=True)
+    assert model["comparisons"][0]["comparability"] == "NOT_COMPARABLE", json.dumps(
+        model["comparisons"][0], sort_keys=True
+    )
+    assert "RESOURCE_ENVELOPE_MISSING" in model["comparisons"][0]["reason_codes"]
     assert "INTENDED_TREATMENT_DIFFERENCE" in model["comparisons"][0]["reason_codes"]
     assert model["comparisons"][0]["paired_observations"] == 3
 
@@ -798,9 +798,24 @@ async def test_regression_compare_accepts_declared_treatments_and_blocks_hard_co
     )
     assert harness_response.status_code == 200, harness_response.text
     harness = harness_response.json()["comparisons"][0]
-    assert harness["comparability"] in {"COMPARABLE", "PARTIALLY_COMPARABLE"}
+    assert harness["comparability"] == "NOT_COMPARABLE"
+    assert "RESOURCE_ENVELOPE_MISSING" in harness["reason_codes"]
     assert "INTENDED_TREATMENT_DIFFERENCE" in harness["reason_codes"]
     assert harness["paired_observations"] == 3
+
+    native_response = await client.post(
+        "/api/workbench/regression/compare",
+        json={
+            "baseline_experiment_id": phase_i_evidence.baseline_id,
+            "candidate_experiment_id": phase_i_evidence.candidate_id,
+            "intent": "NATIVE_HARNESS_SYSTEM_COMPARISON",
+            "cell_mapping": {"codex-low": "codex-high"},
+        },
+    )
+    assert native_response.status_code == 200, native_response.text
+    native = native_response.json()["comparisons"][0]
+    assert native["comparability"] in {"COMPARABLE", "PARTIALLY_COMPARABLE"}
+    assert "RESOURCE_ENVELOPE_MISSING" not in native["reason_codes"]
 
     hard_control_response = await client.post(
         "/api/workbench/regression/compare",

@@ -18,6 +18,8 @@ from harnesslab.experiment.methodology import (
     BudgetContract,
     BudgetDimension,
     BudgetDimensionStatus,
+    BudgetFairnessClass,
+    BudgetScope,
     ComparisonType,
     EvaluationMode,
     FunnelStage,
@@ -27,6 +29,7 @@ from harnesslab.experiment.methodology import (
     ProviderAvailability,
     RecoveryEligibility,
     StageDecision,
+    classify_budget_fairness,
     classify_comparison,
     load_evaluation_methodology,
     next_funnel_stage,
@@ -63,29 +66,42 @@ METHODOLOGY_PATH = ROOT / "release/evaluation-methodology-v2.json"
 
 
 def budget_contract(*, wall_time: int = 60) -> BudgetContract:
-    unavailable = BudgetDimension(
-        status=BudgetDimensionStatus.NOT_AVAILABLE,
-        value=None,
-        unit="count",
-    )
     return BudgetContract(
         max_wall_time=BudgetDimension(
             status=BudgetDimensionStatus.ENFORCED,
             value=wall_time,
             unit="seconds",
+            scopes=(BudgetScope.PER_LOGICAL_RUN,),
         ),
         max_output_tokens=BudgetDimension(
             status=BudgetDimensionStatus.ENFORCED,
             value=2000,
             unit="tokens",
+            scopes=(BudgetScope.PER_PROVIDER_REQUEST, BudgetScope.PER_LOGICAL_RUN),
         ),
-        max_model_turns=unavailable,
-        max_tool_calls=unavailable,
-        max_provider_requests=unavailable,
+        max_model_turns=BudgetDimension(
+            status=BudgetDimensionStatus.ENFORCED,
+            value=1,
+            unit="turns",
+            scopes=(BudgetScope.PER_LOGICAL_RUN,),
+        ),
+        max_tool_calls=BudgetDimension(
+            status=BudgetDimensionStatus.ENFORCED,
+            value=0,
+            unit="calls",
+            scopes=(BudgetScope.PER_LOGICAL_RUN,),
+        ),
+        max_provider_requests=BudgetDimension(
+            status=BudgetDimensionStatus.ENFORCED,
+            value=1,
+            unit="requests",
+            scopes=(BudgetScope.PER_LOGICAL_RUN,),
+        ),
         max_cost=BudgetDimension(
             status=BudgetDimensionStatus.NOT_AVAILABLE,
             value=None,
             unit="USD",
+            scopes=(BudgetScope.NOT_AVAILABLE,),
         ),
     )
 
@@ -288,14 +304,152 @@ def test_controlled_ablation_requires_exactly_one_declared_treatment() -> None:
 def test_budget_contract_and_missing_metrics_are_explicit_and_comparable() -> None:
     budget = budget_contract()
     assert budget.max_wall_time.status is BudgetDimensionStatus.ENFORCED
-    assert budget.max_model_turns.status is BudgetDimensionStatus.NOT_AVAILABLE
+    assert budget.max_model_turns.status is BudgetDimensionStatus.ENFORCED
     assert MetricValue(status=MetricAvailability.NOT_AVAILABLE).value is None
     require_comparable_budgets(budget, budget.model_copy())
 
-    with pytest.raises(MethodologyError, match="not comparable"):
+    with pytest.raises(MethodologyError, match="not resource-normalized comparable"):
         require_comparable_budgets(budget, budget_contract(wall_time=90))
     with pytest.raises(ValidationError, match="cannot contain a value"):
         MetricValue(status=MetricAvailability.NOT_AVAILABLE, value=1)
+
+
+def test_budget_scope_is_required_for_resource_normalized_comparison() -> None:
+    scoped = budget_contract()
+    legacy = BudgetContract.model_validate(
+        {name: dimension.model_dump(mode="json", exclude={"scopes"}) for name, dimension in scoped}
+    )
+
+    assert (
+        classify_budget_fairness(legacy, legacy)
+        is BudgetFairnessClass.NATIVE_HARNESS_SYSTEM_COMPARISON
+    )
+    with pytest.raises(MethodologyError, match="not resource-normalized comparable"):
+        require_comparable_budgets(legacy, legacy)
+
+
+def test_per_request_scope_does_not_imply_per_logical_run_scope() -> None:
+    per_request = budget_contract().model_copy(
+        update={
+            "max_output_tokens": BudgetDimension(
+                status=BudgetDimensionStatus.ENFORCED,
+                value=2000,
+                unit="tokens",
+                scopes=(BudgetScope.PER_PROVIDER_REQUEST,),
+            )
+        }
+    )
+
+    assert per_request.max_output_tokens.scopes is not None
+    assert BudgetScope.PER_LOGICAL_RUN not in per_request.max_output_tokens.scopes
+    assert (
+        classify_budget_fairness(per_request, per_request)
+        is BudgetFairnessClass.NATIVE_HARNESS_SYSTEM_COMPARISON
+    )
+
+
+def test_direct_single_request_contract_can_cover_request_and_run_scopes() -> None:
+    direct = budget_contract()
+
+    assert direct.max_provider_requests.value == 1
+    assert direct.max_model_turns.value == 1
+    assert direct.max_tool_calls.value == 0
+    assert direct.max_output_tokens.scopes == (
+        BudgetScope.PER_PROVIDER_REQUEST,
+        BudgetScope.PER_LOGICAL_RUN,
+    )
+    assert (
+        classify_budget_fairness(direct, direct)
+        is BudgetFairnessClass.RESOURCE_NORMALIZED_COMPARISON
+    )
+
+
+def test_multi_turn_per_turn_cap_and_unknown_request_count_block_aggregate_claim() -> None:
+    unavailable = BudgetDimension(
+        status=BudgetDimensionStatus.NOT_AVAILABLE,
+        value=None,
+        unit="count",
+        scopes=(BudgetScope.NOT_AVAILABLE,),
+    )
+    native = budget_contract().model_copy(
+        update={
+            "max_output_tokens": BudgetDimension(
+                status=BudgetDimensionStatus.ENFORCED,
+                value=2000,
+                unit="tokens",
+                scopes=(BudgetScope.PER_PROVIDER_REQUEST, BudgetScope.PER_MODEL_TURN),
+            ),
+            "max_model_turns": unavailable.model_copy(update={"unit": "turns"}),
+            "max_provider_requests": unavailable.model_copy(update={"unit": "requests"}),
+        }
+    )
+
+    assert native.max_provider_requests.status is BudgetDimensionStatus.NOT_AVAILABLE
+    assert native.max_output_tokens.scopes is not None
+    assert BudgetScope.PER_LOGICAL_RUN not in native.max_output_tokens.scopes
+    assert (
+        classify_budget_fairness(native, native)
+        is BudgetFairnessClass.NATIVE_HARNESS_SYSTEM_COMPARISON
+    )
+    with pytest.raises(MethodologyError, match="not resource-normalized comparable"):
+        require_comparable_budgets(native, native)
+
+
+def test_same_numeric_token_value_does_not_override_scope_difference() -> None:
+    direct = budget_contract()
+    per_turn = direct.model_copy(
+        update={
+            "max_output_tokens": direct.max_output_tokens.model_copy(
+                update={
+                    "scopes": (
+                        BudgetScope.PER_PROVIDER_REQUEST,
+                        BudgetScope.PER_MODEL_TURN,
+                    )
+                }
+            )
+        }
+    )
+
+    assert direct.max_output_tokens.value == per_turn.max_output_tokens.value == 2000
+    assert direct.identity != per_turn.identity
+    assert (
+        classify_budget_fairness(direct, per_turn)
+        is BudgetFairnessClass.NATIVE_HARNESS_SYSTEM_COMPARISON
+    )
+
+
+def test_chat_4000_direct_budgets_are_symmetric_and_resource_normalized() -> None:
+    qwen = budget_contract().model_copy(
+        update={
+            "max_output_tokens": budget_contract().max_output_tokens.model_copy(
+                update={"value": 4000}
+            )
+        }
+    )
+    deepseek = qwen.model_copy()
+
+    assert qwen.max_output_tokens.value == deepseek.max_output_tokens.value == 4000
+    assert qwen.identity == deepseek.identity
+    require_comparable_budgets(qwen, deepseek)
+
+
+def test_legacy_unscoped_budget_identity_and_serialization_remain_stable() -> None:
+    raw = {
+        "max_wall_time": {"status": "ENFORCED", "value": 60, "unit": "seconds"},
+        "max_output_tokens": {"status": "ENFORCED", "value": 2000, "unit": "tokens"},
+        "max_model_turns": {"status": "NOT_AVAILABLE", "value": None, "unit": "turns"},
+        "max_tool_calls": {"status": "NOT_AVAILABLE", "value": None, "unit": "calls"},
+        "max_provider_requests": {
+            "status": "NOT_AVAILABLE",
+            "value": None,
+            "unit": "requests",
+        },
+        "max_cost": {"status": "NOT_AVAILABLE", "value": None, "unit": "USD"},
+    }
+    loaded = BudgetContract.model_validate(raw)
+
+    assert loaded.model_dump(mode="json") == raw
+    assert loaded.identity == canonical_digest(raw)
 
 
 def test_task_health_repeats_five_and_rejects_flaky_terminal_facts(

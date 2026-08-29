@@ -23,6 +23,7 @@ def _facts(label: str, **changes: str | None) -> ComparisonFacts:
         "observed_model": "controlled-model",
         "provider_route": "controlled-test-route",
         "budget_identity": canonical_digest({"budget": 1}),
+        "resource_envelope_identity": canonical_digest({"resource-envelope": 1}),
         "network_policy": "deny",
         "harness": "direct-model",
         "harness_version": "1",

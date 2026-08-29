@@ -52,8 +52,8 @@ function request(): ExperimentBuilderRequest {
       { cell_id: 'right', provider_model_profile_id: form.rightProfile, harness_profile_id: form.rightHarness },
     ],
     budget: {
-      max_wall_time: { status: 'ENFORCED', value: form.wallTime, unit: 'seconds' }, max_output_tokens: { status: 'ENFORCED', value: form.outputTokens, unit: 'tokens' },
-      max_model_turns: { status: 'NOT_AVAILABLE', value: null, unit: 'turns' }, max_tool_calls: { status: 'NOT_AVAILABLE', value: null, unit: 'calls' }, max_provider_requests: { status: 'NOT_AVAILABLE', value: null, unit: 'requests' }, max_cost: { status: 'NOT_AVAILABLE', value: null, unit: 'USD' },
+      max_wall_time: { status: 'ENFORCED', value: form.wallTime, unit: 'seconds', scopes: ['PER_LOGICAL_RUN'] }, max_output_tokens: { status: 'ENFORCED', value: form.outputTokens, unit: 'tokens', scopes: ['PER_PROVIDER_REQUEST'] },
+      max_model_turns: { status: 'NOT_AVAILABLE', value: null, unit: 'turns', scopes: ['NOT_AVAILABLE'] }, max_tool_calls: { status: 'NOT_AVAILABLE', value: null, unit: 'calls', scopes: ['NOT_AVAILABLE'] }, max_provider_requests: { status: 'NOT_AVAILABLE', value: null, unit: 'requests', scopes: ['NOT_AVAILABLE'] }, max_cost: { status: 'NOT_AVAILABLE', value: null, unit: 'USD', scopes: ['NOT_AVAILABLE'] },
     },
     schedule_seed: form.scheduleSeed, max_parallel_runs: form.concurrency, billing_modes: {},
   }

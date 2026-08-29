@@ -27,6 +27,7 @@ FIELDS = (
     "observed_model",
     "provider_route",
     "budget_identity",
+    "resource_envelope_identity",
     "network_policy",
     "harness",
     "harness_version",
@@ -47,12 +48,14 @@ UPLIFT_CONTROLS = CORE_CONTROLS | {
     "requested_model",
     "provider_route",
     "budget_identity",
+    "resource_envelope_identity",
     "network_policy",
 }
 UPLIFT_TREATMENTS = {"harness", "harness_version", "harness_profile_identity", "prompt_identity"}
 MODEL_CONTROLS = CORE_CONTROLS | {
     "provider_route",
     "budget_identity",
+    "resource_envelope_identity",
     "network_policy",
     "harness",
     "harness_version",
@@ -60,6 +63,15 @@ MODEL_CONTROLS = CORE_CONTROLS | {
     "prompt_identity",
 }
 MODEL_TREATMENTS = {"requested_model", "observed_model"}
+NATIVE_SYSTEM_CONTROLS = CORE_CONTROLS | {
+    "requested_model",
+    "provider_route",
+    "network_policy",
+}
+NATIVE_SYSTEM_TREATMENTS = UPLIFT_TREATMENTS | {
+    "budget_identity",
+    "resource_envelope_identity",
+}
 
 
 class ComparabilityEngine:
@@ -74,6 +86,8 @@ class ComparabilityEngine:
     ) -> ComparabilityReport:
         if intent is ComparabilityIntent.HARNESS_UPLIFT:
             controls, treatments = UPLIFT_CONTROLS, UPLIFT_TREATMENTS
+        elif intent is ComparabilityIntent.NATIVE_HARNESS_SYSTEM_COMPARISON:
+            controls, treatments = NATIVE_SYSTEM_CONTROLS, NATIVE_SYSTEM_TREATMENTS
         elif intent is ComparabilityIntent.MODEL_COMPARISON:
             controls, treatments = MODEL_CONTROLS, MODEL_TREATMENTS
         else:
@@ -101,7 +115,19 @@ class ComparabilityEngine:
                 FieldComparison(field=name, left=left_value, right=right_value, state=state)
             )
             if state is FieldState.MISSING:
-                if name == "requested_model" and intent is ComparabilityIntent.MODEL_COMPARISON:
+                if name == "resource_envelope_identity" and name in controls:
+                    reasons.append(
+                        ComparabilityReason(
+                            code=ReasonCode.RESOURCE_ENVELOPE_MISSING,
+                            severity=ReasonSeverity.BLOCKING,
+                            field=name,
+                            detail=(
+                                "An explicitly scoped resource envelope is required for "
+                                "a resource-normalized claim."
+                            ),
+                        )
+                    )
+                elif name == "requested_model" and intent is ComparabilityIntent.MODEL_COMPARISON:
                     reasons.append(
                         ComparabilityReason(
                             code=ReasonCode.REQUESTED_MODEL_MISSING,
@@ -156,7 +182,16 @@ class ComparabilityEngine:
                         )
                     )
             elif state is FieldState.DIFFER:
-                if name == "observed_model":
+                if name == "resource_envelope_identity" and name in controls:
+                    reasons.append(
+                        ComparabilityReason(
+                            code=ReasonCode.RESOURCE_ENVELOPE_MISMATCH,
+                            severity=ReasonSeverity.BLOCKING,
+                            field=name,
+                            detail="Scoped resource envelopes differ.",
+                        )
+                    )
+                elif name == "observed_model":
                     reasons.append(
                         ComparabilityReason(
                             code=ReasonCode.OBSERVED_MODEL_MISMATCH,

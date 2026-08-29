@@ -1,7 +1,11 @@
 export type EvidenceStatus = 'REPORTED' | 'NOT_REPORTED'
 export type Comparability = 'COMPARABLE' | 'PARTIALLY_COMPARABLE' | 'NOT_COMPARABLE'
 export type MatrixComparability = Comparability | 'NOT_REPORTED'
-export type RegressionIntent = 'MODEL_COMPARISON' | 'HARNESS_UPLIFT' | 'GENERAL'
+export type RegressionIntent =
+  | 'MODEL_COMPARISON'
+  | 'HARNESS_UPLIFT'
+  | 'NATIVE_HARNESS_SYSTEM_COMPARISON'
+  | 'GENERAL'
 
 export interface EvidenceValue {
   status: EvidenceStatus

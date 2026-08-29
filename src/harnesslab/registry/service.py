@@ -15,6 +15,7 @@ from harnesslab.experiment.methodology import (
     MethodologyError,
     ProviderAvailability,
     load_evaluation_methodology,
+    require_comparable_budgets,
     require_comparison_type,
 )
 from harnesslab.experiment.plan import MethodologyV2ExperimentPlan, build_methodology_v2_plan
@@ -320,6 +321,12 @@ def _comparison_definitions(
         except MethodologyError as exc:
             raise RegistryError(str(exc)) from exc
     if request.comparison_type is ComparisonType.HARNESS_UPLIFT:
+        try:
+            require_comparable_budgets(request.budget, request.budget)
+        except MethodologyError as exc:
+            raise RegistryError(
+                "Harness uplift requires a resource-normalized budget contract"
+            ) from exc
         direct = next((cell for cell in cells if cell.lane is EvaluationLane.MODEL), None)
         harness = next((cell for cell in cells if cell.lane is EvaluationLane.HARNESS), None)
         if direct is None or harness is None:

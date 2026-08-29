@@ -69,6 +69,21 @@ class BudgetDimensionStatus(StrEnum):
     NOT_AVAILABLE = "NOT_AVAILABLE"
 
 
+class BudgetScope(StrEnum):
+    """The resource boundary to which a budget dimension applies."""
+
+    PER_PROVIDER_REQUEST = "PER_PROVIDER_REQUEST"
+    PER_LOGICAL_RUN = "PER_LOGICAL_RUN"
+    PER_MODEL_TURN = "PER_MODEL_TURN"
+    OBSERVED_ONLY = "OBSERVED_ONLY"
+    NOT_AVAILABLE = "NOT_AVAILABLE"
+
+
+class BudgetFairnessClass(StrEnum):
+    RESOURCE_NORMALIZED_COMPARISON = "RESOURCE_NORMALIZED_COMPARISON"
+    NATIVE_HARNESS_SYSTEM_COMPARISON = "NATIVE_HARNESS_SYSTEM_COMPARISON"
+
+
 class MetricAvailability(StrEnum):
     AVAILABLE = "AVAILABLE"
     NOT_AVAILABLE = "NOT_AVAILABLE"
@@ -313,8 +328,15 @@ class BudgetDimension(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     status: BudgetDimensionStatus
-    value: int | float | None = Field(default=None, gt=0)
+    value: int | float | None = Field(default=None, ge=0)
     unit: str = Field(min_length=1, max_length=40)
+    # Omitted only for backward-compatible reads of methodology-v2 artifacts.
+    # exclude_if preserves their historical canonical JSON and digest.
+    scopes: tuple[BudgetScope, ...] | None = Field(
+        default=None,
+        min_length=1,
+        exclude_if=lambda value: value is None,
+    )
 
     @model_validator(mode="after")
     def availability_matches_value(self) -> BudgetDimension:
@@ -322,6 +344,20 @@ class BudgetDimension(BaseModel):
             raise ValueError("NOT_AVAILABLE budget dimension cannot contain a value")
         if self.status is not BudgetDimensionStatus.NOT_AVAILABLE and self.value is None:
             raise ValueError("available budget dimension requires a value")
+        if self.scopes is None:
+            return self
+        if len(set(self.scopes)) != len(self.scopes):
+            raise ValueError("budget dimension scopes must be unique")
+        if self.status is BudgetDimensionStatus.NOT_AVAILABLE:
+            if self.scopes != (BudgetScope.NOT_AVAILABLE,):
+                raise ValueError("NOT_AVAILABLE budget dimension requires NOT_AVAILABLE scope")
+        elif self.status is BudgetDimensionStatus.OBSERVED_ONLY:
+            if self.scopes != (BudgetScope.OBSERVED_ONLY,):
+                raise ValueError("OBSERVED_ONLY budget dimension requires OBSERVED_ONLY scope")
+        elif any(
+            scope in {BudgetScope.NOT_AVAILABLE, BudgetScope.OBSERVED_ONLY} for scope in self.scopes
+        ):
+            raise ValueError("ENFORCED budget dimension requires an enforcement scope")
         return self
 
 
@@ -334,6 +370,14 @@ class BudgetContract(BaseModel):
     max_tool_calls: BudgetDimension
     max_provider_requests: BudgetDimension
     max_cost: BudgetDimension
+
+    @model_validator(mode="after")
+    def positive_non_count_limits(self) -> BudgetContract:
+        for name in ("max_wall_time", "max_output_tokens", "max_cost"):
+            dimension = getattr(self, name)
+            if dimension.value == 0:
+                raise ValueError(f"{name} must be positive when available")
+        return self
 
     @property
     def identity(self) -> str:
@@ -467,8 +511,56 @@ def require_provider_identity(expected: ExperimentCellSpec, candidate: Experimen
 
 
 def require_comparable_budgets(left: BudgetContract, right: BudgetContract) -> None:
+    if (
+        classify_budget_fairness(left, right)
+        is not BudgetFairnessClass.RESOURCE_NORMALIZED_COMPARISON
+    ):
+        raise MethodologyError(
+            "formal comparison budget contracts are not resource-normalized comparable"
+        )
+
+
+def classify_budget_fairness(left: BudgetContract, right: BudgetContract) -> BudgetFairnessClass:
+    """Classify resource fairness without inferring scope from a numeric value.
+
+    A strong resource-normalized comparison requires identical scoped contracts,
+    a common enforced logical-run wall, and either a common aggregate compute
+    envelope or a common trusted logical-run cost ceiling.
+    """
+
     if left.identity != right.identity:
-        raise MethodologyError("formal comparison budget contracts are not comparable")
+        return BudgetFairnessClass.NATIVE_HARNESS_SYSTEM_COMPARISON
+    dimensions = (
+        left.max_wall_time,
+        left.max_output_tokens,
+        left.max_model_turns,
+        left.max_tool_calls,
+        left.max_provider_requests,
+        left.max_cost,
+    )
+    if any(dimension.scopes is None for dimension in dimensions):
+        return BudgetFairnessClass.NATIVE_HARNESS_SYSTEM_COMPARISON
+
+    def enforced_per_run(dimension: BudgetDimension) -> bool:
+        return (
+            dimension.status is BudgetDimensionStatus.ENFORCED
+            and dimension.scopes is not None
+            and BudgetScope.PER_LOGICAL_RUN in dimension.scopes
+        )
+
+    common_wall = enforced_per_run(left.max_wall_time)
+    aggregate_compute = all(
+        enforced_per_run(dimension)
+        for dimension in (
+            left.max_output_tokens,
+            left.max_model_turns,
+            left.max_provider_requests,
+        )
+    )
+    trusted_cost = enforced_per_run(left.max_cost)
+    if common_wall and (aggregate_compute or trusted_cost):
+        return BudgetFairnessClass.RESOURCE_NORMALIZED_COMPARISON
+    return BudgetFairnessClass.NATIVE_HARNESS_SYSTEM_COMPARISON
 
 
 def recovery_authorization(

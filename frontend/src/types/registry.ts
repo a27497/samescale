@@ -136,6 +136,7 @@ export interface BudgetDimension {
   status: 'ENFORCED' | 'OBSERVED_ONLY' | 'NOT_AVAILABLE'
   value: number | null
   unit: string
+  scopes?: ('PER_PROVIDER_REQUEST' | 'PER_LOGICAL_RUN' | 'PER_MODEL_TURN' | 'OBSERVED_ONLY' | 'NOT_AVAILABLE')[]
 }
 
 export interface BudgetContract {
