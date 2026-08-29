@@ -53,6 +53,13 @@ Cell reports contain success rate, Wilson 95%, per-task macro pass@1/pass@3/pass
 latency/token/tool/step count and p50/p95, deterministic bootstrap intervals, infrastructure rate,
 and failure taxonomy. Missing cost is `NOT_AVAILABLE`, not zero.
 
+The model-comparison closeout uses the same denominator policy for two-cell
+`MODEL_COMPARISON` plans even though those plans do not declare Harness-uplift P-Lane pairs.
+Pairing is recovered only from frozen `paired_slot_identity` values. Infra and unacquired pairs
+remain outside the capability denominator and are disclosed separately; raw percentage-point
+differences use matched capability pairs only. `QUICK`/n=1 output is explicitly
+exploratory/descriptive.
+
 Paired binary statistics count left-pass/right-fail and left-fail/right-pass discordances, then use
 SciPy's exact two-sided binomial test under p=0.5. No discordances gives p=1.0. Paired continuous
 statistics first compute exact task/repeat differences and then resample those differences.

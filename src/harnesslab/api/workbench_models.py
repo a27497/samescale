@@ -91,6 +91,8 @@ class ExperimentTask(WorkbenchModel):
 class ExperimentDetail(ExperimentSummary):
     repeat_count: int
     execution_seed: int
+    comparison_intent: str
+    evaluation_mode: str
     evidence_tiers: tuple[str, ...]
     comparability_summary: dict[str, int]
     report_digest: str | None

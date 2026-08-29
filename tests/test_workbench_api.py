@@ -449,8 +449,9 @@ async def test_workbench_routes_are_read_only_and_have_no_execution_or_analyst_s
         for path, methods in schema["paths"].items()
         if path.startswith("/api/workbench")
     }
-    assert len(paths) == 12
+    assert len(paths) == 13
     assert paths["/api/workbench/regression/compare"] == {"post"}
+    assert paths["/api/workbench/experiments/{experiment_id}/model-comparison-analysis"] == {"get"}
     assert all(
         methods == {"get"}
         for path, methods in paths.items()
@@ -479,12 +480,28 @@ async def test_experiment_list_detail_status_and_pagination_use_persisted_databa
     assert detail.status_code == 200
     assert detail.json()["planned_run_count"] == 9
     assert detail.json()["completed_capability_count"] == 9
+    assert detail.json()["comparison_intent"] == "HARNESS_UPLIFT"
+    assert detail.json()["evaluation_mode"] == "NOT_AVAILABLE"
     status = await client.get(f"/api/workbench/experiments/{phase_i_evidence.baseline_id}/status")
     assert status.json()["terminal"] is True
     assert status.json()["run_status_counts"] == {"completed": 6, "failed_subject": 3}
     assert (
         await client.get("/api/workbench/experiments", params={"limit": 101})
     ).status_code == 422
+
+
+@pytest.mark.integration
+async def test_model_comparison_analysis_route_rejects_other_intents_without_mutation(
+    client: AsyncClient, phase_i_evidence: PhaseIEvidence
+) -> None:
+    response = await client.get(
+        f"/api/workbench/experiments/{phase_i_evidence.baseline_id}/model-comparison-analysis"
+    )
+    assert response.status_code == 422
+    assert response.json()["error"] == {
+        "code": "ANALYSIS_NOT_APPLICABLE",
+        "message": "experiment is not a MODEL_COMPARISON",
+    }
 
 
 @pytest.mark.integration

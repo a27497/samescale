@@ -52,6 +52,11 @@ from harnesslab.evidence.reader import (
     load_verified_manifest,
     trusted_artifact_path,
 )
+from harnesslab.experiment.model_comparison import (
+    ModelComparisonAnalysisError,
+    ModelComparisonCloseout,
+    analyze_model_comparison,
+)
 from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.plan import AnyExperimentPlan, load_experiment_plan_payload
 from harnesslab.experiment.report import (
@@ -282,6 +287,10 @@ async def experiment_detail(
         **summary.model_dump(),
         repeat_count=plan.repeat_count,
         execution_seed=plan.execution_seed,
+        comparison_intent=plan.comparison_intent,
+        evaluation_mode=(
+            plan.evaluation_mode.value if hasattr(plan, "evaluation_mode") else "NOT_AVAILABLE"
+        ),
         evidence_tiers=(tuple(cell.evidence_tier.value for cell in report.cells) if report else ()),
         comparability_summary=dict(sorted(comparability.items())),
         report_digest=report.digest if report else None,
@@ -436,6 +445,31 @@ async def experiment_report(
         cells=tuple(cast(dict[str, object], cell.model_dump(mode="json")) for cell in report.cells),
         pairs=tuple(cast(dict[str, object], pair.model_dump(mode="json")) for pair in report.pairs),
     )
+
+
+async def model_comparison_analysis(
+    session: AsyncSession, experiment_id: str, roots: tuple[Path, ...]
+) -> ModelComparisonCloseout:
+    await _experiment(session, experiment_id)
+    await _confine_experiment_artifacts(session, experiment_id, roots)
+    try:
+        evidence = await load_verified_experiment_evidence(
+            session,
+            experiment_id,
+            artifact_path_guard=lambda path: _trusted_artifact_path(path, roots),
+        )
+        return analyze_model_comparison(
+            evidence,
+            repository_root=Path(__file__).resolve().parents[3],
+        )
+    except ModelComparisonAnalysisError as exc:
+        raise WorkbenchAPIError(422, "ANALYSIS_NOT_APPLICABLE", str(exc)) from exc
+    except ExperimentReportError as exc:
+        raise WorkbenchAPIError(
+            409,
+            "ARTIFACT_INTEGRITY_ERROR",
+            "model comparison evidence is unavailable",
+        ) from exc
 
 
 def _run_summary(run: ExperimentRunRecord) -> RunSummary:
