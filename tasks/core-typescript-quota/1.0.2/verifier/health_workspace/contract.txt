@@ -1,0 +1,1 @@
+attempts produces attempts-1 delays, doubling from base and saturating at cap; safe integers only.

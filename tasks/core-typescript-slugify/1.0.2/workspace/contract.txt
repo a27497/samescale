@@ -1,0 +1,1 @@
+Subscribe once; forward only while active; dispose idempotently unsubscribes exactly once.

@@ -46,8 +46,10 @@ jobs:
         with:
           node-version: "24"
           package-manager-cache: false
-      - name: Run additive Tier-A verifier robustness qualification
-        run: uv run --locked python scripts/verify_tier_a_verifier_robustness.py
+      - name: Run additive Tier-A verifier robustness V2 qualification
+        run: uv run --locked python scripts/verify_tier_a_verifier_robustness_v2.py
+      - name: Verify frozen Model Chat v3 keyless plan
+        run: uv run --locked python scripts/freeze_model_chat_v3.py
       - name: Run authoritative Gate A verification
         run: uv run --locked python scripts/verify_gate_a.py
       - name: Run authoritative Gate B verification

@@ -1,0 +1,1 @@
+Lowercase trimmed names and collapsed values; reject controls, blanks, and normalized duplicates.

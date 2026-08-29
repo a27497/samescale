@@ -1,0 +1,1 @@
+Read is exactly {kind,key}; write is exactly {kind,key,value}; own fields only and non-blank key.

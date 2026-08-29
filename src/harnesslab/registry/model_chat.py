@@ -20,6 +20,11 @@ MODEL_CHAT_V2_EXPERIMENT_ID = "portfolio-alibaba-model-chat-v2"
 MODEL_CHAT_V2_PLAN_DIGEST = (
     "sha256:bd4e47e2e7cbcc406338d0fcb9f6fd029f0c43b89b02ae5bc41b805df4eb8eda"
 )
+MODEL_CHAT_V3_EXPERIMENT_ID = "portfolio-alibaba-model-chat-v3"
+MODEL_CHAT_V3_SCHEDULE_SEED = 20260830
+MODEL_CHAT_V3_PLAN_DIGEST = (
+    "sha256:100ab920df1eee16f9a9cd754cf8b3454de446445518dbb5c86d326aa20b2042"
+)
 
 
 def model_chat_v2_budget() -> BudgetContract:
@@ -89,6 +94,37 @@ def model_chat_v2_builder_request(
         ),
         budget=model_chat_v2_budget(),
         schedule_seed=20260829,
+        max_parallel_runs=1,
+        billing_modes={"alibaba-bailian": BillingMode.PAY_AS_YOU_GO},
+    )
+
+
+def model_chat_v3_builder_request(
+    catalog: RegistryCatalog,
+    methodology: EvaluationMethodologyV2,
+) -> ExperimentBuilderRequest:
+    return ExperimentBuilderRequest(
+        experiment_id=MODEL_CHAT_V3_EXPERIMENT_ID,
+        name="Alibaba Qwen3.8 Max vs DeepSeek V4 Pro Chat v3 n=1",
+        methodology_id=methodology.methodology_id,
+        methodology_digest=methodology.digest,
+        evaluation_mode=EvaluationMode.QUICK,
+        comparison_type=ComparisonType.MODEL_COMPARISON,
+        task_ids=tuple(item.task_id for item in catalog.tasks),
+        cells=(
+            ExperimentCellSelection(
+                cell_id="Q",
+                provider_model_profile_id="alibaba-bailian-qwen3.8-max-chat",
+                harness_profile_id="direct-alibaba-bailian-qwen3.8-max-chat",
+            ),
+            ExperimentCellSelection(
+                cell_id="D",
+                provider_model_profile_id="alibaba-bailian-deepseek-v4-pro-chat",
+                harness_profile_id="direct-alibaba-bailian-deepseek-v4-pro-chat",
+            ),
+        ),
+        budget=model_chat_v2_budget(),
+        schedule_seed=MODEL_CHAT_V3_SCHEDULE_SEED,
         max_parallel_runs=1,
         billing_modes={"alibaba-bailian": BillingMode.PAY_AS_YOU_GO},
     )

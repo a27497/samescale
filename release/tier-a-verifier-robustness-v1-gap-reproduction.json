@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "evidence_id": "tier-a-verifier-robustness-v1-gap-reproduction",
+  "baseline_sha": "ccca552f656cbe42dc77128440c9437d605ed76f",
+  "source_task_id": "core-python-quota",
+  "source_task_version": "1.0.1",
+  "verifier_owned_exception_reproductions": [
+    {"exception": "TypeError", "process_exit": 0, "passed": false, "detail": "SUBJECT_EXCEPTION_TypeError"},
+    {"exception": "AttributeError", "process_exit": 0, "passed": false, "detail": "SUBJECT_EXCEPTION_AttributeError"},
+    {"exception": "KeyError", "process_exit": 0, "passed": false, "detail": "SUBJECT_EXCEPTION_KeyError"},
+    {"exception": "IndexError", "process_exit": 0, "passed": false, "detail": "SUBJECT_EXCEPTION_IndexError"},
+    {"exception": "JSONDecodeError", "process_exit": 0, "passed": false, "detail": "SUBJECT_EXCEPTION_JSONDecodeError"},
+    {"exception": "SyntaxError", "process_exit": 0, "passed": false, "detail": "SUBJECT_EXCEPTION_SyntaxError"},
+    {"exception": "ImportError", "process_exit": 0, "passed": false, "detail": "SUBJECT_EXCEPTION_ImportError"}
+  ],
+  "timeout_reproductions": [
+    {"owner": "subject", "process_exit": 0, "passed": false, "detail": "SUBJECT_WORKER_TIMEOUT"},
+    {"owner": "verifier", "process_exit": 0, "passed": false, "detail": "SUBJECT_WORKER_TIMEOUT"}
+  ],
+  "finding": "V1 inferred provenance from exception type and an outer mixed worker timeout",
+  "real_provider_calls": 0
+}

@@ -1,0 +1,1 @@
+Cursor is canonical non-negative-safe-integer@non-empty-base64url-anchor; malformed input throws.

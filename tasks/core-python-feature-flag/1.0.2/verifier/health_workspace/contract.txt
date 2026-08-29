@@ -1,0 +1,1 @@
+Only decimal start:end windows are valid; whitespace is ignored and 0 <= start <= end <= limit.

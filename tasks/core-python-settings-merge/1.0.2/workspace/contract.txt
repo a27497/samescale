@@ -1,0 +1,1 @@
+send works only while open; close is idempotent; context exit always closes the transport once.
