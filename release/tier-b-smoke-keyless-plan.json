@@ -1,0 +1,691 @@
+{
+  "comparison_type": "MODEL_COMPARISON",
+  "freeze": {
+    "common_resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+    "deepseek_runtime_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+    "endpoint_binding_status": "PENDING_OPERATOR_ENDPOINT_RECONCILIATION",
+    "execution_status": "NOT_RUN",
+    "non_endpoint_controls_frozen": true,
+    "prompt_workspace_analysis": [
+      {
+        "direct_prompt_total_limit_bytes": 1000000,
+        "direct_prompt_tree_limit_bytes": 512000,
+        "prompt_contract_status": "PASS",
+        "rendered_prompt_bytes": 3872,
+        "task_id": "repo-java-widget-update",
+        "task_version": "1.0.0",
+        "workspace_file_count": 7,
+        "workspace_utf8_bytes": 2489
+      },
+      {
+        "direct_prompt_total_limit_bytes": 1000000,
+        "direct_prompt_tree_limit_bytes": 512000,
+        "prompt_contract_status": "PASS",
+        "rendered_prompt_bytes": 6231,
+        "task_id": "repo-python-ledger-transfer",
+        "task_version": "1.0.0",
+        "workspace_file_count": 6,
+        "workspace_utf8_bytes": 4907
+      },
+      {
+        "direct_prompt_total_limit_bytes": 1000000,
+        "direct_prompt_tree_limit_bytes": 512000,
+        "prompt_contract_status": "PASS",
+        "rendered_prompt_bytes": 3343,
+        "task_id": "repo-typescript-resilient-client",
+        "task_version": "1.0.0",
+        "workspace_file_count": 5,
+        "workspace_utf8_bytes": 2069
+      }
+    ],
+    "qualification_digest": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88",
+    "qualification_id": "tier-b-repo-engineering-v1",
+    "qwen_runtime_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+    "real_provider_calls": 0,
+    "resource_envelope_changed_from_tier_a_direct": false,
+    "strategy": "TIER_B_THREE_TASK_TWO_MODEL_KEYLESS_SMOKE"
+  },
+  "methodology_digest": "sha256:cd476e0161a7934afa6cb20160246ecb1a01c5895260e3be72092b01574372b8",
+  "methodology_id": "harnesslab-evaluation-methodology-v2",
+  "plan": {
+    "ablations": [],
+    "benchmark_tier": "TIER_B_REPO_ENGINEERING",
+    "budget_contract": {
+      "max_cost": {
+        "scopes": [
+          "NOT_AVAILABLE"
+        ],
+        "status": "NOT_AVAILABLE",
+        "unit": "USD",
+        "value": null
+      },
+      "max_model_turns": {
+        "scopes": [
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "turns",
+        "value": 1
+      },
+      "max_output_tokens": {
+        "scopes": [
+          "PER_PROVIDER_REQUEST",
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "tokens",
+        "value": 4000
+      },
+      "max_provider_requests": {
+        "scopes": [
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "requests",
+        "value": 1
+      },
+      "max_tool_calls": {
+        "scopes": [
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "calls",
+        "value": 0
+      },
+      "max_wall_time": {
+        "scopes": [
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "seconds",
+        "value": 240
+      }
+    },
+    "budget_contract_identity": "sha256:9058d4be0849c51506a0c46e99fe5cd72c821def10306260677912532baab3fb",
+    "cells": [
+      {
+        "base_provider_profile_identity": "sha256:2ddf16df6055aef07103c5acfa36771267a3dc573ac7ca9a781803285a0beb85",
+        "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "id": "D",
+        "lane": "M",
+        "network_policy": "deny",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "profile_reference": "builtin:registry.direct.alibaba-bailian-deepseek-v4-pro-chat",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "requested_model": "deepseek-v4-pro",
+        "resource_budget_identity": "sha256:654a7463bbeff38a4d171651f88465417123e3807d9cb6bc01c74163e74fcaf7",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1"
+      },
+      {
+        "base_provider_profile_identity": "sha256:d4d09d033b9e9d7d7bcb9859b69a89077584ab641db1487b5f1e40a1375c7132",
+        "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "id": "Q",
+        "lane": "M",
+        "network_policy": "deny",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "profile_reference": "builtin:registry.direct.alibaba-bailian-qwen3.8-max-chat",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "requested_model": "qwen3.8-max",
+        "resource_budget_identity": "sha256:654a7463bbeff38a4d171651f88465417123e3807d9cb6bc01c74163e74fcaf7",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1"
+      }
+    ],
+    "comparison_intent": "MODEL_COMPARISON",
+    "evaluation_mode": "QUICK",
+    "execution_seed": 20260831,
+    "experiment_id": "tier-b-keyless-smoke-v1",
+    "funnel_stage": "BREADTH",
+    "methodology_digest": "sha256:cd476e0161a7934afa6cb20160246ecb1a01c5895260e3be72092b01574372b8",
+    "methodology_id": "harnesslab-evaluation-methodology-v2",
+    "name": "Tier-B Qwen3.8 Max vs DeepSeek V4 Pro keyless smoke n=1",
+    "paired_comparisons": [],
+    "repeat_count": 1,
+    "run_slots": [
+      {
+        "base_provider_profile_identity": "sha256:d4d09d033b9e9d7d7bcb9859b69a89077584ab641db1487b5f1e40a1375c7132",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "tier-b-keyless-smoke-v1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:1e995abd3b71c054ad491320a7672390ae59881adff06d0880ffebf95371389a",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:64da32d41b8aa636e76f2c6be56869dedce375daa3ef980f138c536102abde3e",
+        "slot_order": 0,
+        "task": {
+          "budget_identity": "sha256:1b06f1c3c98281ebd9a45731e6262998d45e9c501aeaba93a92703000148631f",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/repo-java-widget-update/1.0.0",
+          "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+          "task_id": "repo-java-widget-update",
+          "task_version": "1.0.0",
+          "verifier_identity": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73",
+          "workspace_input_digest": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:2ddf16df6055aef07103c5acfa36771267a3dc573ac7ca9a781803285a0beb85",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "tier-b-keyless-smoke-v1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:1e995abd3b71c054ad491320a7672390ae59881adff06d0880ffebf95371389a",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:1c4607fece302066460f1d2584c53a64d65fab23f634c4b97d12c78f553a5d0e",
+        "slot_order": 1,
+        "task": {
+          "budget_identity": "sha256:1b06f1c3c98281ebd9a45731e6262998d45e9c501aeaba93a92703000148631f",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/repo-java-widget-update/1.0.0",
+          "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+          "task_id": "repo-java-widget-update",
+          "task_version": "1.0.0",
+          "verifier_identity": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73",
+          "workspace_input_digest": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:2ddf16df6055aef07103c5acfa36771267a3dc573ac7ca9a781803285a0beb85",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "tier-b-keyless-smoke-v1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:81232acfd717713464caefac5e60b6763346fa42a0253e7b1a86a280701aaae1",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:2d91934bdcce7fbe4226412d0cbf4e394fb2023b0d9008984769095c598e2946",
+        "slot_order": 2,
+        "task": {
+          "budget_identity": "sha256:b8f03fa1c2b0c3193ceef21f9ff29353c5afb38a96b7084ac9218a00c521d253",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/repo-python-ledger-transfer/1.0.0",
+          "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+          "task_id": "repo-python-ledger-transfer",
+          "task_version": "1.0.0",
+          "verifier_identity": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652",
+          "workspace_input_digest": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:d4d09d033b9e9d7d7bcb9859b69a89077584ab641db1487b5f1e40a1375c7132",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "tier-b-keyless-smoke-v1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:81232acfd717713464caefac5e60b6763346fa42a0253e7b1a86a280701aaae1",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:c725eb6bb1d88eb66395c39d39a16afea1d14242dbff0e02d547076807094558",
+        "slot_order": 3,
+        "task": {
+          "budget_identity": "sha256:b8f03fa1c2b0c3193ceef21f9ff29353c5afb38a96b7084ac9218a00c521d253",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/repo-python-ledger-transfer/1.0.0",
+          "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+          "task_id": "repo-python-ledger-transfer",
+          "task_version": "1.0.0",
+          "verifier_identity": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652",
+          "workspace_input_digest": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:2ddf16df6055aef07103c5acfa36771267a3dc573ac7ca9a781803285a0beb85",
+        "cell_id": "D",
+        "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+        "experiment_id": "tier-b-keyless-smoke-v1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:bdad739a64f6a4b0f9234d4e8601305c60f4aab1668429170a9efe19213f2524",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "deepseek-v4-pro",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:1115497e81fe506ff479571de6a4f32bedd64dff9c7510efbbf2f0ce42139e62",
+        "slot_order": 4,
+        "task": {
+          "budget_identity": "sha256:b8f03fa1c2b0c3193ceef21f9ff29353c5afb38a96b7084ac9218a00c521d253",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/repo-typescript-resilient-client/1.0.0",
+          "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+          "task_id": "repo-typescript-resilient-client",
+          "task_version": "1.0.0",
+          "verifier_identity": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02",
+          "workspace_input_digest": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e"
+        }
+      },
+      {
+        "base_provider_profile_identity": "sha256:d4d09d033b9e9d7d7bcb9859b69a89077584ab641db1487b5f1e40a1375c7132",
+        "cell_id": "Q",
+        "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+        "experiment_id": "tier-b-keyless-smoke-v1",
+        "harness": "direct-model",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_version": "evidence-schema-1",
+        "lane": "M",
+        "paired_slot_identity": "sha256:bdad739a64f6a4b0f9234d4e8601305c60f4aab1668429170a9efe19213f2524",
+        "profile_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+        "provider_route": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions",
+        "reasoning_effort": null,
+        "repeat_index": 0,
+        "requested_model": "qwen3.8-max",
+        "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+        "runner_contract": "direct-model-v1",
+        "slot_id": "sha256:d7317d97180576639fc6b56d740aec35eb5574b5982de29eedc7d5cd5d9327ce",
+        "slot_order": 5,
+        "task": {
+          "budget_identity": "sha256:b8f03fa1c2b0c3193ceef21f9ff29353c5afb38a96b7084ac9218a00c521d253",
+          "context_identity": null,
+          "network_policy": "deny",
+          "package_path": "tasks/repo-typescript-resilient-client/1.0.0",
+          "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+          "task_id": "repo-typescript-resilient-client",
+          "task_version": "1.0.0",
+          "verifier_identity": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02",
+          "workspace_input_digest": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e"
+        }
+      }
+    ],
+    "schedule_blocks": [
+      {
+        "block_identity": "sha256:21b99735d5e3fde02c894c0f0c22fe52f20a19f001f4ec8c63467e3eaa09cbba",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:64da32d41b8aa636e76f2c6be56869dedce375daa3ef980f138c536102abde3e",
+          "sha256:1c4607fece302066460f1d2584c53a64d65fab23f634c4b97d12c78f553a5d0e"
+        ],
+        "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+        "task_id": "repo-java-widget-update",
+        "task_version": "1.0.0",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:78adc805ecf71a2e6e238e379becea7b6789333f255b8610b606bebf6140fb63",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:2d91934bdcce7fbe4226412d0cbf4e394fb2023b0d9008984769095c598e2946",
+          "sha256:c725eb6bb1d88eb66395c39d39a16afea1d14242dbff0e02d547076807094558"
+        ],
+        "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+        "task_id": "repo-python-ledger-transfer",
+        "task_version": "1.0.0",
+        "unavailable_provider_routes": []
+      },
+      {
+        "block_identity": "sha256:2f7f742687972b9b284de734d2417d6d413e17f7c8d6f0678e80e8ead6639cc5",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_availability": "AVAILABLE",
+        "repeat_index": 0,
+        "slot_ids": [
+          "sha256:1115497e81fe506ff479571de6a4f32bedd64dff9c7510efbbf2f0ce42139e62",
+          "sha256:d7317d97180576639fc6b56d740aec35eb5574b5982de29eedc7d5cd5d9327ce"
+        ],
+        "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+        "task_id": "repo-typescript-resilient-client",
+        "task_version": "1.0.0",
+        "unavailable_provider_routes": []
+      }
+    ],
+    "schedule_seed": 20260831,
+    "scheduling_policy": "BLOCKED_INTERLEAVED_SCHEDULING",
+    "schema_version": 2,
+    "task_health_attestations": [
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:b936fb143be2a092571d2ff2e36b75e9029386fb33e7e58fa52d13ac7d896161",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:4e6d8347d3449b1421eff528cce3cc91aec3d7c4355e16bd80d40bb3078609b3",
+        "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+        "task_id": "repo-java-widget-update",
+        "task_version": "1.0.0",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:b37fee56acb54746af89f29fe541b034b0f327496dfe87189db2fd18896889f4",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:3ffbe9877de0a0bfd2aab043be5833c1c3386e1116b42b714dc9c1e893a9eafa",
+        "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+        "task_id": "repo-python-ledger-transfer",
+        "task_version": "1.0.0",
+        "valid": true,
+        "verifier_health_repeats": 5
+      },
+      {
+        "baseline_expected": "FAIL",
+        "baseline_terminal_identity": "sha256:5ae28229793609138e307212581ebd81afc16ebca0e76b338bf85059f827d2c7",
+        "deterministic": true,
+        "oracle_expected": "PASS",
+        "oracle_health_repeats": 5,
+        "oracle_terminal_identity": "sha256:32f9a45c83b4e33d7097bbfd2d5c280efa943bb2e1836ec5f71b2f7feb914d84",
+        "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+        "task_id": "repo-typescript-resilient-client",
+        "task_version": "1.0.0",
+        "valid": true,
+        "verifier_health_repeats": 5
+      }
+    ],
+    "tasks": [
+      {
+        "budget_identity": "sha256:1b06f1c3c98281ebd9a45731e6262998d45e9c501aeaba93a92703000148631f",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/repo-java-widget-update/1.0.0",
+        "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+        "task_id": "repo-java-widget-update",
+        "task_version": "1.0.0",
+        "verifier_identity": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73",
+        "workspace_input_digest": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9"
+      },
+      {
+        "budget_identity": "sha256:b8f03fa1c2b0c3193ceef21f9ff29353c5afb38a96b7084ac9218a00c521d253",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/repo-python-ledger-transfer/1.0.0",
+        "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+        "task_id": "repo-python-ledger-transfer",
+        "task_version": "1.0.0",
+        "verifier_identity": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652",
+        "workspace_input_digest": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480"
+      },
+      {
+        "budget_identity": "sha256:b8f03fa1c2b0c3193ceef21f9ff29353c5afb38a96b7084ac9218a00c521d253",
+        "context_identity": null,
+        "network_policy": "deny",
+        "package_path": "tasks/repo-typescript-resilient-client/1.0.0",
+        "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+        "task_id": "repo-typescript-resilient-client",
+        "task_version": "1.0.0",
+        "verifier_identity": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02",
+        "workspace_input_digest": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e"
+      }
+    ],
+    "tier_b_qualification_digest": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88",
+    "tier_b_qualification_id": "tier-b-repo-engineering-v1"
+  },
+  "preflight": {
+    "candidate_experiment_id": "tier-b-keyless-smoke-v1",
+    "candidate_plan_digest": "sha256:7c05ba81e67fba6df388c4511bf0ba7df5a84b07aaf5e27baa2a1b61e886186e",
+    "checks": [
+      {
+        "detail": "Active v2 identity matches",
+        "key": "methodology",
+        "reason_code": "METHODOLOGY_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "3 task identities passed 5x health",
+        "key": "task-health",
+        "reason_code": "TASK_HEALTH_ATTESTED",
+        "status": "PASS"
+      },
+      {
+        "detail": "3 deterministic blocks are frozen",
+        "key": "schedule",
+        "reason_code": "BLOCKED_INTERLEAVED_SCHEDULE_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "QUICK fixes n=1",
+        "key": "repeat-policy",
+        "reason_code": "MODE_REPEAT_POLICY_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "Direct selections re-resolve to their frozen runtime identities",
+        "key": "runtime-contract",
+        "reason_code": "FROZEN_RUNTIME_IDENTITIES_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY=SET",
+        "key": "credential:alibaba-bailian-qwen3.8-max-chat",
+        "reason_code": "CREDENTIAL_REFERENCE_SET",
+        "status": "PASS"
+      },
+      {
+        "detail": "No provider probe was performed; operator status is UNKNOWN",
+        "key": "provider:alibaba-bailian",
+        "reason_code": "PROVIDER_STATUS_UNKNOWN",
+        "status": "WARNING"
+      },
+      {
+        "detail": "Billing mode PAY_AS_YOU_GO permits this planning contract",
+        "key": "billing:alibaba-bailian",
+        "reason_code": "BILLING_AUTOMATION_ALLOWED",
+        "status": "PASS"
+      },
+      {
+        "detail": "Protected runtime endpoint is missing or invalid",
+        "key": "endpoint:alibaba-bailian",
+        "reason_code": "RUNTIME_ENDPOINT_REFERENCE_MISSING",
+        "status": "BLOCKED"
+      },
+      {
+        "detail": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY=SET",
+        "key": "credential:alibaba-bailian-deepseek-v4-pro-chat",
+        "reason_code": "CREDENTIAL_REFERENCE_SET",
+        "status": "PASS"
+      },
+      {
+        "detail": "No provider probe was performed; operator status is UNKNOWN",
+        "key": "provider:alibaba-bailian",
+        "reason_code": "PROVIDER_STATUS_UNKNOWN",
+        "status": "WARNING"
+      },
+      {
+        "detail": "Billing mode PAY_AS_YOU_GO permits this planning contract",
+        "key": "billing:alibaba-bailian",
+        "reason_code": "BILLING_AUTOMATION_ALLOWED",
+        "status": "PASS"
+      },
+      {
+        "detail": "Protected runtime endpoint is missing or invalid",
+        "key": "endpoint:alibaba-bailian",
+        "reason_code": "RUNTIME_ENDPOINT_REFERENCE_MISSING",
+        "status": "BLOCKED"
+      },
+      {
+        "detail": "The strict methodology-v2 budget contract is persisted",
+        "key": "budget",
+        "reason_code": "BUDGET_CONTRACT_VALID",
+        "status": "PASS"
+      },
+      {
+        "detail": "Unavailable dimensions remain explicitly NOT_AVAILABLE",
+        "key": "budget-availability",
+        "reason_code": "BUDGET_METRIC_NOT_AVAILABLE",
+        "status": "WARNING"
+      },
+      {
+        "detail": "No immutable price/input evidence is registered; cost estimate is unavailable",
+        "key": "pricing",
+        "reason_code": "PRICING_NOT_AVAILABLE",
+        "status": "WARNING"
+      }
+    ],
+    "cost_estimate": {
+      "currency": "USD",
+      "evidence_reference": null,
+      "status": "NOT_AVAILABLE",
+      "value": null
+    },
+    "estimated_logical_slots": 6,
+    "estimated_maximum_wall_time_seconds": 1440,
+    "evaluation_mode": "QUICK",
+    "max_parallel_runs": 1,
+    "repeat_count": 1,
+    "schedule_preview": [
+      {
+        "block_identity": "sha256:21b99735d5e3fde02c894c0f0c22fe52f20a19f001f4ec8c63467e3eaa09cbba",
+        "cell_execution_order": [
+          "Q",
+          "D"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "repo-java-widget-update"
+      },
+      {
+        "block_identity": "sha256:78adc805ecf71a2e6e238e379becea7b6789333f255b8610b606bebf6140fb63",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "repo-python-ledger-transfer"
+      },
+      {
+        "block_identity": "sha256:2f7f742687972b9b284de734d2417d6d413e17f7c8d6f0678e80e8ead6639cc5",
+        "cell_execution_order": [
+          "D",
+          "Q"
+        ],
+        "provider_status": "AVAILABLE",
+        "repeat_index": 0,
+        "task_id": "repo-typescript-resilient-client"
+      }
+    ],
+    "status": "BLOCKED"
+  },
+  "provider_selections": [
+    {
+      "base_provider_profile_identity": "sha256:d4d09d033b9e9d7d7bcb9859b69a89077584ab641db1487b5f1e40a1375c7132",
+      "billing_mode": "PAY_AS_YOU_GO",
+      "cell_id": "Q",
+      "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+      "effective_runtime_profile_identity": "sha256:9413aab61520a841952b49c5fce62c98b3ac8fd1ee4bc4e61772984221cbabf3",
+      "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+      "harness_id": "direct-model",
+      "harness_profile_id": "direct-alibaba-bailian-qwen3.8-max-chat",
+      "model_id": "qwen3.8-max",
+      "pricing_snapshot_reference": null,
+      "provider_id": "alibaba-bailian",
+      "provider_profile_id": "alibaba-bailian-qwen3.8-max-chat",
+      "provider_profile_identity": "sha256:ffad5076ae53c873021c238a50f75b98e5e55e44697d951544ecfdb424cbe832",
+      "requested_model": "qwen3.8-max",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "runtime_endpoint_fingerprint": null,
+      "runtime_profile_control_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+      "runtime_profile_source": {
+        "base_url_reference": "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+        "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        "protocol": "chat_completions",
+        "provider": "alibaba-bailian",
+        "reasoning_effort": null,
+        "request_timeout_seconds": 180,
+        "requested_model": "qwen3.8-max",
+        "route": "/chat/completions"
+      },
+      "safe_route_identity": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions"
+    },
+    {
+      "base_provider_profile_identity": "sha256:2ddf16df6055aef07103c5acfa36771267a3dc573ac7ca9a781803285a0beb85",
+      "billing_mode": "PAY_AS_YOU_GO",
+      "cell_id": "D",
+      "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+      "effective_runtime_profile_identity": "sha256:6fe2652aa621e16c3ab5a07824d3b27cd1633a166bf80c4b468a009c36c7692c",
+      "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+      "harness_id": "direct-model",
+      "harness_profile_id": "direct-alibaba-bailian-deepseek-v4-pro-chat",
+      "model_id": "deepseek-v4-pro",
+      "pricing_snapshot_reference": null,
+      "provider_id": "alibaba-bailian",
+      "provider_profile_id": "alibaba-bailian-deepseek-v4-pro-chat",
+      "provider_profile_identity": "sha256:a1f8a6250b1b630f13fda6daa390b7f07bce81821317de6445c1cf8b025891bc",
+      "requested_model": "deepseek-v4-pro",
+      "resource_envelope_identity": "sha256:29b6b838639141c7f5fdba51d61f4f600cf46a728858dcf32b5d78ab81c61956",
+      "runtime_endpoint_fingerprint": null,
+      "runtime_profile_control_identity": "sha256:5eb4848eab56267526f7f98ce125f50161866de46c129093e8fb297c674a12b9",
+      "runtime_profile_source": {
+        "base_url_reference": "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+        "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        "protocol": "chat_completions",
+        "provider": "alibaba-bailian",
+        "reasoning_effort": null,
+        "request_timeout_seconds": 180,
+        "requested_model": "deepseek-v4-pro",
+        "route": "/chat/completions"
+      },
+      "safe_route_identity": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions"
+    }
+  ],
+  "registry_digest": "sha256:cc7bd8c072fdeee4d71c884697164e37850b16e5e1b41b46c3b2d137e51a97e9",
+  "registry_id": "harnesslab-unified-registry-lite-v1",
+  "schema_version": 1,
+  "snapshot_digest": "sha256:0b3e505ba2b773f8ba9cf51dabbec38c4755ac306bf0f1f961ca372284447682",
+  "snapshot_id": "snapshot-tier-b-keyless-smoke-v1"
+}

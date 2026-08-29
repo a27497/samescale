@@ -38,6 +38,7 @@ from harnesslab.registry.models import (
     freeze_provider_model_profile,
 )
 from harnesslab.registry.runtime import direct_harness_control_identity
+from harnesslab.tasks.tier_b import load_tier_b_qualification, validate_tier_b_qualification
 
 ALIBABA_OPENAI_BASE_URL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL"
 ALIBABA_ANTHROPIC_BASE_URL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL"
@@ -600,7 +601,21 @@ def _tasks(repository_root: Path, corpus_path: Path) -> tuple[TaskRegistryItem, 
     path = repository_root / corpus_path
     raw = json.loads(path.read_text(encoding="utf-8"))
     tasks = raw.get("tasks") if isinstance(raw, dict) else None
-    if not isinstance(tasks, list) or len(tasks) != 18:
+    if not isinstance(tasks, list):
+        raise ValueError("task corpus must contain a registered task inventory")
+    if raw.get("benchmark_tier") == "TIER_B_REPO_ENGINEERING":
+        qualification = load_tier_b_qualification(path)
+        validate_tier_b_qualification(repository_root, qualification)
+        return tuple(
+            TaskRegistryItem(
+                task_id=item.task_id,
+                task_version=item.task_version,
+                task_digest=item.task_identity,
+                package_path=item.package_path,
+            )
+            for item in qualification.tasks
+        )
+    if len(tasks) != 18:
         raise ValueError("core corpus must contain exactly 18 registered tasks")
     return tuple(
         TaskRegistryItem(
