@@ -5,6 +5,7 @@ import os
 import subprocess
 import time
 from dataclasses import dataclass
+from enum import StrEnum
 from pathlib import Path
 from typing import cast
 from uuid import uuid4
@@ -33,6 +34,19 @@ class _RunCapture:
     stderr: str
     exit_code: int | None
     timed_out: bool
+
+
+class _StartupProbeState(StrEnum):
+    INIT_OBSERVED = "INIT_OBSERVED"
+    PROCESS_EXITED_BEFORE_INIT = "PROCESS_EXITED_BEFORE_INIT"
+    STARTUP_DEADLINE_EXCEEDED = "STARTUP_DEADLINE_EXCEEDED"
+
+
+@dataclass(frozen=True)
+class _StartupProbeResult:
+    state: _StartupProbeState
+    init_event: dict[str, object] | None
+    exit_code: int | None
 
 
 @dataclass(frozen=True)
@@ -129,7 +143,7 @@ def _run_plan(
         _docker("rm", "--force", name, check=False)
 
 
-def _init_event(stdout: str) -> dict[str, object]:
+def _find_init_event(stdout: str) -> dict[str, object] | None:
     for line in stdout.splitlines():
         try:
             event = json.loads(line)
@@ -141,7 +155,68 @@ def _init_event(stdout: str) -> dict[str, object]:
             and event.get("subtype") == "init"
         ):
             return cast(dict[str, object], event)
+    return None
+
+
+def _init_event(stdout: str) -> dict[str, object]:
+    event = _find_init_event(stdout)
+    if event is not None:
+        return event
     raise AssertionError("pinned Claude did not emit an init event")
+
+
+def _wait_for_init_event(
+    plan: HarnessExecutionPlan,
+    *,
+    name: str,
+    startup_deadline_seconds: float = 15,
+) -> _StartupProbeResult:
+    backend = DockerMultiHarnessBackend(
+        explicitly_enabled=True,
+        credentials={"HARNESSLAB_OPENCODE_GO_API_KEY": FAKE_KEY},
+    )
+    environment = _container_environment(plan)
+    _docker(*backend.create_argv(plan, name), environment=environment)
+    deadline = time.monotonic() + startup_deadline_seconds
+    try:
+        _docker("start", name, environment=environment)
+        while True:
+            logs = _docker("logs", name, check=False)
+            init_event = _find_init_event(logs.stdout.decode("utf-8", errors="strict"))
+            if init_event is not None:
+                return _StartupProbeResult(
+                    _StartupProbeState.INIT_OBSERVED,
+                    init_event,
+                    None,
+                )
+
+            state = json.loads(
+                _docker("inspect", name, "--format", "{{json .State}}").stdout.decode()
+            )
+            if not state["Running"]:
+                final_logs = _docker("logs", name, check=False)
+                init_event = _find_init_event(final_logs.stdout.decode("utf-8", errors="strict"))
+                if init_event is not None:
+                    return _StartupProbeResult(
+                        _StartupProbeState.INIT_OBSERVED,
+                        init_event,
+                        cast(int, state["ExitCode"]),
+                    )
+                return _StartupProbeResult(
+                    _StartupProbeState.PROCESS_EXITED_BEFORE_INIT,
+                    None,
+                    cast(int, state["ExitCode"]),
+                )
+
+            if time.monotonic() >= deadline:
+                return _StartupProbeResult(
+                    _StartupProbeState.STARTUP_DEADLINE_EXCEEDED,
+                    None,
+                    None,
+                )
+            time.sleep(0.05)
+    finally:
+        _docker("rm", "--force", name, check=False)
 
 
 def _start_server(network: str, name: str, code: str) -> None:
@@ -188,14 +263,16 @@ def test_pinned_claude_bare_tool_profile_mismatch_is_reproduced(tmp_path: Path) 
         environment_references=production.environment_references,
         environment_literals=production.environment_literals,
     )
-    capture = _run_plan(
+    probe = _wait_for_init_event(
         bare_plan,
         name=f"hl-r12-bare-{uuid4().hex[:12]}",
-        timeout=2,
     )
-    init = _init_event(capture.stdout)
+    assert probe.state is _StartupProbeState.INIT_OBSERVED, (
+        f"Claude startup probe state={probe.state}; exit_code={probe.exit_code}"
+    )
+    assert probe.init_event is not None
+    init = probe.init_event
 
-    assert capture.timed_out
     assert set(cast(list[str], init["tools"])) == {"Read", "Edit", "Bash"}
     assert set(cast(list[str], init["tools"])) != {"Read", "Edit", "Write", "Bash"}
     assert init["model"] == "qwen3.8-max"
