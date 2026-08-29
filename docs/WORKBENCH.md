@@ -101,6 +101,32 @@ provider route, budget, network, and the intent-specific Harness/model controls 
 remain visually subordinate to blocked comparability. Regression never reruns subjects, claims
 statistical significance, or attributes cause.
 
+## Model-comparison closeout
+
+`GET /api/workbench/experiments/{experiment_id}/model-comparison-analysis` is a read-only view for
+an arbitrary persisted experiment whose frozen intent is `MODEL_COMPARISON` and whose matrix has
+exactly two direct-model cells. It derives model A/B pairings from the immutable
+`paired_slot_identity`; it does not require or add a P-Lane declaration and does not mutate the
+experiment plan.
+
+The response is the same canonical machine-readable closeout produced by
+`harnesslab report model-comparison EXPERIMENT_ID [--output PATH]`. It includes planned/acquired
+slots, the capability denominator, PASS/FAIL/INFRA, per-model rates, all four matched capability
+pair outcomes, raw percentage-point direction, infra/missing pairs, language and task-family
+breakdowns when task metadata reports them, comparability reasons, control drift, trace and
+observed identity coverage, recovery-marker coverage, known usage, and explicit cost status.
+Incomplete cost evidence always has `status=NOT_AVAILABLE` and no total; a known subtotal may be
+reported separately and cannot be read as a complete experiment cost.
+
+Failure presentation uses disjoint labels for capability failure, provider infrastructure,
+verifier infrastructure, budget exhaustion, incomplete provider output, control drift, other
+infrastructure, and unacquired slots. Database `attempt` is disclosed only as a lease-claim count.
+It is never interpreted as a recovery attempt without an explicit immutable recovery marker.
+
+For `QUICK` or any `n=1` plan the response carries
+`conclusion_semantics.scope=EXPLORATORY_DESCRIPTIVE`. The Workbench renders that limitation before
+raw direction and comparability details.
+
 ## Polling and Core readiness
 
 The frontend polls the PostgreSQL-backed status route only for non-terminal experiments, normally

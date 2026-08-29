@@ -58,5 +58,6 @@ jobs:
           tests/test_api_health.py
           tests/test_contracts.py
           tests/test_experiment_executor_safety.py
+          tests/test_model_comparison_analysis.py
           tests/test_model_chat_plan_v3.py
           tests/test_ci_workflow_contracts.py

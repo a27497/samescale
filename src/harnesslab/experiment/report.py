@@ -56,6 +56,7 @@ class VerifiedRunObservation:
     run: ExperimentRunRecord
     observation: RunObservation
     facts: ComparisonFacts | None
+    manifest: dict[str, Any] | None
 
 
 @dataclass(frozen=True)
@@ -296,6 +297,7 @@ async def load_verified_experiment_evidence(
             "steps": None,
         }
         facts: ComparisonFacts | None = None
+        raw: dict[str, Any] | None = None
         has_artifact = run.artifact_manifest_path is not None or run.evidence_digest is not None
         if has_artifact:
             slot = ExperimentRunSlot.model_validate(run.slot_json)
@@ -341,9 +343,10 @@ async def load_verified_experiment_evidence(
                     output_tokens=metrics["output_tokens"],
                     tool_calls=metrics["tool_calls"],
                     steps=metrics["steps"],
-                    explicit_cost=None,
+                    explicit_cost=run.explicit_cost,
                 ),
                 facts=facts,
+                manifest=raw,
             )
         )
     return VerifiedExperimentEvidence(plan=plan, runs=runs, observations=tuple(verified))

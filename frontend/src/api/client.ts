@@ -8,6 +8,7 @@ import type {
   JudgeCalibrationDetail,
   JudgeCalibrationSummary,
   MatrixResponse,
+  ModelComparisonCloseout,
   RegressionResponse,
   RegressionIntent,
   RunDetail,
@@ -41,6 +42,12 @@ export const workbenchApi = {
     (await apiClient.get<ExperimentDetail>(`/experiments/${encodeURIComponent(id)}`)).data,
   getMatrix: async (id: string) =>
     (await apiClient.get<MatrixResponse>(`/experiments/${encodeURIComponent(id)}/matrix`)).data,
+  getModelComparisonAnalysis: async (id: string) =>
+    (
+      await apiClient.get<ModelComparisonCloseout>(
+        `/experiments/${encodeURIComponent(id)}/model-comparison-analysis`,
+      )
+    ).data,
   getRuns: async (id: string, params: Record<string, string | number | undefined> = {}) =>
     (await apiClient.get<RunListResponse>(`/experiments/${encodeURIComponent(id)}/runs`, { params }))
       .data,

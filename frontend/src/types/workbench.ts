@@ -53,11 +53,155 @@ export interface ExperimentTask {
 export interface ExperimentDetail extends ExperimentSummary {
   repeat_count: number
   execution_seed: number
+  comparison_intent: string
+  evaluation_mode: string
   evidence_tiers: string[]
   comparability_summary: Record<string, number>
   report_digest: string | null
   cells: ExperimentCell[]
   tasks: ExperimentTask[]
+}
+
+export type AnalysisAvailability = 'AVAILABLE' | 'PARTIAL' | 'NOT_AVAILABLE'
+
+export interface AnalysisRate {
+  status: 'AVAILABLE' | 'NOT_AVAILABLE'
+  value: number | null
+  numerator: number
+  denominator: number
+}
+
+export interface AnalysisTotal {
+  status: AnalysisAvailability
+  known_slots: number
+  expected_slots: number
+  known_total: number | null
+  total: number | null
+  unit: string
+  reason: string | null
+}
+
+export interface IdentityCoverage {
+  status: AnalysisAvailability
+  counts: Record<string, number>
+  missing_slots: number
+}
+
+export interface TraceCoverageSummary extends IdentityCoverage {}
+
+export interface ModelOutcomeAnalysis {
+  model_label: 'MODEL_A' | 'MODEL_B'
+  cell_id: string
+  requested_model: string
+  provider_route: string
+  planned_slots: number
+  acquired_slots: number
+  unacquired_slots: number
+  capability_denominator: number
+  passed: number
+  failed: number
+  infra: number
+  cancelled: number
+  pass_rate: AnalysisRate
+  evidence_tier: string
+  failure_categories: Record<string, number>
+  observed_models: IdentityCoverage
+  observed_providers: IdentityCoverage
+  trace_coverage: TraceCoverageSummary
+  usage_and_cost: {
+    input_tokens: AnalysisTotal
+    output_tokens: AnalysisTotal
+    explicit_cost: AnalysisTotal
+  }
+}
+
+export interface ModelPairAnalysis {
+  planned_pairs: number
+  matched_capability_pairs: number
+  both_pass: number
+  model_a_only_pass: number
+  model_b_only_pass: number
+  both_fail: number
+  infra_pairs: number
+  missing_pairs: number
+  infra_or_missing_pairs: number
+  raw_percentage_point_difference: number | null
+  raw_difference_direction: 'MODEL_A_HIGHER' | 'MODEL_B_HIGHER' | 'EQUAL' | 'NOT_AVAILABLE'
+}
+
+export interface AnalysisBreakdown {
+  dimension: 'language' | 'task_family'
+  value: string
+  planned_pairs: number
+  matched_capability_pairs: number
+  both_pass: number
+  model_a_only_pass: number
+  model_b_only_pass: number
+  both_fail: number
+  infra_pairs: number
+  missing_pairs: number
+  model_a_pass_rate: AnalysisRate
+  model_b_pass_rate: AnalysisRate
+}
+
+export interface ModelComparisonAnalysis {
+  schema_version: 1
+  report_kind: 'MODEL_COMPARISON_CLOSEOUT'
+  experiment_id: string
+  plan_digest: string
+  comparison_intent: 'MODEL_COMPARISON'
+  evidence_source: 'PERSISTED_IMMUTABLE_EXPERIMENT_EVIDENCE'
+  conclusion_semantics: {
+    scope: 'EXPLORATORY_DESCRIPTIVE' | 'DESCRIPTIVE'
+    evaluation_mode: string
+    repeat_count: number
+    permitted_interpretation: string
+  }
+  overall: {
+    planned_slots: number
+    acquired_slots: number
+    unacquired_slots: number
+    capability_denominator: number
+    passed: number
+    failed: number
+    infra: number
+    cancelled: number
+    failure_categories: Record<string, number>
+  }
+  models: [ModelOutcomeAnalysis, ModelOutcomeAnalysis]
+  pairs: ModelPairAnalysis
+  comparability: {
+    category: Comparability | 'NOT_AVAILABLE'
+    assessed_pairs: number
+    category_counts: Record<string, number>
+    reason_counts: Record<string, number>
+    unassessed_planned_pairs: number
+  }
+  control_drift: {
+    status: 'DETECTED' | 'NOT_DETECTED' | 'NOT_AVAILABLE'
+    affected_pairs: number
+    affected_runs: number
+    assessed_pairs: number
+    reason_counts: Record<string, number>
+  }
+  trace_coverage: TraceCoverageSummary
+  observed_models: IdentityCoverage
+  observed_providers: IdentityCoverage
+  recovery_attempts: {
+    status: 'AVAILABLE' | 'NOT_AVAILABLE'
+    explicitly_marked_primary_acquisitions: number
+    explicitly_marked_recovery_acquisitions: number
+    unmarked_acquisitions: number
+    lease_claim_attempts: number
+    note: string
+  }
+  breakdowns: AnalysisBreakdown[]
+}
+
+export interface ModelComparisonCloseout {
+  schema_version: 1
+  analysis_digest: string
+  analysis: ModelComparisonAnalysis
 }
 
 export type MatrixMetricKey =

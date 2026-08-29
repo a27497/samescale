@@ -7,6 +7,7 @@ import type {
   ExperimentSummary,
   MatrixMetricKey,
   MatrixResponse,
+  ModelComparisonCloseout,
   RunSummary,
 } from '@/types/workbench'
 
@@ -14,6 +15,7 @@ interface ExperimentState {
   items: ExperimentSummary[]
   selected: ExperimentDetail | null
   matrix: MatrixResponse | null
+  modelComparison: ModelComparisonCloseout | null
   runs: RunSummary[]
   durableStatus: ExperimentStatus | null
   loading: boolean
@@ -29,6 +31,7 @@ export const useExperimentStore = defineStore('experiments', {
     items: [],
     selected: null,
     matrix: null,
+    modelComparison: null,
     runs: [],
     durableStatus: null,
     loading: false,
@@ -58,15 +61,20 @@ export const useExperimentStore = defineStore('experiments', {
       this.loading = true
       this.error = null
       try {
-        const [selected, matrix, runs] = await Promise.all([
-          workbenchApi.getExperiment(id),
+        const selected = await workbenchApi.getExperiment(id)
+        const [matrix, runs, modelComparison] = await Promise.all([
           workbenchApi.getMatrix(id),
           workbenchApi.getRuns(id, { limit: 100 }),
+          selected.comparison_intent === 'MODEL_COMPARISON'
+            ? workbenchApi.getModelComparisonAnalysis(id)
+            : Promise.resolve(null),
         ])
         this.selected = selected
         this.matrix = matrix
+        this.modelComparison = modelComparison
         this.runs = runs.items
       } catch {
+        this.modelComparison = null
         this.error = 'Persisted experiment evidence could not be verified.'
       } finally {
         this.loading = false
