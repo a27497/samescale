@@ -16,6 +16,7 @@ from harnesslab.experiment.methodology import (
     EvaluationMode,
     FunnelStage,
     ProviderAvailability,
+    TaskTier,
 )
 from harnesslab.experiment.spec import (
     AblationSpec,
@@ -26,6 +27,10 @@ from harnesslab.experiment.spec import (
 )
 from harnesslab.tasks.health import TaskHealthAttestation, validate_task_health
 from harnesslab.tasks.package import TaskPackage, TaskPackageError
+from harnesslab.tasks.tier_b import (
+    load_tier_b_qualification,
+    validate_tier_b_qualification,
+)
 
 
 class PlannedTask(BaseModel):
@@ -169,6 +174,13 @@ class MethodologyV2ExperimentPlan(BaseModel):
     comparison_intent: str
     budget_contract: BudgetContract
     budget_contract_identity: Sha256Digest
+    benchmark_tier: TaskTier | None = Field(default=None, exclude_if=lambda value: value is None)
+    tier_b_qualification_id: str | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    tier_b_qualification_digest: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     task_health_attestations: tuple[TaskHealthAttestation, ...]
     tasks: tuple[PlannedTask, ...]
     cells: tuple[PlannedCell, ...]
@@ -433,6 +445,7 @@ def build_methodology_v2_plan(
     schedule_seed: int,
     budget_contract: BudgetContract,
     provider_availability: dict[str, ProviderAvailability] | None = None,
+    tier_b_qualification_path: Path | None = None,
 ) -> MethodologyV2ExperimentPlan:
     """Build a health-gated schema-v2 plan without altering schema-v1 semantics."""
 
@@ -451,7 +464,32 @@ def build_methodology_v2_plan(
         policy for policy in methodology.task_tiers if policy.tier.value == "TIER_A_MICRO_CONTRACT"
     )
     planned_task_ids = {task.task_id for task in base.tasks}
-    if not planned_task_ids <= set(tier_a.current_task_ids):
+    planned_packages = tuple(
+        TaskPackage.load(repository_root / task.package_path) for task in base.tasks
+    )
+    repo_engineering = tuple(
+        package.manifest.repo_engineering is not None for package in planned_packages
+    )
+    benchmark_tier: TaskTier | None = None
+    qualification_id: str | None = None
+    qualification_digest: str | None = None
+    if any(repo_engineering):
+        if not all(repo_engineering):
+            raise ExperimentSpecError("one plan cannot aggregate Tier-A and Tier-B task outcomes")
+        if tier_b_qualification_path is None:
+            raise ExperimentSpecError("Tier-B plans require a frozen qualification artifact")
+        try:
+            qualification = load_tier_b_qualification(tier_b_qualification_path)
+            validate_tier_b_qualification(repository_root, qualification)
+        except ValueError as exc:
+            raise ExperimentSpecError(f"invalid Tier-B qualification: {exc}") from exc
+        qualified_ids = {task.task_id for task in qualification.tasks}
+        if not planned_task_ids <= qualified_ids:
+            raise ExperimentSpecError("Tier-B task is absent from the qualification inventory")
+        benchmark_tier = TaskTier.TIER_B_REPO_ENGINEERING
+        qualification_id = qualification.qualification_id
+        qualification_digest = qualification.qualification_digest
+    elif not planned_task_ids <= set(tier_a.current_task_ids):
         raise ExperimentSpecError("task tier assignment is missing from methodology v2")
     repeats = methodology.task_health.verifier_health_repeats
     attestations = tuple(
@@ -481,6 +519,9 @@ def build_methodology_v2_plan(
         comparison_intent=base.comparison_intent,
         budget_contract=budget_contract,
         budget_contract_identity=budget_contract.identity,
+        benchmark_tier=benchmark_tier,
+        tier_b_qualification_id=qualification_id,
+        tier_b_qualification_digest=qualification_digest,
         task_health_attestations=attestations,
         tasks=base.tasks,
         cells=base.cells,

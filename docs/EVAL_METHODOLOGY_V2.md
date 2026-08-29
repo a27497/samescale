@@ -8,10 +8,15 @@ resume behavior.
 
 ## Scope and evidence boundary
 
-The current 18 tasks are `TIER_A_MICRO_CONTRACT`: cheap, deterministic micro-contract tasks. They
+The frozen Core 18 tasks are `TIER_A_MICRO_CONTRACT`: cheap, deterministic micro-contract tasks. They
 are useful for fast controlled evaluation but are not a universal coding-agent benchmark. Future
 task packages can be separately versioned as `TIER_B_REPO_ENGINEERING` or
 `TIER_C_LONG_HORIZON_AGENTIC`; adding a tier does not reinterpret existing task evidence.
+
+The first Tier-B corpus is governed by the separate digest-bound
+`release/tier-b-qualification-v1.json` addendum. The canonical methodology-v2 artifact and its
+Tier-A inventory are unchanged. New Tier-B schema-v2 plans must bind that qualification identity,
+and the planner rejects plans that mix Tier-A and Tier-B outcomes. Tier C remains unimplemented.
 
 Task identity remains content-addressed. A task change that alters semantics requires a new task
 version. Methodology v2 does not rewrite any task, frozen plan, persisted run, or evidence file.

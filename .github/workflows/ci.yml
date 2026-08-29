@@ -61,3 +61,4 @@ jobs:
           tests/test_model_chat_plan_v3.py
           tests/test_model_chat_plan_v3r1.py
           tests/test_ci_workflow_contracts.py
+          tests/test_tier_b_repo_engineering.py

@@ -5,6 +5,7 @@ FROM eclipse-temurin:21-jdk-jammy@sha256:ce5767b7222312d42395f5bab033cd91f09e440
 FROM node:24-bookworm-slim@sha256:3638d9a6fe4030bd716be989438248074489337ba3275657f93595428be4fc03
 
 COPY --from=python-toolchain /usr/local /usr/local
+COPY --from=python-toolchain /usr/lib/x86_64-linux-gnu/libsqlite3.so.0* /usr/lib/x86_64-linux-gnu/
 COPY --from=java-toolchain /opt/java/openjdk /opt/java/openjdk
 
 RUN groupadd --gid 10001 harnesslab \

@@ -1,0 +1,26 @@
+schema_version: 1
+id: repo-typescript-resilient-client
+version: 1.0.0
+domain: software-engineering
+lane_support: [M, H]
+instruction_path: instruction.md
+workspace_path: workspace
+verifier: {kind: python, version: "repo-v1", entrypoint: verifier/verify.py, timeout_seconds: 30}
+oracle: {path: oracle}
+repo_engineering:
+  tier: TIER_B_REPO_ENGINEERING
+  snapshot_kind: frozen_workspace
+  robustness_path: robustness
+  minimum_oracle_files: 3
+  minimum_robustness_variants: 2
+budget: {timeout_seconds: 600, max_output_tokens: 8000, network_policy: deny}
+expected_tools:
+  - {name: node, version: "24"}
+protected_paths: [contract.md, test/public.test.ts]
+metadata:
+  language: typescript
+  category: configuration-dependency-regression
+  scenario_family: environment-driven-resilient-api-client
+  benchmark_role: INDEPENDENT
+  difficulty: repo-intermediate
+  engineering_shape: multi-module-config-and-dependency-interaction

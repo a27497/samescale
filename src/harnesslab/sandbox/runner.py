@@ -46,7 +46,7 @@ from harnesslab.sandbox.subprocess_loop import run_on_subprocess_loop
 from harnesslab.tasks.models import VerifierReport
 from harnesslab.tasks.package import TaskPackage, TaskPackageError, digest_tree
 
-SANDBOX_IMAGE = "harnesslab-phase-c:0.3.0"
+SANDBOX_IMAGE = "harnesslab-phase-c:0.3.1"
 RUN_LABEL = "com.harnesslab.phase=C"
 OUTPUT_LIMIT_BYTES = 65_536
 

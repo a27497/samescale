@@ -26,6 +26,10 @@ platform. The repository currently contains **Phase A — Foundation & Contracts
 - Fail-closed deterministic verification with baseline-fail/oracle-pass polarity validation,
   bounded partial scores, protected-file checks, and immutable evidence manifests
 - Python, Java 21, and TypeScript/Node 24 controlled micro-task fixtures
+- A separately qualified Tier-B repo-engineering corpus with frozen multi-file snapshots for
+  Python/SQLite, Java API/service/persistence, and TypeScript config/dependency work
+- Tier-aware schema-v2 planning that requires the digest-bound Tier-B qualification artifact and
+  cannot pool Tier-A and Tier-B outcomes in one plan
 - `harnesslab task validate` and an authoritative Gate B runner
 - A Docker CLI sandbox with a fresh non-root Linux container per subject/verifier run
 - Inspect-verified capability, privilege, network, rootfs, PID, CPU, memory, and mount controls
@@ -131,6 +135,10 @@ frontend type/test/build checks. The frontend accepts compatible Node releases i
 Gate J adds a keyless production queue/executor/manifest/report fixture, controlled ablation,
 host-validated structured fact binding, safe normalized-trace reads, no-ablation hypothesis proof,
 and source snapshots.
+
+Tier-B corpus qualification is also fully keyless. It repeats baseline/oracle and known-defect
+verification, checks workspace isolation and failure attribution, and never invokes a provider or
+Judge. See [Tier-B repo engineering](docs/TIER_B_REPO_ENGINEERING.md).
 
 ```powershell
 Copy-Item .env.example .env
