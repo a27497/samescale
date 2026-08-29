@@ -39,14 +39,18 @@ def _load_json[T](path: Path, validator: Callable[[Any], T], label: str) -> T:
         raise CoreReleaseError(f"invalid {label}: {type(exc).__name__}") from exc
 
 
-def discover_task_packages(repository_root: Path) -> tuple[Path, ...]:
+def discover_task_packages(
+    repository_root: Path, *, task_version: str = "1.0.0"
+) -> tuple[Path, ...]:
     tasks_root = repository_root / "tasks"
-    return tuple(sorted(path.parent for path in tasks_root.glob("*/*/task.yaml")))
+    return tuple(sorted(path.parent for path in tasks_root.glob(f"*/{task_version}/task.yaml")))
 
 
-def build_corpus_manifest(repository_root: Path) -> CoreCorpusManifest:
+def build_corpus_manifest(
+    repository_root: Path, *, task_version: str = "1.0.0"
+) -> CoreCorpusManifest:
     entries: list[CoreTaskInventoryEntry] = []
-    for task_path in discover_task_packages(repository_root):
+    for task_path in discover_task_packages(repository_root, task_version=task_version):
         try:
             package = TaskPackage.load(task_path)
             validation = validate_task_package(task_path)

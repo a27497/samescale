@@ -32,6 +32,7 @@ def verify_repository_contract() -> None:
         "frontend/package.json",
         "frontend/package-lock.json",
         "release/core-corpus.json",
+        "release/tier-a-verifier-robustness-v1.json",
         "release/core-real-evidence-plan.json",
         "release/core-real-smoke-plan.json",
         "release/release-evidence.json",
@@ -47,6 +48,7 @@ def verify_repository_contract() -> None:
     require_text(".github/workflows/ci.yml", "Java 21")
     require_text(".github/workflows/ci.yml", 'node-version: "24"')
     require_text(".github/workflows/ci.yml", "scripts/verify_gate_k.py")
+    require_text(".github/workflows/ci.yml", "scripts/verify_tier_a_verifier_robustness.py")
     require_text("README.md", "uv sync --locked")
     require_text("README.md", "alembic upgrade head")
     if not (ROOT / ".gitignore").is_file() or ".env" not in (ROOT / ".gitignore").read_text():

@@ -1,0 +1,1 @@
+NEW -> RESERVED -> COMMITTED or CANCELLED; terminal and duplicate transitions throw without mutation.

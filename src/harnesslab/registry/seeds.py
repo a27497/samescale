@@ -44,6 +44,7 @@ ALIBABA_ANTHROPIC_BASE_URL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BAS
 ALIBABA_CREDENTIAL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_API_KEY"
 ALIBABA_MODEL_IDS_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_MODEL_IDS"
 METHODOLOGY_PATH = Path("release/evaluation-methodology-v2.json")
+CURRENT_TIER_A_CORPUS_PATH = Path("release/tier-a-verifier-robustness-v1.json")
 
 _PROVIDER_STATUS_REFERENCES = {
     "gpt56-relay": "HARNESSLAB_GPT56_RELAY_STATUS",
@@ -595,8 +596,8 @@ def _harnesses(environment: Mapping[str, str]) -> tuple[HarnessDefinition, ...]:
     )
 
 
-def _tasks(repository_root: Path) -> tuple[TaskRegistryItem, ...]:
-    path = repository_root / "release/core-corpus.json"
+def _tasks(repository_root: Path, corpus_path: Path) -> tuple[TaskRegistryItem, ...]:
+    path = repository_root / corpus_path
     raw = json.loads(path.read_text(encoding="utf-8"))
     tasks = raw.get("tasks") if isinstance(raw, dict) else None
     if not isinstance(tasks, list) or len(tasks) != 18:
@@ -639,7 +640,10 @@ def _defaults(environment: Mapping[str, str], profile_ids: set[str]) -> Registry
 
 
 def build_registry_catalog(
-    repository_root: Path, environment: Mapping[str, str]
+    repository_root: Path,
+    environment: Mapping[str, str],
+    *,
+    task_corpus_path: Path = CURRENT_TIER_A_CORPUS_PATH,
 ) -> RegistryCatalog:
     providers = _provider_definitions(environment)
     profiles = _profiles(environment)
@@ -648,7 +652,7 @@ def build_registry_catalog(
         models=_model_definitions(environment),
         provider_model_profiles=profiles,
         harnesses=_harnesses(environment),
-        tasks=_tasks(repository_root),
+        tasks=_tasks(repository_root, task_corpus_path),
         defaults=_defaults(environment, {item.profile_id for item in profiles}),
     )
 

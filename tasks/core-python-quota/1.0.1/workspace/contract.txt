@@ -1,0 +1,1 @@
+Hits and puts refresh recency; overflow evicts the LRU key; keys are ordered least to most recent.

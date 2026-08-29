@@ -1,0 +1,1 @@
+Return a fresh, stable descending-priority list without mutating the input or its job objects.

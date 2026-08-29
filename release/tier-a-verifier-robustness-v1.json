@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "corpus_id": "harnesslab-tier-a-verifier-robustness-v1",
+  "tasks": [
+    {
+      "package_path": "tasks/core-java-deduplicate/1.0.1",
+      "task_id": "core-java-deduplicate",
+      "version": "1.0.1",
+      "language": "java",
+      "domain": "software-engineering",
+      "category": "serialization-codec",
+      "scenario_family": "length-prefixed-record-codec",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "intermediate",
+      "task_digest": "sha256:c03f3defc76fd8d2575922a2e827511554fda7501fe961da4b3031e0d65b8f84",
+      "verifier_identity": "sha256:b178a85b9fcb27177fcb19d0f1302ac9f63e391381cb80bad1b3bb983e6ea46f",
+      "workspace_input_identity": "sha256:86c02d6e8c301f55c826ece4c70b00a2539966295d90a6508bac96c191793f12",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "java==21",
+        "javac==21"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.2
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-java-feature-flag/1.0.1",
+      "task_id": "core-java-feature-flag",
+      "version": "1.0.1",
+      "language": "java",
+      "domain": "software-engineering",
+      "category": "exception-propagation",
+      "scenario_family": "service-exception-cause-propagation",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "advanced",
+      "task_digest": "sha256:5cdb5a41c8a053289ecd26dc6bf36d42335726b1b06cdab92196a879fcf1a249",
+      "verifier_identity": "sha256:479b018fa35e4887b5d180f86459ec5d5dc60f60770679962e215bbdd435cce9",
+      "workspace_input_identity": "sha256:5aa14e3cf1083b95c10e7aaa267e93ac9e9a3efde9302552d2c0e2fa5ea2f190",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "java==21",
+        "javac==21"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.25
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-java-quota/1.0.1",
+      "task_id": "core-java-quota",
+      "version": "1.0.1",
+      "language": "java",
+      "domain": "software-engineering",
+      "category": "state-machine",
+      "scenario_family": "reservation-transition-state-machine",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "advanced",
+      "task_digest": "sha256:1be7a1fbe43ac2b235356fb053c409628dfa8f6b3ac84e62adcfc95b6e7ea26a",
+      "verifier_identity": "sha256:f59030f82538ba196bace8b14e90014abe920731964a285d0ae855b977aef5aa",
+      "workspace_input_identity": "sha256:e4100bd5d966558f86e830dc5cf964460dd01b942b396c4580684e3b5e3db0b6",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "java==21",
+        "javac==21"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.5
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-java-settings-merge/1.0.1",
+      "task_id": "core-java-settings-merge",
+      "version": "1.0.1",
+      "language": "java",
+      "domain": "software-engineering",
+      "category": "protocol-normalization",
+      "scenario_family": "http-header-canonicalization",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "advanced",
+      "task_digest": "sha256:e103d0831407aa1b8e7d053beeb511e0e31682323770dd36c36a743faa3b0afc",
+      "verifier_identity": "sha256:51a834873645422ff6daa85670344ee01466fdeecc3c380f734aed30c316ca74",
+      "workspace_input_identity": "sha256:7b888545e7872e402c37157efaf096975df5d61616c511dbd65323695dab594a",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "java==21",
+        "javac==21"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.2
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-java-slugify/1.0.1",
+      "task_id": "core-java-slugify",
+      "version": "1.0.1",
+      "language": "java",
+      "domain": "software-engineering",
+      "category": "collection-partitioning",
+      "scenario_family": "mutable-batch-partitioning",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "foundation",
+      "task_digest": "sha256:f4980f173cf6634acb1a8744329ee63d003cb7371a5bd0d2fbf40e7276462f08",
+      "verifier_identity": "sha256:e7371b547b9c705861f3e33359298571bce73a2683f5dcf4eef89b8bf7c0e894",
+      "workspace_input_identity": "sha256:d8b45b3a35728d6b8ebb40b9e2630f4c9a9b0a680368e5d1e933977b413f450d",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "java==21",
+        "javac==21"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.0
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-python-deduplicate/1.0.1",
+      "task_id": "core-python-deduplicate",
+      "version": "1.0.1",
+      "language": "python",
+      "domain": "software-engineering",
+      "category": "retry-idempotency",
+      "scenario_family": "retry-ledger-idempotency",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "intermediate",
+      "task_digest": "sha256:cd2c382577ddde3cb2843ec07573f020a7d53ac2855c3a74f45e622c87797884",
+      "verifier_identity": "sha256:f50032a4e199ff19ee546f423914ebe338bd6beb6d3c018e2a871c19e131daf0",
+      "workspace_input_identity": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "python==3.12"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.2
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-python-feature-flag/1.0.1",
+      "task_id": "core-python-feature-flag",
+      "version": "1.0.1",
+      "language": "python",
+      "domain": "software-engineering",
+      "category": "parsing-normalization",
+      "scenario_family": "integer-window-expression-parser",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "intermediate",
+      "task_digest": "sha256:153d76300260e04c71f1df79798e4456e37aaa6a30fb52fa028a4f5ab65391a7",
+      "verifier_identity": "sha256:c1e646f5f7b644ed38d8e389548ad810739af2a08a67c61c60e42abb8c5d78b5",
+      "workspace_input_identity": "sha256:d9ed3ea18266ee8f6ff45e06db91fd00757148a883d5ce122e8e52f1f9c7d821",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "python==3.12"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.3333333333333333
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-python-quota/1.0.1",
+      "task_id": "core-python-quota",
+      "version": "1.0.1",
+      "language": "python",
+      "domain": "software-engineering",
+      "category": "cache-collection-behavior",
+      "scenario_family": "lru-cache-recency-eviction",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "advanced",
+      "task_digest": "sha256:3cb346630fd1127c5fb45472b4221bb8537ada85673999751f52648b6877d798",
+      "verifier_identity": "sha256:ba13a72e4a957c2f861c09de7335d47ad5f0cade893fc42daa87af46c4952174",
+      "workspace_input_identity": "sha256:3261aaabd4c8387ef737461c3f0e453a03de8dbaf7f21015aae7c16bbbe7f5c2",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "python==3.12"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.2
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-python-settings-merge/1.0.1",
+      "task_id": "core-python-settings-merge",
+      "version": "1.0.1",
+      "language": "python",
+      "domain": "software-engineering",
+      "category": "resource-lifecycle",
+      "scenario_family": "managed-session-close-lifecycle",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "advanced",
+      "task_digest": "sha256:72349696e41c9c34e468f19f93a1c69c0feef7b18a5fccd098911c37bb5c77f8",
+      "verifier_identity": "sha256:1693133144f8a9823e6ae62f2a4bd15b83c7910db87b9d007facae724030373a",
+      "workspace_input_identity": "sha256:9b0e4c281bc1b21273429a104ed9d24e53227bfa2f3d006fd4af4ed55be1d8d0",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "python==3.12"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.4
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-python-slugify/1.0.1",
+      "task_id": "core-python-slugify",
+      "version": "1.0.1",
+      "language": "python",
+      "domain": "software-engineering",
+      "category": "ordering-stability",
+      "scenario_family": "stable-priority-scheduling",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "intermediate",
+      "task_digest": "sha256:015366a7cac0b05f5b8391825cd7399398898e33a215c1605a27a078e8117dfd",
+      "verifier_identity": "sha256:63714fb49379a13b05ded16b4d49137ef2d63522b497d5fff7b1c11cbf696189",
+      "workspace_input_identity": "sha256:9f78419af52d4a0e7baced19d08d5abdea5f2a55397491b681b9ed56c8ce4e94",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "python==3.12"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.0
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-typescript-deduplicate/1.0.1",
+      "task_id": "core-typescript-deduplicate",
+      "version": "1.0.1",
+      "language": "typescript",
+      "domain": "software-engineering",
+      "category": "pagination-contract",
+      "scenario_family": "canonical-pagination-cursor",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "intermediate",
+      "task_digest": "sha256:66f6ec0f9e1a1c749e91cba5ea4bd6ee5d366b1e74c87e667753cb5c2ecd9db7",
+      "verifier_identity": "sha256:2bcad0a6e1ada6195c6d056ac8fc62b9f431333b9db4add71718e47c76ab5548",
+      "workspace_input_identity": "sha256:935b5579534bb9d3b464008fff6c34b32945dc22a74962aa81d605f8503fa5f5",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "node==24"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.5
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-typescript-feature-flag/1.0.1",
+      "task_id": "core-typescript-feature-flag",
+      "version": "1.0.1",
+      "language": "typescript",
+      "domain": "software-engineering",
+      "category": "discriminated-validation",
+      "scenario_family": "discriminated-request-union-validation",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "advanced",
+      "task_digest": "sha256:8f306a5a8982630dfac4cad87af5784d3aa6f6733f5f2da5cd89725b4465f3c9",
+      "verifier_identity": "sha256:31ff6ea54f7b7f1fda9793477397c8a9c4da04d7da3af0b14958f9755f7ede99",
+      "workspace_input_identity": "sha256:fd982de77d159f10ce4fddc1c97185383aea5b99d5b2f3dc6673a9765bf4f610",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "node==24"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.25
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-typescript-quota/1.0.1",
+      "task_id": "core-typescript-quota",
+      "version": "1.0.1",
+      "language": "typescript",
+      "domain": "software-engineering",
+      "category": "retry-backoff",
+      "scenario_family": "capped-exponential-retry-schedule",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "intermediate",
+      "task_digest": "sha256:7afea36197b4acfbff8a2fe036d22cbfc0c661e150e119bb5906c4a8aa4dc299",
+      "verifier_identity": "sha256:ab9b29cf676119131941e1d10f36bde885841b654425ff085285d3ce72e5ddc6",
+      "workspace_input_identity": "sha256:8ac984147b60c89188614e325fb33f6bba69503797f9b2254459fe250dc25dd7",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "node==24"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.0
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-typescript-settings-merge/1.0.1",
+      "task_id": "core-typescript-settings-merge",
+      "version": "1.0.1",
+      "language": "typescript",
+      "domain": "software-engineering",
+      "category": "recursive-data-safety",
+      "scenario_family": "recursive-json-secret-redaction",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "advanced",
+      "task_digest": "sha256:21312b4e270f537c62efb38e43df8baaadfa7e1b48bc601be5fc7ddc2e0f7ee7",
+      "verifier_identity": "sha256:6efc9e6192862e6f88bf6eb53bc67ebc380411b92cb6e00c5bc8a218af9cf422",
+      "workspace_input_identity": "sha256:4a16e177fc7c1887538d7fba773ff9426fa03121786acfa8cbbbd1a463737e8a",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "node==24"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.2
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/core-typescript-slugify/1.0.1",
+      "task_id": "core-typescript-slugify",
+      "version": "1.0.1",
+      "language": "typescript",
+      "domain": "software-engineering",
+      "category": "event-subscription",
+      "scenario_family": "idempotent-event-subscription-disposal",
+      "benchmark_role": "INDEPENDENT",
+      "difficulty_band": "intermediate",
+      "task_digest": "sha256:4c120890a340cbd5f99fafb15dfbe2dcf165701aa9761d3ce068ef0364e6c17b",
+      "verifier_identity": "sha256:f853e54b809e2521abbe2973c45f3b1b3676435d8d13adbde3262c06ebae9acf",
+      "workspace_input_identity": "sha256:3e23765a05dbd17d7d4447f017f95041d7b35707870931a2ee67add290d1bb55",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "node==24"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.6
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/micro-java-clamp/1.0.1",
+      "task_id": "micro-java-clamp",
+      "version": "1.0.1",
+      "language": "java",
+      "domain": "software-engineering",
+      "category": "targeted-bug-fix",
+      "scenario_family": "clamp-boundary-control",
+      "benchmark_role": "CROSS_LANGUAGE_CONTROL",
+      "difficulty_band": "foundation",
+      "task_digest": "sha256:efedc47c106685f9af6effb684615aef103934d35a042071f4c9293a1f9a0461",
+      "verifier_identity": "sha256:06bbc11a333a6808ea603e572f45edb25f98c75f53b4c9a017ba09e341af6f64",
+      "workspace_input_identity": "sha256:b60bdd77053ebd3c115d4f05e07f53d1593c158fe62ea00d6d8371bbe5d98c05",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "java==21",
+        "javac==21"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.3333333333333333
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/micro-python-clamp/1.0.1",
+      "task_id": "micro-python-clamp",
+      "version": "1.0.1",
+      "language": "python",
+      "domain": "software-engineering",
+      "category": "targeted-bug-fix",
+      "scenario_family": "clamp-boundary-control",
+      "benchmark_role": "CROSS_LANGUAGE_CONTROL",
+      "difficulty_band": "foundation",
+      "task_digest": "sha256:107e02acd8cbcab64c83dade499b5bd1635d05d65849cb44c97ebe4856c393c3",
+      "verifier_identity": "sha256:7dca35fe9345f6ab720e7407db797760e52e4f174dc8f1aaa5c5419c875babfc",
+      "workspace_input_identity": "sha256:3d8015dfb283950af119b9a89da1e070580ed1a85174e2ee8d3110e6bb6dfa65",
+      "lane_support": [
+        "H",
+        "M"
+      ],
+      "expected_toolchain": [
+        "python==3.12"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.3333333333333333
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    },
+    {
+      "package_path": "tasks/micro-typescript-clamp/1.0.1",
+      "task_id": "micro-typescript-clamp",
+      "version": "1.0.1",
+      "language": "typescript",
+      "domain": "software-engineering",
+      "category": "targeted-bug-fix",
+      "scenario_family": "clamp-boundary-control",
+      "benchmark_role": "CROSS_LANGUAGE_CONTROL",
+      "difficulty_band": "foundation",
+      "task_digest": "sha256:65206a2c58ba15522d554f651324981176bb7cf3362f71ef300dce846db9b85c",
+      "verifier_identity": "sha256:03a5368d244528e373af8ae8f5935308334baa4cf6c524c7ef848c2b16a3a5e7",
+      "workspace_input_identity": "sha256:f1eaeb0669e89fa0b2449129f06d622832829d26973b8b9ce787ddcab7b32c1e",
+      "lane_support": [
+        "H",
+        "M",
+        "P"
+      ],
+      "expected_toolchain": [
+        "node==24"
+      ],
+      "baseline": {
+        "passed": false,
+        "score": 0.3333333333333333
+      },
+      "oracle": {
+        "passed": true,
+        "score": 1.0
+      }
+    }
+  ],
+  "qualification": "TIER_A_VERIFIER_ROBUSTNESS_V1"
+}

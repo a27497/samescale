@@ -233,8 +233,15 @@ def validate_frozen_runtime_contract(
     return resolved_profiles
 
 
-def registry_catalog(repository_root: Path, environment: Mapping[str, str]) -> RegistryCatalog:
-    return build_registry_catalog(repository_root, environment)
+def registry_catalog(
+    repository_root: Path,
+    environment: Mapping[str, str],
+    *,
+    task_corpus_path: Path | None = None,
+) -> RegistryCatalog:
+    if task_corpus_path is None:
+        return build_registry_catalog(repository_root, environment)
+    return build_registry_catalog(repository_root, environment, task_corpus_path=task_corpus_path)
 
 
 def registry_settings(catalog: RegistryCatalog, environment: Mapping[str, str]) -> RegistrySettings:
@@ -628,8 +635,10 @@ def preflight_experiment(
     request: ExperimentBuilderRequest,
     repository_root: Path,
     environment: Mapping[str, str],
+    *,
+    task_corpus_path: Path | None = None,
 ) -> ExperimentPreflight:
-    catalog = registry_catalog(repository_root, environment)
+    catalog = registry_catalog(repository_root, environment, task_corpus_path=task_corpus_path)
     checks: list[PreflightCheck] = []
     methodology = load_evaluation_methodology(repository_root / METHODOLOGY_PATH)
     if (
@@ -883,10 +892,17 @@ def build_experiment_snapshot(
     request: ExperimentBuilderRequest,
     repository_root: Path,
     environment: Mapping[str, str],
+    *,
+    task_corpus_path: Path | None = None,
 ) -> ExperimentSnapshot:
-    catalog = registry_catalog(repository_root, environment)
+    catalog = registry_catalog(repository_root, environment, task_corpus_path=task_corpus_path)
     candidate = _build_candidate(request, catalog, repository_root)
-    preflight = preflight_experiment(request, repository_root, environment)
+    preflight = preflight_experiment(
+        request,
+        repository_root,
+        environment,
+        task_corpus_path=task_corpus_path,
+    )
     snapshot_id = "snapshot-" + candidate.plan.experiment_id.removeprefix("registry-")
     snapshot = freeze_experiment_snapshot(
         snapshot_id=snapshot_id,

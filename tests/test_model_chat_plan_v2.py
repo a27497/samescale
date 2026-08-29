@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from functools import cache
+from pathlib import Path
 
 import httpx
 import pytest
@@ -16,7 +17,7 @@ from harnesslab.experiment.plan import load_experiment_plan_payload
 from harnesslab.experiment.spec import ExperimentCellSpec
 from harnesslab.model_lane.models import ProviderRequest
 from harnesslab.model_lane.providers import adapter_for_profile
-from harnesslab.registry.model_chat import model_chat_v2_builder_request
+from harnesslab.registry.model_chat import MODEL_CHAT_V2_PLAN_DIGEST, model_chat_v2_builder_request
 from harnesslab.registry.models import (
     ExperimentBuilderRequest,
     ExperimentSnapshot,
@@ -51,20 +52,38 @@ def environment() -> dict[str, str]:
 @cache
 def frozen_v2() -> tuple[ExperimentSnapshot, ExperimentBuilderRequest]:
     env = environment()
-    catalog = build_registry_catalog(ROOT, env)
+    catalog = build_registry_catalog(ROOT, env, task_corpus_path=Path("release/core-corpus.json"))
     methodology = load_evaluation_methodology(ROOT / "release/evaluation-methodology-v2.json")
     request = model_chat_v2_builder_request(catalog, methodology)
-    return build_experiment_snapshot(request, ROOT, env), request
+    return (
+        build_experiment_snapshot(
+            request,
+            ROOT,
+            env,
+            task_corpus_path=Path("release/core-corpus.json"),
+        ),
+        request,
+    )
 
 
 def test_model_chat_v2_keyless_builder_freeze_load_preflight_and_runtime_round_trip() -> None:
     snapshot, request = frozen_v2()
     loaded_plan = load_experiment_plan_payload(json.loads(snapshot.plan.canonical_json()))
     loaded = ExperimentSnapshot.model_validate_json(snapshot.model_dump_json())
-    preflight = preflight_experiment(request, ROOT, environment())
+    preflight = preflight_experiment(
+        request,
+        ROOT,
+        environment(),
+        task_corpus_path=Path("release/core-corpus.json"),
+    )
     profiles = validate_frozen_runtime_contract(loaded.plan, loaded.provider_selections)
 
     assert loaded_plan.digest == snapshot.plan.digest
+    assert preflight.candidate_plan_digest == snapshot.plan.digest
+    assert {task.task_version for task in snapshot.plan.tasks} == {"1.0.0"}
+    assert MODEL_CHAT_V2_PLAN_DIGEST == (
+        "sha256:bd4e47e2e7cbcc406338d0fcb9f6fd029f0c43b89b02ae5bc41b805df4eb8eda"
+    )
     assert loaded.snapshot_digest == snapshot.snapshot_digest
     assert preflight.status is PreflightStatus.READY_WITH_WARNINGS
     assert snapshot.plan.experiment_id == "portfolio-alibaba-model-chat-v2"

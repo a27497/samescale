@@ -1,0 +1,1 @@
+Records use <decimal Java-char length>#<payload>; malformed or length-mismatched records throw.

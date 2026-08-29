@@ -1,0 +1,1 @@
+Deep-copy JSON data; redact configured keys case-insensitively; preserve holes; reject cycles.

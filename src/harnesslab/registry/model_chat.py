@@ -17,6 +17,9 @@ from harnesslab.registry.models import (
 )
 
 MODEL_CHAT_V2_EXPERIMENT_ID = "portfolio-alibaba-model-chat-v2"
+MODEL_CHAT_V2_PLAN_DIGEST = (
+    "sha256:bd4e47e2e7cbcc406338d0fcb9f6fd029f0c43b89b02ae5bc41b805df4eb8eda"
+)
 
 
 def model_chat_v2_budget() -> BudgetContract:

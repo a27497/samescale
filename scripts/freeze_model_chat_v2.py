@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 from harnesslab.experiment.methodology import load_evaluation_methodology
-from harnesslab.registry.model_chat import model_chat_v2_builder_request
+from harnesslab.registry.model_chat import MODEL_CHAT_V2_PLAN_DIGEST, model_chat_v2_builder_request
 from harnesslab.registry.models import PreflightStatus
 from harnesslab.registry.seeds import build_registry_catalog
 from harnesslab.registry.service import build_experiment_snapshot
@@ -24,10 +24,19 @@ def main() -> None:
     if not V1_PLAN.is_file():
         raise SystemExit("rejected v1 provenance artifact is missing")
     environment = dict(os.environ)
-    catalog = build_registry_catalog(ROOT, environment)
+    catalog = build_registry_catalog(
+        ROOT, environment, task_corpus_path=Path("release/core-corpus.json")
+    )
     methodology = load_evaluation_methodology(ROOT / "release/evaluation-methodology-v2.json")
     request = model_chat_v2_builder_request(catalog, methodology)
-    snapshot = build_experiment_snapshot(request, ROOT, environment)
+    snapshot = build_experiment_snapshot(
+        request,
+        ROOT,
+        environment,
+        task_corpus_path=Path("release/core-corpus.json"),
+    )
+    if snapshot.plan.digest != MODEL_CHAT_V2_PLAN_DIGEST:
+        raise SystemExit("frozen Model Chat v2 plan identity drifted")
     if snapshot.preflight.status is PreflightStatus.BLOCKED:
         reasons = ",".join(
             check.reason_code
