@@ -105,7 +105,15 @@ def test_full_workflow_runs_isolated_parallel_gates_without_nested_regressions()
     assert gate_job["strategy"]["fail-fast"] == "false"
     assert gate_job["services"]["postgres"]
     assert gate_job["env"]["HARNESSLAB_CI_LEAF_MODE"] == "1"
+    prepared = {entry["gate"] for entry in entries if entry.get("prepare_database") == "true"}
+    assert prepared == {"I", "J"}
     assert any("actions/checkout@" in step.get("uses", "") for step in gate_job["steps"])
+    assert any(
+        step.get("name") == "Bootstrap isolated gate database"
+        and step.get("if") == "${{ matrix.prepare_database == true }}"
+        and step.get("run") == "uv run --locked alembic upgrade head"
+        for step in gate_job["steps"]
+    )
     assert any(
         step.get("name") == "Run authoritative Gate ${{ matrix.gate }} verification"
         for step in gate_job["steps"]
