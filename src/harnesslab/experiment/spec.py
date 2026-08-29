@@ -39,6 +39,15 @@ class ExperimentCellSpec(BaseModel):
         pattern=r"^[A-Z][A-Z0-9_]*$",
         description="Environment-variable name only; never secret material.",
     )
+    base_provider_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    effective_runtime_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    resource_envelope_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
     @field_validator("profile_reference")
     @classmethod

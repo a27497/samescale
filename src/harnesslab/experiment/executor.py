@@ -45,9 +45,9 @@ from harnesslab.harness_lane.runner import CodexHarnessRunner
 from harnesslab.model_lane.models import (
     DirectModelEvidence,
     DirectModelRunResult,
-    GenerationSettings,
     ProviderAdapter,
 )
+from harnesslab.model_lane.profiles import model_profile_control_identity
 from harnesslab.model_lane.runner import DirectModelRunner
 from harnesslab.multi_harness.adapter import MultiHarnessAdapter, MultiHarnessBackend
 from harnesslab.multi_harness.models import (
@@ -67,20 +67,7 @@ def resolved_comparison_profile_identity(profile: LaneProfile) -> str:
     """Match Phase F manifest extraction without requiring a completed run."""
 
     if isinstance(profile, ModelProfile):
-        generation = GenerationSettings(
-            effort=profile.reasoning.effort,
-            temperature=profile.reasoning.temperature,
-            max_output_tokens=profile.reasoning.max_output_tokens,
-            request_timeout_seconds=profile.request_timeout_seconds,
-        )
-        return canonical_digest(
-            {
-                "provider": profile.provider,
-                "endpoint_identity": profile.provider_route_identity,
-                "protocol": profile.protocol.value,
-                "generation_settings": generation.model_dump(mode="json"),
-            }
-        )
+        return model_profile_control_identity(profile)
     controls = profile.model_dump(mode="json")
     controls.pop("requested_model", None)
     return canonical_digest(controls)

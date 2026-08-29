@@ -8,11 +8,40 @@ from pydantic import ValidationError
 from yaml.constructor import ConstructorError
 from yaml.nodes import MappingNode
 
+from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.model import ModelProfile
+from harnesslab.model_lane.models import GenerationSettings
 
 
 class ModelProfileError(ValueError):
     """A model profile is malformed or cannot identify a safe route."""
+
+
+def effective_model_profile_identity(profile: ModelProfile) -> str:
+    """Identify the complete executable profile, including the model treatment."""
+
+    return canonical_digest(profile.model_dump(mode="json"))
+
+
+def model_profile_control_identity(profile: ModelProfile) -> str:
+    """Identify Direct-model controls while excluding the requested-model treatment."""
+
+    generation = GenerationSettings(
+        effort=profile.reasoning.effort,
+        temperature=profile.reasoning.temperature,
+        max_output_tokens=profile.reasoning.max_output_tokens,
+        request_timeout_seconds=profile.request_timeout_seconds,
+    )
+    controls: dict[str, object] = {
+        "provider": profile.provider,
+        "endpoint_identity": profile.provider_route_identity,
+        "protocol": profile.protocol.value,
+        "generation_settings": generation.model_dump(mode="json"),
+    }
+    if profile.thinking_mode is not None:
+        controls["thinking_mode"] = profile.thinking_mode
+        controls["thinking_transport"] = profile.thinking_transport
+    return canonical_digest(controls)
 
 
 class _UniqueKeyLoader(yaml.SafeLoader):

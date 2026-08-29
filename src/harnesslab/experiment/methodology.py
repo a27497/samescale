@@ -464,6 +464,11 @@ def classify_comparison(
         "resource_budget_identity": (
             left.resource_budget_identity != right.resource_budget_identity
         ),
+        "resource_envelope_identity": (
+            left.resource_envelope_identity is not None
+            and right.resource_envelope_identity is not None
+            and left.resource_envelope_identity != right.resource_envelope_identity
+        ),
         "network_policy": left.network_policy != right.network_policy,
         "runner_contract": left.runner_contract != right.runner_contract,
     }

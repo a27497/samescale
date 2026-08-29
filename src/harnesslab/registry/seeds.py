@@ -37,6 +37,7 @@ from harnesslab.registry.models import (
     canonical_digest,
     freeze_provider_model_profile,
 )
+from harnesslab.registry.runtime import direct_harness_control_identity
 
 ALIBABA_OPENAI_BASE_URL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL"
 ALIBABA_ANTHROPIC_BASE_URL_REFERENCE = "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL"
@@ -249,7 +250,11 @@ def _model_definitions(environment: Mapping[str, str]) -> tuple[ModelDefinition,
             capabilities=("coding",),
             context_metadata_status="NOT_AVAILABLE",
             reasoning_controls=ReasoningControls(),
-            supported_protocols=(Protocol.MESSAGES, Protocol.RESPONSES),
+            supported_protocols=(
+                Protocol.CHAT_COMPLETIONS,
+                Protocol.MESSAGES,
+                Protocol.RESPONSES,
+            ),
         ),
         ModelDefinition(
             model_id="glm-5.2",
@@ -389,8 +394,10 @@ def _profiles(environment: Mapping[str, str]) -> tuple[ProviderModelProfile, ...
         ),
     ]
     official_alibaba_profiles = (
+        ("qwen3.8-max", Protocol.CHAT_COMPLETIONS, "chat", "/chat/completions"),
         ("qwen3.8-max", Protocol.RESPONSES, "responses", "/responses"),
         ("qwen3.8-max", Protocol.MESSAGES, "messages", "/v1/messages"),
+        ("deepseek-v4-pro", Protocol.CHAT_COMPLETIONS, "chat", "/chat/completions"),
         ("deepseek-v4-pro", Protocol.RESPONSES, "responses", "/responses"),
         ("glm-5.2", Protocol.CHAT_COMPLETIONS, "chat", "/chat/completions"),
     )
@@ -440,12 +447,7 @@ def _harnesses(environment: Mapping[str, str]) -> tuple[HarnessDefinition, ...]:
             profile_reference=f"builtin:registry.direct.{item.profile_id}",
             supported_provider_profile_ids=(item.profile_id,),
             reasoning_effort=item.reasoning_effort,
-            harness_config_identity=canonical_digest(
-                {
-                    "runner": "direct-model-v1",
-                    "provider_profile_identity": item.profile_identity,
-                }
-            ),
+            harness_config_identity=direct_harness_control_identity(),
         )
         for item in profiles
     )

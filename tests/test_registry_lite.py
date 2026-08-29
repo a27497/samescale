@@ -257,6 +257,8 @@ def test_registry_seeds_four_providers_and_keeps_model_provider_separate() -> No
     } == {
         "alibaba-bailian-qwen3.8-max-responses",
         "alibaba-bailian-qwen3.8-max-messages",
+        "alibaba-bailian-qwen3.8-max-chat",
+        "alibaba-bailian-deepseek-v4-pro-chat",
         "alibaba-bailian-deepseek-v4-pro-responses",
         "alibaba-bailian-glm-5.2-chat",
     }

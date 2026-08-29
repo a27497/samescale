@@ -10,6 +10,11 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from harnesslab.contracts.common import Identifier, Protocol, Sha256Digest
 from harnesslab.experiment.methodology import BudgetContract, ComparisonType, EvaluationMode
 from harnesslab.experiment.plan import MethodologyV2ExperimentPlan
+from harnesslab.registry.runtime import (
+    DirectRuntimeProfileSource,
+    direct_harness_control_identity,
+    resolve_direct_runtime_profile,
+)
 
 
 class RegistryError(ValueError):
@@ -168,6 +173,21 @@ class ProviderModelProfile(RegistryModel):
     @property
     def expected_profile_identity(self) -> str:
         raw = self.model_dump(mode="json", exclude={"profile_identity", "enabled"})
+        return canonical_digest(raw)
+
+    @property
+    def base_provider_profile_identity(self) -> str:
+        """Identify registry facts without binding experiment execution limits."""
+
+        raw = self.model_dump(
+            mode="json",
+            exclude={
+                "profile_identity",
+                "enabled",
+                "max_output_tokens",
+                "request_timeout_seconds",
+            },
+        )
         return canonical_digest(raw)
 
     @model_validator(mode="after")
@@ -352,6 +372,7 @@ class ExperimentCellSelection(RegistryModel):
 
 
 class ExperimentBuilderRequest(RegistryModel):
+    experiment_id: Identifier | None = Field(default=None, exclude_if=lambda value: value is None)
     name: str = Field(min_length=1, max_length=200)
     methodology_id: str = Field(min_length=1, max_length=100)
     methodology_digest: Sha256Digest
@@ -439,6 +460,21 @@ class FrozenProviderSelection(RegistryModel):
     runtime_endpoint_fingerprint: Sha256Digest | None = None
     billing_mode: BillingMode
     pricing_snapshot_reference: str | None = None
+    base_provider_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    runtime_profile_source: DirectRuntimeProfileSource | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    runtime_profile_control_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    effective_runtime_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    resource_envelope_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
 
 class ExperimentSnapshot(RegistryModel):
@@ -468,6 +504,66 @@ class ExperimentSnapshot(RegistryModel):
             raise ValueError("snapshot methodology ID does not match plan")
         if self.methodology_digest != self.plan.methodology_digest:
             raise ValueError("snapshot methodology digest does not match plan")
+        cells = {cell.id: cell for cell in self.plan.cells}
+        for selection in self.provider_selections:
+            if selection.harness_id != "direct-model":
+                continue
+            runtime_fields = (
+                selection.runtime_profile_source,
+                selection.runtime_profile_control_identity,
+                selection.effective_runtime_profile_identity,
+                selection.resource_envelope_identity,
+            )
+            if all(value is None for value in runtime_fields):
+                # Historical snapshots predate effective-runtime binding. They remain
+                # readable but are not upgraded to the executable v2 contract.
+                continue
+            if any(value is None for value in runtime_fields):
+                raise ValueError("Direct selection has an incomplete runtime identity binding")
+            if selection.runtime_profile_source is None:
+                raise ValueError("Direct selection is missing its runtime profile source")
+            resolved = resolve_direct_runtime_profile(
+                selection.runtime_profile_source, self.plan.budget_contract
+            )
+            try:
+                cell = cells[selection.cell_id]
+            except KeyError as exc:
+                raise ValueError("Direct selection is missing its frozen plan cell") from exc
+            checks = (
+                selection.provider_id == resolved.profile.provider,
+                selection.requested_model == resolved.profile.requested_model,
+                selection.safe_route_identity == resolved.profile.provider_route_identity,
+                selection.runtime_profile_control_identity == resolved.profile_control_identity,
+                selection.effective_runtime_profile_identity == resolved.effective_profile_identity,
+                selection.resource_envelope_identity == resolved.resource_envelope_identity,
+                selection.harness_config_identity == direct_harness_control_identity(),
+                cell.requested_model == resolved.profile.requested_model,
+                cell.provider_route == resolved.profile.provider_route_identity,
+                cell.profile_identity == resolved.profile_control_identity,
+                cell.effective_runtime_profile_identity == resolved.effective_profile_identity,
+                cell.resource_envelope_identity == resolved.resource_envelope_identity,
+                cell.base_provider_profile_identity == selection.base_provider_profile_identity,
+                cell.harness_config_identity == selection.harness_config_identity,
+                cell.runner_contract == "direct-model-v1",
+            )
+            if not all(checks):
+                raise ValueError("snapshot Direct runtime identities do not re-resolve")
+            for slot in self.plan.run_slots:
+                if slot.cell_id != cell.id:
+                    continue
+                slot_checks = (
+                    slot.requested_model == cell.requested_model,
+                    slot.provider_route == cell.provider_route,
+                    slot.profile_identity == cell.profile_identity,
+                    slot.harness_config_identity == cell.harness_config_identity,
+                    slot.runner_contract == cell.runner_contract,
+                    slot.base_provider_profile_identity == cell.base_provider_profile_identity,
+                    slot.effective_runtime_profile_identity
+                    == cell.effective_runtime_profile_identity,
+                    slot.resource_envelope_identity == cell.resource_envelope_identity,
+                )
+                if not all(slot_checks):
+                    raise ValueError("snapshot Direct slot controls drift from its cell")
         return self
 
 

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.common import EvaluationLane, NetworkPolicy, Sha256Digest
@@ -59,6 +59,15 @@ class PlannedCell(BaseModel):
     network_policy: NetworkPolicy
     runner_contract: str
     credential_reference: str | None
+    base_provider_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    effective_runtime_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    resource_envelope_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
     @classmethod
     def from_spec(cls, cell: ExperimentCellSpec) -> PlannedCell:
@@ -84,6 +93,15 @@ class ExperimentRunSlot(BaseModel):
     harness_config_identity: Sha256Digest
     reasoning_effort: str | None
     runner_contract: str
+    base_provider_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    effective_runtime_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    resource_envelope_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
 
 class ExperimentPlan(BaseModel):
@@ -267,6 +285,14 @@ def build_experiment_plan(spec: ExperimentSpec, repository_root: Path) -> Experi
                     "reasoning_effort": cell.reasoning_effort,
                     "runner_contract": cell.runner_contract,
                 }
+                if cell.base_provider_profile_identity is not None:
+                    identity["base_provider_profile_identity"] = cell.base_provider_profile_identity
+                if cell.effective_runtime_profile_identity is not None:
+                    identity["effective_runtime_profile_identity"] = (
+                        cell.effective_runtime_profile_identity
+                    )
+                if cell.resource_envelope_identity is not None:
+                    identity["resource_envelope_identity"] = cell.resource_envelope_identity
                 slots.append(
                     ExperimentRunSlot(
                         slot_id=canonical_digest(identity),
@@ -285,6 +311,11 @@ def build_experiment_plan(spec: ExperimentSpec, repository_root: Path) -> Experi
                         harness_config_identity=cell.harness_config_identity,
                         reasoning_effort=cell.reasoning_effort,
                         runner_contract=cell.runner_contract,
+                        base_provider_profile_identity=cell.base_provider_profile_identity,
+                        effective_runtime_profile_identity=(
+                            cell.effective_runtime_profile_identity
+                        ),
+                        resource_envelope_identity=cell.resource_envelope_identity,
                     )
                 )
     if len({slot.slot_id for slot in slots}) != len(slots):

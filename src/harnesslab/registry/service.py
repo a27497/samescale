@@ -7,7 +7,9 @@ from pathlib import Path
 
 from harnesslab.comparability.models import ComparabilityIntent
 from harnesslab.contracts.common import EvaluationLane
+from harnesslab.contracts.model import ModelProfile
 from harnesslab.experiment.methodology import (
+    BudgetContract,
     BudgetDimensionStatus,
     ComparisonType,
     EvaluationMode,
@@ -44,7 +46,9 @@ from harnesslab.registry.models import (
     ObservedModelCapability,
     PreflightCheck,
     PreflightStatus,
+    ProviderDefinition,
     ProviderHealthStatus,
+    ProviderModelProfile,
     RegistryCatalog,
     RegistryError,
     RegistrySettings,
@@ -52,6 +56,12 @@ from harnesslab.registry.models import (
     TraceCoverage,
     canonical_digest,
     freeze_experiment_snapshot,
+)
+from harnesslab.registry.runtime import (
+    DirectRuntimeContractError,
+    DirectRuntimeProfileSource,
+    direct_harness_control_identity,
+    resolve_direct_runtime_profile,
 )
 from harnesslab.registry.seeds import build_registry_catalog
 from harnesslab.tasks.package import TaskPackage
@@ -69,6 +79,158 @@ class _ResolvedHarnessProfile:
 class _Candidate:
     plan: MethodologyV2ExperimentPlan
     selections: tuple[FrozenProviderSelection, ...]
+
+
+def _direct_runtime_source(
+    provider: ProviderDefinition,
+    profile: ProviderModelProfile,
+) -> DirectRuntimeProfileSource:
+    endpoint = profile.provider_route_identity.rsplit("|", 1)[-1]
+    if not endpoint.endswith(profile.route):
+        raise RegistryError("provider route identity does not end in the registered route")
+    base = endpoint[: -len(profile.route)]
+    expected_reference = provider.protocol_base_url_references.get(
+        profile.protocol, provider.base_url_reference
+    )
+    if base.startswith("env:"):
+        reference = base.removeprefix("env:")
+        if reference != expected_reference:
+            raise RegistryError("provider route identity has the wrong base URL reference")
+        return DirectRuntimeProfileSource(
+            provider=provider.provider_id,
+            requested_model=profile.requested_model,
+            protocol=profile.protocol,
+            route=profile.route,
+            base_url_reference=reference,
+            credential_reference=profile.credential_reference,
+            reasoning_effort=profile.reasoning_effort,
+            request_timeout_seconds=profile.request_timeout_seconds,
+        )
+    if expected_reference is not None:
+        raise RegistryError("provider route identity bypasses its frozen URL reference")
+    return DirectRuntimeProfileSource(
+        provider=provider.provider_id,
+        requested_model=profile.requested_model,
+        protocol=profile.protocol,
+        route=profile.route,
+        base_url=base,
+        credential_reference=profile.credential_reference,
+        reasoning_effort=profile.reasoning_effort,
+        request_timeout_seconds=profile.request_timeout_seconds,
+    )
+
+
+def resolve_frozen_direct_runtime(
+    selection: FrozenProviderSelection,
+    budget: BudgetContract,
+) -> ModelProfile:
+    """Re-derive and validate a frozen Direct selection at load/preflight/runtime time."""
+
+    if selection.harness_id != "direct-model" or selection.runtime_profile_source is None:
+        raise RegistryError("selection does not contain a frozen Direct runtime source")
+    try:
+        resolved = resolve_direct_runtime_profile(selection.runtime_profile_source, budget)
+    except DirectRuntimeContractError as exc:
+        raise RegistryError(str(exc)) from exc
+    expected = {
+        "runtime profile control": (
+            selection.runtime_profile_control_identity,
+            resolved.profile_control_identity,
+        ),
+        "effective runtime profile": (
+            selection.effective_runtime_profile_identity,
+            resolved.effective_profile_identity,
+        ),
+        "resource envelope": (
+            selection.resource_envelope_identity,
+            resolved.resource_envelope_identity,
+        ),
+        "Direct harness control": (
+            selection.harness_config_identity,
+            direct_harness_control_identity(),
+        ),
+        "requested model": (
+            selection.requested_model,
+            resolved.profile.requested_model,
+        ),
+        "provider": (selection.provider_id, resolved.profile.provider),
+        "route": (selection.safe_route_identity, resolved.profile.provider_route_identity),
+        "credential reference": (
+            selection.credential_reference,
+            resolved.profile.credential_reference,
+        ),
+    }
+    mismatches = [name for name, (frozen, actual) in expected.items() if frozen != actual]
+    if mismatches:
+        raise RegistryError("frozen Direct runtime drift: " + ", ".join(mismatches))
+    return resolved.profile
+
+
+def validate_frozen_runtime_contract(
+    plan: MethodologyV2ExperimentPlan,
+    selections: tuple[FrozenProviderSelection, ...],
+) -> dict[str, ModelProfile]:
+    """Validate plan cells/slots against the canonical frozen runtime derivation."""
+
+    cells = {cell.id: cell for cell in plan.cells}
+    if len(cells) != len(plan.cells):
+        raise RegistryError("frozen plan contains duplicate cell identities")
+    resolved_profiles: dict[str, ModelProfile] = {}
+    for selection in selections:
+        if selection.harness_id != "direct-model":
+            continue
+        try:
+            cell = cells[selection.cell_id]
+        except KeyError as exc:
+            raise RegistryError("frozen Direct selection has no plan cell") from exc
+        profile = resolve_frozen_direct_runtime(selection, plan.budget_contract)
+        cell_checks = {
+            "requested model": (cell.requested_model, profile.requested_model),
+            "provider route": (cell.provider_route, profile.provider_route_identity),
+            "runtime profile control": (
+                cell.profile_identity,
+                selection.runtime_profile_control_identity,
+            ),
+            "effective runtime profile": (
+                cell.effective_runtime_profile_identity,
+                selection.effective_runtime_profile_identity,
+            ),
+            "base provider profile": (
+                cell.base_provider_profile_identity,
+                selection.base_provider_profile_identity,
+            ),
+            "resource envelope": (
+                cell.resource_envelope_identity,
+                selection.resource_envelope_identity,
+            ),
+            "Direct harness control": (
+                cell.harness_config_identity,
+                selection.harness_config_identity,
+            ),
+            "runner contract": (cell.runner_contract, "direct-model-v1"),
+        }
+        mismatches = [name for name, (frozen, actual) in cell_checks.items() if frozen != actual]
+        if mismatches:
+            raise RegistryError("frozen Direct cell drift: " + ", ".join(mismatches))
+        resolved_profiles[selection.cell_id] = profile
+    for slot in plan.run_slots:
+        if slot.cell_id not in resolved_profiles:
+            continue
+        cell = cells[slot.cell_id]
+        if any(
+            (
+                slot.requested_model != cell.requested_model,
+                slot.provider_route != cell.provider_route,
+                slot.profile_identity != cell.profile_identity,
+                slot.harness_config_identity != cell.harness_config_identity,
+                slot.runner_contract != cell.runner_contract,
+                slot.base_provider_profile_identity != cell.base_provider_profile_identity,
+                slot.effective_runtime_profile_identity != cell.effective_runtime_profile_identity,
+                slot.resource_envelope_identity != cell.resource_envelope_identity,
+            )
+        ):
+            raise RegistryError("frozen Direct slot controls drift from its plan cell")
+    return resolved_profiles
 
 
 def registry_catalog(repository_root: Path, environment: Mapping[str, str]) -> RegistryCatalog:
@@ -247,12 +409,24 @@ def _resolve_cells(
         )
         if capability.status is CompatibilityStatus.UNSUPPORTED:
             raise RegistryError("provider model and harness profiles are not explicitly compatible")
-        combined_profile_identity = canonical_digest(
-            {
-                "provider_profile_identity": provider_profile.profile_identity,
-                "harness_config_identity": resolved_harness.profile.harness_config_identity,
-            }
-        )
+        direct_runtime = None
+        if resolved_harness.harness.harness_id == "direct-model":
+            source = _direct_runtime_source(provider, provider_profile)
+            direct_runtime = resolve_direct_runtime_profile(source, request.budget)
+            if (
+                resolved_harness.profile.harness_config_identity
+                != direct_harness_control_identity()
+            ):
+                raise RegistryError("Direct harness profile does not match its canonical control")
+            combined_profile_identity = direct_runtime.profile_control_identity
+        else:
+            source = None
+            combined_profile_identity = canonical_digest(
+                {
+                    "provider_profile_identity": provider_profile.profile_identity,
+                    "harness_config_identity": resolved_harness.profile.harness_config_identity,
+                }
+            )
         cells.append(
             ExperimentCellSpec(
                 id=selection.cell_id,
@@ -277,6 +451,21 @@ def _resolve_cells(
                 network_policy=network_policy,
                 runner_contract=resolved_harness.harness.runner_contract,
                 credential_reference=provider_profile.credential_reference,
+                base_provider_profile_identity=(
+                    provider_profile.base_provider_profile_identity
+                    if direct_runtime is not None
+                    else None
+                ),
+                effective_runtime_profile_identity=(
+                    direct_runtime.effective_profile_identity
+                    if direct_runtime is not None
+                    else None
+                ),
+                resource_envelope_identity=(
+                    direct_runtime.resource_envelope_identity
+                    if direct_runtime is not None
+                    else None
+                ),
             )
         )
         billing_mode = request.billing_modes.get(provider.provider_id, provider.billing_mode)
@@ -296,6 +485,25 @@ def _resolve_cells(
                 runtime_endpoint_fingerprint=provider_profile.runtime_endpoint_fingerprint,
                 billing_mode=billing_mode,
                 pricing_snapshot_reference=provider_profile.pricing_snapshot_reference,
+                base_provider_profile_identity=(
+                    provider_profile.base_provider_profile_identity
+                    if direct_runtime is not None
+                    else None
+                ),
+                runtime_profile_source=source,
+                runtime_profile_control_identity=(
+                    direct_runtime.profile_control_identity if direct_runtime is not None else None
+                ),
+                effective_runtime_profile_identity=(
+                    direct_runtime.effective_profile_identity
+                    if direct_runtime is not None
+                    else None
+                ),
+                resource_envelope_identity=(
+                    direct_runtime.resource_envelope_identity
+                    if direct_runtime is not None
+                    else None
+                ),
             )
         )
     return tuple(cells), tuple(frozen)
@@ -371,7 +579,9 @@ def _build_candidate(
             "selections": [item.model_dump(mode="json") for item in selections],
         }
     )
-    experiment_id = "registry-" + request_identity.removeprefix("sha256:")[:24]
+    experiment_id = request.experiment_id or (
+        "registry-" + request_identity.removeprefix("sha256:")[:24]
+    )
     tasks = {item.task_id: item for item in catalog.tasks}
     spec = ExperimentSpec(
         experiment_id=experiment_id,
@@ -406,6 +616,7 @@ def _build_candidate(
             route: ProviderAvailability.PROVIDER_UNAVAILABLE for route in unavailable_routes
         },
     )
+    validate_frozen_runtime_contract(plan, selections)
     return _Candidate(plan=plan, selections=selections)
 
 
@@ -473,6 +684,12 @@ def preflight_experiment(
                         f"{request.evaluation_mode.value} fixes "
                         f"n={request.evaluation_mode.repeat_count}"
                     ),
+                ),
+                _check(
+                    "runtime-contract",
+                    CheckStatus.PASS,
+                    "FROZEN_RUNTIME_IDENTITIES_VALID",
+                    "Direct selections re-resolve to their frozen runtime identities",
                 ),
             )
         )
@@ -671,7 +888,7 @@ def build_experiment_snapshot(
     candidate = _build_candidate(request, catalog, repository_root)
     preflight = preflight_experiment(request, repository_root, environment)
     snapshot_id = "snapshot-" + candidate.plan.experiment_id.removeprefix("registry-")
-    return freeze_experiment_snapshot(
+    snapshot = freeze_experiment_snapshot(
         snapshot_id=snapshot_id,
         registry_id=catalog.registry_id,
         registry_digest=catalog.digest,
@@ -682,3 +899,5 @@ def build_experiment_snapshot(
         provider_selections=candidate.selections,
         preflight=preflight,
     )
+    validate_frozen_runtime_contract(snapshot.plan, snapshot.provider_selections)
+    return snapshot
