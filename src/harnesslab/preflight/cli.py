@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 from typing import Annotated
 
 import typer
 
 from harnesslab.budget import BudgetCeilingStatus, BudgetEstimateRequest, estimate_budget
-from harnesslab.preflight.io import PreflightInputError, load_control_manifest
+from harnesslab.preflight.io import (
+    PreflightInputError,
+    load_control_manifest,
+    load_secret_environment_file,
+)
 from harnesslab.preflight.models import PreflightSpecification, PreflightStatus
 from harnesslab.preflight.service import run_preflight
 
@@ -31,12 +36,36 @@ def preflight_run(
             help="Repository containing the referenced task packages.",
         ),
     ] = Path("."),
+    secret_env_file: Annotated[
+        Path | None,
+        typer.Option(
+            "--secret-env-file",
+            help=(
+                "Private assignment-only configuration source; values remain in process memory "
+                "and are never emitted."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """Collect host facts and emit one READY, READY_WITH_WARNINGS, or BLOCKED report."""
 
     try:
         specification = load_control_manifest(manifest, PreflightSpecification)
-        report = asyncio.run(run_preflight(specification, repository_root))
+        if secret_env_file is None:
+            report = asyncio.run(run_preflight(specification, repository_root))
+        else:
+            references = frozenset(
+                item.reference
+                for item in specification.configurations
+                + tuple(
+                    requirement
+                    for route in specification.provider_routes
+                    for requirement in route.configuration_references
+                )
+            )
+            environment = dict(os.environ)
+            environment.update(load_secret_environment_file(secret_env_file, references))
+            report = asyncio.run(run_preflight(specification, repository_root, environment))
     except PreflightInputError as exc:
         typer.echo(f"PREFLIGHT_INPUT_ERROR={exc}")
         raise typer.Exit(code=2) from exc

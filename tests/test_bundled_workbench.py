@@ -48,6 +48,33 @@ async def test_api_routes_remain_authoritative_with_bundle(tmp_path: Path) -> No
     assert "bundled-workbench" not in missing_asset.text
 
 
+async def test_integrated_preflight_and_custom_eval_routes_precede_bundle(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("HARNESSLAB_CUSTOM_EVAL_STORE", str(tmp_path / "custom-store"))
+    application = create_app(workbench_dist=_bundle(tmp_path / "dist"))
+    async with AsyncClient(
+        transport=ASGITransport(app=application), base_url="http://test"
+    ) as client:
+        preflight = await client.post(
+            "/api/preflight/assess",
+            json={
+                "docker_required": False,
+                "database_required": False,
+                "minimum_free_bytes": 0,
+                "observations": {"disk_free_bytes": 1},
+            },
+        )
+        custom_tasks = await client.get("/api/custom-eval/tasks")
+
+    assert preflight.status_code == 200
+    assert preflight.json()["status"] in {"READY", "READY_WITH_WARNINGS", "BLOCKED"}
+    assert preflight.json()["provider_calls"] == 0
+    assert preflight.json()["judge_calls"] == 0
+    assert custom_tasks.status_code == 200
+    assert custom_tasks.json() == []
+
+
 def test_explicit_bundle_must_contain_index(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match=r"containing index\.html"):
         create_app(workbench_dist=tmp_path)

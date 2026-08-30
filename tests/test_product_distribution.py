@@ -97,6 +97,9 @@ def test_bundled_workbench_is_part_of_readiness_and_no_call_credentials_are_wire
     healthcheck = HEALTHCHECK_PATH.read_text(encoding="utf-8")
 
     assert environment["HARNESSLAB_WORKBENCH_DIST"] == "/opt/harnesslab/frontend/dist"
+    assert environment["HARNESSLAB_CUSTOM_EVAL_STORE"] == "/opt/harnesslab/custom-eval"
+    assert "harnesslab-custom-eval:/opt/harnesslab/custom-eval" in _sequence(api["volumes"])
+    assert "/opt/harnesslab/custom-eval" in dockerfile
     assert "COPY --from=workbench-build" in dockerfile
     assert '"http://127.0.0.1:8000/api/health"' in healthcheck
     assert '"http://127.0.0.1:8000/"' in healthcheck

@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "audit_id": "kb3-convergence-reentry-2026-08-30",
+  "authoritative_base_sha": "a415822905346fb6e11351b9c5cb0f2b7e2ff4b3",
+  "historic_timeout_root_cause": "UNRESOLVED",
+  "operator_configuration": {
+    "known_secret_env_checked": true,
+    "status": "CONFIG_SOURCE_VALID_NOT_SOURCED",
+    "source_exists": true,
+    "source_is_regular_file": true,
+    "source_mode": "0600",
+    "required_names_present_and_non_empty": [
+      "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+      "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL",
+      "HARNESSLAB_ALIBABA_BAILIAN_API_KEY"
+    ],
+    "secret_values_persisted": false,
+    "secret_values_printed": false,
+    "endpoint_urls_persisted": false,
+    "endpoint_urls_printed": false
+  },
+  "phase_m_configuration_preflight": {
+    "manifest_reference": "release/kb3-operator-config-preflight.json",
+    "specification_digest": "sha256:9bddf5391fc7cdd57e365e6dab32f459282e40d3d8b4f4a146bcba48224f9c44",
+    "configuration_findings": "PASS",
+    "terminal_status": "BLOCKED",
+    "blocking_reason_codes": [
+      "BUDGET_ESTIMATE_REQUIRED"
+    ],
+    "provider_calls": 0,
+    "judge_calls": 0
+  },
+  "successor": {
+    "preferred_experiment_id": "core-real-matrix-v4",
+    "plan_digest": "NOT_AVAILABLE",
+    "planned_subject_runs": 630,
+    "authoritative_seven_cell_binding_available": false,
+    "exact_successor_reconstructable_without_redesign": false,
+    "preflight_status": "BLOCKED",
+    "freeze_status": "NOT_CREATED",
+    "canary_status": "NOT_RUN",
+    "subject_calls": 0,
+    "judge_calls": 0,
+    "recovery_attempts": 0,
+    "authorization_decision": "REDESIGN_REQUIRED"
+  },
+  "blockers": [
+    {
+      "reason_code": "AUTHORITATIVE_SUCCESSOR_BINDING_MISSING",
+      "detail": "The frozen seven-cell v3 plan and separate two-cell Alibaba v3r1 plan do not define one authoritative seven-cell successor binding. Combining them would require a prohibited provider or route design decision."
+    },
+    {
+      "reason_code": "EXACT_SUCCESSOR_PREFLIGHT_NOT_REPRESENTABLE",
+      "detail": "The integrated Phase M schema cannot express heterogeneous seven-route pricing, a fixed 63-call Judge campaign, or all per-cell resource identities in one exact successor preflight."
+    }
+  ],
+  "budget": {
+    "estimated_630_subject_cost": "UNKNOWN",
+    "estimated_judge_cost": "UNKNOWN",
+    "estimated_total_cost": "UNKNOWN",
+    "expected_wall_clock": "UNKNOWN"
+  },
+  "immutability": {
+    "old_matrix_resumed": false,
+    "v3r1_mutated": false,
+    "historical_evidence_rewritten": false,
+    "full_matrix_executed": false
+  }
+}

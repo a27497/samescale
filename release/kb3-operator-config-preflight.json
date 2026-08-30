@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "docker_required": false,
+  "database_required": false,
+  "minimum_free_bytes": 0,
+  "required_images": [],
+  "configurations": [
+    {
+      "reference": "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+      "kind": "HTTPS_URL",
+      "required": true
+    },
+    {
+      "reference": "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL",
+      "kind": "HTTPS_URL",
+      "required": true
+    },
+    {
+      "reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+      "kind": "CREDENTIAL",
+      "required": true
+    }
+  ],
+  "provider_routes": [],
+  "harnesses": [],
+  "tasks": [],
+  "network_policy": "deny",
+  "comparability_controls": [],
+  "resource_envelope": null,
+  "budget": null
+}

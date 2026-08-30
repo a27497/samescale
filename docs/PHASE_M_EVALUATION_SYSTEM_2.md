@@ -26,6 +26,10 @@ The CLI exposes `harnesslab preflight run SPEC.json` and
 `POST /api/preflight/assess`, host collection at `POST /api/preflight/run`, and estimation at
 `POST /api/preflight/budget`.
 
+Operator configuration may be injected with `--secret-env-file`. This path accepts only private,
+current-user-owned, assignment-only files and only names declared by the preflight specification.
+It performs no shell evaluation and never emits configuration values.
+
 ## Preflight semantics
 
 Applicable checks cover the local Docker runtime, database readiness, disk capacity, required

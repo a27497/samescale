@@ -8,6 +8,7 @@ x-harnesslab-app: &harnesslab-app
   environment: &harnesslab-environment
     DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-harnesslab}:${POSTGRES_PASSWORD:-harnesslab_dev_only}@postgres:5432/${POSTGRES_DB:-harnesslab}
     HARNESSLAB_ENVIRONMENT: ${HARNESSLAB_ENVIRONMENT:-production}
+    HARNESSLAB_CUSTOM_EVAL_STORE: /opt/harnesslab/custom-eval
     HARNESSLAB_WORKBENCH_ARTIFACT_ROOTS: '["/opt/harnesslab/artifacts","/opt/harnesslab/harnesslab-artifacts"]'
     HARNESSLAB_WORKBENCH_DIST: /opt/harnesslab/frontend/dist
   networks:
@@ -74,6 +75,7 @@ services:
     volumes:
       - harnesslab-artifacts:/opt/harnesslab/artifacts
       - harnesslab-artifacts-alt:/opt/harnesslab/harnesslab-artifacts
+      - harnesslab-custom-eval:/opt/harnesslab/custom-eval
 
 networks:
   control-plane:
@@ -83,3 +85,4 @@ volumes:
   harnesslab-postgres:
   harnesslab-artifacts:
   harnesslab-artifacts-alt:
+  harnesslab-custom-eval:

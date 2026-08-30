@@ -12,14 +12,23 @@ from harnesslab.productization.lifecycle import CheckState, LifecycleCheck
 runner = CliRunner()
 
 
-def test_help_lists_phase_a_commands() -> None:
+def test_help_lists_integrated_control_commands() -> None:
     result = runner.invoke(app, ["--help"])
 
     assert result.exit_code == 0
-    assert "doctor" in result.stdout
-    assert "serve" in result.stdout
-    assert "model" in result.stdout
-    assert "harness" in result.stdout
+    for command in (
+        "preflight",
+        "budget",
+        "custom-eval",
+        "up",
+        "down",
+        "status",
+        "doctor",
+        "serve",
+        "model",
+        "harness",
+    ):
+        assert command in result.stdout
 
 
 def test_version_uses_package_version() -> None:

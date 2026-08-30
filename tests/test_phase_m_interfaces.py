@@ -75,6 +75,58 @@ def test_invalid_cli_manifest_does_not_echo_rejected_content(tmp_path: Path) -> 
     assert secret not in result.stdout
 
 
+def test_preflight_cli_injects_private_assignment_file_without_echoing_values(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    specification = _specification()
+    expected = assess_preflight(specification, _observations())
+    manifest = tmp_path / "preflight.json"
+    manifest.write_text(specification.model_dump_json(), encoding="utf-8")
+    secret = "literal-private-value"
+    secret_file = tmp_path / "operator.env"
+    secret_file.write_text(f"PHASE_M_PROVIDER_KEY={secret}\n", encoding="utf-8")
+    secret_file.chmod(0o600)
+
+    async def fake_run(
+        received: PreflightSpecification,
+        repository_root: Path,
+        environment: dict[str, str],
+    ) -> object:
+        assert received == specification
+        assert repository_root == Path(".")
+        assert environment["PHASE_M_PROVIDER_KEY"] == secret
+        return expected
+
+    monkeypatch.setattr("harnesslab.preflight.cli.run_preflight", fake_run)
+    result = runner.invoke(
+        app,
+        ["preflight", "run", str(manifest), "--secret-env-file", str(secret_file)],
+    )
+
+    assert result.exit_code == 0
+    assert secret not in result.stdout
+    assert json.loads(result.stdout)["status"] == "READY"
+
+
+def test_preflight_cli_rejects_public_or_unexpected_secret_env_source(
+    tmp_path: Path,
+) -> None:
+    manifest = tmp_path / "preflight.json"
+    manifest.write_text(_specification().model_dump_json(), encoding="utf-8")
+    secret_file = tmp_path / "operator.env"
+    secret_file.write_text("UNEXPECTED_REFERENCE=private\n", encoding="utf-8")
+    secret_file.chmod(0o644)
+
+    result = runner.invoke(
+        app,
+        ["preflight", "run", str(manifest), "--secret-env-file", str(secret_file)],
+    )
+
+    assert result.exit_code == 2
+    assert "private mode" in result.stdout
+    assert "private" not in result.stdout.replace("private mode", "")
+
+
 async def test_preflight_assessment_api_is_pure_and_keyless() -> None:
     specification = _specification()
     payload = specification.model_dump(mode="json")

@@ -32,6 +32,7 @@ LABEL org.opencontainers.image.title="HarnessLab AI" \
 ENV PATH=/opt/harnesslab/.venv/bin:/usr/local/bin:/usr/bin:/bin \
     HOME=/tmp/harnesslab-home \
     HARNESSLAB_ENVIRONMENT=production \
+    HARNESSLAB_CUSTOM_EVAL_STORE=/opt/harnesslab/custom-eval \
     HARNESSLAB_WORKBENCH_DIST=/opt/harnesslab/frontend/dist \
     HARNESSLAB_WORKBENCH_ARTIFACT_ROOTS='["/opt/harnesslab/artifacts","/opt/harnesslab/harnesslab-artifacts"]' \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -39,6 +40,7 @@ ENV PATH=/opt/harnesslab/.venv/bin:/usr/local/bin:/usr/bin:/bin \
 
 RUN install -d -o 10001 -g 10001 \
         /opt/harnesslab/artifacts \
+        /opt/harnesslab/custom-eval \
         /opt/harnesslab/harnesslab-artifacts \
         /tmp/harnesslab-home
 
