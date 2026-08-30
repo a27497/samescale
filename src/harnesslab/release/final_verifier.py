@@ -10,7 +10,7 @@ from pydantic import Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from harnesslab.comparability.models import canonical_digest
+from harnesslab.comparability.models import ComparabilityIntent, canonical_digest
 from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import ExperimentRecord
 from harnesslab.db.models.judgelab import JudgeCalibrationRecord, JudgeEvaluationRecord
@@ -599,6 +599,11 @@ def _verify_pair_and_ablation(
         expected_ablation.changed_dimension,
     ):
         raise CoreReleaseError("authoritative ExperimentPlan ablation definition drifted")
+    if (
+        release_plan.plan_id == "core-real-evidence-v4"
+        and plan_ablations[0].intent is not ComparabilityIntent.CONTROLLED_ABLATION
+    ):
+        raise CoreReleaseError("v4 controlled ablation intent drifted")
     if (
         ablation.ablation_id != expected_ablation.ablation_id
         or ablation.base_cell_id != expected_ablation.base_cell_id

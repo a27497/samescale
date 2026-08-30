@@ -78,9 +78,10 @@ class AblationSpec(BaseModel):
     base_cell_id: Identifier
     variant_cell_id: Identifier
     changed_dimension: Literal["reasoning_effort"]
-    intent: Literal[ComparabilityIntent.CONTROLLED_ABLATION] = (
-        ComparabilityIntent.CONTROLLED_ABLATION
-    )
+    intent: Literal[
+        ComparabilityIntent.GENERAL,
+        ComparabilityIntent.CONTROLLED_ABLATION,
+    ] = ComparabilityIntent.GENERAL
 
 
 class ExperimentSpec(BaseModel):

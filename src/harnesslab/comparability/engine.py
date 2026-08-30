@@ -58,7 +58,13 @@ UPLIFT_CONTROLS = CORE_CONTROLS | {
     "resource_envelope_identity",
     "network_policy",
 }
-UPLIFT_TREATMENTS = {"harness", "harness_version", "harness_profile_identity", "prompt_identity"}
+UPLIFT_TREATMENTS = {
+    "harness",
+    "harness_version",
+    "harness_profile_identity",
+    "reasoning_effort",
+    "prompt_identity",
+}
 MODEL_CONTROLS = CORE_CONTROLS | {
     "provider_route",
     "budget_identity",

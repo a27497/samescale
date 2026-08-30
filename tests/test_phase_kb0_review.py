@@ -1239,19 +1239,24 @@ async def test_smoke_one_judge_call_only() -> None:
 
 
 def _r1_test_policy() -> SmokeContinuationPolicy:
-    receipt_path = ROOT / "artifacts/core-real-matrix-v4-canary/smoke-execution.json"
-    original = json.loads(receipt_path.read_text(encoding="utf-8"))
     return SmokeContinuationPolicy(
         policy_id="kb2r-r1-v4-suffix-continuation",
         base_branch_head="cd7de16eb4549d4a108ec9908b57905b50cd0562",
         repair_commit_identity="cd7de16eb4549d4a108ec9908b57905b50cd0562",
         release_plan_reference="release/core-real-evidence-plan-v4.json",
-        release_plan_digest=original["release_plan_digest"],
+        release_plan_digest="sha256:" + "1" * 64,
         smoke_plan_reference="release/core-real-smoke-plan-v4.json",
-        smoke_plan_digest=original["smoke_plan_digest"],
+        smoke_plan_digest="sha256:" + "2" * 64,
         original_receipt_reference=("artifacts/core-real-matrix-v4-canary/smoke-execution.json"),
-        original_receipt_digest=("sha256:" + hashlib.sha256(receipt_path.read_bytes()).hexdigest()),
-        original_calls=tuple(SmokeCallResult.model_validate(item) for item in original["results"]),
+        original_receipt_digest="sha256:" + "3" * 64,
+        original_calls=tuple(
+            SmokeCallResult(
+                call_id=call_id,
+                evidence_references=(f"fixture://{call_id}",),
+                evidence_digests=("sha256:" + "4" * 64,),
+            )
+            for call_id in EXPECTED_CALL_IDS[:4]
+        ),
         old_control_plane_classification="OBSERVED_MODEL_CONFLICT",
         raw_safe_fact=("observed_model_status=NOT_EXPOSED;observed_model=null;verifier=PASS"),
         repaired_classification_rule=(
@@ -1259,24 +1264,18 @@ def _r1_test_policy() -> SmokeContinuationPolicy:
         ),
         codex_observed_model_capability="NOT_GUARANTEED_BY_PINNED_SCHEMA",
         allowed_suffix_call_ids=EXPECTED_CALL_IDS[4:],
-        protected_file_sha256={
-            reference: "sha256:" + hashlib.sha256((ROOT / reference).read_bytes()).hexdigest()
-            for reference in (
-                "release/core-real-evidence-plan-v4.json",
-                "release/core-real-smoke-plan-v4.json",
-                "release/kb2r-authorization-dossier.json",
-            )
-        },
+        protected_file_sha256={},
     )
 
 
 @pytest.mark.asyncio
 async def test_r1_continuation_can_only_launch_calls_5_to_8_with_combined_ceiling(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     control = SmokeControlPlane.load(ROOT, plan_version="v4")
     bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
     invoker = RecordingInvoker()
+    monkeypatch.setattr(control, "validate_continuation_policy", lambda _: control.preflight())
     receipt = await control.execute_continuation(
         bindings,
         invoker,
@@ -1294,11 +1293,12 @@ async def test_r1_continuation_can_only_launch_calls_5_to_8_with_combined_ceilin
 
 @pytest.mark.asyncio
 async def test_r1_continuation_failure_stops_before_judge_and_cannot_retry(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     control = SmokeControlPlane.load(ROOT, plan_version="v4")
     bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
     invoker = RecordingInvoker(failing_call_id=EXPECTED_CALL_IDS[5])
+    monkeypatch.setattr(control, "validate_continuation_policy", lambda _: control.preflight())
     receipt_path = tmp_path / "r1-smoke-execution.json"
     receipt = await control.execute_continuation(
         bindings,

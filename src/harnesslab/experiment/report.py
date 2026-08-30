@@ -430,12 +430,14 @@ async def build_experiment_report(
             right_facts = facts_by_run[right.run_id]
             left_cell = planned_cells[left_cell_id]
             right_cell = planned_cells[right_cell_id]
-            left_facts = left_facts.model_copy(
-                update={"resource_envelope_identity": left_cell.resource_envelope_identity}
-            )
-            right_facts = right_facts.model_copy(
-                update={"resource_envelope_identity": right_cell.resource_envelope_identity}
-            )
+            if left_cell.resource_envelope_identity is not None:
+                left_facts = left_facts.model_copy(
+                    update={"resource_envelope_identity": left_cell.resource_envelope_identity}
+                )
+            if right_cell.resource_envelope_identity is not None:
+                right_facts = right_facts.model_copy(
+                    update={"resource_envelope_identity": right_cell.resource_envelope_identity}
+                )
             if intent is ComparabilityIntent.CONTROLLED_ABLATION:
                 left_facts = left_facts.model_copy(
                     update={
