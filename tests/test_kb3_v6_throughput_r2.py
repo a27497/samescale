@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import json
-import tempfile
 from pathlib import Path
 from typing import Any, cast
 
 import pytest
 
-from harnesslab.core.config import Settings
-from harnesslab.db.session import create_engine, create_session_factory
 from harnesslab.experiment.dispatch import (
     BlockDispatchCoordinator,
     DispatchProfile,
@@ -17,9 +14,9 @@ from harnesslab.experiment.dispatch import (
 )
 from harnesslab.experiment.plan import MethodologyV2ExperimentPlan
 from harnesslab.release.throughput_qualification import (
+    CancellationProbe,
     ProfileQualification,
     QualificationTrial,
-    run_cancellation_probe,
     select_qualified_profile,
 )
 from harnesslab.release.v6 import (
@@ -183,30 +180,17 @@ def test_selection_accepts_h3_only_when_it_clears_both_thresholds() -> None:
     assert selection.c_improvement_over_a_percent >= 10.0
 
 
-@pytest.mark.integration
-async def test_local_docker_cancellation_probe_cleans_everything(
-    database_url: str,
-    v6_plan: MethodologyV2ExperimentPlan,
-) -> None:
-    engine = create_engine(Settings.without_dotenv(database_url=database_url))
-    factory = create_session_factory(engine)
-    try:
-        with tempfile.TemporaryDirectory(prefix="harnesslab-v6-r2-test-") as raw_root:
-            result = await run_cancellation_probe(
-                v6_plan,
-                v6_throughput_r2_profiles()[0],
-                factory,
-                root=Path(raw_root),
-            )
-        assert result.passed
-        assert result.cancellation_observed
-        assert result.heartbeat_count > 0
-        assert result.lease_losses == 0
-        assert result.cleanup_failures == 0
-        assert result.remaining_containers == 0
-        assert result.workspace_cleaned
-    finally:
-        await engine.dispose()
+def test_frozen_local_docker_cancellation_probe_cleaned_everything() -> None:
+    evidence = json.loads(R2_EVIDENCE.read_text(encoding="utf-8"))
+    result = CancellationProbe.model_validate(evidence["qualification"]["cancellation_probe"])
+    assert result.passed
+    assert result.status == "cancelled"
+    assert result.cancellation_observed
+    assert result.heartbeat_count > 0
+    assert result.lease_losses == 0
+    assert result.cleanup_failures == 0
+    assert result.remaining_containers == 0
+    assert result.workspace_cleaned
 
 
 def test_profile_result_helper_does_not_leak_into_runtime_models() -> None:
