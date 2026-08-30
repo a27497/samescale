@@ -4,14 +4,14 @@ import hashlib
 import json
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "release"
 
 
 def _load(name: str) -> dict[str, Any]:
-    return json.loads((RELEASE / name).read_text())
+    return cast(dict[str, Any], json.loads((RELEASE / name).read_text()))
 
 
 def _sha256(name: str) -> str:
