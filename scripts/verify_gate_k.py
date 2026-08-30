@@ -272,7 +272,10 @@ def verify_contract_mode() -> bool:
             "release/resume-claim-evidence.json",
         )
     )
-    secret_patterns = (r"sk-[A-Za-z0-9_-]{20,}", r"(?i)bearer\s+[A-Za-z0-9._-]{20,}")
+    secret_patterns = (
+        r"(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]{20,}",
+        r"(?i)bearer\s+[A-Za-z0-9._-]{20,}",
+    )
     if any(re.search(pattern, serialized_release) for pattern in secret_patterns):
         print("FAIL: release artifact contains secret-like material")
         return False

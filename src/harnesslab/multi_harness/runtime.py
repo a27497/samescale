@@ -136,6 +136,7 @@ class MultiHarnessRuntime:
             "java": ("java", "-version"),
             "javac": ("javac", "-version"),
             "node": ("node", "--version"),
+            "sqlite": ("sqlite3", "--version"),
         }.items():
             result = await cli.run(
                 "run",

@@ -23,6 +23,11 @@ from harnesslab.multi_harness.profile import (
 from harnesslab.sandbox.runner import SANDBOX_IMAGE
 from harnesslab.tasks.package import TaskPackage
 
+SECRET_PATTERNS = (
+    re.compile(rb"(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]{20,}"),
+    re.compile(rb"(?<![A-Za-z0-9])gh[opsu]_[A-Za-z0-9]{20,}"),
+)
+
 
 class ExitCode(IntEnum):
     PASS = 0
@@ -224,6 +229,7 @@ def _probe_tool_versions(image: str) -> dict[str, str]:
         "java": ("java", "-version"),
         "javac": ("javac", "-version"),
         "node": ("node", "--version"),
+        "sqlite": ("sqlite3", "--version"),
     }.items():
         result = subprocess.run(
             (
@@ -376,16 +382,12 @@ def verify_repository_secrets() -> bool:
     if listed.returncode != 0:
         print("FAIL: unable to enumerate repository files")
         return False
-    patterns = (
-        re.compile(rb"sk-[A-Za-z0-9_-]{20,}"),
-        re.compile(rb"gh[opsu]_[A-Za-z0-9]{20,}"),
-    )
     matches: list[str] = []
     for raw in listed.stdout.split(b"\0"):
         if not raw:
             continue
         path = ROOT / os.fsdecode(raw)
-        if path.is_file() and any(pattern.search(path.read_bytes()) for pattern in patterns):
+        if path.is_file() and any(pattern.search(path.read_bytes()) for pattern in SECRET_PATTERNS):
             matches.append(os.fsdecode(raw))
     if matches:
         print(f"FAIL: credential-like content detected: {matches}")

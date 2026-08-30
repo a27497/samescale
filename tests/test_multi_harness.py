@@ -67,6 +67,10 @@ TASKS = {
     "java": ROOT / "tasks" / "micro-java-clamp" / "1.0.0",
     "typescript": ROOT / "tasks" / "micro-typescript-clamp" / "1.0.0",
 }
+RUNTIME_TOOLCHAIN_TASKS = (
+    *TASKS.values(),
+    ROOT / "tasks" / "repo-python-ledger-transfer" / "1.0.0",
+)
 
 
 def fake_image(harness: HarnessKind) -> ImageIdentity:
@@ -647,8 +651,11 @@ async def test_phase_f_runtime_doctors_verify_pins_flags_and_toolchains(
     assert result.tool_versions["java"].startswith("21.")
     assert result.tool_versions["javac"].startswith("21.")
     assert result.tool_versions["node"].startswith("24.")
+    assert result.tool_versions["sqlite"].startswith("3.")
     requirements = tuple(
-        tool for path in TASKS.values() for tool in TaskPackage.load(path).definition.expected_tools
+        tool
+        for path in RUNTIME_TOOLCHAIN_TASKS
+        for tool in TaskPackage.load(path).definition.expected_tools
     )
     from harnesslab.harness_lane.toolchains import unsatisfied_tools
 

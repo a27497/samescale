@@ -25,6 +25,8 @@ def _load_verifier(name: str) -> Any:
 
 verify_gate_c = _load_verifier("verify_gate_c")
 verify_gate_d = _load_verifier("verify_gate_d")
+verify_gate_e = _load_verifier("verify_gate_e")
+verify_gate_f = _load_verifier("verify_gate_f")
 verify_gate_g = _load_verifier("verify_gate_g")
 
 
@@ -77,14 +79,16 @@ def test_leaf_mode_requires_explicit_github_actions_context(monkeypatch: Any) ->
         assert module.ci_leaf_mode_authorized()
 
 
-def test_gate_g_secret_scan_requires_a_token_boundary() -> None:
+def test_repository_secret_scanners_require_a_token_boundary() -> None:
     false_positive = b"task-package-frozen-workspace-v1"
     provider_credential = b'credential="sk-' + (b"a" * 24) + b'"'
     github_credential = b'token="ghp_' + (b"b" * 24) + b'"'
 
-    assert not any(pattern.search(false_positive) for pattern in verify_gate_g.SECRET_PATTERNS)
-    assert any(pattern.search(provider_credential) for pattern in verify_gate_g.SECRET_PATTERNS)
-    assert any(pattern.search(github_credential) for pattern in verify_gate_g.SECRET_PATTERNS)
+    for module in (verify_gate_d, verify_gate_e, verify_gate_f, verify_gate_g):
+        assert not any(pattern.search(false_positive) for pattern in module.SECRET_PATTERNS)
+        assert any(pattern.search(provider_credential) for pattern in module.SECRET_PATTERNS)
+    for module in (verify_gate_e, verify_gate_f, verify_gate_g):
+        assert any(pattern.search(github_credential) for pattern in module.SECRET_PATTERNS)
 
 
 def test_fast_and_full_workflow_triggers_and_concurrency_are_bounded() -> None:

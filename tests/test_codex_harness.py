@@ -59,7 +59,7 @@ from harnesslab.harness_lane.prompt import (
 )
 from harnesslab.harness_lane.runner import CodexHarnessRunner
 from harnesslab.harness_lane.runtime import REQUIRED_EXEC_HELP, CodexRuntime
-from harnesslab.harness_lane.toolchains import unsatisfied_tools
+from harnesslab.harness_lane.toolchains import extract_tool_version, unsatisfied_tools
 from harnesslab.harness_lane.trace import collect_codex_jsonl
 from harnesslab.sandbox.docker_cli import CommandResult, _DockerCLI
 from harnesslab.sandbox.models import ImageIdentity
@@ -71,6 +71,10 @@ TASKS = (
     ROOT / "tasks" / "micro-python-clamp" / "1.0.0",
     ROOT / "tasks" / "micro-java-clamp" / "1.0.0",
     ROOT / "tasks" / "micro-typescript-clamp" / "1.0.0",
+)
+RUNTIME_TOOLCHAIN_TASKS = (
+    *TASKS,
+    ROOT / "tasks" / "repo-python-ledger-transfer" / "1.0.0",
 )
 
 
@@ -156,10 +160,15 @@ async def test_codex_runtime_doctor_verifies_pinned_version_and_flags() -> None:
     assert result.required_flags == REQUIRED_EXEC_HELP
     requirements = tuple(
         tool
-        for task_path in TASKS
+        for task_path in RUNTIME_TOOLCHAIN_TASKS
         for tool in TaskPackage.load(task_path).definition.expected_tools
     )
     assert not unsatisfied_tools(requirements, result.tool_versions)
+    assert result.tool_versions["sqlite"].startswith("3.")
+
+
+def test_sqlite_tool_version_is_parsed_from_cli_output() -> None:
+    assert extract_tool_version("sqlite", "3.40.1 2022-12-28 14:03:47") == "3.40.1"
 
 
 def test_codex_profile_and_prompt_hashes_are_deterministic() -> None:
@@ -578,7 +587,7 @@ async def test_real_codex_cleanup_query_failure_is_unverified() -> None:
 def test_task_expected_tools_reject_old_python_and_java() -> None:
     requirements = tuple(
         tool
-        for task_path in TASKS
+        for task_path in RUNTIME_TOOLCHAIN_TASKS
         for tool in TaskPackage.load(task_path).definition.expected_tools
     )
 

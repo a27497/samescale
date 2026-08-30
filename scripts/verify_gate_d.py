@@ -152,6 +152,10 @@ CRITICAL_TESTS = {
     "test_gate_d_subprocess_environment_isolates_real_provider_configuration",
     "test_gate_d_sanitized_subprocess_keeps_missing_credential_tests_keyless",
 }
+SECRET_PATTERNS = (
+    re.compile(rb"(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]{20,}"),
+    re.compile(rb"(?<![A-Za-z0-9])sk-ant-[A-Za-z0-9_-]{20,}"),
+)
 PHASE_J_MODULE_NAMES = {
     "analyst.py",
     "analyst_agent.py",
@@ -343,10 +347,6 @@ def verify_repository_secret_hygiene() -> bool:
     if listed.returncode != 0:
         print("FAIL: unable to enumerate candidate repository files for credential hygiene")
         return False
-    patterns = (
-        re.compile(rb"sk-[A-Za-z0-9_-]{20,}"),
-        re.compile(rb"sk-ant-[A-Za-z0-9_-]{20,}"),
-    )
     matches: list[str] = []
     for raw in listed.stdout.split(b"\0"):
         if not raw:
@@ -358,7 +358,7 @@ def verify_repository_secret_hygiene() -> bool:
         except OSError:
             matches.append(relative)
             continue
-        if any(pattern.search(content) for pattern in patterns):
+        if any(pattern.search(content) for pattern in SECRET_PATTERNS):
             matches.append(relative)
     if matches:
         print(f"FAIL: possible provider credential material in repository files: {matches}")

@@ -10,7 +10,7 @@ COPY --from=python-toolchain /usr/local /usr/local
 COPY --from=java-toolchain /opt/java/openjdk /opt/java/openjdk
 
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends ca-certificates git \
+    && apt-get install --yes --no-install-recommends ca-certificates git sqlite3 \
     && rm -rf /var/lib/apt/lists/* \
     && npm install --global --omit=dev "@anthropic-ai/claude-code@${CLAUDE_VERSION}" \
     && npm cache clean --force \

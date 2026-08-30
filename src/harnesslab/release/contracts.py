@@ -42,8 +42,20 @@ def _load_json[T](path: Path, validator: Callable[[Any], T], label: str) -> T:
 def discover_task_packages(
     repository_root: Path, *, task_version: str = "1.0.0"
 ) -> tuple[Path, ...]:
+    """Discover Tier-A Core packages without folding qualified Tier-B tasks into its corpus."""
+
     tasks_root = repository_root / "tasks"
-    return tuple(sorted(path.parent for path in tasks_root.glob(f"*/{task_version}/task.yaml")))
+    discovered: list[Path] = []
+    for manifest in sorted(tasks_root.glob(f"*/{task_version}/task.yaml")):
+        task_path = manifest.parent
+        try:
+            if TaskPackage.load(task_path).manifest.repo_engineering is not None:
+                continue
+        except TaskPackageError:
+            # Keep malformed candidates visible so Core validation fails closed downstream.
+            pass
+        discovered.append(task_path)
+    return tuple(discovered)
 
 
 def build_corpus_manifest(

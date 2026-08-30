@@ -67,6 +67,7 @@ def test_core_corpus_is_exact_balanced_deterministic_and_validated() -> None:
     assert len({task.category for task in checked.tasks}) >= 5
     assert all(not task.baseline.passed for task in checked.tasks)
     assert all(task.oracle.passed and task.oracle.score == 1 for task in checked.tasks)
+    assert not any(task.task_id.startswith("repo-") for task in rebuilt.tasks)
     assert not any(path.is_symlink() for path in (ROOT / "tasks").rglob("*"))
 
 

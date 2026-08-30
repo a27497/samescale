@@ -14,6 +14,7 @@ RUN apt-get update \
     && apt-get install --yes --no-install-recommends \
         ca-certificates \
         git \
+        sqlite3 \
     && rm -rf /var/lib/apt/lists/* \
     && case "${TARGETARCH}" in \
         amd64) CODEX_PLATFORM=linux-x64 ;; \

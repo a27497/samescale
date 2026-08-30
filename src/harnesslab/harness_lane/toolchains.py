@@ -9,6 +9,7 @@ _VERSION_PATTERNS = {
     "java": re.compile(r'\bversion\s+"(\d+(?:\.\d+)*)'),
     "javac": re.compile(r"\bjavac\s+(\d+(?:\.\d+)*)\b"),
     "node": re.compile(r"\bv(\d+(?:\.\d+)+)\b"),
+    "sqlite": re.compile(r"\b(\d+(?:\.\d+)+)\b"),
 }
 
 

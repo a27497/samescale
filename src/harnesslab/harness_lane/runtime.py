@@ -105,6 +105,7 @@ class CodexRuntime:
             "java": ("java", "-version"),
             "javac": ("javac", "-version"),
             "node": ("node", "--version"),
+            "sqlite": ("sqlite3", "--version"),
         }
         tool_versions: dict[str, str] = {}
         for tool, command in commands.items():
