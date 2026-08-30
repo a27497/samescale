@@ -7,13 +7,14 @@ from collections import Counter
 from collections.abc import Collection, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from typing import Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from harnesslab.contracts.common import EvaluationLane
 from harnesslab.db.models.experiment import ExperimentRunRecord
-from harnesslab.experiment.executor import ExperimentRunExecutor
 from harnesslab.experiment.methodology import ProviderAvailability
 from harnesslab.experiment.plan import ExperimentRunSlot, MethodologyV2ExperimentPlan
 from harnesslab.experiment.queue import ACTIVE_STATUSES, TERMINAL_STATUSES, RunSnapshot
@@ -54,6 +55,21 @@ class DispatchProfile(BaseModel):
             separators=(",", ":"),
         ).encode()
         return "sha256:" + hashlib.sha256(raw).hexdigest()
+
+
+class DispatchExecutor(Protocol):
+    """Minimal durable executor contract used by the production dispatcher."""
+
+    session_factory: async_sessionmaker[AsyncSession]
+
+    async def claim(
+        self,
+        experiment_id: str,
+        *,
+        slot_ids: Collection[str] | None = None,
+    ) -> RunSnapshot | None: ...
+
+    async def execute(self, claimed: RunSnapshot) -> RunSnapshot: ...
 
 
 @dataclass(frozen=True)
@@ -134,9 +150,9 @@ class BlockDispatchCoordinator:
             if provider_cap is None:
                 raise ValueError(f"dispatch profile lacks provider cap: {resource.provider_id}")
             if counts[resource.lane_class] >= lane_cap:
-                continue
+                return None
             if provider_counts[resource.provider_id] >= provider_cap:
-                continue
+                return None
             self._represented.add(slot_id)
             self._dispatch_sequence.append(slot_id)
             return slot
@@ -171,7 +187,7 @@ class BlockAwareDispatcher:
     def __init__(
         self,
         *,
-        executor: ExperimentRunExecutor,
+        executor: DispatchExecutor,
         plan: MethodologyV2ExperimentPlan,
         profile: DispatchProfile,
     ) -> None:

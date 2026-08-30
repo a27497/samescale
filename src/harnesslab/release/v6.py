@@ -46,6 +46,7 @@ V6_EXECUTION_SEED = 20260824
 V6_SCHEDULE_SEED = 20260831
 V6_CORPUS_REFERENCE = "release/core-corpus-v4.json"
 V6_METHODOLOGY_REFERENCE = "release/evaluation-methodology-v2.json"
+V6_THROUGHPUT_R2_SELECTED_PROFILE_ID = "V6_PROFILE_C_C6_H3"
 
 
 @dataclass(frozen=True)
@@ -121,6 +122,37 @@ def v6_dispatch_profiles() -> tuple[DispatchProfile, DispatchProfile]:
             max_direct_concurrency=4,
             provider_concurrency=provider_caps,
         ),
+    )
+
+
+def v6_throughput_r2_profiles() -> tuple[DispatchProfile, DispatchProfile, DispatchProfile]:
+    """Bounded local-qualification candidates; no profile permits adaptive limits."""
+
+    a, b = v6_dispatch_profiles()
+    return (
+        a,
+        b,
+        DispatchProfile(
+            profile_id="V6_PROFILE_C_C6_H3",
+            global_concurrency=6,
+            max_harness_concurrency=3,
+            max_direct_concurrency=4,
+            provider_concurrency={
+                "gpt56-relay": 2,
+                "alibaba-bailian": 2,
+                "deepseek-official": 2,
+            },
+        ),
+    )
+
+
+def selected_v6_dispatch_profile() -> DispatchProfile:
+    """Return the fixed R2 profile selected by real local host telemetry."""
+
+    return next(
+        profile
+        for profile in v6_throughput_r2_profiles()
+        if profile.profile_id == V6_THROUGHPUT_R2_SELECTED_PROFILE_ID
     )
 
 
@@ -336,7 +368,7 @@ async def dispatch_v6_queue(
     expected_identities = {cell.id: v6_binding_identity(cell) for cell in plan.cells}
     if dict(binding_identities) != expected_identities:
         raise ValueError("V6 executable binding identity drifted from the frozen plan")
-    selected = profile or v6_dispatch_profiles()[1]
+    selected = profile or selected_v6_dispatch_profile()
     async with session_factory() as session, session.begin():
         await enqueue_plan(session, plan)
     executor = ExperimentRunExecutor(
