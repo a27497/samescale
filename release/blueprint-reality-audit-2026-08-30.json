@@ -1,0 +1,875 @@
+{
+  "schema_version": 1,
+  "audit_id": "harnesslab-blueprint-reality-2026-08-30",
+  "audit_date": "2026-08-30",
+  "audited_code_head_sha": "968873954e7e00b5d3426bf1f224c32369e4118f",
+  "authoritative_base_sha": "a415822905346fb6e11351b9c5cb0f2b7e2ff4b3",
+  "documentation_reference": "docs/BLUEPRINT_REALITY_AUDIT_2026-08-30.md",
+  "blueprint_source": {
+    "status": "UNAVAILABLE",
+    "available_authorities": [
+      "The convergence brief supplied for this task",
+      "Repository architecture, methodology, release, and lane documentation at the audited code head"
+    ],
+    "limitation": "No final post-K blueprint defining K-C, L, P, Q, R, and S is tracked in the repository or included in the supplied convergence brief. Q and R are not assigned inferred product meanings."
+  },
+  "classification_vocabulary": [
+    "IMPLEMENTED",
+    "PARTIAL",
+    "MISSING",
+    "BLOCKED_BY_EVIDENCE",
+    "SUPERSEDED",
+    "NOT_YET_REQUIRED"
+  ],
+  "stage_summaries": [
+    {
+      "stage": "K-B3",
+      "status": "BLOCKED_BY_EVIDENCE",
+      "summary": "Configuration-source reconciliation and a secret-safe Phase M preflight occurred, but the exact seven-cell successor cannot be frozen from the available authoritative bindings and no successor canary was acquired."
+    },
+    {
+      "stage": "K-B4",
+      "status": "PARTIAL",
+      "summary": "Typed failure and evidence primitives exist, but the unified diagnosis taxonomy, clustering, drill-down platform, attribution records, BadCase export, and dedicated Workbench experience are not implemented at this audit baseline."
+    },
+    {
+      "stage": "K-C",
+      "status": "BLOCKED_BY_EVIDENCE",
+      "summary": "Assuming K-C denotes final Core release closure, its keyless hard stop exists while real Matrix, paired, Judge, BadCase, exact-head CI, and tag evidence remain unavailable."
+    },
+    {
+      "stage": "L",
+      "status": "PARTIAL",
+      "summary": "Automated code-quality enforcement is mature, while repository ownership and contribution governance are not represented by tracked ownership artifacts. Exact Phase L acceptance criteria are unavailable."
+    },
+    {
+      "stage": "M",
+      "status": "PARTIAL",
+      "summary": "Preflight, budget, lifecycle contracts, task quality, and development/held-out split primitives are integrated. Discriminative and stress suites, failure clustering, and end-to-end funnel orchestration remain absent or incomplete."
+    },
+    {
+      "stage": "N",
+      "status": "PARTIAL",
+      "summary": "One-command lifecycle, production Compose, and the bundled Workbench are integrated. Settings and run-control remain deliberately limited, and a published multi-platform distribution is not evidenced."
+    },
+    {
+      "stage": "O",
+      "status": "PARTIAL",
+      "summary": "The isolated Custom Evaluation foundation is integrated, but custom plans cannot yet execute through the experiment runners and no custom-evaluation Workbench surface exists."
+    },
+    {
+      "stage": "P",
+      "status": "PARTIAL",
+      "summary": "Reusable internal adapter protocols exist. A supported public Adapter SDK, discovery mechanism, compatibility contract, templates, and SDK qualification do not. Phase P implementation is outside this convergence phase."
+    },
+    {
+      "stage": "Q",
+      "status": "NOT_YET_REQUIRED",
+      "summary": "The authoritative definition of Phase Q is unavailable, so no feature meaning or implementation claim is inferred."
+    },
+    {
+      "stage": "R",
+      "status": "NOT_YET_REQUIRED",
+      "summary": "The authoritative definition of Phase R is unavailable, so no feature meaning or implementation claim is inferred."
+    },
+    {
+      "stage": "S",
+      "status": "PARTIAL",
+      "summary": "Fast and manual Full Release CI architecture is implemented and an evidence comparison surface exists. Automated regression policy and external benchmark validation are not implemented."
+    }
+  ],
+  "requirements": [
+    {
+      "stage": "K-B3",
+      "requirement_id": "kb3-historical-immutability",
+      "requirement": "Preserve old Matrix, v3, v3r1, and original attempt evidence without resuming or rewriting it.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "release/kb3-convergence-reentry-audit.json",
+        "release/reports/core-real-matrix-v3-pause-checkpoint.json"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "The historical timeout root cause remains UNRESOLVED."
+      ]
+    },
+    {
+      "stage": "K-B3",
+      "requirement_id": "kb3-configuration-absence-conclusion",
+      "requirement": "Treat the earlier conclusion that legitimate operator configuration was absent as authoritative.",
+      "status": "SUPERSEDED",
+      "evidence_refs": [
+        "release/kb3-convergence-reentry-audit.json"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "The convergence audit found the known private configuration source valid but not sourced; no value or endpoint was persisted."
+      ]
+    },
+    {
+      "stage": "K-B3",
+      "requirement_id": "kb3-secret-safe-config-reconciliation",
+      "requirement": "Reconcile the known operator configuration source without exposing values.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "release/kb3-convergence-reentry-audit.json",
+        "docs/PHASE_M_EVALUATION_SYSTEM_2.md",
+        "tests/test_phase_m_interfaces.py"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "Configuration validity does not explain the historical provider timeouts."
+      ]
+    },
+    {
+      "stage": "K-B3",
+      "requirement_id": "kb3-exact-successor-preflight",
+      "requirement": "Run one exact-identity, keyless, pre-spend Phase M preflight for the intended seven-cell successor.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "release/kb3-convergence-reentry-audit.json",
+        "release/kb3-operator-config-preflight.json",
+        "src/harnesslab/preflight/service.py"
+      ],
+      "remaining_work": [
+        "Define an authoritative seven-cell successor binding without changing provider, model, or route.",
+        "Represent heterogeneous route pricing, the Judge campaign, and per-cell resource identities in one exact preflight.",
+        "Rerun the complete successor preflight after those design blockers are resolved."
+      ],
+      "limitations": [
+        "The completed preflight was configuration-focused and terminated BLOCKED; it was not an exact successor authorization."
+      ]
+    },
+    {
+      "stage": "K-B3",
+      "requirement_id": "kb3-successor-freeze",
+      "requirement": "Freeze a new 18-task, seven-cell, FORMAL n=5 successor with 630 planned subject runs.",
+      "status": "BLOCKED_BY_EVIDENCE",
+      "evidence_refs": [
+        "release/kb3-convergence-reentry-audit.json",
+        "release/core-real-evidence-plan-v3.json"
+      ],
+      "remaining_work": [
+        "Resolve the missing authoritative successor binding and preflight representation.",
+        "Freeze a new immutable plan rather than modifying or resuming v3 or v3r1."
+      ],
+      "limitations": [
+        "The preferred successor identifier has no plan digest and has not been created."
+      ]
+    },
+    {
+      "stage": "K-B3",
+      "requirement_id": "kb3-bounded-canary-and-budget",
+      "requirement": "Acquire at most seven subject canaries and one Judge canary, then produce an evidence-backed full-Matrix authorization decision.",
+      "status": "BLOCKED_BY_EVIDENCE",
+      "evidence_refs": [
+        "release/kb3-convergence-reentry-audit.json",
+        "src/harnesslab/budget/estimator.py"
+      ],
+      "remaining_work": [
+        "Complete a scientifically valid successor preflight and freeze.",
+        "Obtain bounded canary evidence under explicit authorization.",
+        "Supply authoritative pricing before converting unknown cost to a monetary estimate."
+      ],
+      "limitations": [
+        "Subject calls, Judge calls, and recovery attempts are all zero; cost and wall-clock projections are UNKNOWN."
+      ]
+    },
+    {
+      "stage": "K-B4",
+      "requirement_id": "kb4-unified-failure-taxonomy",
+      "requirement": "Normalize compile, test, timeout, provider, protocol, tool, workspace, dependency, verifier, and artifact failures while preserving capability versus infrastructure.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/model_lane/models.py",
+        "src/harnesslab/harness_lane/models.py",
+        "src/harnesslab/sandbox/models.py",
+        "src/harnesslab/experiment/outcomes.py"
+      ],
+      "remaining_work": [
+        "Add one diagnosis-level taxonomy mapping the existing lane-specific enums to every required K-B4 class.",
+        "Qualify deterministic precedence when several failure signals coexist."
+      ],
+      "limitations": [
+        "The existing typed enums are useful but fragmented and do not cover the required diagnosis vocabulary as one stable contract."
+      ]
+    },
+    {
+      "stage": "K-B4",
+      "requirement_id": "kb4-deterministic-clustering",
+      "requirement": "Cluster failures deterministically across cell, task, language, task family, failure class, trace, tool, and workspace-diff dimensions.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "src/harnesslab/experiment/model_comparison.py",
+        "src/harnesslab/analyst/evidence.py"
+      ],
+      "remaining_work": [
+        "Implement canonical cluster keys, summaries, stable ordering, and integrity-bound evidence references.",
+        "Add synthetic qualification for every grouping dimension and mixed-dimension cluster."
+      ],
+      "limitations": [
+        "Presentation categories and per-run inspection are not a clustering engine."
+      ]
+    },
+    {
+      "stage": "K-B4",
+      "requirement_id": "kb4-drilldown",
+      "requirement": "Provide Experiment to Cell to Task family to Failure cluster to Run to Trace, diff, tool, verifier, and attribution drill-down.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/analyst/evidence.py",
+        "src/harnesslab/api/routes/workbench.py",
+        "frontend/src/views/RunDetailView.vue"
+      ],
+      "remaining_work": [
+        "Add task-family and failure-cluster resources.",
+        "Expose workspace diff, tool-call, verifier, and attribution detail through one typed diagnosis API."
+      ],
+      "limitations": [
+        "Existing run and trace views skip the cluster layer and do not implement the complete required chain."
+      ]
+    },
+    {
+      "stage": "K-B4",
+      "requirement_id": "kb4-attribution-boundary",
+      "requirement": "Distinguish VERIFIED_FACT from HYPOTHESIS and prevent trace correlation from being reported as causality.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/analyst/models.py",
+        "src/harnesslab/analyst/report.py",
+        "src/harnesslab/experiment/report.py"
+      ],
+      "remaining_work": [
+        "Create diagnosis-specific attribution records bound to run, cluster, trace, diff, and verifier evidence.",
+        "Represent controlled-ablation support separately from ordinary correlation."
+      ],
+      "limitations": [
+        "The Analyst fact boundary is reusable, but it is not yet the K-B4 diagnosis attribution service."
+      ]
+    },
+    {
+      "stage": "K-B4",
+      "requirement_id": "kb4-badcase-export",
+      "requirement": "Export evidence-backed BadCases without fabricating real cases.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "release/badcases.json",
+        "docs/BADCASES.md",
+        "src/harnesslab/release/final_verifier.py"
+      ],
+      "remaining_work": [
+        "Implement deterministic export from eligible capability-failure evidence.",
+        "Preserve placeholders until real evidence satisfies the export contract."
+      ],
+      "limitations": [
+        "The repository has three honest placeholders and final-release validation, but no general export machinery."
+      ]
+    },
+    {
+      "stage": "K-B4",
+      "requirement_id": "kb4-workbench",
+      "requirement": "Integrate diagnosis into the Workbench without duplicating backend analysis logic.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "frontend/src/router/index.ts",
+        "frontend/src/views/RunDetailView.vue",
+        "src/harnesslab/api/app.py"
+      ],
+      "remaining_work": [
+        "Add typed diagnosis client models, routes, cluster exploration, drill-down, and BadCase export affordances backed by one backend service."
+      ],
+      "limitations": [
+        "The audit baseline has no dedicated diagnosis route or diagnosis API registration."
+      ]
+    },
+    {
+      "stage": "K-C",
+      "requirement_id": "kc-keyless-release-hard-stop",
+      "requirement": "Fail closed until all mandatory real release evidence is present and semantically valid.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "scripts/verify_gate_k.py",
+        "src/harnesslab/release/final_verifier.py",
+        "release/release-evidence.json"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "A passing keyless Gate K proves the hard stop, not release readiness."
+      ]
+    },
+    {
+      "stage": "K-C",
+      "requirement_id": "kc-final-core-evidence",
+      "requirement": "Bind completed real Matrix, paired comparison or no-uplift policy, controlled ablation, Judge, and three factual BadCases.",
+      "status": "BLOCKED_BY_EVIDENCE",
+      "evidence_refs": [
+        "release/release-evidence.json",
+        "release/badcases.json",
+        "docs/RELEASE_EVIDENCE.md"
+      ],
+      "remaining_work": [
+        "Complete only separately authorized, scientifically valid real campaigns.",
+        "Bind trusted artifacts and rebuild reports through the final verifier."
+      ],
+      "limitations": [
+        "No successor full Matrix is authorized by this convergence phase."
+      ]
+    },
+    {
+      "stage": "K-C",
+      "requirement_id": "kc-exact-head-ci-and-tag",
+      "requirement": "Verify the final release candidate at its exact head and authorize the Core tag without merging main.",
+      "status": "BLOCKED_BY_EVIDENCE",
+      "evidence_refs": [
+        ".github/workflows/full-ci.yml",
+        "release/release-evidence.json",
+        "src/harnesslab/release/final_verifier.py"
+      ],
+      "remaining_work": [
+        "Run one final exact-head Full Release workflow after all mandatory evidence is checked in.",
+        "Bind its successful identity in the release manifest before any tag operation."
+      ],
+      "limitations": [
+        "The audit does not assert that K-C is the official post-K name because the final blueprint source is unavailable."
+      ]
+    },
+    {
+      "stage": "L",
+      "requirement_id": "l-automated-code-quality",
+      "requirement": "Enforce tests, lint, formatting, strict typing, migrations, and whitespace integrity.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "pyproject.toml",
+        ".github/workflows/ci.yml",
+        ".github/workflows/full-ci.yml",
+        "scripts/verify_gate_a.py"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "This is automated quality enforcement, not proof of ownership coverage or long-term maintainability."
+      ]
+    },
+    {
+      "stage": "L",
+      "requirement_id": "l-ownership-governance",
+      "requirement": "Record component ownership, review responsibility, and contribution expectations.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "AGENTS.md",
+        "docs/ARCHITECTURE.md"
+      ],
+      "remaining_work": [
+        "Obtain the authoritative Phase L ownership requirements.",
+        "Add tracked ownership and contribution artifacts if those requirements call for them."
+      ],
+      "limitations": [
+        "AGENTS.md provides task governance but does not identify code owners or maintainers."
+      ]
+    },
+    {
+      "stage": "L",
+      "requirement_id": "l-boundary-convergence",
+      "requirement": "Keep cross-lane behavior in shared, maintainable boundaries rather than duplicating orchestration and taxonomy.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/model_lane/models.py",
+        "src/harnesslab/harness_lane/adapter.py",
+        "src/harnesslab/multi_harness/adapter.py",
+        "src/harnesslab/experiment/executor.py"
+      ],
+      "remaining_work": [
+        "Converge diagnosis taxonomy and future Adapter SDK boundaries without rewriting stable execution contracts."
+      ],
+      "limitations": [
+        "Exact code-quality acceptance criteria for Phase L are unavailable."
+      ]
+    },
+    {
+      "stage": "M",
+      "requirement_id": "m-preflight",
+      "requirement": "Provide secret-safe readiness assessment across configuration, runtime, data, compatibility, policy, resources, comparability, trace, and budget.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "src/harnesslab/preflight/models.py",
+        "src/harnesslab/preflight/service.py",
+        "src/harnesslab/api/routes/preflight.py",
+        "tests/test_phase_m_preflight.py"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "The current schema cannot express every heterogeneous K-B3 successor requirement in one exact preflight."
+      ]
+    },
+    {
+      "stage": "M",
+      "requirement_id": "m-budget",
+      "requirement": "Estimate subject and Judge calls, tokens, requests, turns, tool calls, and cost without treating unknown price as zero.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "src/harnesslab/budget/models.py",
+        "src/harnesslab/budget/estimator.py",
+        "tests/test_phase_m_budget.py"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "Monetary projections still require authoritative price inputs."
+      ]
+    },
+    {
+      "stage": "M",
+      "requirement_id": "m-lifecycle",
+      "requirement": "Expose durable lifecycle states and immutable, explicitly authorized infrastructure recovery attempts.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/experiment/lifecycle.py",
+        "src/harnesslab/experiment/queue.py",
+        "src/harnesslab/experiment/executor.py",
+        "tests/test_experiment_lifecycle.py"
+      ],
+      "remaining_work": [
+        "Wire Phase M lifecycle and recovery-ledger contracts into the authoritative queue and executor rather than leaving them as compatibility primitives."
+      ],
+      "limitations": [
+        "The lifecycle module is validated independently; existing queue persistence continues to use legacy status transitions."
+      ]
+    },
+    {
+      "stage": "M",
+      "requirement_id": "m-task-quality",
+      "requirement": "Represent digest-bound task quality and qualification without promoting imported or custom tasks into official tiers.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/tasks/quality.py",
+        "docs/TASK_QUALITY_AND_SPLITS.md",
+        "tests/test_task_quality_and_splits.py",
+        "release/tier-b-qualification-v1.json"
+      ],
+      "remaining_work": [
+        "Integrate the quality record into governed task discovery and experiment planning where required by the final methodology."
+      ],
+      "limitations": [
+        "The quality layer consumes evidence but does not run qualification or persist a new authoritative registry."
+      ]
+    },
+    {
+      "stage": "M",
+      "requirement_id": "m-development-heldout",
+      "requirement": "Freeze development and held-out membership with provenance and leakage checks.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/tasks/splits.py",
+        "docs/TASK_QUALITY_AND_SPLITS.md",
+        "tests/test_task_quality_and_splits.py"
+      ],
+      "remaining_work": [
+        "Create and govern actual source-backed split manifests for suites that require development and held-out evaluation."
+      ],
+      "limitations": [
+        "The repository has the freeze mechanism but no audited production split artifact."
+      ]
+    },
+    {
+      "stage": "M",
+      "requirement_id": "m-discriminative-suite",
+      "requirement": "Provide a versioned Discriminative Suite with real task definitions and qualification.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "docs/EVAL_METHODOLOGY_V2.md",
+        "release/evaluation-methodology-v2.json"
+      ],
+      "remaining_work": [
+        "Define, source, qualify, version, and gate a discriminative task suite without selecting it from favorable outcomes."
+      ],
+      "limitations": [
+        "The methodology labels discriminative stress as an optional future extension; it does not supply a suite."
+      ]
+    },
+    {
+      "stage": "M",
+      "requirement_id": "m-stress-suite",
+      "requirement": "Provide a versioned Stress Suite with explicit resource and interpretation boundaries.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "docs/EVAL_METHODOLOGY_V2.md",
+        "release/evaluation-methodology-v2.json"
+      ],
+      "remaining_work": [
+        "Define and qualify stress tasks, ceilings, scheduling, and report semantics."
+      ],
+      "limitations": [
+        "A future funnel-stage enum is not an implemented Stress Suite."
+      ]
+    },
+    {
+      "stage": "M",
+      "requirement_id": "m-failure-clustering",
+      "requirement": "Aggregate evaluation failures into deterministic, inspectable clusters.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "src/harnesslab/experiment/report.py",
+        "src/harnesslab/analyst/evidence.py"
+      ],
+      "remaining_work": [
+        "Implement the shared K-B4 diagnosis clustering layer and reuse it from Phase M reporting."
+      ],
+      "limitations": [
+        "Existing outcome summaries and per-run inspection do not cluster failures."
+      ]
+    },
+    {
+      "stage": "M",
+      "requirement_id": "m-funnel-evaluation",
+      "requirement": "Operate the explicit Preflight, Smoke, Breadth, Informal, Formal, and optional discriminative/stress funnel with GO or STOP gates.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/experiment/methodology.py",
+        "src/harnesslab/experiment/plan.py",
+        "docs/EVAL_METHODOLOGY_V2.md"
+      ],
+      "remaining_work": [
+        "Bind stage completion evidence and explicit operator decisions to subsequent plan creation and execution.",
+        "Add missing suite definitions before enabling the final optional stage."
+      ],
+      "limitations": [
+        "The canonical stage model and transition helper exist, but there is no complete funnel campaign orchestrator."
+      ]
+    },
+    {
+      "stage": "N",
+      "requirement_id": "n-one-command-lifecycle",
+      "requirement": "Provide keyless up, down, status, and doctor commands over a trusted product manifest.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "src/harnesslab/productization/cli.py",
+        "src/harnesslab/productization/lifecycle.py",
+        "tests/test_product_lifecycle.py",
+        "docs/PRODUCTIZATION.md"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "Product lifecycle readiness does not authorize an evaluation or prove scientific readiness."
+      ]
+    },
+    {
+      "stage": "N",
+      "requirement_id": "n-production-container-and-workbench",
+      "requirement": "Build and serve the production API and bundled Workbench with migrations and hardened local services.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "docker/product/Dockerfile",
+        "docker-compose.yml",
+        "src/harnesslab/api/static.py",
+        "tests/test_bundled_workbench.py"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "This audit does not claim that a published prebuilt image or installer has been released."
+      ]
+    },
+    {
+      "stage": "N",
+      "requirement_id": "n-settings-and-registry-ux",
+      "requirement": "Provide usable product settings and model, provider, Harness, and capability registry experiences.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "frontend/src/views/SettingsView.vue",
+        "frontend/src/views/ModelsView.vue",
+        "frontend/src/views/HarnessesView.vue",
+        "src/harnesslab/api/routes/registry.py"
+      ],
+      "remaining_work": [
+        "Define a secure operator workflow for changing supported non-secret settings and credential references if required.",
+        "Integrate Custom Evaluation and diagnosis navigation after those backends are complete."
+      ],
+      "limitations": [
+        "Settings are intentionally presence-only and registry planning remains backend-governed."
+      ]
+    },
+    {
+      "stage": "N",
+      "requirement_id": "n-run-control-ux",
+      "requirement": "Expose safe experiment lifecycle and scoped infrastructure recovery controls.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "frontend/src/views/RunControlView.vue",
+        "src/harnesslab/api/routes/workbench.py",
+        "src/harnesslab/experiment/lifecycle.py"
+      ],
+      "remaining_work": [
+        "Connect explicit authorized infrastructure recovery to the authoritative lifecycle service.",
+        "Keep capability outcomes terminal and prohibit retry-all behavior."
+      ],
+      "limitations": [
+        "The integrated Run Control view is observational; it does not issue lifecycle mutations."
+      ]
+    },
+    {
+      "stage": "N",
+      "requirement_id": "n-distribution-release",
+      "requirement": "Ship a reproducible supported distribution beyond the source-checkout lifecycle.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "pyproject.toml",
+        "docker/product/Dockerfile",
+        "tests/test_product_distribution.py",
+        "docs/PRODUCTIZATION.md"
+      ],
+      "remaining_work": [
+        "Define supported platforms and produce signed or otherwise provenance-bound release artifacts if required by the unavailable final blueprint.",
+        "Qualify installation and upgrade from those artifacts."
+      ],
+      "limitations": [
+        "Wheel content and source distribution behavior are tested; no published artifact or cross-platform support matrix is evidenced."
+      ]
+    },
+    {
+      "stage": "O",
+      "requirement_id": "o-managed-store-and-import",
+      "requirement": "Import user-owned task packages into an immutable managed Custom namespace with provenance.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "src/harnesslab/custom_eval/store.py",
+        "src/harnesslab/custom_eval/models.py",
+        "tests/test_custom_eval.py",
+        "docs/CUSTOM_EVALUATION.md"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "Remote transport is denied by default and must remain explicitly authorized."
+      ]
+    },
+    {
+      "stage": "O",
+      "requirement_id": "o-builder-criteria-validation",
+      "requirement": "Build, validate, and describe deterministic and optional Judge-rubric criteria for custom tasks.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "src/harnesslab/custom_eval/builder.py",
+        "src/harnesslab/custom_eval/evaluation.py",
+        "src/harnesslab/custom_eval/cli.py",
+        "tests/test_custom_eval.py"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "The subsystem consumes supplied Judge evidence and does not execute a Judge."
+      ]
+    },
+    {
+      "stage": "O",
+      "requirement_id": "o-official-custom-isolation",
+      "requirement": "Prevent Custom tasks and reports from becoming Official benchmark evidence.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "src/harnesslab/custom_eval/models.py",
+        "src/harnesslab/custom_eval/store.py",
+        "src/harnesslab/experiment/spec.py",
+        "docs/CUSTOM_EVALUATION.md"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "Future execution integration must preserve the separate namespace rather than widening Official discovery."
+      ]
+    },
+    {
+      "stage": "O",
+      "requirement_id": "o-custom-plan-and-report",
+      "requirement": "Create deterministic Quick, Compare, and Formal custom plans and custom-only reports.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        "src/harnesslab/custom_eval/evaluation.py",
+        "src/harnesslab/custom_eval/cli.py",
+        "src/harnesslab/custom_eval/api.py",
+        "tests/test_custom_eval.py"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "Reports summarize supplied observations; plan creation is not execution."
+      ]
+    },
+    {
+      "stage": "O",
+      "requirement_id": "o-custom-execution",
+      "requirement": "Execute a custom plan through approved Model and Harness runners and persist evidence without crossing into Official results.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "src/harnesslab/custom_eval/cli.py",
+        "src/harnesslab/custom_eval/evaluation.py",
+        "src/harnesslab/experiment/executor.py",
+        "docs/CUSTOM_EVALUATION.md"
+      ],
+      "remaining_work": [
+        "Add a custom-only execution binding, persistence namespace, preflight, lifecycle, and immutable evidence loader.",
+        "Reuse approved runner implementations without allowing Custom paths into Official ExperimentSpec discovery."
+      ],
+      "limitations": [
+        "There is no custom run or execute command and no Provider, Harness, or Judge invocation path in the custom_eval package."
+      ]
+    },
+    {
+      "stage": "O",
+      "requirement_id": "o-custom-workbench",
+      "requirement": "Provide a usable Workbench experience for custom import, building, validation, planning, execution, and reporting.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "frontend/src/router/index.ts",
+        "src/harnesslab/custom_eval/api.py"
+      ],
+      "remaining_work": [
+        "Add Custom Evaluation routes and typed client views after custom execution semantics are defined."
+      ],
+      "limitations": [
+        "Backend foundation endpoints are integrated, but the frontend has no Custom Evaluation route."
+      ]
+    },
+    {
+      "stage": "P",
+      "requirement_id": "p-reusable-internal-adapters",
+      "requirement": "Reuse stable internal Model, Harness, experiment-lane, Judge-provider, and analysis backend seams.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/model_lane/models.py",
+        "src/harnesslab/harness_lane/adapter.py",
+        "src/harnesslab/multi_harness/adapter.py",
+        "src/harnesslab/experiment/executor.py",
+        "src/harnesslab/analyst/backend.py"
+      ],
+      "remaining_work": [
+        "Select which internal protocols are safe to stabilize publicly and separate them from private orchestration details."
+      ],
+      "limitations": [
+        "Internal typing protocols are not a supported SDK contract."
+      ]
+    },
+    {
+      "stage": "P",
+      "requirement_id": "p-public-adapter-sdk",
+      "requirement": "Provide a versioned public Adapter SDK with documented lifecycle, capabilities, security, evidence, and compatibility contracts.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "pyproject.toml",
+        "docs/ARCHITECTURE.md"
+      ],
+      "remaining_work": [
+        "Define the SDK only after convergence, including package boundaries, public models, error contracts, and compatibility policy.",
+        "Add examples, templates, conformance tests, and migration guidance."
+      ],
+      "limitations": [
+        "Phase P implementation is explicitly outside this convergence phase."
+      ]
+    },
+    {
+      "stage": "P",
+      "requirement_id": "p-adapter-discovery-and-qualification",
+      "requirement": "Discover third-party adapters safely and qualify them without arbitrary ambient code execution.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "pyproject.toml",
+        "src/harnesslab/registry/service.py",
+        "docs/SECURITY.md"
+      ],
+      "remaining_work": [
+        "Define explicit registration, provenance, capability negotiation, sandboxing, and conformance gates."
+      ],
+      "limitations": [
+        "The package exposes only the HarnessLab CLI entry point; no adapter entry-point group or SDK registry exists."
+      ]
+    },
+    {
+      "stage": "Q",
+      "requirement_id": "q-authoritative-definition",
+      "requirement": "Obtain the final blueprint definition and acceptance criteria for Phase Q before implementation.",
+      "status": "NOT_YET_REQUIRED",
+      "evidence_refs": [
+        "docs/ARCHITECTURE.md"
+      ],
+      "remaining_work": [
+        "Supply or recover the authoritative final post-K blueprint.",
+        "Perform a fresh evidence-backed audit after Phase Q has a defined scope."
+      ],
+      "limitations": [
+        "No product meaning is assigned to Q by this audit."
+      ]
+    },
+    {
+      "stage": "R",
+      "requirement_id": "r-authoritative-definition",
+      "requirement": "Obtain the final blueprint definition and acceptance criteria for Phase R before implementation.",
+      "status": "NOT_YET_REQUIRED",
+      "evidence_refs": [
+        "docs/ARCHITECTURE.md"
+      ],
+      "remaining_work": [
+        "Supply or recover the authoritative final post-K blueprint.",
+        "Perform a fresh evidence-backed audit after Phase R has a defined scope."
+      ],
+      "limitations": [
+        "No product meaning is assigned to R by this audit."
+      ]
+    },
+    {
+      "stage": "S",
+      "requirement_id": "s-fast-ci",
+      "requirement": "Run bounded deterministic checks on pushes and pull requests with cancellation of stale work.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        ".github/workflows/ci.yml",
+        "tests/test_ci_workflow_contracts.py"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "Fast CI intentionally does not replace the full gate chain."
+      ]
+    },
+    {
+      "stage": "S",
+      "requirement_id": "s-full-release-ci",
+      "requirement": "Run the full keyless gate and qualification architecture manually at an exact candidate head.",
+      "status": "IMPLEMENTED",
+      "evidence_refs": [
+        ".github/workflows/full-ci.yml",
+        "scripts/verify_fresh_setup.py",
+        "tests/test_ci_workflow_contracts.py"
+      ],
+      "remaining_work": [],
+      "limitations": [
+        "A workflow definition is not evidence that the final convergence head has passed it."
+      ]
+    },
+    {
+      "stage": "S",
+      "requirement_id": "s-regression-comparison",
+      "requirement": "Compare two persisted experiment reports under explicit comparability controls.",
+      "status": "PARTIAL",
+      "evidence_refs": [
+        "src/harnesslab/api/workbench_service.py",
+        "frontend/src/views/RegressionView.vue",
+        "tests/test_workbench_api.py",
+        "frontend/tests/workbench.spec.ts"
+      ],
+      "remaining_work": [
+        "Define versioned regression baselines, decision thresholds, ownership, and an automated fail-closed policy gate."
+      ],
+      "limitations": [
+        "The Workbench comparison is evidence presentation and does not claim significance, infer causality, or enforce a CI regression budget."
+      ]
+    },
+    {
+      "stage": "S",
+      "requirement_id": "s-external-benchmark-validation",
+      "requirement": "Ingest, qualify, execute, and report external benchmarks with provenance and contamination controls.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "docs/EVAL_METHODOLOGY.md",
+        "docs/ARCHITECTURE.md",
+        "src/harnesslab/tasks/quality.py"
+      ],
+      "remaining_work": [
+        "Define permitted benchmark sources, licenses, provenance, contamination checks, adapters, task conversion, qualification, and reporting boundaries.",
+        "Keep external benchmark evidence distinct from official Core and user Custom evidence."
+      ],
+      "limitations": [
+        "Current Judge qualification explicitly disclaims external benchmark validation."
+      ]
+    }
+  ]
+}
