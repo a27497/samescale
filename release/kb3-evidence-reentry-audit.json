@@ -1,0 +1,137 @@
+{
+  "audit_id": "phase-k-b3-evidence-reentry-audit-v1",
+  "authoritative_base_sha": "a415822905346fb6e11351b9c5cb0f2b7e2ff4b3",
+  "evidence_boundary": {
+    "database": "READ_ONLY_OPERATOR_POSTGRES_SNAPSHOT",
+    "filesystem": "READ_ONLY_OPERATOR_ARTIFACT_AND_TRACKED_RELEASE_SNAPSHOT",
+    "historical_timeout_phase": "NOT_INDEPENDENTLY_VERIFIABLE_FROM_PERSISTED_MANIFESTS",
+    "local_main_ref": "f117f88977c5855973eefe7cdd4875ece1791365",
+    "origin_main_ref": "a415822905346fb6e11351b9c5cb0f2b7e2ff4b3",
+    "operator_snapshot_recorded_at_utc": "2026-08-30T08:48:51Z",
+    "protected_file_content_inspected": false,
+    "provider_status_probe_performed": false,
+    "reason_provider_status_not_probed": "LEGITIMATE_ALIBABA_ENDPOINT_AND_CREDENTIAL_REFERENCES_ABSENT",
+    "secret_values_read_or_persisted": false
+  },
+  "historical_artifact_identities": {
+    "core_real_matrix_v3": {
+      "artifacts": {
+        "release/core-real-evidence-plan-v3.json": "sha256:c997d17f909897dc43add2539270c8a7d93ae621f9b3f3d010f6e243c09b7eb1",
+        "release/core-real-matrix-v3-portfolio-view.json": "sha256:e845f0d8657690532db0d1408cbba7d435f979f64ee8d115a52274058673e216",
+        "release/core-real-smoke-plan-v3.json": "sha256:a96c5e31fc521a17affd33e28cc01f22e9ea359a00410cd8099687f249742a7c",
+        "release/reports/core-real-matrix-v3-interim-partial.md": "sha256:91776b2210a3291fe5258f6313db06cf0ce45cadebe43b1c0fb79d638e23902f",
+        "release/reports/core-real-matrix-v3-pause-checkpoint.json": "sha256:ddaeba7df423e159ca67574f2d000ab48137df0e76d581c4c0985bedc383036e"
+      },
+      "database_status_field": "running",
+      "experiment_id": "core-real-matrix-v3",
+      "last_finished_at_utc": "2026-08-28T07:03:29.379083Z",
+      "logical_runs_attempted": 177,
+      "logical_runs_untouched": 453,
+      "logical_runs_total": 630,
+      "matrix_resumed_by_lane_a": false,
+      "operator_state": "PAUSED_NO_ACTIVE_LEASE",
+      "physical_attempts": 178,
+      "plan_digest": "sha256:5b91aea8c2cf812e911358b3a39f75d8d0eada153188c219eaf5176d3b3b107d"
+    },
+    "model_chat_v2": {
+      "active_lease_count": 0,
+      "experiment_id": "portfolio-alibaba-model-chat-v2",
+      "historical_status": "HISTORICAL_NO_LANE_A_ACQUISITION",
+      "last_finished_at_utc": "2026-08-29T12:02:08.330543Z",
+      "logical_runs_attempted": 23,
+      "logical_runs_untouched": 13,
+      "logical_runs_total": 36,
+      "plan_digest": "sha256:bd4e47e2e7cbcc406338d0fcb9f6fd029f0c43b89b02ae5bc41b805df4eb8eda"
+    },
+    "model_chat_v3": {
+      "artifacts": {
+        "release/model-chat-v3-canary.json": "sha256:f1a30c4f6090037e57374be5c79ccf92e1fa87d4e6817619680023de3b8db784",
+        "release/model-chat-v3-continuation-policy.json": "sha256:1e0da3d230e0a2ab544569f367e849ea08ad2fd588d971e0f8a8ce3180b2d07e",
+        "release/model-chat-v3-keyless-plan.json": "sha256:6fe30658b2b2794738eca3523669790c820fc4903812d7c54a540d52b4f15f48"
+      },
+      "experiment_id": "portfolio-alibaba-model-chat-v3",
+      "operator_database_state": "ABSENT",
+      "operator_preflight_receipt_digest": "sha256:c4e7e498f47adda45347607d3cc322e9b34663c51e1de9514435cdcd01b8aeb5",
+      "operator_preflight_stop": "FROZEN_PLAN_MISMATCH",
+      "plan_digest": "sha256:100ab920df1eee16f9a9cd754cf8b3454de446445518dbb5c86d326aa20b2042",
+      "real_subject_acquisition": 0,
+      "status": "STOPPED_ZERO_ACQUISITION"
+    },
+    "model_chat_v3r1": {
+      "active_lease_count": 0,
+      "artifacts": {
+        "release/model-chat-v3r1-canary.json": "sha256:bad7d94981bc9d752070fcee713975fd22c02249b552aaa20b77446887369ee8",
+        "release/model-chat-v3r1-continuation-policy.json": "sha256:b19f7ba7b03e3546fef746a06f1041bd9084ab60520075dc32c88e25f50fcce1",
+        "release/model-chat-v3r1-keyless-plan.json": "sha256:1f8e94d494e91b3200efebda757cea8853e92830c579b05a7f5673181254d790"
+      },
+      "capability_fail": 1,
+      "capability_pass": 15,
+      "experiment_id": "portfolio-alibaba-model-chat-v3r1",
+      "historical_artifact_file_count": 132,
+      "historical_artifact_manifest_count": 18,
+      "historical_artifact_tree_digest": "sha256:bf8e396278de2370541f0fe2444a46015a6677f82f820e1c8f007143001f2760",
+      "historical_input_tokens_observed": 6116,
+      "historical_output_tokens_observed": 26044,
+      "historical_provider_failure_rate": 0.1111111111111111,
+      "historical_subject_duration_ms_observed": 565401,
+      "infra_failure": 2,
+      "last_finished_at_utc": "2026-08-29T20:52:06.711299Z",
+      "logical_runs_attempted": 18,
+      "logical_runs_untouched": 18,
+      "logical_runs_total": 36,
+      "original_evidence_mutated_by_lane_a": false,
+      "plan_digest": "sha256:b20865518f6531fdf2db3cacfeef9b33afbf4614f43aee8b850f8135e59d7548",
+      "qwen_timeout_elapsed_ms": [
+        180421.385,
+        180416.169
+      ],
+      "qwen_timeout_manifest_facts": {
+        "observed_model": null,
+        "provider_failure": "timeout",
+        "provider_result": null,
+        "requested_model": "qwen3.8-max",
+        "route_identity": "alibaba-bailian|chat_completions|env:HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL/chat/completions"
+      },
+      "recovery_attempts": 0,
+      "status": "HARD_STOPPED_PARTIAL_EXPLORATORY_EVIDENCE"
+    }
+  },
+  "judge_audit": {
+    "database_calibration_ids": [
+      "core-calibration-keyless-v1"
+    ],
+    "database_evaluation_rows": 126,
+    "real_judge_campaign_detected": false,
+    "real_judge_launches_by_lane_a": 0,
+    "requested_models": [
+      "fake-biased-unstable-judge-v1",
+      "fake-good-judge-v1"
+    ],
+    "result": "ONLY_DETERMINISTIC_KEYLESS_FAKE_CALIBRATION_PRESENT"
+  },
+  "protected_file": {
+    "path": "CHATGPT_PROJECT_HANDOFF_2026-08-27.md",
+    "present_in_authoritative_worktree": true,
+    "present_in_lane_worktree": false,
+    "sha256": "sha256:132d1e9d58871e35f31e93686a12107965fc9d7bb19e497141b628bcc6745ac9",
+    "size_bytes": 28774,
+    "tracked": false
+  },
+  "qwen_route_reconciliation": {
+    "historic_timeout_root_cause": "UNRESOLVED",
+    "legitimate_required_references": [
+      "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+      "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL",
+      "HARNESSLAB_ALIBABA_BAILIAN_API_KEY"
+    ],
+    "live_process_environment": "ALL_REQUIRED_REFERENCES_ABSENT",
+    "operator_dotenv": "ALL_REQUIRED_REFERENCES_ABSENT",
+    "present_failure_classification": "CREDENTIAL_OPERATOR_CONFIGURATION_PROBLEM",
+    "provider_or_route_availability": "NOT_VERIFIABLE_WITHOUT_LEGITIMATE_CONFIGURATION",
+    "reconciliation_result": "UNRESOLVED_HARD_STOP",
+    "route_changed": false,
+    "secret_recovery_attempted": false,
+    "semantic_retry_attempted": false
+  },
+  "schema_version": 1
+}

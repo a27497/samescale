@@ -1,0 +1,69 @@
+{
+  "actual_evidence": {
+    "basis": "HISTORICAL_V3R1_ONLY_NOT_TRANSFERABLE_TO_AN_UNCREATED_SUCCESSOR",
+    "harness_internal_turns": "NOT_AVAILABLE",
+    "historical_input_tokens": 6116,
+    "historical_observed_subject_latency_ms": 565401,
+    "historical_output_tokens": 26044,
+    "historical_provider_failure_rate": 0.1111111111111111,
+    "historical_provider_requests": 18,
+    "historical_tool_calls": 0,
+    "successor_canary_evidence": "NOT_AVAILABLE"
+  },
+  "authorization_boundary": {
+    "full_matrix_budget_authorization_detected": false,
+    "full_matrix_executed": false,
+    "judge_canary_executed": false,
+    "matrix_launches_authorized_by_this_dossier": 0,
+    "subject_canary_executed": false
+  },
+  "canary": {
+    "judge_launches": 0,
+    "recovery_attempts": 0,
+    "status": "NOT_RUN_HARD_STOP",
+    "subject_launches": 0
+  },
+  "cost_latency_projection": {
+    "comparability_readiness": "NOT_READY_NO_SUCCESSOR_PLAN_OR_CANARY",
+    "estimated_630_run_subject_cost": "NOT_AVAILABLE",
+    "estimated_judge_campaign_cost": "NOT_AVAILABLE",
+    "estimated_per_run_cost": "NOT_AVAILABLE",
+    "estimated_total_cost": "NOT_AVAILABLE",
+    "expected_wall_clock": "NOT_AVAILABLE",
+    "pricing_evidence": "NOT_AVAILABLE",
+    "provider_route_failure_rate": "NOT_AVAILABLE_FOR_SUCCESSOR",
+    "reason": "PROJECTING_AN_UNFROZEN_SUCCESSOR_FROM_HISTORICAL_PARTIAL_EVIDENCE_WOULD_BE_SCIENTIFICALLY_INVALID",
+    "trace_coverage": "NOT_AVAILABLE_FOR_SUCCESSOR"
+  },
+  "dossier_id": "phase-k-b3-full-matrix-authorization-v1",
+  "historical_audit": {
+    "path": "release/kb3-evidence-reentry-audit.json",
+    "sha256": "sha256:c25cfcbabb56f43e4cb3d23ecfabe638c5afdb3543c34871320a71b52a829c20"
+  },
+  "lane": "A",
+  "real_call_accounting": {
+    "judge_calls": 0,
+    "provider_requests": 0,
+    "subject_calls": 0
+  },
+  "result": "HARD_STOPPED",
+  "route_reconciliation": {
+    "historic_timeout_root_cause": "UNRESOLVED",
+    "present_failure_classification": "CREDENTIAL_OPERATOR_CONFIGURATION_PROBLEM",
+    "reconciliation_status": "UNRESOLVED_HARD_STOP"
+  },
+  "schema_version": 1,
+  "successor": {
+    "experiment_id": null,
+    "plan_digest": null,
+    "planned_subject_runs": 0,
+    "status": "NOT_CREATED_BECAUSE_OPERATIONAL_RECONCILIATION_FAILED"
+  },
+  "target_design_if_reauthorized_after_clean_reconciliation": {
+    "cells": 7,
+    "formal_repeats": 5,
+    "subject_logical_runs": 630,
+    "tasks": 18,
+    "task_version": "1.0.2"
+  }
+}
