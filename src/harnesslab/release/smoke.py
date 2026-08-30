@@ -129,6 +129,10 @@ PLAN_PATHS = {
         "release/core-real-evidence-plan-v3.json",
         "release/core-real-smoke-plan-v3.json",
     ),
+    "v4": (
+        "release/core-real-evidence-plan-v4.json",
+        "release/core-real-smoke-plan-v4.json",
+    ),
 }
 
 
@@ -290,11 +294,11 @@ class SmokeControlPlane:
         try:
             release_reference, smoke_reference = PLAN_PATHS[plan_version]
         except KeyError as exc:
-            raise SmokeControlPlaneError("plan version must be v2 or v3") from exc
+            raise SmokeControlPlaneError("plan version must be v2, v3, or v4") from exc
         try:
             release_plan = load_real_evidence_plan(root / release_reference)
             smoke_plan = load_real_smoke_plan(root / smoke_reference)
-            corpus = load_core_corpus(root / "release/core-corpus.json")
+            corpus = load_core_corpus(root / release_plan.corpus_reference)
         except CoreReleaseError as exc:
             raise SmokeControlPlaneError(str(exc)) from exc
         expected_ids = (

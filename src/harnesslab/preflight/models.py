@@ -7,7 +7,12 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from harnesslab.budget import BudgetEstimate, BudgetEstimateRequest
+from harnesslab.budget import (
+    BudgetEstimate,
+    BudgetEstimateRequest,
+    MatrixBudgetEstimate,
+    MatrixBudgetEstimateRequest,
+)
 from harnesslab.contracts.common import EvaluationLane, NetworkPolicy, Sha256Digest
 
 
@@ -45,6 +50,16 @@ class TraceSupport(StrEnum):
             TraceSupport.FINAL_OUTPUT_ONLY: 1,
             TraceSupport.FULL_STREAM: 2,
         }[self]
+
+
+class PreflightAuthorizationLevel(StrEnum):
+    CANARY_PREFLIGHT = "CANARY_PREFLIGHT"
+    FULL_MATRIX_PREFLIGHT = "FULL_MATRIX_PREFLIGHT"
+
+
+class ObservedModelExposure(StrEnum):
+    NOT_AVAILABLE = "NOT_AVAILABLE"
+    RUN_EVIDENCE_ONLY = "RUN_EVIDENCE_ONLY"
 
 
 class ConfigurationRequirement(_FrozenModel):
@@ -199,4 +214,110 @@ class PreflightReport(_FrozenModel):
         )
         if self.status is not expected:
             raise ValueError("preflight status does not match its findings")
+        return self
+
+
+class MatrixCellRequirement(_FrozenModel):
+    """Exact model/harness/route binding checked before Matrix spend."""
+
+    cell_id: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]*$", max_length=100)
+    roles: tuple[Literal["M", "H", "P"], ...] = Field(min_length=1)
+    route_identity: str = Field(min_length=1, max_length=800)
+    requested_model: str = Field(min_length=1, max_length=300)
+    harness_id: str = Field(min_length=1, max_length=100)
+    runtime_profile_identity: str = Field(min_length=1, max_length=800)
+    image_reference: str | None = Field(default=None, min_length=1, max_length=500)
+    trace_support: TraceSupport
+    required_trace_support: TraceSupport
+    observed_model_exposure: ObservedModelExposure
+    observed_model_required: bool = True
+    resource_envelope: FrozenResourceEnvelope
+
+    @model_validator(mode="after")
+    def roles_are_unique(self) -> MatrixCellRequirement:
+        if len(set(self.roles)) != len(self.roles):
+            raise ValueError("Matrix cell roles must be unique")
+        return self
+
+
+class MatrixPreflightSpecification(_FrozenModel):
+    """Additive authorization layer over the backward-compatible Phase M checks."""
+
+    schema_version: Literal[1] = 1
+    authorization_level: PreflightAuthorizationLevel
+    prerequisites: PreflightSpecification
+    cells: tuple[MatrixCellRequirement, ...] = Field(min_length=1)
+    matrix_budget: MatrixBudgetEstimateRequest
+    fixed_subject_call_count: int = Field(ge=1)
+    fixed_judge_call_count: int = Field(ge=0)
+    spend_authorized: bool = False
+
+    @model_validator(mode="after")
+    def bindings_are_complete(self) -> MatrixPreflightSpecification:
+        if self.prerequisites.budget is not None:
+            raise ValueError(
+                "Matrix preflight uses matrix_budget, not the legacy homogeneous budget"
+            )
+        cell_ids = [cell.cell_id for cell in self.cells]
+        if len(set(cell_ids)) != len(cell_ids):
+            raise ValueError("Matrix cell IDs must be unique")
+        budgets = {cell.cell_id: cell for cell in self.matrix_budget.subject_cells}
+        if set(cell_ids) != set(budgets):
+            raise ValueError("every Matrix cell must have exactly one heterogeneous budget")
+        routes = {route.route_identity for route in self.prerequisites.provider_routes}
+        harnesses = {harness.harness_id for harness in self.prerequisites.harnesses}
+        images = set(self.prerequisites.required_images)
+        for cell in self.cells:
+            budget = budgets[cell.cell_id]
+            if budget.route_identity != cell.route_identity:
+                raise ValueError("Matrix cell and budget route identities must match")
+            if cell.route_identity not in routes:
+                raise ValueError("Matrix cell route must be declared in prerequisites")
+            if cell.harness_id not in harnesses:
+                raise ValueError("Matrix cell harness must be declared in prerequisites")
+            if cell.image_reference is not None and cell.image_reference not in images:
+                raise ValueError("Matrix cell image must be declared in prerequisites")
+        subject_calls = sum(item.planned_run_count for item in budgets.values())
+        if subject_calls != self.fixed_subject_call_count:
+            raise ValueError("fixed subject call count must match the Matrix budget")
+        if self.matrix_budget.judge_campaign.planned_call_count != self.fixed_judge_call_count:
+            raise ValueError("fixed Judge call count must match the Matrix budget")
+        if self.authorization_level is PreflightAuthorizationLevel.CANARY_PREFLIGHT:
+            if any(item.planned_run_count != 1 for item in budgets.values()):
+                raise ValueError("CANARY_PREFLIGHT requires exactly one launch per cell")
+            if self.fixed_judge_call_count > 1:
+                raise ValueError("CANARY_PREFLIGHT permits at most one Judge launch")
+        return self
+
+    @property
+    def digest(self) -> str:
+        payload = json.dumps(
+            self.model_dump(mode="json"),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+        return "sha256:" + hashlib.sha256(payload.encode()).hexdigest()
+
+
+class MatrixPreflightReport(_FrozenModel):
+    status: PreflightStatus
+    authorization_level: PreflightAuthorizationLevel
+    specification_digest: Sha256Digest
+    findings: tuple[PreflightFinding, ...] = Field(min_length=1)
+    matrix_budget_estimate: MatrixBudgetEstimate
+    provider_calls: Literal[0] = 0
+    judge_calls: Literal[0] = 0
+
+    @model_validator(mode="after")
+    def status_matches_findings(self) -> MatrixPreflightReport:
+        expected = (
+            PreflightStatus.BLOCKED
+            if any(item.status is CheckStatus.BLOCKED for item in self.findings)
+            else PreflightStatus.READY_WITH_WARNINGS
+            if any(item.status is CheckStatus.WARNING for item in self.findings)
+            else PreflightStatus.READY
+        )
+        if self.status is not expected:
+            raise ValueError("Matrix preflight status does not match its findings")
         return self

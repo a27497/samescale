@@ -7,6 +7,11 @@ from harnesslab.preflight.models import (
     ConfigurationRequirement,
     FrozenResourceEnvelope,
     HarnessRequirement,
+    MatrixCellRequirement,
+    MatrixPreflightReport,
+    MatrixPreflightSpecification,
+    ObservedModelExposure,
+    PreflightAuthorizationLevel,
     PreflightFinding,
     PreflightObservations,
     PreflightReport,
@@ -17,7 +22,12 @@ from harnesslab.preflight.models import (
     TaskRequirement,
     TraceSupport,
 )
-from harnesslab.preflight.service import assess_preflight, run_preflight
+from harnesslab.preflight.service import (
+    assess_matrix_preflight,
+    assess_preflight,
+    run_matrix_preflight,
+    run_preflight,
+)
 
 __all__ = [
     "CheckStatus",
@@ -26,6 +36,11 @@ __all__ = [
     "ConfigurationRequirement",
     "FrozenResourceEnvelope",
     "HarnessRequirement",
+    "MatrixCellRequirement",
+    "MatrixPreflightReport",
+    "MatrixPreflightSpecification",
+    "ObservedModelExposure",
+    "PreflightAuthorizationLevel",
     "PreflightFinding",
     "PreflightObservations",
     "PreflightReport",
@@ -35,6 +50,8 @@ __all__ = [
     "TaskObservation",
     "TaskRequirement",
     "TraceSupport",
+    "assess_matrix_preflight",
     "assess_preflight",
+    "run_matrix_preflight",
     "run_preflight",
 ]

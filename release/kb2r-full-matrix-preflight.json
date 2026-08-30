@@ -1,0 +1,508 @@
+{
+  "schema_version": 1,
+  "authorization_level": "FULL_MATRIX_PREFLIGHT",
+  "prerequisites": {
+    "schema_version": 1,
+    "docker_required": true,
+    "database_required": true,
+    "minimum_free_bytes": 1073741824,
+    "required_images": [
+      "harnesslab-phase-e-codex:0.149.0",
+      "harnesslab-phase-f-claude:2.1.241",
+      "harnesslab-phase-f-deepseek:0.1.1-rc.2",
+      "harnesslab-egress-proxy:1.0.0"
+    ],
+    "configurations": [
+      {
+        "reference": "DATABASE_URL",
+        "kind": "NON_EMPTY",
+        "required": true
+      },
+      {
+        "reference": "HARNESSLAB_GPT56_RELAY_BASE_URL",
+        "kind": "HTTPS_URL",
+        "required": true
+      },
+      {
+        "reference": "HARNESSLAB_GPT56_RELAY_API_KEY",
+        "kind": "CREDENTIAL",
+        "required": true
+      },
+      {
+        "reference": "HARNESSLAB_OPENCODE_GO_API_KEY",
+        "kind": "CREDENTIAL",
+        "required": true
+      },
+      {
+        "reference": "DEEPSEEK_API_KEY",
+        "kind": "CREDENTIAL",
+        "required": true
+      }
+    ],
+    "provider_routes": [
+      {
+        "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "expected_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "configuration_references": [],
+        "requires_network": true
+      },
+      {
+        "route_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+        "expected_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+        "configuration_references": [],
+        "requires_network": true
+      },
+      {
+        "route_identity": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+        "expected_identity": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+        "configuration_references": [],
+        "requires_network": true
+      },
+      {
+        "route_identity": "opencode-go|chat_completions|https://opencode.ai/zen/go/v1/chat/completions",
+        "expected_identity": "opencode-go|chat_completions|https://opencode.ai/zen/go/v1/chat/completions",
+        "configuration_references": [],
+        "requires_network": true
+      }
+    ],
+    "harnesses": [
+      {
+        "harness_id": "direct-model",
+        "executable": null,
+        "requested_model": "registry-bound-per-cell",
+        "compatible_models": [],
+        "supported_lanes": [
+          "M"
+        ],
+        "selected_lane": "M",
+        "trace_support": "FINAL_OUTPUT_ONLY",
+        "required_trace_support": "FINAL_OUTPUT_ONLY"
+      },
+      {
+        "harness_id": "codex",
+        "executable": null,
+        "requested_model": "gpt-5.6-sol",
+        "compatible_models": [
+          "gpt-5.6-sol"
+        ],
+        "supported_lanes": [
+          "H"
+        ],
+        "selected_lane": "H",
+        "trace_support": "FULL_STREAM",
+        "required_trace_support": "FULL_STREAM"
+      },
+      {
+        "harness_id": "claude-code",
+        "executable": null,
+        "requested_model": "qwen3.8-max",
+        "compatible_models": [
+          "qwen3.8-max"
+        ],
+        "supported_lanes": [
+          "H"
+        ],
+        "selected_lane": "H",
+        "trace_support": "FULL_STREAM",
+        "required_trace_support": "FULL_STREAM"
+      },
+      {
+        "harness_id": "deepseek-e1",
+        "executable": null,
+        "requested_model": "deepseek-v4-flash",
+        "compatible_models": [
+          "deepseek-v4-flash"
+        ],
+        "supported_lanes": [
+          "H"
+        ],
+        "selected_lane": "H",
+        "trace_support": "FINAL_OUTPUT_ONLY",
+        "required_trace_support": "FINAL_OUTPUT_ONLY"
+      }
+    ],
+    "tasks": [
+      {
+        "package_path": "tasks/core-java-deduplicate/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-java-feature-flag/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-java-quota/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-java-settings-merge/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-java-slugify/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-python-deduplicate/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-python-feature-flag/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-python-quota/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-python-settings-merge/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-python-slugify/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-typescript-deduplicate/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-typescript-feature-flag/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-typescript-quota/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-typescript-settings-merge/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/core-typescript-slugify/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/micro-java-clamp/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/micro-python-clamp/1.0.2",
+        "selected_lane": "H"
+      },
+      {
+        "package_path": "tasks/micro-typescript-clamp/1.0.2",
+        "selected_lane": "H"
+      }
+    ],
+    "network_policy": "allowlist",
+    "comparability_controls": [],
+    "resource_envelope": null,
+    "budget": null
+  },
+  "cells": [
+    {
+      "cell_id": "model-gpt56-relay-responses",
+      "roles": [
+        "M",
+        "P"
+      ],
+      "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+      "requested_model": "gpt-5.6-sol",
+      "harness_id": "direct-model",
+      "runtime_profile_identity": "direct-gpt56-relay-gpt56-responses",
+      "image_reference": null,
+      "trace_support": "FINAL_OUTPUT_ONLY",
+      "required_trace_support": "FINAL_OUTPUT_ONLY",
+      "observed_model_exposure": "RUN_EVIDENCE_ONLY",
+      "observed_model_required": true,
+      "resource_envelope": {
+        "frozen": true,
+        "expected_identity": "sha256:60657874abf980e9c2c42a8278145f827ae30813de74e052202befc61230fe66",
+        "actual_identity": "sha256:60657874abf980e9c2c42a8278145f827ae30813de74e052202befc61230fe66"
+      }
+    },
+    {
+      "cell_id": "model-qwen38-opencode-go-messages",
+      "roles": [
+        "M"
+      ],
+      "route_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+      "requested_model": "qwen3.8-max",
+      "harness_id": "direct-model",
+      "runtime_profile_identity": "direct-opencode-go-qwen38-messages",
+      "image_reference": null,
+      "trace_support": "FINAL_OUTPUT_ONLY",
+      "required_trace_support": "FINAL_OUTPUT_ONLY",
+      "observed_model_exposure": "RUN_EVIDENCE_ONLY",
+      "observed_model_required": true,
+      "resource_envelope": {
+        "frozen": true,
+        "expected_identity": "sha256:d512c4effcfeb56d1aa2a8a0761fda72cb5c7fce72ad27b033d1acdc7f5bfbf8",
+        "actual_identity": "sha256:d512c4effcfeb56d1aa2a8a0761fda72cb5c7fce72ad27b033d1acdc7f5bfbf8"
+      }
+    },
+    {
+      "cell_id": "model-deepseek-v4pro-chat",
+      "roles": [
+        "M"
+      ],
+      "route_identity": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+      "requested_model": "deepseek-v4-pro",
+      "harness_id": "direct-model",
+      "runtime_profile_identity": "direct-deepseek-official-v4pro-chat",
+      "image_reference": null,
+      "trace_support": "FINAL_OUTPUT_ONLY",
+      "required_trace_support": "FINAL_OUTPUT_ONLY",
+      "observed_model_exposure": "RUN_EVIDENCE_ONLY",
+      "observed_model_required": true,
+      "resource_envelope": {
+        "frozen": true,
+        "expected_identity": "sha256:ce4ba394364cd9e27d9aed551a991aa41611e81514fe17323dde1df934deeb07",
+        "actual_identity": "sha256:ce4ba394364cd9e27d9aed551a991aa41611e81514fe17323dde1df934deeb07"
+      }
+    },
+    {
+      "cell_id": "harness-codex-gpt56-medium",
+      "roles": [
+        "H",
+        "P"
+      ],
+      "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+      "requested_model": "gpt-5.6-sol",
+      "harness_id": "codex",
+      "runtime_profile_identity": "codex-gpt56-medium",
+      "image_reference": "harnesslab-phase-e-codex:0.149.0",
+      "trace_support": "FULL_STREAM",
+      "required_trace_support": "FULL_STREAM",
+      "observed_model_exposure": "RUN_EVIDENCE_ONLY",
+      "observed_model_required": true,
+      "resource_envelope": {
+        "frozen": true,
+        "expected_identity": "sha256:c02c4fd84e357eae207352bb1b7100da987a1e4e6fecf3533992e1e2cdd05e70",
+        "actual_identity": "sha256:c02c4fd84e357eae207352bb1b7100da987a1e4e6fecf3533992e1e2cdd05e70"
+      }
+    },
+    {
+      "cell_id": "harness-codex-gpt56-high",
+      "roles": [
+        "H"
+      ],
+      "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+      "requested_model": "gpt-5.6-sol",
+      "harness_id": "codex",
+      "runtime_profile_identity": "codex-gpt56-high",
+      "image_reference": "harnesslab-phase-e-codex:0.149.0",
+      "trace_support": "FULL_STREAM",
+      "required_trace_support": "FULL_STREAM",
+      "observed_model_exposure": "RUN_EVIDENCE_ONLY",
+      "observed_model_required": true,
+      "resource_envelope": {
+        "frozen": true,
+        "expected_identity": "sha256:861669a47290a152052dbdf59bd010039afefab5de1ab72d9afdf540e73e6c8c",
+        "actual_identity": "sha256:861669a47290a152052dbdf59bd010039afefab5de1ab72d9afdf540e73e6c8c"
+      }
+    },
+    {
+      "cell_id": "harness-claude-qwen38-opencode-go",
+      "roles": [
+        "H"
+      ],
+      "route_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+      "requested_model": "qwen3.8-max",
+      "harness_id": "claude-code",
+      "runtime_profile_identity": "claude-qwen38-opencode-go",
+      "image_reference": "harnesslab-phase-f-claude:2.1.241",
+      "trace_support": "FULL_STREAM",
+      "required_trace_support": "FULL_STREAM",
+      "observed_model_exposure": "RUN_EVIDENCE_ONLY",
+      "observed_model_required": true,
+      "resource_envelope": {
+        "frozen": true,
+        "expected_identity": "sha256:7a262ca45018fd37e74a7239a41fca7a349a1e782f158849714608e2dfa99cc0",
+        "actual_identity": "sha256:7a262ca45018fd37e74a7239a41fca7a349a1e782f158849714608e2dfa99cc0"
+      }
+    },
+    {
+      "cell_id": "harness-deepseek-v4flash",
+      "roles": [
+        "H"
+      ],
+      "route_identity": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+      "requested_model": "deepseek-v4-flash",
+      "harness_id": "deepseek-e1",
+      "runtime_profile_identity": "deepseek-harness-v4flash",
+      "image_reference": "harnesslab-phase-f-deepseek:0.1.1-rc.2",
+      "trace_support": "FINAL_OUTPUT_ONLY",
+      "required_trace_support": "FINAL_OUTPUT_ONLY",
+      "observed_model_exposure": "NOT_AVAILABLE",
+      "observed_model_required": false,
+      "resource_envelope": {
+        "frozen": true,
+        "expected_identity": "sha256:a414b48f2b0a36fc749d51b8ac47ec40a7e0c5cea4740881c42545d29f059c4d",
+        "actual_identity": "sha256:a414b48f2b0a36fc749d51b8ac47ec40a7e0c5cea4740881c42545d29f059c4d"
+      }
+    }
+  ],
+  "matrix_budget": {
+    "schema_version": 1,
+    "subject_cells": [
+      {
+        "cell_id": "model-gpt56-relay-responses",
+        "planned_run_count": 90,
+        "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "resource_ceiling": {
+          "input_tokens": 32768,
+          "output_tokens": 2000,
+          "provider_requests": 1,
+          "harness_turns": 0
+        },
+        "pricing": {
+          "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+          "availability": "UNKNOWN",
+          "input_usd_per_million_tokens": null,
+          "output_usd_per_million_tokens": null,
+          "request_usd": null,
+          "evidence_reference": null
+        }
+      },
+      {
+        "cell_id": "model-qwen38-opencode-go-messages",
+        "planned_run_count": 90,
+        "route_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+        "resource_ceiling": {
+          "input_tokens": 32768,
+          "output_tokens": 2000,
+          "provider_requests": 1,
+          "harness_turns": 0
+        },
+        "pricing": {
+          "route_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+          "availability": "UNKNOWN",
+          "input_usd_per_million_tokens": null,
+          "output_usd_per_million_tokens": null,
+          "request_usd": null,
+          "evidence_reference": null
+        }
+      },
+      {
+        "cell_id": "model-deepseek-v4pro-chat",
+        "planned_run_count": 90,
+        "route_identity": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+        "resource_ceiling": {
+          "input_tokens": 32768,
+          "output_tokens": 2000,
+          "provider_requests": 1,
+          "harness_turns": 0
+        },
+        "pricing": {
+          "route_identity": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+          "availability": "UNKNOWN",
+          "input_usd_per_million_tokens": null,
+          "output_usd_per_million_tokens": null,
+          "request_usd": null,
+          "evidence_reference": null
+        }
+      },
+      {
+        "cell_id": "harness-codex-gpt56-medium",
+        "planned_run_count": 90,
+        "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "resource_ceiling": {
+          "input_tokens": 32768,
+          "output_tokens": 2000,
+          "provider_requests": 16,
+          "harness_turns": 16
+        },
+        "pricing": {
+          "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+          "availability": "UNKNOWN",
+          "input_usd_per_million_tokens": null,
+          "output_usd_per_million_tokens": null,
+          "request_usd": null,
+          "evidence_reference": null
+        }
+      },
+      {
+        "cell_id": "harness-codex-gpt56-high",
+        "planned_run_count": 90,
+        "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "resource_ceiling": {
+          "input_tokens": 32768,
+          "output_tokens": 2000,
+          "provider_requests": 16,
+          "harness_turns": 16
+        },
+        "pricing": {
+          "route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+          "availability": "UNKNOWN",
+          "input_usd_per_million_tokens": null,
+          "output_usd_per_million_tokens": null,
+          "request_usd": null,
+          "evidence_reference": null
+        }
+      },
+      {
+        "cell_id": "harness-claude-qwen38-opencode-go",
+        "planned_run_count": 90,
+        "route_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+        "resource_ceiling": {
+          "input_tokens": 32768,
+          "output_tokens": 2000,
+          "provider_requests": 16,
+          "harness_turns": 16
+        },
+        "pricing": {
+          "route_identity": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+          "availability": "UNKNOWN",
+          "input_usd_per_million_tokens": null,
+          "output_usd_per_million_tokens": null,
+          "request_usd": null,
+          "evidence_reference": null
+        }
+      },
+      {
+        "cell_id": "harness-deepseek-v4flash",
+        "planned_run_count": 90,
+        "route_identity": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+        "resource_ceiling": {
+          "input_tokens": 32768,
+          "output_tokens": 2000,
+          "provider_requests": 16,
+          "harness_turns": 16
+        },
+        "pricing": {
+          "route_identity": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+          "availability": "UNKNOWN",
+          "input_usd_per_million_tokens": null,
+          "output_usd_per_million_tokens": null,
+          "request_usd": null,
+          "evidence_reference": null
+        }
+      }
+    ],
+    "judge_campaign": {
+      "profile_id": "judge-glm52-opencode-go-chat",
+      "planned_call_count": 63,
+      "route_identity": "opencode-go|chat_completions|https://opencode.ai/zen/go/v1/chat/completions",
+      "resource_ceiling": {
+        "input_tokens": 8192,
+        "output_tokens": 256,
+        "provider_requests": 1,
+        "harness_turns": 0
+      },
+      "pricing": {
+        "route_identity": "opencode-go|chat_completions|https://opencode.ai/zen/go/v1/chat/completions",
+        "availability": "UNKNOWN",
+        "input_usd_per_million_tokens": null,
+        "output_usd_per_million_tokens": null,
+        "request_usd": null,
+        "evidence_reference": null
+      }
+    },
+    "budget_ceiling_usd": null
+  },
+  "fixed_subject_call_count": 630,
+  "fixed_judge_call_count": 63,
+  "spend_authorized": false
+}

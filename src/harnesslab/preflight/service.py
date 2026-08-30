@@ -8,7 +8,12 @@ from collections.abc import Awaitable, Callable, Mapping
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-from harnesslab.budget import BudgetCeilingStatus, PricingAvailability, estimate_budget
+from harnesslab.budget import (
+    BudgetCeilingStatus,
+    PricingAvailability,
+    estimate_budget,
+    estimate_matrix_budget,
+)
 from harnesslab.contracts.common import NetworkPolicy, Protocol
 from harnesslab.core.config import Settings
 from harnesslab.db.health import check_database
@@ -16,6 +21,10 @@ from harnesslab.preflight.models import (
     CheckStatus,
     ConfigurationKind,
     ConfigurationRequirement,
+    MatrixPreflightReport,
+    MatrixPreflightSpecification,
+    ObservedModelExposure,
+    PreflightAuthorizationLevel,
     PreflightFinding,
     PreflightObservations,
     PreflightReport,
@@ -607,3 +616,165 @@ async def run_preflight(
         tasks=task_observations,
     )
     return assess_preflight(specification, observations)
+
+
+def _assess_matrix_from_base_report(
+    specification: MatrixPreflightSpecification,
+    base_report: PreflightReport,
+) -> MatrixPreflightReport:
+    findings = [item for item in base_report.findings if item.check_id != "budget"]
+    estimate = estimate_matrix_budget(specification.matrix_budget)
+
+    for cell in specification.cells:
+        trace_ready = cell.trace_support.level >= cell.required_trace_support.level
+        findings.append(
+            _finding(
+                f"matrix-trace:{cell.cell_id}",
+                CheckStatus.PASS if trace_ready else CheckStatus.BLOCKED,
+                "MATRIX_TRACE_SUPPORT_READY" if trace_ready else "MATRIX_TRACE_SUPPORT_MISSING",
+                f"Cell {cell.cell_id} provides its frozen trace requirement."
+                if trace_ready
+                else f"Cell {cell.cell_id} cannot provide its frozen trace requirement.",
+                "No action is required."
+                if trace_ready
+                else "Select a qualified binding with sufficient trace evidence.",
+            )
+        )
+        observed_ready = (
+            not cell.observed_model_required
+            or cell.observed_model_exposure is ObservedModelExposure.RUN_EVIDENCE_ONLY
+        )
+        findings.append(
+            _finding(
+                f"matrix-observed-model:{cell.cell_id}",
+                CheckStatus.PASS if observed_ready else CheckStatus.BLOCKED,
+                "OBSERVED_MODEL_EXPOSURE_READY"
+                if observed_ready
+                else "OBSERVED_MODEL_EXPOSURE_MISSING",
+                f"Cell {cell.cell_id} exposes observed-model run evidence."
+                if observed_ready
+                else f"Cell {cell.cell_id} lacks required observed-model run evidence.",
+                "No action is required."
+                if observed_ready
+                else "Use a binding that records the observed model or revise before freeze.",
+            )
+        )
+        envelope = cell.resource_envelope
+        envelope_ready = envelope.frozen and envelope.actual_identity == envelope.expected_identity
+        findings.append(
+            _finding(
+                f"matrix-resource-envelope:{cell.cell_id}",
+                CheckStatus.PASS if envelope_ready else CheckStatus.BLOCKED,
+                "MATRIX_RESOURCE_ENVELOPE_FROZEN"
+                if envelope_ready
+                else "MATRIX_RESOURCE_ENVELOPE_NOT_FROZEN",
+                f"Cell {cell.cell_id} has a frozen matching resource envelope."
+                if envelope_ready
+                else f"Cell {cell.cell_id} has no frozen matching resource envelope.",
+                "No action is required."
+                if envelope_ready
+                else "Freeze the exact per-cell resource envelope before execution.",
+            )
+        )
+
+    pricing_known = estimate.estimated_cost_availability is PricingAvailability.KNOWN
+    is_canary = specification.authorization_level is PreflightAuthorizationLevel.CANARY_PREFLIGHT
+    findings.append(
+        _finding(
+            "matrix-pricing",
+            CheckStatus.PASS
+            if pricing_known
+            else CheckStatus.WARNING
+            if is_canary
+            else CheckStatus.BLOCKED,
+            "MATRIX_PRICING_KNOWN"
+            if pricing_known
+            else "CANARY_PRICING_UNKNOWN"
+            if is_canary
+            else "FULL_MATRIX_PRICING_UNKNOWN",
+            "Every active Matrix route has immutable pricing."
+            if pricing_known
+            else "Unknown route pricing remains unknown and is not converted to zero.",
+            "No action is required."
+            if pricing_known
+            else "Register immutable route pricing before full-Matrix authorization.",
+        )
+    )
+    if is_canary:
+        authorized = specification.spend_authorized
+        findings.append(
+            _finding(
+                "matrix-authorization",
+                CheckStatus.PASS if authorized else CheckStatus.BLOCKED,
+                "BOUNDED_CANARY_AUTHORIZED" if authorized else "BOUNDED_CANARY_NOT_AUTHORIZED",
+                "The exact bounded canary call count and hard ceilings are authorized."
+                if authorized
+                else "The bounded canary lacks explicit spend authorization.",
+                "No action is required."
+                if authorized
+                else "Authorize only the frozen bounded canary before provider execution.",
+            )
+        )
+    else:
+        ceiling_ready = estimate.budget_ceiling_status is BudgetCeilingStatus.WITHIN_CEILING
+        authorized = specification.spend_authorized and pricing_known and ceiling_ready
+        findings.append(
+            _finding(
+                "matrix-authorization",
+                CheckStatus.PASS if authorized else CheckStatus.BLOCKED,
+                "FULL_MATRIX_BUDGET_AUTHORIZED"
+                if authorized
+                else "FULL_MATRIX_BUDGET_NOT_AUTHORIZED",
+                "The heterogeneous subject and Judge budget is explicitly authorized."
+                if authorized
+                else "The 630-subject and Judge campaign budget is not fully authorized.",
+                "No action is required."
+                if authorized
+                else "Supply immutable pricing, a sufficient ceiling, and explicit authorization.",
+            )
+        )
+
+    status = (
+        PreflightStatus.BLOCKED
+        if any(item.status is CheckStatus.BLOCKED for item in findings)
+        else PreflightStatus.READY_WITH_WARNINGS
+        if any(item.status is CheckStatus.WARNING for item in findings)
+        else PreflightStatus.READY
+    )
+    return MatrixPreflightReport(
+        status=status,
+        authorization_level=specification.authorization_level,
+        specification_digest=specification.digest,
+        findings=tuple(findings),
+        matrix_budget_estimate=estimate,
+    )
+
+
+def assess_matrix_preflight(
+    specification: MatrixPreflightSpecification,
+    observations: PreflightObservations,
+) -> MatrixPreflightReport:
+    """Assess one bounded-canary or full-Matrix authorization without external calls."""
+
+    base_report = assess_preflight(specification.prerequisites, observations)
+    return _assess_matrix_from_base_report(specification, base_report)
+
+
+async def run_matrix_preflight(
+    specification: MatrixPreflightSpecification,
+    repository_root: Path,
+    environment: Mapping[str, str] | None = None,
+    *,
+    docker_check: DockerCheck = docker_preflight,
+    database_check: DatabaseCheck = check_database,
+) -> MatrixPreflightReport:
+    """Collect keyless facts and assess Matrix authorization; never launch a provider."""
+
+    base_report = await run_preflight(
+        specification.prerequisites,
+        repository_root,
+        environment,
+        docker_check=docker_check,
+        database_check=database_check,
+    )
+    return _assess_matrix_from_base_report(specification, base_report)

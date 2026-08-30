@@ -285,17 +285,21 @@ class CallPreflight(StrictModel):
 
 class RealEvidencePlan(CanonicalModel):
     schema_version: Literal[3] = 3
-    plan_id: Literal["core-real-evidence-v2", "core-real-evidence-v3"] = "core-real-evidence-v2"
-    supersedes_plan_id: Literal["core-real-evidence-v1", "core-real-evidence-v2"] = (
-        "core-real-evidence-v1"
+    plan_id: Literal["core-real-evidence-v2", "core-real-evidence-v3", "core-real-evidence-v4"] = (
+        "core-real-evidence-v2"
     )
+    supersedes_plan_id: Literal[
+        "core-real-evidence-v1", "core-real-evidence-v2", "core-real-evidence-v3"
+    ] = "core-real-evidence-v1"
     history_reference: Literal["release/history/core-real-v1.json"]
     history_digest: Sha256Digest
     official_route_snapshot_reference: Literal["release/opencode-go-route-snapshot.json"]
     official_route_snapshot_digest: Sha256Digest
     corpus_reference: str
     corpus_digest: Sha256Digest
-    experiment_id: Literal["core-real-matrix-v2", "core-real-matrix-v3"] = "core-real-matrix-v2"
+    experiment_id: Literal["core-real-matrix-v2", "core-real-matrix-v3", "core-real-matrix-v4"] = (
+        "core-real-matrix-v2"
+    )
     execution_seed: int
     selected_profiles: tuple[ProviderProfile, ...]
     model_profile_slots: tuple[ModelProfileSlot, ...]
@@ -314,6 +318,7 @@ class RealEvidencePlan(CanonicalModel):
         expected_version_binding = {
             "core-real-evidence-v2": ("core-real-evidence-v1", "core-real-matrix-v2", 90),
             "core-real-evidence-v3": ("core-real-evidence-v2", "core-real-matrix-v3", 180),
+            "core-real-evidence-v4": ("core-real-evidence-v3", "core-real-matrix-v4", 180),
         }
         supersedes, experiment_id, subject_timeout = expected_version_binding[self.plan_id]
         if self.supersedes_plan_id != supersedes or self.experiment_id != experiment_id:
@@ -477,11 +482,14 @@ class RealSmokeCall(StrictModel):
 
 
 class RealSmokePlan(CanonicalModel):
-    schema_version: Literal[2, 3] = 2
-    plan_id: Literal["core-real-smoke-v2", "core-real-smoke-v3"] = "core-real-smoke-v2"
+    schema_version: Literal[2, 3, 4] = 2
+    plan_id: Literal["core-real-smoke-v2", "core-real-smoke-v3", "core-real-smoke-v4"] = (
+        "core-real-smoke-v2"
+    )
     release_plan_reference: Literal[
         "release/core-real-evidence-plan.json",
         "release/core-real-evidence-plan-v3.json",
+        "release/core-real-evidence-plan-v4.json",
     ]
     release_plan_digest: Sha256Digest
     calls: tuple[RealSmokeCall, ...]
@@ -497,6 +505,7 @@ class RealSmokePlan(CanonicalModel):
         expected = {
             "core-real-smoke-v2": (2, "release/core-real-evidence-plan.json", 90),
             "core-real-smoke-v3": (3, "release/core-real-evidence-plan-v3.json", 180),
+            "core-real-smoke-v4": (4, "release/core-real-evidence-plan-v4.json", 180),
         }
         schema_version, plan_reference, subject_timeout = expected[self.plan_id]
         if self.schema_version != schema_version or self.release_plan_reference != plan_reference:

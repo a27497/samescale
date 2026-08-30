@@ -187,11 +187,11 @@ def preflight_release_smoke_credentials(
 
     from harnesslab.release.smoke import REQUIRED_CONFIGURATION_REFERENCES
 
-    if plan_version not in {"v2", "v3"}:
-        typer.echo("FAIL credential preflight: plan version must be v2 or v3")
+    if plan_version not in {"v2", "v3", "v4"}:
+        typer.echo("FAIL credential preflight: plan version must be v2, v3, or v4")
         raise typer.Exit(code=2)
-    if plan_version == "v3":
-        typer.echo("PLAN_VERSION=v3")
+    if plan_version != "v2":
+        typer.echo(f"PLAN_VERSION={plan_version}")
     missing = False
     for reference in REQUIRED_CONFIGURATION_REFERENCES:
         present = bool(os.environ.get(reference, "").strip())

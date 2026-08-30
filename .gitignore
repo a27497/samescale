@@ -29,6 +29,7 @@ gate-k-results.xml
 full-pytest-results.xml
 harnesslab-runtime/
 harnesslab-artifacts/
+artifacts/
 frontend/node_modules/
 frontend/dist/
 .phase-i-test-artifacts/

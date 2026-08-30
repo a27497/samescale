@@ -9,6 +9,9 @@ from harnesslab.budget.models import (
     CallResourceCeiling,
     CostProjection,
     ExpectedCallUsage,
+    MatrixBudgetComponent,
+    MatrixBudgetEstimate,
+    MatrixBudgetEstimateRequest,
     PricingAvailability,
     ProviderPricing,
     TokenCeilings,
@@ -78,6 +81,131 @@ def estimate_budget(request: BudgetEstimateRequest) -> BudgetEstimate:
         expected_case_justification=request.expected_case_justification,
         budget_ceiling_usd=request.budget_ceiling_usd,
         budget_ceiling_status=_ceiling_status(request.budget_ceiling_usd, worst),
+    )
+
+
+def estimate_matrix_budget(request: MatrixBudgetEstimateRequest) -> MatrixBudgetEstimate:
+    """Aggregate heterogeneous subject cells and the fixed Judge campaign keylessly."""
+
+    components: list[MatrixBudgetComponent] = []
+    subject_input = subject_output = judge_input = judge_output = 0
+    provider_requests = harness_turns = 0
+    known_amount = Decimal(0)
+    unknown_routes: set[str] = set()
+
+    for cell in request.subject_cells:
+        calls = cell.planned_run_count
+        projection = _project_single_component(calls, cell.resource_ceiling, cell.pricing)
+        components.append(
+            _matrix_component(
+                component_id=cell.cell_id,
+                kind="SUBJECT",
+                calls=calls,
+                ceiling=cell.resource_ceiling,
+                route_identity=cell.route_identity,
+                projection=projection,
+            )
+        )
+        subject_input += calls * cell.resource_ceiling.input_tokens
+        subject_output += calls * cell.resource_ceiling.output_tokens
+        provider_requests += calls * cell.resource_ceiling.provider_requests
+        harness_turns += calls * cell.resource_ceiling.harness_turns
+        if projection.amount_usd is None:
+            unknown_routes.update(projection.unknown_route_identities)
+        else:
+            known_amount += projection.amount_usd
+
+    judge = request.judge_campaign
+    judge_projection = _project_single_component(
+        judge.planned_call_count,
+        judge.resource_ceiling,
+        judge.pricing,
+    )
+    components.append(
+        _matrix_component(
+            component_id=judge.profile_id,
+            kind="JUDGE",
+            calls=judge.planned_call_count,
+            ceiling=judge.resource_ceiling,
+            route_identity=judge.route_identity,
+            projection=judge_projection,
+        )
+    )
+    judge_input = judge.planned_call_count * judge.resource_ceiling.input_tokens
+    judge_output = judge.planned_call_count * judge.resource_ceiling.output_tokens
+    provider_requests += judge.planned_call_count * judge.resource_ceiling.provider_requests
+    harness_turns += judge.planned_call_count * judge.resource_ceiling.harness_turns
+    if judge_projection.amount_usd is None:
+        unknown_routes.update(judge_projection.unknown_route_identities)
+    else:
+        known_amount += judge_projection.amount_usd
+
+    worst = (
+        CostProjection(
+            availability=PricingAvailability.UNKNOWN,
+            unknown_route_identities=tuple(sorted(unknown_routes)),
+        )
+        if unknown_routes
+        else CostProjection(availability=PricingAvailability.KNOWN, amount_usd=known_amount)
+    )
+    tokens = TokenCeilings(
+        subject_input=subject_input,
+        subject_output=subject_output,
+        judge_input=judge_input,
+        judge_output=judge_output,
+        total=subject_input + subject_output + judge_input + judge_output,
+    )
+    return MatrixBudgetEstimate(
+        expected_subject_calls=sum(cell.planned_run_count for cell in request.subject_cells),
+        expected_judge_calls=judge.planned_call_count,
+        components=tuple(components),
+        token_ceiling=tokens,
+        provider_request_ceiling=provider_requests,
+        harness_turn_ceiling=harness_turns,
+        estimated_cost_availability=worst.availability,
+        projected_worst_case=worst,
+        budget_ceiling_usd=request.budget_ceiling_usd,
+        budget_ceiling_status=_ceiling_status(request.budget_ceiling_usd, worst),
+    )
+
+
+def _project_single_component(
+    calls: int,
+    ceiling: CallResourceCeiling,
+    pricing: ProviderPricing,
+) -> CostProjection:
+    if calls == 0:
+        return CostProjection(availability=PricingAvailability.KNOWN, amount_usd=Decimal(0))
+    if pricing.availability is PricingAvailability.UNKNOWN:
+        return CostProjection(
+            availability=PricingAvailability.UNKNOWN,
+            unknown_route_identities=(pricing.route_identity,),
+        )
+    return CostProjection(
+        availability=PricingAvailability.KNOWN,
+        amount_usd=_call_cost(calls, ceiling, pricing),
+    )
+
+
+def _matrix_component(
+    *,
+    component_id: str,
+    kind: str,
+    calls: int,
+    ceiling: CallResourceCeiling,
+    route_identity: str,
+    projection: CostProjection,
+) -> MatrixBudgetComponent:
+    return MatrixBudgetComponent(
+        component_id=component_id,
+        kind=kind,
+        call_count=calls,
+        route_identity=route_identity,
+        input_token_ceiling=calls * ceiling.input_tokens,
+        output_token_ceiling=calls * ceiling.output_tokens,
+        provider_request_ceiling=calls * ceiling.provider_requests,
+        harness_turn_ceiling=calls * ceiling.harness_turns,
+        projected_worst_case=projection,
     )
 
 

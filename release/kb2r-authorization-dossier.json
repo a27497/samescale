@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "phase": "K-B2R_REAL_MATRIX_REDESIGN",
+  "decision": "HARD_STOPPED",
+  "selection_basis": [
+    "scientific_coverage",
+    "clean_comparability",
+    "operational_viability",
+    "non_speculative_capability",
+    "minimum_implementation_complexity"
+  ],
+  "historical_scores_used_for_selection": false,
+  "candidate_designs": [
+    {
+      "design_id": "CONTROLLED_REFERENCE_TOPOLOGY_V4",
+      "selected": true,
+      "cell_count": 7,
+      "matched_pair": [
+        "model-gpt56-relay-responses",
+        "harness-codex-gpt56-medium"
+      ],
+      "ablation": [
+        "harness-codex-gpt56-medium",
+        "harness-codex-gpt56-high"
+      ],
+      "required_new_binding_code": false,
+      "configuration_available": true,
+      "pricing": "UNKNOWN_NOT_ZERO"
+    },
+    {
+      "design_id": "ALIBABA_CENTERED_P_LANE",
+      "selected": false,
+      "cell_count": 7,
+      "matched_pair": [
+        "model-qwen38-alibaba-messages",
+        "harness-claude-qwen38-alibaba"
+      ],
+      "ablation": [
+        "harness-codex-gpt56-medium",
+        "harness-codex-gpt56-high"
+      ],
+      "required_new_binding_code": false,
+      "required_new_orchestration_code": true,
+      "configuration_available": true,
+      "pricing": "UNKNOWN_NOT_ZERO"
+    }
+  ],
+  "successor": {
+    "experiment_id": "core-real-matrix-v4",
+    "plan_id": "core-real-evidence-v4",
+    "plan_digest": "sha256:2e30dcaa50d0e836577d4c985c0d84caca41ed22df36987faa46a98991eeedcb",
+    "smoke_plan_digest": "sha256:4dd0b0380f21b7a96083e8d41ca82de726edf4ae5813420eaf037d33c7167258",
+    "task_version": "1.0.2",
+    "task_count": 18,
+    "cell_count": 7,
+    "repeat_count": 5,
+    "planned_subject_calls": 630,
+    "planned_judge_calls": 63
+  },
+  "preflight": {
+    "canary": {
+      "status": "READY_WITH_WARNINGS",
+      "digest": "sha256:bd3c515e7eed6ac9148756e71e393182e9606853e52775741e0016dd6912926d",
+      "fixed_subject_calls": 7,
+      "fixed_judge_calls": 1,
+      "warning_reason_codes": [
+        "CANARY_PRICING_UNKNOWN"
+      ],
+      "blocking_reason_codes": []
+    },
+    "full_matrix": {
+      "status": "BLOCKED",
+      "digest": "sha256:119e6b4aadabf62f07a12470ea50d6c208d2bd700e1e0886bab17d63b66cc6ea",
+      "fixed_subject_calls": 630,
+      "fixed_judge_calls": 63,
+      "blocking_reason_codes": [
+        "FULL_MATRIX_PRICING_UNKNOWN",
+        "FULL_MATRIX_BUDGET_NOT_AUTHORIZED"
+      ]
+    }
+  },
+  "canary_execution": {
+    "status": "ABORTED",
+    "receipt_digest": "sha256:8c03917520f60a1426f21d793945f0e9914ceba91809514a8adfd74a6d74aa15",
+    "attempted_subject_launches": 4,
+    "attempted_judge_launches": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "recovery_attempts": 0,
+    "failing_call_id": "smoke-4-harness-codex-gpt56-medium",
+    "failure_category": "OBSERVED_MODEL_CONFLICT",
+    "calls": [
+      {
+        "call_id": "smoke-1-model-gpt56-relay-responses",
+        "terminal_outcome": "verified_pass",
+        "input_tokens": 346,
+        "output_tokens": 278,
+        "latency_ms": 68532,
+        "provider_requests": 1,
+        "harness_turns": 0,
+        "tool_calls": null,
+        "trace_coverage": "FINAL_OUTPUT_ONLY",
+        "observed_model": "gpt-5.6-sol"
+      },
+      {
+        "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+        "terminal_outcome": "verified_pass",
+        "input_tokens": 403,
+        "output_tokens": 1523,
+        "latency_ms": 34957,
+        "provider_requests": 1,
+        "harness_turns": 0,
+        "tool_calls": null,
+        "trace_coverage": "FINAL_OUTPUT_ONLY",
+        "observed_model": "qwen3.8-max"
+      },
+      {
+        "call_id": "smoke-3-model-deepseek-v4pro-chat",
+        "terminal_outcome": "verified_fail",
+        "input_tokens": 379,
+        "output_tokens": 222,
+        "latency_ms": 3330,
+        "provider_requests": 1,
+        "harness_turns": 0,
+        "tool_calls": null,
+        "trace_coverage": "FINAL_OUTPUT_ONLY",
+        "observed_model": "deepseek-v4-pro"
+      },
+      {
+        "call_id": "smoke-4-harness-codex-gpt56-medium",
+        "terminal_outcome": "verified_pass_but_identity_invalid",
+        "input_tokens": 145878,
+        "output_tokens": 2398,
+        "latency_ms": 97840,
+        "provider_requests": null,
+        "harness_turns": 1,
+        "tool_calls": 18,
+        "trace_coverage": "FULL_STREAM",
+        "trace_event_count": 24,
+        "observed_model": null,
+        "observed_model_status": "not_exposed"
+      }
+    ],
+    "unlaunched_subject_cells": [
+      "harness-codex-gpt56-high",
+      "harness-claude-qwen38-opencode-go",
+      "harness-deepseek-v4flash"
+    ],
+    "judge_unlaunched_reason": "SUBJECT_PREREQUISITE_INVALID"
+  },
+  "full_matrix_projection": {
+    "subject_calls": 630,
+    "judge_calls": 63,
+    "subject_cost_usd": null,
+    "judge_cost_usd": null,
+    "total_cost_usd": null,
+    "cost_status": "UNKNOWN_NOT_ZERO",
+    "provider_request_ceiling": 6093,
+    "harness_turn_ceiling": 5760,
+    "token_ceiling": 22436064,
+    "sequential_wall_clock_ceiling_seconds": 119070
+  },
+  "invariants": {
+    "old_matrix_resumed": false,
+    "v3r1_mutated": false,
+    "historical_evidence_rewritten": false,
+    "full_matrix_executed": false,
+    "historic_qwen_timeout_root_cause": "UNRESOLVED"
+  }
+}

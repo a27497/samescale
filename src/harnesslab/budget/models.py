@@ -233,3 +233,101 @@ class BudgetEstimate(BaseModel):
     @property
     def digest(self) -> str:
         return "sha256:" + hashlib.sha256(self.canonical_json().encode()).hexdigest()
+
+
+class MatrixCellBudget(BaseModel):
+    """Heterogeneous frozen budget for one subject cell."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    cell_id: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]*$", max_length=100)
+    planned_run_count: int = Field(ge=1, le=1_000_000)
+    route_identity: str = Field(min_length=1, max_length=500)
+    resource_ceiling: CallResourceCeiling
+    pricing: ProviderPricing
+
+    @model_validator(mode="after")
+    def pricing_matches_route(self) -> MatrixCellBudget:
+        if self.pricing.route_identity != self.route_identity:
+            raise ValueError("cell pricing route must match the frozen route identity")
+        return self
+
+
+class JudgeCampaignBudget(BaseModel):
+    """Fixed Judge campaign, represented separately from subject cells."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    profile_id: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]*$", max_length=100)
+    planned_call_count: int = Field(ge=0, le=1_000_000)
+    route_identity: str = Field(min_length=1, max_length=500)
+    resource_ceiling: CallResourceCeiling
+    pricing: ProviderPricing
+
+    @model_validator(mode="after")
+    def pricing_matches_route(self) -> JudgeCampaignBudget:
+        if self.pricing.route_identity != self.route_identity:
+            raise ValueError("Judge pricing route must match the frozen route identity")
+        return self
+
+
+class MatrixBudgetEstimateRequest(BaseModel):
+    """Additive heterogeneous Matrix budget; legacy requests remain unchanged."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: Literal[1] = 1
+    subject_cells: tuple[MatrixCellBudget, ...] = Field(min_length=1)
+    judge_campaign: JudgeCampaignBudget
+    budget_ceiling_usd: Decimal | None = Field(default=None, gt=0, allow_inf_nan=False)
+
+    @model_validator(mode="after")
+    def cells_are_unique(self) -> MatrixBudgetEstimateRequest:
+        identities = [cell.cell_id for cell in self.subject_cells]
+        if len(set(identities)) != len(identities):
+            raise ValueError("Matrix subject cell IDs must be unique")
+        return self
+
+
+class MatrixBudgetComponent(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    component_id: str = Field(min_length=1, max_length=100)
+    kind: Literal["SUBJECT", "JUDGE"]
+    call_count: int = Field(ge=0)
+    route_identity: str = Field(min_length=1, max_length=500)
+    input_token_ceiling: int = Field(ge=0)
+    output_token_ceiling: int = Field(ge=0)
+    provider_request_ceiling: int = Field(ge=0)
+    harness_turn_ceiling: int = Field(ge=0)
+    projected_worst_case: CostProjection
+
+
+class MatrixBudgetEstimate(BaseModel):
+    """Deterministic aggregate retaining every heterogeneous component."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: Literal[1] = 1
+    expected_subject_calls: int = Field(ge=1)
+    expected_judge_calls: int = Field(ge=0)
+    components: tuple[MatrixBudgetComponent, ...] = Field(min_length=2)
+    token_ceiling: TokenCeilings
+    provider_request_ceiling: int = Field(ge=1)
+    harness_turn_ceiling: int = Field(ge=0)
+    estimated_cost_availability: PricingAvailability
+    projected_worst_case: CostProjection
+    budget_ceiling_usd: Decimal | None = Field(default=None, gt=0, allow_inf_nan=False)
+    budget_ceiling_status: BudgetCeilingStatus
+
+    def canonical_json(self) -> str:
+        return json.dumps(
+            self.model_dump(mode="json"),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+
+    @property
+    def digest(self) -> str:
+        return "sha256:" + hashlib.sha256(self.canonical_json().encode()).hexdigest()

@@ -1,6 +1,6 @@
 """Deterministic pre-spend budget and cost estimation."""
 
-from harnesslab.budget.estimator import estimate_budget
+from harnesslab.budget.estimator import estimate_budget, estimate_matrix_budget
 from harnesslab.budget.models import (
     BudgetCeilingStatus,
     BudgetEstimate,
@@ -9,6 +9,11 @@ from harnesslab.budget.models import (
     CallResourceCeiling,
     CostProjection,
     ExpectedCallUsage,
+    JudgeCampaignBudget,
+    MatrixBudgetComponent,
+    MatrixBudgetEstimate,
+    MatrixBudgetEstimateRequest,
+    MatrixCellBudget,
     PricingAvailability,
     ProviderPricing,
     TokenCeilings,
@@ -22,8 +27,14 @@ __all__ = [
     "CallResourceCeiling",
     "CostProjection",
     "ExpectedCallUsage",
+    "JudgeCampaignBudget",
+    "MatrixBudgetComponent",
+    "MatrixBudgetEstimate",
+    "MatrixBudgetEstimateRequest",
+    "MatrixCellBudget",
     "PricingAvailability",
     "ProviderPricing",
     "TokenCeilings",
     "estimate_budget",
+    "estimate_matrix_budget",
 ]
