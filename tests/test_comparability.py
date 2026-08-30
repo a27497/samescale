@@ -122,8 +122,7 @@ def test_harness_uplift_reasoning_effort_drift_is_a_blocking_hard_control() -> N
 
     assert report.status is ComparabilityStatus.NOT_COMPARABLE
     assert any(
-        reason.code is ReasonCode.HARD_CONTROL_MISMATCH
-        and reason.field == "reasoning_effort"
+        reason.code is ReasonCode.HARD_CONTROL_MISMATCH and reason.field == "reasoning_effort"
         for reason in report.reasons
     )
 
@@ -727,8 +726,7 @@ async def test_real_runner_persisted_manifests_supply_comparability_controls(
         assert report.status is ComparabilityStatus.NOT_COMPARABLE
         assert any(
             reason.field == "reasoning_effort"
-            and reason.code
-            in {ReasonCode.HARD_CONTROL_MISSING, ReasonCode.HARD_CONTROL_MISMATCH}
+            and reason.code in {ReasonCode.HARD_CONTROL_MISSING, ReasonCode.HARD_CONTROL_MISMATCH}
             for reason in report.reasons
         )
         assert any(
