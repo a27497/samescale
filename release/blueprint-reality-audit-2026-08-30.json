@@ -2,16 +2,13 @@
   "schema_version": 1,
   "audit_id": "harnesslab-blueprint-reality-2026-08-30",
   "audit_date": "2026-08-30",
-  "audited_code_head_sha": "bc3d9ec3ba2badc48ddff20ca7f469705b5a914e",
+  "audited_code_head_sha": "1caae6e043830ce09059de632131d01f4214cac7",
   "authoritative_base_sha": "a415822905346fb6e11351b9c5cb0f2b7e2ff4b3",
   "documentation_reference": "docs/BLUEPRINT_REALITY_AUDIT_2026-08-30.md",
   "blueprint_source": {
-    "status": "UNAVAILABLE",
-    "available_authorities": [
-      "The convergence brief supplied for this task",
-      "Repository architecture, methodology, release, and lane documentation at the audited code head"
-    ],
-    "limitation": "No final post-K blueprint defining K-C, L, P, Q, R, and S is tracked in the repository or included in the supplied convergence brief. Q and R are not assigned inferred product meanings."
+    "status": "AUTHORITATIVE_FINAL_BLUEPRINT_2026-08-25",
+    "reference": "docs/FINAL_BLUEPRINT_PHASE_MAP_2026-08-25.md",
+    "authority": "Technical Lead final phase map supplied in the post-convergence brief"
   },
   "classification_vocabulary": [
     "IMPLEMENTED",
@@ -23,24 +20,29 @@
   ],
   "stage_summaries": [
     {
+      "stage": "K-B2",
+      "status": "PARTIAL",
+      "summary": "Secret-safe configuration and bounded controls exist, but no valid seven-cell canary or evidence-backed cost and wall-clock dossier exists; K-B2R redesign is current."
+    },
+    {
       "stage": "K-B3",
-      "status": "BLOCKED_BY_EVIDENCE",
-      "summary": "Configuration-source reconciliation and a secret-safe Phase M preflight occurred, but the exact seven-cell successor cannot be frozen from the available authoritative bindings and no successor canary was acquired."
+      "status": "NOT_YET_REQUIRED",
+      "summary": "The Core Real Matrix must wait for K-B2 authorization of a newly frozen successor; no 630-run campaign is authorized."
     },
     {
       "stage": "K-B4",
-      "status": "IMPLEMENTED",
-      "summary": "The deterministic diagnosis, attribution, evidence-qualified BadCase export, API, and Workbench platform is implemented and synthetically qualified without fabricating real BadCases."
+      "status": "BLOCKED_BY_EVIDENCE",
+      "summary": "The Diagnosis Platform is implemented, but the real Codex reasoning ablation, three factual verifier-backed BadCases, and real attribution report are absent."
     },
     {
       "stage": "K-C",
       "status": "BLOCKED_BY_EVIDENCE",
-      "summary": "Assuming K-C denotes final Core release closure, its keyless hard stop exists while real Matrix, paired, Judge, BadCase, exact-head CI, and tag evidence remain unavailable."
+      "summary": "The v1.0.0-core hard stop exists while Real Matrix, Judge, pair and ablation, BadCase, claim-map, exact-head A-K CI, and Tag Guard evidence remain absent."
     },
     {
       "stage": "L",
       "status": "PARTIAL",
-      "summary": "Automated code-quality enforcement is mature, while repository ownership and contribution governance are not represented by tracked ownership artifacts. Exact Phase L acceptance criteria are unavailable."
+      "summary": "Automated code-quality enforcement is mature, while Architecture Ownership, AI audit, debt cleanup, human-led refactor, debug drills, and interview ownership remain incomplete."
     },
     {
       "stage": "M",
@@ -65,12 +67,12 @@
     {
       "stage": "Q",
       "status": "NOT_YET_REQUIRED",
-      "summary": "The authoritative definition of Phase Q is unavailable, so no feature meaning or implementation claim is inferred."
+      "summary": "The controlled Static Context versus Retrieved Context RAG suite is defined but intentionally not implemented before the evidence loop closes."
     },
     {
       "stage": "R",
       "status": "NOT_YET_REQUIRED",
-      "summary": "The authoritative definition of Phase R is unavailable, so no feature meaning or implementation claim is inferred."
+      "summary": "The controlled Native Tools versus MCP Tools suite is defined but intentionally not implemented before the evidence loop closes."
     },
     {
       "stage": "S",
@@ -94,8 +96,8 @@
       ]
     },
     {
-      "stage": "K-B3",
-      "requirement_id": "kb3-configuration-absence-conclusion",
+      "stage": "K-B2",
+      "requirement_id": "kb2r-configuration-absence-conclusion",
       "requirement": "Treat the earlier conclusion that legitimate operator configuration was absent as authoritative.",
       "status": "SUPERSEDED",
       "evidence_refs": [
@@ -107,8 +109,8 @@
       ]
     },
     {
-      "stage": "K-B3",
-      "requirement_id": "kb3-secret-safe-config-reconciliation",
+      "stage": "K-B2",
+      "requirement_id": "kb2r-secret-safe-config-reconciliation",
       "requirement": "Reconcile the known operator configuration source without exposing values.",
       "status": "IMPLEMENTED",
       "evidence_refs": [
@@ -122,9 +124,9 @@
       ]
     },
     {
-      "stage": "K-B3",
-      "requirement_id": "kb3-exact-successor-preflight",
-      "requirement": "Run one exact-identity, keyless, pre-spend Phase M preflight for the intended seven-cell successor.",
+      "stage": "K-B2",
+      "requirement_id": "kb2r-two-level-successor-preflight",
+      "requirement": "Represent exact bounded-canary authorization separately from heterogeneous full-Matrix and fixed Judge authorization.",
       "status": "PARTIAL",
       "evidence_refs": [
         "release/kb3-convergence-reentry-audit.json",
@@ -133,16 +135,17 @@
       ],
       "remaining_work": [
         "Define an authoritative seven-cell successor binding without changing provider, model, or route.",
-        "Represent heterogeneous route pricing, the Judge campaign, and per-cell resource identities in one exact preflight.",
-        "Rerun the complete successor preflight after those design blockers are resolved."
+        "Implement CANARY_PREFLIGHT and FULL_MATRIX_PREFLIGHT without breaking simple preflight consumers.",
+        "Represent heterogeneous route pricing, Judge campaign, and per-cell resource identities.",
+        "Rerun both authorization levels after the seven-cell design is selected."
       ],
       "limitations": [
         "The completed preflight was configuration-focused and terminated BLOCKED; it was not an exact successor authorization."
       ]
     },
     {
-      "stage": "K-B3",
-      "requirement_id": "kb3-successor-freeze",
+      "stage": "K-B2",
+      "requirement_id": "kb2r-successor-freeze",
       "requirement": "Freeze a new 18-task, seven-cell, FORMAL n=5 successor with 630 planned subject runs.",
       "status": "BLOCKED_BY_EVIDENCE",
       "evidence_refs": [
@@ -158,9 +161,9 @@
       ]
     },
     {
-      "stage": "K-B3",
-      "requirement_id": "kb3-bounded-canary-and-budget",
-      "requirement": "Acquire at most seven subject canaries and one Judge canary, then produce an evidence-backed full-Matrix authorization decision.",
+      "stage": "K-B2",
+      "requirement_id": "kb2r-bounded-canary-and-budget",
+      "requirement": "Acquire at most seven subject canaries and one Judge canary, then produce actual telemetry, projected cost and wall clock, and a K-B2 authorization decision.",
       "status": "BLOCKED_BY_EVIDENCE",
       "evidence_refs": [
         "release/kb3-convergence-reentry-audit.json",
@@ -173,6 +176,23 @@
       ],
       "limitations": [
         "Subject calls, Judge calls, and recovery attempts are all zero; cost and wall-clock projections are UNKNOWN."
+      ]
+    },
+    {
+      "stage": "K-B3",
+      "requirement_id": "kb3-core-real-matrix-and-judge",
+      "requirement": "After K-B2 authorization, execute 18 tasks by seven cells by five repeats and the real Judge campaign, producing Model, Harness, Comparability, P-Lane, and Statistics outputs.",
+      "status": "NOT_YET_REQUIRED",
+      "evidence_refs": [
+        "docs/FINAL_BLUEPRINT_PHASE_MAP_2026-08-25.md",
+        "release/kb3-convergence-reentry-audit.json"
+      ],
+      "remaining_work": [
+        "Complete K-B2R redesign, frozen canary, and the K-B2 authorization decision.",
+        "Obtain separate authorization before any 630-subject acquisition."
+      ],
+      "limitations": [
+        "No successor is frozen and no full Matrix or real Judge campaign is authorized."
       ]
     },
     {
@@ -269,6 +289,25 @@
       ]
     },
     {
+      "stage": "K-B4",
+      "requirement_id": "kb4-real-analysis-evidence",
+      "requirement": "Complete the real Codex medium/high reasoning ablation, three real verifier-backed BadCases, trace diagnosis, and attribution report with Comparability approval for any Harness-uplift claim.",
+      "status": "BLOCKED_BY_EVIDENCE",
+      "evidence_refs": [
+        "docs/FINAL_BLUEPRINT_PHASE_MAP_2026-08-25.md",
+        "release/badcases.json",
+        "release/release-evidence.json"
+      ],
+      "remaining_work": [
+        "Acquire the controlled real ablation only after K-B2/K-B3 authorization.",
+        "Export three factual verifier-backed BadCases from immutable real evidence.",
+        "Produce the real trace diagnosis and attribution report."
+      ],
+      "limitations": [
+        "The implemented Diagnosis Platform and synthetic qualification do not complete the K-B4 phase."
+      ]
+    },
+    {
       "stage": "K-C",
       "requirement_id": "kc-keyless-release-hard-stop",
       "requirement": "Fail closed until all mandatory real release evidence is present and semantically valid.",
@@ -316,7 +355,7 @@
         "Bind its successful identity in the release manifest before any tag operation."
       ],
       "limitations": [
-        "The audit does not assert that K-C is the official post-K name because the final blueprint source is unavailable."
+        "Engineering promotion to main does not satisfy the Real Matrix, Judge, pair and ablation, BadCase, Release Claim Map, or Tag Guard requirements."
       ]
     },
     {
@@ -345,8 +384,8 @@
         "docs/ARCHITECTURE.md"
       ],
       "remaining_work": [
-        "Obtain the authoritative Phase L ownership requirements.",
-        "Add tracked ownership and contribution artifacts if those requirements call for them."
+        "Record Architecture Ownership and contribution responsibility.",
+        "Complete the AI Code Audit, Technical Debt Cleanup, Human-led Refactor, Debug Drills, and Interview Ownership requirements."
       ],
       "limitations": [
         "AGENTS.md provides task governance but does not identify code owners or maintainers."
@@ -367,7 +406,7 @@
         "Converge diagnosis taxonomy and future Adapter SDK boundaries without rewriting stable execution contracts."
       ],
       "limitations": [
-        "Exact code-quality acceptance criteria for Phase L are unavailable."
+        "Automated quality gates do not prove architecture ownership or human refactor readiness."
       ]
     },
     {
@@ -600,7 +639,7 @@
         "docs/PRODUCTIZATION.md"
       ],
       "remaining_work": [
-        "Define supported platforms and produce signed or otherwise provenance-bound release artifacts if required by the unavailable final blueprint.",
+        "Define supported platforms and produce signed or otherwise provenance-bound release artifacts.",
         "Qualify installation and upgrade from those artifacts."
       ],
       "limitations": [
@@ -728,14 +767,14 @@
     {
       "stage": "P",
       "requirement_id": "p-public-adapter-sdk",
-      "requirement": "Provide a versioned public Adapter SDK with documented lifecycle, capabilities, security, evidence, and compatibility contracts.",
+      "requirement": "Provide versioned public ModelProviderAdapter, HarnessAdapter, and JudgeAdapter SDKs with documented lifecycle, capabilities, security, evidence, and compatibility contracts.",
       "status": "MISSING",
       "evidence_refs": [
         "pyproject.toml",
         "docs/ARCHITECTURE.md"
       ],
       "remaining_work": [
-        "Define the SDK only after convergence, including package boundaries, public models, error contracts, and compatibility policy.",
+        "Define all three SDKs only after the evidence loop closes, including package boundaries, public models, error contracts, capability registration, and compatibility policy.",
         "Add examples, templates, conformance tests, and migration guidance."
       ],
       "limitations": [
@@ -761,34 +800,36 @@
     },
     {
       "stage": "Q",
-      "requirement_id": "q-authoritative-definition",
-      "requirement": "Obtain the final blueprint definition and acceptance criteria for Phase Q before implementation.",
+      "requirement_id": "q-controlled-rag-suite",
+      "requirement": "Evaluate Static Context versus Retrieved Context as a controlled treatment in a dedicated RAG evaluation suite.",
       "status": "NOT_YET_REQUIRED",
       "evidence_refs": [
+        "docs/FINAL_BLUEPRINT_PHASE_MAP_2026-08-25.md",
         "docs/ARCHITECTURE.md"
       ],
       "remaining_work": [
-        "Supply or recover the authoritative final post-K blueprint.",
-        "Perform a fresh evidence-backed audit after Phase Q has a defined scope."
+        "Freeze the corpus, retrieval policy, context budgets, contamination controls, traces, and paired analysis.",
+        "Keep the RAG treatment isolated from the Core Matrix."
       ],
       "limitations": [
-        "No product meaning is assigned to Q by this audit."
+        "Phase Q is defined but deliberately deferred until the real Core evidence loop closes."
       ]
     },
     {
       "stage": "R",
-      "requirement_id": "r-authoritative-definition",
-      "requirement": "Obtain the final blueprint definition and acceptance criteria for Phase R before implementation.",
+      "requirement_id": "r-controlled-mcp-suite",
+      "requirement": "Evaluate Native Tools versus MCP Tools as a controlled treatment in a dedicated Tool/MCP evaluation suite.",
       "status": "NOT_YET_REQUIRED",
       "evidence_refs": [
+        "docs/FINAL_BLUEPRINT_PHASE_MAP_2026-08-25.md",
         "docs/ARCHITECTURE.md"
       ],
       "remaining_work": [
-        "Supply or recover the authoritative final post-K blueprint.",
-        "Perform a fresh evidence-backed audit after Phase R has a defined scope."
+        "Freeze native and MCP tool capability identities, server identity, network policy, budgets, trace semantics, and paired analysis.",
+        "Keep the Tool/MCP treatment isolated from the Core Matrix."
       ],
       "limitations": [
-        "No product meaning is assigned to R by this audit."
+        "Phase R is defined but deliberately deferred until the real Core evidence loop closes."
       ]
     },
     {
@@ -854,6 +895,23 @@
       ],
       "limitations": [
         "Current Judge qualification explicitly disclaims external benchmark validation."
+      ]
+    },
+    {
+      "stage": "S",
+      "requirement_id": "s-compatibility-and-interchange",
+      "requirement": "Support SWE-bench subsets, terminal-style tasks, and provenance-preserving experiment export and import.",
+      "status": "MISSING",
+      "evidence_refs": [
+        "docs/FINAL_BLUEPRINT_PHASE_MAP_2026-08-25.md",
+        "docs/ARCHITECTURE.md"
+      ],
+      "remaining_work": [
+        "Define and qualify a bounded SWE-bench subset and terminal-style task compatibility contract.",
+        "Define immutable, schema-versioned experiment export and import with provenance and isolation checks."
+      ],
+      "limitations": [
+        "Current internal artifact loaders do not constitute a supported experiment interchange format."
       ]
     }
   ]

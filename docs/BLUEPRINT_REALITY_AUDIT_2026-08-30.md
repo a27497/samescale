@@ -2,282 +2,171 @@
 
 ## Outcome
 
-HarnessLab has substantially more implemented foundation than a phase-name inventory suggests, but
-the post-K roadmap is not complete. The integrated tree at
-`bc3d9ec3ba2badc48ddff20ca7f469705b5a914e` contains the Phase M control primitives, Phase N
-one-command product baseline, Phase O Custom Evaluation foundation, a corrected K-B3
-configuration/preflight audit, and the keyless K-B4 Diagnosis Platform. It does not contain usable
-custom execution, a public Adapter SDK, external benchmark validation, or the real evidence
-required to close Core release.
+This audit applies the authoritative final phase map in
+`docs/FINAL_BLUEPRINT_PHASE_MAP_2026-08-25.md` to convergence head
+`1caae6e043830ce09059de632131d01f4214cac7`.
+
+HarnessLab has a strong engineering foundation, but the real-evidence loop is open. Phase M/N/O
+foundations and the K-B4 Diagnosis Platform are integrated. The K-B4 phase is not complete because
+the controlled real ablation, three real verifier-backed BadCases, and final attribution evidence
+do not exist. The project is entering K-B2R Matrix redesign; it has not entered or completed K-B3.
 
 The machine-readable authority for this audit is
 `release/blueprint-reality-audit-2026-08-30.json`.
 
 ## Source boundary
 
-The final HarnessLab post-K blueprint is unavailable. No tracked repository file defines the
-acceptance criteria for K-C, L, P, Q, R, and S, and the supplied convergence brief names those
-stages without defining all of them. This audit therefore uses only:
-
-- the convergence brief's explicit K-B3, K-B4, M, N, O, P, Q/R, and S questions;
-- repository architecture, methodology, release, and lane documentation; and
-- source and tests at the audited integrated code head.
-
-The classification of K-C is conditional on it meaning final Core release closure, which is the
-closest repository-backed boundary. The audit does not assign inferred feature meanings to Q or R.
-Their minimum remaining work is first to recover the authoritative blueprint.
+The authoritative source is the Technical Lead phase map dated 2026-08-25. Repository source,
+tests, frozen evidence, and release controls at the audited head establish implementation reality.
+The phase map defines K-B2, K-B3, K-B4, K-C, L, M, N, O, P, Q, R, and S; Q is controlled RAG
+evaluation and R is controlled Tool/MCP evaluation.
 
 Statuses mean:
 
-- `IMPLEMENTED`: the major requirement has repository implementation and direct qualification
-  evidence.
-- `PARTIAL`: useful implementation exists, but a material part of the requirement is absent or not
-  integrated.
-- `MISSING`: no implementation satisfying the requirement exists at the audited head.
-- `BLOCKED_BY_EVIDENCE`: the engineering boundary may exist, but the required real or authoritative
-  evidence does not.
-- `SUPERSEDED`: a prior conclusion or artifact is replaced by newer, more complete evidence.
-- `NOT_YET_REQUIRED`: the task explicitly defers the phase, or its definition is unavailable and
-  implementation would be speculative.
+- `IMPLEMENTED`: the requirement has implementation and direct qualification evidence.
+- `PARTIAL`: useful implementation exists, but a material required part is absent or disconnected.
+- `MISSING`: no implementation satisfying the requirement exists.
+- `BLOCKED_BY_EVIDENCE`: engineering may exist, but mandatory real or authoritative evidence does
+  not.
+- `SUPERSEDED`: a prior conclusion or artifact has been replaced by newer evidence.
+- `NOT_YET_REQUIRED`: the defined phase is downstream of the current evidence gate and must not be
+  implemented yet.
 
 ## Stage summary
 
 | Stage | Status | Reality |
 | --- | --- | --- |
-| K-B3 | `BLOCKED_BY_EVIDENCE` | Configuration reconciliation is complete, but the exact successor cannot be frozen and no canary was acquired. |
-| K-B4 | `IMPLEMENTED` | The deterministic diagnosis, attribution, BadCase-export, API, and Workbench platform is synthetically qualified; no real BadCase is fabricated. |
-| K-C | `BLOCKED_BY_EVIDENCE` | The release hard stop exists; final real evidence and exact-head release verification do not. |
-| L | `PARTIAL` | Automated code-quality gates are strong; ownership/contribution governance is not tracked. |
-| M | `PARTIAL` | Preflight, budget, lifecycle, quality, splits, and failure clustering exist; discriminative/stress suites and full funnel orchestration remain. |
-| N | `PARTIAL` | One-command productization is implemented; active controls and released distribution evidence remain limited. |
-| O | `PARTIAL` | Custom foundation is implemented; true custom execution and Workbench UX are missing. |
-| P | `PARTIAL` | Internal seams are reusable; there is no supported public Adapter SDK. |
-| Q | `NOT_YET_REQUIRED` | Definition unavailable; no meaning is inferred. |
-| R | `NOT_YET_REQUIRED` | Definition unavailable; no meaning is inferred. |
-| S | `PARTIAL` | Fast/Full CI exists; automated regression policy and external benchmark validation do not. |
+| K-B2 | `PARTIAL` | Keyless configuration and bounded controls exist, but no valid seven-cell canary or evidence-backed cost/wall-clock dossier exists; K-B2R redesign is current. |
+| K-B3 | `NOT_YET_REQUIRED` | The Core Real Matrix must wait for K-B2 authorization of a newly frozen successor; no 630-run campaign is authorized. |
+| K-B4 | `BLOCKED_BY_EVIDENCE` | The Diagnosis Platform is implemented, but the real ablation, three factual BadCases, and real attribution report are absent. |
+| K-C | `BLOCKED_BY_EVIDENCE` | Gate K is fail-closed; Real Matrix, Judge, pair/ablation, BadCase, claim-map, and Tag Guard evidence remain absent. |
+| L | `PARTIAL` | Automated quality is strong; ownership, AI audit, debt cleanup, human refactor, debug drills, and interview ownership remain incomplete. |
+| M | `PARTIAL` | Preflight, budget, lifecycle primitives, quality, splits, and clustering exist; discriminative/stress suites and full funnel/lifecycle integration remain. |
+| N | `PARTIAL` | One-command productization and Workbench foundations exist; unified active registry/settings/control-plane completeness remains limited. |
+| O | `PARTIAL` | Managed Custom Evaluation foundations exist; true external-repo execution and Workbench custom flow remain incomplete. |
+| P | `PARTIAL` | Internal adapter seams exist; public ModelProvider/Harness/Judge SDKs and third-party loading do not. |
+| Q | `NOT_YET_REQUIRED` | The controlled Static Context vs Retrieved Context RAG suite is defined but intentionally not implemented before the evidence loop closes. |
+| R | `NOT_YET_REQUIRED` | The controlled Native Tools vs MCP Tools suite is defined but intentionally not implemented before the evidence loop closes. |
+| S | `PARTIAL` | Fast/Full CI exists; regression gating, historical comparison governance, external imports, compatibility targets, and experiment interchange remain incomplete. |
 
-## K-B3 — evidence re-entry
+## K-B2 — Real Matrix Authorization Decision
 
-### Implemented or superseded
+The current state is `K-B2R_REAL_MATRIX_REDESIGN`. Secret-safe configuration reconciliation and
+Phase M preflight exist, but the attempted successor was not frozen and acquired zero calls. The
+prior `REDESIGN_REQUIRED` decision is therefore a redesign entry, not a permanent K-B3 block.
 
-- Historical immutability is preserved. The convergence audit reports no old-Matrix resume, v3r1
-  mutation, historical evidence rewrite, or full Matrix execution. Evidence:
-  `release/kb3-convergence-reentry-audit.json` and
-  `release/reports/core-real-matrix-v3-pause-checkpoint.json`.
-- The earlier conclusion that legitimate configuration was absent is `SUPERSEDED`. The known
-  private source was checked by name/presence and permission only and classified
-  `CONFIG_SOURCE_VALID_NOT_SOURCED`. No value or endpoint was printed or persisted. Evidence:
-  `release/kb3-convergence-reentry-audit.json`.
-- Secret-file injection into Phase M preflight is implemented and qualified. Evidence:
-  `docs/PHASE_M_EVALUATION_SYSTEM_2.md`, `src/harnesslab/preflight/io.py`, and
-  `tests/test_phase_m_interfaces.py`.
+K-B2 remains `PARTIAL` until a bounded, frozen seven-cell canary produces actual tokens, latency,
+Harness turns, provider requests, trace/observed-model coverage, pricing where available, projected
+630-subject and 63-Judge cost, and expected wall clock. Its final decision must be
+`AUTHORIZE_FULL_MATRIX`, `REDESIGN_PLAN`, or `STOP`.
 
-### Partial or blocked
+Historical timeout root cause remains `UNRESOLVED`. Old Matrix and Model Chat v2/v3/v3r1 evidence
+remain immutable and may be used only as design references.
 
-The completed Phase M run was configuration-focused and ended `BLOCKED` with
-`BUDGET_ESTIMATE_REQUIRED`; it was not an exact successor authorization. More importantly, the
-integrated audit found that the frozen seven-cell v3 plan and separate two-cell Alibaba plan do not
-form one authoritative seven-cell successor binding. The current preflight schema also cannot
-express all heterogeneous pricing, fixed Judge-campaign, and per-cell resource facts in one exact
-manifest.
+## K-B3 — Core Real Matrix
 
-Consequently:
+K-B3 is `NOT_YET_REQUIRED` because K-B2 has not authorized a frozen successor. The blueprint target
+remains 18 task-version 1.0.2 tasks × 7 cells × 5 repeats = 630 subject runs followed by the fixed
+real Judge campaign. Required outputs are Model Results, Harness Results, Comparability, P-Lane,
+and Statistics.
 
-- `core-real-matrix-v4` has no plan digest and was not created;
-- subject canary calls, Judge calls, and recovery attempts remain zero;
-- projected subject, Judge, total cost, and wall clock remain `UNKNOWN`; and
-- the current authorization decision is `REDESIGN_REQUIRED`.
+No successor digest, seven-cell canary, full Matrix evidence, or real Judge campaign exists. This
+audit does not revive v3, graft v3r1 onto it, or authorize acquisition.
 
-This is `BLOCKED_BY_EVIDENCE`, not permission to alter a provider, model, route, or historical plan.
-The historical timeout root cause remains `UNRESOLVED`.
+## K-B4 — Real Analysis
 
-## K-B4 — Diagnosis and Attribution Platform
+### Platform status: `IMPLEMENTED`
 
-The engineering platform is `IMPLEMENTED` and keylessly qualified:
+The shared backend and Workbench platform provides the closed failure taxonomy, capability versus
+infrastructure separation, deterministic multidimensional clustering, full drill-down, explicit
+`VERIFIED_FACT` versus `HYPOTHESIS`, and fail-closed BadCase export. Controlled-ablation membership
+strengthens association but never becomes a causal claim. Synthetic qualification never counts as
+real evidence.
 
-- `src/harnesslab/diagnosis/models.py` defines the required closed failure taxonomy, preserves
-  capability versus infrastructure, and makes `VERIFIED_FACT` and `HYPOTHESIS` explicit;
-- `src/harnesslab/diagnosis/service.py` builds canonical clusters across model, Harness, task,
-  language, task family, failure, trace, tool, and workspace-diff patterns from immutable evidence;
-- controlled-ablation membership strengthens an association but never produces a causal claim;
-- the API and `frontend/src/views/DiagnosisView.vue` provide the full Experiment → Cell → Task
-  family → Cluster → Run → Trace/diff/tool/verifier/attribution chain without duplicating backend
-  classification logic; and
-- BadCase export admits real cases only when immutable evidence is verified, scope is capability,
-  and the verifier failed. Infrastructure, missing-artifact, and verifier-not-run observations are
-  excluded. Synthetic qualification is opt-in and never counted as real.
+### Phase status: `BLOCKED_BY_EVIDENCE`
 
-Evidence is in `tests/test_diagnosis.py`, `tests/test_workbench_api.py`, and
-`frontend/tests/diagnosis.spec.ts`. `release/badcases.json` remains an honest three-slot
-placeholder because this task acquired no real Matrix evidence. That is the intended scientific
-boundary, not a missing K-B4 export implementation.
+The phase additionally requires the real Codex medium/high reasoning ablation, three real
+verifier-backed BadCases, trace diagnosis over the real campaign, and a final attribution report.
+Harness-uplift claims require Comparability Engine approval. None of that real evidence exists, so
+the platform must not be reported as K-B4 completion.
 
-## K-C — conditional Core release closure
+## K-C — v1.0.0-core
 
-If K-C is the final Core release boundary, it is `BLOCKED_BY_EVIDENCE`.
+K-C is `BLOCKED_BY_EVIDENCE`. Gate K and the final verifier fail closed, but release requires final
+Gate K, exact-head A–K CI, Real Matrix Evidence, Judge Evidence, Pair/Ablation Evidence, three
+factual BadCases, a Release Claim Map, and Tag Guard authorization. Engineering promotion to main
+does not authorize the Core tag or claim K-B3/K-B4 completion.
 
-The fail-closed engineering boundary is implemented by `scripts/verify_gate_k.py`,
-`src/harnesslab/release/final_verifier.py`, and `release/release-evidence.json`. A keyless pass proves
-that incomplete evidence cannot authorize release; it does not prove readiness.
+## L — Ownership and Code Quality
 
-Still required are trusted final bindings for the real Matrix, paired comparison or explicit
-no-uplift policy, controlled ablation, real Judge report, three factual BadCases, exact final
-candidate commit, and successful exact-head Full Release CI. The final verifier must rebuild and
-semantically validate those artifacts before any Core tag operation. This convergence phase does
-not authorize the 630-run campaign, main merge, or tag creation.
-
-## L — ownership and code quality
-
-The code-quality half is `IMPLEMENTED`: `pyproject.toml`, `.github/workflows/ci.yml`,
-`.github/workflows/full-ci.yml`, and `scripts/verify_gate_a.py` enforce pytest, Ruff lint and format,
-strict mypy, migration checks, and whitespace integrity.
-
-Ownership is `MISSING` under the ordinary meaning of that requirement. The repository has task
-governance in `AGENTS.md`, but no tracked CODEOWNERS, OWNERS, MAINTAINERS, or contribution document.
-Because the final Phase L blueprint is unavailable, this audit does not invent a team topology or
-mandatory review policy. The minimum safe next step is to recover the acceptance criteria and then
-add only the ownership artifacts they require.
-
-Boundary convergence is `PARTIAL`. Provider, Codex, multi-Harness, and experiment protocols are
-well typed but use several related adapter and failure contracts. K-B4 taxonomy convergence and a
-future public Adapter SDK should reuse these seams without rewriting stable evidence contracts.
+Automated code quality is implemented through pytest, Ruff, strict mypy, migration checks,
+whitespace enforcement, Fast CI, and Full Release CI. The broader phase remains `PARTIAL` because
+Architecture Ownership, AI Code Audit, Technical Debt Cleanup, Human-led Refactor, Debug Drills,
+and Interview Ownership are not complete tracked outcomes.
 
 ## M — Evaluation System 2.0
 
-### Implemented
+Implemented foundations include experiment preflight, simple cost/budget estimation, lifecycle
+models, task-quality records, development/holdout split freezing, and failure clustering.
 
-- Preflight: `src/harnesslab/preflight`, CLI/API registration, and
-  `tests/test_phase_m_preflight.py`.
-- Budget: `src/harnesslab/budget` and `tests/test_phase_m_budget.py`; unknown price remains unknown.
+Material gaps keep the phase `PARTIAL`:
 
-### Partial
-
-- Lifecycle: `src/harnesslab/experiment/lifecycle.py` implements states, immutable attempt ledgers,
-  and explicit infrastructure recovery authorization, but it is not wired as the authoritative
-  transition engine for `experiment/queue.py` and `experiment/executor.py`.
-- Task Quality: `src/harnesslab/tasks/quality.py` provides digest-bound records and fail-closed
-  qualification semantics, but it consumes existing evidence and is not a production quality
-  registry.
-- Dev/Holdout: `src/harnesslab/tasks/splits.py` provides canonical freeze and leakage checking, but
-  no audited production split manifest exists.
-- Funnel Evaluation: `experiment/methodology.py` and `experiment/plan.py` define the stages and
-  explicit GO/STOP semantics. They do not implement a complete campaign orchestrator that binds
-  stage evidence and operator decisions to the next acquisition.
-
-### Missing
-
-- The Discriminative Suite is not implemented.
-- The Stress Suite is not implemented.
-- Failure Clustering is implemented by the shared K-B4 diagnosis layer and available to Phase M
-  evidence consumers; full funnel orchestration remains separate.
-
-`docs/EVAL_METHODOLOGY_V2.md` and `release/evaluation-methodology-v2.json` explicitly describe
-discriminative/stress as an optional future extension. A stage enum is not a qualified suite.
+- no qualified Discriminative Suite;
+- no qualified Stress Suite;
+- no governed production quality-tier and dev/holdout manifests;
+- no complete funnel orchestrator binding stage evidence and operator GO/STOP decisions;
+- lifecycle/recovery models are not the authoritative queue/executor transition engine; and
+- the existing simple preflight/budget schema does not represent heterogeneous seven-cell and
+  fixed Judge campaigns.
 
 ## N — Productization
 
-The one-command baseline is `IMPLEMENTED`:
-
-- `harnesslab up`, `down`, `status`, and `doctor` use the trusted lifecycle in
-  `src/harnesslab/productization`;
-- `docker/product/Dockerfile` and `docker-compose.yml` build the production service graph;
-- `src/harnesslab/api/static.py` serves the compiled Workbench with deep-link fallback; and
-- product lifecycle, distribution content, and bundled asset behavior have dedicated tests.
-
-The broader phase remains `PARTIAL`:
-
-- Settings intentionally exposes non-secret defaults and presence-only credentials; it is not an
-  operator mutation surface.
-- Run Control observes durable state and labels recovery boundaries, but does not issue authorized
-  lifecycle operations.
-- The source/wheel distribution contract is tested, but no published prebuilt artifact, installer,
-  provenance binding, upgrade qualification, or supported-platform matrix is evidenced.
-- Diagnosis is integrated into the product navigation. Custom Evaluation product navigation and
-  execution remain pending their execution boundary.
-
-These are remaining product capabilities, not grounds to rebuild the finished one-command shell.
+`harnesslab up/down/status/doctor`, production Compose, bundled Workbench, Experiment Builder,
+registry views, Run Control observation, and Diagnosis UX exist. The phase remains `PARTIAL` because
+the Model/Harness/Capability Registry is not a fully unified active control plane, Settings are
+presence-oriented, recovery actions are not wired through Run Control, and no published supported
+multi-platform distribution is evidenced.
 
 ## O — Custom Evaluation
 
-The foundation is implemented:
+Managed storage, import provenance, Task Builder, custom verifier criteria, Quick/Compare/Formal
+plans, custom-only reports, and Official/Custom isolation exist. The phase remains `PARTIAL` because
+external-repository import is local-package oriented, custom plans cannot execute through approved
+Model/Harness runners, and the Workbench has no end-to-end Custom Evaluation flow.
 
-- immutable managed storage and import provenance;
-- package builder, strict criteria, and structural or explicit behavioral validation;
-- Quick/Compare/Formal deterministic planning and custom-only reporting;
-- CLI and API operations; and
-- strict Official/Custom isolation.
+## P — Adapter SDK and Ecosystem
 
-Evidence is concentrated in `src/harnesslab/custom_eval`, `tests/test_custom_eval.py`, and
-`docs/CUSTOM_EVALUATION.md`.
+Internal Provider, Harness, multi-Harness, experiment-lane, and analyst protocols are reusable.
+They are not a supported SDK. Public ModelProviderAdapter, HarnessAdapter, and JudgeAdapter SDKs,
+stable compatibility contracts, capability registration, provenance/security controls,
+conformance tests, and third-party adapter loading are missing. Phase P is defined but deliberately
+deferred until the evidence loop closes.
 
-True usable custom execution is `MISSING`. The CLI has import, list, inspect, build, validate, plan,
-and report commands but no run/execute command. The package intentionally does not call Provider,
-Harness, Judge, or Official experiment execution. The next implementation must add a custom-only
-execution binding, preflight, lifecycle, persistence namespace, and immutable evidence loading
-while preserving the Official boundary. The Workbench also has no Custom Evaluation route.
+## Q — RAG Evaluation
 
-## P — Adapter SDK
+Q is defined as a dedicated controlled RAG suite comparing `Static Context` with `Retrieved
+Context`. It is `NOT_YET_REQUIRED`, not undefined and not implemented. Future work must freeze the
+retrieval corpus, contamination controls, retrieval policy, context budgets, trace evidence, and
+paired analysis without mixing RAG treatment effects into the Core Matrix.
 
-Reusable internal seams already exist:
+## R — MCP Evaluation
 
-- `ProviderAdapter` in `src/harnesslab/model_lane/models.py`;
-- `HarnessAdapter` in `src/harnesslab/harness_lane/adapter.py`;
-- `MultiHarnessAdapter` in `src/harnesslab/multi_harness/adapter.py`;
-- `ExperimentLaneBinding` in `src/harnesslab/experiment/executor.py`; and
-- `AnalystBackend` in `src/harnesslab/analyst/backend.py`.
+R is defined as a dedicated controlled Tool/MCP suite comparing `Native Tools` with `MCP Tools`.
+It is `NOT_YET_REQUIRED`, not undefined and not implemented. Future work must freeze tool
+capabilities, MCP server identity, network/security policy, call budgets, trace semantics, and
+paired analysis without contaminating Core evidence.
 
-This is `PARTIAL`, not an SDK. The public package has no versioned adapter API, entry-point group,
-extension discovery, compatibility policy, conformance suite, template, security/provenance
-contract, or migration guide. Phase P is explicitly outside the current convergence phase; these
-internal protocols should be evaluated for stabilization later rather than broadly refactored now.
+## S — Regression, CI, and External Benchmarks
 
-## Q and R — definitions unavailable
-
-Both stages are `NOT_YET_REQUIRED`. The repository architecture lists several planned or excluded
-future boundaries, but there is no evidence assigning any of them to Q or R. In particular, this
-audit does not guess whether either stage means remote execution, RAG, MCP, distributed artifacts,
-or another feature.
-
-Minimum remaining work for each stage:
-
-1. supply or recover the authoritative final blueprint;
-2. define the stage's security, evidence, product, and qualification boundaries; and
-3. rerun a source-backed audit before implementing it.
-
-## S — CI, regression, and external benchmarks
-
-Fast and Full CI architecture is already implemented:
-
-- `.github/workflows/ci.yml` runs bounded deterministic checks on push and pull request and cancels
-  stale work; and
-- `.github/workflows/full-ci.yml` is the manual full gate/qualification/fresh-setup workflow.
-
-Do not rebuild these workflows merely because Phase S is incomplete.
-
-Regression capability is `PARTIAL`. The API and `frontend/src/views/RegressionView.vue` compare
-persisted experiment reports under explicit comparability controls. That surface deliberately does
-not claim significance, infer causality, or enforce a regression budget. A complete regression
-system still needs versioned baselines, owners, thresholds, decision policy, and a fail-closed
-automated gate.
-
-External benchmark validation is `MISSING`. `docs/EVAL_METHODOLOGY.md` explicitly disclaims it for
-the current Judge qualification. A future implementation needs governed source and license
-provenance, contamination controls, task conversion, qualification, execution, and reporting that
-remain distinct from both official Core and user Custom evidence.
+Fast and manual Full Release CI architecture is implemented. The Workbench can compare persisted
+experiments under comparability controls. The phase remains `PARTIAL` because it lacks a governed CI
+Regression Gate, versioned historical-baseline policy, external benchmark import, SWE-bench subset
+qualification, terminal-style compatibility qualification, and experiment export/import.
 
 ## Machine-readable convention
 
-The JSON artifact follows established repository conventions:
-
-- `schema_version` and a stable `audit_id`;
-- an exact audited code SHA and authoritative base SHA;
-- a closed status vocabulary;
-- stable per-requirement identifiers;
-- repository-relative evidence references;
-- explicit remaining work and limitations; and
-- no timestamps, credential values, endpoint values, or inferred Q/R meanings.
-
-This shape follows `release/resume-claim-evidence.json`, `release/release-evidence.json`,
-`release/kb3-convergence-reentry-audit.json`, and the strict canonical evidence contracts under
-`src/harnesslab/release`. `tests/test_blueprint_reality_audit.py` validates the closed schema,
-stage coverage, status vocabulary, evidence-reference safety/existence, and Markdown linkage.
+The JSON artifact records the authoritative phase-map reference, exact audited code SHA, closed
+status vocabulary, stable requirement identifiers, repository-relative evidence references,
+remaining work, and explicit limitations. It contains no credentials, endpoint values, or invented
+evidence. `tests/test_blueprint_reality_audit.py` verifies the authority, stage coverage, K-B4
+platform/phase separation, Q/R definitions, evidence references, and Markdown linkage.
