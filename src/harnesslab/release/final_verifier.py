@@ -600,10 +600,10 @@ def _verify_pair_and_ablation(
     ):
         raise CoreReleaseError("authoritative ExperimentPlan ablation definition drifted")
     if (
-        release_plan.plan_id == "core-real-evidence-v4"
+        release_plan.plan_id in {"core-real-evidence-v4", "core-real-evidence-v5"}
         and plan_ablations[0].intent is not ComparabilityIntent.CONTROLLED_ABLATION
     ):
-        raise CoreReleaseError("v4 controlled ablation intent drifted")
+        raise CoreReleaseError("successor controlled ablation intent drifted")
     if (
         ablation.ablation_id != expected_ablation.ablation_id
         or ablation.base_cell_id != expected_ablation.base_cell_id
@@ -632,7 +632,7 @@ def _verify_pair_and_ablation(
         "base_provider_profile_identity",
         "resource_envelope_identity",
     )
-    if release_plan.plan_id == "core-real-evidence-v4":
+    if release_plan.plan_id in {"core-real-evidence-v4", "core-real-evidence-v5"}:
         hard_controls = (*hard_controls, "profile_identity")
     drift = [name for name in hard_controls if getattr(base, name) != getattr(variant, name)]
     if drift or base.reasoning_effort == variant.reasoning_effort:

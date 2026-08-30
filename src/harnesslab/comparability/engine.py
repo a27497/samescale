@@ -57,12 +57,12 @@ UPLIFT_CONTROLS = CORE_CONTROLS | {
     "budget_identity",
     "resource_envelope_identity",
     "network_policy",
+    "reasoning_effort",
 }
 UPLIFT_TREATMENTS = {
     "harness",
     "harness_version",
     "harness_profile_identity",
-    "reasoning_effort",
     "prompt_identity",
 }
 MODEL_CONTROLS = CORE_CONTROLS | {

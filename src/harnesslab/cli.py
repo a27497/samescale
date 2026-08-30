@@ -50,6 +50,7 @@ from harnesslab.release.matrix import (
     execute_real_matrix,
     execute_real_matrix_canary,
 )
+from harnesslab.release.r2 import execute_r2_canary
 from harnesslab.release.smoke import (
     SmokeControlPlane,
     SmokeControlPlaneError,
@@ -212,6 +213,43 @@ def continue_release_smoke_r1(
         raise typer.Exit(code=1)
 
 
+@release_smoke_app.command("continue-r2")
+def continue_release_smoke_r2(
+    allow_real_canary: bool = typer.Option(False, "--allow-real-canary"),
+    repository_root: str = typer.Option(".", "--repository-root"),
+    artifact_root: str = typer.Option("artifacts/core-real-matrix-v5-r2-canary", "--artifact-root"),
+    policy_path: str = typer.Option("release/kb2r-r2-canary-policy.json", "--policy-path"),
+    equivalence_path: str = typer.Option(
+        "release/kb2r-r2-readiness-equivalence.json", "--equivalence-path"
+    ),
+) -> None:
+    """Execute only frozen v5 Cell 7 and then its Judge; never dispatch Calls 1-6."""
+
+    try:
+        receipt = asyncio.run(
+            execute_r2_canary(
+                Path(repository_root),
+                allow_real_canary=allow_real_canary,
+                environment=os.environ,
+                artifact_root=Path(artifact_root),
+                policy_path=Path(policy_path),
+                equivalence_path=Path(equivalence_path),
+            )
+        )
+    except (SmokeControlPlaneError, EgressNetworkIsolationUnavailable) as exc:
+        typer.echo(f"FAIL R2 canary: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo(f"R2_CANARY={receipt.status}")
+    typer.echo(f"NEW_SUBJECT_LAUNCHES={receipt.new_subject_launches}")
+    typer.echo(f"NEW_JUDGE_LAUNCHES={receipt.new_judge_launches}")
+    if receipt.failing_call_id is not None:
+        typer.echo(f"FAILING_CALL_ID={receipt.failing_call_id}")
+        assert receipt.failure_category is not None
+        typer.echo(f"FAILURE_CATEGORY={receipt.failure_category.value}")
+    if receipt.status == "HARD_STOPPED":
+        raise typer.Exit(code=1)
+
+
 @release_smoke_app.command("credential-preflight")
 def preflight_release_smoke_credentials(
     plan_version: str = typer.Option("v2", "--plan-version", help="Frozen plan version."),
@@ -220,8 +258,8 @@ def preflight_release_smoke_credentials(
 
     from harnesslab.release.smoke import REQUIRED_CONFIGURATION_REFERENCES
 
-    if plan_version not in {"v2", "v3", "v4"}:
-        typer.echo("FAIL credential preflight: plan version must be v2, v3, or v4")
+    if plan_version not in {"v2", "v3", "v4", "v5"}:
+        typer.echo("FAIL credential preflight: plan version must be v2, v3, v4, or v5")
         raise typer.Exit(code=2)
     if plan_version != "v2":
         typer.echo(f"PLAN_VERSION={plan_version}")

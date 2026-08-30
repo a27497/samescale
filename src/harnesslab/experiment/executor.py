@@ -64,7 +64,7 @@ type LaneProfile = ModelProfile | CodexHarnessProfile | MultiHarnessProfile
 
 
 def resolved_comparison_profile_identity(profile: LaneProfile) -> str:
-    """Match Phase F manifest extraction without requiring a completed run."""
+    """Match extraction; reasoning effort remains an explicit intent-specific field."""
 
     if isinstance(profile, ModelProfile):
         return model_profile_control_identity(profile)

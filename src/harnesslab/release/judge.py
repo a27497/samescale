@@ -24,7 +24,7 @@ from harnesslab.judgelab.report import JudgeCalibrationReport
 from harnesslab.release.provider_config import configured_model_profile
 from harnesslab.release.smoke import SmokeControlPlane, SmokeControlPlaneError
 
-REAL_JUDGE_CALIBRATION_ID = "core-real-judge-v3"
+REAL_JUDGE_CALIBRATION_ID = "core-real-judge-v5"
 REAL_JUDGE_CELL_ID = "judge-glm52-opencode-go-chat"
 REAL_JUDGE_CALLS = 63
 
@@ -38,7 +38,7 @@ def build_real_judge_plan(
     environment: Mapping[str, str] | None = None,
 ) -> tuple[JudgeCalibrationPlan, JudgeSuite, dict[str, JudgeDefinition]]:
     selected_environment = environment if environment is not None else os.environ
-    control = SmokeControlPlane.load(repository_root, plan_version="v3")
+    control = SmokeControlPlane.load(repository_root, plan_version="v5")
     provider = next(
         (
             item
@@ -70,7 +70,7 @@ def build_real_judge_plan(
     real_spec = base_spec.model_copy(
         update={
             "calibration_id": REAL_JUDGE_CALIBRATION_ID,
-            "name": "HarnessLab Core Real GLM-5.2 Judge Calibration v3",
+            "name": "HarnessLab Core Real GLM-5.2 Judge Calibration v5",
             "judge_cells": (cell,),
         }
     )

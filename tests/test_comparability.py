@@ -55,6 +55,7 @@ def facts(**changes: str | None) -> ComparisonFacts:
         "harness": "left-harness",
         "harness_version": "1.0.0",
         "harness_profile_identity": "sha256:" + "6" * 64,
+        "reasoning_effort": "medium",
         "prompt_identity": "sha256:" + "7" * 64,
         "trace_coverage": "FULL_STREAM",
     }
@@ -98,6 +99,7 @@ def test_harness_uplift_treatments_are_comparable_when_controls_match() -> None:
         "provider_route",
         "budget_identity",
         "network_policy",
+        "reasoning_effort",
     ),
 )
 def test_harness_uplift_hard_control_mutation_is_not_comparable(field: str) -> None:
@@ -107,6 +109,21 @@ def test_harness_uplift_hard_control_mutation_is_not_comparable(field: str) -> N
     expected_field = "verifier_control_identity" if field == "verifier_identity" else field
     assert any(
         reason.code is ReasonCode.HARD_CONTROL_MISMATCH and reason.field == expected_field
+        for reason in report.reasons
+    )
+
+
+def test_harness_uplift_reasoning_effort_drift_is_a_blocking_hard_control() -> None:
+    report = ComparabilityEngine().assess(
+        facts(),
+        facts(evidence_identity="sha256:" + "8" * 64, reasoning_effort="high"),
+        intent=ComparabilityIntent.HARNESS_UPLIFT,
+    )
+
+    assert report.status is ComparabilityStatus.NOT_COMPARABLE
+    assert any(
+        reason.code is ReasonCode.HARD_CONTROL_MISMATCH
+        and reason.field == "reasoning_effort"
         for reason in report.reasons
     )
 
@@ -499,6 +516,7 @@ def phase_f_manifest(harness: str) -> dict[str, object]:
             "network_policy": "deny",
             "provider_route": "same-route",
             "requested_model": "same-model",
+            "reasoning_effort": "medium",
         },
         "profile_hash": "sha256:" + ("7" if harness == "left" else "8") * 64,
         "requested_model": "same-model",
@@ -707,7 +725,12 @@ async def test_real_runner_persisted_manifests_supply_comparability_controls(
             loaded[left], loaded[right], intent=ComparabilityIntent.HARNESS_UPLIFT
         )
         assert report.status is ComparabilityStatus.NOT_COMPARABLE
-        assert not any(reason.code is ReasonCode.HARD_CONTROL_MISSING for reason in report.reasons)
+        assert any(
+            reason.field == "reasoning_effort"
+            and reason.code
+            in {ReasonCode.HARD_CONTROL_MISSING, ReasonCode.HARD_CONTROL_MISMATCH}
+            for reason in report.reasons
+        )
         assert any(
             reason.code is ReasonCode.HARD_CONTROL_MISMATCH and reason.field == "provider_route"
             for reason in report.reasons

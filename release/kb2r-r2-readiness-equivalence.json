@@ -1,0 +1,381 @@
+{
+  "schema_version": 1,
+  "equivalence_id": "V4_TO_V5_READINESS_EQUIVALENCE",
+  "source_plan_reference": "release/core-real-evidence-plan-v4.json",
+  "source_plan_digest": "sha256:2e30dcaa50d0e836577d4c985c0d84caca41ed22df36987faa46a98991eeedcb",
+  "source_smoke_reference": "release/core-real-smoke-plan-v4.json",
+  "source_smoke_digest": "sha256:4dd0b0380f21b7a96083e8d41ca82de726edf4ae5813420eaf037d33c7167258",
+  "target_plan_reference": "release/core-real-evidence-plan-v5.json",
+  "target_plan_digest": "sha256:97253765cc91bc98b66bb975dbb5b59b409ca14e6ed7fa7d07f11b0093d4c1cc",
+  "target_smoke_reference": "release/core-real-smoke-plan-v5.json",
+  "target_smoke_digest": "sha256:033aa082e46117911305a5fde90fb54e2028566c7540ade64fcf8bd33a507c48",
+  "scope": "TECHNICAL_READINESS_ONLY",
+  "does_not_satisfy": [
+    "V5_MATRIX_EVIDENCE",
+    "FORMAL_STATISTICS",
+    "K_B3_EVIDENCE",
+    "K_C_EVIDENCE"
+  ],
+  "entries": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "source_evidence": {
+        "logical_namespace": "artifacts/core-real-matrix-v4-canary/smoke-1-model-gpt56-relay-responses/manifest.json",
+        "call_id": "smoke-1-model-gpt56-relay-responses",
+        "content_digest": "sha256:8af266acda2a5a753bc7893d2af4a0efc88e757cc52b8ac34dbfecf3f12f1cdc"
+      },
+      "source": {
+        "call_id": "smoke-1-model-gpt56-relay-responses",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "gpt-5.6-sol",
+        "protocol": "responses",
+        "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "credential_references": [
+          "HARNESSLAB_GPT56_RELAY_BASE_URL",
+          "HARNESSLAB_GPT56_RELAY_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:3912c6af1968d3cd69c76c4696ac99a6852b777da8bb87cd03775699b262bc90",
+        "harness_runtime": "direct-model",
+        "harness_version": "evidence-schema-1",
+        "harness_image_identity": "NOT_APPLICABLE_DIRECT_MODEL",
+        "runner_contract": "DirectModelRunner",
+        "reasoning_effort": "medium",
+        "prompt_contract": "direct-patch-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-adapter-route+verifier-network-none"
+      },
+      "target": {
+        "call_id": "smoke-1-model-gpt56-relay-responses",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "gpt-5.6-sol",
+        "protocol": "responses",
+        "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "credential_references": [
+          "HARNESSLAB_GPT56_RELAY_BASE_URL",
+          "HARNESSLAB_GPT56_RELAY_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:3912c6af1968d3cd69c76c4696ac99a6852b777da8bb87cd03775699b262bc90",
+        "harness_runtime": "direct-model",
+        "harness_version": "evidence-schema-1",
+        "harness_image_identity": "NOT_APPLICABLE_DIRECT_MODEL",
+        "runner_contract": "DirectModelRunner",
+        "reasoning_effort": "medium",
+        "prompt_contract": "direct-patch-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-adapter-route+verifier-network-none"
+      },
+      "equivalent": true
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "source_evidence": {
+        "logical_namespace": "artifacts/core-real-matrix-v4-canary/smoke-2-model-qwen38-opencode-go-messages/manifest.json",
+        "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+        "content_digest": "sha256:5338a0e31daef21663aa2ad9fb772c82c70f33f53d0bac1d03a64670438d04fb"
+      },
+      "source": {
+        "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "qwen3.8-max",
+        "protocol": "messages",
+        "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+        "credential_references": [
+          "HARNESSLAB_OPENCODE_GO_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:12f0a12a19952db5d55ae9ed5e3333c892ba74dc5b47b7974da5d1f48465d211",
+        "harness_runtime": "direct-model",
+        "harness_version": "evidence-schema-1",
+        "harness_image_identity": "NOT_APPLICABLE_DIRECT_MODEL",
+        "runner_contract": "DirectModelRunner",
+        "reasoning_effort": "NOT_APPLICABLE",
+        "prompt_contract": "direct-patch-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-adapter-route+verifier-network-none"
+      },
+      "target": {
+        "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "qwen3.8-max",
+        "protocol": "messages",
+        "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+        "credential_references": [
+          "HARNESSLAB_OPENCODE_GO_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:12f0a12a19952db5d55ae9ed5e3333c892ba74dc5b47b7974da5d1f48465d211",
+        "harness_runtime": "direct-model",
+        "harness_version": "evidence-schema-1",
+        "harness_image_identity": "NOT_APPLICABLE_DIRECT_MODEL",
+        "runner_contract": "DirectModelRunner",
+        "reasoning_effort": "NOT_APPLICABLE",
+        "prompt_contract": "direct-patch-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-adapter-route+verifier-network-none"
+      },
+      "equivalent": true
+    },
+    {
+      "call_id": "smoke-3-model-deepseek-v4pro-chat",
+      "source_evidence": {
+        "logical_namespace": "artifacts/core-real-matrix-v4-canary/smoke-3-model-deepseek-v4pro-chat/manifest.json",
+        "call_id": "smoke-3-model-deepseek-v4pro-chat",
+        "content_digest": "sha256:45dd168443c0c94d20c79039e56dab51dcd4e55fbd9b7b1c79bb17943954c366"
+      },
+      "source": {
+        "call_id": "smoke-3-model-deepseek-v4pro-chat",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "deepseek-v4-pro",
+        "protocol": "chat_completions",
+        "provider_route": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+        "credential_references": [
+          "DEEPSEEK_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:15f4e6c7f66b88e1041baaf8b9f04609a63813386b7302d9c03919e31b83acfd",
+        "harness_runtime": "direct-model",
+        "harness_version": "evidence-schema-1",
+        "harness_image_identity": "NOT_APPLICABLE_DIRECT_MODEL",
+        "runner_contract": "DirectModelRunner",
+        "reasoning_effort": "NOT_APPLICABLE",
+        "prompt_contract": "direct-patch-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-adapter-route+verifier-network-none"
+      },
+      "target": {
+        "call_id": "smoke-3-model-deepseek-v4pro-chat",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "deepseek-v4-pro",
+        "protocol": "chat_completions",
+        "provider_route": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+        "credential_references": [
+          "DEEPSEEK_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:15f4e6c7f66b88e1041baaf8b9f04609a63813386b7302d9c03919e31b83acfd",
+        "harness_runtime": "direct-model",
+        "harness_version": "evidence-schema-1",
+        "harness_image_identity": "NOT_APPLICABLE_DIRECT_MODEL",
+        "runner_contract": "DirectModelRunner",
+        "reasoning_effort": "NOT_APPLICABLE",
+        "prompt_contract": "direct-patch-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-adapter-route+verifier-network-none"
+      },
+      "equivalent": true
+    },
+    {
+      "call_id": "smoke-4-harness-codex-gpt56-medium",
+      "source_evidence": {
+        "logical_namespace": "artifacts/core-real-matrix-v4-canary/smoke-4-harness-codex-gpt56-medium/manifest.json",
+        "call_id": "smoke-4-harness-codex-gpt56-medium",
+        "content_digest": "sha256:3b3dea13651b2ac9ae1b540cbbdcd56644ae8cebbbdd3eadb58056e22c683011"
+      },
+      "source": {
+        "call_id": "smoke-4-harness-codex-gpt56-medium",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "gpt-5.6-sol",
+        "protocol": "responses",
+        "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "credential_references": [
+          "HARNESSLAB_GPT56_RELAY_BASE_URL",
+          "HARNESSLAB_GPT56_RELAY_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:3ab77aa8bd76b77e12a04a07faa7e3648ed1c43ca838858f72fda0024bfd869b",
+        "harness_runtime": "codex",
+        "harness_version": "0.149.0",
+        "harness_image_identity": "harnesslab-phase-e-codex:0.149.0@sha256:daef990e4872023733de35548e2da1c6685dadf73010f8bb70fbe1279e8e95cb",
+        "runner_contract": "CodexHarnessRunner",
+        "reasoning_effort": "medium",
+        "prompt_contract": "codex-harness-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-scoped-proxy+subject-internal-network+verifier-network-none"
+      },
+      "target": {
+        "call_id": "smoke-4-harness-codex-gpt56-medium",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "gpt-5.6-sol",
+        "protocol": "responses",
+        "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "credential_references": [
+          "HARNESSLAB_GPT56_RELAY_BASE_URL",
+          "HARNESSLAB_GPT56_RELAY_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:3ab77aa8bd76b77e12a04a07faa7e3648ed1c43ca838858f72fda0024bfd869b",
+        "harness_runtime": "codex",
+        "harness_version": "0.149.0",
+        "harness_image_identity": "harnesslab-phase-e-codex:0.149.0@sha256:daef990e4872023733de35548e2da1c6685dadf73010f8bb70fbe1279e8e95cb",
+        "runner_contract": "CodexHarnessRunner",
+        "reasoning_effort": "medium",
+        "prompt_contract": "codex-harness-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-scoped-proxy+subject-internal-network+verifier-network-none"
+      },
+      "equivalent": true
+    },
+    {
+      "call_id": "smoke-5-harness-codex-gpt56-high",
+      "source_evidence": {
+        "logical_namespace": "artifacts/core-real-matrix-v4-r1-suffix/smoke-5-harness-codex-gpt56-high/manifest.json",
+        "call_id": "smoke-5-harness-codex-gpt56-high",
+        "content_digest": "sha256:702e0340575c36da9b2022ee64b2b07bdd1050f31e3972e7f4a0a5fb30d72986"
+      },
+      "source": {
+        "call_id": "smoke-5-harness-codex-gpt56-high",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "gpt-5.6-sol",
+        "protocol": "responses",
+        "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "credential_references": [
+          "HARNESSLAB_GPT56_RELAY_BASE_URL",
+          "HARNESSLAB_GPT56_RELAY_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:012d0c1178ef4790c2b4d4f6032c51a83f0a6d16413899a75cfb3cfdca53b895",
+        "harness_runtime": "codex",
+        "harness_version": "0.149.0",
+        "harness_image_identity": "harnesslab-phase-e-codex:0.149.0@sha256:daef990e4872023733de35548e2da1c6685dadf73010f8bb70fbe1279e8e95cb",
+        "runner_contract": "CodexHarnessRunner",
+        "reasoning_effort": "high",
+        "prompt_contract": "codex-harness-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-scoped-proxy+subject-internal-network+verifier-network-none"
+      },
+      "target": {
+        "call_id": "smoke-5-harness-codex-gpt56-high",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "gpt-5.6-sol",
+        "protocol": "responses",
+        "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "credential_references": [
+          "HARNESSLAB_GPT56_RELAY_BASE_URL",
+          "HARNESSLAB_GPT56_RELAY_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:012d0c1178ef4790c2b4d4f6032c51a83f0a6d16413899a75cfb3cfdca53b895",
+        "harness_runtime": "codex",
+        "harness_version": "0.149.0",
+        "harness_image_identity": "harnesslab-phase-e-codex:0.149.0@sha256:daef990e4872023733de35548e2da1c6685dadf73010f8bb70fbe1279e8e95cb",
+        "runner_contract": "CodexHarnessRunner",
+        "reasoning_effort": "high",
+        "prompt_contract": "codex-harness-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-scoped-proxy+subject-internal-network+verifier-network-none"
+      },
+      "equivalent": true
+    },
+    {
+      "call_id": "smoke-6-harness-claude-qwen38-opencode-go",
+      "source_evidence": {
+        "logical_namespace": "artifacts/core-real-matrix-v4-r1-suffix/smoke-6-harness-claude-qwen38-opencode-go/manifest.json",
+        "call_id": "smoke-6-harness-claude-qwen38-opencode-go",
+        "content_digest": "sha256:269be70f5a3c1698f538c551d4bb9a20b3f498eda404b06d295a6694c61235d9"
+      },
+      "source": {
+        "call_id": "smoke-6-harness-claude-qwen38-opencode-go",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "qwen3.8-max",
+        "protocol": "messages",
+        "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+        "credential_references": [
+          "HARNESSLAB_OPENCODE_GO_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:8f962d73194e720ff12f415e530f39764d3680257aa81c7fc555b5ca4083b696",
+        "harness_runtime": "claude-code",
+        "harness_version": "2.1.241",
+        "harness_image_identity": "harnesslab-phase-f-claude:2.1.241@sha256:f109a1fc5e5955b7eb925e8fb5767c607c0128d44ee58977b8431794a0c4a383",
+        "runner_contract": "MultiHarnessRunner",
+        "reasoning_effort": "NOT_APPLICABLE",
+        "prompt_contract": "claude-harness-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-scoped-proxy+subject-internal-network+verifier-network-none"
+      },
+      "target": {
+        "call_id": "smoke-6-harness-claude-qwen38-opencode-go",
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2",
+        "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "workspace_input_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+        "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+        "requested_model": "qwen3.8-max",
+        "protocol": "messages",
+        "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+        "credential_references": [
+          "HARNESSLAB_OPENCODE_GO_API_KEY"
+        ],
+        "provider_profile_identity": "sha256:8f962d73194e720ff12f415e530f39764d3680257aa81c7fc555b5ca4083b696",
+        "harness_runtime": "claude-code",
+        "harness_version": "2.1.241",
+        "harness_image_identity": "harnesslab-phase-f-claude:2.1.241@sha256:f109a1fc5e5955b7eb925e8fb5767c607c0128d44ee58977b8431794a0c4a383",
+        "runner_contract": "MultiHarnessRunner",
+        "reasoning_effort": "NOT_APPLICABLE",
+        "prompt_contract": "claude-harness-v1",
+        "resource_envelope_identity": "sha256:7c7dcd5c7356ac4f71c6b8eb9411c5345fc156e8231b972a5d6f751373fb2109",
+        "max_output_tokens": 2000,
+        "timeout_seconds": 180,
+        "network_security_policy": "provider-scoped-proxy+subject-internal-network+verifier-network-none"
+      },
+      "equivalent": true
+    }
+  ]
+}

@@ -28,7 +28,7 @@ def cell(
     provider_route: str = "fake-provider-route",
     harness: str | None = None,
     harness_version: str = "1.0",
-    reasoning_effort: str | None = None,
+    reasoning_effort: str | None = "medium",
     profile_identity: str | None = None,
     harness_config_identity: str | None = None,
     runner_contract: str | None = None,

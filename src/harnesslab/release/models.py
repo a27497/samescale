@@ -265,10 +265,10 @@ class CallPreflight(StrictModel):
     cell_count: Literal[7] = 7
     repeat_count: Literal[5] = 5
     total_subject_runs: Literal[630] = 630
-    direct_model_runs: Literal[270] = 270
+    direct_model_runs: Literal[270, 360] = 270
     codex_runs: Literal[180] = 180
     claude_runs: Literal[90] = 90
-    deepseek_runs: Literal[90] = 90
+    deepseek_runs: Literal[0, 90] = 90
     judge_calls: Literal[63] = 63
     total_top_level_external_calls: Literal[693] = 693
     ablation_paired_observations: Literal[90] = 90
@@ -285,11 +285,17 @@ class CallPreflight(StrictModel):
 
 class RealEvidencePlan(CanonicalModel):
     schema_version: Literal[3] = 3
-    plan_id: Literal["core-real-evidence-v2", "core-real-evidence-v3", "core-real-evidence-v4"] = (
-        "core-real-evidence-v2"
-    )
+    plan_id: Literal[
+        "core-real-evidence-v2",
+        "core-real-evidence-v3",
+        "core-real-evidence-v4",
+        "core-real-evidence-v5",
+    ] = "core-real-evidence-v2"
     supersedes_plan_id: Literal[
-        "core-real-evidence-v1", "core-real-evidence-v2", "core-real-evidence-v3"
+        "core-real-evidence-v1",
+        "core-real-evidence-v2",
+        "core-real-evidence-v3",
+        "core-real-evidence-v4",
     ] = "core-real-evidence-v1"
     history_reference: Literal["release/history/core-real-v1.json"]
     history_digest: Sha256Digest
@@ -297,9 +303,12 @@ class RealEvidencePlan(CanonicalModel):
     official_route_snapshot_digest: Sha256Digest
     corpus_reference: str
     corpus_digest: Sha256Digest
-    experiment_id: Literal["core-real-matrix-v2", "core-real-matrix-v3", "core-real-matrix-v4"] = (
-        "core-real-matrix-v2"
-    )
+    experiment_id: Literal[
+        "core-real-matrix-v2",
+        "core-real-matrix-v3",
+        "core-real-matrix-v4",
+        "core-real-matrix-v5",
+    ] = "core-real-matrix-v2"
     execution_seed: int
     selected_profiles: tuple[ProviderProfile, ...]
     model_profile_slots: tuple[ModelProfileSlot, ...]
@@ -319,6 +328,7 @@ class RealEvidencePlan(CanonicalModel):
             "core-real-evidence-v2": ("core-real-evidence-v1", "core-real-matrix-v2", 90),
             "core-real-evidence-v3": ("core-real-evidence-v2", "core-real-matrix-v3", 180),
             "core-real-evidence-v4": ("core-real-evidence-v3", "core-real-matrix-v4", 180),
+            "core-real-evidence-v5": ("core-real-evidence-v4", "core-real-matrix-v5", 180),
         }
         supersedes, experiment_id, subject_timeout = expected_version_binding[self.plan_id]
         if self.supersedes_plan_id != supersedes or self.experiment_id != experiment_id:
@@ -336,6 +346,12 @@ class RealEvidencePlan(CanonicalModel):
             "harness-deepseek-v4flash": "deepseek-v4-flash",
             "judge-glm52-opencode-go-chat": "glm-5.2",
         }
+        if self.plan_id == "core-real-evidence-v5":
+            expected_profile_models = {
+                **expected_profile_models,
+                "model-deepseek-v4flash-chat": "deepseek-v4-flash",
+            }
+            expected_profile_models.pop("harness-deepseek-v4flash")
         if profile_ids != set(expected_profile_models):
             raise ValueError("Core v2 configured profile identity set drifted")
         profiles = {profile.profile_id: profile for profile in self.selected_profiles}
@@ -364,6 +380,12 @@ class RealEvidencePlan(CanonicalModel):
             "harness-deepseek-v4flash": "FIRST_PARTY_MODEL_API",
             "judge-glm52-opencode-go-chat": "THIRD_PARTY_INFERENCE_PLATFORM",
         }
+        if self.plan_id == "core-real-evidence-v5":
+            expected_provenance = {
+                **expected_provenance,
+                "model-deepseek-v4flash-chat": "FIRST_PARTY_MODEL_API",
+            }
+            expected_provenance.pop("harness-deepseek-v4flash")
         if any(
             profile.provider_provenance.value != expected_provenance[profile_id]
             for profile_id, profile in profiles.items()
@@ -410,21 +432,27 @@ class RealEvidencePlan(CanonicalModel):
             or judge.thinking_transport is not None
         ):
             raise ValueError("OpenCode Go model route contract drifted")
-        if len(self.model_profile_slots) != 3:
-            raise ValueError("release plan requires exactly three Model-only slots")
+        expected_model_slots = 4 if self.plan_id == "core-real-evidence-v5" else 3
+        if len(self.model_profile_slots) != expected_model_slots:
+            raise ValueError("release plan Model-only slot count drifted")
         if len(self.cells) != 7:
             raise ValueError("release plan requires seven planned cells")
         if {cell.cell_id for cell in self.cells} != set(expected_profile_models) - {
             "judge-glm52-opencode-go-chat"
         }:
             raise ValueError("Core v2 release cell identity set drifted")
-        if {cell.runtime for cell in self.cells} != {
-            "direct-model",
-            "codex",
-            "claude-code",
-            "deepseek-e1",
-        }:
+        expected_runtimes = {"direct-model", "codex", "claude-code"}
+        if self.plan_id != "core-real-evidence-v5":
+            expected_runtimes.add("deepseek-e1")
+        if {cell.runtime for cell in self.cells} != expected_runtimes:
             raise ValueError("release plan omits a required runtime")
+        expected_direct_runs = 360 if self.plan_id == "core-real-evidence-v5" else 270
+        expected_deepseek_runs = 0 if self.plan_id == "core-real-evidence-v5" else 90
+        if (
+            self.preflight.direct_model_runs != expected_direct_runs
+            or self.preflight.deepseek_runs != expected_deepseek_runs
+        ):
+            raise ValueError("release lane preflight counts drifted")
         if sum(int(cell.planned_runs) for cell in self.cells) != self.preflight.total_subject_runs:
             raise ValueError("release cell expansion disagrees with call preflight")
         cell_ids = {cell.cell_id for cell in self.cells}
@@ -482,14 +510,18 @@ class RealSmokeCall(StrictModel):
 
 
 class RealSmokePlan(CanonicalModel):
-    schema_version: Literal[2, 3, 4] = 2
-    plan_id: Literal["core-real-smoke-v2", "core-real-smoke-v3", "core-real-smoke-v4"] = (
-        "core-real-smoke-v2"
-    )
+    schema_version: Literal[2, 3, 4, 5] = 2
+    plan_id: Literal[
+        "core-real-smoke-v2",
+        "core-real-smoke-v3",
+        "core-real-smoke-v4",
+        "core-real-smoke-v5",
+    ] = "core-real-smoke-v2"
     release_plan_reference: Literal[
         "release/core-real-evidence-plan.json",
         "release/core-real-evidence-plan-v3.json",
         "release/core-real-evidence-plan-v4.json",
+        "release/core-real-evidence-plan-v5.json",
     ]
     release_plan_digest: Sha256Digest
     calls: tuple[RealSmokeCall, ...]
@@ -506,6 +538,7 @@ class RealSmokePlan(CanonicalModel):
             "core-real-smoke-v2": (2, "release/core-real-evidence-plan.json", 90),
             "core-real-smoke-v3": (3, "release/core-real-evidence-plan-v3.json", 180),
             "core-real-smoke-v4": (4, "release/core-real-evidence-plan-v4.json", 180),
+            "core-real-smoke-v5": (5, "release/core-real-evidence-plan-v5.json", 180),
         }
         schema_version, plan_reference, subject_timeout = expected[self.plan_id]
         if self.schema_version != schema_version or self.release_plan_reference != plan_reference:
@@ -539,6 +572,9 @@ class RealSmokePlan(CanonicalModel):
             "DeepSeek Harness uses non-official route",
             "Judge persistence or integrity failure",
         }
+        if self.plan_id == "core-real-smoke-v5":
+            required_abort_conditions.remove("DeepSeek Harness uses non-official route")
+            required_abort_conditions.add("Cell 7 leaves frozen DeepSeek official route")
         if set(self.abort_conditions) != required_abort_conditions:
             raise ValueError("Core v2 abort policy must contain the exact fail-closed set")
         return self

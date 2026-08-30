@@ -159,12 +159,12 @@ def test_v3_cycle_one_is_separate_and_technical_readiness_is_non_promotional() -
     assert len(readiness.observations) == 8
 
 
-def test_real_judge_plan_reuses_frozen_v3_profile_suite_and_thresholds() -> None:
+def test_real_judge_plan_reuses_frozen_v5_profile_suite_and_thresholds() -> None:
     plan, _suite, _definitions = build_real_judge_plan(
         ROOT, {"HARNESSLAB_OPENCODE_GO_API_KEY": "REFERENCE_ONLY"}
     )
 
-    assert plan.calibration_id == "core-real-judge-v3"
+    assert plan.calibration_id == "core-real-judge-v5"
     assert len(plan.judge_cells) == 1
     assert len(plan.slots) == 63
     assert plan.judge_cells[0].model_profile.requested_model == "glm-5.2"

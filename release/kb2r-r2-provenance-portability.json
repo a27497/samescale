@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "correction_id": "kb2r-r2-r1-provenance-portability",
+  "mutates_r1_policy": false,
+  "r1_policy_reference": "release/kb2r-r1-continuation-policy.json",
+  "r1_policy_sha256": "sha256:3239df4b635f9f96b55e390a59ddb9a6d4975d3a267de23eb7081904a0e1ea92",
+  "historical_issue": "The immutable R1 policy includes operator-local absolute evidence references that governed completed execution.",
+  "portable_interpretation": "Resolve historical evidence by call ID, artifact namespace, and content digest; do not require the original operator filesystem layout.",
+  "portable_call_references": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "logical_namespace": "artifacts/core-real-matrix-v4-canary/smoke-1-model-gpt56-relay-responses/manifest.json",
+      "content_digest": "sha256:8af266acda2a5a753bc7893d2af4a0efc88e757cc52b8ac34dbfecf3f12f1cdc"
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "logical_namespace": "artifacts/core-real-matrix-v4-canary/smoke-2-model-qwen38-opencode-go-messages/manifest.json",
+      "content_digest": "sha256:5338a0e31daef21663aa2ad9fb772c82c70f33f53d0bac1d03a64670438d04fb"
+    },
+    {
+      "call_id": "smoke-3-model-deepseek-v4pro-chat",
+      "logical_namespace": "artifacts/core-real-matrix-v4-canary/smoke-3-model-deepseek-v4pro-chat/manifest.json",
+      "content_digest": "sha256:45dd168443c0c94d20c79039e56dab51dcd4e55fbd9b7b1c79bb17943954c366"
+    },
+    {
+      "call_id": "smoke-4-harness-codex-gpt56-medium",
+      "logical_namespace": "artifacts/core-real-matrix-v4-canary/smoke-4-harness-codex-gpt56-medium/manifest.json",
+      "content_digest": "sha256:3b3dea13651b2ac9ae1b540cbbdcd56644ae8cebbbdd3eadb58056e22c683011"
+    }
+  ],
+  "future_reference_contract": [
+    "repository-relative logical reference",
+    "content-addressed digest",
+    "run/call identity",
+    "artifact namespace identity"
+  ],
+  "tracked_absolute_operator_paths": 0
+}

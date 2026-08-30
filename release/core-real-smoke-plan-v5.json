@@ -1,0 +1,212 @@
+{
+  "schema_version": 5,
+  "plan_id": "core-real-smoke-v5",
+  "release_plan_reference": "release/core-real-evidence-plan-v5.json",
+  "release_plan_digest": "sha256:97253765cc91bc98b66bb975dbb5b59b409ca14e6ed7fa7d07f11b0093d4c1cc",
+  "calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "lane": "M",
+      "task_id": "core-python-deduplicate",
+      "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "judge_case_reference": null,
+      "profile_id": "model-gpt56-relay-responses",
+      "requested_model": "gpt-5.6-sol",
+      "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+      "max_output_tokens": 2000,
+      "timeout_seconds": 180,
+      "top_level_launches": 1,
+      "credential_references": [
+        "HARNESSLAB_GPT56_RELAY_BASE_URL",
+        "HARNESSLAB_GPT56_RELAY_API_KEY"
+      ],
+      "expected_evidence": [
+        "provider authentication and schema",
+        "requested/observed model evidence",
+        "route identity and immutable run manifest"
+      ]
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "lane": "M",
+      "task_id": "core-python-deduplicate",
+      "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "judge_case_reference": null,
+      "profile_id": "model-qwen38-opencode-go-messages",
+      "requested_model": "qwen3.8-max",
+      "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+      "max_output_tokens": 2000,
+      "timeout_seconds": 180,
+      "top_level_launches": 1,
+      "credential_references": [
+        "HARNESSLAB_OPENCODE_GO_API_KEY"
+      ],
+      "expected_evidence": [
+        "provider authentication and schema",
+        "requested/observed model evidence",
+        "route identity and immutable run manifest"
+      ]
+    },
+    {
+      "call_id": "smoke-3-model-deepseek-v4pro-chat",
+      "lane": "M",
+      "task_id": "core-python-deduplicate",
+      "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "judge_case_reference": null,
+      "profile_id": "model-deepseek-v4pro-chat",
+      "requested_model": "deepseek-v4-pro",
+      "provider_route": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+      "max_output_tokens": 2000,
+      "timeout_seconds": 180,
+      "top_level_launches": 1,
+      "credential_references": [
+        "DEEPSEEK_API_KEY"
+      ],
+      "expected_evidence": [
+        "provider authentication and schema",
+        "requested/observed model evidence",
+        "route identity and immutable run manifest"
+      ]
+    },
+    {
+      "call_id": "smoke-4-harness-codex-gpt56-medium",
+      "lane": "H",
+      "task_id": "core-python-deduplicate",
+      "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "judge_case_reference": null,
+      "profile_id": "harness-codex-gpt56-medium",
+      "requested_model": "gpt-5.6-sol",
+      "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+      "max_output_tokens": 2000,
+      "timeout_seconds": 180,
+      "top_level_launches": 1,
+      "credential_references": [
+        "HARNESSLAB_GPT56_RELAY_BASE_URL",
+        "HARNESSLAB_GPT56_RELAY_API_KEY"
+      ],
+      "expected_evidence": [
+        "provider authentication and schema",
+        "requested/observed model evidence",
+        "route identity and immutable run manifest",
+        "provider-scoped proxy enforcement",
+        "verifier network-none evidence",
+        "sanitized Harness trace"
+      ]
+    },
+    {
+      "call_id": "smoke-5-harness-codex-gpt56-high",
+      "lane": "H",
+      "task_id": "core-python-deduplicate",
+      "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "judge_case_reference": null,
+      "profile_id": "harness-codex-gpt56-high",
+      "requested_model": "gpt-5.6-sol",
+      "provider_route": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+      "max_output_tokens": 2000,
+      "timeout_seconds": 180,
+      "top_level_launches": 1,
+      "credential_references": [
+        "HARNESSLAB_GPT56_RELAY_BASE_URL",
+        "HARNESSLAB_GPT56_RELAY_API_KEY"
+      ],
+      "expected_evidence": [
+        "provider authentication and schema",
+        "requested/observed model evidence",
+        "route identity and immutable run manifest",
+        "provider-scoped proxy enforcement",
+        "verifier network-none evidence",
+        "sanitized Harness trace"
+      ]
+    },
+    {
+      "call_id": "smoke-6-harness-claude-qwen38-opencode-go",
+      "lane": "H",
+      "task_id": "core-python-deduplicate",
+      "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "judge_case_reference": null,
+      "profile_id": "harness-claude-qwen38-opencode-go",
+      "requested_model": "qwen3.8-max",
+      "provider_route": "opencode-go|messages|https://opencode.ai/zen/go/v1/messages",
+      "max_output_tokens": 2000,
+      "timeout_seconds": 180,
+      "top_level_launches": 1,
+      "credential_references": [
+        "HARNESSLAB_OPENCODE_GO_API_KEY"
+      ],
+      "expected_evidence": [
+        "provider authentication and schema",
+        "requested/observed model evidence",
+        "route identity and immutable run manifest",
+        "provider-scoped proxy enforcement",
+        "verifier network-none evidence",
+        "sanitized Harness trace"
+      ]
+    },
+    {
+      "call_id": "smoke-7-model-deepseek-v4flash-chat",
+      "lane": "M",
+      "task_id": "core-python-deduplicate",
+      "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "judge_case_reference": null,
+      "profile_id": "model-deepseek-v4flash-chat",
+      "requested_model": "deepseek-v4-flash",
+      "provider_route": "deepseek-official|chat_completions|https://api.deepseek.com/chat/completions",
+      "max_output_tokens": 2000,
+      "timeout_seconds": 180,
+      "top_level_launches": 1,
+      "credential_references": [
+        "DEEPSEEK_API_KEY"
+      ],
+      "expected_evidence": [
+        "provider authentication and schema",
+        "requested/observed model evidence",
+        "route identity and immutable run manifest"
+      ]
+    },
+    {
+      "call_id": "smoke-8-judge-glm52-opencode-go",
+      "lane": "J",
+      "task_id": null,
+      "task_digest": null,
+      "judge_case_reference": "judge_suites/core-calibration/1.0.0#label-l0-pass",
+      "profile_id": "judge-glm52-opencode-go-chat",
+      "requested_model": "glm-5.2",
+      "provider_route": "opencode-go|chat_completions|https://opencode.ai/zen/go/v1/chat/completions",
+      "max_output_tokens": 256,
+      "timeout_seconds": 90,
+      "top_level_launches": 1,
+      "credential_references": [
+        "HARNESSLAB_OPENCODE_GO_API_KEY"
+      ],
+      "expected_evidence": [
+        "provider authentication and schema",
+        "persisted Judge evaluation evidence",
+        "observed Judge model",
+        "JudgeLab contract and L2 authority binding"
+      ]
+    }
+  ],
+  "max_top_level_launch_count": 8,
+  "max_output_token_ceiling": 14256,
+  "abort_conditions": [
+    "auth error",
+    "route mismatch",
+    "schema mismatch",
+    "observed model conflict",
+    "model alias unexpectedly resolves elsewhere",
+    "secret appears in artifact or trace",
+    "proxy bypass",
+    "unrestricted network detected",
+    "verifier receives network",
+    "provider-route identity mismatch in intended P-Lane",
+    "task binding mismatch",
+    "artifact integrity error",
+    "Codex relay provider falls back to OpenAI or ChatGPT default",
+    "Claude Code leaves the fixed OpenCode Go route",
+    "Cell 7 leaves frozen DeepSeek official route",
+    "Judge persistence or integrity failure"
+  ],
+  "execution_state": "NOT_RUN",
+  "real_evaluation_call_count": 0,
+  "authorization_required": true
+}

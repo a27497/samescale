@@ -94,6 +94,11 @@ EXPECTED_CALL_IDS = (
     "smoke-7-harness-deepseek-v4flash",
     "smoke-8-judge-glm52-opencode-go",
 )
+EXPECTED_V5_CALL_IDS = (
+    *EXPECTED_CALL_IDS[:6],
+    "smoke-7-model-deepseek-v4flash-chat",
+    EXPECTED_CALL_IDS[7],
+)
 EXPECTED_RUNNERS = (
     "DirectModelRunner",
     "DirectModelRunner",
@@ -113,6 +118,12 @@ EXPECTED_ADAPTERS = (
     "DockerMultiHarnessBackend",
     "DockerMultiHarnessBackend",
     "OpenAICompatibleChatAdapter",
+)
+EXPECTED_V5_RUNNERS = (*EXPECTED_RUNNERS[:6], "DirectModelRunner", EXPECTED_RUNNERS[7])
+EXPECTED_V5_ADAPTERS = (
+    *EXPECTED_ADAPTERS[:6],
+    "OpenAICompatibleChatAdapter",
+    EXPECTED_ADAPTERS[7],
 )
 REQUIRED_CONFIGURATION_REFERENCES = (
     "HARNESSLAB_GPT56_RELAY_BASE_URL",
@@ -134,6 +145,10 @@ PLAN_PATHS = {
     "v4": (
         "release/core-real-evidence-plan-v4.json",
         "release/core-real-smoke-plan-v4.json",
+    ),
+    "v5": (
+        "release/core-real-evidence-plan-v5.json",
+        "release/core-real-smoke-plan-v5.json",
     ),
 }
 
@@ -399,7 +414,7 @@ class SmokeControlPlane:
         try:
             release_reference, smoke_reference = PLAN_PATHS[plan_version]
         except KeyError as exc:
-            raise SmokeControlPlaneError("plan version must be v2, v3, or v4") from exc
+            raise SmokeControlPlaneError("plan version must be v2, v3, v4, or v5") from exc
         try:
             release_plan = load_real_evidence_plan(root / release_reference)
             smoke_plan = load_real_smoke_plan(root / smoke_reference)
@@ -440,7 +455,10 @@ class SmokeControlPlane:
             or sum(call.max_output_tokens for call in smoke_plan.calls) != 14_256
         ):
             raise SmokeControlPlaneError("smoke bounds are not exactly 8 calls / 14,256 tokens")
-        if tuple(call.call_id for call in smoke_plan.calls) != EXPECTED_CALL_IDS:
+        expected_call_ids = EXPECTED_V5_CALL_IDS if plan_version == "v5" else EXPECTED_CALL_IDS
+        expected_runners = EXPECTED_V5_RUNNERS if plan_version == "v5" else EXPECTED_RUNNERS
+        expected_adapters = EXPECTED_V5_ADAPTERS if plan_version == "v5" else EXPECTED_ADAPTERS
+        if tuple(call.call_id for call in smoke_plan.calls) != expected_call_ids:
             raise SmokeControlPlaneError("smoke call identity or deterministic order drifted")
         profiles = {profile.profile_id: profile for profile in release_plan.selected_profiles}
         corpus_tasks = {task.task_id: task for task in corpus.tasks}
@@ -464,7 +482,7 @@ class SmokeControlPlane:
             profile = profiles.get(call.profile_id)
             if profile is None:
                 raise SmokeControlPlaneError("smoke call references an undeclared profile")
-            expected_lane = "J" if index == 7 else "M" if index < 3 else "H"
+            expected_lane = "J" if index == 7 else call.lane
             expected_task_id = None if expected_lane == "J" else SUBJECT_TASK_ID
             expected_task_digest = None if expected_lane == "J" else task.task_digest
             expected_judge = JUDGE_CASE_REFERENCE if expected_lane == "J" else None
@@ -490,8 +508,8 @@ class SmokeControlPlane:
                 SmokeBinding(
                     call=call,
                     provider_profile=profile,
-                    runner_identity=EXPECTED_RUNNERS[index],
-                    adapter_identity=EXPECTED_ADAPTERS[index],
+                    runner_identity=expected_runners[index],
+                    adapter_identity=expected_adapters[index],
                     task_path=None if expected_lane == "J" else task_path,
                 )
             )
@@ -502,6 +520,14 @@ class SmokeControlPlane:
     @property
     def smoke_plan_digest(self) -> str:
         return self.smoke_plan.digest
+
+    @property
+    def expected_call_ids(self) -> tuple[str, ...]:
+        return (
+            EXPECTED_V5_CALL_IDS
+            if self.smoke_plan.plan_id == "core-real-smoke-v5"
+            else EXPECTED_CALL_IDS
+        )
 
     def preflight(self) -> SmokeExecutionReceipt:
         """Keyless structural preflight. It cannot invoke a provider or resolve credentials."""
@@ -685,7 +711,7 @@ class SmokeControlPlane:
         attempted = 0
         failing_call_id = None
         failure_category = None
-        for expected_call, binding in zip(EXPECTED_CALL_IDS, bindings, strict=True):
+        for expected_call, binding in zip(self.expected_call_ids, bindings, strict=True):
             if binding.frozen.call.call_id != expected_call or attempted >= 8:
                 raise SmokeControlPlaneError("top-level launch bound was exceeded")
             attempted += 1
@@ -886,7 +912,7 @@ class ProductionSmokeInvoker:
 
     async def invoke(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
         call_id = binding.frozen.call.call_id
-        if call_id in EXPECTED_CALL_IDS[:3]:
+        if call_id in EXPECTED_CALL_IDS[:3] or call_id == EXPECTED_V5_CALL_IDS[6]:
             return await self._direct(binding)
         if call_id in EXPECTED_CALL_IDS[3:5]:
             return await self._codex(binding)

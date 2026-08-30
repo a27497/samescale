@@ -132,6 +132,10 @@ class ExperimentSpec(BaseModel):
                 raise ValueError("paired comparison requires two distinct cells")
             if left.lane is not EvaluationLane.MODEL or right.lane is not EvaluationLane.HARNESS:
                 raise ValueError("P-Lane requires an M-Lane left cell and H-Lane right cell")
+            if left.reasoning_effort is None or right.reasoning_effort is None:
+                raise ValueError("HARNESS_UPLIFT requires an explicit reasoning_effort control")
+            if left.reasoning_effort != right.reasoning_effort:
+                raise ValueError("HARNESS_UPLIFT reasoning_effort hard control drifted")
 
         control_fields = (
             "lane",

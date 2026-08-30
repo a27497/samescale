@@ -59,8 +59,9 @@ def _profile_identity(raw: dict[str, Any], profile: dict[str, Any]) -> str | Non
     if profile:
         controls = dict(profile)
         controls.pop("requested_model", None)
-        # reasoning_effort is a first-class treatment for CONTROLLED_ABLATION.
-        # The complete executable profile remains bound by profile_hash.
+        # reasoning_effort is compared explicitly by intent: a hard control for
+        # HARNESS_UPLIFT and the sole treatment for CONTROLLED_ABLATION. The
+        # complete executable profile remains bound by profile_hash.
         controls.pop("reasoning_effort", None)
         return canonical_digest(controls)
     if "provider" not in raw:

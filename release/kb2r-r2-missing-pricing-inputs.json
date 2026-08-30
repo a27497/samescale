@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "pricing_input_manifest_id": "core-real-matrix-v5-missing-pricing-inputs",
+  "experiment_id": "core-real-matrix-v5",
+  "subject_slots": 630,
+  "judge_slots": 63,
+  "cost_status": "UNKNOWN_NOT_ZERO",
+  "authoritative_repository_pricing_complete": false,
+  "missing_inputs": [
+    {
+      "provider_route_family": "GPT relay",
+      "profiles": [
+        "model-gpt56-relay-responses",
+        "harness-codex-gpt56-medium",
+        "harness-codex-gpt56-high"
+      ],
+      "required_non_secret_rates": [
+        "input_usd_per_million_tokens",
+        "cached_input_usd_per_million_tokens",
+        "output_usd_per_million_tokens",
+        "reasoning_token_billing_rule",
+        "per_request_or_platform_fee_if_any"
+      ],
+      "evidence_requirement": "Operator relay invoice/rate-card identity and effective date; upstream public pricing alone is insufficient for this trusted third-party relay."
+    },
+    {
+      "provider_route_family": "OpenCode Go",
+      "profiles": [
+        "model-qwen38-opencode-go-messages",
+        "harness-claude-qwen38-opencode-go",
+        "judge-glm52-opencode-go-chat"
+      ],
+      "required_non_secret_rates": [
+        "qwen38_input_usd_per_million_tokens_or_subscription_allocation_rule",
+        "qwen38_output_usd_per_million_tokens_or_subscription_allocation_rule",
+        "glm52_input_usd_per_million_tokens_or_subscription_allocation_rule",
+        "glm52_output_usd_per_million_tokens_or_subscription_allocation_rule",
+        "cache_read_and_cache_write_billing_rules",
+        "per_request_or_platform_fee_if_any"
+      ],
+      "evidence_requirement": "Operator-specific OpenCode Go plan/rate-card identity and effective date. The tracked route snapshot establishes routes and permission, not price."
+    },
+    {
+      "provider_route_family": "DeepSeek official",
+      "profiles": [
+        "model-deepseek-v4pro-chat",
+        "model-deepseek-v4flash-chat"
+      ],
+      "required_non_secret_rates": [
+        "v4pro_uncached_input_usd_per_million_tokens",
+        "v4pro_cached_input_usd_per_million_tokens",
+        "v4pro_output_usd_per_million_tokens",
+        "v4flash_uncached_input_usd_per_million_tokens",
+        "v4flash_cached_input_usd_per_million_tokens",
+        "v4flash_output_usd_per_million_tokens",
+        "thinking_or_reasoning_token_billing_rule",
+        "effective_date_and_currency"
+      ],
+      "evidence_requirement": "Versioned official DeepSeek rate card for the exact requested model identifiers and account region. No authoritative price snapshot is tracked in this repository."
+    }
+  ],
+  "estimated_630_subject_cost_usd": null,
+  "estimated_63_judge_cost_usd": null,
+  "estimated_total_cost_usd": null,
+  "full_matrix_budget_authorized": false,
+  "full_matrix_executed": false
+}

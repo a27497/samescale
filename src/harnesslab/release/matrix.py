@@ -63,7 +63,11 @@ from harnesslab.release.smoke import (
 from harnesslab.sandbox.models import ImageIdentity
 from harnesslab.tasks.package import TaskPackage
 
-MATRIX_IDS = {"v2": "core-real-matrix-v2", "v3": "core-real-matrix-v3"}
+MATRIX_IDS = {
+    "v2": "core-real-matrix-v2",
+    "v3": "core-real-matrix-v3",
+    "v5": "core-real-matrix-v5",
+}
 MATRIX_CANARY_TASK_ID = "core-python-deduplicate"
 MATRIX_PILOT_TASK_IDS = (
     MATRIX_CANARY_TASK_ID,
@@ -138,7 +142,7 @@ class MatrixControlPlane:
     @classmethod
     def load(cls, repository_root: Path, *, plan_version: str = "v2") -> MatrixControlPlane:
         if plan_version not in MATRIX_IDS:
-            raise MatrixControlPlaneError("plan version must be v2 or v3")
+            raise MatrixControlPlaneError("plan version must be v2, v3, or v5")
         return cls(SmokeControlPlane.load(repository_root, plan_version=plan_version))
 
     @property

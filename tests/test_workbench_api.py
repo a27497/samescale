@@ -822,7 +822,8 @@ async def test_regression_compare_accepts_declared_treatments_and_blocks_hard_co
     harness = harness_response.json()["comparisons"][0]
     assert harness["comparability"] == "NOT_COMPARABLE"
     assert "RESOURCE_ENVELOPE_MISSING" in harness["reason_codes"]
-    assert "INTENDED_TREATMENT_DIFFERENCE" in harness["reason_codes"]
+    # SUPERSEDED_LEGACY_EXPECTATION: effort drift is not an implicit uplift treatment.
+    assert "HARD_CONTROL_MISMATCH" in harness["reason_codes"]
     assert harness["paired_observations"] == 3
 
     native_response = await client.post(

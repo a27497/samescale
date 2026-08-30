@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "qualification_id": "kb2r-r2-core-v5-qualification",
+  "base_commit": "290d99c26425dcf1b60bfc711a93640edd37645e",
+  "deepseek_forensics": {
+    "real_calls": 0,
+    "forensic_result": "SYSTEMIC_PROVIDER_BOUNDARY_FAILURE_PATTERN",
+    "core_qualification": "PROVIDER_BOOTSTRAP_CONTRACT_INCOMPATIBLE",
+    "root_cause": "FROZEN_DSH_PROVIDER_REQUEST_CONTRACT_NOT_QUALIFIED_AGAINST_OFFICIAL_ROUTE",
+    "exact_rejected_field_known": false,
+    "project_deterministic_fixable": false,
+    "disposition": "UNQUALIFIED_FOR_CORE_V5",
+    "adapter_disposition": "RETAIN_DIAGNOSTIC_EXPERIMENTAL_STRESS_CANDIDATE",
+    "pinned_runtime": {
+      "package_version": "0.1.1-rc.2",
+      "image_reference": "harnesslab-phase-f-deepseek:0.1.1-rc.2",
+      "image_id": "sha256:2eddec8215b40ac59f281e467c1396ff85c93743639b87b89d843b5c0ba63c3c",
+      "effective_config_digest": "sha256:a0a0e9f380872097cb7f8b7356f36433a2afeb8de5044a9e63d4ed47b4bee9f5",
+      "command_contract": "node --expose-internals /usr/local/bin/dsh --profile headless <frozen-prompt>",
+      "command_prefix_digest": "sha256:0229531d3a133da6cf6bdde5bf55e092ddcb2dd818c275e2b7a516079f353ebb"
+    },
+    "keyless_reproduction": {
+      "test_reference": "tests/test_phase_f_deepseek_startup.py",
+      "test_sha256": "sha256:7b8dfc3a16ea9a11a113070d86140269a1b1657ac831192e62118e7bddef0617",
+      "result": "PASS",
+      "interpretation": "Exact pinned image/config/adapter reaches a controlled local Chat Completions endpoint, emits the frozen model and streaming request, consumes valid SSE, and exits zero."
+    },
+    "historical_evidence": [
+      {
+        "reference": "release/diagnostics/core-real-v2-attempt-13.json",
+        "sha256": "sha256:f8da5584fe8873eaf4c45470fa55dd781e71777579d71742b27770b2f23ef4db",
+        "outcome": "exit_1_process_error_unknown_startup_no_workspace_mutation"
+      },
+      {
+        "reference": "release/diagnostics/core-real-v3-attempt-1.json",
+        "sha256": "sha256:e402cb0764b75f66d6790a31f2b06196f4843c5644aeddfc19cb6a8ddeeaa4fb",
+        "outcome": "exit_1_process_error_17581ms_no_workspace_mutation"
+      },
+      {
+        "reference": "artifacts/core-real-matrix-v4-r1-suffix/smoke-7-harness-deepseek-v4flash/manifest.json",
+        "sha256": "sha256:d528f4ead9720b109106f615af7c0daf769b0e4fe48e2159ad389ecbbeb6889c",
+        "outcome": "exit_1_process_error_18231ms_verifier_not_executed_no_workspace_mutation"
+      }
+    ],
+    "safe_diagnostic_gap": "Immutable stderr is digest-only, so the exact provider response subtype cannot be recovered without fabrication."
+  },
+  "cell7_candidates": [
+    {
+      "rank": 1,
+      "candidate": "direct-deepseek-official-v4flash-chat",
+      "release_profile": "model-deepseek-v4flash-chat",
+      "score": 27,
+      "score_dimensions": {
+        "operational_qualification": 4,
+        "scientific_usefulness": 5,
+        "stable_route": 5,
+        "trace_quality": 3,
+        "reproducibility": 5,
+        "minimal_wiring": 5
+      },
+      "selected": true,
+      "reason": "Already-supported DirectModelRunner and official Chat Completions route enable a controlled V4 Pro versus Flash system comparison without speculative protocol support."
+    },
+    {
+      "rank": 2,
+      "candidate": "claude-qwen38-alibaba-bailian",
+      "release_profile": "harness-claude-qwen38-alibaba-bailian",
+      "score": 25,
+      "score_dimensions": {
+        "operational_qualification": 3,
+        "scientific_usefulness": 5,
+        "stable_route": 4,
+        "trace_quality": 5,
+        "reproducibility": 4,
+        "minimal_wiring": 4
+      },
+      "selected": false,
+      "reason": "Supported and scientifically useful, but real provider health is unobserved and would introduce a less-qualified route."
+    }
+  ],
+  "judge_audit": {
+    "real_calls": 0,
+    "redesign_required": false,
+    "profile_id": "judge-glm52-opencode-go-chat",
+    "release_profile_digest": "sha256:4e49a97e705c3ffdcfdd4ba187a6ae00b9c5dde8c8d0b713aa9128183e723ff3",
+    "judge_model_profile_identity": "sha256:715eeaec1cfd58b1b0cf66ed4bf3c373a1c3c1d1864bd779c0bdb00058102e70",
+    "route": "opencode-go|chat_completions|https://opencode.ai/zen/go/v1/chat/completions",
+    "historical_not_bare_json_interpretation": "DIAGNOSTIC_OUTPUT_NONCONFORMANCE_NOT_DETERMINISTIC_PARSER_OR_PROMPT_BUG",
+    "keyless_contracts": [
+      "strict bare JSON parser and mode schema",
+      "untrusted candidate separation",
+      "deterministic L0 authority",
+      "atomic content-digested persistence",
+      "frozen model and route identity"
+    ],
+    "definition_sha256": "sha256:cf121d1501803c5f220236a5ccec6555ecebff7ed8409b2f5736205602e01f44",
+    "suite_sha256": "sha256:2229e7263ae0552654b7ee79fdff86c6a20c37354d4fffa58d52a851a7737c56",
+    "gold_sha256": "sha256:8cfdb4c1f93cdf63f37c359ef4a43b319988b9f70bc97ccaaf17620a8371c2ce"
+  },
+  "gate_a_503_correction": "The obsolete R1 Full Gate A 503 was generated by the intentional database-failure sensitivity mutation; PostgreSQL service health did not fail spontaneously."
+}

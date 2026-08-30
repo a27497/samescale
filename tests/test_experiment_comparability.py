@@ -28,6 +28,7 @@ def _facts(label: str, **changes: str | None) -> ComparisonFacts:
         "harness": "direct-model",
         "harness_version": "1",
         "harness_profile_identity": canonical_digest({"profile": "left"}),
+        "reasoning_effort": "medium",
         "prompt_identity": canonical_digest({"prompt": "left"}),
         "trace_coverage": "CONTROLLED_TEST",
     }
