@@ -266,7 +266,7 @@ def test_product_port_uses_compose_dotenv_when_process_environment_is_unset(
 
 
 def test_command_failure_never_exposes_stderr_or_secret(compose_file: Path) -> None:
-    literal_secret = "sk-private-must-never-appear"
+    literal_secret = "private-token-must-never-appear"
     executor = FakeExecutor()
     executor.failure = ("up", literal_secret)
     lifecycle = ProductLifecycle(compose_file, executor=executor, preflight=docker_ready)
