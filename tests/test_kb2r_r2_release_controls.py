@@ -191,6 +191,7 @@ def test_r2_artifacts_are_portable_and_do_not_require_ignored_evidence() -> None
         RELEASE / "core-real-smoke-plan-v5.json",
         RELEASE / "kb2r-r2-core-qualification.json",
         RELEASE / "kb2r-r2-canary-policy.json",
+        RELEASE / "kb2r-r2-closure-dossier.json",
         RELEASE / "kb2r-r2-provenance-portability.json",
         RELEASE / "kb2r-r2-readiness-equivalence.json",
     )
@@ -221,6 +222,30 @@ def test_deepseek_and_judge_keyless_decisions_are_frozen_without_score_selection
     assert judge["real_calls"] == 0
     assert judge["redesign_required"] is False
     assert judge["historical_not_bare_json_interpretation"].startswith("DIAGNOSTIC_")
+
+
+def test_r2_closure_is_ready_for_separate_authorization_but_not_spend_or_execution() -> None:
+    dossier = json.loads((RELEASE / "kb2r-r2-closure-dossier.json").read_text(encoding="utf-8"))
+    assert dossier["authorization_decision"] == "READY_FOR_FULL_MATRIX_AUTHORIZATION"
+    assert dossier["full_matrix_spend_authorized"] is False
+    assert dossier["full_matrix_executed"] is False
+    assert len(dossier["core_cells"]) == 7
+    assert dossier["core_cells"][6]["capability_outcome"] == (
+        "FAIL_SUBJECT_OUTPUT_ERROR_MAX_TOKENS"
+    )
+    assert dossier["core_cells"][6]["infrastructure_outcome"] == "SUCCESS"
+    assert dossier["judge_canary"]["outcome"] == "JUDGED"
+    assert dossier["judge_canary"]["observed_model"] == "glm-5.2"
+    assert dossier["r2_execution"]["total_new_external_launches"] == 2
+    assert dossier["r2_execution"]["recovery_attempts"] == 0
+    assert dossier["r2_execution"]["reran_calls_1_to_6"] is False
+    assert dossier["methodology"]["paired_lane_reasoning_effort_policy"] == "HARD_CONTROL"
+    assert dossier["methodology"]["formal_ablation_paired_observations_required"] == 90
+    assert dossier["full_matrix_preflight"]["cost_status"] == "UNKNOWN_NOT_ZERO"
+    assert dossier["full_matrix_preflight"]["blocking_reason_codes"] == [
+        "FULL_MATRIX_PRICING_UNKNOWN",
+        "FULL_MATRIX_BUDGET_NOT_AUTHORIZED",
+    ]
 
 
 def test_v4_and_r1_historical_evidence_remains_byte_identical() -> None:
