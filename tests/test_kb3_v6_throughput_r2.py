@@ -1,38 +1,49 @@
 from __future__ import annotations
 
+import hashlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-import pytest
-
+from harnesslab.contracts.common import EvaluationLane
 from harnesslab.experiment.dispatch import (
     BlockDispatchCoordinator,
     DispatchProfile,
     SlotResourceClass,
     slot_resource_class,
 )
-from harnesslab.experiment.plan import MethodologyV2ExperimentPlan
+from harnesslab.experiment.plan import MethodologyV2ExperimentPlan, ScheduleBlock
 from harnesslab.release.throughput_qualification import (
     CancellationProbe,
     ProfileQualification,
     QualificationTrial,
+    ThroughputR2Qualification,
     select_qualified_profile,
 )
 from harnesslab.release.v6 import (
     V6_THROUGHPUT_R2_SELECTED_PROFILE_ID,
-    build_v6_plan,
     selected_v6_dispatch_profile,
     v6_throughput_r2_profiles,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
 R2_EVIDENCE = ROOT / "release/core-real-matrix-v6-throughput-r2.json"
+V6_CONTROL = ROOT / "release/core-real-matrix-v6-control.json"
+V5_INCIDENT = ROOT / "release/kb3-v5-attempt1-scheduling-incident.json"
 
 
-@pytest.fixture(scope="session")
-def v6_plan() -> MethodologyV2ExperimentPlan:
-    return build_v6_plan(ROOT, {})
+@dataclass(frozen=True)
+class _SchedulerSlotView:
+    slot_id: str
+    lane: EvaluationLane
+    provider_route: str
+
+
+@dataclass(frozen=True)
+class _SchedulerPlanView:
+    schedule_blocks: tuple[ScheduleBlock, ...]
+    run_slots: tuple[_SchedulerSlotView, ...]
 
 
 def _profile_result(
@@ -78,9 +89,11 @@ def test_r2_profiles_change_only_bounded_concurrency() -> None:
 def test_frozen_r2_evidence_selects_the_production_default() -> None:
     evidence = json.loads(R2_EVIDENCE.read_text(encoding="utf-8"))
     qualification = evidence["qualification"]
+    parsed = ThroughputR2Qualification.model_validate(qualification)
     selected = selected_v6_dispatch_profile()
     assert qualification["selection"]["selected_profile_id"] == selected.profile_id
     assert qualification["selection"]["selected_profile_digest"] == selected.digest
+    assert select_qualified_profile(parsed.profiles) == parsed.selection
     assert qualification["selection"]["c_improvement_over_b_percent"] >= 10
     assert qualification["selection"]["c_improvement_over_a_percent"] >= 10
     assert qualification["external_call_counts"] == {
@@ -131,12 +144,36 @@ def test_frozen_r2_evidence_selects_the_production_default() -> None:
     assert evidence["frozen_v5_incident_sha256"] == (
         "sha256:02f1b49092b2c592231e132fdcc97135f876d6694f513f2bc0b49897ad8e8cac"
     )
+    assert evidence["accepted_v6_control_sha256"] == (
+        "sha256:" + hashlib.sha256(V6_CONTROL.read_bytes()).hexdigest()
+    )
+    assert evidence["frozen_v5_incident_sha256"] == (
+        "sha256:" + hashlib.sha256(V5_INCIDENT.read_bytes()).hexdigest()
+    )
 
 
-def test_dispatch_sequence_is_independent_of_completion_order(
-    v6_plan: MethodologyV2ExperimentPlan,
-) -> None:
-    expected = tuple(slot.slot_id for slot in v6_plan.run_slots)
+def test_dispatch_sequence_is_independent_of_completion_order() -> None:
+    control = json.loads(V6_CONTROL.read_text(encoding="utf-8"))
+    evidence = json.loads(R2_EVIDENCE.read_text(encoding="utf-8"))
+    cells = {item["cell_id"]: item for item in control["cells"]}
+    schedule_blocks = tuple(
+        ScheduleBlock.model_validate(item) for item in control["schedule_blocks"]
+    )
+    run_slots = tuple(
+        _SchedulerSlotView(
+            slot_id=item["slot_id"],
+            lane=EvaluationLane(cells[item["cell_id"]]["lane"]),
+            provider_route=f"{cells[item['cell_id']]['provider_id']}|frozen-control",
+        )
+        for item in control["logical_slots"]
+    )
+    v6_plan = cast(
+        MethodologyV2ExperimentPlan,
+        cast(object, _SchedulerPlanView(schedule_blocks=schedule_blocks, run_slots=run_slots)),
+    )
+    expected = tuple(evidence["qualification"]["profiles"][0]["trials"][0]["dispatch_sequence"])
+    assert expected == tuple(slot_id for block in schedule_blocks for slot_id in block.slot_ids)
+    assert set(expected) == {slot.slot_id for slot in run_slots}
     observed: list[tuple[str, ...]] = []
     for newest_first in (False, True):
         coordinator = BlockDispatchCoordinator(v6_plan, v6_throughput_r2_profiles()[2])
