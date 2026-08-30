@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
+import pytest
+
 from harnesslab.comparability.models import ComparisonFacts, canonical_digest
 from harnesslab.contracts.common import EvaluationLane
 from harnesslab.contracts.run import RunStatus
@@ -26,9 +30,19 @@ TEST_FIXTURE_TASKS = (
     "tasks/core-typescript-feature-flag/1.0.2",
     "tasks/micro-java-clamp/1.0.2",
 )
+DENOMINATOR_DISTINCTION_TASKS = (
+    *TEST_FIXTURE_TASKS,
+    "tasks/core-python-quota/1.0.2",
+    "tasks/core-typescript-quota/1.0.2",
+)
+FixtureOutcome = tuple[StatisticalOutcome, str, dict[str, object] | None] | None
 
 
-def _fixture_plan() -> ExperimentPlan:
+def _fixture_plan(
+    *,
+    experiment_id: str = TEST_FIXTURE_EXPERIMENT_ID,
+    task_packages: tuple[str, ...] = TEST_FIXTURE_TASKS,
+) -> ExperimentPlan:
     """Schema-valid synthetic plan; it is never persisted as release or v3 evidence."""
 
     shared_profile = identity("synthetic-model-comparison-shared-profile")
@@ -49,9 +63,9 @@ def _fixture_plan() -> ExperimentPlan:
     )
     return build_experiment_plan(
         ExperimentSpec(
-            experiment_id=TEST_FIXTURE_EXPERIMENT_ID,
+            experiment_id=experiment_id,
             name="Synthetic model-comparison analysis fixture",
-            task_packages=TEST_FIXTURE_TASKS,
+            task_packages=task_packages,
             cells=cells,
             repeat_count=1,
             execution_seed=7,
@@ -89,9 +103,7 @@ def _facts(
     )
 
 
-def _fixture_outcome(
-    task_index: int, cell_id: str
-) -> tuple[StatisticalOutcome, str, dict[str, object] | None] | None:
+def _fixture_outcome(task_index: int, cell_id: str) -> FixtureOutcome:
     pass_manifest: dict[str, object] = {
         "outcome": "verified_pass",
         "provider": "synthetic-provider",
@@ -172,6 +184,60 @@ def _fixture_outcome(
     return None
 
 
+def _denominator_distinction_outcome(task_index: int, cell_id: str) -> FixtureOutcome:
+    pass_manifest: dict[str, object] = {
+        "outcome": "verified_pass",
+        "provider": "synthetic-provider",
+        "summary": "synthetic denominator regression passed",
+    }
+    fail_manifest: dict[str, object] = {
+        "outcome": "verified_fail",
+        "provider": "synthetic-provider",
+        "summary": "synthetic denominator regression capability failure",
+    }
+    if task_index < 7:
+        if cell_id == "b" and task_index == 6:
+            return StatisticalOutcome.CAPABILITY_FAIL, "verified_fail", fail_manifest
+        return StatisticalOutcome.CAPABILITY_PASS, "verified_pass", pass_manifest
+    if cell_id == "b":
+        return StatisticalOutcome.CAPABILITY_PASS, "verified_pass", pass_manifest
+    if task_index == 7:
+        return (
+            StatisticalOutcome.INFRA_FAILURE,
+            "provider_error",
+            {
+                "outcome": "provider_error",
+                "provider": "synthetic-provider",
+                "provider_failure": "timeout",
+                "summary": "synthetic denominator regression infrastructure failure",
+            },
+        )
+    return None
+
+
+def _zero_model_a_denominator_outcome(task_index: int, cell_id: str) -> FixtureOutcome:
+    if cell_id == "b":
+        return (
+            StatisticalOutcome.CAPABILITY_PASS,
+            "verified_pass",
+            {
+                "outcome": "verified_pass",
+                "provider": "synthetic-provider",
+                "summary": "synthetic zero-denominator regression passed",
+            },
+        )
+    return (
+        StatisticalOutcome.INFRA_FAILURE,
+        "provider_error",
+        {
+            "outcome": "provider_error",
+            "provider": "synthetic-provider",
+            "provider_failure": "timeout",
+            "summary": f"synthetic zero-denominator infrastructure failure {task_index}",
+        },
+    )
+
+
 def _run_status(outcome: StatisticalOutcome | None) -> RunStatus:
     if outcome is StatisticalOutcome.CAPABILITY_PASS:
         return RunStatus.COMPLETED
@@ -182,15 +248,19 @@ def _run_status(outcome: StatisticalOutcome | None) -> RunStatus:
     return RunStatus.QUEUED
 
 
-def _fixture_evidence() -> VerifiedExperimentEvidence:
+def _fixture_evidence(
+    *,
+    plan: ExperimentPlan | None = None,
+    fixture_outcome: Callable[[int, str], FixtureOutcome] = _fixture_outcome,
+) -> VerifiedExperimentEvidence:
     """Synthetic in-memory observations only; no provider, database, or evidence writes occur."""
 
-    plan = _fixture_plan()
+    plan = plan or _fixture_plan()
     task_indexes = {task.task_id: index for index, task in enumerate(plan.tasks)}
     runs: list[ExperimentRunRecord] = []
     observations: list[VerifiedRunObservation] = []
     for slot in plan.run_slots:
-        fixture = _fixture_outcome(task_indexes[slot.task.task_id], slot.cell_id)
+        fixture = fixture_outcome(task_indexes[slot.task.task_id], slot.cell_id)
         outcome = fixture[0] if fixture is not None else None
         source = fixture[1] if fixture is not None else None
         manifest = fixture[2] if fixture is not None else None
@@ -262,7 +332,57 @@ def test_synthetic_fixture_reports_capability_infra_pairs_and_descriptive_scope(
     assert (analysis.pairs.both_pass, analysis.pairs.model_a_only_pass) == (1, 1)
     assert (analysis.pairs.model_b_only_pass, analysis.pairs.both_fail) == (0, 1)
     assert (analysis.pairs.infra_pairs, analysis.pairs.missing_pairs) == (3, 1)
-    assert analysis.pairs.raw_percentage_point_difference == -(100 / 3)
+    assert analysis.pass_rate_differences.orientation == "MODEL_B_MINUS_MODEL_A"
+    assert analysis.pass_rate_differences.per_model_capability_pass_rate_difference_pp == -25
+    assert analysis.pass_rate_differences.matched_capability_pair_pass_rate_difference_pp == -(
+        100 / 3
+    )
+
+
+def test_synthetic_regression_distinguishes_per_model_and_matched_pair_denominators() -> None:
+    plan = _fixture_plan(
+        experiment_id="synthetic-model-comparison-denominator-distinction",
+        task_packages=DENOMINATOR_DISTINCTION_TASKS,
+    )
+    analysis = analyze_model_comparison(
+        _fixture_evidence(plan=plan, fixture_outcome=_denominator_distinction_outcome),
+        repository_root=ROOT,
+    ).analysis
+    by_label = {model.model_label: model for model in analysis.models}
+
+    assert by_label["MODEL_A"].capability_denominator == 7
+    assert by_label["MODEL_A"].passed == 7
+    assert by_label["MODEL_A"].infra == 1
+    assert by_label["MODEL_A"].unacquired_slots == 1
+    assert by_label["MODEL_B"].capability_denominator == 9
+    assert by_label["MODEL_B"].passed == 8
+    assert analysis.pairs.matched_capability_pairs == 7
+    assert analysis.pairs.model_a_only_pass == 1
+    assert analysis.pairs.model_b_only_pass == 0
+    assert analysis.pass_rate_differences.per_model_capability_pass_rate_difference_pp == (
+        pytest.approx(-11.11111111111111)
+    )
+    assert analysis.pass_rate_differences.matched_capability_pair_pass_rate_difference_pp == (
+        pytest.approx(-14.285714285714286)
+    )
+    canonical = analysis.canonical_json()
+    assert '"orientation":"MODEL_B_MINUS_MODEL_A"' in canonical
+    assert '"per_model_capability_pass_rate_difference_pp"' in canonical
+    assert '"matched_capability_pair_pass_rate_difference_pp"' in canonical
+    assert "raw_percentage_point_difference" not in canonical
+
+
+def test_pass_rate_differences_are_unavailable_when_required_denominators_are_zero() -> None:
+    analysis = analyze_model_comparison(
+        _fixture_evidence(fixture_outcome=_zero_model_a_denominator_outcome),
+        repository_root=ROOT,
+    ).analysis
+
+    assert analysis.models[0].capability_denominator == 0
+    assert analysis.models[1].capability_denominator == len(TEST_FIXTURE_TASKS)
+    assert analysis.pairs.matched_capability_pairs == 0
+    assert analysis.pass_rate_differences.per_model_capability_pass_rate_difference_pp is None
+    assert analysis.pass_rate_differences.matched_capability_pair_pass_rate_difference_pp is None
 
 
 def test_synthetic_fixture_distinguishes_failure_identity_trace_recovery_and_cost() -> None:

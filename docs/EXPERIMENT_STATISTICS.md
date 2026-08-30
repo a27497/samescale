@@ -56,8 +56,13 @@ and failure taxonomy. Missing cost is `NOT_AVAILABLE`, not zero.
 The model-comparison closeout uses the same denominator policy for two-cell
 `MODEL_COMPARISON` plans even though those plans do not declare Harness-uplift P-Lane pairs.
 Pairing is recovered only from frozen `paired_slot_identity` values. Infra and unacquired pairs
-remain outside the capability denominator and are disclosed separately; raw percentage-point
-differences use matched capability pairs only. `QUICK`/n=1 output is explicitly
+remain outside the capability denominator and are disclosed separately. The closeout reports two
+distinct percentage-point differences with orientation `MODEL_B_MINUS_MODEL_A`:
+`per_model_capability_pass_rate_difference_pp` subtracts the per-model capability pass rates, with
+each model using its own capability denominator, while
+`matched_capability_pair_pass_rate_difference_pp` uses only matched capability pairs and divides
+the Model B-only minus Model A-only pass count by the matched-pair denominator. Either value is
+`null` when its required denominator is zero. `QUICK`/n=1 output is explicitly
 exploratory/descriptive.
 
 Paired binary statistics count left-pass/right-fail and left-fail/right-pass discordances, then use

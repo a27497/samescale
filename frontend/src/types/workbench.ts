@@ -125,8 +125,12 @@ export interface ModelPairAnalysis {
   infra_pairs: number
   missing_pairs: number
   infra_or_missing_pairs: number
-  raw_percentage_point_difference: number | null
-  raw_difference_direction: 'MODEL_A_HIGHER' | 'MODEL_B_HIGHER' | 'EQUAL' | 'NOT_AVAILABLE'
+}
+
+export interface PassRateDifferenceAnalysis {
+  orientation: 'MODEL_B_MINUS_MODEL_A'
+  per_model_capability_pass_rate_difference_pp: number | null
+  matched_capability_pair_pass_rate_difference_pp: number | null
 }
 
 export interface AnalysisBreakdown {
@@ -170,6 +174,7 @@ export interface ModelComparisonAnalysis {
   }
   models: [ModelOutcomeAnalysis, ModelOutcomeAnalysis]
   pairs: ModelPairAnalysis
+  pass_rate_differences: PassRateDifferenceAnalysis
   comparability: {
     category: Comparability | 'NOT_AVAILABLE'
     assessed_pairs: number

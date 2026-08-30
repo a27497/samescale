@@ -23,6 +23,9 @@ const rateText = (value: { status: string; value: number | null }) =>
     ? `${(value.value * 100).toFixed(1)}%`
     : 'NOT_AVAILABLE'
 
+const percentagePointText = (value: number | null) =>
+  value === null ? 'NOT_AVAILABLE' : `${value.toFixed(1)} pp`
+
 const identityText = (value: { status: string; counts: Record<string, number>; missing_slots: number }) => {
   const known = Object.entries(value.counts).map(([name, count]) => `${name} (${count})`)
   if (value.missing_slots) known.push(`NOT_AVAILABLE (${value.missing_slots})`)
@@ -71,7 +74,7 @@ onBeforeUnmount(() => store.stopPolling())
       </div>
       <template v-else>
         <div v-if="analysis" class="panel">
-          <div class="notice">{{ analysis.conclusion_semantics.permitted_interpretation }} Raw differences are descriptive and remain subordinate to comparability and missingness.</div>
+          <div class="notice">{{ analysis.conclusion_semantics.permitted_interpretation }} Pass-rate differences are descriptive and remain subordinate to comparability and missingness.</div>
           <div class="metric-grid" style="margin-top: 16px">
             <div class="metric-card accent"><div class="label">Planned slots</div><div class="value">{{ analysis.overall.planned_slots }}</div></div>
             <div class="metric-card"><div class="label">Acquired slots</div><div class="value">{{ analysis.overall.acquired_slots }}</div><div class="detail">Unacquired {{ analysis.overall.unacquired_slots }}</div></div>
@@ -91,7 +94,8 @@ onBeforeUnmount(() => store.stopPolling())
                 <dt>Model B only</dt><dd>{{ analysis.pairs.model_b_only_pass }}</dd>
                 <dt>Both fail</dt><dd>{{ analysis.pairs.both_fail }}</dd>
                 <dt>Infra / missing</dt><dd>{{ analysis.pairs.infra_pairs }} / {{ analysis.pairs.missing_pairs }}</dd>
-                <dt>Raw B − A</dt><dd>{{ analysis.pairs.raw_percentage_point_difference === null ? 'NOT_AVAILABLE' : `${analysis.pairs.raw_percentage_point_difference.toFixed(1)} pp` }}</dd>
+                <dt>Per-model capability rates (B − A)</dt><dd>{{ percentagePointText(analysis.pass_rate_differences.per_model_capability_pass_rate_difference_pp) }}</dd>
+                <dt>Matched capability-pair rates (B − A)</dt><dd>{{ percentagePointText(analysis.pass_rate_differences.matched_capability_pair_pass_rate_difference_pp) }}</dd>
               </dl>
             </div>
             <div class="panel">

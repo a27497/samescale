@@ -114,8 +114,16 @@ class PairOutcomeSummary(AnalysisModel):
     infra_pairs: int = Field(ge=0)
     missing_pairs: int = Field(ge=0)
     infra_or_missing_pairs: int = Field(ge=0)
-    raw_percentage_point_difference: float | None = Field(default=None, ge=-100.0, le=100.0)
-    raw_difference_direction: Literal["MODEL_A_HIGHER", "MODEL_B_HIGHER", "EQUAL", "NOT_AVAILABLE"]
+
+
+class PassRateDifferenceSummary(AnalysisModel):
+    orientation: Literal["MODEL_B_MINUS_MODEL_A"] = "MODEL_B_MINUS_MODEL_A"
+    per_model_capability_pass_rate_difference_pp: float | None = Field(
+        default=None, ge=-100.0, le=100.0
+    )
+    matched_capability_pair_pass_rate_difference_pp: float | None = Field(
+        default=None, ge=-100.0, le=100.0
+    )
 
 
 class ComparabilitySummary(AnalysisModel):
@@ -190,6 +198,7 @@ class ModelComparisonAnalysis(AnalysisModel):
     overall: OverallOutcomeSummary
     models: tuple[ModelOutcomeSummary, ModelOutcomeSummary]
     pairs: PairOutcomeSummary
+    pass_rate_differences: PassRateDifferenceSummary
     comparability: ComparabilitySummary
     control_drift: ControlDriftSummary
     trace_coverage: TraceCoverageSummary
@@ -557,14 +566,6 @@ def _pair_summary(rows: tuple[_PairRow, ...]) -> PairOutcomeSummary:
             model_b_only += 1
         else:
             both_fail += 1
-    if capability:
-        difference = 100.0 * (model_b_only - model_a_only) / len(capability)
-        direction = (
-            "MODEL_B_HIGHER" if difference > 0 else "MODEL_A_HIGHER" if difference < 0 else "EQUAL"
-        )
-    else:
-        difference = None
-        direction = "NOT_AVAILABLE"
     infra = sum(row.category == "INFRA" for row in rows)
     missing = sum(row.category == "MISSING" for row in rows)
     return PairOutcomeSummary(
@@ -577,8 +578,30 @@ def _pair_summary(rows: tuple[_PairRow, ...]) -> PairOutcomeSummary:
         infra_pairs=infra,
         missing_pairs=missing,
         infra_or_missing_pairs=infra + missing,
-        raw_percentage_point_difference=difference,
-        raw_difference_direction=direction,
+    )
+
+
+def _pass_rate_differences(
+    model_a: ModelOutcomeSummary,
+    model_b: ModelOutcomeSummary,
+    pairs: PairOutcomeSummary,
+) -> PassRateDifferenceSummary:
+    per_model_difference = None
+    if model_a.capability_denominator and model_b.capability_denominator:
+        per_model_difference = 100.0 * (
+            model_b.passed / model_b.capability_denominator
+            - model_a.passed / model_a.capability_denominator
+        )
+    matched_pair_difference = None
+    if pairs.matched_capability_pairs:
+        matched_pair_difference = (
+            100.0
+            * (pairs.model_b_only_pass - pairs.model_a_only_pass)
+            / pairs.matched_capability_pairs
+        )
+    return PassRateDifferenceSummary(
+        per_model_capability_pass_rate_difference_pp=per_model_difference,
+        matched_capability_pair_pass_rate_difference_pp=matched_pair_difference,
     )
 
 
@@ -759,6 +782,7 @@ def analyze_model_comparison(
         ),
         models=(model_a, model_b),
         pairs=pair_summary,
+        pass_rate_differences=_pass_rate_differences(model_a, model_b, pair_summary),
         comparability=comparability,
         control_drift=drift,
         trace_coverage=_trace_coverage(

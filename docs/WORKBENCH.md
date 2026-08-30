@@ -112,7 +112,8 @@ experiment plan.
 The response is the same canonical machine-readable closeout produced by
 `harnesslab report model-comparison EXPERIMENT_ID [--output PATH]`. It includes planned/acquired
 slots, the capability denominator, PASS/FAIL/INFRA, per-model rates, all four matched capability
-pair outcomes, raw percentage-point direction, infra/missing pairs, language and task-family
+pair outcomes, per-model capability and matched-capability-pair percentage-point differences with
+an explicit `MODEL_B_MINUS_MODEL_A` orientation, infra/missing pairs, language and task-family
 breakdowns when task metadata reports them, comparability reasons, control drift, trace and
 observed identity coverage, recovery-marker coverage, known usage, and explicit cost status.
 Incomplete cost evidence always has `status=NOT_AVAILABLE` and no total; a known subtotal may be
@@ -125,7 +126,7 @@ It is never interpreted as a recovery attempt without an explicit immutable reco
 
 For `QUICK` or any `n=1` plan the response carries
 `conclusion_semantics.scope=EXPLORATORY_DESCRIPTIVE`. The Workbench renders that limitation before
-raw direction and comparability details.
+the two denominator-specific pass-rate differences and comparability details.
 
 ## Polling and Core readiness
 
