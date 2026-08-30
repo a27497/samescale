@@ -30,6 +30,7 @@ from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
 from harnesslab.multi_harness.models import DeepSeekSessionExtraction, HarnessKind
 from harnesslab.multi_harness.profile import canonical_claude_profile, canonical_deepseek_profile
 from harnesslab.multi_harness.runtime import MultiHarnessRuntime
+from harnesslab.preflight.cli import budget_app, preflight_app
 from harnesslab.release.diagnostic import (
     ComponentDiagnosticError,
     execute_real_component_diagnostics,
@@ -98,6 +99,8 @@ app.add_typer(report_app, name="report")
 app.add_typer(judge_app, name="judge")
 app.add_typer(analyst_app, name="analyst")
 app.add_typer(release_app, name="release")
+app.add_typer(preflight_app, name="preflight")
+app.add_typer(budget_app, name="budget")
 model_app.add_typer(model_profile_app, name="profile")
 harness_app.add_typer(codex_harness_app, name="codex")
 harness_app.add_typer(claude_harness_app, name="claude")
