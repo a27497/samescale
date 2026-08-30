@@ -2,7 +2,7 @@
   "schema_version": 1,
   "audit_id": "harnesslab-blueprint-reality-2026-08-30",
   "audit_date": "2026-08-30",
-  "audited_code_head_sha": "968873954e7e00b5d3426bf1f224c32369e4118f",
+  "audited_code_head_sha": "bc3d9ec3ba2badc48ddff20ca7f469705b5a914e",
   "authoritative_base_sha": "a415822905346fb6e11351b9c5cb0f2b7e2ff4b3",
   "documentation_reference": "docs/BLUEPRINT_REALITY_AUDIT_2026-08-30.md",
   "blueprint_source": {
@@ -29,8 +29,8 @@
     },
     {
       "stage": "K-B4",
-      "status": "PARTIAL",
-      "summary": "Typed failure and evidence primitives exist, but the unified diagnosis taxonomy, clustering, drill-down platform, attribution records, BadCase export, and dedicated Workbench experience are not implemented at this audit baseline."
+      "status": "IMPLEMENTED",
+      "summary": "The deterministic diagnosis, attribution, evidence-qualified BadCase export, API, and Workbench platform is implemented and synthetically qualified without fabricating real BadCases."
     },
     {
       "stage": "K-C",
@@ -45,7 +45,7 @@
     {
       "stage": "M",
       "status": "PARTIAL",
-      "summary": "Preflight, budget, lifecycle contracts, task quality, and development/held-out split primitives are integrated. Discriminative and stress suites, failure clustering, and end-to-end funnel orchestration remain absent or incomplete."
+      "summary": "Preflight, budget, lifecycle contracts, task quality, development/held-out splits, and deterministic failure clustering are integrated. Discriminative and stress suites plus end-to-end funnel orchestration remain absent or incomplete."
     },
     {
       "stage": "N",
@@ -179,107 +179,93 @@
       "stage": "K-B4",
       "requirement_id": "kb4-unified-failure-taxonomy",
       "requirement": "Normalize compile, test, timeout, provider, protocol, tool, workspace, dependency, verifier, and artifact failures while preserving capability versus infrastructure.",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "evidence_refs": [
-        "src/harnesslab/model_lane/models.py",
-        "src/harnesslab/harness_lane/models.py",
-        "src/harnesslab/sandbox/models.py",
-        "src/harnesslab/experiment/outcomes.py"
+        "src/harnesslab/diagnosis/models.py",
+        "src/harnesslab/diagnosis/service.py",
+        "tests/test_diagnosis.py"
       ],
-      "remaining_work": [
-        "Add one diagnosis-level taxonomy mapping the existing lane-specific enums to every required K-B4 class.",
-        "Qualify deterministic precedence when several failure signals coexist."
-      ],
+      "remaining_work": [],
       "limitations": [
-        "The existing typed enums are useful but fragmented and do not cover the required diagnosis vocabulary as one stable contract."
+        "Classification consumes persisted structured facts and never retroactively reinterprets historical provider evidence."
       ]
     },
     {
       "stage": "K-B4",
       "requirement_id": "kb4-deterministic-clustering",
       "requirement": "Cluster failures deterministically across cell, task, language, task family, failure class, trace, tool, and workspace-diff dimensions.",
-      "status": "MISSING",
+      "status": "IMPLEMENTED",
       "evidence_refs": [
-        "src/harnesslab/experiment/model_comparison.py",
-        "src/harnesslab/analyst/evidence.py"
+        "src/harnesslab/diagnosis/service.py",
+        "tests/test_diagnosis.py"
       ],
-      "remaining_work": [
-        "Implement canonical cluster keys, summaries, stable ordering, and integrity-bound evidence references.",
-        "Add synthetic qualification for every grouping dimension and mixed-dimension cluster."
-      ],
+      "remaining_work": [],
       "limitations": [
-        "Presentation categories and per-run inspection are not a clustering engine."
+        "Synthetic qualification proves deterministic mechanics; substantive real clusters still depend on immutable experiment evidence."
       ]
     },
     {
       "stage": "K-B4",
       "requirement_id": "kb4-drilldown",
       "requirement": "Provide Experiment to Cell to Task family to Failure cluster to Run to Trace, diff, tool, verifier, and attribution drill-down.",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "evidence_refs": [
-        "src/harnesslab/analyst/evidence.py",
+        "src/harnesslab/diagnosis/service.py",
         "src/harnesslab/api/routes/workbench.py",
-        "frontend/src/views/RunDetailView.vue"
+        "frontend/src/views/DiagnosisView.vue",
+        "frontend/tests/diagnosis.spec.ts"
       ],
-      "remaining_work": [
-        "Add task-family and failure-cluster resources.",
-        "Expose workspace diff, tool-call, verifier, and attribution detail through one typed diagnosis API."
-      ],
+      "remaining_work": [],
       "limitations": [
-        "Existing run and trace views skip the cluster layer and do not implement the complete required chain."
+        "The Workbench presents backend-derived analysis and does not perform browser-side failure classification."
       ]
     },
     {
       "stage": "K-B4",
       "requirement_id": "kb4-attribution-boundary",
       "requirement": "Distinguish VERIFIED_FACT from HYPOTHESIS and prevent trace correlation from being reported as causality.",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "evidence_refs": [
-        "src/harnesslab/analyst/models.py",
-        "src/harnesslab/analyst/report.py",
-        "src/harnesslab/experiment/report.py"
+        "src/harnesslab/diagnosis/models.py",
+        "src/harnesslab/diagnosis/service.py",
+        "tests/test_diagnosis.py"
       ],
-      "remaining_work": [
-        "Create diagnosis-specific attribution records bound to run, cluster, trace, diff, and verifier evidence.",
-        "Represent controlled-ablation support separately from ordinary correlation."
-      ],
+      "remaining_work": [],
       "limitations": [
-        "The Analyst fact boundary is reusable, but it is not yet the K-B4 diagnosis attribution service."
+        "Controlled ablation strengthens association only; the contract continues to reject causal attribution."
       ]
     },
     {
       "stage": "K-B4",
       "requirement_id": "kb4-badcase-export",
       "requirement": "Export evidence-backed BadCases without fabricating real cases.",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "evidence_refs": [
+        "src/harnesslab/diagnosis/models.py",
+        "src/harnesslab/diagnosis/service.py",
+        "tests/test_diagnosis.py",
         "release/badcases.json",
-        "docs/BADCASES.md",
-        "src/harnesslab/release/final_verifier.py"
+        "docs/BADCASES.md"
       ],
-      "remaining_work": [
-        "Implement deterministic export from eligible capability-failure evidence.",
-        "Preserve placeholders until real evidence satisfies the export contract."
-      ],
+      "remaining_work": [],
       "limitations": [
-        "The repository has three honest placeholders and final-release validation, but no general export machinery."
+        "No real Matrix evidence was acquired, so the three release BadCase slots remain honest placeholders. Synthetic qualification cases are never counted as real."
       ]
     },
     {
       "stage": "K-B4",
       "requirement_id": "kb4-workbench",
       "requirement": "Integrate diagnosis into the Workbench without duplicating backend analysis logic.",
-      "status": "MISSING",
+      "status": "IMPLEMENTED",
       "evidence_refs": [
+        "src/harnesslab/api/routes/workbench.py",
+        "frontend/src/views/DiagnosisView.vue",
         "frontend/src/router/index.ts",
-        "frontend/src/views/RunDetailView.vue",
-        "src/harnesslab/api/app.py"
+        "frontend/tests/diagnosis.spec.ts"
       ],
-      "remaining_work": [
-        "Add typed diagnosis client models, routes, cluster exploration, drill-down, and BadCase export affordances backed by one backend service."
-      ],
+      "remaining_work": [],
       "limitations": [
-        "The audit baseline has no dedicated diagnosis route or diagnosis API registration."
+        "The dedicated UI consumes the backend diagnosis service and remains read-only except for deterministic export generation."
       ]
     },
     {
@@ -504,16 +490,15 @@
       "stage": "M",
       "requirement_id": "m-failure-clustering",
       "requirement": "Aggregate evaluation failures into deterministic, inspectable clusters.",
-      "status": "MISSING",
+      "status": "IMPLEMENTED",
       "evidence_refs": [
-        "src/harnesslab/experiment/report.py",
-        "src/harnesslab/analyst/evidence.py"
+        "src/harnesslab/diagnosis/models.py",
+        "src/harnesslab/diagnosis/service.py",
+        "tests/test_diagnosis.py"
       ],
-      "remaining_work": [
-        "Implement the shared K-B4 diagnosis clustering layer and reuse it from Phase M reporting."
-      ],
+      "remaining_work": [],
       "limitations": [
-        "Existing outcome summaries and per-run inspection do not cluster failures."
+        "The clustering service is available to Phase M evidence consumers; the broader funnel orchestrator remains partial."
       ]
     },
     {
@@ -579,7 +564,7 @@
       ],
       "remaining_work": [
         "Define a secure operator workflow for changing supported non-secret settings and credential references if required.",
-        "Integrate Custom Evaluation and diagnosis navigation after those backends are complete."
+        "Integrate Custom Evaluation navigation after its execution boundary is complete."
       ],
       "limitations": [
         "Settings are intentionally presence-only and registry planning remains backend-governed."

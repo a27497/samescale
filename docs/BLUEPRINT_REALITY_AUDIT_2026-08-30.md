@@ -4,11 +4,11 @@
 
 HarnessLab has substantially more implemented foundation than a phase-name inventory suggests, but
 the post-K roadmap is not complete. The integrated tree at
-`968873954e7e00b5d3426bf1f224c32369e4118f` contains the Phase M control primitives, Phase N
-one-command product baseline, Phase O Custom Evaluation foundation, and a corrected K-B3
-configuration/preflight audit. It does not contain the K-B4 Diagnosis Platform, usable custom
-execution, a public Adapter SDK, external benchmark validation, or the real evidence required to
-close Core release.
+`bc3d9ec3ba2badc48ddff20ca7f469705b5a914e` contains the Phase M control primitives, Phase N
+one-command product baseline, Phase O Custom Evaluation foundation, a corrected K-B3
+configuration/preflight audit, and the keyless K-B4 Diagnosis Platform. It does not contain usable
+custom execution, a public Adapter SDK, external benchmark validation, or the real evidence
+required to close Core release.
 
 The machine-readable authority for this audit is
 `release/blueprint-reality-audit-2026-08-30.json`.
@@ -45,10 +45,10 @@ Statuses mean:
 | Stage | Status | Reality |
 | --- | --- | --- |
 | K-B3 | `BLOCKED_BY_EVIDENCE` | Configuration reconciliation is complete, but the exact successor cannot be frozen and no canary was acquired. |
-| K-B4 | `PARTIAL` | Failure/evidence primitives exist; the unified diagnosis and attribution platform does not. |
+| K-B4 | `IMPLEMENTED` | The deterministic diagnosis, attribution, BadCase-export, API, and Workbench platform is synthetically qualified; no real BadCase is fabricated. |
 | K-C | `BLOCKED_BY_EVIDENCE` | The release hard stop exists; final real evidence and exact-head release verification do not. |
 | L | `PARTIAL` | Automated code-quality gates are strong; ownership/contribution governance is not tracked. |
-| M | `PARTIAL` | Preflight, budget, lifecycle, quality, and split primitives exist; suites, clustering, and full funnel orchestration remain. |
+| M | `PARTIAL` | Preflight, budget, lifecycle, quality, splits, and failure clustering exist; discriminative/stress suites and full funnel orchestration remain. |
 | N | `PARTIAL` | One-command productization is implemented; active controls and released distribution evidence remain limited. |
 | O | `PARTIAL` | Custom foundation is implemented; true custom execution and Workbench UX are missing. |
 | P | `PARTIAL` | Internal seams are reusable; there is no supported public Adapter SDK. |
@@ -93,34 +93,24 @@ The historical timeout root cause remains `UNRESOLVED`.
 
 ## K-B4 — Diagnosis and Attribution Platform
 
-The baseline is `PARTIAL`. Existing components should be reused:
+The engineering platform is `IMPLEMENTED` and keylessly qualified:
 
-- provider failures and transport phases in `src/harnesslab/model_lane/models.py`;
-- Harness and capability/infrastructure distinctions in
-  `src/harnesslab/harness_lane/models.py` and `src/harnesslab/experiment/outcomes.py`;
-- verifier lifecycle failures in `src/harnesslab/sandbox/models.py`;
-- run/trace inspection in `src/harnesslab/analyst/evidence.py`; and
-- the enforced `VERIFIED_FACT`/`HYPOTHESIS` boundary in
-  `src/harnesslab/analyst/models.py` and `src/harnesslab/analyst/report.py`.
+- `src/harnesslab/diagnosis/models.py` defines the required closed failure taxonomy, preserves
+  capability versus infrastructure, and makes `VERIFIED_FACT` and `HYPOTHESIS` explicit;
+- `src/harnesslab/diagnosis/service.py` builds canonical clusters across model, Harness, task,
+  language, task family, failure, trace, tool, and workspace-diff patterns from immutable evidence;
+- controlled-ablation membership strengthens an association but never produces a causal claim;
+- the API and `frontend/src/views/DiagnosisView.vue` provide the full Experiment → Cell → Task
+  family → Cluster → Run → Trace/diff/tool/verifier/attribution chain without duplicating backend
+  classification logic; and
+- BadCase export admits real cases only when immutable evidence is verified, scope is capability,
+  and the verifier failed. Infrastructure, missing-artifact, and verifier-not-run observations are
+  excluded. Synthetic qualification is opt-in and never counted as real.
 
-These do not yet form the required platform. Material gaps are:
-
-- one deterministic diagnosis taxonomy covering compile, test, timeout, provider, Harness
-  protocol, tool, no-modification, wrong-files, protected-file, dependency, verifier, and artifact
-  failures;
-- canonical clustering across model, Harness, task, language, family, failure, trace, tool, and
-  workspace-diff dimensions;
-- the complete Experiment → Cell → Task family → Cluster → Run → Trace/diff/tool/verifier/
-  attribution chain;
-- diagnosis-specific attribution records that never treat correlation as causality and identify
-  controlled-ablation support separately;
-- deterministic BadCase export from eligible real capability failures; and
-- a dedicated API and Workbench experience backed by the same analysis service.
-
-`release/badcases.json` remains an honest three-slot placeholder. It must not be populated with
-synthetic cases as if they were real evidence. The machine-readable requirement IDs under K-B4 are
-stable so the status and evidence references can be updated after the isolated K-B4 implementation
-lands.
+Evidence is in `tests/test_diagnosis.py`, `tests/test_workbench_api.py`, and
+`frontend/tests/diagnosis.spec.ts`. `release/badcases.json` remains an honest three-slot
+placeholder because this task acquired no real Matrix evidence. That is the intended scientific
+boundary, not a missing K-B4 export implementation.
 
 ## K-C — conditional Core release closure
 
@@ -178,7 +168,8 @@ future public Adapter SDK should reuse these seams without rewriting stable evid
 
 - The Discriminative Suite is not implemented.
 - The Stress Suite is not implemented.
-- Failure Clustering is not implemented and should be supplied by the shared K-B4 diagnosis layer.
+- Failure Clustering is implemented by the shared K-B4 diagnosis layer and available to Phase M
+  evidence consumers; full funnel orchestration remains separate.
 
 `docs/EVAL_METHODOLOGY_V2.md` and `release/evaluation-methodology-v2.json` explicitly describe
 discriminative/stress as an optional future extension. A stage enum is not a qualified suite.
@@ -201,8 +192,8 @@ The broader phase remains `PARTIAL`:
   lifecycle operations.
 - The source/wheel distribution contract is tested, but no published prebuilt artifact, installer,
   provenance binding, upgrade qualification, or supported-platform matrix is evidenced.
-- Diagnosis and Custom Evaluation product navigation remain pending their backend execution
-  boundaries.
+- Diagnosis is integrated into the product navigation. Custom Evaluation product navigation and
+  execution remain pending their execution boundary.
 
 These are remaining product capabilities, not grounds to rebuild the finished one-command shell.
 
