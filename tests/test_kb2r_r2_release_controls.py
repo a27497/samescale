@@ -15,7 +15,9 @@ from harnesslab.release.matrix import MatrixControlPlane
 from harnesslab.release.r2 import (
     R2CanaryPolicy,
     V4ToV5ReadinessEquivalence,
+    load_r2_canary_policy,
     load_readiness_equivalence,
+    validate_r2_policy,
 )
 from harnesslab.release.smoke import EXPECTED_V5_CALL_IDS, RuntimeIdentities, SmokeControlPlane
 from harnesslab.sandbox.models import ImageIdentity
@@ -168,11 +170,27 @@ def test_r2_canary_policy_model_forbids_substitution_retry_and_excess_launches()
         R2CanaryPolicy.model_validate(raw)
 
 
+def test_frozen_r2_policy_binds_v5_equivalence_and_only_two_new_launches() -> None:
+    policy = load_r2_canary_policy(RELEASE / "kb2r-r2-canary-policy.json")
+    equivalence = load_readiness_equivalence(RELEASE / "kb2r-r2-readiness-equivalence.json")
+    control = SmokeControlPlane.load(ROOT, plan_version="v5")
+    validate_r2_policy(ROOT, control, policy, equivalence)
+
+    assert policy.cell7_call_id == EXPECTED_V5_CALL_IDS[6]
+    assert policy.judge_call_id == EXPECTED_V5_CALL_IDS[7]
+    assert policy.max_new_subject_launches == 1
+    assert policy.max_new_judge_launches == 1
+    assert policy.max_new_external_launches == 2
+    assert policy.recovery_attempts_allowed == 0
+    assert policy.substitution_after_freeze_allowed is False
+
+
 def test_r2_artifacts_are_portable_and_do_not_require_ignored_evidence() -> None:
     paths = (
         RELEASE / "core-real-evidence-plan-v5.json",
         RELEASE / "core-real-smoke-plan-v5.json",
         RELEASE / "kb2r-r2-core-qualification.json",
+        RELEASE / "kb2r-r2-canary-policy.json",
         RELEASE / "kb2r-r2-provenance-portability.json",
         RELEASE / "kb2r-r2-readiness-equivalence.json",
     )

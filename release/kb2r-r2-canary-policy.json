@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "policy_id": "kb2r-r2-v5-canary",
+  "base_commit": "290d99c26425dcf1b60bfc711a93640edd37645e",
+  "frozen_implementation_commit": "d3c75da96833b1387530a18803dc11b6bfcd398c",
+  "release_plan_reference": "release/core-real-evidence-plan-v5.json",
+  "release_plan_digest": "sha256:97253765cc91bc98b66bb975dbb5b59b409ca14e6ed7fa7d07f11b0093d4c1cc",
+  "smoke_plan_reference": "release/core-real-smoke-plan-v5.json",
+  "smoke_plan_digest": "sha256:033aa082e46117911305a5fde90fb54e2028566c7540ade64fcf8bd33a507c48",
+  "readiness_equivalence_reference": "release/kb2r-r2-readiness-equivalence.json",
+  "readiness_equivalence_digest": "sha256:2759e5b2ed7683c5973facd70cb464d49e9047e15b170633945390f904cba43c",
+  "cell7_call_id": "smoke-7-model-deepseek-v4flash-chat",
+  "cell7_profile_id": "model-deepseek-v4flash-chat",
+  "judge_call_id": "smoke-8-judge-glm52-opencode-go",
+  "judge_profile_id": "judge-glm52-opencode-go-chat",
+  "max_new_subject_launches": 1,
+  "max_new_judge_launches": 1,
+  "max_new_external_launches": 2,
+  "recovery_attempts_allowed": 0,
+  "substitution_after_freeze_allowed": false,
+  "protected_file_sha256": {
+    "release/core-real-evidence-plan-v4.json": "sha256:5de29e88ff9482a34111e6639eb6a139045d812466614a5ceaeb6e796c76f90d",
+    "release/core-real-smoke-plan-v4.json": "sha256:cc3a8d9fd4df7e47d8f55df0dd7d7b922e2b972307f9ac11f86e9648a0df69ec",
+    "release/kb2r-authorization-dossier.json": "sha256:1c5ca81022d2a389637f9718254e746e81733b56819bef2d87bd62015eaf33e8",
+    "release/kb2r-r1-continuation-policy.json": "sha256:3239df4b635f9f96b55e390a59ddb9a6d4975d3a267de23eb7081904a0e1ea92",
+    "release/kb2r-r1-authorization-dossier.json": "sha256:e0b95fe11ddd6b5b524fe14afdb4180e719e34066a807f29ce72374b642954cd",
+    "release/kb2r-r2-core-qualification.json": "sha256:bf68bdb17115ddff155dea0c711755cc2172b38c862c64694c05a837dcc75252",
+    "release/kb2r-r2-provenance-portability.json": "sha256:b410ddad4ff789e6700f7fa60dfcb19a5e18afb310dbe3db248bd14f4ef9d0fb",
+    "release/kb2r-r2-missing-pricing-inputs.json": "sha256:6165d0b8ee95fb593c0348ce11fa1f879e70974020aceca17917822c96686c80"
+  }
+}
