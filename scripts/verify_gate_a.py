@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 JUNIT = ROOT / "gate-a-results.xml"
 CRITICAL_TESTS = {
     "test_database_connectivity",
-    "test_doctor_reports_pass_with_database",
+    "test_doctor_reports_pass_for_ready_product",
     "test_health_reports_healthy_database",
     "test_migration_from_empty_database",
 }
