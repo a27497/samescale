@@ -323,6 +323,108 @@ def test_model_comparison_treats_model_identity_difference_as_intended() -> None
     assert report.status is ComparabilityStatus.COMPARABLE
 
 
+def controlled_facts(**changes: str | None) -> ComparisonFacts:
+    values: dict[str, object] = {
+        **facts().model_dump(mode="python"),
+        "verifier_control_identity": "sha256:" + "4" * 64,
+        "verifier_execution_identity": "sha256:" + "d" * 64,
+        "verifier_execution_status": "EXECUTED",
+        "verifier_control_execution_status": "MATCH",
+        "provider_config_identity": "sha256:" + "e" * 64,
+        "harness_image_identity": "sha256:" + "f" * 64,
+        "runner_contract": "phase-k-real-codex-v1",
+        "credential_reference_identity": "HARNESSLAB_GPT56_RELAY_API_KEY",
+        "tool_policy_identity": "sha256:" + "a" * 64,
+        "mcp_policy_identity": "sha256:" + "c" * 64,
+        "reasoning_effort": "medium",
+    }
+    values.update(changes)
+    return ComparisonFacts.model_validate(values)
+
+
+def test_controlled_ablation_models_reasoning_effort_as_the_only_treatment() -> None:
+    left = controlled_facts(observed_model=None)
+    right = controlled_facts(
+        evidence_identity="sha256:" + "8" * 64,
+        observed_model=None,
+        reasoning_effort="high",
+    )
+    report = ComparabilityEngine().assess(
+        left, right, intent=ComparabilityIntent.CONTROLLED_ABLATION
+    )
+
+    assert report.status is ComparabilityStatus.COMPARABLE
+    assert any(
+        field.field == "reasoning_effort" and field.state is FieldState.INTENDED_DIFFERENCE
+        for field in report.fields
+    )
+    assert any(
+        reason.code is ReasonCode.OPERATOR_TRUSTED_ROUTE_MODEL_NOT_RUNTIME_EXPOSED
+        for reason in report.reasons
+    )
+    assert left.observed_model is None and right.observed_model is None
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "task_id",
+        "task_version",
+        "task_digest",
+        "workspace_input_digest",
+        "context_identity",
+        "verifier_control_identity",
+        "verifier_execution_identity",
+        "requested_model",
+        "provider_route",
+        "provider_config_identity",
+        "budget_identity",
+        "resource_envelope_identity",
+        "network_policy",
+        "harness",
+        "harness_version",
+        "harness_profile_identity",
+        "harness_image_identity",
+        "runner_contract",
+        "prompt_identity",
+        "credential_reference_identity",
+        "tool_policy_identity",
+        "mcp_policy_identity",
+        "trace_coverage",
+    ),
+)
+def test_controlled_ablation_blocks_every_non_treatment_hard_control_drift(
+    field: str,
+) -> None:
+    left = controlled_facts(observed_model=None)
+    right = controlled_facts(
+        evidence_identity="sha256:" + "8" * 64,
+        observed_model=None,
+        reasoning_effort="high",
+        **{field: "mutated"},
+    )
+    report = ComparabilityEngine().assess(
+        left, right, intent=ComparabilityIntent.CONTROLLED_ABLATION
+    )
+    assert report.status is ComparabilityStatus.NOT_COMPARABLE
+
+
+def test_controlled_ablation_blocks_explicit_or_asymmetric_observed_model_identity() -> None:
+    left = controlled_facts(observed_model="same-model")
+    exposed_mismatch = controlled_facts(
+        evidence_identity="sha256:" + "8" * 64,
+        reasoning_effort="high",
+        observed_model="other-model",
+    )
+    asymmetric = exposed_mismatch.model_copy(update={"observed_model": None})
+
+    for right in (exposed_mismatch, asymmetric):
+        report = ComparabilityEngine().assess(
+            left, right, intent=ComparabilityIntent.CONTROLLED_ABLATION
+        )
+        assert report.status is ComparabilityStatus.NOT_COMPARABLE
+
+
 @pytest.mark.parametrize("missing_side", ("left", "right", "both"))
 def test_model_comparison_missing_requested_model_is_not_comparable(missing_side: str) -> None:
     left = facts(requested_model=None) if missing_side in {"left", "both"} else facts()

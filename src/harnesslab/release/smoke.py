@@ -3,15 +3,17 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import subprocess
 import tempfile
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
+from typing import Literal
 from typing import Protocol as TypingProtocol
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from harnesslab.contracts.common import Protocol
 from harnesslab.contracts.model import ModelProfile
@@ -154,6 +156,11 @@ class SmokeFailureCategory(StrEnum):
     INFRASTRUCTURE = "INFRASTRUCTURE"
 
 
+class ObservedModelAssessment(StrEnum):
+    VERIFIED = "VERIFIED"
+    OBSERVED_MODEL_MISSING = "OBSERVED_MODEL_MISSING"
+
+
 class SmokeCallFailure(RuntimeError):
     def __init__(
         self,
@@ -167,31 +174,46 @@ class SmokeCallFailure(RuntimeError):
 
 
 def _validate_harness_observed_model(
-    profile: MultiHarnessProfile,
+    profile: CodexHarnessProfile | MultiHarnessProfile,
     *,
-    trace_coverage: TraceCoverage,
+    trace_coverage: TraceCoverage | str,
     observed_model_status: ObservedModelStatus,
     observed_model: str | None,
-) -> None:
+) -> ObservedModelAssessment:
     """Validate each harness's declared observation surface without inferring identity."""
 
-    if profile.harness is HarnessKind.CLAUDE_CODE:
+    coverage = TraceCoverage(trace_coverage)
+    if isinstance(profile, CodexHarnessProfile):
+        valid_coverage = coverage is TraceCoverage.FULL_STREAM
+        if (
+            valid_coverage
+            and observed_model_status is ObservedModelStatus.NOT_EXPOSED
+            and observed_model is None
+        ):
+            return ObservedModelAssessment.OBSERVED_MODEL_MISSING
         valid = (
-            trace_coverage is TraceCoverage.FULL_STREAM
+            valid_coverage
+            and observed_model_status is ObservedModelStatus.EXPOSED
+            and observed_model == profile.requested_model
+        )
+    elif profile.harness is HarnessKind.CLAUDE_CODE:
+        valid = (
+            coverage is TraceCoverage.FULL_STREAM
             and observed_model_status is ObservedModelStatus.EXPOSED
             and observed_model == profile.requested_model
         )
     else:
         valid = (
-            trace_coverage is TraceCoverage.FINAL_OUTPUT_ONLY
+            coverage is TraceCoverage.FINAL_OUTPUT_ONLY
             and observed_model_status is ObservedModelStatus.NOT_EXPOSED
             and observed_model is None
         )
     if not valid:
         raise SmokeCallFailure(
             SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
-            f"{profile.harness.value} observed-model contract failed",
+            f"{profile.harness} observed-model contract failed",
         )
+    return ObservedModelAssessment.VERIFIED
 
 
 class SmokeCallResult(BaseModel):
@@ -218,6 +240,74 @@ class SmokeExecutionReceipt(BaseModel):
     release_plan_digest: str
     status: SmokeExecutionStatus
     attempted_top_level_launches: int = Field(ge=0, le=8)
+    failing_call_id: str | None = None
+    failure_category: SmokeFailureCategory | None = None
+    results: tuple[SmokeCallResult, ...]
+
+    def canonical_json(self) -> str:
+        return json.dumps(
+            self.model_dump(mode="json"),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+
+
+class SmokeContinuationPolicy(BaseModel):
+    """Append-only authority for the unattempted v4 suffix."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: Literal[1] = 1
+    policy_id: Literal["kb2r-r1-v4-suffix-continuation"]
+    base_branch_head: Literal["cd7de16eb4549d4a108ec9908b57905b50cd0562"]
+    repair_commit_identity: str = Field(pattern=r"^[0-9a-f]{40}$")
+    release_plan_reference: Literal["release/core-real-evidence-plan-v4.json"]
+    release_plan_digest: str
+    smoke_plan_reference: Literal["release/core-real-smoke-plan-v4.json"]
+    smoke_plan_digest: str
+    original_receipt_reference: Literal["artifacts/core-real-matrix-v4-canary/smoke-execution.json"]
+    original_receipt_digest: str
+    original_calls: tuple[SmokeCallResult, ...]
+    old_control_plane_classification: Literal["OBSERVED_MODEL_CONFLICT"]
+    raw_safe_fact: Literal["observed_model_status=NOT_EXPOSED;observed_model=null;verifier=PASS"]
+    repaired_classification_rule: Literal[
+        "NOT_EXPOSED_PLUS_NULL_IS_OBSERVED_MODEL_MISSING_LIMITATION_NOT_CONFLICT"
+    ]
+    codex_observed_model_capability: Literal["NOT_GUARANTEED_BY_PINNED_SCHEMA"]
+    allowed_suffix_call_ids: tuple[str, ...]
+    historical_subject_launches: Literal[4] = 4
+    historical_judge_launches: Literal[0] = 0
+    max_new_subject_launches: Literal[3] = 3
+    max_new_judge_launches: Literal[1] = 1
+    max_total_subject_launches: Literal[7] = 7
+    max_total_judge_launches: Literal[1] = 1
+    retries_allowed: Literal[0] = 0
+    protected_file_sha256: dict[str, str]
+
+    @model_validator(mode="after")
+    def exact_suffix(self) -> SmokeContinuationPolicy:
+        if self.allowed_suffix_call_ids != EXPECTED_CALL_IDS[4:]:
+            raise ValueError("continuation authority is not the exact Calls 5-8 suffix")
+        if tuple(item.call_id for item in self.original_calls) != EXPECTED_CALL_IDS[:4]:
+            raise ValueError("continuation does not bind exact original Calls 1-4")
+        return self
+
+
+class SmokeContinuationReceipt(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    schema_version: Literal[1] = 1
+    policy_id: Literal["kb2r-r1-v4-suffix-continuation"]
+    status: SmokeExecutionStatus
+    historical_subject_launches: Literal[4] = 4
+    new_subject_launches: int = Field(ge=0, le=3)
+    total_subject_launches: int = Field(ge=4, le=7)
+    historical_judge_launches: Literal[0] = 0
+    new_judge_launches: int = Field(ge=0, le=1)
+    total_judge_launches: int = Field(ge=0, le=1)
+    recovery_attempts: Literal[0] = 0
+    reran_calls_1_to_4: Literal[False] = False
     failing_call_id: str | None = None
     failure_category: SmokeFailureCategory | None = None
     results: tuple[SmokeCallResult, ...]
@@ -620,8 +710,141 @@ class SmokeControlPlane:
             self._persist_receipt(receipt_path, receipt)
         return receipt
 
+    def validate_continuation_policy(
+        self, policy: SmokeContinuationPolicy
+    ) -> SmokeExecutionReceipt:
+        """Validate historical bindings and suffix authority without a provider call."""
+
+        if (
+            policy.release_plan_digest != self.release_plan.digest
+            or policy.smoke_plan_digest != self.smoke_plan_digest
+        ):
+            raise SmokeControlPlaneError("continuation plan digest drifted")
+        for reference, expected in policy.protected_file_sha256.items():
+            path = (self.repository_root / reference).resolve()
+            if self.repository_root not in path.parents or not path.is_file():
+                raise SmokeControlPlaneError(
+                    f"protected continuation input is unavailable: {reference}"
+                )
+            actual = "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+            if actual != expected:
+                raise SmokeControlPlaneError(f"protected historical bytes changed: {reference}")
+        receipt_path = (self.repository_root / policy.original_receipt_reference).resolve()
+        if self.repository_root not in receipt_path.parents or not receipt_path.is_file():
+            raise SmokeControlPlaneError("original aborted receipt is unavailable")
+        receipt_digest = "sha256:" + hashlib.sha256(receipt_path.read_bytes()).hexdigest()
+        if receipt_digest != policy.original_receipt_digest:
+            raise SmokeControlPlaneError("original aborted receipt bytes changed")
+        try:
+            receipt = SmokeExecutionReceipt.model_validate_json(
+                receipt_path.read_text(encoding="utf-8")
+            )
+        except ValueError as exc:
+            raise SmokeControlPlaneError("original aborted receipt is invalid") from exc
+        if (
+            receipt.status is not SmokeExecutionStatus.ABORTED
+            or receipt.attempted_top_level_launches != 4
+            or receipt.failing_call_id != EXPECTED_CALL_IDS[3]
+            or receipt.failure_category is not SmokeFailureCategory.OBSERVED_MODEL_CONFLICT
+            or receipt.results != policy.original_calls
+        ):
+            raise SmokeControlPlaneError("original Calls 1-4 receipt semantics drifted")
+        for result in receipt.results:
+            if not result.evidence_references or not result.evidence_digests:
+                raise SmokeControlPlaneError("original call evidence binding is incomplete")
+            evidence_path = Path(result.evidence_references[0]).resolve()
+            artifacts = (self.repository_root / "artifacts").resolve()
+            if artifacts not in evidence_path.parents or not evidence_path.is_dir():
+                raise SmokeControlPlaneError("original call evidence path escaped artifacts")
+            if digest_tree(evidence_path) != result.evidence_digests[0]:
+                raise SmokeControlPlaneError("original call evidence identity drifted")
+        commit = subprocess.run(
+            ("git", "cat-file", "-e", f"{policy.repair_commit_identity}^{{commit}}"),
+            cwd=self.repository_root,
+            capture_output=True,
+            check=False,
+        )
+        if commit.returncode != 0:
+            raise SmokeControlPlaneError("repair commit identity is unavailable")
+        return receipt
+
+    async def execute_continuation(
+        self,
+        bindings: Sequence[ResolvedSmokeBinding],
+        invoker: SmokeInvoker,
+        policy: SmokeContinuationPolicy,
+        *,
+        allow_real_smoke: bool,
+        receipt_path: Path,
+    ) -> SmokeContinuationReceipt:
+        if not allow_real_smoke:
+            raise SmokeControlPlaneError("real suffix requires --allow-real-smoke")
+        self.validate_continuation_policy(policy)
+        suffix = tuple(bindings[4:])
+        if len(bindings) != 8 or tuple(item.frozen for item in bindings) != self.bindings:
+            raise SmokeControlPlaneError("continuation received mutated v4 bindings")
+        if tuple(item.frozen.call.call_id for item in suffix) != policy.allowed_suffix_call_ids:
+            raise SmokeControlPlaneError("continuation binding is not exact Calls 5-8")
+        if receipt_path.exists() or any(
+            (receipt_path.parent / call_id).exists() for call_id in policy.allowed_suffix_call_ids
+        ):
+            raise SmokeControlPlaneError("suffix evidence already exists; retries are forbidden")
+
+        results: list[SmokeCallResult] = []
+        failing_call_id: str | None = None
+        failure_category: SmokeFailureCategory | None = None
+        new_subject = 0
+        new_judge = 0
+        for index, binding in enumerate(suffix):
+            call_id = policy.allowed_suffix_call_ids[index]
+            if index < 3:
+                if new_subject >= policy.max_new_subject_launches:
+                    raise SmokeControlPlaneError("new subject launch ceiling exceeded")
+                new_subject += 1
+            else:
+                if len(results) != 3 or new_judge >= policy.max_new_judge_launches:
+                    raise SmokeControlPlaneError("Judge prerequisite or launch ceiling failed")
+                new_judge += 1
+            try:
+                result = await invoker.invoke(binding)
+                if result.call_id != call_id:
+                    raise SmokeCallFailure(
+                        SmokeFailureCategory.ARTIFACT_INTEGRITY,
+                        "continuation result identity mismatch",
+                    )
+                results.append(result)
+            except SmokeCallFailure as exc:
+                if exc.evidence_result is not None:
+                    results.append(exc.evidence_result)
+                failing_call_id = call_id
+                failure_category = exc.category
+                break
+            except Exception:
+                failing_call_id = call_id
+                failure_category = SmokeFailureCategory.INFRASTRUCTURE
+                break
+        receipt = SmokeContinuationReceipt(
+            policy_id=policy.policy_id,
+            status=(
+                SmokeExecutionStatus.SUCCEEDED
+                if failing_call_id is None
+                else SmokeExecutionStatus.ABORTED
+            ),
+            new_subject_launches=new_subject,
+            total_subject_launches=4 + new_subject,
+            new_judge_launches=new_judge,
+            total_judge_launches=new_judge,
+            failing_call_id=failing_call_id,
+            failure_category=failure_category,
+            results=tuple(results),
+        )
+        self._persist_receipt(receipt_path, receipt)
+        return receipt
+
     @staticmethod
-    def _persist_receipt(path: Path, receipt: SmokeExecutionReceipt) -> None:
+    def _persist_receipt(
+        path: Path, receipt: SmokeExecutionReceipt | SmokeContinuationReceipt
+    ) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.NamedTemporaryFile(
             "w", encoding="utf-8", dir=path.parent, delete=False
@@ -763,12 +986,15 @@ class ProductionSmokeInvoker:
                 "Codex smoke artifact integrity failed",
                 artifact,
             )
-        if result.evidence.observed_model != profile.requested_model:
-            raise SmokeCallFailure(
-                SmokeFailureCategory.OBSERVED_MODEL_CONFLICT,
-                "Codex observed model conflict",
-                artifact,
+        try:
+            _validate_harness_observed_model(
+                profile,
+                trace_coverage=result.evidence.trace_coverage,
+                observed_model_status=result.evidence.observed_model_status,
+                observed_model=result.evidence.observed_model,
             )
+        except SmokeCallFailure as exc:
+            raise SmokeCallFailure(exc.category, str(exc), artifact) from exc
         return artifact
 
     async def _claude(self, binding: ResolvedSmokeBinding) -> SmokeCallResult:
@@ -1032,4 +1258,57 @@ async def execute_real_smoke(
         invoker,
         allow_real_smoke=True,
         receipt_path=output / "smoke-execution.json",
+    )
+
+
+def load_smoke_continuation_policy(path: Path) -> SmokeContinuationPolicy:
+    try:
+        return SmokeContinuationPolicy.model_validate_json(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise SmokeControlPlaneError("invalid R1 continuation policy") from exc
+
+
+async def execute_real_smoke_continuation(
+    repository_root: Path,
+    *,
+    allow_real_smoke: bool,
+    environment: Mapping[str, str] | None = None,
+    artifact_root: Path | None = None,
+    policy_path: Path | None = None,
+) -> SmokeContinuationReceipt:
+    """Execute only v4 Calls 5-8 under append-only R1 authority."""
+
+    if not allow_real_smoke:
+        raise SmokeControlPlaneError("real suffix requires --allow-real-smoke")
+    root = repository_root.resolve()
+    selected_environment = environment if environment is not None else os.environ
+    control = SmokeControlPlane.load(root, plan_version="v4")
+    selected_policy_path = (
+        policy_path
+        if policy_path is not None
+        else root / "release/kb2r-r1-continuation-policy.json"
+    ).resolve()
+    policy = load_smoke_continuation_policy(selected_policy_path)
+    control.validate_continuation_policy(policy)
+    control.validate_real_environment(selected_environment)
+    await preflight_egress_network_isolation()
+    runtime = await resolve_runtime_identities()
+    bindings = control.resolve_real_bindings(selected_environment, runtime)
+    output = (
+        artifact_root
+        if artifact_root is not None
+        else root / "artifacts/core-real-matrix-v4-r1-suffix"
+    ).resolve()
+    invoker = ProductionSmokeInvoker(
+        root,
+        selected_environment,
+        output,
+        smoke_plan_id=control.smoke_plan.plan_id,
+    )
+    return await control.execute_continuation(
+        bindings,
+        invoker,
+        policy,
+        allow_real_smoke=True,
+        receipt_path=output / "r1-smoke-execution.json",
     )

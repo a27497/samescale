@@ -32,6 +32,13 @@ FIELDS = (
     "harness",
     "harness_version",
     "harness_profile_identity",
+    "provider_config_identity",
+    "harness_image_identity",
+    "runner_contract",
+    "credential_reference_identity",
+    "tool_policy_identity",
+    "mcp_policy_identity",
+    "reasoning_effort",
     "prompt_identity",
     "trace_coverage",
 )
@@ -72,6 +79,34 @@ NATIVE_SYSTEM_TREATMENTS = UPLIFT_TREATMENTS | {
     "budget_identity",
     "resource_envelope_identity",
 }
+CONTROLLED_ABLATION_CONTROLS = {
+    "task_id",
+    "task_version",
+    "task_digest",
+    "workspace_input_digest",
+    "context_identity",
+    "verifier_control_identity",
+    "verifier_execution_identity",
+    "verifier_execution_status",
+    "verifier_control_execution_status",
+    "requested_model",
+    "provider_route",
+    "provider_config_identity",
+    "budget_identity",
+    "resource_envelope_identity",
+    "network_policy",
+    "harness",
+    "harness_version",
+    "harness_profile_identity",
+    "harness_image_identity",
+    "runner_contract",
+    "prompt_identity",
+    "credential_reference_identity",
+    "tool_policy_identity",
+    "mcp_policy_identity",
+    "trace_coverage",
+}
+CONTROLLED_ABLATION_TREATMENTS = {"reasoning_effort"}
 
 
 class ComparabilityEngine:
@@ -90,6 +125,11 @@ class ComparabilityEngine:
             controls, treatments = NATIVE_SYSTEM_CONTROLS, NATIVE_SYSTEM_TREATMENTS
         elif intent is ComparabilityIntent.MODEL_COMPARISON:
             controls, treatments = MODEL_CONTROLS, MODEL_TREATMENTS
+        elif intent is ComparabilityIntent.CONTROLLED_ABLATION:
+            controls, treatments = (
+                CONTROLLED_ABLATION_CONTROLS,
+                CONTROLLED_ABLATION_TREATMENTS,
+            )
         else:
             controls, treatments = CORE_CONTROLS, set()
         fields: list[FieldComparison] = []
@@ -136,7 +176,10 @@ class ComparabilityEngine:
                             detail=("A requested model identity is required for model comparison."),
                         )
                     )
-                elif name == "observed_model":
+                elif (
+                    name == "observed_model"
+                    and intent is not ComparabilityIntent.CONTROLLED_ABLATION
+                ):
                     reasons.append(
                         ComparabilityReason(
                             code=ReasonCode.OBSERVED_MODEL_MISSING,
@@ -147,7 +190,10 @@ class ComparabilityEngine:
                             ),
                         )
                     )
-                elif name in verifier_diagnostics:
+                elif name == "verifier_identity" or (
+                    name in verifier_diagnostics
+                    and intent is not ComparabilityIntent.CONTROLLED_ABLATION
+                ):
                     pass
                 elif name in controls:
                     reasons.append(
@@ -200,7 +246,10 @@ class ComparabilityEngine:
                             detail="Observed model identities differ.",
                         )
                     )
-                elif name in verifier_diagnostics:
+                elif name == "verifier_identity" or (
+                    name in verifier_diagnostics
+                    and intent is not ComparabilityIntent.CONTROLLED_ABLATION
+                ):
                     pass
                 elif name in controls:
                     reasons.append(
@@ -279,6 +328,61 @@ class ComparabilityEngine:
                             detail=(f"The {side} observed model differs from its requested model."),
                         )
                     )
+        if intent is ComparabilityIntent.CONTROLLED_ABLATION:
+            if left.reasoning_effort is None or right.reasoning_effort is None:
+                reasons.append(
+                    ComparabilityReason(
+                        code=ReasonCode.DECLARED_TREATMENT_MISSING,
+                        severity=ReasonSeverity.BLOCKING,
+                        field="reasoning_effort",
+                        detail="The declared reasoning-effort treatment identity is absent.",
+                    )
+                )
+            elif left.reasoning_effort == right.reasoning_effort:
+                reasons.append(
+                    ComparabilityReason(
+                        code=ReasonCode.DECLARED_TREATMENT_NOT_DIFFERENT,
+                        severity=ReasonSeverity.BLOCKING,
+                        field="reasoning_effort",
+                        detail="The declared reasoning-effort treatment did not differ.",
+                    )
+                )
+            for side, facts in (("left", left), ("right", right)):
+                if (
+                    facts.observed_model is not None
+                    and facts.requested_model is not None
+                    and facts.observed_model != facts.requested_model
+                ):
+                    reasons.append(
+                        ComparabilityReason(
+                            code=ReasonCode.REQUESTED_OBSERVED_MISMATCH,
+                            severity=ReasonSeverity.BLOCKING,
+                            field="observed_model",
+                            detail=f"The {side} observed model conflicts with its frozen model.",
+                        )
+                    )
+            if left.observed_model is None and right.observed_model is None:
+                reasons.append(
+                    ComparabilityReason(
+                        code=(ReasonCode.OPERATOR_TRUSTED_ROUTE_MODEL_NOT_RUNTIME_EXPOSED),
+                        severity=ReasonSeverity.INFORMATIONAL,
+                        field="observed_model",
+                        detail=(
+                            "Association under the same frozen operator-trusted route and "
+                            "configuration; runtime model identity was not exposed, so this is "
+                            "not an independently proven first-party model-level causal claim."
+                        ),
+                    )
+                )
+            elif (left.observed_model is None) != (right.observed_model is None):
+                reasons.append(
+                    ComparabilityReason(
+                        code=ReasonCode.OBSERVED_MODEL_ASYMMETRIC,
+                        severity=ReasonSeverity.BLOCKING,
+                        field="observed_model",
+                        detail="Observed-model exposure is asymmetric across the ablation pair.",
+                    )
+                )
         severities = {reason.severity for reason in reasons}
         if ReasonSeverity.BLOCKING in severities:
             status = ComparabilityStatus.NOT_COMPARABLE

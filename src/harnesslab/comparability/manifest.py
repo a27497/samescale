@@ -59,6 +59,9 @@ def _profile_identity(raw: dict[str, Any], profile: dict[str, Any]) -> str | Non
     if profile:
         controls = dict(profile)
         controls.pop("requested_model", None)
+        # reasoning_effort is a first-class treatment for CONTROLLED_ABLATION.
+        # The complete executable profile remains bound by profile_hash.
+        controls.pop("reasoning_effort", None)
         return canonical_digest(controls)
     if "provider" not in raw:
         return None
@@ -69,6 +72,48 @@ def _profile_identity(raw: dict[str, Any], profile: dict[str, Any]) -> str | Non
         "generation_settings": raw.get("generation_settings"),
     }
     return canonical_digest(controls)
+
+
+def _provider_config_identity(raw: dict[str, Any], profile: dict[str, Any]) -> str | None:
+    configured = _string(profile.get("provider_config_digest"))
+    if configured is not None:
+        return configured
+    provider = _string(raw.get("provider"))
+    route = _string(raw.get("provider_route"))
+    protocol = _string(raw.get("protocol"))
+    if provider is None and route is None:
+        return None
+    return canonical_digest({"provider": provider, "route": route, "protocol": protocol})
+
+
+def _harness_image_identity(profile: dict[str, Any]) -> str | None:
+    for name in ("codex_image", "claude_image", "deepseek_image", "image"):
+        image = _mapping(profile.get(name))
+        if image:
+            return canonical_digest(image)
+    return None
+
+
+def _tool_policy_identity(profile: dict[str, Any]) -> str | None:
+    names = (
+        "tool_network_policy",
+        "web_search_policy",
+        "effective_filesystem_policy",
+        "filesystem_enforcement",
+        "codex_inner_filesystem_policy",
+        "codex_inner_network_policy",
+        "codex_inner_network_enforcement",
+        "shell_tool_environment_policy",
+        "subject_toolchain_profile",
+    )
+    controls = {name: profile[name] for name in names if name in profile}
+    return canonical_digest(controls) if controls else None
+
+
+def _mcp_policy_identity(profile: dict[str, Any]) -> str | None:
+    names = ("mcp_profile", "external_skill_plugin_profile")
+    controls = {name: profile[name] for name in names if name in profile}
+    return canonical_digest(controls) if controls else None
 
 
 def _effective_network_policy(profile: dict[str, Any]) -> str | None:
@@ -183,6 +228,17 @@ def facts_from_manifest(
         harness=harness,
         harness_version=version,
         harness_profile_identity=_profile_identity(raw, profile),
+        provider_config_identity=_provider_config_identity(raw, profile),
+        harness_image_identity=_harness_image_identity(profile),
+        credential_reference_identity=(
+            _string(profile.get("provider_credential_reference"))
+            or _string(profile.get("credential_reference"))
+        ),
+        tool_policy_identity=_tool_policy_identity(profile),
+        mcp_policy_identity=_mcp_policy_identity(profile),
+        reasoning_effort=(
+            _string(profile.get("reasoning_effort")) or _string(generation.get("effort"))
+        ),
         prompt_identity=_string(raw.get("prompt_hash")),
         trace_coverage=_string(raw.get("trace_coverage")),
     )

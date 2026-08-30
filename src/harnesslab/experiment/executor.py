@@ -70,6 +70,7 @@ def resolved_comparison_profile_identity(profile: LaneProfile) -> str:
         return model_profile_control_identity(profile)
     controls = profile.model_dump(mode="json")
     controls.pop("requested_model", None)
+    controls.pop("reasoning_effort", None)
     return canonical_digest(controls)
 
 

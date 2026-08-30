@@ -613,7 +613,7 @@ def _verify_pair_and_ablation(
     cells = {item.id: item for item in experiment.plan.cells}
     base = cells[ablation.base_cell_id]
     variant = cells[ablation.variant_cell_id]
-    hard_controls = (
+    hard_controls: tuple[str, ...] = (
         "lane",
         "requested_model",
         "provider_route",
@@ -624,7 +624,11 @@ def _verify_pair_and_ablation(
         "network_policy",
         "runner_contract",
         "credential_reference",
+        "base_provider_profile_identity",
+        "resource_envelope_identity",
     )
+    if release_plan.plan_id == "core-real-evidence-v4":
+        hard_controls = (*hard_controls, "profile_identity")
     drift = [name for name in hard_controls if getattr(base, name) != getattr(variant, name)]
     if drift or base.reasoning_effort == variant.reasoning_effort:
         raise CoreReleaseError(f"controlled ablation hard-control drift: {','.join(drift)}")

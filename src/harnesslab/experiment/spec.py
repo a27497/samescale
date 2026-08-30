@@ -78,6 +78,9 @@ class AblationSpec(BaseModel):
     base_cell_id: Identifier
     variant_cell_id: Identifier
     changed_dimension: Literal["reasoning_effort"]
+    intent: Literal[ComparabilityIntent.CONTROLLED_ABLATION] = (
+        ComparabilityIntent.CONTROLLED_ABLATION
+    )
 
 
 class ExperimentSpec(BaseModel):
@@ -140,6 +143,8 @@ class ExperimentSpec(BaseModel):
             "network_policy",
             "runner_contract",
             "credential_reference",
+            "base_provider_profile_identity",
+            "resource_envelope_identity",
         )
         for ablation in self.ablations:
             try:
@@ -156,13 +161,13 @@ class ExperimentSpec(BaseModel):
                 raise ValueError(f"ablation has undeclared hard-control drift: {','.join(drift)}")
             if base.reasoning_effort == variant.reasoning_effort:
                 raise ValueError("ablation declared reasoning_effort but it did not change")
-            if (
-                base.profile_identity == variant.profile_identity
-                or base.harness_config_identity == variant.harness_config_identity
-            ):
+            deliberate_r1_contract = "intent" in ablation.model_fields_set
+            if deliberate_r1_contract and base.profile_identity != variant.profile_identity:
                 raise ValueError(
-                    "reasoning_effort ablation must freeze distinct resolved profile identities"
+                    "reasoning_effort must not be hidden inside the comparison profile identity"
                 )
+            if base.harness_config_identity == variant.harness_config_identity:
+                raise ValueError("ablation executable profile identities must remain distinct")
         return self
 
 

@@ -390,6 +390,7 @@ async def build_experiment_report(
     )
 
     engine = ComparabilityEngine()
+    planned_cells = {cell.id: cell for cell in plan.cells}
     pair_evidence: list[PairEvidence] = []
     pair_statistics: list[PairStatistics] = []
 
@@ -425,9 +426,30 @@ async def build_experiment_report(
                 or right_observation.outcome not in capability
             ):
                 continue
-            report = engine.assess(
-                facts_by_run[left.run_id], facts_by_run[right.run_id], intent=intent
+            left_facts = facts_by_run[left.run_id]
+            right_facts = facts_by_run[right.run_id]
+            left_cell = planned_cells[left_cell_id]
+            right_cell = planned_cells[right_cell_id]
+            left_facts = left_facts.model_copy(
+                update={"resource_envelope_identity": left_cell.resource_envelope_identity}
             )
+            right_facts = right_facts.model_copy(
+                update={"resource_envelope_identity": right_cell.resource_envelope_identity}
+            )
+            if intent is ComparabilityIntent.CONTROLLED_ABLATION:
+                left_facts = left_facts.model_copy(
+                    update={
+                        "runner_contract": left_cell.runner_contract,
+                        "credential_reference_identity": left_cell.credential_reference,
+                    }
+                )
+                right_facts = right_facts.model_copy(
+                    update={
+                        "runner_contract": right_cell.runner_contract,
+                        "credential_reference_identity": right_cell.credential_reference,
+                    }
+                )
+            report = engine.assess(left_facts, right_facts, intent=intent)
             reasons = tuple(reason.code.value for reason in report.reasons)
             pair_evidence.append(
                 PairEvidence(
@@ -478,7 +500,7 @@ async def build_experiment_report(
             pair_id,
             ablation.base_cell_id,
             ablation.variant_cell_id,
-            ComparabilityIntent.GENERAL,
+            ablation.intent,
         )
         ablations.append(
             AblationStatistics(

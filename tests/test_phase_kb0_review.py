@@ -40,7 +40,11 @@ from harnesslab.harness_lane.models import (
     HarnessLaneOutcome,
     ObservedModelStatus,
 )
-from harnesslab.harness_lane.profile import CODEX_IMAGE, canonical_codex_profile
+from harnesslab.harness_lane.profile import (
+    CODEX_IMAGE,
+    canonical_codex_profile,
+    configured_gpt56_relay_codex_profile,
+)
 from harnesslab.harness_lane.trace import collect_codex_jsonl
 from harnesslab.model_lane.models import DirectModelOutcome
 from harnesslab.multi_harness.docker_backend import DockerMultiHarnessBackend
@@ -70,6 +74,7 @@ from harnesslab.release.smoke import (
     RuntimeIdentities,
     SmokeCallFailure,
     SmokeCallResult,
+    SmokeContinuationPolicy,
     SmokeControlPlane,
     SmokeControlPlaneError,
     SmokeExecutionStatus,
@@ -1233,6 +1238,88 @@ async def test_smoke_one_judge_call_only() -> None:
     assert len(judge_calls) == 1
 
 
+def _r1_test_policy() -> SmokeContinuationPolicy:
+    receipt_path = ROOT / "artifacts/core-real-matrix-v4-canary/smoke-execution.json"
+    original = json.loads(receipt_path.read_text(encoding="utf-8"))
+    return SmokeContinuationPolicy(
+        policy_id="kb2r-r1-v4-suffix-continuation",
+        base_branch_head="cd7de16eb4549d4a108ec9908b57905b50cd0562",
+        repair_commit_identity="cd7de16eb4549d4a108ec9908b57905b50cd0562",
+        release_plan_reference="release/core-real-evidence-plan-v4.json",
+        release_plan_digest=original["release_plan_digest"],
+        smoke_plan_reference="release/core-real-smoke-plan-v4.json",
+        smoke_plan_digest=original["smoke_plan_digest"],
+        original_receipt_reference=("artifacts/core-real-matrix-v4-canary/smoke-execution.json"),
+        original_receipt_digest=("sha256:" + hashlib.sha256(receipt_path.read_bytes()).hexdigest()),
+        original_calls=tuple(SmokeCallResult.model_validate(item) for item in original["results"]),
+        old_control_plane_classification="OBSERVED_MODEL_CONFLICT",
+        raw_safe_fact=("observed_model_status=NOT_EXPOSED;observed_model=null;verifier=PASS"),
+        repaired_classification_rule=(
+            "NOT_EXPOSED_PLUS_NULL_IS_OBSERVED_MODEL_MISSING_LIMITATION_NOT_CONFLICT"
+        ),
+        codex_observed_model_capability="NOT_GUARANTEED_BY_PINNED_SCHEMA",
+        allowed_suffix_call_ids=EXPECTED_CALL_IDS[4:],
+        protected_file_sha256={
+            reference: "sha256:" + hashlib.sha256((ROOT / reference).read_bytes()).hexdigest()
+            for reference in (
+                "release/core-real-evidence-plan-v4.json",
+                "release/core-real-smoke-plan-v4.json",
+                "release/kb2r-authorization-dossier.json",
+            )
+        },
+    )
+
+
+@pytest.mark.asyncio
+async def test_r1_continuation_can_only_launch_calls_5_to_8_with_combined_ceiling(
+    tmp_path: Path,
+) -> None:
+    control = SmokeControlPlane.load(ROOT, plan_version="v4")
+    bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
+    invoker = RecordingInvoker()
+    receipt = await control.execute_continuation(
+        bindings,
+        invoker,
+        _r1_test_policy(),
+        allow_real_smoke=True,
+        receipt_path=tmp_path / "r1-smoke-execution.json",
+    )
+
+    assert tuple(item.frozen.call.call_id for item in invoker.calls) == EXPECTED_CALL_IDS[4:]
+    assert receipt.reran_calls_1_to_4 is False
+    assert (receipt.new_subject_launches, receipt.total_subject_launches) == (3, 7)
+    assert (receipt.new_judge_launches, receipt.total_judge_launches) == (1, 1)
+    assert receipt.recovery_attempts == 0
+
+
+@pytest.mark.asyncio
+async def test_r1_continuation_failure_stops_before_judge_and_cannot_retry(
+    tmp_path: Path,
+) -> None:
+    control = SmokeControlPlane.load(ROOT, plan_version="v4")
+    bindings = control.resolve_real_bindings(SAFE_ENVIRONMENT, _runtime())
+    invoker = RecordingInvoker(failing_call_id=EXPECTED_CALL_IDS[5])
+    receipt_path = tmp_path / "r1-smoke-execution.json"
+    receipt = await control.execute_continuation(
+        bindings,
+        invoker,
+        _r1_test_policy(),
+        allow_real_smoke=True,
+        receipt_path=receipt_path,
+    )
+    assert tuple(item.frozen.call.call_id for item in invoker.calls) == EXPECTED_CALL_IDS[4:6]
+    assert receipt.new_subject_launches == 2
+    assert receipt.new_judge_launches == 0
+    with pytest.raises(SmokeControlPlaneError, match="retries are forbidden"):
+        await control.execute_continuation(
+            bindings,
+            RecordingInvoker(),
+            _r1_test_policy(),
+            allow_real_smoke=True,
+            receipt_path=receipt_path,
+        )
+
+
 @pytest.mark.parametrize(
     ("mutation", "value"),
     (
@@ -1350,6 +1437,29 @@ def test_claude_smoke_requires_exact_exposed_observed_model() -> None:
                 observed_model=observed_model,
             )
         assert raised.value.category is SmokeFailureCategory.OBSERVED_MODEL_CONFLICT
+
+
+def test_codex_smoke_not_exposed_is_limitation_but_exposed_mismatch_blocks() -> None:
+    profile = configured_gpt56_relay_codex_profile(
+        _runtime().codex_image,
+        provider_base_url_reference="HARNESSLAB_GPT56_RELAY_BASE_URL",
+        reasoning_effort="medium",
+    )
+    assessment = _validate_harness_observed_model(
+        profile,
+        trace_coverage=TraceCoverage.FULL_STREAM,
+        observed_model_status=ObservedModelStatus.NOT_EXPOSED,
+        observed_model=None,
+    )
+    assert assessment.value == "OBSERVED_MODEL_MISSING"
+    with pytest.raises(SmokeCallFailure) as raised:
+        _validate_harness_observed_model(
+            profile,
+            trace_coverage=TraceCoverage.FULL_STREAM,
+            observed_model_status=ObservedModelStatus.EXPOSED,
+            observed_model="wrong-model",
+        )
+    assert raised.value.category is SmokeFailureCategory.OBSERVED_MODEL_CONFLICT
 
 
 def test_dsh_incoherent_observed_model_state_is_rejected() -> None:

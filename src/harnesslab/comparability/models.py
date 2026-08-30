@@ -19,6 +19,7 @@ class ComparabilityIntent(StrEnum):
     HARNESS_UPLIFT = "HARNESS_UPLIFT"
     NATIVE_HARNESS_SYSTEM_COMPARISON = "NATIVE_HARNESS_SYSTEM_COMPARISON"
     MODEL_COMPARISON = "MODEL_COMPARISON"
+    CONTROLLED_ABLATION = "CONTROLLED_ABLATION"
     GENERAL = "GENERAL"
 
 
@@ -49,6 +50,12 @@ class ReasonCode(StrEnum):
     VERIFIER_CONTROL_EXECUTION_MISMATCH = "VERIFIER_CONTROL_EXECUTION_MISMATCH"
     RESOURCE_ENVELOPE_MISSING = "RESOURCE_ENVELOPE_MISSING"
     RESOURCE_ENVELOPE_MISMATCH = "RESOURCE_ENVELOPE_MISMATCH"
+    OPERATOR_TRUSTED_ROUTE_MODEL_NOT_RUNTIME_EXPOSED = (
+        "OPERATOR_TRUSTED_ROUTE_MODEL_NOT_RUNTIME_EXPOSED"
+    )
+    DECLARED_TREATMENT_MISSING = "DECLARED_TREATMENT_MISSING"
+    DECLARED_TREATMENT_NOT_DIFFERENT = "DECLARED_TREATMENT_NOT_DIFFERENT"
+    OBSERVED_MODEL_ASYMMETRIC = "OBSERVED_MODEL_ASYMMETRIC"
 
 
 class ComparisonFacts(BaseModel):
@@ -78,6 +85,13 @@ class ComparisonFacts(BaseModel):
     harness: str | None = None
     harness_version: str | None = None
     harness_profile_identity: str | None = None
+    provider_config_identity: str | None = None
+    harness_image_identity: str | None = None
+    runner_contract: str | None = None
+    credential_reference_identity: str | None = None
+    tool_policy_identity: str | None = None
+    mcp_policy_identity: str | None = None
+    reasoning_effort: str | None = None
     prompt_identity: str | None = None
     trace_coverage: str | None = None
 

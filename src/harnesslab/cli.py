@@ -55,6 +55,7 @@ from harnesslab.release.smoke import (
     SmokeControlPlaneError,
     SmokeExecutionStatus,
     execute_real_smoke,
+    execute_real_smoke_continuation,
     resolve_runtime_identities,
 )
 from harnesslab.release.telemetry import summarize_smoke_telemetry
@@ -171,6 +172,38 @@ def execute_release_smoke(
         raise typer.Exit(code=2) from exc
     typer.echo(f"SMOKE_EXECUTION={receipt.status.value}")
     typer.echo(f"ATTEMPTED_TOP_LEVEL_LAUNCHES={receipt.attempted_top_level_launches}")
+    if receipt.failing_call_id is not None:
+        typer.echo(f"FAILING_CALL_ID={receipt.failing_call_id}")
+        assert receipt.failure_category is not None
+        typer.echo(f"FAILURE_CATEGORY={receipt.failure_category.value}")
+    if receipt.status is SmokeExecutionStatus.ABORTED:
+        raise typer.Exit(code=1)
+
+
+@release_smoke_app.command("continue-r1")
+def continue_release_smoke_r1(
+    allow_real_smoke: bool = typer.Option(False, "--allow-real-smoke"),
+    repository_root: str = typer.Option(".", "--repository-root"),
+    artifact_root: str = typer.Option("artifacts/core-real-matrix-v4-r1-suffix", "--artifact-root"),
+    policy_path: str = typer.Option("release/kb2r-r1-continuation-policy.json", "--policy-path"),
+) -> None:
+    """Execute only immutable v4 Calls 5-8; Calls 1-4 can never be dispatched here."""
+
+    try:
+        receipt = asyncio.run(
+            execute_real_smoke_continuation(
+                Path(repository_root),
+                allow_real_smoke=allow_real_smoke,
+                artifact_root=Path(artifact_root),
+                policy_path=Path(policy_path),
+            )
+        )
+    except (SmokeControlPlaneError, EgressNetworkIsolationUnavailable) as exc:
+        typer.echo(f"FAIL smoke continuation: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo(f"SMOKE_CONTINUATION={receipt.status.value}")
+    typer.echo(f"NEW_SUBJECT_LAUNCHES={receipt.new_subject_launches}")
+    typer.echo(f"NEW_JUDGE_LAUNCHES={receipt.new_judge_launches}")
     if receipt.failing_call_id is not None:
         typer.echo(f"FAILING_CALL_ID={receipt.failing_call_id}")
         assert receipt.failure_category is not None

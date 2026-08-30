@@ -231,6 +231,7 @@ class MatrixControlPlane:
                     network_policy=first.definition.budget.network_policy,
                     runner_contract=MATRIX_RUNNER_CONTRACTS[frozen.runtime],
                     credential_reference=provider.credential_reference,
+                    resource_envelope_identity=budget_identity,
                 )
             )
         spec = ExperimentSpec(
@@ -254,6 +255,7 @@ class MatrixControlPlane:
                     base_cell_id=self.release_plan.ablation.base_cell_id,
                     variant_cell_id=self.release_plan.ablation.variant_cell_id,
                     changed_dimension="reasoning_effort",
+                    intent=ComparabilityIntent.CONTROLLED_ABLATION,
                 ),
             ),
         )
