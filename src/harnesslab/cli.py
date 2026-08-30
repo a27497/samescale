@@ -18,6 +18,7 @@ from harnesslab.comparability.engine import ComparabilityEngine
 from harnesslab.comparability.manifest import ComparabilityInputError, load_manifest_facts
 from harnesslab.comparability.models import ComparabilityIntent
 from harnesslab.core.config import Settings
+from harnesslab.custom_eval.cli import custom_eval_app
 from harnesslab.db.health import check_database
 from harnesslab.egress import EgressNetworkIsolationUnavailable
 from harnesslab.experiment.cli import experiment_app, report_app, run_app
@@ -93,6 +94,7 @@ app.add_typer(sandbox_app, name="sandbox")
 app.add_typer(model_app, name="model")
 app.add_typer(harness_app, name="harness")
 app.add_typer(compare_app, name="compare")
+app.add_typer(custom_eval_app, name="custom-eval")
 app.add_typer(experiment_app, name="experiment")
 app.add_typer(run_app, name="run")
 app.add_typer(report_app, name="report")
