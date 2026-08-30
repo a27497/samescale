@@ -10,6 +10,7 @@ from harnesslab.api.workbench_errors import (
     request_validation_error_handler,
     workbench_error_handler,
 )
+from harnesslab.custom_eval.api import router as custom_eval_router
 
 
 def create_app() -> FastAPI:
@@ -22,6 +23,7 @@ def create_app() -> FastAPI:
     application.include_router(workbench_router, prefix="/api")
     application.include_router(registry_router, prefix="/api")
     application.include_router(experiment_router, prefix="/api")
+    application.include_router(custom_eval_router, prefix="/api")
     application.add_exception_handler(WorkbenchAPIError, workbench_error_handler)
     application.add_exception_handler(RequestValidationError, request_validation_error_handler)
     return application
