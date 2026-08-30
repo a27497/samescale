@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -10,6 +11,7 @@ from harnesslab.release.contracts import (
     load_real_evidence_plan,
     load_real_smoke_plan,
 )
+from harnesslab.release.smoke import load_smoke_continuation_policy
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "release"
@@ -76,3 +78,40 @@ def test_dossier_records_hard_stop_without_rewriting_history() -> None:
         "full_matrix_executed": False,
         "historic_qwen_timeout_root_cause": "UNRESOLVED",
     }
+
+
+def test_r1_append_only_dossier_preserves_history_and_terminal_suffix() -> None:
+    expected_sha256 = {
+        "core-real-evidence-plan-v4.json": (
+            "5de29e88ff9482a34111e6639eb6a139045d812466614a5ceaeb6e796c76f90d"
+        ),
+        "core-real-smoke-plan-v4.json": (
+            "cc3a8d9fd4df7e47d8f55df0dd7d7b922e2b972307f9ac11f86e9648a0df69ec"
+        ),
+        "kb2r-authorization-dossier.json": (
+            "1c5ca81022d2a389637f9718254e746e81733b56819bef2d87bd62015eaf33e8"
+        ),
+    }
+    for name, expected in expected_sha256.items():
+        assert hashlib.sha256((RELEASE / name).read_bytes()).hexdigest() == expected
+
+    policy = load_smoke_continuation_policy(RELEASE / "kb2r-r1-continuation-policy.json")
+    dossier = json.loads(
+        (RELEASE / "kb2r-r1-authorization-dossier.json").read_text(encoding="utf-8")
+    )
+    assert policy.allowed_suffix_call_ids == (
+        "smoke-5-harness-codex-gpt56-high",
+        "smoke-6-harness-claude-qwen38-opencode-go",
+        "smoke-7-harness-deepseek-v4flash",
+        "smoke-8-judge-glm52-opencode-go",
+    )
+    assert dossier["decision"] == "HARD_STOPPED"
+    assert len(dossier["subject_calls"]) == 7
+    assert dossier["continuation"]["reran_calls_1_to_4"] is False
+    assert dossier["continuation"]["recovery_attempts"] == 0
+    assert dossier["continuation"]["new_judge_launches"] == 0
+    assert dossier["hard_stop"]["call_id"] == "smoke-7-harness-deepseek-v4flash"
+    assert dossier["comparability"]["formal_90_pair_requirement_preserved"] is True
+    assert dossier["comparability"]["uplift_claim_authorized"] is False
+    assert dossier["full_matrix_projection"]["cost_status"] == "UNKNOWN_NOT_ZERO"
+    assert dossier["full_matrix_projection"]["full_matrix_executed"] is False
