@@ -275,6 +275,21 @@ class SmokeContinuationPolicy(BaseModel):
         "NOT_EXPOSED_PLUS_NULL_IS_OBSERVED_MODEL_MISSING_LIMITATION_NOT_CONFLICT"
     ]
     codex_observed_model_capability: Literal["NOT_GUARANTEED_BY_PINNED_SCHEMA"]
+    pinned_codex_cli_version: Literal["0.149.0"] = "0.149.0"
+    pinned_codex_image_reference: Literal["harnesslab-phase-e-codex:0.149.0"] = (
+        "harnesslab-phase-e-codex:0.149.0"
+    )
+    parser_action: Literal["PRESERVE_NOT_EXPOSED_NULL_NO_FABRICATION"] = (
+        "PRESERVE_NOT_EXPOSED_NULL_NO_FABRICATION"
+    )
+    r1_call4_interpretation: Literal["OBSERVED_MODEL_MISSING_LIMITATION"] = (
+        "OBSERVED_MODEL_MISSING_LIMITATION"
+    )
+    keyless_audit_evidence: tuple[str, ...] = (
+        "captured_exec_jsonl_contains_no_observed_model_field",
+        "codex_exec_help_promises_jsonl_events_but_no_runtime_model_identity",
+        "pinned_package_exposes_no_public_exec_jsonl_schema_guaranteeing_model",
+    )
     allowed_suffix_call_ids: tuple[str, ...]
     historical_subject_launches: Literal[4] = 4
     historical_judge_launches: Literal[0] = 0

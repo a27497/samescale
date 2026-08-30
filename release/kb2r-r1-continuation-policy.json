@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "policy_id": "kb2r-r1-v4-suffix-continuation",
+  "base_branch_head": "cd7de16eb4549d4a108ec9908b57905b50cd0562",
+  "repair_commit_identity": "0ce81133e5e2911d4c4efea998d040379761515e",
+  "release_plan_reference": "release/core-real-evidence-plan-v4.json",
+  "release_plan_digest": "sha256:2e30dcaa50d0e836577d4c985c0d84caca41ed22df36987faa46a98991eeedcb",
+  "smoke_plan_reference": "release/core-real-smoke-plan-v4.json",
+  "smoke_plan_digest": "sha256:4dd0b0380f21b7a96083e8d41ca82de726edf4ae5813420eaf037d33c7167258",
+  "original_receipt_reference": "artifacts/core-real-matrix-v4-canary/smoke-execution.json",
+  "original_receipt_digest": "sha256:8c03917520f60a1426f21d793945f0e9914ceba91809514a8adfd74a6d74aa15",
+  "original_calls": [
+    {
+      "call_id": "smoke-1-model-gpt56-relay-responses",
+      "evidence_digests": [
+        "sha256:c0d5699a5da405e700587a50c5babea4e682ab822fe755f57d163ec7b0e4224e"
+      ],
+      "evidence_references": [
+        "/home/dev/projects/my-project/artifacts/core-real-matrix-v4-canary/smoke-1-model-gpt56-relay-responses/smoke-1-model-gpt56-relay-responses"
+      ]
+    },
+    {
+      "call_id": "smoke-2-model-qwen38-opencode-go-messages",
+      "evidence_digests": [
+        "sha256:76b0b4da6efd5036bda4c32ec09656593ec06b30ae9d7559b2462e440e505796"
+      ],
+      "evidence_references": [
+        "/home/dev/projects/my-project/artifacts/core-real-matrix-v4-canary/smoke-2-model-qwen38-opencode-go-messages/smoke-2-model-qwen38-opencode-go-messages"
+      ]
+    },
+    {
+      "call_id": "smoke-3-model-deepseek-v4pro-chat",
+      "evidence_digests": [
+        "sha256:222bb88a968aea047c09c29871044471644ab848a74e2ab5bd678fb67ffac0e7"
+      ],
+      "evidence_references": [
+        "/home/dev/projects/my-project/artifacts/core-real-matrix-v4-canary/smoke-3-model-deepseek-v4pro-chat/smoke-3-model-deepseek-v4pro-chat"
+      ]
+    },
+    {
+      "call_id": "smoke-4-harness-codex-gpt56-medium",
+      "evidence_digests": [
+        "sha256:c389763b2f626f1f916acead9ca09124316015013595b8d482ebdca149fa2010",
+        "sha256:1e7bec8d6fb1856fbf97ed139dc7e11b69f30eb0dc8d49b1863d57ffac4a49e6",
+        "sha256:02915499f1fbc49b865d77a477ae5ded182eb0256ddd9f474908431054d4a8b7"
+      ],
+      "evidence_references": [
+        "/home/dev/projects/my-project/artifacts/core-real-matrix-v4-canary/smoke-4-harness-codex-gpt56-medium/smoke-4-harness-codex-gpt56-medium",
+        "egress-proxy:harnesslab-egress-proxy:1.0.0@sha256:79a3fa038387109951346b8cadea9e3a77ce3c9b8891e74f7bd19e261872dced",
+        "egress-network:hl-smoke-36aa529ee88d-3-internal"
+      ]
+    }
+  ],
+  "old_control_plane_classification": "OBSERVED_MODEL_CONFLICT",
+  "raw_safe_fact": "observed_model_status=NOT_EXPOSED;observed_model=null;verifier=PASS",
+  "repaired_classification_rule": "NOT_EXPOSED_PLUS_NULL_IS_OBSERVED_MODEL_MISSING_LIMITATION_NOT_CONFLICT",
+  "codex_observed_model_capability": "NOT_GUARANTEED_BY_PINNED_SCHEMA",
+  "pinned_codex_cli_version": "0.149.0",
+  "pinned_codex_image_reference": "harnesslab-phase-e-codex:0.149.0",
+  "parser_action": "PRESERVE_NOT_EXPOSED_NULL_NO_FABRICATION",
+  "r1_call4_interpretation": "OBSERVED_MODEL_MISSING_LIMITATION",
+  "keyless_audit_evidence": [
+    "captured_exec_jsonl_contains_no_observed_model_field",
+    "codex_exec_help_promises_jsonl_events_but_no_runtime_model_identity",
+    "pinned_package_exposes_no_public_exec_jsonl_schema_guaranteeing_model"
+  ],
+  "allowed_suffix_call_ids": [
+    "smoke-5-harness-codex-gpt56-high",
+    "smoke-6-harness-claude-qwen38-opencode-go",
+    "smoke-7-harness-deepseek-v4flash",
+    "smoke-8-judge-glm52-opencode-go"
+  ],
+  "historical_subject_launches": 4,
+  "historical_judge_launches": 0,
+  "max_new_subject_launches": 3,
+  "max_new_judge_launches": 1,
+  "max_total_subject_launches": 7,
+  "max_total_judge_launches": 1,
+  "retries_allowed": 0,
+  "protected_file_sha256": {
+    "release/core-real-evidence-plan-v4.json": "sha256:5de29e88ff9482a34111e6639eb6a139045d812466614a5ceaeb6e796c76f90d",
+    "release/core-real-smoke-plan-v4.json": "sha256:cc3a8d9fd4df7e47d8f55df0dd7d7b922e2b972307f9ac11f86e9648a0df69ec",
+    "release/kb2r-authorization-dossier.json": "sha256:1c5ca81022d2a389637f9718254e746e81733b56819bef2d87bd62015eaf33e8"
+  }
+}
