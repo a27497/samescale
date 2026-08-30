@@ -25,6 +25,12 @@ jobs:
             command: uv run --locked python scripts/freeze_model_chat_v3.py
           - id: model-chat-v3r1
             command: uv run --locked python scripts/freeze_model_chat_v3r1.py
+          - id: v6-canary-control
+            prepare_database: true
+            command: >-
+              uv run --locked pytest -q
+              tests/test_kb3_v6_canary.py
+              tests/test_kb3_v6.py
     services:
       postgres:
         image: postgres:18
@@ -61,6 +67,9 @@ jobs:
         with:
           node-version: "24"
           package-manager-cache: false
+      - name: Bootstrap qualification database
+        if: ${{ matrix.prepare_database == true }}
+        run: uv run --locked alembic upgrade head
       - name: Run keyless qualification
         run: ${{ matrix.command }}
 

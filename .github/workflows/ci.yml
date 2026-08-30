@@ -64,3 +64,4 @@ jobs:
           tests/test_ci_workflow_contracts.py
           tests/test_tier_b_repo_engineering.py
           tests/test_tier_b_smoke_plan.py
+          tests/test_kb3_v6_canary.py

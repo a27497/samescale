@@ -139,6 +139,25 @@ def test_full_workflow_runs_isolated_parallel_gates_without_nested_regressions()
     assert "--actions-reproduction" in FULL_WORKFLOW.read_text(encoding="utf-8")
 
 
+def test_v6_canary_control_runs_in_fast_and_full_release_ci() -> None:
+    fast_text = FAST_WORKFLOW.read_text(encoding="utf-8")
+    full = _workflow(FULL_WORKFLOW)
+    qualifications = full["jobs"]["qualification"]["strategy"]["matrix"]["include"]
+    v6 = next(item for item in qualifications if item["id"] == "v6-canary-control")
+
+    assert "tests/test_kb3_v6_canary.py" in fast_text
+    assert "tests/test_kb3_v6_canary.py" in v6["command"]
+    assert "tests/test_kb3_v6.py" in v6["command"]
+    assert v6["prepare_database"] == "true"
+    qualification_steps = full["jobs"]["qualification"]["steps"]
+    assert any(
+        step.get("name") == "Bootstrap qualification database"
+        and step.get("if") == "${{ matrix.prepare_database == true }}"
+        and step.get("run") == "uv run --locked alembic upgrade head"
+        for step in qualification_steps
+    )
+
+
 def test_full_workflow_is_keyless_and_fast_ci_preserves_legacy_gate_status() -> None:
     fast = _workflow(FAST_WORKFLOW)
     full_text = FULL_WORKFLOW.read_text(encoding="utf-8")

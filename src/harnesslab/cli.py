@@ -27,6 +27,7 @@ from harnesslab.multi_harness.models import DeepSeekSessionExtraction, HarnessKi
 from harnesslab.multi_harness.profile import canonical_claude_profile, canonical_deepseek_profile
 from harnesslab.multi_harness.runtime import MultiHarnessRuntime
 from harnesslab.preflight.cli import budget_app, preflight_app
+from harnesslab.preflight.io import PreflightInputError, load_control_manifest
 from harnesslab.productization.cli import (
     doctor_command,
     down_command,
@@ -60,6 +61,20 @@ from harnesslab.release.smoke import (
     resolve_runtime_identities,
 )
 from harnesslab.release.telemetry import summarize_smoke_telemetry
+from harnesslab.release.v6_authorization import V6CanaryAuthorizationRequest
+from harnesslab.release.v6_canary import (
+    V6CanaryControlError,
+    V6CanaryExecutionStatus,
+    V6CanaryStatus,
+    authorize_v6_canary,
+    execute_real_v6_canary,
+    load_v6_canary_authorization,
+    load_v6_operator_inputs,
+    load_v6_preflight_receipt,
+    persist_v6_canary_authorization,
+    persist_v6_preflight_receipt,
+    run_v6_canary_preflight,
+)
 from harnesslab.sandbox.preflight import DockerPreflightError, docker_preflight
 from harnesslab.tasks.package import TaskPackageError
 from harnesslab.tasks.validation import validate_task_package
@@ -92,6 +107,10 @@ release_telemetry_app = typer.Typer(
 release_judge_app = typer.Typer(
     no_args_is_help=True, help="Preflight or execute the frozen real Judge campaign."
 )
+release_v6_canary_app = typer.Typer(
+    no_args_is_help=True,
+    help="Preflight, authorize, or execute only the bounded V6 Alibaba three-call canary.",
+)
 app.command("up")(up_command)
 app.command("down")(down_command)
 app.command("status")(status_command)
@@ -118,6 +137,99 @@ release_app.add_typer(release_component_smoke_app, name="component-smoke")
 release_app.add_typer(release_matrix_app, name="matrix")
 release_app.add_typer(release_telemetry_app, name="telemetry")
 release_app.add_typer(release_judge_app, name="judge")
+release_app.add_typer(release_v6_canary_app, name="v6-canary")
+
+
+@release_v6_canary_app.command("preflight")
+def preflight_release_v6_canary(
+    operator_inputs: str = typer.Option(
+        ..., "--operator-inputs", help="Strict non-secret V6 operator pricing/account inputs."
+    ),
+    receipt_root: str = typer.Option(
+        "artifacts/core-real-matrix-v6-canary-control",
+        "--receipt-root",
+        help="Append-only V6 control receipt root.",
+    ),
+    repository_root: str = typer.Option(
+        ".", "--repository-root", help="Repository containing frozen V6 controls."
+    ),
+) -> None:
+    """Run local real-readiness checks and emit an immutable zero-call receipt."""
+
+    try:
+        inputs = load_v6_operator_inputs(Path(operator_inputs))
+        receipt = asyncio.run(run_v6_canary_preflight(Path(repository_root), inputs))
+        path = persist_v6_preflight_receipt(Path(receipt_root), receipt)
+    except V6CanaryControlError as exc:
+        typer.echo(f"FAIL V6 canary preflight: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo(f"V6_CANARY_PREFLIGHT={receipt.status.value}")
+    typer.echo(f"PREFLIGHT_RECEIPT={path}")
+    typer.echo(f"PREFLIGHT_RECEIPT_DIGEST={receipt.receipt_digest}")
+    typer.echo("REAL_PROVIDER_CALLS=0")
+    typer.echo("REAL_HARNESS_PROVIDER_CALLS=0")
+    typer.echo("REAL_JUDGE_CALLS=0")
+    if receipt.status is V6CanaryStatus.BLOCKED:
+        raise typer.Exit(code=2)
+
+
+@release_v6_canary_app.command("authorize")
+def authorize_release_v6_canary(
+    preflight_receipt: str = typer.Option(..., "--preflight-receipt"),
+    authorization_request: str = typer.Option(..., "--authorization-request"),
+    receipt_root: str = typer.Option(
+        "artifacts/core-real-matrix-v6-canary-control", "--receipt-root"
+    ),
+) -> None:
+    """Issue only the scope-bound three-call authorization from a READY receipt."""
+
+    try:
+        preflight = load_v6_preflight_receipt(Path(preflight_receipt))
+        request = load_control_manifest(Path(authorization_request), V6CanaryAuthorizationRequest)
+        authorization = authorize_v6_canary(preflight, request)
+        path = persist_v6_canary_authorization(Path(receipt_root), authorization)
+    except (V6CanaryControlError, PreflightInputError) as exc:
+        typer.echo(f"FAIL V6 canary authorization: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo("V6_CANARY_AUTHORIZATION=ISSUED")
+    typer.echo(f"AUTHORIZATION_RECEIPT={path}")
+    typer.echo(f"AUTHORIZATION_DIGEST={authorization.authorization_digest}")
+    typer.echo("MATRIX_EXECUTION_AUTHORIZED=false")
+
+
+@release_v6_canary_app.command("execute")
+def execute_release_v6_canary(
+    allow_real_v6_canary: bool = typer.Option(False, "--allow-real-v6-canary"),
+    operator_inputs: str = typer.Option(..., "--operator-inputs"),
+    preflight_receipt: str = typer.Option(..., "--preflight-receipt"),
+    authorization_receipt: str = typer.Option(..., "--authorization-receipt"),
+    artifact_root: str = typer.Option(
+        "artifacts/core-real-matrix-v6-three-call-canary", "--artifact-root"
+    ),
+    repository_root: str = typer.Option(".", "--repository-root"),
+) -> None:
+    """Execute exactly three preregistered calls; no Matrix, retry, or substitution path."""
+
+    try:
+        closeout = asyncio.run(
+            execute_real_v6_canary(
+                Path(repository_root),
+                operator_inputs=load_v6_operator_inputs(Path(operator_inputs)),
+                preflight_receipt=load_v6_preflight_receipt(Path(preflight_receipt)),
+                authorization=load_v6_canary_authorization(Path(authorization_receipt)),
+                artifact_root=Path(artifact_root),
+                allow_real_v6_canary=allow_real_v6_canary,
+            )
+        )
+    except V6CanaryControlError as exc:
+        typer.echo(f"FAIL V6 canary execution: {exc}")
+        raise typer.Exit(code=2) from exc
+    typer.echo(f"V6_CANARY_EXECUTION={closeout.status.value}")
+    typer.echo(f"ATTEMPTED_PRIMARY_CALLS={closeout.attempted_primary_calls}")
+    typer.echo(f"JUDGE_STATE={closeout.judge_state}")
+    typer.echo(f"CLOSEOUT_DIGEST={closeout.closeout_digest}")
+    if closeout.status is V6CanaryExecutionStatus.ABORTED:
+        raise typer.Exit(code=1)
 
 
 @release_smoke_app.command("preflight")
