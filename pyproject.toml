@@ -42,6 +42,30 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = ["src/harnesslab"]
 
+[tool.hatch.build.targets.wheel.force-include]
+".dockerignore" = "harnesslab/productization/distribution/.dockerignore"
+"alembic" = "harnesslab/productization/distribution/alembic"
+"alembic.ini" = "harnesslab/productization/distribution/alembic.ini"
+"docker/product" = "harnesslab/productization/distribution/docker/product"
+"docker-compose.yml" = "harnesslab/productization/distribution/docker-compose.yml"
+"docs" = "harnesslab/productization/distribution/docs"
+"frontend/index.html" = "harnesslab/productization/distribution/frontend/index.html"
+"frontend/package-lock.json" = "harnesslab/productization/distribution/frontend/package-lock.json"
+"frontend/package.json" = "harnesslab/productization/distribution/frontend/package.json"
+"frontend/src" = "harnesslab/productization/distribution/frontend/src"
+"frontend/tsconfig.json" = "harnesslab/productization/distribution/frontend/tsconfig.json"
+"frontend/vite.config.ts" = "harnesslab/productization/distribution/frontend/vite.config.ts"
+"judge_suites" = "harnesslab/productization/distribution/judge_suites"
+"profiles" = "harnesslab/productization/distribution/profiles"
+"pyproject.toml" = "harnesslab/productization/distribution/pyproject.toml"
+"README.md" = "harnesslab/productization/distribution/README.md"
+"release" = "harnesslab/productization/distribution/release"
+"rules.md" = "harnesslab/productization/distribution/rules.md"
+"scripts" = "harnesslab/productization/distribution/scripts"
+"src" = "harnesslab/productization/distribution/src"
+"tasks" = "harnesslab/productization/distribution/tasks"
+"uv.lock" = "harnesslab/productization/distribution/uv.lock"
+
 [tool.uv]
 required-version = "==0.12.5"
 

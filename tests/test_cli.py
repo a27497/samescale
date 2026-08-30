@@ -7,6 +7,7 @@ from typer.testing import CliRunner
 
 from harnesslab import __version__
 from harnesslab.cli import app
+from harnesslab.productization.lifecycle import CheckState, LifecycleCheck
 
 runner = CliRunner()
 
@@ -44,24 +45,57 @@ def test_serve_uses_psycopg_compatible_event_loop(monkeypatch: pytest.MonkeyPatc
     assert captured["loop"] == "harnesslab.core.runtime:selector_loop_factory"
 
 
-def test_doctor_reports_not_configured_with_distinct_exit(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: object
+def test_doctor_reports_product_not_running_with_distinct_exit(
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.delenv("DATABASE_URL", raising=False)
-    result = runner.invoke(app, ["doctor"], env={"DATABASE_URL": ""})
+    class NotRunningLifecycle:
+        def doctor(self) -> tuple[LifecycleCheck, ...]:
+            return (
+                LifecycleCheck("docker", CheckState.PASS, "server ready"),
+                LifecycleCheck("compose", CheckState.PASS, "configuration valid"),
+                LifecycleCheck("postgresql", CheckState.NOT_RUNNING, "run `harnesslab up`"),
+                LifecycleCheck("api-health", CheckState.NOT_RUNNING, "services not ready"),
+                LifecycleCheck("workbench", CheckState.NOT_RUNNING, "services not ready"),
+            )
+
+    monkeypatch.setattr(
+        "harnesslab.productization.cli._lifecycle",
+        lambda _compose_file, _project_name: NotRunningLifecycle(),
+    )
+    result = runner.invoke(app, ["doctor"])
 
     assert result.exit_code == 2
-    assert "NOT_CONFIGURED" in result.stdout
+    assert "NOT_RUNNING" in result.stdout
     assert "postgresql" in result.stdout
+    assert "SECRETS=MASKED" in result.stdout
 
 
-@pytest.mark.integration
-def test_doctor_reports_pass_with_database(database_url: str) -> None:
-    result = runner.invoke(app, ["doctor"], env={"DATABASE_URL": database_url})
+def test_doctor_reports_pass_for_ready_product(monkeypatch: pytest.MonkeyPatch) -> None:
+    class ReadyLifecycle:
+        def doctor(self) -> tuple[LifecycleCheck, ...]:
+            return (
+                LifecycleCheck("docker", CheckState.PASS, "server ready"),
+                LifecycleCheck("compose", CheckState.PASS, "configuration valid"),
+                LifecycleCheck("postgresql", CheckState.PASS, "running health=healthy"),
+                LifecycleCheck("migration", CheckState.PASS, "complete"),
+                LifecycleCheck("api-container", CheckState.PASS, "running health=healthy"),
+                LifecycleCheck("api-health", CheckState.PASS, "http://127.0.0.1:8000/api/health"),
+                LifecycleCheck("workbench", CheckState.PASS, "http://127.0.0.1:8000/"),
+                LifecycleCheck("provider-calls", CheckState.PASS, "disabled for lifecycle"),
+                LifecycleCheck("judge-calls", CheckState.PASS, "disabled for lifecycle"),
+            )
+
+    monkeypatch.setattr(
+        "harnesslab.productization.cli._lifecycle",
+        lambda _compose_file, _project_name: ReadyLifecycle(),
+    )
+    result = runner.invoke(app, ["doctor"])
 
     assert result.exit_code == 0
-    assert "PASS" in result.stdout
-    assert "SELECT 1 succeeded" in result.stdout
+    assert "api-health" in result.stdout
+    assert "workbench" in result.stdout
+    assert "provider-calls" in result.stdout
+    assert "judge-calls" in result.stdout
 
 
 def test_model_profile_validate_does_not_read_credential() -> None:

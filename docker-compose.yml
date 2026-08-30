@@ -1,19 +1,85 @@
+x-harnesslab-app: &harnesslab-app
+  image: ${HARNESSLAB_IMAGE:-harnesslab-ai:local}
+  build:
+    context: .
+    dockerfile: docker/product/Dockerfile
+    args:
+      SOURCE_REVISION: ${HARNESSLAB_SOURCE_REVISION:-unknown}
+  environment: &harnesslab-environment
+    DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-harnesslab}:${POSTGRES_PASSWORD:-harnesslab_dev_only}@postgres:5432/${POSTGRES_DB:-harnesslab}
+    HARNESSLAB_ENVIRONMENT: ${HARNESSLAB_ENVIRONMENT:-production}
+    HARNESSLAB_WORKBENCH_ARTIFACT_ROOTS: '["/opt/harnesslab/artifacts","/opt/harnesslab/harnesslab-artifacts"]'
+    HARNESSLAB_WORKBENCH_DIST: /opt/harnesslab/frontend/dist
+  networks:
+    - control-plane
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
 services:
   postgres:
-    image: postgres:18
+    image: postgres:18.6@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-harnesslab}
       POSTGRES_USER: ${POSTGRES_USER:-harnesslab}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-harnesslab_dev_only}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 2s
       timeout: 3s
       retries: 20
+      start_period: 5s
+    restart: unless-stopped
     volumes:
       - harnesslab-postgres:/var/lib/postgresql
+    networks:
+      - control-plane
+
+  migrate:
+    <<: *harnesslab-app
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    restart: "no"
+
+  api:
+    <<: *harnesslab-app
+    command: ["harnesslab", "serve", "--host", "0.0.0.0", "--port", "8000"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:${HARNESSLAB_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "/opt/harnesslab/docker/product/healthcheck.py"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    restart: unless-stopped
+    stop_grace_period: 15s
+    volumes:
+      - harnesslab-artifacts:/opt/harnesslab/artifacts
+      - harnesslab-artifacts-alt:/opt/harnesslab/harnesslab-artifacts
+
+networks:
+  control-plane:
+    driver: bridge
 
 volumes:
   harnesslab-postgres:
+  harnesslab-artifacts:
+  harnesslab-artifacts-alt:

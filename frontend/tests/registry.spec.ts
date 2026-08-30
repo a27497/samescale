@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import router from '@/router'
 import CapabilitiesView from '@/views/CapabilitiesView.vue'
 import ExperimentBuilderView from '@/views/ExperimentBuilderView.vue'
+import HarnessesView from '@/views/HarnessesView.vue'
+import ModelsView from '@/views/ModelsView.vue'
 import ProvidersView from '@/views/ProvidersView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 
@@ -61,7 +63,7 @@ beforeEach(() => {
 describe('Unified Registry Lite Workbench', () => {
   it('registers every Registry Lite route', () => {
     const paths = router.getRoutes().map((item) => item.path)
-    expect(paths).toEqual(expect.arrayContaining(['/models', '/providers', '/harnesses', '/capabilities', '/settings', '/experiments/new']))
+    expect(paths).toEqual(expect.arrayContaining(['/models', '/providers', '/harnesses', '/capabilities', '/settings', '/experiments/new', '/run-control']))
   })
 
   it('renders only safe Alibaba references and configured-model state', async () => {
@@ -86,6 +88,37 @@ describe('Unified Registry Lite Workbench', () => {
     await flushPromises()
     expect(wrapper.text()).toContain('UNSUPPORTED')
     expect(wrapper.text()).toContain('PROVIDER_MODEL_PROFILE_UNSUPPORTED_BY_HARNESS')
+    expect(wrapper.text()).toContain('NOT_SUPPORTED')
+  })
+
+  it('exposes provider-model identity and routing metadata without credential values', async () => {
+    api.models.mockResolvedValueOnce({
+      models: [{
+        model_id: 'gpt-5.6-sol', display_name: 'GPT 5.6', model_family: 'gpt-5.6',
+        capabilities: ['reasoning'], context_window_tokens: 128000, context_metadata_status: 'REPORTED',
+        reasoning_controls: { effort: true, temperature: false, thinking_toggle: false },
+        supported_protocols: ['responses'],
+      }],
+      provider_profiles: [providerProfile],
+    })
+    const wrapper = mount(ModelsView)
+    await flushPromises()
+    expect(wrapper.text()).toContain('gpt56-relay-gpt56-responses')
+    expect(wrapper.text()).toContain('gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses')
+    expect(wrapper.text()).toContain('RUN_EVIDENCE_ONLY')
+    expect(wrapper.text()).toContain('sha256:profile')
+    expect(wrapper.text()).not.toContain('sk-sentinel')
+  })
+
+  it('exposes Harness image, tools, network, observed-model surface, and supported profiles', async () => {
+    const wrapper = mount(HarnessesView)
+    await flushPromises()
+    const text = wrapper.text()
+    expect(text).toContain('codex-image')
+    expect(text).toContain('shell')
+    expect(text).toContain('PROVIDER_ALLOWLIST')
+    expect(text).toContain('RUN_EVIDENCE_ONLY')
+    expect(text).toContain('gpt56-relay-gpt56-responses')
   })
 
   it('keeps repeat count backend-derived and previews blocked interleaving', async () => {
