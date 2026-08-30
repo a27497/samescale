@@ -220,7 +220,7 @@ class ProductLifecycle:
         distribution_env = self.compose_file.parent / ".env"
         if distribution_env.is_file():
             return distribution_env
-        return Path(__file__).resolve().parent / "default.env"
+        return Path(__file__).resolve().parent / "default.env.example"
 
     def docker_preflight(self) -> DockerPreflight:
         return self._preflight()
