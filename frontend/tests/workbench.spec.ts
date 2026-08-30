@@ -7,6 +7,7 @@ import MatrixHeatmap from '@/components/MatrixHeatmap.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import TraceTimeline from '@/components/TraceTimeline.vue'
 import { escapeTooltipText } from '@/charts/safeTooltip'
+import App from '@/App.vue'
 import router from '@/router'
 import { useExperimentStore } from '@/stores/experiments'
 import CoreReadinessView from '@/views/CoreReadinessView.vue'
@@ -14,7 +15,9 @@ import ExperimentsView from '@/views/ExperimentsView.vue'
 import ExperimentDetailView from '@/views/ExperimentDetailView.vue'
 import JudgeDetailView from '@/views/JudgeDetailView.vue'
 import JudgeLabView from '@/views/JudgeLabView.vue'
+import OverviewView from '@/views/OverviewView.vue'
 import RegressionView from '@/views/RegressionView.vue'
+import RunControlView from '@/views/RunControlView.vue'
 import RunDetailView from '@/views/RunDetailView.vue'
 
 const api = vi.hoisted(() => ({
@@ -146,8 +149,41 @@ beforeEach(() => {
 describe('Workbench contracts', () => {
   it('registers every major route and no Analyst route', () => {
     const paths = router.getRoutes().map((item) => item.path)
-    expect(paths).toEqual(expect.arrayContaining(['/', '/experiments', '/experiments/:id', '/runs/:runId', '/regression', '/judgelab', '/judgelab/:calibrationId', '/core-readiness']))
+    expect(paths).toEqual(expect.arrayContaining(['/', '/experiments', '/experiments/:id', '/run-control', '/runs/:runId', '/regression', '/judgelab', '/judgelab/:calibrationId', '/core-readiness']))
     expect(paths.some((path) => path.includes('analyst'))).toBe(false)
+  })
+
+  it('renders grouped product navigation and route metadata in the responsive shell', async () => {
+    await router.push('/run-control')
+    const wrapper = mount(App, {
+      global: {
+        plugins: [router],
+        stubs: {
+          RouterView: { template: '<div data-test="router-view" />' },
+          ElTooltip: { template: '<span><slot /></span>' },
+        },
+      },
+    })
+    expect(wrapper.text()).toContain('Workspace')
+    expect(wrapper.text()).toContain('Registry')
+    expect(wrapper.text()).toContain('Evidence')
+    expect(wrapper.find('.topbar h1').text()).toBe('Run Control')
+    await wrapper.get('.mobile-menu-button').trigger('click')
+    expect(wrapper.get('.workbench-shell').classes()).toContain('nav-open')
+    wrapper.unmount()
+  })
+
+  it('renders an evidence-first overview with direct registry and run-control entry points', async () => {
+    api.readiness.mockResolvedValueOnce({
+      status: 'NOT_READY', task_corpus_size: 4, blockers: ['REAL_JUDGE_EVIDENCE'], checks: [],
+      evaluated_at: '2026-08-23T00:00:00Z',
+    })
+    const wrapper = mount(OverviewView, { global: { plugins: [router] } })
+    await flushPromises()
+    expect(wrapper.text()).toContain('Controlled evaluation, from registry to trace')
+    expect(wrapper.text()).toContain('Keyless Matrix')
+    expect(wrapper.text()).toContain('Run Control')
+    expect(wrapper.find('a[href="/run-control"]').exists()).toBe(true)
   })
 
   it('renders reported zero differently from NOT_REPORTED', () => {
@@ -224,6 +260,54 @@ describe('Workbench contracts', () => {
     expect(wrapper.text()).toContain('FULL_STREAM')
     expect(wrapper.text()).toContain('NOT_REPORTED')
     expect(wrapper.text()).not.toContain('NATIVE_REASONING_CONTENT_MUST_STAY_HIDDEN')
+  })
+
+  it('keeps capability terminal while presenting infrastructure as explicit scoped recovery', async () => {
+    api.getRuns.mockResolvedValueOnce({
+      items: [
+        { ...run, run_id: 'run-capability', normalized_outcome: 'capability_fail', status: 'completed' },
+        { ...run, run_id: 'run-infra', normalized_outcome: 'infra_failure', status: 'failed' },
+        { ...run, run_id: 'run-cancelled', normalized_outcome: 'cancelled', status: 'cancelled' },
+      ],
+      total: 3, limit: 100, offset: 0,
+    })
+    await router.push('/run-control?experiment=matrix-keyless')
+    const wrapper = mount(RunControlView, { global: { plugins: [router] } })
+    await flushPromises()
+    const text = wrapper.text()
+    expect(text).toContain('Capability results stay final')
+    expect(text).toContain('RECOVERY REVIEW')
+    expect(text).toContain('Preserve exact treatment')
+    expect(text).toContain('Diagnosis & trace')
+    const cancelledRow = wrapper.findAll('tbody tr').find((row) => row.text().includes('run-cancelled'))
+    expect(cancelledRow?.text()).toContain('OBSERVE')
+    expect(cancelledRow?.text()).toContain('Observe backend lifecycle state')
+    expect(cancelledRow?.text()).not.toContain('Recorded evidence; no semantic retry')
+    expect(wrapper.findAll('button').some((button) => button.text().toLowerCase().includes('retry')))
+      .toBe(false)
+    expect(api.getStatus).toHaveBeenCalledWith('matrix-keyless')
+    expect(api.getRuns).toHaveBeenCalledWith('matrix-keyless', { limit: 100 })
+  })
+
+  it('retains a deep-linked Run Control experiment after reconstructed-page load', async () => {
+    await router.push('/run-control?experiment=matrix-keyless')
+    const wrapper = mount(RunControlView, { global: { plugins: [router] } })
+    await flushPromises()
+    expect((wrapper.get('[aria-label="Run Control experiment"]').element as HTMLSelectElement).value)
+      .toBe('matrix-keyless')
+    expect(router.currentRoute.value.query.experiment).toBe('matrix-keyless')
+  })
+
+  it('loads a deep-linked Run Control identity even when it is outside the bounded list page', async () => {
+    api.listExperiments.mockResolvedValueOnce({ items: [experiment], total: 101, limit: 100, offset: 0 })
+    await router.push('/run-control?experiment=outside-first-page')
+    const wrapper = mount(RunControlView, { global: { plugins: [router] } })
+    await flushPromises()
+    expect((wrapper.get('[aria-label="Run Control experiment"]').element as HTMLSelectElement).value)
+      .toBe('outside-first-page')
+    expect(wrapper.text()).toContain('outside-first-page · direct link')
+    expect(api.getStatus).toHaveBeenCalledWith('outside-first-page')
+    expect(api.getRuns).toHaveBeenCalledWith('outside-first-page', { limit: 100 })
   })
 
   it('renders suite-scoped Judge qualification', async () => {

@@ -3,22 +3,17 @@ from __future__ import annotations
 import asyncio
 import json
 import os
-import sys
-from dataclasses import dataclass
-from enum import StrEnum
 from pathlib import Path
+from typing import Annotated
 
 import typer
 import uvicorn
-from pydantic import ValidationError
 
 from harnesslab import __version__
 from harnesslab.analyst.cli import analyst_app
 from harnesslab.comparability.engine import ComparabilityEngine
 from harnesslab.comparability.manifest import ComparabilityInputError, load_manifest_facts
 from harnesslab.comparability.models import ComparabilityIntent
-from harnesslab.core.config import Settings
-from harnesslab.db.health import check_database
 from harnesslab.egress import EgressNetworkIsolationUnavailable
 from harnesslab.experiment.cli import experiment_app, report_app, run_app
 from harnesslab.harness_lane.profile import canonical_codex_profile
@@ -30,6 +25,12 @@ from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
 from harnesslab.multi_harness.models import DeepSeekSessionExtraction, HarnessKind
 from harnesslab.multi_harness.profile import canonical_claude_profile, canonical_deepseek_profile
 from harnesslab.multi_harness.runtime import MultiHarnessRuntime
+from harnesslab.productization.cli import (
+    doctor_command,
+    down_command,
+    status_command,
+    up_command,
+)
 from harnesslab.release.diagnostic import (
     ComponentDiagnosticError,
     execute_real_component_diagnostics,
@@ -87,6 +88,9 @@ release_telemetry_app = typer.Typer(
 release_judge_app = typer.Typer(
     no_args_is_help=True, help="Preflight or execute the frozen real Judge campaign."
 )
+app.command("up")(up_command)
+app.command("down")(down_command)
+app.command("status")(status_command)
 app.add_typer(task_app, name="task")
 app.add_typer(sandbox_app, name="sandbox")
 app.add_typer(model_app, name="model")
@@ -527,57 +531,6 @@ def assess_comparability(
         )
 
 
-class CheckStatus(StrEnum):
-    PASS = "PASS"
-    FAIL = "FAIL"
-    NOT_CONFIGURED = "NOT_CONFIGURED"
-
-
-@dataclass(frozen=True)
-class DoctorResult:
-    name: str
-    status: CheckStatus
-    detail: str
-
-
-async def run_doctor() -> list[DoctorResult]:
-    results = [
-        DoctorResult("package", CheckStatus.PASS, f"HarnessLab {__version__}"),
-    ]
-    if sys.version_info[:2] == (3, 12):
-        results.append(DoctorResult("python", CheckStatus.PASS, sys.version.split()[0]))
-    else:
-        results.append(
-            DoctorResult(
-                "python", CheckStatus.FAIL, f"requires Python 3.12; found {sys.version.split()[0]}"
-            )
-        )
-
-    try:
-        settings = Settings()
-    except ValidationError:
-        results.append(
-            DoctorResult(
-                "configuration", CheckStatus.NOT_CONFIGURED, "DATABASE_URL is missing or invalid"
-            )
-        )
-        results.append(
-            DoctorResult("postgresql", CheckStatus.NOT_CONFIGURED, "configuration is unavailable")
-        )
-        return results
-
-    results.append(
-        DoctorResult("configuration", CheckStatus.PASS, f"environment={settings.environment}")
-    )
-    try:
-        await check_database(settings)
-    except Exception as exc:  # CLI boundary reports the error class without credentials.
-        results.append(DoctorResult("postgresql", CheckStatus.FAIL, type(exc).__name__))
-    else:
-        results.append(DoctorResult("postgresql", CheckStatus.PASS, "SELECT 1 succeeded"))
-    return results
-
-
 def version_callback(value: bool) -> None:
     if value:
         typer.echo(__version__)
@@ -598,16 +551,17 @@ def main(
 
 
 @app.command()
-def doctor() -> None:
-    """Check runtime, configuration, and PostgreSQL connectivity."""
+def doctor(
+    compose_file: Annotated[
+        Path | None, typer.Option("--compose-file", help="Product Compose file.")
+    ] = None,
+    project_name: Annotated[
+        str, typer.Option("--project-name", help="Compose project name.")
+    ] = "harnesslab",
+) -> None:
+    """Check Docker, product configuration, and runtime readiness keylessly."""
 
-    results = asyncio.run(run_doctor())
-    for result in results:
-        typer.echo(f"{result.status.value:<14} {result.name:<15} {result.detail}")
-    if any(result.status is CheckStatus.FAIL for result in results):
-        raise typer.Exit(code=1)
-    if any(result.status is CheckStatus.NOT_CONFIGURED for result in results):
-        raise typer.Exit(code=2)
+    doctor_command(compose_file=compose_file, project_name=project_name)
 
 
 @app.command()
