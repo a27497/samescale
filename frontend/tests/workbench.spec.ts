@@ -149,7 +149,7 @@ beforeEach(() => {
 describe('Workbench contracts', () => {
   it('registers every major route and no Analyst route', () => {
     const paths = router.getRoutes().map((item) => item.path)
-    expect(paths).toEqual(expect.arrayContaining(['/', '/experiments', '/experiments/:id', '/run-control', '/runs/:runId', '/regression', '/judgelab', '/judgelab/:calibrationId', '/core-readiness']))
+    expect(paths).toEqual(expect.arrayContaining(['/', '/experiments', '/experiments/:id', '/run-control', '/runs/:runId', '/regression', '/diagnosis', '/judgelab', '/judgelab/:calibrationId', '/core-readiness']))
     expect(paths.some((path) => path.includes('analyst'))).toBe(false)
   })
 

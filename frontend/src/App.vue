@@ -29,6 +29,7 @@ const navigation = [
     label: 'Evidence',
     items: [
       { to: '/regression', label: 'Regression', mark: 'RG' },
+      { to: '/diagnosis', label: 'Diagnosis', mark: 'DX' },
       { to: '/judgelab', label: 'JudgeLab', mark: 'JL' },
       { to: '/core-readiness', label: 'Core Readiness', mark: 'CR' },
     ],

@@ -394,3 +394,93 @@ export interface CoreReadiness {
   blockers: string[]
   evaluated_at: string
 }
+
+export type FailureScope = 'CAPABILITY' | 'INFRASTRUCTURE'
+export type AttributionKind = 'VERIFIED_FACT' | 'HYPOTHESIS'
+
+export interface DiagnosisAttribution {
+  kind: AttributionKind
+  statement: string
+  evidence_references: string[]
+  causal_strength: 'NOT_APPLICABLE' | 'CORRELATION_ONLY' | 'CONTROLLED_ABLATION_ASSOCIATION'
+  caveat: string | null
+}
+
+export interface DiagnosisRun {
+  run_id: string
+  origin: 'IMMUTABLE_EXPERIMENT' | 'SYNTHETIC_QUALIFICATION'
+  task_id: string
+  task_version: string
+  model: string
+  harness: string
+  language: string
+  task_family: string
+  failure_class: string
+  failure_scope: FailureScope
+  artifact_verified: boolean
+  evidence_identity: string | null
+  trace: {
+    status: 'REPORTED' | 'NOT_REPORTED'
+    coverage: string | null
+    digest: string | null
+    pattern: string
+    events: { ordinal: number; type: string; status: string | null; exit_code: number | null }[]
+  }
+  workspace_diff: {
+    status: 'REPORTED' | 'DIGEST_ONLY' | 'NOT_REPORTED'
+    input_digest: string | null
+    output_digest: string | null
+    pattern: string
+    changed_paths: { path: string; status: string }[]
+    protected_paths_changed: string[]
+  }
+  tool_calls: {
+    status: 'REPORTED' | 'NOT_REPORTED'
+    count: number | null
+    pattern: string
+    failed_exit_codes: number[]
+  }
+  verifier: {
+    status: 'PASSED' | 'FAILED' | 'NOT_RUN' | 'NOT_REPORTED'
+    score: number | null
+    sandbox_status: string | null
+    failure_subtype: string | null
+  }
+  attributions: DiagnosisAttribution[]
+}
+
+export interface DiagnosisCluster {
+  cluster_id: string
+  dimensions: Record<string, string>
+  failure_class: string
+  failure_scope: FailureScope
+  run_count: number
+  real_run_count: number
+  synthetic_run_count: number
+  runs: DiagnosisRun[]
+}
+
+export interface DiagnosisReport {
+  schema_version: 1
+  experiment_id: string
+  plan_digest: string
+  report_digest: string
+  cluster_dimensions: string[]
+  correlation_warning: string
+  classification_limitations: string[]
+  failure_run_count: number
+  real_run_count: number
+  synthetic_run_count: number
+  cells: {
+    cell_id: string
+    task_families: { task_family: string; clusters: DiagnosisCluster[] }[]
+  }[]
+}
+
+export interface BadCaseExport {
+  experiment_id: string
+  export_digest: string
+  real_case_count: number
+  synthetic_qualification_case_count: number
+  limitation: string
+}

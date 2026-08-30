@@ -38,9 +38,17 @@ from harnesslab.api.workbench_service import (
     run_detail,
     trace_detail,
 )
+from harnesslab.diagnosis.models import BadCaseExport, BadCaseExportRequest, DiagnosisReport
+from harnesslab.diagnosis.service import (
+    DiagnosisEvidenceError,
+    DiagnosisRequestError,
+    build_badcase_export,
+    diagnose_experiment,
+)
 from harnesslab.experiment.model_comparison import ModelComparisonCloseout
 
 router = APIRouter(prefix="/workbench", tags=["workbench"])
+REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 Session = Annotated[AsyncSession, Depends(workbench_session)]
 ArtifactRoots = Annotated[tuple[Path, ...], Depends(workbench_artifact_roots)]
 PageLimit = Annotated[int, Query(ge=1, le=100)]
@@ -118,6 +126,45 @@ async def get_model_comparison_analysis(
     experiment_id: str, session: Session, artifact_roots: ArtifactRoots
 ) -> ModelComparisonCloseout:
     return await model_comparison_analysis(session, experiment_id, artifact_roots)
+
+
+async def _diagnosis(
+    experiment_id: str, session: AsyncSession, artifact_roots: tuple[Path, ...]
+) -> DiagnosisReport:
+    try:
+        return await diagnose_experiment(
+            session,
+            experiment_id,
+            artifact_roots,
+            repository_root=REPOSITORY_ROOT,
+        )
+    except DiagnosisRequestError as exc:
+        raise WorkbenchAPIError(404, "NOT_FOUND", str(exc)) from exc
+    except DiagnosisEvidenceError as exc:
+        raise WorkbenchAPIError(
+            409, "ARTIFACT_INTEGRITY_ERROR", "diagnosis evidence cannot be verified"
+        ) from exc
+
+
+@router.get("/experiments/{experiment_id}/diagnosis", response_model=DiagnosisReport)
+async def get_diagnosis(
+    experiment_id: str, session: Session, artifact_roots: ArtifactRoots
+) -> DiagnosisReport:
+    return await _diagnosis(experiment_id, session, artifact_roots)
+
+
+@router.post("/experiments/{experiment_id}/diagnosis/badcases", response_model=BadCaseExport)
+async def export_badcases(
+    experiment_id: str,
+    request: BadCaseExportRequest,
+    session: Session,
+    artifact_roots: ArtifactRoots,
+) -> BadCaseExport:
+    report = await _diagnosis(experiment_id, session, artifact_roots)
+    try:
+        return build_badcase_export(report, request)
+    except DiagnosisRequestError as exc:
+        raise WorkbenchAPIError(422, "INVALID_BADCASE_EXPORT", str(exc)) from exc
 
 
 @router.get("/experiments/{experiment_id}/status", response_model=ExperimentStatusResponse)

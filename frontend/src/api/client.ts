@@ -2,6 +2,8 @@ import axios from 'axios'
 
 import type {
   CoreReadiness,
+  BadCaseExport,
+  DiagnosisReport,
   ExperimentDetail,
   ExperimentListResponse,
   ExperimentStatus,
@@ -57,6 +59,19 @@ export const workbenchApi = {
     (await apiClient.get<RunDetail>(`/runs/${encodeURIComponent(id)}`)).data,
   getTrace: async (id: string) =>
     (await apiClient.get<TraceResponse>(`/runs/${encodeURIComponent(id)}/trace`)).data,
+  getDiagnosis: async (id: string) =>
+    (
+      await apiClient.get<DiagnosisReport>(
+        `/experiments/${encodeURIComponent(id)}/diagnosis`,
+      )
+    ).data,
+  exportBadCases: async (id: string, clusterIds: string[] = []) =>
+    (
+      await apiClient.post<BadCaseExport>(
+        `/experiments/${encodeURIComponent(id)}/diagnosis/badcases`,
+        { cluster_ids: clusterIds, include_synthetic_qualification: false },
+      )
+    ).data,
   listCalibrations: async () =>
     (
       await apiClient.get<{

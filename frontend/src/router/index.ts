@@ -71,6 +71,12 @@ const router = createRouter({
       meta: { title: 'Regression', section: 'Evidence' },
     },
     {
+      path: '/diagnosis',
+      name: 'diagnosis',
+      component: () => import('@/views/DiagnosisView.vue'),
+      meta: { title: 'Failure Diagnosis', section: 'Evidence' },
+    },
+    {
       path: '/judgelab',
       name: 'judgelab',
       component: () => import('@/views/JudgeLabView.vue'),

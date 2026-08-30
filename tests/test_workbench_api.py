@@ -449,13 +449,18 @@ async def test_workbench_routes_are_read_only_and_have_no_execution_or_analyst_s
         for path, methods in schema["paths"].items()
         if path.startswith("/api/workbench")
     }
-    assert len(paths) == 13
+    assert len(paths) == 15
     assert paths["/api/workbench/regression/compare"] == {"post"}
+    assert paths["/api/workbench/experiments/{experiment_id}/diagnosis/badcases"] == {"post"}
     assert paths["/api/workbench/experiments/{experiment_id}/model-comparison-analysis"] == {"get"}
     assert all(
         methods == {"get"}
         for path, methods in paths.items()
-        if path != "/api/workbench/regression/compare"
+        if path
+        not in {
+            "/api/workbench/regression/compare",
+            "/api/workbench/experiments/{experiment_id}/diagnosis/badcases",
+        }
     )
     serialized = json.dumps(
         {key: sorted(value) for key, value in paths.items()}, sort_keys=True
