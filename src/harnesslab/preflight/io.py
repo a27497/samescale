@@ -17,9 +17,7 @@ class PreflightInputError(ValueError):
 _ENVIRONMENT_REFERENCE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 
-def load_secret_environment_file(
-    path: Path, allowed_references: frozenset[str]
-) -> dict[str, str]:
+def load_secret_environment_file(path: Path, allowed_references: frozenset[str]) -> dict[str, str]:
     """Load a private assignment-only environment file without shell evaluation."""
 
     try:
