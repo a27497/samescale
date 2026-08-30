@@ -139,7 +139,10 @@ def main() -> int:
         Check("exact Python", ("uv", "run", "--locked", "python", "--version")),
         Check("CLI help", ("uv", "run", "--locked", "harnesslab", "--help")),
         Check("CLI version", ("uv", "run", "--locked", "harnesslab", "--version")),
-        Check("CLI doctor", ("uv", "run", "--locked", "harnesslab", "doctor")),
+        Check(
+            "sandbox CLI doctor",
+            ("uv", "run", "--locked", "harnesslab", "sandbox", "doctor"),
+        ),
         Check("Alembic current head", ("uv", "run", "--locked", "alembic", "upgrade", "head")),
         Check(
             "pytest",
