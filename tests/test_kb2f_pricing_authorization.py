@@ -39,6 +39,9 @@ def test_kb2f_preserves_the_exact_v5_scientific_design_and_r2_evidence() -> None
     assert dossier["frozen_inputs"]["operator_input_template_sha256"] == _sha256(
         "release/operator-pricing-input-template.json"
     )
+    assert dossier["frozen_inputs"]["operator_input_closure_sha256"] == _sha256(
+        "release/kb2f-operator-input-closure.json"
+    )
     plan = _load("core-real-evidence-plan-v5.json")
     assert [cell["cell_id"] for cell in plan["cells"]] == [
         "model-gpt56-relay-responses",
@@ -104,11 +107,13 @@ def test_current_deepseek_rates_and_scenarios_are_exact() -> None:
     assert Decimal(snapshot["empirical_projection"]["deepseek_peak_estimate"]) == peak
 
 
-def test_subscription_accounting_stays_separate_and_unverified() -> None:
+def test_subscription_accounting_is_confirmed_and_quota_guarded() -> None:
     snapshot = _load("core-real-matrix-v5-pricing-snapshot.json")
     opencode = snapshot["opencode_go_public_contract"]
+    closure = _load("kb2f-operator-input-closure.json")["opencode_go"]
 
-    assert opencode["operator_account_status"] == "ACCOUNT_PLAN_NOT_VERIFIABLE_KEYLESSLY"
+    assert opencode["operator_account_status"] == "ACTIVE_GO_SUBSCRIPTION_CONFIRMED"
+    assert opencode["accounting_model"] == "SUBSCRIPTION_INCLUDED_QUOTA"
     assert opencode["monthly_subscription_fee"] == "10.00"
     assert opencode["general_usage_value_limits"] == {
         "five_hour": "12.00",
@@ -126,7 +131,11 @@ def test_subscription_accounting_stays_separate_and_unverified() -> None:
         "weekly": 2150,
         "monthly": 4300,
     }
-    assert opencode["overage_semantics"]["operator_use_balance_state"] == "NOT_VERIFIED"
+    assert opencode["overage_semantics"]["operator_zen_balance"] == "0.00"
+    assert opencode["overage_semantics"]["operator_paid_overage_capacity"] == "NONE_CONFIRMED"
+    assert opencode["overage_semantics"]["quota_exhaustion_policy"] == (
+        "FAIL_CLOSED_NO_PROVIDER_SUBSTITUTION"
+    )
     assert snapshot["accounting_semantics"]["included_quota_treated_as_free"] is False
     assert (
         snapshot["accounting_semantics"][
@@ -140,47 +149,112 @@ def test_subscription_accounting_stays_separate_and_unverified() -> None:
         for source in opencode["sources"]
     )
 
+    dashboard = closure["dashboard_snapshot"]
+    assert dashboard["reset_observations_are_durable_facts"] is False
+    dashboard_models = {item["requested_model"]: item for item in dashboard["models"]}
+    qwen = dashboard_models["qwen3.8-max"]
+    glm = dashboard_models["glm-5.2"]
+    for model in (qwen, glm):
+        assert model["projection_fits_current_snapshot"] is True
+        for window in model["windows"].values():
+            usage = Decimal(window["usage"])
+            quota = Decimal(window["quota"])
+            remaining = Decimal(window["remaining"])
+            projected = Decimal(window["projected_remaining_after_matrix"])
+            assert quota - usage == remaining
+            assert projected >= 0
+    assert Decimal(qwen["windows"]["five_hour"]["projected_remaining_after_matrix"]) == (
+        Decimal("3.00") - Decimal("0.0372") - Decimal("1.870380000")
+    )
+    assert Decimal(glm["windows"]["monthly"]["projected_remaining_after_matrix"]) == (
+        Decimal("60.00") - Decimal("0.0017") - Decimal("0.049870800")
+    )
 
-def test_unknown_operator_costs_never_become_zero_or_fake_precision() -> None:
+
+def test_operator_export_costs_reconcile_and_remain_planning_projections() -> None:
     snapshot = _load("core-real-matrix-v5-pricing-snapshot.json")
     dossier = _load("kb2f-full-matrix-authorization-dossier.json")
+    closure = _load("kb2f-operator-input-closure.json")
+    relay = closure["gpt_relay"]
 
-    assert snapshot["gpt_relay"]["pricing_status"] == "GPT_RELAY_RATE_CARD_REQUIRED"
+    assert snapshot["gpt_relay"]["pricing_status"] == ("OPERATOR_USAGE_DERIVED_PRICING_FROZEN")
     assert snapshot["gpt_relay"]["public_openai_pricing_substituted"] is False
-    assert snapshot["empirical_projection"]["estimated_630_subject_cost"] == "UNKNOWN_NOT_ZERO"
-    assert snapshot["empirical_projection"]["estimated_63_judge_cost"] == "UNKNOWN_NOT_ZERO"
-    assert snapshot["empirical_projection"]["estimated_total_cost"] == "UNKNOWN_NOT_ZERO"
-    assert snapshot["hard_resource_ceiling"]["aggregate_input_token_ceiling"] is None
-    assert (
-        snapshot["full_matrix_cost_status"]["recommended_safe_maximum_spend_ceiling"]
-        == "NOT_RECOMMENDABLE_UNTIL_OPERATOR_INPUTS_ARE_BOUND"
+    assert relay["operator_provided_csv_sha256"] == (
+        "sha256:eb4831effff557177acb84931a562efa31c61e66f1edb490846e9027b2e2bb8b"
     )
-    assert dossier["authorization_result"] == "OPERATOR_PRICING_INPUT_REQUIRED"
-    assert dossier["cost_estimate"]["recommended_max_spend_ceiling"] is None
+    assert relay["raw_csv_stored"] is False
+    assert relay["maximum_observed_multiplier_is_contractual_permanent_maximum"] is False
+
+    rates = relay["base_rates_per_million_tokens"]
+    million = Decimal(1_000_000)
+    for row in relay["canary_rows"]:
+        original = (
+            Decimal(row["uncached_input_tokens"]) * Decimal(rates["uncached_input"])
+            + Decimal(row["cache_read_tokens"]) * Decimal(rates["cache_read_input"])
+            + Decimal(row["output_tokens"]) * Decimal(rates["output"])
+        ) / million
+        assert original == Decimal(row["original_cost"])
+        assert (
+            row["uncached_input_tokens"] + row["cache_read_tokens"] == row["aggregate_input_tokens"]
+        )
+
+    empirical = (
+        sum(
+            (Decimal(row["actual_billed_cost"]) for row in relay["canary_rows"]),
+            start=Decimal(0),
+        )
+        * 90
+    )
+    original = sum(
+        (Decimal(row["original_cost"]) for row in relay["canary_rows"]),
+        start=Decimal(0),
+    )
+    observed_max = original * Decimal("0.06") * 90
+    assert empirical == Decimal("2.07326340")
+    assert observed_max == Decimal("3.02259060")
+    assert Decimal(relay["matrix_projection"]["empirical_270_run_cost"]) == empirical
+    assert Decimal(relay["matrix_projection"]["observed_max_multiplier_projection"]) == (
+        observed_max
+    )
+
+    combined = closure["combined_projection"]
+    assert Decimal(combined["expected_total_marginal_cash_low"]) == (
+        empirical + Decimal("0.18994140")
+    )
+    assert Decimal(combined["expected_total_marginal_cash_high"]) == (
+        empirical + Decimal("0.37988280")
+    )
+    assert Decimal(combined["planning_conservative_total"]) == (
+        observed_max + Decimal("1.01356200")
+    )
+    assert combined["planning_conservative_total_is_hard_monetary_ceiling"] is False
+    assert snapshot["hard_resource_ceiling"]["aggregate_input_token_ceiling"] is None
+    assert dossier["authorization_result"] == "READY_FOR_OPERATOR_SPEND_APPROVAL"
+    assert dossier["operator_pricing_inputs_remaining"] == []
+    assert dossier["cost_estimate"]["spend_authorization_status"] == (
+        "AWAITING_EXPLICIT_OPERATOR_APPROVAL"
+    )
+    assert dossier["cost_estimate"]["soft_spend_warning_usd"] == "5.00"
+    assert dossier["cost_estimate"]["proposed_hard_operator_spend_ceiling_usd"] == "10.00"
     assert [item["scenario_id"] for item in snapshot["cost_scenarios"]] == [
         "OFF_PEAK_ESTIMATE",
         "PEAK_ESTIMATE",
         "WORST_CASE_AUTHORIZATION_ESTIMATE",
     ]
     assert snapshot["cost_scenarios"][2]["complete_cost_bound_available"] is False
-    assert (
-        snapshot["subscription_quota_consumption_projection"]["cash_spend_inference_permitted"]
-        is False
-    )
     assert dossier["cost_estimate"]["subscription_cost_dimensions"] == {
-        "ECONOMIC_ALLOCATED_COST": "UNKNOWN_PENDING_ACCOUNT_AND_ALLOCATION_CONFIRMATION",
-        "MARGINAL_CASH_SPEND": "UNKNOWN_PENDING_QUOTA_BALANCE_AND_OVERAGE_CONFIRMATION",
+        "ECONOMIC_ALLOCATED_COST": "EXISTING_10_USD_MONTHLY_SUBSCRIPTION_NOT_ALLOCATED_TO_MATRIX",
+        "MARGINAL_CASH_SPEND": "0.000000000_CURRENT_QUOTA_SNAPSHOT",
     }
-    assert {item["reason_code"] for item in dossier["authorization_blockers"]} == {
-        "GPT_RELAY_RATE_CARD_REQUIRED",
-        "OPENCODE_ACCOUNT_PLAN_CONFIRMATION_REQUIRED",
-        "OPENCODE_QUOTA_AND_OVERAGE_STATE_REQUIRED",
-        "FULL_MATRIX_SPEND_AUTHORIZATION_REQUIRED",
+    assert {item["reason_code"] for item in dossier["spend_authorization_prerequisites"]} == {
+        "EXPLICIT_OPERATOR_SPEND_APPROVAL_REQUIRED",
+        "OPENCODE_QUOTA_SNAPSHOT_REFRESH_REQUIRED_AT_LAUNCH",
     }
 
 
 def test_operator_template_is_null_only_for_unknown_values_and_secret_safe() -> None:
     template = _load("operator-pricing-input-template.json")
+    closure = _load("kb2f-operator-input-closure.json")
     relay = template["gpt_relay_rate_card"]
     account = template["opencode_go_account_confirmation"]
 
@@ -200,9 +274,17 @@ def test_operator_template_is_null_only_for_unknown_values_and_secret_safe() -> 
     assert not any("api_key=" in value.lower() or "bearer " in value.lower() for value in strings)
     assert not any("http://" in value or "https://" in value for value in strings)
 
+    closure_strings = _all_strings(closure)
+    assert not any(value.startswith(("/home/", "/Users/")) for value in closure_strings)
+    assert not any(
+        "api_key=" in value.lower() or "bearer " in value.lower() for value in closure_strings
+    )
+    assert not any("http://" in value or "https://" in value for value in closure_strings)
+
 
 def test_kb2f_performed_no_evaluation_calls_and_did_not_start_kb3() -> None:
     dossier = _load("kb2f-full-matrix-authorization-dossier.json")
+    closure = _load("kb2f-operator-input-closure.json")
     matrix = dossier["matrix_state"]
 
     assert matrix["scientific_design_changed"] is False
@@ -213,6 +295,14 @@ def test_kb2f_performed_no_evaluation_calls_and_did_not_start_kb3() -> None:
     assert matrix["judge_calls"] == 0
     assert matrix["full_matrix_executed"] is False
     assert matrix["k_b3_started"] is False
+    assert closure["execution_state"] == {
+        "provider_calls": 0,
+        "harness_calls": 0,
+        "judge_calls": 0,
+        "full_matrix_executed": False,
+        "k_b3_started": False,
+        "main_promoted_by_this_continuation": False,
+    }
     assert dossier["implementation_scope"] == {
         "release_and_test_artifacts_only": True,
         "phase_m_production_code_changed": False,

@@ -7,6 +7,11 @@
   "scientific_plan_digest": "sha256:97253765cc91bc98b66bb975dbb5b59b409ca14e6ed7fa7d07f11b0093d4c1cc",
   "scientific_plan_mutated": false,
   "snapshot_retrieval_completed_at": "2026-08-30T15:23:47Z",
+  "operator_input_closure": {
+    "status": "OPERATOR_INPUTS_CLOSED",
+    "reference": "release/kb2f-operator-input-closure.json",
+    "recorded_at": "2026-08-30T16:18:40Z"
+  },
   "currency_normalization": {
     "normalized_currency": "USD",
     "documentary_caveat": "The official English provider pages display dollar signs but do not spell out the ISO 4217 code in the cited pricing tables."
@@ -85,8 +90,8 @@
   },
   "opencode_go_public_contract": {
     "public_contract_status": "OFFICIAL_CURRENT_CONTRACT_FROZEN",
-    "operator_account_status": "ACCOUNT_PLAN_NOT_VERIFIABLE_KEYLESSLY",
-    "accounting_model_if_operator_confirms_active_go": "SUBSCRIPTION_INCLUDED_QUOTA",
+    "operator_account_status": "ACTIVE_GO_SUBSCRIPTION_CONFIRMED",
+    "accounting_model": "SUBSCRIPTION_INCLUDED_QUOTA",
     "retrieved_at": "2026-08-30T15:21:11Z",
     "monthly_subscription_fee": "10.00",
     "general_usage_value_limits": {
@@ -134,11 +139,14 @@
       "default_after_limit": "REQUESTS_BLOCK_EXCEPT_FREE_MODELS",
       "zen_balance_fallback_available": true,
       "zen_balance_fallback_requires_console_use_balance_enabled": true,
-      "operator_use_balance_state": "NOT_VERIFIED",
-      "marginal_overage_rate": "UNKNOWN"
+      "operator_zen_balance": "0.00",
+      "operator_zen_balance_currency": "USD",
+      "operator_paid_overage_capacity": "NONE_CONFIRMED",
+      "marginal_overage_rate": "NOT_APPLICABLE_NO_CONFIRMED_PAID_OVERAGE",
+      "quota_exhaustion_policy": "FAIL_CLOSED_NO_PROVIDER_SUBSTITUTION"
     },
-    "classification_basis": "A present API-key reference and historical route access do not prove an active Go subscription because official documentation separately supports Go subscriptions and Zen per-request balance accounts.",
-    "operator_confirmation_reference": "release/operator-pricing-input-template.json",
+    "classification_basis": "The operator supplied an account-dashboard attestation confirming an active OpenCode Go subscription, current per-model quota usage, and zero Zen balance.",
+    "operator_confirmation_reference": "release/kb2f-operator-input-closure.json",
     "sources": [
       {
         "role": "GO_SUBSCRIPTION_LIMITS_MODELS_AND_OVERAGE",
@@ -161,20 +169,25 @@
     ]
   },
   "gpt_relay": {
-    "pricing_status": "GPT_RELAY_RATE_CARD_REQUIRED",
-    "accounting_model": "UNKNOWN",
+    "pricing_status": "OPERATOR_USAGE_DERIVED_PRICING_FROZEN",
+    "accounting_model": "PAY_AS_YOU_GO_WITH_OBSERVED_ROW_MULTIPLIER",
     "route_provenance": "OPERATOR_TRUSTED_THIRD_PARTY_RELAY",
     "public_openai_pricing_substituted": false,
-    "authoritative_local_rate_card_found": false,
-    "operator_input_reference": "release/operator-pricing-input-template.json",
-    "required_fields": [
-      "input_usd_per_million_tokens",
-      "cached_input_usd_per_million_tokens_if_applicable",
-      "output_usd_per_million_tokens",
-      "reasoning_token_billing_rule",
-      "per_request_or_platform_fee_if_any",
-      "rate_card_effective_date"
-    ]
+    "operator_usage_export_reference": "release/kb2f-operator-input-closure.json",
+    "operator_provided_csv_sha256": "sha256:eb4831effff557177acb84931a562efa31c61e66f1edb490846e9027b2e2bb8b",
+    "base_rates_per_million_tokens": {
+      "uncached_input": "5.00",
+      "cache_read_input": "0.50",
+      "output": "30.00"
+    },
+    "observed_rate_multipliers": [
+      "0.02",
+      "0.06"
+    ],
+    "maximum_observed_rate_multiplier": "0.06",
+    "maximum_observed_multiplier_is_contractual_maximum": false,
+    "empirical_270_run_cost": "2.07326340",
+    "observed_max_multiplier_270_run_cost": "3.02259060"
   },
   "accounting_semantics": {
     "supported_in_snapshot": [
@@ -186,46 +199,51 @@
     "economic_allocated_cost_is_separate_from_marginal_cash_spend": true,
     "included_quota_treated_as_free": false,
     "phase_m_production_code_changed": false,
-    "phase_m_change_deferred_reason": "The complete result remains operator-input-blocked. Append-only pricing evidence can preserve known components without weakening frozen Phase M version-1 semantics."
+    "phase_m_change_deferred_reason": "The operator-input closure is documentation-only and does not require weakening frozen Phase M version-1 semantics. Spend remains separately approval-gated."
   },
   "cost_scenarios": [
     {
       "scenario_id": "OFF_PEAK_ESTIMATE",
-      "basis": "Single-canary empirical projection with DeepSeek cache-miss input charged at current off-peak rates",
+      "basis": "Operator-export GPT empirical billing plus single-canary DeepSeek projection at current off-peak rates; OpenCode fits current included quota snapshot",
       "known_deepseek_subject_component": "0.189941400",
-      "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
-      "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
-      "estimated_total_cost": "UNKNOWN_NOT_ZERO"
+      "gpt_relay_subject_component": "2.073263400",
+      "opencode_additional_marginal_cash": "0.000000000",
+      "estimated_630_subject_marginal_cash": "2.263204800",
+      "estimated_63_judge_marginal_cash": "0.000000000",
+      "estimated_total_marginal_cash": "2.263204800"
     },
     {
       "scenario_id": "PEAK_ESTIMATE",
-      "basis": "Single-canary empirical projection with DeepSeek cache-miss input charged at current peak rates",
+      "basis": "Operator-export GPT empirical billing plus single-canary DeepSeek projection at current peak rates; OpenCode fits current included quota snapshot",
       "known_deepseek_subject_component": "0.379882800",
-      "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
-      "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
-      "estimated_total_cost": "UNKNOWN_NOT_ZERO"
+      "gpt_relay_subject_component": "2.073263400",
+      "opencode_additional_marginal_cash": "0.000000000",
+      "estimated_630_subject_marginal_cash": "2.453146200",
+      "estimated_63_judge_marginal_cash": "0.000000000",
+      "estimated_total_marginal_cash": "2.453146200"
     },
     {
       "scenario_id": "WORST_CASE_AUTHORIZATION_ESTIMATE",
-      "basis": "DeepSeek peak rate with hard output-token ceiling and empirical input, plus unresolved GPT relay and OpenCode contributions",
+      "basis": "GPT maximum observed multiplier applied to canary original costs plus DeepSeek peak conservative output-ceiling projection; OpenCode fits current included quota snapshot",
+      "gpt_observed_max_multiplier_component": "3.022590600",
       "known_deepseek_conservative_component": "1.013562000",
       "complete_cost_bound_available": false,
-      "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
-      "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
-      "estimated_total_cost": "UNKNOWN_NOT_ZERO"
+      "planning_conservative_total": "4.036152600",
+      "classification": "PLANNING_CONSERVATIVE_NOT_HARD_MONETARY_CEILING"
     }
   ],
   "empirical_projection": {
     "classification": "EMPIRICAL_PROJECTION",
     "method": "Multiply each single bounded canary observation by its frozen 90-run cell count and the single Judge observation by 63 calls.",
-    "precision_warning": "One observation per cell is not statistically representative. Cache-token accounting was not exposed for the OpenCode observations, so its usage-value subtotal is incomplete and is not cash-spend evidence.",
+    "precision_warning": "One observation per cell is not statistically representative. OpenCode usage values are quota-consumption projections, not additional cash-spend evidence. GPT multiplier 0.06 is observed, not a permanent contractual maximum.",
     "provider_usage": [
       {
         "provider_family": "GPT_RELAY",
         "subject_calls": 270,
         "input_tokens": 20507940,
         "output_tokens": 370440,
-        "estimated_cash_cost": "UNKNOWN_NOT_ZERO"
+        "empirical_marginal_cash_cost": "2.073263400",
+        "observed_max_multiplier_projection": "3.022590600"
       },
       {
         "provider_family": "OPENCODE_GO_QWEN38",
@@ -233,8 +251,9 @@
         "input_tokens": 49320,
         "output_tokens": 295290,
         "partial_observed_token_usage_value": "1.870380000",
-        "economic_allocated_cost": "UNKNOWN_PENDING_ACCOUNT_CONFIRMATION",
-        "marginal_cash_spend": "UNKNOWN_PENDING_ACCOUNT_AND_BALANCE_CONFIRMATION"
+        "economic_allocated_cost": "EXISTING_SUBSCRIPTION_FEE_NOT_ALLOCATED_TO_MATRIX",
+        "marginal_cash_spend": "0.000000000",
+        "quota_projection_fits_current_snapshot": true
       },
       {
         "provider_family": "DEEPSEEK_OFFICIAL",
@@ -250,8 +269,9 @@
         "input_tokens": 11466,
         "output_tokens": 7686,
         "partial_observed_token_usage_value": "0.049870800",
-        "economic_allocated_cost": "UNKNOWN_PENDING_ACCOUNT_CONFIRMATION",
-        "marginal_cash_spend": "UNKNOWN_PENDING_ACCOUNT_AND_BALANCE_CONFIRMATION"
+        "economic_allocated_cost": "EXISTING_SUBSCRIPTION_FEE_NOT_ALLOCATED_TO_MATRIX",
+        "marginal_cash_spend": "0.000000000",
+        "quota_projection_fits_current_snapshot": true
       }
     ],
     "subject_input_tokens": 20632590,
@@ -263,12 +283,19 @@
     "deepseek_off_peak_estimate": "0.189941400",
     "deepseek_peak_estimate": "0.379882800",
     "opencode_partial_observed_token_usage_value": "1.920250800",
-    "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
-    "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
-    "estimated_total_cost": "UNKNOWN_NOT_ZERO"
+    "gpt_relay_empirical_cost": "2.073263400",
+    "estimated_630_subject_marginal_cash_range": {
+      "low": "2.263204800",
+      "high": "2.453146200"
+    },
+    "estimated_63_judge_marginal_cash": "0.000000000",
+    "estimated_total_marginal_cash_range": {
+      "low": "2.263204800",
+      "high": "2.453146200"
+    }
   },
   "subscription_quota_consumption_projection": {
-    "status": "INCOMPLETE_AND_NOT_BOUND_TO_ACTIVE_ACCOUNT",
+    "status": "FITS_CURRENT_ATTESTED_QUOTA_SNAPSHOT_RECHECK_BEFORE_LAUNCH",
     "qwen38": {
       "planned_requests": 180,
       "official_typical_request_reference": {
@@ -281,7 +308,18 @@
         "weekly": "0.45",
         "monthly": "0.222222222"
       },
-      "partial_observed_token_usage_value": "1.870380000"
+      "partial_observed_token_usage_value": "1.870380000",
+      "attested_quota_remaining": {
+        "five_hour": "2.9628",
+        "weekly": "4.2769",
+        "monthly": "11.7769"
+      },
+      "projected_remaining_after_matrix": {
+        "five_hour": "1.092420000",
+        "weekly": "2.406520000",
+        "monthly": "9.906520000"
+      },
+      "fits_all_current_windows": true
     },
     "glm52_judge": {
       "planned_requests": 63,
@@ -295,15 +333,35 @@
         "weekly": "0.029302326",
         "monthly": "0.014651163"
       },
-      "partial_observed_token_usage_value": "0.049870800"
+      "partial_observed_token_usage_value": "0.049870800",
+      "attested_quota_remaining": {
+        "five_hour": "11.9992",
+        "weekly": "29.9983",
+        "monthly": "59.9983"
+      },
+      "projected_remaining_after_matrix": {
+        "five_hour": "11.949329200",
+        "weekly": "29.948429200",
+        "monthly": "59.948429200"
+      },
+      "fits_all_current_windows": true
     },
     "combined_partial_observed_token_usage_value": "1.920250800",
-    "cash_spend_inference_permitted": false,
+    "additional_marginal_cash_spend": "0.000000000",
+    "zen_balance": "0.00",
+    "paid_overage_capacity": "NONE_CONFIRMED",
+    "quota_exhaustion_policy": "FAIL_CLOSED_NO_PROVIDER_SUBSTITUTION",
+    "reset_observations": {
+      "five_hour": "APPROXIMATELY_59_MINUTES",
+      "weekly": "APPROXIMATELY_7_HOURS_58_MINUTES",
+      "monthly": "APPROXIMATELY_26_DAYS_3_HOURS",
+      "durable_future_facts": false
+    },
     "limitations": [
       "Official request figures are estimates from typical request patterns, not guaranteed request quotas.",
       "The two model families share dollar-value windows whose mixed-model allocation is not established by the public table.",
-      "Canary evidence does not expose cached-token quantities.",
-      "The current operator account plan, remaining quota, resets, and Use balance state are not verified."
+      "Dashboard reset observations are time-sensitive and must be refreshed before launch.",
+      "Zero Zen balance means no paid overage capacity is assumed."
     ]
   },
   "conservative_projection": {
@@ -312,7 +370,10 @@
     "deepseek_peak": "1.013562000",
     "deepseek_output_only_hard_ceiling_off_peak": "0.475200000",
     "deepseek_output_only_hard_ceiling_peak": "0.950400000",
-    "limitation": "The frozen plan has output, request, Harness-turn, and time ceilings but no aggregate hard input-token ceiling. These DeepSeek figures combine the hard output ceiling with empirical input and therefore are not a complete dollar hard ceiling."
+    "gpt_observed_max_multiplier": "0.06",
+    "gpt_observed_max_multiplier_projection": "3.022590600",
+    "planning_conservative_total": "4.036152600",
+    "limitation": "The frozen plan has output, request, Harness-turn, and time ceilings but no aggregate hard input-token ceiling, and GPT multiplier 0.06 is observed rather than a contractual maximum. This is a planning-conservative projection, not a hard monetary ceiling."
   },
   "hard_resource_ceiling": {
     "classification": "HARD_RESOURCE_CEILING",
@@ -328,16 +389,22 @@
     "monetary_hard_ceiling": "UNKNOWN_NOT_ZERO"
   },
   "full_matrix_cost_status": {
-    "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
-    "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
-    "estimated_total_cost": "UNKNOWN_NOT_ZERO",
-    "estimated_cost_range": "KNOWN_DEEPSEEK_EMPIRICAL_COMPONENT_USD_0.189941400_TO_0.379882800_PLUS_UNKNOWN_NOT_ZERO",
-    "recommended_safe_maximum_spend_ceiling": "NOT_RECOMMENDABLE_UNTIL_OPERATOR_INPUTS_ARE_BOUND",
-    "unknown_cost_contributors": [
-      "GPT_RELAY_RATE_CARD",
-      "OPENCODE_GO_ACTIVE_ACCOUNT_PLAN",
-      "OPENCODE_GO_REMAINING_QUOTA_AND_RESET_WINDOWS",
-      "OPENCODE_GO_USE_BALANCE_STATE_AND_OVERAGE_TERMS"
-    ]
+    "operator_input_result": "READY_FOR_OPERATOR_SPEND_APPROVAL",
+    "estimated_630_subject_marginal_cash_range": {
+      "low": "2.263204800",
+      "high": "2.453146200"
+    },
+    "estimated_63_judge_marginal_cash": "0.000000000",
+    "estimated_total_marginal_cash_range": {
+      "low": "2.263204800",
+      "high": "2.453146200"
+    },
+    "planning_conservative_total": "4.036152600",
+    "planning_conservative_is_hard_monetary_ceiling": false,
+    "soft_spend_warning_usd": "5.00",
+    "proposed_hard_operator_spend_ceiling_usd": "10.00",
+    "spend_authorization_status": "AWAITING_EXPLICIT_OPERATOR_APPROVAL",
+    "open_code_quota_is_separate_operational_guard": true,
+    "remaining_operator_pricing_inputs": []
   }
 }

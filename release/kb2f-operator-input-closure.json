@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "closure_id": "kb2f-operator-pricing-input-closure",
+  "recorded_at": "2026-08-30T16:18:40Z",
+  "operator_input_result": "READY_FOR_OPERATOR_SPEND_APPROVAL",
+  "raw_secrets_stored": false,
+  "private_relay_url_stored": false,
+  "sensitive_account_identifiers_stored": false,
+  "opencode_go": {
+    "source_type": "OPERATOR_PROVIDED_ACCOUNT_DASHBOARD_ATTESTATION",
+    "account_product": "OPENCODE_GO",
+    "subscription_status": "ACTIVE_SUBSCRIPTION_CONFIRMED_BY_OPERATOR",
+    "accounting_status": "ACTIVE_GO_SUBSCRIPTION_CONFIRMED",
+    "zen_balance": "0.00",
+    "zen_balance_currency": "USD",
+    "marginal_cash_overage_capacity": "NONE_CONFIRMED",
+    "paid_zen_fallback_assumed": false,
+    "quota_exhaustion_policy": "FAIL_CLOSED_AS_QUOTA_OR_INFRASTRUCTURE_EXHAUSTION",
+    "provider_substitution_on_exhaustion": false,
+    "dashboard_snapshot": {
+      "snapshot_timestamp": "NOT_SUPPLIED",
+      "recorded_at": "2026-08-30T16:18:40Z",
+      "reset_observations_are_durable_facts": false,
+      "reset_observations": {
+        "five_hour": "APPROXIMATELY_59_MINUTES",
+        "weekly": "APPROXIMATELY_7_HOURS_58_MINUTES",
+        "monthly": "APPROXIMATELY_26_DAYS_3_HOURS"
+      },
+      "models": [
+        {
+          "requested_model": "qwen3.8-max",
+          "usage_value_projection": "1.870380000",
+          "windows": {
+            "five_hour": {
+              "usage": "0.0372",
+              "quota": "3.00",
+              "remaining": "2.9628",
+              "projected_remaining_after_matrix": "1.092420000"
+            },
+            "weekly": {
+              "usage": "3.2231",
+              "quota": "7.50",
+              "remaining": "4.2769",
+              "projected_remaining_after_matrix": "2.406520000"
+            },
+            "monthly": {
+              "usage": "3.2231",
+              "quota": "15.00",
+              "remaining": "11.7769",
+              "projected_remaining_after_matrix": "9.906520000"
+            }
+          },
+          "projection_fits_current_snapshot": true
+        },
+        {
+          "requested_model": "glm-5.2",
+          "usage_value_projection": "0.049870800",
+          "windows": {
+            "five_hour": {
+              "usage": "0.0008",
+              "quota": "12.00",
+              "remaining": "11.9992",
+              "projected_remaining_after_matrix": "11.949329200"
+            },
+            "weekly": {
+              "usage": "0.0017",
+              "quota": "30.00",
+              "remaining": "29.9983",
+              "projected_remaining_after_matrix": "29.948429200"
+            },
+            "monthly": {
+              "usage": "0.0017",
+              "quota": "60.00",
+              "remaining": "59.9983",
+              "projected_remaining_after_matrix": "59.948429200"
+            }
+          },
+          "projection_fits_current_snapshot": true
+        }
+      ]
+    },
+    "prelaunch_requirement": "Reconfirm quota availability and reset state immediately before Matrix execution because dashboard reset observations are time-sensitive."
+  },
+  "gpt_relay": {
+    "source_type": "OPERATOR_PROVIDED_USAGE_EXPORT",
+    "operator_provided_csv_sha256": "sha256:eb4831effff557177acb84931a562efa31c61e66f1edb490846e9027b2e2bb8b",
+    "raw_csv_stored": false,
+    "raw_csv_available_in_task_attachment": false,
+    "hash_and_exact_row_derivation_attested_by_operator": true,
+    "route_provenance": "OPERATOR_TRUSTED_THIRD_PARTY_RELAY",
+    "base_rates_per_million_tokens": {
+      "uncached_input": "5.00",
+      "cache_read_input": "0.50",
+      "output": "30.00"
+    },
+    "observed_rate_multipliers": [
+      "0.02",
+      "0.06"
+    ],
+    "maximum_observed_rate_multiplier": "0.06",
+    "maximum_observed_multiplier_is_contractual_permanent_maximum": false,
+    "observed_billing_formula": "BILLED_COST_EQUALS_ORIGINAL_COST_TIMES_ROW_RATE_MULTIPLIER",
+    "canary_rows": [
+      {
+        "cell_id": "model-gpt56-relay-responses",
+        "logical_runs": 1,
+        "provider_requests": 1,
+        "uncached_input_tokens": 346,
+        "cache_read_tokens": 0,
+        "output_tokens": 278,
+        "original_cost": "0.01007000",
+        "actual_billed_cost": "0.00060420",
+        "aggregate_input_tokens": 346,
+        "harnesslab_input_reconciled": true
+      },
+      {
+        "cell_id": "harness-codex-gpt56-medium",
+        "logical_runs": 1,
+        "provider_requests": 6,
+        "uncached_input_tokens": 39304,
+        "cache_read_tokens": 106574,
+        "output_tokens": 2398,
+        "original_cost": "0.32174700",
+        "actual_billed_cost": "0.00875674",
+        "aggregate_input_tokens": 145878,
+        "harnesslab_input_reconciled": true
+      },
+      {
+        "cell_id": "harness-codex-gpt56-high",
+        "logical_runs": 1,
+        "provider_requests": 6,
+        "uncached_input_tokens": 31978,
+        "cache_read_tokens": 49664,
+        "output_tokens": 1440,
+        "original_cost": "0.22792200",
+        "actual_billed_cost": "0.01367532",
+        "aggregate_input_tokens": 81642,
+        "harnesslab_input_reconciled": true
+      }
+    ],
+    "matrix_projection": {
+      "runs_per_cell": 90,
+      "direct_empirical_billed": "0.05437800",
+      "codex_medium_empirical_billed": "0.78810660",
+      "codex_high_empirical_billed": "1.23077880",
+      "empirical_270_run_cost": "2.07326340",
+      "observed_max_multiplier_projection": "3.02259060",
+      "observed_max_multiplier_projection_is_hard_monetary_ceiling": false
+    }
+  },
+  "combined_projection": {
+    "deepseek_empirical_off_peak": "0.18994140",
+    "deepseek_empirical_peak": "0.37988280",
+    "expected_total_marginal_cash_low": "2.26320480",
+    "expected_total_marginal_cash_high": "2.45314620",
+    "gpt_observed_max_multiplier_projection": "3.02259060",
+    "deepseek_conservative_peak": "1.01356200",
+    "planning_conservative_total": "4.03615260",
+    "planning_conservative_total_is_hard_monetary_ceiling": false,
+    "opencode_additional_marginal_cash": "0.00",
+    "opencode_zero_cash_basis": "ACTIVE_INCLUDED_GO_QUOTA_WITH_ZERO_ZEN_BALANCE_AND_CURRENT_PROJECTED_QUOTA_FIT"
+  },
+  "spend_guard_recommendation": {
+    "soft_spend_warning_usd": "5.00",
+    "proposed_hard_operator_spend_ceiling_usd": "10.00",
+    "spend_authorization_status": "AWAITING_EXPLICIT_OPERATOR_APPROVAL",
+    "recommendation_is_authorization": false,
+    "open_code_quota_is_separate_operational_guard": true
+  },
+  "execution_state": {
+    "provider_calls": 0,
+    "harness_calls": 0,
+    "judge_calls": 0,
+    "full_matrix_executed": false,
+    "k_b3_started": false,
+    "main_promoted_by_this_continuation": false
+  }
+}

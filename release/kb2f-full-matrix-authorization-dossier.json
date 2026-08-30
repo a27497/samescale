@@ -2,7 +2,7 @@
   "schema_version": 1,
   "dossier_id": "kb2f-full-matrix-pricing-and-spend-authorization",
   "k_phase": "K-B2F_PRICING_AND_SPEND_AUTHORIZATION",
-  "authorization_result": "OPERATOR_PRICING_INPUT_REQUIRED",
+  "authorization_result": "READY_FOR_OPERATOR_SPEND_APPROVAL",
   "technical_readiness": "PASS",
   "k_b3_status": "NOT_STARTED",
   "promotion": {
@@ -28,9 +28,12 @@
   },
   "frozen_inputs": {
     "pricing_snapshot_reference": "release/core-real-matrix-v5-pricing-snapshot.json",
-    "pricing_snapshot_sha256": "sha256:b4b9c1912d268b993b113bfb83a883a1f0969de2d26f30ad99a8ff63cca3be65",
+    "pricing_snapshot_sha256": "sha256:5d996deef0b3714d164f9cdc1574a00c974faac0da022269e40ac6834c84de89",
+    "operator_input_closure_reference": "release/kb2f-operator-input-closure.json",
+    "operator_input_closure_sha256": "sha256:e7d2d3f89e1a7377fecab5c73ad1dcf8a212f28e07bd154948c8cd328e0116ab",
     "operator_input_template_reference": "release/operator-pricing-input-template.json",
-    "operator_input_template_sha256": "sha256:e7cec778e84a1b537ef6e8eb54286894aad48a89649a6176e4d7ccb35e26305d"
+    "operator_input_template_sha256": "sha256:e7cec778e84a1b537ef6e8eb54286894aad48a89649a6176e4d7ccb35e26305d",
+    "operator_input_template_status": "SATISFIED_BY_OPERATOR_INPUT_CLOSURE"
   },
   "provider_status": {
     "deepseek_official": {
@@ -39,40 +42,63 @@
       "remaining_operator_input": false
     },
     "opencode_go": {
-      "accounting_status": "ACCOUNT_PLAN_NOT_VERIFIABLE_KEYLESSLY",
-      "account_plan": "UNKNOWN_PENDING_OPERATOR_CONFIRMATION",
-      "operator_confirmation_required": "OPENCODE_ACCOUNT_PLAN_CONFIRMATION_REQUIRED",
+      "accounting_status": "ACTIVE_GO_SUBSCRIPTION_CONFIRMED",
+      "account_plan": "OPENCODE_GO",
+      "subscription_status": "ACTIVE_SUBSCRIPTION_CONFIRMED_BY_OPERATOR",
+      "operator_confirmation_required": "NONE",
       "public_subscription_contract_frozen": true,
-      "remaining_quota_verified": false,
-      "use_balance_state_verified": false
+      "current_quota_snapshot_attested": true,
+      "zen_balance": "0.00",
+      "marginal_cash_overage_capacity": "NONE_CONFIRMED",
+      "quota_exhaustion_policy": "FAIL_CLOSED_NO_PROVIDER_SUBSTITUTION"
     },
     "gpt_relay": {
-      "pricing_status": "GPT_RELAY_RATE_CARD_REQUIRED",
-      "operator_input_required": "GPT_RELAY_RATE_CARD_REQUIRED",
-      "public_openai_pricing_substituted": false
+      "pricing_status": "OPERATOR_USAGE_DERIVED_PRICING_FROZEN",
+      "operator_input_required": "NONE",
+      "public_openai_pricing_substituted": false,
+      "operator_provided_csv_sha256": "sha256:eb4831effff557177acb84931a562efa31c61e66f1edb490846e9027b2e2bb8b",
+      "base_uncached_input_rate_per_million": "5.00",
+      "base_cache_read_rate_per_million": "0.50",
+      "base_output_rate_per_million": "30.00",
+      "observed_rate_multipliers": [
+        "0.02",
+        "0.06"
+      ],
+      "maximum_observed_rate_multiplier": "0.06",
+      "maximum_observed_multiplier_is_contractual_maximum": false
     }
   },
   "cost_estimate": {
-    "classification": "PARTIAL_KNOWN_COMPONENTS_WITH_ACTIVE_UNKNOWN_CONTRIBUTIONS",
-    "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
-    "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
-    "estimated_total_cost": "UNKNOWN_NOT_ZERO",
-    "estimated_cost_range": "KNOWN_DEEPSEEK_EMPIRICAL_COMPONENT_USD_0.189941400_TO_0.379882800_PLUS_UNKNOWN_NOT_ZERO",
+    "classification": "OPERATOR_INPUTS_COMPLETE_EMPIRICAL_AND_PLANNING_CONSERVATIVE_PROJECTIONS",
+    "estimated_630_subject_marginal_cash_range": {
+      "low": "2.263204800",
+      "high": "2.453146200"
+    },
+    "estimated_63_judge_marginal_cash": "0.000000000",
+    "estimated_total_marginal_cash_range": {
+      "low": "2.263204800",
+      "high": "2.453146200"
+    },
+    "gpt_relay_empirical_270_run_cost": "2.073263400",
+    "gpt_relay_observed_max_multiplier_270_run_cost": "3.022590600",
     "deepseek_empirical_off_peak": "0.189941400",
     "deepseek_empirical_peak": "0.379882800",
     "deepseek_conservative_off_peak": "0.506781000",
     "deepseek_conservative_peak": "1.013562000",
     "opencode_partial_observed_token_usage_value": "1.920250800",
     "opencode_value_is_cash_spend": false,
-    "subscription_fixed_fee_if_active": "10.00_PER_MONTH",
-    "subscription_fixed_fee_allocated_to_matrix": "UNKNOWN_PENDING_ACCOUNT_AND_ALLOCATION_CONFIRMATION",
-    "subscription_marginal_cash_spend": "UNKNOWN_PENDING_QUOTA_BALANCE_AND_OVERAGE_CONFIRMATION",
+    "subscription_fixed_fee": "10.00_PER_MONTH_EXISTING_SUBSCRIPTION",
+    "subscription_fixed_fee_allocated_to_matrix": "NOT_ALLOCATED_EXISTING_RECURRING_COST",
+    "subscription_marginal_cash_spend": "0.000000000_CURRENT_QUOTA_SNAPSHOT",
     "subscription_cost_dimensions": {
-      "ECONOMIC_ALLOCATED_COST": "UNKNOWN_PENDING_ACCOUNT_AND_ALLOCATION_CONFIRMATION",
-      "MARGINAL_CASH_SPEND": "UNKNOWN_PENDING_QUOTA_BALANCE_AND_OVERAGE_CONFIRMATION"
+      "ECONOMIC_ALLOCATED_COST": "EXISTING_10_USD_MONTHLY_SUBSCRIPTION_NOT_ALLOCATED_TO_MATRIX",
+      "MARGINAL_CASH_SPEND": "0.000000000_CURRENT_QUOTA_SNAPSHOT"
     },
-    "recommended_max_spend_ceiling": null,
-    "recommended_max_spend_ceiling_status": "NOT_RECOMMENDABLE_UNTIL_OPERATOR_INPUTS_ARE_BOUND"
+    "planning_conservative_total": "4.036152600",
+    "planning_conservative_is_hard_monetary_ceiling": false,
+    "soft_spend_warning_usd": "5.00",
+    "proposed_hard_operator_spend_ceiling_usd": "10.00",
+    "spend_authorization_status": "AWAITING_EXPLICIT_OPERATOR_APPROVAL"
   },
   "projection_integrity": {
     "empirical_projection_distinguished_from_hard_resource_ceiling": true,
@@ -92,24 +118,17 @@
     "total_output_token_ceiling": 1276128,
     "sequential_wall_clock_ceiling_seconds": 119070,
     "aggregate_input_token_ceiling": null,
-    "complete_monetary_ceiling": "UNKNOWN_NOT_ZERO"
+    "complete_monetary_ceiling": "NOT_AVAILABLE_PLANNING_CONSERVATIVE_ONLY"
   },
-  "authorization_blockers": [
+  "operator_pricing_inputs_remaining": [],
+  "spend_authorization_prerequisites": [
     {
-      "reason_code": "GPT_RELAY_RATE_CARD_REQUIRED",
-      "operator_fact_required": "A non-secret rate card, invoice, or contract bound to the GPT_RELAY route alias and credential reference, including input, cached-input, output, reasoning, request/platform fee, and effective-date fields."
+      "reason_code": "EXPLICIT_OPERATOR_SPEND_APPROVAL_REQUIRED",
+      "requirement": "Approve or reject the proposed USD 10.00 hard operator spend ceiling and USD 5.00 soft warning."
     },
     {
-      "reason_code": "OPENCODE_ACCOUNT_PLAN_CONFIRMATION_REQUIRED",
-      "operator_fact_required": "A sanitized console export or signed attestation binding the credential fingerprint to an active OpenCode Go monthly subscription and current billing period."
-    },
-    {
-      "reason_code": "OPENCODE_QUOTA_AND_OVERAGE_STATE_REQUIRED",
-      "operator_fact_required": "Current remaining/reset values for the 5-hour, weekly, and monthly windows plus Use balance state and Zen balance metadata when enabled."
-    },
-    {
-      "reason_code": "FULL_MATRIX_SPEND_AUTHORIZATION_REQUIRED",
-      "operator_fact_required": "Explicit spend approval against a complete bounded estimate after the pricing/account inputs above are frozen."
+      "reason_code": "OPENCODE_QUOTA_SNAPSHOT_REFRESH_REQUIRED_AT_LAUNCH",
+      "requirement": "Refresh the time-sensitive Go quota/reset dashboard immediately before launch; fail closed if the projected campaign no longer fits."
     }
   ],
   "matrix_state": {
