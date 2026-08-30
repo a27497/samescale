@@ -38,7 +38,7 @@
   "dossier_id": "phase-k-b3-full-matrix-authorization-v1",
   "historical_audit": {
     "path": "release/kb3-evidence-reentry-audit.json",
-    "sha256": "sha256:c25cfcbabb56f43e4cb3d23ecfabe638c5afdb3543c34871320a71b52a829c20"
+    "sha256": "sha256:ef7534ba6f1f6353088720dd991588a4dc6e25fe5d37fe35f13c8bc664e2c3a8"
   },
   "lane": "A",
   "real_call_accounting": {

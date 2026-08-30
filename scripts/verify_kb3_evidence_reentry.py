@@ -9,7 +9,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT_PATH = ROOT / "release/kb3-evidence-reentry-audit.json"
 DOSSIER_PATH = ROOT / "release/kb3-full-matrix-authorization-dossier.json"
-AUDIT_SHA256 = "c25cfcbabb56f43e4cb3d23ecfabe638c5afdb3543c34871320a71b52a829c20"
+AUDIT_SHA256 = "ef7534ba6f1f6353088720dd991588a4dc6e25fe5d37fe35f13c8bc664e2c3a8"
 
 
 def _load(path: Path) -> dict[str, Any]:

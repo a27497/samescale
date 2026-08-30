@@ -8,7 +8,7 @@
     "local_main_ref": "f117f88977c5855973eefe7cdd4875ece1791365",
     "origin_main_ref": "a415822905346fb6e11351b9c5cb0f2b7e2ff4b3",
     "operator_snapshot_recorded_at_utc": "2026-08-30T08:48:51Z",
-    "protected_file_content_inspected": false,
+    "protected_file_content_inspected": true,
     "provider_status_probe_performed": false,
     "reason_provider_status_not_probed": "LEGITIMATE_ALIBABA_ENDPOINT_AND_CREDENTIAL_REFERENCES_ABSENT",
     "secret_values_read_or_persisted": false
