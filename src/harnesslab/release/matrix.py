@@ -40,6 +40,7 @@ from harnesslab.harness_lane.runner import CodexHarnessRunner
 from harnesslab.model_lane.models import DirectModelRunResult, ProviderAdapter
 from harnesslab.model_lane.providers import (
     AnthropicMessagesAdapter,
+    CampaignHTTPClientPool,
     OpenAICompatibleChatAdapter,
     OpenAIResponsesAdapter,
 )
@@ -474,6 +475,7 @@ def production_matrix_bindings(
     *,
     artifact_root: Path,
     runtime_root: Path,
+    http_pool: CampaignHTTPClientPool | None = None,
 ) -> dict[str, ExperimentLaneBinding]:
     control.smoke.validate_real_environment(environment)
     profiles = control._profiles(runtime)
@@ -490,7 +492,20 @@ def production_matrix_bindings(
                 "messages": AnthropicMessagesAdapter,
                 "chat_completions": OpenAICompatibleChatAdapter,
             }
-            direct_adapter = adapters[profile.protocol.value](environment=environment)
+            client = None
+            if http_pool is not None:
+                if profile.credential_reference is None:
+                    raise MatrixControlPlaneError(
+                        "Direct Matrix profile lacks a credential reference"
+                    )
+                client = http_pool.client_for(
+                    profile.provider_route_identity,
+                    profile.credential_reference,
+                )
+            direct_adapter = adapters[profile.protocol.value](
+                client=client,
+                environment=environment,
+            )
             bindings[frozen.cell_id] = _DirectProductionBinding(
                 profile=profile,
                 provider=direct_adapter,
@@ -598,30 +613,32 @@ async def execute_real_matrix(
         raise MatrixControlPlaneError("subset selection is defined only for v3")
     else:
         selected_slot_ids = tuple(slot.slot_id for slot in plan.run_slots)
-    bindings = production_matrix_bindings(
-        control,
-        runtime,
-        selected_environment,
-        artifact_root=artifact_root,
-        runtime_root=runtime_root,
-    )
     engine = create_engine(Settings())
     factory = create_session_factory(engine)
     try:
-        async with factory() as session, session.begin():
-            enqueued = await enqueue_plan(session, plan)
-        worker = ExperimentRunExecutor(
-            repository_root=control.repository_root,
-            session_factory=factory,
-            bindings=bindings,
-            owner="harnesslab-phase-k-matrix",
-        )
-        executed = await worker.run_bounded(
-            plan.experiment_id,
-            max_runs=max_runs,
-            concurrency=concurrency,
-            slot_ids=selected_slot_ids,
-        )
+        async with CampaignHTTPClientPool(max_connections_per_route=2) as http_pool:
+            bindings = production_matrix_bindings(
+                control,
+                runtime,
+                selected_environment,
+                artifact_root=artifact_root,
+                runtime_root=runtime_root,
+                http_pool=http_pool,
+            )
+            async with factory() as session, session.begin():
+                enqueued = await enqueue_plan(session, plan)
+            worker = ExperimentRunExecutor(
+                repository_root=control.repository_root,
+                session_factory=factory,
+                bindings=bindings,
+                owner="harnesslab-phase-k-matrix",
+            )
+            executed = await worker.run_bounded(
+                plan.experiment_id,
+                max_runs=max_runs,
+                concurrency=concurrency,
+                slot_ids=selected_slot_ids,
+            )
         terminal_statuses = {"completed", "failed_infra", "failed_subject", "cancelled"}
         async with factory() as session:
             persisted: list[ExperimentRunRecord | None] = []
@@ -669,30 +686,32 @@ async def execute_real_matrix_canary(
     selection_digest, selected_slot_ids = control.select_slots(runtime, "canary")
     if selection_digest != plan.digest:
         raise MatrixControlPlaneError("Matrix canary selection plan identity drifted")
-    bindings = production_matrix_bindings(
-        control,
-        runtime,
-        selected_environment,
-        artifact_root=artifact_root,
-        runtime_root=runtime_root,
-    )
     engine = create_engine(Settings())
     factory = create_session_factory(engine)
     try:
-        async with factory() as session, session.begin():
-            enqueued = await enqueue_plan(session, plan)
-        worker = ExperimentRunExecutor(
-            repository_root=control.repository_root,
-            session_factory=factory,
-            bindings=bindings,
-            owner="harnesslab-phase-k-matrix-canary",
-        )
-        executed = await worker.run_bounded(
-            plan.experiment_id,
-            max_runs=MATRIX_CELL_COUNT,
-            concurrency=concurrency,
-            slot_ids=selected_slot_ids,
-        )
+        async with CampaignHTTPClientPool(max_connections_per_route=2) as http_pool:
+            bindings = production_matrix_bindings(
+                control,
+                runtime,
+                selected_environment,
+                artifact_root=artifact_root,
+                runtime_root=runtime_root,
+                http_pool=http_pool,
+            )
+            async with factory() as session, session.begin():
+                enqueued = await enqueue_plan(session, plan)
+            worker = ExperimentRunExecutor(
+                repository_root=control.repository_root,
+                session_factory=factory,
+                bindings=bindings,
+                owner="harnesslab-phase-k-matrix-canary",
+            )
+            executed = await worker.run_bounded(
+                plan.experiment_id,
+                max_runs=MATRIX_CELL_COUNT,
+                concurrency=concurrency,
+                slot_ids=selected_slot_ids,
+            )
         safe_results = tuple(
             MatrixCanaryRunResult(
                 cell_id=item.cell_id,

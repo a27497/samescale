@@ -4,6 +4,7 @@ import json
 import os
 import time
 from collections.abc import Mapping
+from contextlib import AbstractAsyncContextManager
 from typing import Any
 
 import httpx
@@ -28,6 +29,55 @@ from harnesslab.model_lane.models import (
 
 MAX_PROVIDER_RESPONSE_BYTES = 2_000_000
 MAX_PROVIDER_TRANSPORT_TRACE_EVENTS = 16
+
+
+class CampaignHTTPClientPool(AbstractAsyncContextManager["CampaignHTTPClientPool"]):
+    """Campaign-owned clients isolated by exact route and credential reference."""
+
+    def __init__(self, *, max_connections_per_route: int = 2) -> None:
+        if not 1 <= max_connections_per_route <= 8:
+            raise ValueError("max connections per route must be between 1 and 8")
+        self.max_connections_per_route = max_connections_per_route
+        self._clients: dict[tuple[str, str], httpx.AsyncClient] = {}
+        self._closed = False
+
+    def client_for(self, route_identity: str, credential_reference: str) -> httpx.AsyncClient:
+        if self._closed:
+            raise RuntimeError("campaign HTTP pool is closed")
+        if not route_identity or not credential_reference:
+            raise ValueError("route and credential references must be non-empty")
+        key = (route_identity, credential_reference)
+        client = self._clients.get(key)
+        if client is None:
+            limits = httpx.Limits(
+                max_connections=self.max_connections_per_route,
+                max_keepalive_connections=self.max_connections_per_route,
+            )
+            client = httpx.AsyncClient(
+                follow_redirects=False,
+                limits=limits,
+                timeout=None,
+                trust_env=False,
+            )
+            self._clients[key] = client
+        return client
+
+    @property
+    def route_count(self) -> int:
+        return len(self._clients)
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: object,
+    ) -> None:
+        self._closed = True
+        clients = tuple(self._clients.values())
+        self._clients.clear()
+        for client in clients:
+            await client.aclose()
+
 
 _TRANSPORT_EVENT_PHASES = {
     "connection.connect_tcp": ProviderTransportPhase.CONNECT_TCP,
