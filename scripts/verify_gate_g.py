@@ -71,6 +71,10 @@ CRITICAL_TESTS = {
     "test_phase_g_cli_surface_and_canonical_plan_output",
     "test_phase_g_nested_cli_help",
 }
+SECRET_PATTERNS = (
+    re.compile(rb"(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]{20,}"),
+    re.compile(rb"(?<![A-Za-z0-9])gh[opsu]_[A-Za-z0-9]{20,}"),
+)
 
 
 def run(check: Check) -> bool:
@@ -237,16 +241,12 @@ def verify_repository_identity_and_secrets() -> bool:
         check=False,
         capture_output=True,
     )
-    patterns = (
-        re.compile(rb"sk-[A-Za-z0-9_-]{20,}"),
-        re.compile(rb"gh[opsu]_[A-Za-z0-9]{20,}"),
-    )
     matches: list[str] = []
     for raw in listed.stdout.split(b"\0"):
         if not raw:
             continue
         path = ROOT / os.fsdecode(raw)
-        if path.is_file() and any(pattern.search(path.read_bytes()) for pattern in patterns):
+        if path.is_file() and any(pattern.search(path.read_bytes()) for pattern in SECRET_PATTERNS):
             matches.append(os.fsdecode(raw))
     if listed.returncode != 0 or matches:
         print(f"FAIL: repository enumeration/secret hygiene failed: {matches}")

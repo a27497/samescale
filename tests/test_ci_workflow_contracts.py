@@ -25,6 +25,7 @@ def _load_verifier(name: str) -> Any:
 
 verify_gate_c = _load_verifier("verify_gate_c")
 verify_gate_d = _load_verifier("verify_gate_d")
+verify_gate_g = _load_verifier("verify_gate_g")
 
 
 def _workflow(path: Path) -> dict[str, Any]:
@@ -74,6 +75,16 @@ def test_leaf_mode_requires_explicit_github_actions_context(monkeypatch: Any) ->
         monkeypatch.setenv("GITHUB_ACTIONS", "true")
         monkeypatch.setenv(module.CI_LEAF_MODE_ENV, "1")
         assert module.ci_leaf_mode_authorized()
+
+
+def test_gate_g_secret_scan_requires_a_token_boundary() -> None:
+    false_positive = b"task-package-frozen-workspace-v1"
+    provider_credential = b'credential="sk-' + (b"a" * 24) + b'"'
+    github_credential = b'token="ghp_' + (b"b" * 24) + b'"'
+
+    assert not any(pattern.search(false_positive) for pattern in verify_gate_g.SECRET_PATTERNS)
+    assert any(pattern.search(provider_credential) for pattern in verify_gate_g.SECRET_PATTERNS)
+    assert any(pattern.search(github_credential) for pattern in verify_gate_g.SECRET_PATTERNS)
 
 
 def test_fast_and_full_workflow_triggers_and_concurrency_are_bounded() -> None:
