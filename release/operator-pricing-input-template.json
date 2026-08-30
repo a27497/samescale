@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "template_id": "kb2f-operator-pricing-and-account-confirmation",
+  "status": "OPERATOR_INPUT_REQUIRED",
+  "contains_secrets": false,
+  "gpt_relay_rate_card": {
+    "status": "GPT_RELAY_RATE_CARD_REQUIRED",
+    "safe_binding": {
+      "route_alias": "GPT_RELAY",
+      "credential_reference": "HARNESSLAB_GPT56_RELAY_API_KEY",
+      "requested_models": [
+        "gpt-5.6-sol"
+      ],
+      "private_endpoint_value_required": false,
+      "credential_value_required": false
+    },
+    "currency": null,
+    "effective_from": null,
+    "effective_to": null,
+    "input_usd_per_million_tokens": null,
+    "cached_input_usd_per_million_tokens": null,
+    "output_usd_per_million_tokens": null,
+    "reasoning_token_billing_rule": null,
+    "reasoning_token_billing_rule_allowed_values": [
+      "BILLED_AS_INPUT",
+      "BILLED_AS_OUTPUT",
+      "SEPARATE_RATE",
+      "INCLUDED",
+      "NOT_BILLED",
+      "UNKNOWN"
+    ],
+    "reasoning_usd_per_million_tokens": null,
+    "request_usd": null,
+    "platform_fee_usd": null,
+    "platform_fee_period": null,
+    "minimum_commitment_or_volume_tier_rule": null,
+    "evidence": {
+      "kind": null,
+      "kind_allowed_values": [
+        "RATE_CARD",
+        "INVOICE",
+        "CONTRACT"
+      ],
+      "issuer": null,
+      "document_id": null,
+      "effective_date": null,
+      "logical_or_repository_relative_reference": null,
+      "sha256": null
+    },
+    "operator_attestation": {
+      "applies_to_route_alias": "GPT_RELAY",
+      "applies_to_credential_reference": "HARNESSLAB_GPT56_RELAY_API_KEY",
+      "confirmed_at": null,
+      "confirmed_by_pseudonymous_id": null
+    }
+  },
+  "opencode_go_account_confirmation": {
+    "status": "OPENCODE_ACCOUNT_PLAN_CONFIRMATION_REQUIRED",
+    "provider": "OPENCODE_GO",
+    "workspace_or_account_pseudonymous_id": null,
+    "subscription_product": null,
+    "subscription_status": null,
+    "billing_interval": null,
+    "current_period_start": null,
+    "current_period_end_or_renewal_at": null,
+    "currency": null,
+    "recurring_fee": null,
+    "api_key_nonsecret_identifier_or_fingerprint": null,
+    "use_balance_enabled": null,
+    "subscription_already_paid_for_execution_period": null,
+    "five_hour_remaining_usage_value": null,
+    "five_hour_reset_at": null,
+    "weekly_remaining_usage_value": null,
+    "weekly_reset_at": null,
+    "monthly_remaining_usage_value": null,
+    "monthly_reset_at": null,
+    "zen_balance_amount": null,
+    "zen_balance_currency": null,
+    "confirmation_timestamp": null,
+    "confirmation_source": null,
+    "confirmation_evidence_reference": null,
+    "confirmation_evidence_sha256": null,
+    "credential_value_required": false
+  }
+}

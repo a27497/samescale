@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "dossier_id": "kb2f-full-matrix-pricing-and-spend-authorization",
+  "k_phase": "K-B2F_PRICING_AND_SPEND_AUTHORIZATION",
+  "authorization_result": "OPERATOR_PRICING_INPUT_REQUIRED",
+  "technical_readiness": "PASS",
+  "k_b3_status": "NOT_STARTED",
+  "promotion": {
+    "result": "PASS",
+    "old_main_sha": "ae495944d16ef1f6ea8c4afa63aa3bdc14fff006",
+    "new_main_sha": "2a1a10ceae4db5b8c637103b8255f51267692d01",
+    "fast_forward_only": true,
+    "merge_commit_created": false,
+    "squash_performed": false,
+    "rebase_performed": false,
+    "force_push_used": false,
+    "promotion_commit_created": false,
+    "certifying_fast_ci_run": 33317647533,
+    "certifying_full_release_ci_run": 33317736986,
+    "main_fast_ci_run": 33319362414,
+    "main_fast_ci_result": "SUCCESS",
+    "full_release_rerun": false
+  },
+  "pricing_branch": {
+    "name": "codex/kb2f-pricing-authorization",
+    "base_sha": "2a1a10ceae4db5b8c637103b8255f51267692d01",
+    "promote_in_this_phase": false
+  },
+  "frozen_inputs": {
+    "pricing_snapshot_reference": "release/core-real-matrix-v5-pricing-snapshot.json",
+    "pricing_snapshot_sha256": "sha256:b4b9c1912d268b993b113bfb83a883a1f0969de2d26f30ad99a8ff63cca3be65",
+    "operator_input_template_reference": "release/operator-pricing-input-template.json",
+    "operator_input_template_sha256": "sha256:e7cec778e84a1b537ef6e8eb54286894aad48a89649a6176e4d7ccb35e26305d"
+  },
+  "provider_status": {
+    "deepseek_official": {
+      "pricing_status": "OFFICIAL_CURRENT_PRICING_FROZEN",
+      "rate_snapshot": "CURRENT_2026_08_16_PEAK_AND_OFF_PEAK",
+      "remaining_operator_input": false
+    },
+    "opencode_go": {
+      "accounting_status": "ACCOUNT_PLAN_NOT_VERIFIABLE_KEYLESSLY",
+      "account_plan": "UNKNOWN_PENDING_OPERATOR_CONFIRMATION",
+      "operator_confirmation_required": "OPENCODE_ACCOUNT_PLAN_CONFIRMATION_REQUIRED",
+      "public_subscription_contract_frozen": true,
+      "remaining_quota_verified": false,
+      "use_balance_state_verified": false
+    },
+    "gpt_relay": {
+      "pricing_status": "GPT_RELAY_RATE_CARD_REQUIRED",
+      "operator_input_required": "GPT_RELAY_RATE_CARD_REQUIRED",
+      "public_openai_pricing_substituted": false
+    }
+  },
+  "cost_estimate": {
+    "classification": "PARTIAL_KNOWN_COMPONENTS_WITH_ACTIVE_UNKNOWN_CONTRIBUTIONS",
+    "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
+    "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
+    "estimated_total_cost": "UNKNOWN_NOT_ZERO",
+    "estimated_cost_range": "KNOWN_DEEPSEEK_EMPIRICAL_COMPONENT_USD_0.189941400_TO_0.379882800_PLUS_UNKNOWN_NOT_ZERO",
+    "deepseek_empirical_off_peak": "0.189941400",
+    "deepseek_empirical_peak": "0.379882800",
+    "deepseek_conservative_off_peak": "0.506781000",
+    "deepseek_conservative_peak": "1.013562000",
+    "opencode_partial_observed_token_usage_value": "1.920250800",
+    "opencode_value_is_cash_spend": false,
+    "subscription_fixed_fee_if_active": "10.00_PER_MONTH",
+    "subscription_fixed_fee_allocated_to_matrix": "UNKNOWN_PENDING_ACCOUNT_AND_ALLOCATION_CONFIRMATION",
+    "subscription_marginal_cash_spend": "UNKNOWN_PENDING_QUOTA_BALANCE_AND_OVERAGE_CONFIRMATION",
+    "subscription_cost_dimensions": {
+      "ECONOMIC_ALLOCATED_COST": "UNKNOWN_PENDING_ACCOUNT_AND_ALLOCATION_CONFIRMATION",
+      "MARGINAL_CASH_SPEND": "UNKNOWN_PENDING_QUOTA_BALANCE_AND_OVERAGE_CONFIRMATION"
+    },
+    "recommended_max_spend_ceiling": null,
+    "recommended_max_spend_ceiling_status": "NOT_RECOMMENDABLE_UNTIL_OPERATOR_INPUTS_ARE_BOUND"
+  },
+  "projection_integrity": {
+    "empirical_projection_distinguished_from_hard_resource_ceiling": true,
+    "single_canary_precision_fabricated": false,
+    "included_subscription_quota_treated_as_free": false,
+    "economic_allocated_cost_separate_from_marginal_cash_spend": true,
+    "unknown_contribution_treated_as_zero": false,
+    "off_peak_universally_assumed": false
+  },
+  "hard_resource_ceiling": {
+    "subject_runs": 630,
+    "judge_calls": 63,
+    "provider_request_ceiling": 4743,
+    "harness_turn_ceiling": 4320,
+    "subject_output_token_ceiling": 1260000,
+    "judge_output_token_ceiling": 16128,
+    "total_output_token_ceiling": 1276128,
+    "sequential_wall_clock_ceiling_seconds": 119070,
+    "aggregate_input_token_ceiling": null,
+    "complete_monetary_ceiling": "UNKNOWN_NOT_ZERO"
+  },
+  "authorization_blockers": [
+    {
+      "reason_code": "GPT_RELAY_RATE_CARD_REQUIRED",
+      "operator_fact_required": "A non-secret rate card, invoice, or contract bound to the GPT_RELAY route alias and credential reference, including input, cached-input, output, reasoning, request/platform fee, and effective-date fields."
+    },
+    {
+      "reason_code": "OPENCODE_ACCOUNT_PLAN_CONFIRMATION_REQUIRED",
+      "operator_fact_required": "A sanitized console export or signed attestation binding the credential fingerprint to an active OpenCode Go monthly subscription and current billing period."
+    },
+    {
+      "reason_code": "OPENCODE_QUOTA_AND_OVERAGE_STATE_REQUIRED",
+      "operator_fact_required": "Current remaining/reset values for the 5-hour, weekly, and monthly windows plus Use balance state and Zen balance metadata when enabled."
+    },
+    {
+      "reason_code": "FULL_MATRIX_SPEND_AUTHORIZATION_REQUIRED",
+      "operator_fact_required": "Explicit spend approval against a complete bounded estimate after the pricing/account inputs above are frozen."
+    }
+  ],
+  "matrix_state": {
+    "scientific_design_changed": false,
+    "cells_changed": false,
+    "canary_rerun": false,
+    "subject_provider_calls": 0,
+    "harness_calls": 0,
+    "judge_calls": 0,
+    "full_matrix_executed": false,
+    "k_b3_started": false
+  },
+  "implementation_scope": {
+    "release_and_test_artifacts_only": true,
+    "phase_m_production_code_changed": false,
+    "full_release_required": false
+  },
+  "immutable_scientific_evidence": {
+    "release/core-real-evidence-plan-v5.json": "sha256:7301b257656dcd2e32cb8384032744a58bd60cbbe4dd26f782c9c5c521e82763",
+    "release/core-real-smoke-plan-v5.json": "sha256:963b5fc4b5dccd28a1e591cb051e05c7665a54940dab31da5dc1ea23e27e22f1",
+    "release/kb2r-r2-closure-dossier.json": "sha256:3c8dec57bf9d5089cec6fe7c471cfa770d116ab64867c3c15816edebd53f3aeb",
+    "release/kb2r-r2-canary-policy.json": "sha256:a9a8db209404ec954396c55b15bd7a3e1462fa7ed96dd857fcbcb51bb9c52ae9",
+    "release/kb2r-r2-core-qualification.json": "sha256:bf68bdb17115ddff155dea0c711755cc2172b38c862c64694c05a837dcc75252",
+    "release/kb2r-r2-readiness-equivalence.json": "sha256:b75fd7af26a05252f9e9f8cd7dc6ebe8b30d54218857f602b7329ed2ad1ff54f",
+    "release/kb2r-r1-continuation-policy.json": "sha256:3239df4b635f9f96b55e390a59ddb9a6d4975d3a267de23eb7081904a0e1ea92"
+  }
+}

@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "core-real-matrix-v5-pricing-2026-08-30",
+  "experiment_id": "core-real-matrix-v5",
+  "promoted_main_sha": "2a1a10ceae4db5b8c637103b8255f51267692d01",
+  "scientific_plan_reference": "release/core-real-evidence-plan-v5.json",
+  "scientific_plan_digest": "sha256:97253765cc91bc98b66bb975dbb5b59b409ca14e6ed7fa7d07f11b0093d4c1cc",
+  "scientific_plan_mutated": false,
+  "snapshot_retrieval_completed_at": "2026-08-30T15:23:47Z",
+  "currency_normalization": {
+    "normalized_currency": "USD",
+    "documentary_caveat": "The official English provider pages display dollar signs but do not spell out the ISO 4217 code in the cited pricing tables."
+  },
+  "deepseek_official": {
+    "pricing_status": "OFFICIAL_CURRENT_PRICING_FROZEN",
+    "accounting_model": "PAY_AS_YOU_GO",
+    "effective_from": "2026-08-16T16:00:00Z",
+    "retrieved_at": "2026-08-30T15:20:47Z",
+    "price_unit": "USD_PER_MILLION_TOKENS",
+    "peak_schedule": {
+      "timezone": "UTC",
+      "weekdays": [
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY"
+      ],
+      "intervals": [
+        "01:00-04:00",
+        "06:00-10:00"
+      ],
+      "off_peak_definition": "All other hours, including weekends"
+    },
+    "models": [
+      {
+        "requested_model": "deepseek-v4-pro",
+        "resolved_version": "DeepSeek-V4-Pro-0813",
+        "off_peak": {
+          "cache_hit_input": "0.022",
+          "cache_miss_input": "0.66",
+          "output": "1.98"
+        },
+        "peak": {
+          "cache_hit_input": "0.044",
+          "cache_miss_input": "1.32",
+          "output": "3.96"
+        }
+      },
+      {
+        "requested_model": "deepseek-v4-flash",
+        "resolved_version": "DeepSeek-V4-Flash-0731",
+        "off_peak": {
+          "cache_hit_input": "0.007",
+          "cache_miss_input": "0.22",
+          "output": "0.66"
+        },
+        "peak": {
+          "cache_hit_input": "0.014",
+          "cache_miss_input": "0.44",
+          "output": "1.32"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "role": "CURRENT_PRICE_AND_MODEL_IDENTITY",
+        "url": "https://api-docs.deepseek.com/quick_start/pricing/",
+        "retrieved_at": "2026-08-30T15:20:47Z",
+        "response_body_sha256": "sha256:cf2c6fb2dd8a32a538f12a8176175b8809a3516326a5cb30dfe52d63c490a968"
+      },
+      {
+        "role": "PRICE_EFFECTIVE_DATE",
+        "url": "https://api-docs.deepseek.com/news/news260813/",
+        "retrieved_at": "2026-08-30T15:20:47Z",
+        "response_body_sha256": "sha256:214a2359a897756d9e453ced7b99443913651158b55846abce18e9b5743400dd"
+      },
+      {
+        "role": "CHANGELOG_CORROBORATION",
+        "url": "https://api-docs.deepseek.com/updates/",
+        "retrieved_at": "2026-08-30T15:20:47Z",
+        "response_body_sha256": "sha256:9f0e83b23b4e5aaf47b973a222821bb033d0541c8eae67d03a5ab73858d4713a"
+      }
+    ]
+  },
+  "opencode_go_public_contract": {
+    "public_contract_status": "OFFICIAL_CURRENT_CONTRACT_FROZEN",
+    "operator_account_status": "ACCOUNT_PLAN_NOT_VERIFIABLE_KEYLESSLY",
+    "accounting_model_if_operator_confirms_active_go": "SUBSCRIPTION_INCLUDED_QUOTA",
+    "retrieved_at": "2026-08-30T15:21:11Z",
+    "monthly_subscription_fee": "10.00",
+    "general_usage_value_limits": {
+      "five_hour": "12.00",
+      "weekly": "30.00",
+      "monthly": "60.00"
+    },
+    "models": [
+      {
+        "requested_model": "qwen3.8-max",
+        "supported": true,
+        "endpoint_protocol": "MESSAGES",
+        "official_estimated_requests": {
+          "five_hour": 160,
+          "weekly": 400,
+          "monthly": 810
+        },
+        "official_usage_value_rates_per_million_tokens": {
+          "input": "2.00",
+          "output": "6.00",
+          "cached_read": "0.25",
+          "cached_write": "2.50"
+        },
+        "model_specific_monthly_usage_value": "15.00"
+      },
+      {
+        "requested_model": "glm-5.2",
+        "supported": true,
+        "endpoint_protocol": "CHAT_COMPLETIONS",
+        "official_estimated_requests": {
+          "five_hour": 880,
+          "weekly": 2150,
+          "monthly": 4300
+        },
+        "official_usage_value_rates_per_million_tokens": {
+          "input": "1.40",
+          "output": "4.40",
+          "cached_read": "0.26",
+          "cached_write": null
+        },
+        "model_specific_monthly_usage_value": "60.00"
+      }
+    ],
+    "overage_semantics": {
+      "default_after_limit": "REQUESTS_BLOCK_EXCEPT_FREE_MODELS",
+      "zen_balance_fallback_available": true,
+      "zen_balance_fallback_requires_console_use_balance_enabled": true,
+      "operator_use_balance_state": "NOT_VERIFIED",
+      "marginal_overage_rate": "UNKNOWN"
+    },
+    "classification_basis": "A present API-key reference and historical route access do not prove an active Go subscription because official documentation separately supports Go subscriptions and Zen per-request balance accounts.",
+    "operator_confirmation_reference": "release/operator-pricing-input-template.json",
+    "sources": [
+      {
+        "role": "GO_SUBSCRIPTION_LIMITS_MODELS_AND_OVERAGE",
+        "url": "https://opencode.ai/docs/go/",
+        "retrieved_at": "2026-08-30T15:22:02Z",
+        "response_body_sha256": "sha256:37c771caa4cbad52b159caf0473068c686dc370e18fa7db317cde718f6fd62c5"
+      },
+      {
+        "role": "ZEN_PER_REQUEST_ACCOUNTING_DISTINCTION",
+        "url": "https://opencode.ai/docs/zen/",
+        "retrieved_at": "2026-08-30T15:22:02Z",
+        "response_body_sha256": "sha256:e5777d69689ca7f2bd8afaf7d70ade166d694f47de7ff04bdcd9de90a75730f1"
+      },
+      {
+        "role": "SEPARATE_GO_AND_ZEN_CREDENTIAL_FLOWS",
+        "url": "https://opencode.ai/docs/providers/",
+        "retrieved_at": "2026-08-30T15:22:02Z",
+        "response_body_sha256": "sha256:9f4e59d66da76fc570b931e91a2758cce3f709f95893653a4096e2d159d87a4e"
+      }
+    ]
+  },
+  "gpt_relay": {
+    "pricing_status": "GPT_RELAY_RATE_CARD_REQUIRED",
+    "accounting_model": "UNKNOWN",
+    "route_provenance": "OPERATOR_TRUSTED_THIRD_PARTY_RELAY",
+    "public_openai_pricing_substituted": false,
+    "authoritative_local_rate_card_found": false,
+    "operator_input_reference": "release/operator-pricing-input-template.json",
+    "required_fields": [
+      "input_usd_per_million_tokens",
+      "cached_input_usd_per_million_tokens_if_applicable",
+      "output_usd_per_million_tokens",
+      "reasoning_token_billing_rule",
+      "per_request_or_platform_fee_if_any",
+      "rate_card_effective_date"
+    ]
+  },
+  "accounting_semantics": {
+    "supported_in_snapshot": [
+      "PAY_AS_YOU_GO",
+      "SUBSCRIPTION_INCLUDED_QUOTA",
+      "SUBSCRIPTION_OVERAGE",
+      "UNKNOWN"
+    ],
+    "economic_allocated_cost_is_separate_from_marginal_cash_spend": true,
+    "included_quota_treated_as_free": false,
+    "phase_m_production_code_changed": false,
+    "phase_m_change_deferred_reason": "The complete result remains operator-input-blocked. Append-only pricing evidence can preserve known components without weakening frozen Phase M version-1 semantics."
+  },
+  "cost_scenarios": [
+    {
+      "scenario_id": "OFF_PEAK_ESTIMATE",
+      "basis": "Single-canary empirical projection with DeepSeek cache-miss input charged at current off-peak rates",
+      "known_deepseek_subject_component": "0.189941400",
+      "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
+      "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
+      "estimated_total_cost": "UNKNOWN_NOT_ZERO"
+    },
+    {
+      "scenario_id": "PEAK_ESTIMATE",
+      "basis": "Single-canary empirical projection with DeepSeek cache-miss input charged at current peak rates",
+      "known_deepseek_subject_component": "0.379882800",
+      "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
+      "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
+      "estimated_total_cost": "UNKNOWN_NOT_ZERO"
+    },
+    {
+      "scenario_id": "WORST_CASE_AUTHORIZATION_ESTIMATE",
+      "basis": "DeepSeek peak rate with hard output-token ceiling and empirical input, plus unresolved GPT relay and OpenCode contributions",
+      "known_deepseek_conservative_component": "1.013562000",
+      "complete_cost_bound_available": false,
+      "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
+      "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
+      "estimated_total_cost": "UNKNOWN_NOT_ZERO"
+    }
+  ],
+  "empirical_projection": {
+    "classification": "EMPIRICAL_PROJECTION",
+    "method": "Multiply each single bounded canary observation by its frozen 90-run cell count and the single Judge observation by 63 calls.",
+    "precision_warning": "One observation per cell is not statistically representative. Cache-token accounting was not exposed for the OpenCode observations, so its usage-value subtotal is incomplete and is not cash-spend evidence.",
+    "provider_usage": [
+      {
+        "provider_family": "GPT_RELAY",
+        "subject_calls": 270,
+        "input_tokens": 20507940,
+        "output_tokens": 370440,
+        "estimated_cash_cost": "UNKNOWN_NOT_ZERO"
+      },
+      {
+        "provider_family": "OPENCODE_GO_QWEN38",
+        "subject_calls": 180,
+        "input_tokens": 49320,
+        "output_tokens": 295290,
+        "partial_observed_token_usage_value": "1.870380000",
+        "economic_allocated_cost": "UNKNOWN_PENDING_ACCOUNT_CONFIRMATION",
+        "marginal_cash_spend": "UNKNOWN_PENDING_ACCOUNT_AND_BALANCE_CONFIRMATION"
+      },
+      {
+        "provider_family": "DEEPSEEK_OFFICIAL",
+        "subject_calls": 180,
+        "input_tokens": 75330,
+        "output_tokens": 199980,
+        "off_peak_estimate_cache_miss_input": "0.189941400",
+        "peak_estimate_cache_miss_input": "0.379882800"
+      },
+      {
+        "provider_family": "OPENCODE_GO_GLM52_JUDGE",
+        "judge_calls": 63,
+        "input_tokens": 11466,
+        "output_tokens": 7686,
+        "partial_observed_token_usage_value": "0.049870800",
+        "economic_allocated_cost": "UNKNOWN_PENDING_ACCOUNT_CONFIRMATION",
+        "marginal_cash_spend": "UNKNOWN_PENDING_ACCOUNT_AND_BALANCE_CONFIRMATION"
+      }
+    ],
+    "subject_input_tokens": 20632590,
+    "subject_output_tokens": 865710,
+    "judge_input_tokens": 11466,
+    "judge_output_tokens": 7686,
+    "total_input_tokens": 20644056,
+    "total_output_tokens": 873396,
+    "deepseek_off_peak_estimate": "0.189941400",
+    "deepseek_peak_estimate": "0.379882800",
+    "opencode_partial_observed_token_usage_value": "1.920250800",
+    "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
+    "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
+    "estimated_total_cost": "UNKNOWN_NOT_ZERO"
+  },
+  "subscription_quota_consumption_projection": {
+    "status": "INCOMPLETE_AND_NOT_BOUND_TO_ACTIVE_ACCOUNT",
+    "qwen38": {
+      "planned_requests": 180,
+      "official_typical_request_reference": {
+        "five_hour": 160,
+        "weekly": 400,
+        "monthly": 810
+      },
+      "planned_request_fraction": {
+        "five_hour": "1.125",
+        "weekly": "0.45",
+        "monthly": "0.222222222"
+      },
+      "partial_observed_token_usage_value": "1.870380000"
+    },
+    "glm52_judge": {
+      "planned_requests": 63,
+      "official_typical_request_reference": {
+        "five_hour": 880,
+        "weekly": 2150,
+        "monthly": 4300
+      },
+      "planned_request_fraction": {
+        "five_hour": "0.071590909",
+        "weekly": "0.029302326",
+        "monthly": "0.014651163"
+      },
+      "partial_observed_token_usage_value": "0.049870800"
+    },
+    "combined_partial_observed_token_usage_value": "1.920250800",
+    "cash_spend_inference_permitted": false,
+    "limitations": [
+      "Official request figures are estimates from typical request patterns, not guaranteed request quotas.",
+      "The two model families share dollar-value windows whose mixed-model allocation is not established by the public table.",
+      "Canary evidence does not expose cached-token quantities.",
+      "The current operator account plan, remaining quota, resets, and Use balance state are not verified."
+    ]
+  },
+  "conservative_projection": {
+    "classification": "CONSERVATIVE_OUTPUT_CEILING_WITH_EMPIRICAL_INPUT",
+    "deepseek_off_peak": "0.506781000",
+    "deepseek_peak": "1.013562000",
+    "deepseek_output_only_hard_ceiling_off_peak": "0.475200000",
+    "deepseek_output_only_hard_ceiling_peak": "0.950400000",
+    "limitation": "The frozen plan has output, request, Harness-turn, and time ceilings but no aggregate hard input-token ceiling. These DeepSeek figures combine the hard output ceiling with empirical input and therefore are not a complete dollar hard ceiling."
+  },
+  "hard_resource_ceiling": {
+    "classification": "HARD_RESOURCE_CEILING",
+    "subject_runs": 630,
+    "judge_calls": 63,
+    "provider_request_ceiling": 4743,
+    "harness_turn_ceiling": 4320,
+    "subject_output_token_ceiling": 1260000,
+    "judge_output_token_ceiling": 16128,
+    "total_output_token_ceiling": 1276128,
+    "sequential_wall_clock_ceiling_seconds": 119070,
+    "aggregate_input_token_ceiling": null,
+    "monetary_hard_ceiling": "UNKNOWN_NOT_ZERO"
+  },
+  "full_matrix_cost_status": {
+    "estimated_630_subject_cost": "UNKNOWN_NOT_ZERO",
+    "estimated_63_judge_cost": "UNKNOWN_NOT_ZERO",
+    "estimated_total_cost": "UNKNOWN_NOT_ZERO",
+    "estimated_cost_range": "KNOWN_DEEPSEEK_EMPIRICAL_COMPONENT_USD_0.189941400_TO_0.379882800_PLUS_UNKNOWN_NOT_ZERO",
+    "recommended_safe_maximum_spend_ceiling": "NOT_RECOMMENDABLE_UNTIL_OPERATOR_INPUTS_ARE_BOUND",
+    "unknown_cost_contributors": [
+      "GPT_RELAY_RATE_CARD",
+      "OPENCODE_GO_ACTIVE_ACCOUNT_PLAN",
+      "OPENCODE_GO_REMAINING_QUOTA_AND_RESET_WINDOWS",
+      "OPENCODE_GO_USE_BALANCE_STATE_AND_OVERAGE_TERMS"
+    ]
+  }
+}
