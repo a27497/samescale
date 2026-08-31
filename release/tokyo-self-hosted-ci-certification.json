@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "receipt_id": "tokyo-self-hosted-ci-certification",
+  "phase": "TOKYO_SELF_HOSTED_GITHUB_ACTIONS_CERTIFICATION",
+  "append_only": true,
+  "repository": "a27497/harnesslab-ai",
+  "branch": "codex/kb3-tokyo-self-hosted-ci",
+  "certification_result": "PASS",
+  "recorded_at": "2026-08-31T12:07:41Z",
+  "source_integration_head": "a857567b0f94d448e909aee4e8d26065ae9763ea",
+  "certified_infrastructure_head": "16b0959ea901781dc78135e922397aa7bcb29208",
+  "certified_head_binding": {
+    "type": "EXACT_GITHUB_ACTIONS_HEAD_SHA",
+    "sha": "16b0959ea901781dc78135e922397aa7bcb29208",
+    "fast_run_id": 33387922663,
+    "full_run_id": 33388215972
+  },
+  "receipt_commit_binding": "CONTAINING_GIT_COMMIT",
+  "final_head_role": "METADATA_ONLY_CHILD_OF_CERTIFIED_INFRASTRUCTURE_HEAD",
+  "default_branch": {
+    "name": "main",
+    "head_observed_after_certification": "1efeaae4e6a0240380042176b245b499cf7774cc",
+    "changed_by_this_phase": false,
+    "temporary_switch_performed": false
+  },
+  "bootstrap": {
+    "workflow": ".github/workflows/full-ci.yml",
+    "workflow_identity": "HarnessLab Full Release CI",
+    "method": "DEFAULT_BRANCH_VISIBLE_WORKFLOW_DISPATCH_WITH_SAME_REF_REUSABLE_WORKFLOW_CALL",
+    "dispatch_ref": "codex/kb3-tokyo-self-hosted-ci",
+    "execution_targets": [
+      "hosted",
+      "tokyo-fast",
+      "tokyo-full"
+    ],
+    "hosted_default_preserved": true,
+    "self_hosted_implementation_duplicated": false
+  },
+  "runner_fleet": {
+    "location": "Tokyo",
+    "scope": "repository",
+    "count": 3,
+    "max_parallelism": 3,
+    "version": "2.337.0",
+    "account": "harnesslab-runner",
+    "account_login_enabled": false,
+    "labels": [
+      "self-hosted",
+      "Linux",
+      "X64",
+      "harnesslab-tokyo"
+    ],
+    "runners": [
+      {
+        "name": "harnesslab-tokyo-1",
+        "status": "online",
+        "busy": false,
+        "runner_service": "actions.runner.a27497-harnesslab-ai.harnesslab-tokyo-1.service",
+        "docker_service": "harnesslab-runner-docker@1.service",
+        "network_namespace_service": "harnesslab-runner-netns@1.service",
+        "dns_service": "harnesslab-runner-dns@1.service"
+      },
+      {
+        "name": "harnesslab-tokyo-2",
+        "status": "online",
+        "busy": false,
+        "runner_service": "actions.runner.a27497-harnesslab-ai.harnesslab-tokyo-2.service",
+        "docker_service": "harnesslab-runner-docker@2.service",
+        "network_namespace_service": "harnesslab-runner-netns@2.service",
+        "dns_service": "harnesslab-runner-dns@2.service"
+      },
+      {
+        "name": "harnesslab-tokyo-3",
+        "status": "online",
+        "busy": false,
+        "runner_service": "actions.runner.a27497-harnesslab-ai.harnesslab-tokyo-3.service",
+        "docker_service": "harnesslab-runner-docker@3.service",
+        "network_namespace_service": "harnesslab-runner-netns@3.service",
+        "dns_service": "harnesslab-runner-dns@3.service"
+      }
+    ]
+  },
+  "host": {
+    "operating_system": "Ubuntu 24.04",
+    "kernel": "Linux 6.8.0-136-generic x86_64",
+    "cpu_model": "AMD EPYC 7K62 48-Core Processor",
+    "available_vcpus": 8,
+    "memory_bytes": 16768626688,
+    "swap_bytes": 4294963200,
+    "root_disk_bytes": 105557704704,
+    "docker_version": "29.7.1",
+    "containerd_version": "2.2.6"
+  },
+  "runtime_isolation": {
+    "docker_daemon_per_runner": true,
+    "containerd_state_per_runner": true,
+    "network_namespace_per_runner": true,
+    "docker_socket_per_runner": true,
+    "docker_data_root_per_runner": true,
+    "shared_host_tmp": false,
+    "runner_docker_pair_tmp_bind": true,
+    "runner_tmp_roots": [
+      "/var/lib/harnesslab-runner/tmp-1",
+      "/var/lib/harnesslab-runner/tmp-2",
+      "/var/lib/harnesslab-runner/tmp-3"
+    ],
+    "operator_home_masked_read_only": "/home/dev",
+    "operator_home_visible_entries_inside_runner": 0,
+    "workspace_strategy": "RUNNER_MANAGED_PERSISTENT_WORKTREE_WITH_EMPTY_JOB_TEMP_AFTER_RUN",
+    "cleanup_strategy": "JOB_IDENTITY_TARGETED_POSTGRES_CLEANUP_PLUS_POST_RUN_RESIDUAL_AUDIT",
+    "docker_access_risk": "HIGH_PRIVILEGE_LOCAL_DOCKER_API",
+    "docker_access_mitigations": [
+      "private repository",
+      "manual workflow dispatch",
+      "dedicated non-login runner account",
+      "per-runner Docker and network namespaces",
+      "operator home hidden by read-only tmpfs"
+    ]
+  },
+  "tool_cache": {
+    "prewarmed_on_all_runners": true,
+    "java": "Temurin 21.0.12+101.0.LTS",
+    "node": "24.20.0",
+    "workflow_java_major": 21,
+    "workflow_node_major": 24
+  },
+  "postgresql": {
+    "image": "postgres:18.6@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+    "bind_address": "127.0.0.1",
+    "host_port": "DYNAMIC_PER_JOB",
+    "network_isolation": "PER_RUNNER_NETWORK_NAMESPACE",
+    "cleanup": "JOB_IDENTITY_TARGETED"
+  },
+  "certifying_runs": {
+    "fast": {
+      "run_id": 33387922663,
+      "url": "https://github.com/a27497/harnesslab-ai/actions/runs/33387922663",
+      "event": "workflow_dispatch",
+      "head_sha": "16b0959ea901781dc78135e922397aa7bcb29208",
+      "started_at": "2026-08-31T11:38:31Z",
+      "completed_at": "2026-08-31T11:42:01Z",
+      "wall_time_seconds": 210,
+      "job_time_seconds": 199,
+      "result": "SUCCESS"
+    },
+    "full": {
+      "run_id": 33388215972,
+      "url": "https://github.com/a27497/harnesslab-ai/actions/runs/33388215972",
+      "event": "workflow_dispatch",
+      "head_sha": "16b0959ea901781dc78135e922397aa7bcb29208",
+      "started_at": "2026-08-31T11:42:22Z",
+      "completed_at": "2026-08-31T12:03:05Z",
+      "wall_time_seconds": 1243,
+      "result": "SUCCESS"
+    }
+  },
+  "full_release_subtasks": [
+    {
+      "name": "qualification (robustness-v2)",
+      "result": "SUCCESS",
+      "duration_seconds": 434
+    },
+    {
+      "name": "qualification (model-chat-v3)",
+      "result": "SUCCESS",
+      "duration_seconds": 363
+    },
+    {
+      "name": "qualification (model-chat-v3r1)",
+      "result": "SUCCESS",
+      "duration_seconds": 49
+    },
+    {
+      "name": "qualification (v6-canary-control)",
+      "result": "SUCCESS",
+      "duration_seconds": 211
+    },
+    {
+      "name": "gate-A",
+      "result": "SUCCESS",
+      "duration_seconds": 891
+    },
+    {
+      "name": "gate-B",
+      "result": "SUCCESS",
+      "duration_seconds": 160
+    },
+    {
+      "name": "gate-C",
+      "result": "SUCCESS",
+      "duration_seconds": 130
+    },
+    {
+      "name": "gate-D",
+      "result": "SUCCESS",
+      "duration_seconds": 105
+    },
+    {
+      "name": "gate-E",
+      "result": "SUCCESS",
+      "duration_seconds": 126
+    },
+    {
+      "name": "gate-F",
+      "result": "SUCCESS",
+      "duration_seconds": 143
+    },
+    {
+      "name": "gate-G",
+      "result": "SUCCESS",
+      "duration_seconds": 124
+    },
+    {
+      "name": "gate-H",
+      "result": "SUCCESS",
+      "duration_seconds": 97
+    },
+    {
+      "name": "gate-I",
+      "result": "SUCCESS",
+      "duration_seconds": 155
+    },
+    {
+      "name": "gate-J",
+      "result": "SUCCESS",
+      "duration_seconds": 100
+    },
+    {
+      "name": "gate-K",
+      "result": "SUCCESS",
+      "duration_seconds": 197
+    },
+    {
+      "name": "fresh-setup",
+      "result": "SUCCESS",
+      "duration_seconds": 43
+    }
+  ],
+  "correctness": {
+    "keyless_qualifications": "PASS",
+    "qualification_count": 4,
+    "gate_a_through_k": "PASS",
+    "gate_count": 11,
+    "self_hosted_fresh_setup": "PASS",
+    "fast_ci": "PASS",
+    "full_release_ci": "PASS"
+  },
+  "external_execution": {
+    "real_provider_calls": 0,
+    "real_harness_provider_calls": 0,
+    "real_judge_calls": 0,
+    "real_canary_calls": 0,
+    "real_matrix_calls": 0,
+    "evidence": "CERTIFYING_FULL_RUN_LOG_MARKERS_AND_GATE_RECEIPTS"
+  },
+  "telemetry": {
+    "sample_interval_seconds": 2,
+    "sample_count": 610,
+    "cpu_peak_percent": 81.5,
+    "memory_peak_bytes": 3929767936,
+    "swap_peak_bytes": 24264704,
+    "load_1m_peak": 7.41,
+    "concurrent_container_peak": 5,
+    "disk_used_start_bytes": 67958976512,
+    "disk_used_peak_bytes": 69531238400,
+    "disk_used_end_bytes": 69435867136
+  },
+  "performance": {
+    "local_serial_baseline_seconds": 8538,
+    "local_serial_baseline_display": "142m18s",
+    "target_full_wall_seconds": 3600,
+    "full_target_met": true,
+    "ci_optimization_r2_recommended": false
+  },
+  "residual_resource_audit": {
+    "observed_after_full_run": true,
+    "all_runners_online": true,
+    "all_runners_idle": true,
+    "containers_per_runner": [
+      0,
+      0,
+      0
+    ],
+    "custom_networks_per_runner": [
+      0,
+      0,
+      0
+    ],
+    "runner_job_temp_entries_per_runner": [
+      0,
+      0,
+      0
+    ],
+    "ci_tmp_residuals_per_runner": [
+      0,
+      0,
+      0
+    ],
+    "resource_collision_signals_per_runner": [
+      0,
+      0,
+      0
+    ],
+    "normal_runner_runtime_state_retained": [
+      "tool caches",
+      "runner-managed checkout",
+      "CLR diagnostic pipes",
+      "node compile cache",
+      "uv cache lock"
+    ],
+    "production_project_worktree_modified": false,
+    "result": "PASS"
+  },
+  "non_certifying_attempts": [
+    {
+      "run_id": 33381149702,
+      "result": "FAILED",
+      "reason": "missing Node runtime before runtime pinning"
+    },
+    {
+      "run_id": 33381773781,
+      "result": "CANCELLED",
+      "reason": "transient setup-java network timeout"
+    },
+    {
+      "run_id": 33382271370,
+      "result": "CANCELLED",
+      "reason": "shared /tmp ownership collision"
+    },
+    {
+      "run_id": 33383578102,
+      "result": "CANCELLED",
+      "reason": "PrivateTmp prevented Docker bind-mount visibility"
+    },
+    {
+      "run_id": 33386105101,
+      "result": "FAILED",
+      "reason": "operator home artifacts were visible to runner tests"
+    }
+  ],
+  "hosted_ci_status": {
+    "github_hosted_fast_ci": "PENDING_MINUTES",
+    "github_hosted_full_release_ci": "PENDING_MINUTES",
+    "hosted_minutes_consumed_by_this_certification": 0
+  },
+  "immutability": {
+    "hosted_ci_workflow_semantics_preserved": true,
+    "v6_scientific_code_modified": false,
+    "v6_evidence_modified": false,
+    "main_modified": false,
+    "default_branch_changed": false
+  }
+}
