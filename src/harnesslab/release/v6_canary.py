@@ -141,7 +141,7 @@ class V6CanaryCall(_FrozenModel):
 
 class V6HostMinimums(_FrozenModel):
     cpu_count: Literal[8]
-    memory_bytes: Literal[17179869184]
+    memory_bytes: Literal[16000000000]
     disk_free_bytes: Literal[1073741824]
     claude_image_reference: Literal["harnesslab-phase-f-claude:2.1.241"]
     egress_proxy_image_reference: Literal["harnesslab-egress-proxy:1.0.0"]
@@ -246,7 +246,6 @@ class V6OperatorInputs(_FrozenModel):
     tax_treatment: str | None = Field(default=None, min_length=1, max_length=300)
     fx_treatment: str | None = Field(default=None, min_length=1, max_length=300)
     public_region_and_model_rates_apply: bool | None = None
-    account_reference_fingerprint: Sha256Digest | None = None
     host_attestation_reference: str | None = Field(default=None, min_length=1, max_length=300)
 
     @property
@@ -1523,7 +1522,6 @@ def _assess_pricing(
         "tax": _explicit_operator_statement(operator.tax_treatment),
         "fx": _explicit_operator_statement(operator.fx_treatment),
         "rate-applicability": operator.public_region_and_model_rates_apply is True,
-        "account-reference": operator.account_reference_fingerprint is not None,
         "host-attestation": _explicit_operator_statement(operator.host_attestation_reference),
     }
     for name, ready in inputs.items():

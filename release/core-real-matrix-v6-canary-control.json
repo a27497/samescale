@@ -85,7 +85,7 @@
   "public_rate_fact_digest": "sha256:db433418b7495647accbeb1fde13fa09be3eba321001f1351ab5259b5b20401c",
   "host_minimums": {
     "cpu_count": 8,
-    "memory_bytes": 17179869184,
+    "memory_bytes": 16000000000,
     "disk_free_bytes": 1073741824,
     "claude_image_reference": "harnesslab-phase-f-claude:2.1.241",
     "egress_proxy_image_reference": "harnesslab-egress-proxy:1.0.0"

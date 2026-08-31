@@ -10,6 +10,5 @@
   "tax_treatment": null,
   "fx_treatment": null,
   "public_region_and_model_rates_apply": null,
-  "account_reference_fingerprint": null,
   "host_attestation_reference": null
 }

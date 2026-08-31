@@ -45,8 +45,9 @@ harnesslab release v6-canary preflight \
 The command checks frozen source/control digests, Alibaba endpoint classes and shared workspace,
 credential presence, exact deployed model IDs, registry and Harness bindings, subject and Judge
 workloads, all pricing/account confirmations, Docker, isolated egress, pinned images, and the fixed
-8-vCPU/16-GiB production-host floor. It writes a content-addressed immutable receipt even when
-blocked and always reports zero provider, Harness-provider, and Judge calls.
+8-vCPU/nominal-16-GB-class production-host floor (`16000000000` bytes). It writes a
+content-addressed immutable receipt even when blocked and always reports zero provider,
+Harness-provider, and Judge calls.
 
 After a `READY` receipt, copy
 `release/core-real-matrix-v6-canary-authorization-request.template.json` to an operator-owned

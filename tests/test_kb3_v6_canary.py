@@ -61,7 +61,6 @@ def _operator_inputs() -> V6OperatorInputs:
         tax_treatment="EXCLUDED_FROM_PUBLIC_RATE_OPERATOR_CONFIRMED",
         fx_treatment="NO_FX_USD_BILLING_OPERATOR_CONFIRMED",
         public_region_and_model_rates_apply=True,
-        account_reference_fingerprint="sha256:" + "a" * 64,
         host_attestation_reference="operator-host-attestation:v6-canary-unit-test",
     )
 
@@ -212,7 +211,48 @@ def test_missing_pricing_inputs_stay_required_and_never_become_zero(
     assert receipt.status is V6CanaryStatus.BLOCKED
     assert receipt.pricing_status == "OPERATOR_INPUTS_REQUIRED"
     assert pricing and all(item.status.value == "BLOCKED" for item in pricing)
+    assert "pricing:account-reference" not in {item.check_id for item in receipt.findings}
     assert all("not treated as zero" in item.detail for item in pricing)
+
+
+def test_certified_tokyo_memory_passes_and_sub_16_gb_class_memory_blocks(
+    control: V6CanaryControl,
+) -> None:
+    certified = assess_v6_canary_preflight(
+        ROOT,
+        control,
+        _operator_inputs(),
+        _environment(),
+        _host().model_copy(update={"memory_bytes": 16768626688}),
+    )
+    below_floor = assess_v6_canary_preflight(
+        ROOT,
+        control,
+        _operator_inputs(),
+        _environment(),
+        _host().model_copy(update={"memory_bytes": 15999999999}),
+    )
+    certified_memory = next(item for item in certified.findings if item.check_id == "host:memory")
+    below_floor_memory = next(
+        item for item in below_floor.findings if item.check_id == "host:memory"
+    )
+    assert control.host_minimums.memory_bytes == 16000000000
+    assert certified.status is V6CanaryStatus.READY
+    assert certified_memory.status.value == "PASS"
+    assert certified_memory.reason_code == "PRODUCTION_MEMORY_READY"
+    assert below_floor.status is V6CanaryStatus.BLOCKED
+    assert below_floor_memory.status.value == "BLOCKED"
+    assert below_floor_memory.reason_code == "PRODUCTION_MEMORY_INSUFFICIENT"
+    assert (certified.provider_calls, certified.harness_provider_calls, certified.judge_calls) == (
+        0,
+        0,
+        0,
+    )
+    assert (
+        below_floor.provider_calls,
+        below_floor.harness_provider_calls,
+        below_floor.judge_calls,
+    ) == (0, 0, 0)
 
 
 def test_ready_receipt_contains_only_references_and_fingerprints(
@@ -221,7 +261,16 @@ def test_ready_receipt_contains_only_references_and_fingerprints(
     receipt = _preflight(control)
     serialized = receipt.model_dump_json()
     assert receipt.status is V6CanaryStatus.READY
+    assert "account_reference_fingerprint" not in V6OperatorInputs.model_fields
+    assert "pricing:account-reference" not in {item.check_id for item in receipt.findings}
     assert receipt.endpoint_evidence.same_workspace is True
+    assert receipt.endpoint_evidence.openai_endpoint_fingerprint is not None
+    assert receipt.endpoint_evidence.anthropic_endpoint_fingerprint is not None
+    assert receipt.endpoint_evidence.workspace_fingerprint is not None
+    assert (
+        receipt.endpoint_evidence.openai_endpoint_fingerprint
+        != receipt.endpoint_evidence.anthropic_endpoint_fingerprint
+    )
     assert receipt.credential_present is True
     assert SECRET not in serialized
     assert OPENAI_ENDPOINT not in serialized
