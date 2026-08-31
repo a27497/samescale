@@ -179,7 +179,7 @@ def test_full_workflow_is_keyless_and_fast_ci_preserves_legacy_gate_status() -> 
 def test_self_hosted_workflows_are_manual_only_and_repository_read_only() -> None:
     for path in (SELF_HOSTED_FAST_WORKFLOW, SELF_HOSTED_FULL_WORKFLOW):
         workflow = _workflow(path)
-        assert set(workflow["on"]) == {"workflow_dispatch"}
+        assert set(workflow["on"]) == {"workflow_dispatch", "workflow_call"}
         assert workflow["permissions"] == {"contents": "read"}
         assert workflow["concurrency"]["cancel-in-progress"] == "false"
         for job in workflow["jobs"].values():
@@ -247,3 +247,27 @@ def test_ci_postgres_helper_uses_job_identity_dynamic_port_and_targeted_cleanup(
     assert "docker network prune" not in helper
     assert "label=${LABEL_PREFIX}.repository=${GITHUB_REPOSITORY}" in helper
     assert "label=${LABEL_PREFIX}.runner=${RUNNER_NAME}" in helper
+
+
+def test_registered_full_release_workflow_bootstraps_same_ref_tokyo_workflows() -> None:
+    workflow = _workflow(FULL_WORKFLOW)
+    dispatch = workflow["on"]["workflow_dispatch"]
+    execution_target = dispatch["inputs"]["execution_target"]
+
+    assert execution_target["required"] == "true"
+    assert execution_target["default"] == "hosted"
+    assert execution_target["type"] == "choice"
+    assert execution_target["options"] == ["hosted", "tokyo-fast", "tokyo-full"]
+
+    for job_name in ("qualification", "gates", "fresh-setup"):
+        assert workflow["jobs"][job_name]["if"] == "${{ inputs.execution_target == 'hosted' }}"
+    assert workflow["jobs"]["tokyo-fast"] == {
+        "name": "Tokyo self-hosted Fast CI",
+        "if": "${{ inputs.execution_target == 'tokyo-fast' }}",
+        "uses": "./.github/workflows/self-hosted-ci.yml",
+    }
+    assert workflow["jobs"]["tokyo-full"] == {
+        "name": "Tokyo self-hosted Full Release CI",
+        "if": "${{ inputs.execution_target == 'tokyo-full' }}",
+        "uses": "./.github/workflows/self-hosted-full-ci.yml",
+    }

@@ -2,6 +2,7 @@ name: HarnessLab Self-Hosted Full Release CI
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group: harnesslab-self-hosted-ci-${{ github.workflow }}-${{ github.ref }}

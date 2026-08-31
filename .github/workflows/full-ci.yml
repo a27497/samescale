@@ -2,6 +2,16 @@ name: HarnessLab Full Release CI
 
 on:
   workflow_dispatch:
+    inputs:
+      execution_target:
+        description: Execution infrastructure
+        required: true
+        default: hosted
+        type: choice
+        options:
+          - hosted
+          - tokyo-fast
+          - tokyo-full
 
 concurrency:
   group: harnesslab-ci-${{ github.workflow }}-${{ github.ref }}
@@ -13,6 +23,7 @@ permissions:
 jobs:
   qualification:
     name: qualification (${{ matrix.id }})
+    if: ${{ inputs.execution_target == 'hosted' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
@@ -77,6 +88,7 @@ jobs:
 
   gates:
     name: gate-${{ matrix.gate }}
+    if: ${{ inputs.execution_target == 'hosted' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
@@ -152,6 +164,7 @@ jobs:
 
   fresh-setup:
     name: fresh-setup
+    if: ${{ inputs.execution_target == 'hosted' }}
     needs:
       - qualification
       - gates
@@ -180,3 +193,13 @@ jobs:
         run: >-
           uv run --locked python scripts/verify_fresh_setup.py
           --check-runtime --actions-reproduction
+
+  tokyo-fast:
+    name: Tokyo self-hosted Fast CI
+    if: ${{ inputs.execution_target == 'tokyo-fast' }}
+    uses: ./.github/workflows/self-hosted-ci.yml
+
+  tokyo-full:
+    name: Tokyo self-hosted Full Release CI
+    if: ${{ inputs.execution_target == 'tokyo-full' }}
+    uses: ./.github/workflows/self-hosted-full-ci.yml
