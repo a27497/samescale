@@ -12,6 +12,8 @@ from harnesslab.release.final_verifier import EXPECTED_WORKFLOW
 ROOT = Path(__file__).resolve().parents[1]
 FAST_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 FULL_WORKFLOW = ROOT / ".github" / "workflows" / "full-ci.yml"
+SELF_HOSTED_FAST_WORKFLOW = ROOT / ".github" / "workflows" / "self-hosted-ci.yml"
+SELF_HOSTED_FULL_WORKFLOW = ROOT / ".github" / "workflows" / "self-hosted-full-ci.yml"
 
 
 def _load_verifier(name: str) -> Any:
@@ -172,3 +174,76 @@ def test_full_workflow_is_keyless_and_fast_ci_preserves_legacy_gate_status() -> 
     assert "freeze_model_chat_v3r1.py" in full_text
     assert "HARNESSLAB_ENABLE_REAL" not in full_text
     assert "--allow-real" not in full_text
+
+
+def test_self_hosted_workflows_are_manual_only_and_repository_read_only() -> None:
+    for path in (SELF_HOSTED_FAST_WORKFLOW, SELF_HOSTED_FULL_WORKFLOW):
+        workflow = _workflow(path)
+        assert set(workflow["on"]) == {"workflow_dispatch"}
+        assert workflow["permissions"] == {"contents": "read"}
+        assert workflow["concurrency"]["cancel-in-progress"] == "false"
+        for job in workflow["jobs"].values():
+            assert job["runs-on"] == ["self-hosted", "linux", "x64", "harnesslab-tokyo"]
+
+
+def test_self_hosted_full_release_preserves_matrix_contract_and_caps_parallelism() -> None:
+    hosted = _workflow(FULL_WORKFLOW)
+    self_hosted = _workflow(SELF_HOSTED_FULL_WORKFLOW)
+
+    for job_name in ("qualification", "gates"):
+        hosted_job = hosted["jobs"][job_name]
+        self_hosted_job = self_hosted["jobs"][job_name]
+        assert self_hosted_job["strategy"]["matrix"] == hosted_job["strategy"]["matrix"]
+        assert self_hosted_job["strategy"]["fail-fast"] == "false"
+        assert self_hosted_job["strategy"]["max-parallel"] == "3"
+        assert "services" not in self_hosted_job
+        steps = self_hosted_job["steps"]
+        assert any(step.get("run") == "scripts/ci_job_postgres.sh start" for step in steps)
+        assert any(
+            step.get("run") == "scripts/ci_job_postgres.sh cleanup-current"
+            and step.get("if") == "${{ always() }}"
+            for step in steps
+        )
+
+    fresh = self_hosted["jobs"]["fresh-setup"]
+    assert set(fresh["needs"]) == {"qualification", "gates"}
+    assert "--actions-reproduction" in SELF_HOSTED_FULL_WORKFLOW.read_text(encoding="utf-8")
+    assert "SELF_HOSTED_FRESH_SETUP=PASS" in SELF_HOSTED_FULL_WORKFLOW.read_text(encoding="utf-8")
+
+
+def test_self_hosted_fast_ci_preserves_hosted_fast_commands_without_fixed_port() -> None:
+    hosted = _workflow(FAST_WORKFLOW)["jobs"]["gates"]
+    self_hosted = _workflow(SELF_HOSTED_FAST_WORKFLOW)["jobs"]["gates"]
+    hosted_runs = {step.get("name"): step.get("run") for step in hosted["steps"] if "run" in step}
+    self_hosted_runs = {
+        step.get("name"): step.get("run") for step in self_hosted["steps"] if "run" in step
+    }
+    for name in (
+        "Install pinned Python",
+        "Sync locked dependencies",
+        "Upgrade test database",
+        "Lint, format, type, and whitespace checks",
+        "Run bounded deterministic core regressions",
+    ):
+        assert self_hosted_runs[name] == hosted_runs[name]
+    assert "services" not in self_hosted
+    assert "5432:5432" not in SELF_HOSTED_FAST_WORKFLOW.read_text(encoding="utf-8")
+    assert "5432:5432" not in SELF_HOSTED_FULL_WORKFLOW.read_text(encoding="utf-8")
+
+
+def test_ci_postgres_helper_uses_job_identity_dynamic_port_and_targeted_cleanup() -> None:
+    helper = (ROOT / "scripts" / "ci_job_postgres.sh").read_text(encoding="utf-8")
+    for identity in (
+        "GITHUB_REPOSITORY",
+        "GITHUB_RUN_ID",
+        "GITHUB_RUN_ATTEMPT",
+        "GITHUB_JOB",
+        "RUNNER_NAME",
+    ):
+        assert identity in helper
+    assert "--publish 127.0.0.1::5432" in helper
+    assert "docker system prune" not in helper
+    assert "docker container prune" not in helper
+    assert "docker network prune" not in helper
+    assert "label=${LABEL_PREFIX}.repository=${GITHUB_REPOSITORY}" in helper
+    assert "label=${LABEL_PREFIX}.runner=${RUNNER_NAME}" in helper

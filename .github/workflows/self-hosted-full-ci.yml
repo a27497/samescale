@@ -1,0 +1,182 @@
+name: HarnessLab Self-Hosted Full Release CI
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: harnesslab-self-hosted-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  qualification:
+    name: qualification (${{ matrix.id }})
+    runs-on: [self-hosted, linux, x64, harnesslab-tokyo]
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - id: robustness-v2
+            command: uv run --locked python scripts/verify_tier_a_verifier_robustness_v2.py
+          - id: model-chat-v3
+            command: uv run --locked python scripts/freeze_model_chat_v3.py
+          - id: model-chat-v3r1
+            command: uv run --locked python scripts/freeze_model_chat_v3r1.py
+          - id: v6-canary-control
+            prepare_database: true
+            command: >-
+              uv run --locked pytest -q
+              tests/test_kb3_v6_canary.py
+              tests/test_kb3_v6_integration.py
+              tests/test_kb3_v6_throughput_r2.py
+              tests/test_kb3_v6.py
+    env:
+      HARNESSLAB_ENVIRONMENT: test
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          clean: true
+      - name: Remove stale PostgreSQL owned by this runner
+        run: scripts/ci_job_postgres.sh cleanup-stale
+      - name: Start isolated PostgreSQL
+        run: scripts/ci_job_postgres.sh start
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.12.5
+          enable-cache: true
+      - name: Install pinned Python
+        run: uv python install 3.12.14
+      - name: Install Java 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Bootstrap qualification database
+        if: ${{ matrix.prepare_database == true }}
+        run: uv run --locked alembic upgrade head
+      - name: Run keyless qualification
+        run: ${{ matrix.command }}
+      - name: Remove job-owned PostgreSQL
+        if: ${{ always() }}
+        run: scripts/ci_job_postgres.sh cleanup-current
+
+  gates:
+    name: gate-${{ matrix.gate }}
+    runs-on: [self-hosted, linux, x64, harnesslab-tokyo]
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - gate: A
+            command: uv run --locked python scripts/verify_gate_a.py
+          - gate: B
+            command: uv run --locked python scripts/verify_gate_b.py
+          - gate: C
+            command: uv run --locked python scripts/verify_gate_c.py --leaf-only
+          - gate: D
+            command: uv run --locked python scripts/verify_gate_d.py --leaf-only
+          - gate: E
+            command: uv run --locked python scripts/verify_gate_e.py
+          - gate: F
+            command: uv run --locked python scripts/verify_gate_f.py
+          - gate: G
+            command: uv run --locked python scripts/verify_gate_g.py
+          - gate: H
+            command: uv run --locked python scripts/verify_gate_h.py
+          - gate: I
+            prepare_database: true
+            command: uv run --locked python scripts/verify_gate_i.py
+          - gate: J
+            prepare_database: true
+            command: uv run --locked python scripts/verify_gate_j.py
+          - gate: K
+            command: uv run --locked python scripts/verify_gate_k.py
+    env:
+      HARNESSLAB_ENVIRONMENT: test
+      HARNESSLAB_CI_LEAF_MODE: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          clean: true
+      - name: Remove stale PostgreSQL owned by this runner
+        run: scripts/ci_job_postgres.sh cleanup-stale
+      - name: Start isolated PostgreSQL
+        run: scripts/ci_job_postgres.sh start
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.12.5
+          enable-cache: true
+      - name: Install pinned Python
+        run: uv python install 3.12.14
+      - name: Install Java 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Bootstrap isolated gate database
+        if: ${{ matrix.prepare_database == true }}
+        run: uv run --locked alembic upgrade head
+      - name: Run authoritative Gate ${{ matrix.gate }} verification
+        run: ${{ matrix.command }}
+      - name: Remove job-owned PostgreSQL
+        if: ${{ always() }}
+        run: scripts/ci_job_postgres.sh cleanup-current
+
+  fresh-setup:
+    name: fresh-setup
+    needs:
+      - qualification
+      - gates
+    runs-on: [self-hosted, linux, x64, harnesslab-tokyo]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          clean: true
+      - name: Remove stale PostgreSQL owned by this runner
+        run: scripts/ci_job_postgres.sh cleanup-stale
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.12.5
+          enable-cache: true
+      - name: Install pinned Python
+        run: uv python install 3.12.14
+      - name: Install Java 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Attest clean self-hosted fresh-setup reproduction
+        run: |
+          uv run --locked python scripts/verify_fresh_setup.py --check-runtime --actions-reproduction
+          echo "SELF_HOSTED_FRESH_SETUP=PASS"
+      - name: Remove job-owned PostgreSQL
+        if: ${{ always() }}
+        run: scripts/ci_job_postgres.sh cleanup-current

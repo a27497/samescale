@@ -1,0 +1,63 @@
+name: HarnessLab Self-Hosted Fast CI
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: harnesslab-self-hosted-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    name: gates
+    runs-on: [self-hosted, linux, x64, harnesslab-tokyo]
+    timeout-minutes: 25
+    env:
+      HARNESSLAB_ENVIRONMENT: test
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          clean: true
+      - name: Remove stale PostgreSQL owned by this runner
+        run: scripts/ci_job_postgres.sh cleanup-stale
+      - name: Start isolated PostgreSQL
+        run: scripts/ci_job_postgres.sh start
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.12.5
+          enable-cache: true
+      - name: Install pinned Python
+        run: uv python install 3.12.14
+      - name: Sync locked dependencies
+        run: uv sync --locked
+      - name: Upgrade test database
+        run: uv run --locked alembic upgrade head
+      - name: Lint, format, type, and whitespace checks
+        run: |
+          uv run --locked ruff check .
+          uv run --locked ruff format --check .
+          uv run --locked mypy src tests scripts
+          git diff --check
+      - name: Run bounded deterministic core regressions
+        run: >-
+          uv run --locked pytest -q
+          tests/test_api_health.py
+          tests/test_contracts.py
+          tests/test_experiment_executor_safety.py
+          tests/test_model_comparison_analysis.py
+          tests/test_model_chat_plan_v3.py
+          tests/test_model_chat_plan_v3r1.py
+          tests/test_ci_workflow_contracts.py
+          tests/test_tier_b_repo_engineering.py
+          tests/test_tier_b_smoke_plan.py
+          tests/test_kb3_v6_canary.py
+          tests/test_kb3_v6_integration.py
+          tests/test_kb3_v6_throughput_r2.py
+      - name: Remove job-owned PostgreSQL
+        if: ${{ always() }}
+        run: scripts/ci_job_postgres.sh cleanup-current
