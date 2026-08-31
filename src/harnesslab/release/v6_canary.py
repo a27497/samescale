@@ -489,6 +489,23 @@ async def run_v6_canary_preflight(
     )
 
 
+def v6_preflights_are_execution_equivalent(
+    authorized: V6CanaryPreflightReceipt,
+    current: V6CanaryPreflightReceipt,
+) -> bool:
+    """Compare immutable and current readiness, excluding only volatile free disk bytes."""
+
+    if current.status is not V6CanaryStatus.READY:
+        return False
+    excluded = {
+        "receipt_digest": True,
+        "host_observation": {"disk_free_bytes": True},
+    }
+    return authorized.model_dump(mode="json", exclude=excluded) == current.model_dump(
+        mode="json", exclude=excluded
+    )
+
+
 def persist_v6_preflight_receipt(receipt_root: Path, receipt: V6CanaryPreflightReceipt) -> Path:
     path = (
         receipt_root.resolve()
@@ -1313,7 +1330,9 @@ async def execute_real_v6_canary(
         selected_environment,
         host_observation=host_observation,
     )
-    if current != preflight_receipt:
+    if current.status is not V6CanaryStatus.READY:
+        raise V6CanaryControlError("current V6 preflight is not READY")
+    if not v6_preflights_are_execution_equivalent(preflight_receipt, current):
         raise V6CanaryControlError(
             "current V6 preflight differs from the authorized immutable receipt"
         )
@@ -1324,7 +1343,7 @@ async def execute_real_v6_canary(
         current.host_observation,
     )
     return await V6CanaryControlPlane(control).execute(
-        preflight=current,
+        preflight=preflight_receipt,
         authorization=authorization,
         invoker=invoker,
         artifact_root=artifact_root,
@@ -1822,4 +1841,5 @@ __all__ = [
     "persist_v6_canary_authorization",
     "persist_v6_preflight_receipt",
     "run_v6_canary_preflight",
+    "v6_preflights_are_execution_equivalent",
 ]

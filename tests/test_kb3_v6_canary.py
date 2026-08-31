@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+import harnesslab.release.v6_canary as v6_canary_module
 from harnesslab.multi_harness.models import HarnessKind
 from harnesslab.multi_harness.profile import configured_qwen_alibaba_bailian_claude_profile
 from harnesslab.multi_harness.prompt import render_harness_prompt
@@ -32,8 +33,10 @@ from harnesslab.release.v6_canary import (
     V6OperatorInputs,
     assess_v6_canary_preflight,
     authorize_v6_canary,
+    execute_real_v6_canary,
     load_v6_canary_control,
     persist_v6_preflight_receipt,
+    v6_preflights_are_execution_equivalent,
 )
 from harnesslab.sandbox.models import ImageIdentity
 
@@ -97,13 +100,14 @@ def _preflight(
     *,
     environment: dict[str, str] | None = None,
     operator: V6OperatorInputs | None = None,
+    host: V6HostObservation | None = None,
 ) -> V6CanaryPreflightReceipt:
     return assess_v6_canary_preflight(
         ROOT,
         control,
         operator or _operator_inputs(),
         environment or _environment(),
-        _host(),
+        host or _host(),
     )
 
 
@@ -350,6 +354,295 @@ def test_ready_receipt_contains_only_references_and_fingerprints(
     assert ANTHROPIC_ENDPOINT not in serialized
     assert "workspace-sentinel" not in serialized
     assert receipt.judge_state == "PROVISIONAL_PENDING_REAL_CANARY"
+
+
+def test_identical_ready_preflights_are_execution_equivalent(
+    control: V6CanaryControl,
+) -> None:
+    authorized = _preflight(control)
+    assert v6_preflights_are_execution_equivalent(authorized, authorized)
+
+
+def test_ready_preflights_allow_only_disk_free_bytes_to_vary(
+    control: V6CanaryControl,
+) -> None:
+    authorized = _preflight(control)
+    current = _preflight(
+        control,
+        host=_host().model_copy(update={"disk_free_bytes": 2 * 1024**3}),
+    )
+    assert authorized.host_observation.disk_free_bytes != current.host_observation.disk_free_bytes
+    assert authorized.status is current.status is V6CanaryStatus.READY
+    assert v6_preflights_are_execution_equivalent(authorized, current)
+
+
+def test_disk_derived_receipt_digest_difference_is_execution_equivalent(
+    control: V6CanaryControl,
+) -> None:
+    authorized = _preflight(control)
+    current = _preflight(
+        control,
+        host=_host().model_copy(update={"disk_free_bytes": 2 * 1024**3}),
+    )
+    assert authorized.receipt_digest != current.receipt_digest
+    assert v6_preflights_are_execution_equivalent(authorized, current)
+
+
+@pytest.mark.asyncio
+async def test_current_disk_below_minimum_blocks_before_invoker(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    control: V6CanaryControl,
+) -> None:
+    authorized = _preflight(control)
+    current = _preflight(
+        control,
+        host=_host().model_copy(
+            update={"disk_free_bytes": control.host_minimums.disk_free_bytes - 1}
+        ),
+    )
+    authorization = _authorization(control, authorized)
+    constructions = 0
+
+    async def current_preflight(*args: object, **kwargs: object) -> V6CanaryPreflightReceipt:
+        return current
+
+    def unexpected_invoker(*args: object, **kwargs: object) -> None:
+        nonlocal constructions
+        constructions += 1
+        raise AssertionError("blocked preflight constructed the production invoker")
+
+    monkeypatch.setattr(v6_canary_module, "run_v6_canary_preflight", current_preflight)
+    monkeypatch.setattr(v6_canary_module, "ProductionV6CanaryInvoker", unexpected_invoker)
+    assert current.status is V6CanaryStatus.BLOCKED
+    assert not v6_preflights_are_execution_equivalent(authorized, current)
+    with pytest.raises(V6CanaryControlError, match="current V6 preflight is not READY"):
+        await execute_real_v6_canary(
+            ROOT,
+            operator_inputs=_operator_inputs(),
+            preflight_receipt=authorized,
+            authorization=authorization,
+            artifact_root=tmp_path / "below-disk-floor",
+            allow_real_v6_canary=True,
+            environment=_environment(),
+        )
+    assert constructions == 0
+
+
+@pytest.mark.parametrize(
+    "drift",
+    (
+        "endpoint-fingerprint",
+        "same-workspace",
+        "credential-present",
+        "model-binding",
+        "operator-input-digest",
+        "pricing-status",
+        "public-rate-digest",
+        "docker-status",
+        "egress-isolation",
+        "cpu-count",
+        "memory-bytes",
+        "claude-image-identity",
+        "egress-image-identity",
+        "max-primary-calls",
+        "max-provider-requests",
+        "max-harness-turns",
+        "judge-state",
+        "finding-reason",
+    ),
+)
+@pytest.mark.asyncio
+async def test_nonvolatile_preflight_drift_blocks_before_invoker(
+    drift: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    control: V6CanaryControl,
+) -> None:
+    authorized = _preflight(control)
+    current = authorized
+    other_digest = "sha256:" + "e" * 64
+    if drift == "endpoint-fingerprint":
+        current = current.model_copy(
+            update={
+                "endpoint_evidence": current.endpoint_evidence.model_copy(
+                    update={"openai_endpoint_fingerprint": other_digest}
+                )
+            }
+        )
+    elif drift == "same-workspace":
+        current = current.model_copy(
+            update={
+                "endpoint_evidence": current.endpoint_evidence.model_copy(
+                    update={"same_workspace": False}
+                )
+            }
+        )
+    elif drift == "credential-present":
+        current = current.model_copy(update={"credential_present": False})
+    elif drift == "model-binding":
+        changed_binding = current.model_bindings[0].model_copy(
+            update={"execution_binding_identity": other_digest}
+        )
+        current = current.model_copy(
+            update={"model_bindings": (changed_binding, *current.model_bindings[1:])}
+        )
+    elif drift == "operator-input-digest":
+        current = current.model_copy(update={"operator_input_digest": other_digest})
+    elif drift == "pricing-status":
+        current = current.model_copy(update={"pricing_status": "OPERATOR_INPUTS_REQUIRED"})
+    elif drift == "public-rate-digest":
+        current = current.model_copy(update={"public_rate_fact_digest": other_digest})
+    elif drift == "docker-status":
+        current = current.model_copy(
+            update={
+                "host_observation": current.host_observation.model_copy(
+                    update={"docker_ready": False}
+                )
+            }
+        )
+    elif drift == "egress-isolation":
+        current = current.model_copy(
+            update={
+                "host_observation": current.host_observation.model_copy(
+                    update={"egress_isolation_ready": False}
+                )
+            }
+        )
+    elif drift == "cpu-count":
+        current = current.model_copy(
+            update={
+                "host_observation": current.host_observation.model_copy(update={"cpu_count": 7})
+            }
+        )
+    elif drift == "memory-bytes":
+        current = current.model_copy(
+            update={
+                "host_observation": current.host_observation.model_copy(
+                    update={"memory_bytes": 17 * 1024**3}
+                )
+            }
+        )
+    elif drift == "claude-image-identity":
+        assert current.host_observation.claude_image is not None
+        current = current.model_copy(
+            update={
+                "host_observation": current.host_observation.model_copy(
+                    update={
+                        "claude_image": current.host_observation.claude_image.model_copy(
+                            update={"image_id": other_digest}
+                        )
+                    }
+                )
+            }
+        )
+    elif drift == "egress-image-identity":
+        assert current.host_observation.egress_proxy_image is not None
+        current = current.model_copy(
+            update={
+                "host_observation": current.host_observation.model_copy(
+                    update={
+                        "egress_proxy_image": (
+                            current.host_observation.egress_proxy_image.model_copy(
+                                update={"image_id": other_digest}
+                            )
+                        )
+                    }
+                )
+            }
+        )
+    elif drift == "max-primary-calls":
+        current = current.model_copy(update={"max_primary_calls": 4})
+    elif drift == "max-provider-requests":
+        current = current.model_copy(update={"max_provider_requests": 19})
+    elif drift == "max-harness-turns":
+        current = current.model_copy(update={"max_harness_turns": 17})
+    elif drift == "judge-state":
+        current = current.model_copy(update={"judge_state": "CANARY_QUALIFIED"})
+    elif drift == "finding-reason":
+        changed_finding = current.findings[0].model_copy(
+            update={"reason_code": "UNEXPECTED_REASON_DRIFT"}
+        )
+        current = current.model_copy(update={"findings": (changed_finding, *current.findings[1:])})
+    else:  # pragma: no cover - the parameter list is closed above
+        raise AssertionError(f"unknown drift case: {drift}")
+
+    authorization = _authorization(control, authorized)
+    constructions = 0
+
+    async def current_preflight(*args: object, **kwargs: object) -> V6CanaryPreflightReceipt:
+        return current
+
+    def unexpected_invoker(*args: object, **kwargs: object) -> None:
+        nonlocal constructions
+        constructions += 1
+        raise AssertionError("nonvolatile drift constructed the production invoker")
+
+    monkeypatch.setattr(v6_canary_module, "run_v6_canary_preflight", current_preflight)
+    monkeypatch.setattr(v6_canary_module, "ProductionV6CanaryInvoker", unexpected_invoker)
+    assert not v6_preflights_are_execution_equivalent(authorized, current)
+    with pytest.raises(V6CanaryControlError, match="differs from the authorized"):
+        await execute_real_v6_canary(
+            ROOT,
+            operator_inputs=_operator_inputs(),
+            preflight_receipt=authorized,
+            authorization=authorization,
+            artifact_root=tmp_path / drift,
+            allow_real_v6_canary=True,
+            environment=_environment(),
+        )
+    assert constructions == 0
+
+
+@pytest.mark.asyncio
+async def test_execution_uses_current_host_and_original_authorized_receipt_binding(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    control: V6CanaryControl,
+) -> None:
+    authorized = _preflight(control)
+    current = _preflight(
+        control,
+        host=_host().model_copy(update={"disk_free_bytes": 2 * 1024**3}),
+    )
+    authorization = _authorization(control, authorized)
+    authorization_digest = authorization.authorization_digest
+    observed_hosts: list[V6HostObservation] = []
+
+    async def current_preflight(*args: object, **kwargs: object) -> V6CanaryPreflightReceipt:
+        return current
+
+    def fake_production_invoker(
+        repository_root: Path,
+        environment: dict[str, str],
+        artifact_root: Path,
+        host_observation: V6HostObservation,
+    ) -> _FakeInvoker:
+        observed_hosts.append(host_observation)
+        return _FakeInvoker(artifact_root / "provider-evidence")
+
+    monkeypatch.setattr(v6_canary_module, "run_v6_canary_preflight", current_preflight)
+    monkeypatch.setattr(v6_canary_module, "ProductionV6CanaryInvoker", fake_production_invoker)
+    artifact_root = tmp_path / "current-host-original-binding"
+    closeout = await execute_real_v6_canary(
+        ROOT,
+        operator_inputs=_operator_inputs(),
+        preflight_receipt=authorized,
+        authorization=authorization,
+        artifact_root=artifact_root,
+        allow_real_v6_canary=True,
+        environment=_environment(),
+    )
+    marker = json.loads(
+        (artifact_root / "launch-journal" / f"001-{EXPECTED_CALL_IDS[0]}.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert observed_hosts == [current.host_observation]
+    assert closeout.preflight_receipt_digest == authorized.receipt_digest
+    assert marker["preflight_receipt_digest"] == authorized.receipt_digest
+    assert authorization.preflight_receipt_digest == authorized.receipt_digest
+    assert authorization.authorization_digest == authorization_digest
 
 
 def test_receipt_persistence_is_immutable_and_idempotent(
