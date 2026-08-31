@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "input_id": "replace-with-operator-input-id",
+  "billing_region": null,
+  "billing_currency": null,
+  "qwen_deployed_model_id": null,
+  "glm_deployed_model_id": null,
+  "cache_or_batch_adjustments": null,
+  "account_specific_promotions": null,
+  "tax_treatment": null,
+  "fx_treatment": null,
+  "public_region_and_model_rates_apply": null,
+  "account_reference_fingerprint": null,
+  "host_attestation_reference": null
+}

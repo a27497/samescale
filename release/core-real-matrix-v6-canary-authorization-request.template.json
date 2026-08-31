@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "scope": "CORE_REAL_MATRIX_V6_THREE_CALL_CANARY",
+  "authorization_id": "replace-with-unique-authorization-id",
+  "operator_reference": "replace-with-operator-reference",
+  "authorized_at": "2026-08-31T00:00:00+08:00",
+  "experiment_id": "core-real-matrix-v6",
+  "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+  "canary_plan_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "preflight_receipt_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "spend_authorized": true,
+  "allow_real_canary": true,
+  "max_primary_calls": 3,
+  "retries": 0,
+  "semantic_retries": 0,
+  "substitutions": 0,
+  "matrix_execution_authorized": false
+}

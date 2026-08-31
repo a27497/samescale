@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "receipt_id": "core-real-matrix-v6-integration-certification-tokyo",
+  "phase": "K_B3_V6_INTEGRATION_CERTIFICATION",
+  "append_only": true,
+  "repository": "a27497/harnesslab-ai",
+  "branch": "codex/kb3-v6-integration-certification",
+  "certified_head_binding": "CONTAINING_GIT_COMMIT",
+  "source_provenance": {
+    "common_accepted_base": "00bea2eab9e2b1d493bad8f1de594e6a740b7d63",
+    "lane_a": {
+      "branch": "codex/kb3-v6-throughput-r2",
+      "source_head": "91b27068b670e7b4a7b3aab833d1f06ce0438e49",
+      "fast_ci_run": 33340524279,
+      "full_release_ci_run": 33340530212,
+      "verified_state": "SUCCESS"
+    },
+    "lane_b": {
+      "branch": "codex/kb3-v6-canary-preflight",
+      "source_head": "b1496d522b0d192f51d0e47ae0d03dd1edd8975f",
+      "fast_ci_run": 33336129892,
+      "full_release_ci_run": 33336134553,
+      "verified_state": "SUCCESS"
+    }
+  },
+  "v6_control": {
+    "reference": "release/core-real-matrix-v6-control.json",
+    "sha256": "sha256:52318dd45e843611840a046f7f85670941281026d10f56b36fe0df421e69f42f",
+    "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+    "schedule_digest": "sha256:f3ac0384cddafd4b4dd7b811f66a0e117cdc7e68b758cd111d5e6a4d6726dd2a",
+    "scheduling_policy": "BLOCKED_INTERLEAVED_SCHEDULING",
+    "task_count": 18,
+    "repeat_count": 5,
+    "cell_count": 7,
+    "block_count": 90,
+    "subject_slot_count": 630
+  },
+  "throughput_r2": {
+    "reference": "release/core-real-matrix-v6-throughput-r2.json",
+    "evidence_identity": "sha256:2a4309a5f06f490898fc42c7ff402cbdd7d38d743321c2c799ee82b66c46d8cc",
+    "evidence_class": "REAL_LOCAL_HOST_TELEMETRY_KEYLESS_WORKLOAD",
+    "selected_profile_id": "V6_PROFILE_C_C6_H3",
+    "selected_profile_digest": "sha256:85117b2577f3456e0df573ed2467d19dee64bebca748e178bd92017dea6133b7",
+    "global_concurrency": 6,
+    "max_harness_concurrency": 3,
+    "max_direct_concurrency": 4,
+    "provider_concurrency_caps": {
+      "gpt56-relay": 2,
+      "alibaba-bailian": 2,
+      "deepseek-official": 2
+    }
+  },
+  "canary_control": {
+    "reference": "release/core-real-matrix-v6-canary-control.json",
+    "identity": "sha256:c9749a9941061c460fde7c750e6d1b0d39b03d5291333dfae91003f8be7ea78a",
+    "max_primary_calls": 3,
+    "call_ids": [
+      "v6-canary-1-direct-qwen38-alibaba-chat",
+      "v6-canary-2-claude-qwen38-alibaba-messages",
+      "v6-canary-3-judge-glm52-alibaba-chat"
+    ],
+    "retries": 0,
+    "semantic_retries": 0,
+    "substitutions": 0,
+    "throughput_profile_authorization_required": false,
+    "matrix_execution_authorized": false,
+    "judge_state": "PROVISIONAL_PENDING_REAL_CANARY"
+  },
+  "matrix_authorization_boundary": {
+    "required_receipt_type": "V6MatrixAuthorizationReceipt",
+    "scope": "CORE_REAL_MATRIX_V6_630_SLOT_MATRIX",
+    "authorized_slot_count": 630,
+    "required_execution_profile_identity": "sha256:85117b2577f3456e0df573ed2467d19dee64bebca748e178bd92017dea6133b7",
+    "profile_a_authorization": "REJECTED",
+    "profile_b_authorization": "REJECTED",
+    "missing_authorization": "REJECTED",
+    "mismatched_authorization": "REJECTED",
+    "canary_authorization_reusable_for_matrix": false
+  },
+  "local_certification": {
+    "host": "Tokyo",
+    "result": "PASS",
+    "gate_a": "PASS",
+    "gate_b": "PASS",
+    "gate_c": "PASS",
+    "gate_d": "PASS",
+    "gate_e": "PASS",
+    "gate_f": "PASS",
+    "gate_g": "PASS",
+    "gate_h": "PASS",
+    "gate_i": "PASS",
+    "gate_j": "PASS",
+    "gate_k": "PASS",
+    "keyless_qualifications": "PASS",
+    "fresh_setup": "NOT_REPRODUCIBLE_ACTIONS_ONLY_PREFLIGHT_AND_RUNTIME_PASS",
+    "targeted_tests": "PASS",
+    "quality_checks": "PASS"
+  },
+  "ci_status": {
+    "github_hosted_fast_ci": "PENDING_MINUTES",
+    "github_hosted_full_release_ci": "PENDING_MINUTES",
+    "self_hosted_ci": "NOT_CONFIGURED_YET"
+  },
+  "external_execution": {
+    "real_provider_calls": 0,
+    "real_harness_provider_calls": 0,
+    "real_judge_calls": 0,
+    "real_canary_calls": 0,
+    "real_matrix_calls": 0
+  },
+  "immutability": {
+    "frozen_v5_evidence_modified": false,
+    "frozen_v6_control_modified": false,
+    "throughput_r2_evidence_modified": false,
+    "main_modified": false,
+    "github_actions_runner_infrastructure_modified": false
+  }
+}

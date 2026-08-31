@@ -1,0 +1,405 @@
+from __future__ import annotations
+
+import hashlib
+from datetime import UTC, datetime
+from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
+
+from harnesslab.release.v6_authorization import (
+    V6CanaryAuthorizationReceipt,
+    V6CanaryAuthorizationRequest,
+    V6MatrixAuthorizationReceipt,
+)
+from harnesslab.release.v6_canary import (
+    EXPECTED_CALL_IDS,
+    ProductionV6CanaryInvoker,
+    V6CanaryCall,
+    V6CanaryCallEvidence,
+    V6CanaryControl,
+    V6CanaryControlError,
+    V6CanaryControlPlane,
+    V6CanaryFailureCategory,
+    V6CanaryLaunchMarker,
+    V6CanaryPreflightReceipt,
+    V6CanaryStatus,
+    V6HostObservation,
+    V6OperatorInputs,
+    assess_v6_canary_preflight,
+    authorize_v6_canary,
+    load_v6_canary_control,
+    persist_v6_preflight_receipt,
+)
+from harnesslab.sandbox.models import ImageIdentity
+
+ROOT = Path(__file__).resolve().parents[1]
+OPENAI_ENDPOINT = "https://workspace-sentinel.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+ANTHROPIC_ENDPOINT = "https://workspace-sentinel.cn-beijing.maas.aliyuncs.com/apps/anthropic"
+SECRET = "unit-test-secret-that-must-not-be-persisted"
+
+
+def _environment() -> dict[str, str]:
+    return {
+        "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL": OPENAI_ENDPOINT,
+        "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL": ANTHROPIC_ENDPOINT,
+        "HARNESSLAB_ALIBABA_BAILIAN_API_KEY": SECRET,
+        "HARNESSLAB_ALIBABA_BAILIAN_QWEN38_MODEL_ID": "qwen3.8-max",
+        "HARNESSLAB_ALIBABA_BAILIAN_GLM52_MODEL_ID": "glm-5.2",
+    }
+
+
+def _operator_inputs() -> V6OperatorInputs:
+    return V6OperatorInputs(
+        input_id="v6-canary-unit-test",
+        billing_region="China (Beijing)",
+        billing_currency="USD",
+        qwen_deployed_model_id="qwen3.8-max",
+        glm_deployed_model_id="glm-5.2",
+        cache_or_batch_adjustments="NONE_CONFIRMED",
+        account_specific_promotions="NONE_CONFIRMED",
+        tax_treatment="EXCLUDED_FROM_PUBLIC_RATE_OPERATOR_CONFIRMED",
+        fx_treatment="NO_FX_USD_BILLING_OPERATOR_CONFIRMED",
+        public_region_and_model_rates_apply=True,
+        account_reference_fingerprint="sha256:" + "a" * 64,
+        host_attestation_reference="operator-host-attestation:v6-canary-unit-test",
+    )
+
+
+def _host() -> V6HostObservation:
+    return V6HostObservation(
+        docker_ready=True,
+        egress_isolation_ready=True,
+        cpu_count=8,
+        memory_bytes=16 * 1024**3,
+        disk_free_bytes=1024**3,
+        claude_image=ImageIdentity(
+            reference="harnesslab-phase-f-claude:2.1.241",
+            image_id="sha256:" + "b" * 64,
+        ),
+        egress_proxy_image=ImageIdentity(
+            reference="harnesslab-egress-proxy:1.0.0",
+            image_id="sha256:" + "c" * 64,
+        ),
+    )
+
+
+@pytest.fixture(scope="module")
+def control() -> V6CanaryControl:
+    return load_v6_canary_control(ROOT)
+
+
+def _preflight(
+    control: V6CanaryControl,
+    *,
+    environment: dict[str, str] | None = None,
+    operator: V6OperatorInputs | None = None,
+) -> V6CanaryPreflightReceipt:
+    return assess_v6_canary_preflight(
+        ROOT,
+        control,
+        operator or _operator_inputs(),
+        environment or _environment(),
+        _host(),
+    )
+
+
+def _authorization(
+    control: V6CanaryControl, preflight: V6CanaryPreflightReceipt
+) -> V6CanaryAuthorizationReceipt:
+    return authorize_v6_canary(
+        preflight,
+        V6CanaryAuthorizationRequest(
+            scope="CORE_REAL_MATRIX_V6_THREE_CALL_CANARY",
+            authorization_id="v6-canary-unit-test-auth",
+            operator_reference="operator:test",
+            authorized_at=datetime(2026, 8, 31, tzinfo=UTC),
+            experiment_id="core-real-matrix-v6",
+            plan_digest=control.plan_digest,
+            canary_plan_digest=control.digest,
+            preflight_receipt_digest=preflight.receipt_digest,
+            spend_authorized=True,
+            allow_real_canary=True,
+        ),
+    )
+
+
+class _FakeInvoker:
+    def __init__(
+        self,
+        evidence_root: Path,
+        *,
+        fail_call: str | None = None,
+    ) -> None:
+        self.evidence_root = evidence_root
+        self.fail_call = fail_call
+        self.calls: list[str] = []
+
+    async def invoke(
+        self, call: V6CanaryCall, marker: V6CanaryLaunchMarker
+    ) -> V6CanaryCallEvidence:
+        self.calls.append(call.call_id)
+        call_root = self.evidence_root / call.call_id
+        call_root.mkdir(parents=True, exist_ok=True)
+        path = call_root / "evidence.json"
+        path.write_text("keyless fake evidence\n", encoding="utf-8")
+        failure = V6CanaryFailureCategory.PROVIDER if call.call_id == self.fail_call else None
+        return ProductionV6CanaryInvoker._call_evidence(
+            call,
+            marker,
+            observed_model=call.requested_model,
+            safe_outcome="FAKE_TERMINAL",
+            failure=failure,
+            evidence_reference=str(path.resolve()),
+            evidence_digest="sha256:" + hashlib.sha256(path.read_bytes()).hexdigest(),
+        )
+
+
+def test_control_is_exactly_three_calls_with_structural_zero_retries(
+    control: V6CanaryControl,
+) -> None:
+    assert tuple(item.call_id for item in control.calls) == EXPECTED_CALL_IDS
+    assert control.max_primary_calls == 3
+    assert control.retries == control.semantic_retries == control.substitutions == 0
+    assert control.matrix_execution_allowed is False
+    assert control.judge_initial_state == "PROVISIONAL_PENDING_REAL_CANARY"
+    assert control.throughput_profile_binding.startswith("NOT_REQUIRED_FOR_THREE_CALL_CANARY")
+
+
+@pytest.mark.parametrize(
+    ("mutation", "reason_code"),
+    [
+        (
+            {"HARNESSLAB_ALIBABA_BAILIAN_API_KEY": ""},
+            "ALIBABA_CREDENTIAL_MISSING",
+        ),
+        (
+            {
+                "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL": (
+                    "https://other-workspace.cn-beijing.maas.aliyuncs.com/apps/anthropic"
+                )
+            },
+            "ALIBABA_ENDPOINT_WORKSPACE_MISMATCH",
+        ),
+        (
+            {"HARNESSLAB_ALIBABA_BAILIAN_QWEN38_MODEL_ID": "qwen-different"},
+            "ALIBABA_DEPLOYED_MODEL_ID_MISMATCH",
+        ),
+    ],
+)
+def test_failed_identity_preflight_is_blocked_and_zero_call(
+    control: V6CanaryControl,
+    mutation: dict[str, str],
+    reason_code: str,
+) -> None:
+    environment = {**_environment(), **mutation}
+    receipt = _preflight(control, environment=environment)
+    assert receipt.status is V6CanaryStatus.BLOCKED
+    assert reason_code in {item.reason_code for item in receipt.findings}
+    assert (receipt.provider_calls, receipt.harness_provider_calls, receipt.judge_calls) == (
+        0,
+        0,
+        0,
+    )
+
+
+def test_missing_pricing_inputs_stay_required_and_never_become_zero(
+    control: V6CanaryControl,
+) -> None:
+    incomplete = V6OperatorInputs(input_id="v6-incomplete-pricing")
+    receipt = _preflight(control, operator=incomplete)
+    pricing = [item for item in receipt.findings if item.check_id.startswith("pricing:")]
+    assert receipt.status is V6CanaryStatus.BLOCKED
+    assert receipt.pricing_status == "OPERATOR_INPUTS_REQUIRED"
+    assert pricing and all(item.status.value == "BLOCKED" for item in pricing)
+    assert all("not treated as zero" in item.detail for item in pricing)
+
+
+def test_ready_receipt_contains_only_references_and_fingerprints(
+    control: V6CanaryControl,
+) -> None:
+    receipt = _preflight(control)
+    serialized = receipt.model_dump_json()
+    assert receipt.status is V6CanaryStatus.READY
+    assert receipt.endpoint_evidence.same_workspace is True
+    assert receipt.credential_present is True
+    assert SECRET not in serialized
+    assert OPENAI_ENDPOINT not in serialized
+    assert ANTHROPIC_ENDPOINT not in serialized
+    assert "workspace-sentinel" not in serialized
+    assert receipt.judge_state == "PROVISIONAL_PENDING_REAL_CANARY"
+
+
+def test_receipt_persistence_is_immutable_and_idempotent(
+    tmp_path: Path, control: V6CanaryControl
+) -> None:
+    receipt = _preflight(control)
+    first = persist_v6_preflight_receipt(tmp_path, receipt)
+    assert persist_v6_preflight_receipt(tmp_path, receipt) == first
+    first.write_text("changed\n", encoding="utf-8")
+    with pytest.raises(V6CanaryControlError, match="different bytes"):
+        persist_v6_preflight_receipt(tmp_path, receipt)
+
+
+def test_authorization_scopes_reject_v5_and_matrix_reuse(
+    control: V6CanaryControl,
+) -> None:
+    preflight = _preflight(control)
+    authorization = _authorization(control, preflight)
+    assert authorization.matrix_execution_authorized is False
+    with pytest.raises(ValidationError):
+        V6CanaryAuthorizationRequest.model_validate(
+            {
+                **authorization.model_dump(mode="json", exclude={"authorization_digest"}),
+                "scope": "CORE_REAL_MATRIX_V5_CANARY",
+            }
+        )
+    with pytest.raises(ValidationError):
+        V6MatrixAuthorizationReceipt.model_validate(authorization.model_dump(mode="json"))
+
+
+@pytest.mark.asyncio
+async def test_failed_preflight_never_invokes_and_fourth_call_is_rejected(
+    tmp_path: Path, control: V6CanaryControl
+) -> None:
+    blocked = _preflight(
+        control,
+        environment={**_environment(), "HARNESSLAB_ALIBABA_BAILIAN_API_KEY": ""},
+    )
+    ready = _preflight(control)
+    authorization = _authorization(control, ready)
+    invoker = _FakeInvoker(tmp_path / "blocked" / "provider-evidence")
+    with pytest.raises(V6CanaryControlError, match="failed V6 preflight"):
+        await V6CanaryControlPlane(control).execute(
+            preflight=blocked,
+            authorization=authorization,
+            invoker=invoker,
+            artifact_root=tmp_path / "blocked",
+            allow_real_v6_canary=True,
+        )
+    assert invoker.calls == []
+
+    four_calls = (*control.calls, control.calls[-1])
+    with pytest.raises(V6CanaryControlError, match="exactly the preregistered three"):
+        await V6CanaryControlPlane(control).execute(
+            preflight=ready,
+            authorization=authorization,
+            invoker=invoker,
+            artifact_root=tmp_path / "fourth",
+            allow_real_v6_canary=True,
+            calls=four_calls,
+        )
+    assert invoker.calls == []
+
+
+@pytest.mark.asyncio
+async def test_exact_execution_is_bounded_and_resume_is_idempotent(
+    tmp_path: Path, control: V6CanaryControl
+) -> None:
+    preflight = _preflight(control)
+    authorization = _authorization(control, preflight)
+    artifact_root = tmp_path / "canary"
+    invoker = _FakeInvoker(artifact_root / "provider-evidence")
+    plane = V6CanaryControlPlane(control)
+    closeout = await plane.execute(
+        preflight=preflight,
+        authorization=authorization,
+        invoker=invoker,
+        artifact_root=artifact_root,
+        allow_real_v6_canary=True,
+    )
+    assert tuple(invoker.calls) == EXPECTED_CALL_IDS
+    assert closeout.attempted_primary_calls == 3
+    assert closeout.retries == closeout.semantic_retries == closeout.substitutions == 0
+    assert closeout.judge_state == "CANARY_QUALIFIED"
+
+    resumed = _FakeInvoker(artifact_root / "provider-evidence")
+    assert (
+        await plane.execute(
+            preflight=preflight,
+            authorization=authorization,
+            invoker=resumed,
+            artifact_root=artifact_root,
+            allow_real_v6_canary=True,
+        )
+        == closeout
+    )
+    assert resumed.calls == []
+
+    evidence_file = artifact_root / "provider-evidence" / EXPECTED_CALL_IDS[0] / "evidence.json"
+    evidence_file.write_text("tampered\n", encoding="utf-8")
+    with pytest.raises(V6CanaryControlError, match="artifact digest mismatch"):
+        await plane.execute(
+            preflight=preflight,
+            authorization=authorization,
+            invoker=resumed,
+            artifact_root=artifact_root,
+            allow_real_v6_canary=True,
+        )
+    assert resumed.calls == []
+
+
+@pytest.mark.asyncio
+async def test_failure_stops_suffix_and_judge_remains_provisional(
+    tmp_path: Path, control: V6CanaryControl
+) -> None:
+    preflight = _preflight(control)
+    authorization = _authorization(control, preflight)
+    artifact_root = tmp_path / "failed"
+    invoker = _FakeInvoker(artifact_root / "provider-evidence", fail_call=EXPECTED_CALL_IDS[1])
+    closeout = await V6CanaryControlPlane(control).execute(
+        preflight=preflight,
+        authorization=authorization,
+        invoker=invoker,
+        artifact_root=artifact_root,
+        allow_real_v6_canary=True,
+    )
+    assert tuple(invoker.calls) == EXPECTED_CALL_IDS[:2]
+    assert closeout.attempted_primary_calls == 2
+    assert closeout.failing_call_id == EXPECTED_CALL_IDS[1]
+    assert closeout.judge_state == "PROVISIONAL_PENDING_REAL_CANARY"
+
+
+@pytest.mark.asyncio
+async def test_launch_without_terminal_evidence_can_never_retry(
+    tmp_path: Path, control: V6CanaryControl
+) -> None:
+    preflight = _preflight(control)
+    authorization = _authorization(control, preflight)
+    artifact_root = tmp_path / "crashed"
+    marker = V6CanaryControlPlane(control)._launch_marker(
+        control.calls[0], preflight, authorization
+    )
+    marker_path = artifact_root / "launch-journal" / f"001-{control.calls[0].call_id}.json"
+    marker_path.parent.mkdir(parents=True)
+    marker_path.write_text(
+        marker.model_dump_json() + "\n",
+        encoding="utf-8",
+    )
+    invoker = _FakeInvoker(tmp_path / "fake")
+    with pytest.raises(V6CanaryControlError, match="retries are zero"):
+        await V6CanaryControlPlane(control).execute(
+            preflight=preflight,
+            authorization=authorization,
+            invoker=invoker,
+            artifact_root=artifact_root,
+            allow_real_v6_canary=True,
+        )
+    assert invoker.calls == []
+
+
+def test_call_evidence_schema_cannot_represent_retries_or_substitution(
+    control: V6CanaryControl,
+) -> None:
+    assert V6CanaryCallEvidence.model_fields["retry_count"].default == 0
+    assert V6CanaryCallEvidence.model_fields["semantic_retry_count"].default == 0
+    assert V6CanaryCallEvidence.model_fields["substitution_count"].default == 0
+    with pytest.raises(ValidationError):
+        V6CanaryCallEvidence.model_validate(
+            {
+                "retry_count": 1,
+                "semantic_retry_count": 0,
+                "substitution_count": 0,
+            }
+        )
+    assert all(item.route_identity.startswith("alibaba-bailian|") for item in control.calls)

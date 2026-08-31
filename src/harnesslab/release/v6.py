@@ -39,6 +39,10 @@ from harnesslab.experiment.spec import (
 from harnesslab.registry.models import HarnessDefinition, HarnessProfileDefinition
 from harnesslab.registry.seeds import build_registry_catalog
 from harnesslab.release.contracts import load_core_corpus
+from harnesslab.release.v6_authorization import (
+    V6_MATRIX_EXECUTION_PROFILE_IDENTITY,
+    V6MatrixAuthorizationReceipt,
+)
 from harnesslab.tasks.package import TaskPackage
 
 V6_EXPERIMENT_ID = "core-real-matrix-v6"
@@ -357,6 +361,7 @@ async def dispatch_v6_queue(
     binding_identities: Mapping[str, str],
     owner: str,
     max_runs: int,
+    matrix_authorization: V6MatrixAuthorizationReceipt,
     profile: DispatchProfile | None = None,
 ) -> BlockDispatchResult:
     """Authoritative V6 production path; it never falls back to schema-v1 claiming."""
@@ -368,7 +373,11 @@ async def dispatch_v6_queue(
     expected_identities = {cell.id: v6_binding_identity(cell) for cell in plan.cells}
     if dict(binding_identities) != expected_identities:
         raise ValueError("V6 executable binding identity drifted from the frozen plan")
-    selected = profile or selected_v6_dispatch_profile()
+    selected = validate_v6_matrix_authorization(
+        plan,
+        matrix_authorization=matrix_authorization,
+        profile=profile,
+    )
     async with session_factory() as session, session.begin():
         await enqueue_plan(session, plan)
     executor = ExperimentRunExecutor(
@@ -379,3 +388,29 @@ async def dispatch_v6_queue(
     )
     dispatcher = BlockAwareDispatcher(executor=executor, plan=plan, profile=selected)
     return await dispatcher.run(max_runs=max_runs)
+
+
+def validate_v6_matrix_authorization(
+    plan: MethodologyV2ExperimentPlan,
+    *,
+    matrix_authorization: V6MatrixAuthorizationReceipt,
+    profile: DispatchProfile | None = None,
+) -> DispatchProfile:
+    """Return Profile C only when a matching 630-slot Matrix receipt authorizes it."""
+
+    selected = profile or selected_v6_dispatch_profile()
+    production_profile = selected_v6_dispatch_profile()
+    if (
+        selected != production_profile
+        or selected.digest != V6_MATRIX_EXECUTION_PROFILE_IDENTITY
+        or not isinstance(matrix_authorization, V6MatrixAuthorizationReceipt)
+        or matrix_authorization.experiment_id != V6_EXPERIMENT_ID
+        or matrix_authorization.plan_digest != plan.digest
+        or matrix_authorization.authorized_slot_count != len(plan.run_slots)
+        or matrix_authorization.execution_profile_identity != selected.digest
+        or not matrix_authorization.matrix_execution_authorized
+        or matrix_authorization.authorization_digest
+        != matrix_authorization.expected_authorization_digest
+    ):
+        raise ValueError("V6 Matrix authorization or final execution-profile binding mismatch")
+    return selected

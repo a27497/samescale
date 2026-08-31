@@ -224,6 +224,7 @@ def build_checks(*, leaf_only: bool) -> tuple[Check, ...]:
             Check(
                 "Gate A regression",
                 ("uv", "run", "--locked", "python", "scripts/verify_gate_a.py"),
+                timeout_seconds=900,
             ),
             Check(
                 "Gate B regression",
