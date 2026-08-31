@@ -227,6 +227,16 @@ def test_self_hosted_fast_ci_preserves_hosted_fast_commands_without_fixed_port()
     ):
         assert self_hosted_runs[name] == hosted_runs[name]
     assert "services" not in self_hosted
+    assert any(
+        step.get("name") == "Install Java 21"
+        and step.get("with") == {"distribution": "temurin", "java-version": "21"}
+        for step in self_hosted["steps"]
+    )
+    assert any(
+        step.get("name") == "Install Node 24"
+        and step.get("with") == {"node-version": "24", "package-manager-cache": "false"}
+        for step in self_hosted["steps"]
+    )
     assert "5432:5432" not in SELF_HOSTED_FAST_WORKFLOW.read_text(encoding="utf-8")
     assert "5432:5432" not in SELF_HOSTED_FULL_WORKFLOW.read_text(encoding="utf-8")
 
