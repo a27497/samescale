@@ -7,10 +7,13 @@ Matrix. It can authorize only these top-level launches, in order:
 2. Claude Code plus Qwen3.8 Max through Alibaba Anthropic-compatible Messages.
 3. The preferred GLM-5.2 Alibaba Judge on the frozen `label-l0-pass` public case.
 
-The structural limits are three primary launches, zero retries, zero semantic retries, zero
-substitutions, and no Matrix acquisition. A launch marker is persisted before each call. If a
-process ends after that marker but before terminal per-call evidence, resume hard-stops because the
-call may already have spent and the retry budget is zero.
+The structural limits are three primary launches and at most 18 provider requests: one Direct
+request, up to 16 Claude/Qwen requests under `--max-turns 16`, and one Judge request. The Claude
+launch also sets `CLAUDE_CODE_MAX_OUTPUT_TOKENS=2000`, bounding output per request. Retries,
+semantic retries, and substitutions are zero, and Matrix acquisition is forbidden. A launch marker
+is persisted before each primary launch. If a process ends after that marker but before terminal
+per-call evidence, resume hard-stops because the launch may already have spent and the retry budget
+is zero.
 
 ## Operator inputs
 
@@ -56,7 +59,8 @@ location and replace its identifiers, timestamp, and the two zero-digest placeho
 `V6CanaryAuthorizationRequest` must
 bind the receipt digest and canary-plan digest, use scope
 `CORE_REAL_MATRIX_V6_THREE_CALL_CANARY`, set `spend_authorized` and `allow_real_canary` to true,
-and retain the literal zero retry/substitution and false Matrix fields. Issue the receipt with:
+bind limits of 3 primary launches, 18 provider requests, and 16 Claude Harness turns, and retain
+the literal zero retry/substitution and false Matrix fields. Issue the receipt with:
 
 ```console
 harnesslab release v6-canary authorize \
@@ -70,6 +74,17 @@ slots, pricing/spend authority, and Profile C execution identity
 `sha256:85117b2577f3456e0df573ed2467d19dee64bebca748e178bd92017dea6133b7`.
 Profile A and Profile B receipts fail closed. The canary remains independent and does not bind or
 depend on throughput-profile authorization.
+
+## Planning cost basis
+
+At the frozen standard non-cache CNY rates, the planning-envelope projections are CNY `0.465216`
+for Direct Qwen, CNY `0.465216` for the historical Claude/Qwen envelope, and CNY `0.072704` for the
+GLM Judge, totaling CNY `1.003136`. This is
+`PLANNING_ESTIMATE_NOT_HARD_BILLING_CEILING`: aggregate Claude input-token usage is not hard-capped
+by the CLI. Executable safety instead comes from the 3-primary-launch / at-most-18-provider-request
+structure, the 16-turn Claude cap, per-request output cap, timeouts, fixed workloads/models/routes,
+and zero retries or substitutions. A future operator must still explicitly authorize spend; this
+control does not impose or claim a hard CNY billing ceiling.
 
 ## Future execution
 
@@ -85,6 +100,6 @@ harnesslab release v6-canary execute \
 
 Execution recomputes the full local preflight and requires byte-equivalent receipt facts before
 call one. Per-call evidence and the concise closeout are immutable. GLM-5.2 remains
-`PROVISIONAL_PENDING_REAL_CANARY` unless all three calls, including exact observed Judge model and
-strict public JSON parsing, succeed. This control-plane implementation does not itself authorize or
-execute the canary.
+`PROVISIONAL_PENDING_REAL_CANARY` unless all three primary launches, including exact observed Judge
+model and strict public JSON parsing, succeed. This control-plane implementation does not itself
+authorize or execute the canary.

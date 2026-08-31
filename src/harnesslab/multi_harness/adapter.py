@@ -69,6 +69,19 @@ def _safe_paths(workspace: Path, context: Path | None) -> None:
 class ClaudeCodeAdapter:
     """Claude Code H-Lane adapter; it never decides task correctness."""
 
+    def __init__(
+        self,
+        *,
+        max_turns: int | None = None,
+        max_output_tokens: int | None = None,
+    ) -> None:
+        if max_turns is not None and max_turns <= 0:
+            raise HarnessAdapterError("Claude max turns must be positive")
+        if max_output_tokens is not None and max_output_tokens <= 0:
+            raise HarnessAdapterError("Claude max output tokens must be positive")
+        self.max_turns = max_turns
+        self.max_output_tokens = max_output_tokens
+
     def preflight(self, profile: MultiHarnessProfile) -> None:
         if profile.harness is not HarnessKind.CLAUDE_CODE:
             raise HarnessAdapterError("Claude adapter received another harness profile")
@@ -107,6 +120,8 @@ class ClaudeCodeAdapter:
             "--disable-slash-commands",
             "--no-chrome",
         )
+        if self.max_turns is not None:
+            argv = (*argv, "--max-turns", str(self.max_turns))
         environment_references: tuple[tuple[str, str], ...] = ()
         environment_literals: tuple[tuple[str, str], ...] = (
             ("CLAUDE_CODE_DISABLE_AUTO_MEMORY", "1"),
@@ -114,6 +129,11 @@ class ClaudeCodeAdapter:
             ("CLAUDE_CODE_NO_MODEL_FALLBACK", "1"),
             ("CLAUDE_CONFIG_DIR", "/tmp/claude-config"),
         )
+        if self.max_output_tokens is not None:
+            environment_literals = (
+                *environment_literals,
+                ("CLAUDE_CODE_MAX_OUTPUT_TOKENS", str(self.max_output_tokens)),
+            )
         if profile.provider_credential_reference is not None:
             assert profile.provider_credential_reference is not None
             assert profile.provider_credential_transport is not None

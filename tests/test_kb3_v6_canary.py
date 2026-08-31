@@ -8,6 +8,9 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from harnesslab.multi_harness.models import HarnessKind
+from harnesslab.multi_harness.profile import configured_qwen_alibaba_bailian_claude_profile
+from harnesslab.multi_harness.prompt import render_harness_prompt
 from harnesslab.release.v6_authorization import (
     V6CanaryAuthorizationReceipt,
     V6CanaryAuthorizationRequest,
@@ -120,6 +123,9 @@ def _authorization(
             preflight_receipt_digest=preflight.receipt_digest,
             spend_authorized=True,
             allow_real_canary=True,
+            max_primary_calls=3,
+            max_provider_requests=18,
+            max_harness_turns=16,
         ),
     )
 
@@ -160,10 +166,41 @@ def test_control_is_exactly_three_calls_with_structural_zero_retries(
 ) -> None:
     assert tuple(item.call_id for item in control.calls) == EXPECTED_CALL_IDS
     assert control.max_primary_calls == 3
+    assert control.max_provider_requests == 18
+    assert control.max_harness_turns == 16
+    assert tuple(item.max_provider_requests for item in control.calls) == (1, 16, 1)
+    assert tuple(item.max_harness_turns for item in control.calls) == (None, 16, None)
     assert control.retries == control.semantic_retries == control.substitutions == 0
     assert control.matrix_execution_allowed is False
     assert control.judge_initial_state == "PROVISIONAL_PENDING_REAL_CANARY"
     assert control.throughput_profile_binding.startswith("NOT_REQUIRED_FOR_THREE_CALL_CANARY")
+
+
+def test_v6_claude_adapter_binds_turn_and_output_limits(
+    tmp_path: Path, control: V6CanaryControl
+) -> None:
+    call = control.calls[1]
+    image = _host().claude_image
+    assert image is not None
+    assert call.task_digest is not None
+    profile = configured_qwen_alibaba_bailian_claude_profile(
+        image, execution_timeout_seconds=call.timeout_seconds
+    )
+    prompt = render_harness_prompt(
+        HarnessKind.CLAUDE_CODE,
+        task_instruction="Bounded V6 canary test.",
+        task_digest=call.task_digest,
+        workspace_input_digest="sha256:" + "d" * 64,
+        context_digest=None,
+        network_policy=profile.network_policy,
+    )
+    plan = ProductionV6CanaryInvoker._claude_adapter(call).prepare(
+        profile, prompt, workspace=tmp_path, context=None, task_id="v6-bounded-claude"
+    )
+    assert plan.argv.count("--max-turns") == 1
+    index = plan.argv.index("--max-turns")
+    assert plan.argv[index : index + 2] == ("--max-turns", "16")
+    assert dict(plan.environment_literals)["CLAUDE_CODE_MAX_OUTPUT_TOKENS"] == "2000"
 
 
 def test_control_binds_current_v6_source_and_public_rate_fact(
@@ -303,6 +340,11 @@ def test_ready_receipt_contains_only_references_and_fingerprints(
         != receipt.endpoint_evidence.anthropic_endpoint_fingerprint
     )
     assert receipt.credential_present is True
+    assert receipt.max_primary_calls == 3
+    assert receipt.max_provider_requests == 18
+    assert receipt.max_harness_turns == 16
+    assert receipt.retries == receipt.semantic_retries == receipt.substitutions == 0
+    assert receipt.matrix_execution_authorized is False
     assert SECRET not in serialized
     assert OPENAI_ENDPOINT not in serialized
     assert ANTHROPIC_ENDPOINT not in serialized
@@ -326,11 +368,29 @@ def test_authorization_scopes_reject_v5_and_matrix_reuse(
 ) -> None:
     preflight = _preflight(control)
     authorization = _authorization(control, preflight)
+    assert authorization.max_primary_calls == 3
+    assert authorization.max_provider_requests == 18
+    assert authorization.max_harness_turns == 16
+    assert authorization.retries == authorization.semantic_retries == 0
+    assert authorization.substitutions == 0
     assert authorization.matrix_execution_authorized is False
+    raw = authorization.model_dump(mode="json", exclude={"authorization_digest"})
+    for required in ("max_primary_calls", "max_provider_requests", "max_harness_turns"):
+        missing = {**raw}
+        missing.pop(required)
+        with pytest.raises(ValidationError):
+            V6CanaryAuthorizationRequest.model_validate(missing)
+    for field, wrong in (
+        ("max_primary_calls", 4),
+        ("max_provider_requests", 17),
+        ("max_harness_turns", 15),
+    ):
+        with pytest.raises(ValidationError):
+            V6CanaryAuthorizationRequest.model_validate({**raw, field: wrong})
     with pytest.raises(ValidationError):
         V6CanaryAuthorizationRequest.model_validate(
             {
-                **authorization.model_dump(mode="json", exclude={"authorization_digest"}),
+                **raw,
                 "scope": "CORE_REAL_MATRIX_V5_CANARY",
             }
         )
@@ -360,7 +420,7 @@ async def test_failed_preflight_never_invokes_and_fourth_call_is_rejected(
     assert invoker.calls == []
 
     four_calls = (*control.calls, control.calls[-1])
-    with pytest.raises(V6CanaryControlError, match="exactly the preregistered three"):
+    with pytest.raises(V6CanaryControlError, match="exactly three preregistered primary launches"):
         await V6CanaryControlPlane(control).execute(
             preflight=ready,
             authorization=authorization,
@@ -390,7 +450,11 @@ async def test_exact_execution_is_bounded_and_resume_is_idempotent(
     )
     assert tuple(invoker.calls) == EXPECTED_CALL_IDS
     assert closeout.attempted_primary_calls == 3
+    assert closeout.max_primary_calls == 3
+    assert closeout.max_provider_requests == 18
+    assert closeout.max_harness_turns == 16
     assert closeout.retries == closeout.semantic_retries == closeout.substitutions == 0
+    assert closeout.matrix_execution_authorized is False
     assert closeout.judge_state == "CANARY_QUALIFIED"
 
     resumed = _FakeInvoker(artifact_root / "provider-evidence")

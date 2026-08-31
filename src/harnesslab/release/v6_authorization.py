@@ -19,7 +19,7 @@ class _FrozenModel(BaseModel):
 
 
 class V6CanaryAuthorizationRequest(_FrozenModel):
-    """Operator-owned authority for only the preregistered three-call V6 canary."""
+    """Operator-owned authority for only the preregistered V6 canary launches."""
 
     schema_version: Literal[1] = 1
     scope: Literal["CORE_REAL_MATRIX_V6_THREE_CALL_CANARY"]
@@ -32,7 +32,9 @@ class V6CanaryAuthorizationRequest(_FrozenModel):
     preflight_receipt_digest: Sha256Digest
     spend_authorized: Literal[True]
     allow_real_canary: Literal[True]
-    max_primary_calls: Literal[3] = 3
+    max_primary_calls: Literal[3]
+    max_provider_requests: Literal[18]
+    max_harness_turns: Literal[16]
     retries: Literal[0] = 0
     semantic_retries: Literal[0] = 0
     substitutions: Literal[0] = 0

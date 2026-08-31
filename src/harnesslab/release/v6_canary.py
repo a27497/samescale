@@ -127,6 +127,8 @@ class V6CanaryCall(_FrozenModel):
     task_digest: Sha256Digest | None
     judge_case_reference: str | None
     max_output_tokens: int = Field(gt=0)
+    max_provider_requests: int = Field(gt=0, le=16)
+    max_harness_turns: int | None = Field(default=None, gt=0, le=16)
     timeout_seconds: int = Field(gt=0, le=180)
 
     @model_validator(mode="after")
@@ -136,6 +138,9 @@ class V6CanaryCall(_FrozenModel):
             raise ValueError("only the Judge canary may carry a Judge case")
         if is_judge == (self.task_reference is not None or self.task_digest is not None):
             raise ValueError("subject calls require one task identity; Judge calls do not")
+        is_harness = self.role is V6CanaryCallRole.SUBJECT_HARNESS
+        if is_harness != (self.max_harness_turns is not None):
+            raise ValueError("only the Harness canary requires a Harness turn ceiling")
         return self
 
 
@@ -164,6 +169,8 @@ class V6CanaryControl(_FrozenModel):
     public_rate_fact_digest: Sha256Digest
     host_minimums: V6HostMinimums
     max_primary_calls: Literal[3] = 3
+    max_provider_requests: Literal[18] = 18
+    max_harness_turns: Literal[16] = 16
     retries: Literal[0] = 0
     semantic_retries: Literal[0] = 0
     substitutions: Literal[0] = 0
@@ -218,6 +225,10 @@ class V6CanaryControl(_FrozenModel):
             raise ValueError("V6 subject canary task identities differ")
         if tuple(item.max_output_tokens for item in self.calls) != (2000, 2000, 256):
             raise ValueError("V6 canary output bounds drifted")
+        if tuple(item.max_provider_requests for item in self.calls) != (1, 16, 1):
+            raise ValueError("V6 canary provider-request bounds drifted")
+        if tuple(item.max_harness_turns for item in self.calls) != (None, 16, None):
+            raise ValueError("V6 canary Harness-turn bounds drifted")
         if tuple(item.timeout_seconds for item in self.calls) != (180, 180, 90):
             raise ValueError("V6 canary timeout bounds drifted")
         if self.deployed_model_references != {
@@ -305,7 +316,9 @@ class V6CanaryPreflightReceipt(_FrozenModel):
     host_observation: V6HostObservation
     pricing_status: Literal["CONFIRMED", "OPERATOR_INPUTS_REQUIRED"]
     public_rate_fact_digest: Sha256Digest
-    max_primary_calls: Literal[3] = 3
+    max_primary_calls: Literal[3]
+    max_provider_requests: Literal[18]
+    max_harness_turns: Literal[16]
     retries: Literal[0] = 0
     semantic_retries: Literal[0] = 0
     substitutions: Literal[0] = 0
@@ -448,6 +461,9 @@ def assess_v6_canary_preflight(
         "host_observation": host,
         "pricing_status": "CONFIRMED" if pricing_ready else "OPERATOR_INPUTS_REQUIRED",
         "public_rate_fact_digest": control.public_rate_fact_digest,
+        "max_primary_calls": control.max_primary_calls,
+        "max_provider_requests": control.max_provider_requests,
+        "max_harness_turns": control.max_harness_turns,
         "judge_state": control.judge_initial_state,
     }
     draft = V6CanaryPreflightReceipt.model_construct(
@@ -627,7 +643,9 @@ class V6CanaryCloseout(_FrozenModel):
     call_evidence_digests: tuple[Sha256Digest, ...]
     failing_call_id: str | None = None
     failure_category: V6CanaryFailureCategory | None = None
-    max_primary_calls: Literal[3] = 3
+    max_primary_calls: Literal[3]
+    max_provider_requests: Literal[18]
+    max_harness_turns: Literal[16]
     retries: Literal[0] = 0
     semantic_retries: Literal[0] = 0
     substitutions: Literal[0] = 0
@@ -766,7 +784,7 @@ class ProductionV6CanaryInvoker:
         result = await MultiHarnessRunner(artifact_root=self._provider_artifact_root(call)).run(
             self.repository_root / call.task_reference,
             profile,
-            adapter=ClaudeCodeAdapter(),
+            adapter=self._claude_adapter(call),
             backend=backend,
             run_id=call.call_id,
         )
@@ -802,6 +820,15 @@ class ProductionV6CanaryInvoker:
             evidence_digest=digests[0],
             extra_references=tuple(references[1:]),
             extra_digests=tuple(digests[1:]),
+        )
+
+    @staticmethod
+    def _claude_adapter(call: V6CanaryCall) -> ClaudeCodeAdapter:
+        if call.role is not V6CanaryCallRole.SUBJECT_HARNESS or call.max_harness_turns is None:
+            raise V6CanaryControlError("V6 Claude call lacks the frozen Harness-turn bound")
+        return ClaudeCodeAdapter(
+            max_turns=call.max_harness_turns,
+            max_output_tokens=call.max_output_tokens,
         )
 
     async def _judge(
@@ -921,7 +948,7 @@ class ProductionV6CanaryInvoker:
 
 
 class V6CanaryControlPlane:
-    """Exact three-call executor with crash-safe no-retry resume semantics."""
+    """Three-primary-launch executor with crash-safe no-retry resume semantics."""
 
     def __init__(self, control: V6CanaryControl) -> None:
         self.control = control
@@ -1015,7 +1042,7 @@ class V6CanaryControlPlane:
             raise V6CanaryControlError("failed V6 preflight leaves external-call count at zero")
         if calls != self.control.calls or len(calls) != 3:
             raise V6CanaryControlError(
-                "V6 canary executor accepts exactly the preregistered three calls"
+                "V6 canary executor accepts exactly three preregistered primary launches"
             )
         exact = (
             preflight.canary_plan_digest == self.control.digest,
@@ -1024,6 +1051,8 @@ class V6CanaryControlPlane:
             authorization.preflight_receipt_digest == preflight.receipt_digest,
             authorization.plan_digest == self.control.plan_digest,
             authorization.max_primary_calls == self.control.max_primary_calls,
+            authorization.max_provider_requests == self.control.max_provider_requests,
+            authorization.max_harness_turns == self.control.max_harness_turns,
             authorization.retries == self.control.retries,
             authorization.semantic_retries == self.control.semantic_retries,
             authorization.substitutions == self.control.substitutions,
@@ -1198,6 +1227,9 @@ class V6CanaryControlPlane:
             "call_evidence_digests": tuple(item.evidence_digest for item in evidence),
             "failing_call_id": failed.call_id if failed else None,
             "failure_category": failed.failure_category if failed else None,
+            "max_primary_calls": self.control.max_primary_calls,
+            "max_provider_requests": self.control.max_provider_requests,
+            "max_harness_turns": self.control.max_harness_turns,
             "judge_state": ("CANARY_QUALIFIED" if succeeded else "PROVISIONAL_PENDING_REAL_CANARY"),
         }
         draft = V6CanaryCloseout.model_construct(

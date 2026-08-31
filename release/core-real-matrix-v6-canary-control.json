@@ -40,6 +40,8 @@
       "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
       "judge_case_reference": null,
       "max_output_tokens": 2000,
+      "max_provider_requests": 1,
+      "max_harness_turns": null,
       "timeout_seconds": 180
     },
     {
@@ -59,6 +61,8 @@
       "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
       "judge_case_reference": null,
       "max_output_tokens": 2000,
+      "max_provider_requests": 16,
+      "max_harness_turns": 16,
       "timeout_seconds": 180
     },
     {
@@ -78,6 +82,8 @@
       "task_digest": null,
       "judge_case_reference": "judge_suites/core-calibration/1.0.0#label-l0-pass",
       "max_output_tokens": 256,
+      "max_provider_requests": 1,
+      "max_harness_turns": null,
       "timeout_seconds": 90
     }
   ],
@@ -91,6 +97,8 @@
     "egress_proxy_image_reference": "harnesslab-egress-proxy:1.0.0"
   },
   "max_primary_calls": 3,
+  "max_provider_requests": 18,
+  "max_harness_turns": 16,
   "retries": 0,
   "semantic_retries": 0,
   "substitutions": 0,

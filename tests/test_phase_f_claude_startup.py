@@ -76,6 +76,31 @@ def _docker(
     )
 
 
+def test_pinned_claude_recognizes_hidden_max_turns_flag_keylessly() -> None:
+    result = _docker(
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        CLAUDE_IMAGE,
+        "-p",
+        "--max-turns",
+        "not-an-integer",
+        "probe",
+        check=False,
+    )
+    diagnostic = result.stderr.decode("utf-8", errors="strict")
+    assert result.returncode == 1
+    assert "option '--max-turns <turns>'" in diagnostic
+    assert "is invalid. must be a number" in diagnostic
+    assert "unknown option" not in diagnostic.lower()
+
+
 def _production_plan(workspace: Path) -> HarnessExecutionPlan:
     image = ImageIdentity(reference=CLAUDE_IMAGE, image_id="sha256:" + "7" * 64)
     profile = configured_qwen_opencode_go_claude_profile(image, execution_timeout_seconds=5)

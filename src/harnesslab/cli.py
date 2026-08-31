@@ -109,7 +109,7 @@ release_judge_app = typer.Typer(
 )
 release_v6_canary_app = typer.Typer(
     no_args_is_help=True,
-    help="Preflight, authorize, or execute only the bounded V6 Alibaba three-call canary.",
+    help="Preflight, authorize, or execute only the bounded V6 Alibaba canary.",
 )
 app.command("up")(up_command)
 app.command("down")(down_command)
@@ -181,7 +181,7 @@ def authorize_release_v6_canary(
         "artifacts/core-real-matrix-v6-canary-control", "--receipt-root"
     ),
 ) -> None:
-    """Issue only the scope-bound three-call authorization from a READY receipt."""
+    """Issue only the scope-bound three-primary-launch authorization from a READY receipt."""
 
     try:
         preflight = load_v6_preflight_receipt(Path(preflight_receipt))
@@ -208,7 +208,7 @@ def execute_release_v6_canary(
     ),
     repository_root: str = typer.Option(".", "--repository-root"),
 ) -> None:
-    """Execute exactly three preregistered calls; no Matrix, retry, or substitution path."""
+    """Execute three primary launches and at most 18 provider requests; no Matrix path."""
 
     try:
         closeout = asyncio.run(

@@ -11,6 +11,8 @@
   "spend_authorized": true,
   "allow_real_canary": true,
   "max_primary_calls": 3,
+  "max_provider_requests": 18,
+  "max_harness_turns": 16,
   "retries": 0,
   "semantic_retries": 0,
   "substitutions": 0,

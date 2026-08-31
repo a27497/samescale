@@ -326,6 +326,7 @@ def test_claude_plan_is_non_bare_isolated_stream_json_with_canonical_tools(
     assert plan.argv[plan.argv.index("--setting-sources") + 1] == ""
     assert plan.argv[plan.argv.index("--mcp-config") + 1] == '{"mcpServers":{}}'
     assert "--disable-slash-commands" in plan.argv
+    assert "--max-turns" not in plan.argv
     assert "AskUserQuestion" not in plan.argv
     assert "WebSearch" not in plan.argv
     assert dict(plan.environment_literals) == {
@@ -334,6 +335,26 @@ def test_claude_plan_is_non_bare_isolated_stream_json_with_canonical_tools(
         "CLAUDE_CODE_NO_MODEL_FALLBACK": "1",
         "CLAUDE_CONFIG_DIR": "/tmp/claude-config",
     }
+
+
+def test_claude_optional_turn_and_output_bounds_are_explicit(tmp_path: Path) -> None:
+    profile = fake_profile(HarnessKind.CLAUDE_CODE)
+    prompt = render_harness_prompt(
+        HarnessKind.CLAUDE_CODE,
+        task_instruction="Fix clamp.",
+        task_digest="sha256:" + "1" * 64,
+        workspace_input_digest="sha256:" + "2" * 64,
+        context_digest=None,
+        network_policy=profile.network_policy,
+    )
+    plan = ClaudeCodeAdapter(max_turns=16, max_output_tokens=2000).prepare(
+        profile, prompt, workspace=tmp_path, context=None, task_id="bounded-claude"
+    )
+
+    assert plan.argv.count("--max-turns") == 1
+    index = plan.argv.index("--max-turns")
+    assert plan.argv[index : index + 2] == ("--max-turns", "16")
+    assert dict(plan.environment_literals)["CLAUDE_CODE_MAX_OUTPUT_TOKENS"] == "2000"
 
 
 @pytest.mark.asyncio
