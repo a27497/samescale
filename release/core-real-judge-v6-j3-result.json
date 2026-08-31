@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_GROK46_AIWANWU_RELAY_JUDGE_J3_ROUTE_CANARY_FREEZE",
+  "state": "PASS",
+  "calibration_id": "core-real-judge-v6-j3",
+  "j3_route_canary": "PASS",
+  "route_canary_digest": "sha256:5fd668f2705514217db87df11bd01ae6ab9ef1c8bba092df32fde63033ceca33",
+  "qualification_plan_digest": "sha256:3e8bc9249171e1fcc8675e31d9efdd208c8173d2fcd2a41d00d374dc95fb06c8",
+  "profile_identity": "sha256:ceaa61e57ed362b9dab7825b0da33f7b283ba108ad014933f29eb39b852e305e",
+  "canary_evidence_digest": "sha256:5f3652c20b9d21c9c14aa9bb039ede8c7a5f20ae3a42a6ec037a7f3f89a28796",
+  "route_result": {
+    "requested_model": "grok-4.6",
+    "observed_relay_model": "grok-4.6-build",
+    "relay_reported_model": "grok-4.6-build",
+    "scientific_route": "GROK_4_6_VIA_AIWANWU_RELAY",
+    "reasoning_effort": "high",
+    "application_calls": 1,
+    "retries": 0,
+    "provider_outcome": "SUCCESS",
+    "response_id": "cdbdb830-141d-973a-a806-e1272a21cbcc",
+    "strict_schema": "PROVIDER_ACCEPTED_AND_LOCAL_LABEL_PARSE_PASSED",
+    "latency_ms": 9622,
+    "xai_direct": false,
+    "historical_attempt_authorized": true
+  },
+  "token_usage": {
+    "non_cached_input_tokens": 366,
+    "cached_input_tokens": 128,
+    "input_tokens": 494,
+    "completion_output_tokens": 556,
+    "reasoning_tokens": 528,
+    "total_tokens": 1050,
+    "input_reconciliation": "366_NON_CACHED_PLUS_128_CACHED_EQUALS_494_INPUT"
+  },
+  "qualification_evidence": {
+    "eligible": false,
+    "qualification_status": "NOT_AUTHORIZED_NOT_RUN"
+  },
+  "empirical_billing_evidence": {
+    "state": "EMPIRICALLY_VERIFIED_FROM_SUCCESSFUL_CALL_RECORD",
+    "unit": "RELAY_BILLING_UNIT",
+    "currency_claimed": false,
+    "base_rates_per_1m": {
+      "non_cached_input": "4.00",
+      "cache_read": "1.00",
+      "output": "12.00"
+    },
+    "rate_multiplier": "0.15",
+    "effective_operator_rates_per_1m": {
+      "non_cached_input": "0.60",
+      "cache_read": "0.15",
+      "output": "1.80"
+    },
+    "matched_canary_billing_row": {
+      "model": "grok-4.6",
+      "reasoning_effort": "High",
+      "non_cached_input_tokens": 366,
+      "cache_read_tokens": 128,
+      "output_tokens": 556,
+      "rate_multiplier": "0.15",
+      "original_cost": "0.00826400",
+      "billed_cost": "0.00123960"
+    },
+    "rate_consistency_rows": [
+      {
+        "non_cached_input_tokens": 2531,
+        "cache_read_tokens": 128,
+        "output_tokens": 1384,
+        "billed_cost": "0.00402900",
+        "j3_judge_call": false
+      },
+      {
+        "non_cached_input_tokens": 13324,
+        "cache_read_tokens": 0,
+        "output_tokens": 667,
+        "billed_cost": "0.00919500",
+        "j3_judge_call": false
+      }
+    ],
+    "rate_consistency_rows_classification": "UNRELATED_APPLICATION_USAGE_NOT_J3_JUDGE_CALLS",
+    "shared_api_key_name": "opencode",
+    "shared_api_key_name_does_not_establish_j3_usage": true,
+    "xai_direct_pricing_used": false
+  },
+  "freeze_activity": {
+    "real_provider_calls": 0,
+    "real_judge_calls": 0,
+    "real_matrix_calls": 0
+  }
+}

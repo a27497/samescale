@@ -73,19 +73,60 @@
   },
   "route_canary": {
     "reference": "release/core-real-judge-v6-j3-route-canary.json",
+    "result_reference": "release/core-real-judge-v6-j3-result.json",
     "digest": "sha256:5fd668f2705514217db87df11bd01ae6ab9ef1c8bba092df32fde63033ceca33",
+    "evidence_digest": "sha256:5f3652c20b9d21c9c14aa9bb039ede8c7a5f20ae3a42a6ec037a7f3f89a28796",
     "call_count": 1,
     "application_retry_count": 0,
-    "authorization_state": "NOT_AUTHORIZED_NOT_RUN",
+    "result": "PASS",
+    "authorization_state": "AUTHORIZED_COMPLETED",
+    "observed_relay_model": "grok-4.6-build",
     "qualification_evidence_eligible": false,
     "qualification_evidence_reuse_prohibited": true
   },
-  "relay_price_state": "PENDING_EMPIRICAL_SUCCESSFUL_CALL_RECORD",
-  "qualification_spend_budget": "NOT_YET_FROZEN",
-  "billing_policy": {
+  "relay_pricing_and_qualification_budget": {
+    "relay_pricing_state": "EMPIRICALLY_VERIFIED_FROM_SUCCESSFUL_CALL_RECORD",
+    "unit": "RELAY_BILLING_UNIT",
+    "currency_claimed": false,
+    "base_rates_per_1m": {
+      "non_cached_input": "4.00",
+      "cache_read": "1.00",
+      "output": "12.00"
+    },
+    "rate_multiplier": "0.15",
+    "effective_operator_rates_per_1m": {
+      "non_cached_input": "0.60",
+      "cache_read": "0.15",
+      "output": "1.80"
+    },
     "official_xai_direct_pricing_used": false,
-    "relay_cost_estimate": "NOT_INVENTED",
-    "future_excel_parsing_in_scope": false
+    "operator_planning_ceiling": {
+      "amount": "1.000000",
+      "unit": "RELAY_BILLING_UNIT",
+      "classification": "CONSERVATIVE_OPERATOR_PLANNING_CEILING_NOT_THEORETICAL_WORST_CASE"
+    },
+    "supporting_empirical_reference": {
+      "highest_observed_billed_call": "0.00919500",
+      "qualification_slot_count": 63,
+      "scaled_reference": "0.57928500",
+      "formal_worst_case": false
+    },
+    "future_authorized_qualification_control": {
+      "cost_source": "PERSISTED_TOKEN_USAGE",
+      "cost_rates": "EMPIRICALLY_VERIFIED_EFFECTIVE_OPERATOR_RATES",
+      "stop_before_next_slot_when_cumulative_estimate_reaches_or_exceeds_ceiling": true,
+      "return_partial_evidence_on_ceiling_stop": true,
+      "retry_completed_or_failed_slots": false,
+      "preserve_token_fields": [
+        "non_cached_input",
+        "cached_input",
+        "completion_output",
+        "reasoning_tokens",
+        "total_tokens"
+      ],
+      "reasoning_tokens_are_billing_and_resource_evidence": true,
+      "max_public_output_tokens_is_total_billing_ceiling": false
+    }
   },
   "formal_matrix": {
     "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",

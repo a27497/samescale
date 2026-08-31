@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from decimal import Decimal
 from pathlib import Path
 
 from harnesslab.contracts.common import Protocol
@@ -32,6 +33,7 @@ J2_RESULT = RELEASE / "core-real-judge-v6-j2-result.json"
 J2_CANARY = RELEASE / "core-real-judge-v6-j2-route-canary.json"
 J3_PLAN = RELEASE / "core-real-judge-v6-j3-plan.json"
 J3_CANARY = RELEASE / "core-real-judge-v6-j3-route-canary.json"
+J3_RESULT = RELEASE / "core-real-judge-v6-j3-result.json"
 
 
 def test_j2_is_frozen_as_route_unavailable_not_judge_failure() -> None:
@@ -182,7 +184,7 @@ def test_j3_payloads_bind_high_reasoning_and_existing_strict_mode_schemas() -> N
     assert parser_digest == ("e23503f81e237c2de4a9859916091b36b4e4ec08d028b5bfd8e0167f9028c49b")
 
 
-def test_j3_route_canary_is_one_call_separate_and_not_authorized() -> None:
+def test_j3_route_canary_preregistration_is_one_call_separate() -> None:
     plan, suite, definitions = build_j3_plan(ROOT)
     identity = build_j3_route_canary_identity(plan, suite, definitions)
     frozen = json.loads(J3_CANARY.read_text())
@@ -217,14 +219,156 @@ def test_j3_route_canary_is_one_call_separate_and_not_authorized() -> None:
     ]
 
 
-def test_j3_relay_price_matrix_and_zero_call_controls_are_frozen() -> None:
+def test_j3_route_canary_result_is_frozen_pass() -> None:
+    frozen = json.loads(J3_RESULT.read_text())
+
+    assert frozen["state"] == frozen["j3_route_canary"] == "PASS"
+    assert frozen["route_canary_digest"] == J3_ROUTE_CANARY_DIGEST
+    assert frozen["qualification_plan_digest"] == J3_PLAN_DIGEST
+    assert frozen["profile_identity"] == (
+        "sha256:ceaa61e57ed362b9dab7825b0da33f7b283ba108ad014933f29eb39b852e305e"
+    )
+    assert frozen["canary_evidence_digest"] == (
+        "sha256:5f3652c20b9d21c9c14aa9bb039ede8c7a5f20ae3a42a6ec037a7f3f89a28796"
+    )
+    route = frozen["route_result"]
+    assert route == {
+        "requested_model": "grok-4.6",
+        "observed_relay_model": "grok-4.6-build",
+        "relay_reported_model": "grok-4.6-build",
+        "scientific_route": "GROK_4_6_VIA_AIWANWU_RELAY",
+        "reasoning_effort": "high",
+        "application_calls": 1,
+        "retries": 0,
+        "provider_outcome": "SUCCESS",
+        "response_id": "cdbdb830-141d-973a-a806-e1272a21cbcc",
+        "strict_schema": "PROVIDER_ACCEPTED_AND_LOCAL_LABEL_PARSE_PASSED",
+        "latency_ms": 9622,
+        "xai_direct": False,
+        "historical_attempt_authorized": True,
+    }
+    usage = frozen["token_usage"]
+    assert usage["non_cached_input_tokens"] + usage["cached_input_tokens"] == 494
+    assert usage == {
+        "non_cached_input_tokens": 366,
+        "cached_input_tokens": 128,
+        "input_tokens": 494,
+        "completion_output_tokens": 556,
+        "reasoning_tokens": 528,
+        "total_tokens": 1050,
+        "input_reconciliation": "366_NON_CACHED_PLUS_128_CACHED_EQUALS_494_INPUT",
+    }
+    assert frozen["qualification_evidence"] == {
+        "eligible": False,
+        "qualification_status": "NOT_AUTHORIZED_NOT_RUN",
+    }
+    assert set(frozen["freeze_activity"].values()) == {0}
+
+
+def test_j3_empirical_relay_pricing_arithmetic_is_exact() -> None:
+    result = json.loads(J3_RESULT.read_text())
+    billing = result["empirical_billing_evidence"]
+    assert billing["state"] == "EMPIRICALLY_VERIFIED_FROM_SUCCESSFUL_CALL_RECORD"
+    assert billing["unit"] == "RELAY_BILLING_UNIT"
+    assert billing["currency_claimed"] is False
+    assert billing["base_rates_per_1m"] == {
+        "non_cached_input": "4.00",
+        "cache_read": "1.00",
+        "output": "12.00",
+    }
+    assert billing["rate_multiplier"] == "0.15"
+    rates = billing["effective_operator_rates_per_1m"]
+    assert rates == {
+        "non_cached_input": "0.60",
+        "cache_read": "0.15",
+        "output": "1.80",
+    }
+    million = Decimal(1_000_000)
+
+    canary = billing["matched_canary_billing_row"]
+    base = (
+        Decimal(canary["non_cached_input_tokens"]) * Decimal("4.00")
+        + Decimal(canary["cache_read_tokens"]) * Decimal("1.00")
+        + Decimal(canary["output_tokens"]) * Decimal("12.00")
+    ) / million
+    billed = (
+        Decimal(canary["non_cached_input_tokens"]) * Decimal(rates["non_cached_input"])
+        + Decimal(canary["cache_read_tokens"]) * Decimal(rates["cache_read"])
+        + Decimal(canary["output_tokens"]) * Decimal(rates["output"])
+    ) / million
+    assert base == Decimal(canary["original_cost"]) == Decimal("0.00826400")
+    assert billed == Decimal(canary["billed_cost"]) == Decimal("0.00123960")
+    assert base * Decimal(canary["rate_multiplier"]) == billed
+
+    expected = [Decimal("0.00402900"), Decimal("0.00919500")]
+    for row, expected_cost in zip(billing["rate_consistency_rows"], expected, strict=True):
+        row_cost = (
+            Decimal(row["non_cached_input_tokens"]) * Decimal(rates["non_cached_input"])
+            + Decimal(row["cache_read_tokens"]) * Decimal(rates["cache_read"])
+            + Decimal(row["output_tokens"]) * Decimal(rates["output"])
+        ) / million
+        assert row_cost == Decimal(row["billed_cost"]) == expected_cost
+        assert row["j3_judge_call"] is False
+
+    assert billing["rate_consistency_rows_classification"] == (
+        "UNRELATED_APPLICATION_USAGE_NOT_J3_JUDGE_CALLS"
+    )
+    assert billing["shared_api_key_name"] == "opencode"
+    assert billing["shared_api_key_name_does_not_establish_j3_usage"] is True
+    assert billing["xai_direct_pricing_used"] is False
+
+
+def test_j3_qualification_budget_matrix_and_zero_call_controls_are_frozen() -> None:
     frozen = json.loads(J3_PLAN.read_text())
-    assert frozen["relay_price_state"] == "PENDING_EMPIRICAL_SUCCESSFUL_CALL_RECORD"
-    assert frozen["qualification_spend_budget"] == "NOT_YET_FROZEN"
-    assert frozen["billing_policy"] == {
-        "official_xai_direct_pricing_used": False,
-        "relay_cost_estimate": "NOT_INVENTED",
-        "future_excel_parsing_in_scope": False,
+    route_canary = frozen["route_canary"]
+    assert route_canary["result"] == "PASS"
+    assert route_canary["authorization_state"] == "AUTHORIZED_COMPLETED"
+    assert route_canary["observed_relay_model"] == "grok-4.6-build"
+    assert route_canary["qualification_evidence_eligible"] is False
+
+    pricing = frozen["relay_pricing_and_qualification_budget"]
+    assert pricing["relay_pricing_state"] == ("EMPIRICALLY_VERIFIED_FROM_SUCCESSFUL_CALL_RECORD")
+    assert pricing["unit"] == "RELAY_BILLING_UNIT"
+    assert pricing["currency_claimed"] is False
+    assert pricing["base_rates_per_1m"] == {
+        "non_cached_input": "4.00",
+        "cache_read": "1.00",
+        "output": "12.00",
+    }
+    assert pricing["effective_operator_rates_per_1m"] == {
+        "non_cached_input": "0.60",
+        "cache_read": "0.15",
+        "output": "1.80",
+    }
+    assert pricing["official_xai_direct_pricing_used"] is False
+    assert pricing["operator_planning_ceiling"] == {
+        "amount": "1.000000",
+        "unit": "RELAY_BILLING_UNIT",
+        "classification": ("CONSERVATIVE_OPERATOR_PLANNING_CEILING_NOT_THEORETICAL_WORST_CASE"),
+    }
+    reference = pricing["supporting_empirical_reference"]
+    assert (
+        Decimal(reference["highest_observed_billed_call"]) * reference["qualification_slot_count"]
+        == Decimal(reference["scaled_reference"])
+        == Decimal("0.57928500")
+    )
+    assert reference["formal_worst_case"] is False
+    control = pricing["future_authorized_qualification_control"]
+    assert control == {
+        "cost_source": "PERSISTED_TOKEN_USAGE",
+        "cost_rates": "EMPIRICALLY_VERIFIED_EFFECTIVE_OPERATOR_RATES",
+        "stop_before_next_slot_when_cumulative_estimate_reaches_or_exceeds_ceiling": True,
+        "return_partial_evidence_on_ceiling_stop": True,
+        "retry_completed_or_failed_slots": False,
+        "preserve_token_fields": [
+            "non_cached_input",
+            "cached_input",
+            "completion_output",
+            "reasoning_tokens",
+            "total_tokens",
+        ],
+        "reasoning_tokens_are_billing_and_resource_evidence": True,
+        "max_public_output_tokens_is_total_billing_ceiling": False,
     }
     assert frozen["route_provenance"]["classification"] == "THIRD_PARTY_RELAY"
     assert frozen["route_provenance"]["xai_direct"] is False
