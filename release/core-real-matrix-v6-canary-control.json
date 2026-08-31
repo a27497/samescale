@@ -5,7 +5,7 @@
   "experiment_id": "core-real-matrix-v6",
   "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
   "v6_control_reference": "release/core-real-matrix-v6-control.json",
-  "v6_control_sha256": "sha256:52318dd45e843611840a046f7f85670941281026d10f56b36fe0df421e69f42f",
+  "v6_control_sha256": "sha256:9061656741e62d6683cb231a7d26c05d26c934f00f4c76a4dae3a8a2e4851e50",
   "corpus_reference": "release/core-corpus-v4.json",
   "corpus_sha256": "sha256:8fdf26537cb897603af0bae98092fb29d4927bc0f9a0dfb45cea86760f90642d",
   "endpoint_contract": {
@@ -82,7 +82,7 @@
     }
   ],
   "judge_suite_digest": "sha256:c2708196237eab94dac473581e3a06de2f7d0e2c50e8b55190b253e547fc43fb",
-  "public_rate_fact_digest": "sha256:db433418b7495647accbeb1fde13fa09be3eba321001f1351ab5259b5b20401c",
+  "public_rate_fact_digest": "sha256:fd32ad0e8802b6e2b4804b51a0ce7342db684bcc7247c037a781a93ac0568963",
   "host_minimums": {
     "cpu_count": 8,
     "memory_bytes": 16000000000,

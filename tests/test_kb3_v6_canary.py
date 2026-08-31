@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -53,13 +54,13 @@ def _operator_inputs() -> V6OperatorInputs:
     return V6OperatorInputs(
         input_id="v6-canary-unit-test",
         billing_region="China (Beijing)",
-        billing_currency="USD",
+        billing_currency="CNY",
         qwen_deployed_model_id="qwen3.8-max",
         glm_deployed_model_id="glm-5.2",
         cache_or_batch_adjustments="NONE_CONFIRMED",
         account_specific_promotions="NONE_CONFIRMED",
-        tax_treatment="EXCLUDED_FROM_PUBLIC_RATE_OPERATOR_CONFIRMED",
-        fx_treatment="NO_FX_USD_BILLING_OPERATOR_CONFIRMED",
+        tax_treatment="ALIYUN_CHINA_SITE_PUBLIC_PRICES_INCLUDE_VAT",
+        fx_treatment="NO_FX_CNY_PRICING_AND_CNY_SETTLEMENT",
         public_region_and_model_rates_apply=True,
         host_attestation_reference="operator-host-attestation:v6-canary-unit-test",
     )
@@ -165,6 +166,18 @@ def test_control_is_exactly_three_calls_with_structural_zero_retries(
     assert control.throughput_profile_binding.startswith("NOT_REQUIRED_FOR_THREE_CALL_CANARY")
 
 
+def test_control_binds_current_v6_source_and_public_rate_fact(
+    control: V6CanaryControl,
+) -> None:
+    source_path = ROOT / control.v6_control_reference
+    source = json.loads(source_path.read_text(encoding="utf-8"))
+    assert (
+        control.v6_control_sha256
+        == "sha256:" + hashlib.sha256(source_path.read_bytes()).hexdigest()
+    )
+    assert control.public_rate_fact_digest == source["pricing"]["public_rate_fact_digest"]
+
+
 @pytest.mark.parametrize(
     ("mutation", "reason_code"),
     [
@@ -213,6 +226,24 @@ def test_missing_pricing_inputs_stay_required_and_never_become_zero(
     assert pricing and all(item.status.value == "BLOCKED" for item in pricing)
     assert "pricing:account-reference" not in {item.check_id for item in receipt.findings}
     assert all("not treated as zero" in item.detail for item in pricing)
+
+
+def test_stale_usd_operator_currency_is_blocked_and_zero_call(
+    control: V6CanaryControl,
+) -> None:
+    operator = _operator_inputs().model_copy(update={"billing_currency": "USD"})
+    receipt = _preflight(control, operator=operator)
+    currency = next(
+        item for item in receipt.findings if item.check_id == "pricing:billing-currency"
+    )
+    assert receipt.status is V6CanaryStatus.BLOCKED
+    assert receipt.pricing_status == "OPERATOR_INPUTS_REQUIRED"
+    assert currency.status.value == "BLOCKED"
+    assert (receipt.provider_calls, receipt.harness_provider_calls, receipt.judge_calls) == (
+        0,
+        0,
+        0,
+    )
 
 
 def test_certified_tokyo_memory_passes_and_sub_16_gb_class_memory_blocks(

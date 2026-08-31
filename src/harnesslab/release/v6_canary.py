@@ -1514,7 +1514,7 @@ def _assess_pricing(
 ) -> bool:
     inputs = {
         "billing-region": operator.billing_region == "China (Beijing)",
-        "billing-currency": operator.billing_currency == "USD",
+        "billing-currency": operator.billing_currency == "CNY",
         "qwen-model": operator.qwen_deployed_model_id == "qwen3.8-max",
         "glm-model": operator.glm_deployed_model_id == "glm-5.2",
         "cache-batch": _explicit_operator_statement(operator.cache_or_batch_adjustments),

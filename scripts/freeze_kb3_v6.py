@@ -249,31 +249,32 @@ def build_control_artifact(repository_root: Path) -> dict[str, Any]:
             "v5_authorization_reusable": False,
             "status": "PUBLIC_BASE_RATES_VERIFIED_OPERATOR_BILLING_INPUTS_REQUIRED",
             "authoritative_public_source": (
-                "https://www.alibabacloud.com/help/en/model-studio/model-pricing"
+                "https://help.aliyun.com/zh/model-studio/model-pricing"
             ),
             "retrieved_at": "2026-08-31",
             "public_rate_evidence": {
-                "currency": "USD",
+                "currency": "CNY",
                 "unit": "per_1_million_tokens",
                 "region": "China (Beijing)",
                 "qwen3.8-max": {
-                    "input": "1.65",
-                    "output": "4.951",
+                    "input": "12",
+                    "output": "36",
                     "token_tier": "0<Token<=1M",
                 },
                 "glm-5.2": {
-                    "input": "1.100",
-                    "output": "3.851",
+                    "input": "8",
+                    "output": "28",
                     "token_tier": "flat-rate",
                 },
             },
             "public_rate_fact_digest": canonical_digest(
                 {
-                    "source": "Alibaba Cloud Model Studio model pricing",
+                    "source": "Aliyun China Model Studio model pricing",
                     "retrieved_at": "2026-08-31",
+                    "currency": "CNY",
                     "region": "China (Beijing)",
-                    "qwen3.8-max": ["1.65", "4.951", "0<Token<=1M"],
-                    "glm-5.2": ["1.100", "3.851", "flat-rate"],
+                    "qwen3.8-max": ["12", "36", "0<Token<=1M"],
+                    "glm-5.2": ["8", "28", "flat-rate"],
                 }
             ),
             "required_inputs": [

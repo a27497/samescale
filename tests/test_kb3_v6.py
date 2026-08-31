@@ -9,6 +9,7 @@ import httpx
 import pytest
 from sqlalchemy import delete, select
 
+from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.common import Protocol
 from harnesslab.core.config import Settings
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
@@ -90,6 +91,13 @@ def test_v6_frozen_digests_and_schedule_are_reproducible(
     assert [slot.slot_id for slot in v6_plan.run_slots] == [
         item["slot_id"] for item in v6_control["logical_slots"]
     ]
+    assert v6_control["plan_digest"] == (
+        "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a"
+    )
+    assert v6_control["schedule_digest"] == canonical_digest(v6_control["schedule_blocks"])
+    assert v6_control["schedule_digest"] == (
+        "sha256:f3ac0384cddafd4b4dd7b811f66a0e117cdc7e68b758cd111d5e6a4d6726dd2a"
+    )
 
 
 def test_v6_has_no_opencode_subject_and_freezes_alibaba_profiles(
@@ -335,11 +343,32 @@ def test_v6_optimization_decisions_preserve_isolation(v6_control: dict[str, Any]
     assert v6_control["pricing"]["status"] == (
         "PUBLIC_BASE_RATES_VERIFIED_OPERATOR_BILLING_INPUTS_REQUIRED"
     )
-    assert v6_control["pricing"]["public_rate_evidence"]["qwen3.8-max"] == {
-        "input": "1.65",
-        "output": "4.951",
+    pricing = v6_control["pricing"]
+    assert pricing["authoritative_public_source"] == (
+        "https://help.aliyun.com/zh/model-studio/model-pricing"
+    )
+    assert pricing["public_rate_evidence"]["currency"] == "CNY"
+    assert pricing["public_rate_evidence"]["region"] == "China (Beijing)"
+    assert pricing["public_rate_evidence"]["qwen3.8-max"] == {
+        "input": "12",
+        "output": "36",
         "token_tier": "0<Token<=1M",
     }
+    assert pricing["public_rate_evidence"]["glm-5.2"] == {
+        "input": "8",
+        "output": "28",
+        "token_tier": "flat-rate",
+    }
+    assert pricing["public_rate_fact_digest"] == canonical_digest(
+        {
+            "source": "Aliyun China Model Studio model pricing",
+            "retrieved_at": "2026-08-31",
+            "currency": "CNY",
+            "region": "China (Beijing)",
+            "qwen3.8-max": ["12", "36", "0<Token<=1M"],
+            "glm-5.2": ["8", "28", "flat-rate"],
+        }
+    )
     assert v6_control["execution_state"] == {
         "keyless_provider_calls": 0,
         "real_harness_calls": 0,

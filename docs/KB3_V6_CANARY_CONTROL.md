@@ -18,7 +18,8 @@ Copy `release/core-real-matrix-v6-operator-inputs.template.json` to a private or
 location and complete every field. Values are non-secret. `cache_or_batch_adjustments`,
 `account_specific_promotions`, `tax_treatment`, and `fx_treatment` require an explicit statement;
 `UNKNOWN`, `UNCONFIRMED`, `TBD`, `NOT_AVAILABLE`, and `N/A` remain blocked. Pricing is never
-converted to zero.
+converted to zero. The frozen public rates apply to the Aliyun China-site China (Beijing) PAYG
+account class and require `billing_currency` to be `CNY`.
 
 The process environment must provide these values without writing them into an artifact:
 

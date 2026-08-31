@@ -7234,24 +7234,24 @@
     "spend_authorized": false,
     "v5_authorization_reusable": false,
     "status": "PUBLIC_BASE_RATES_VERIFIED_OPERATOR_BILLING_INPUTS_REQUIRED",
-    "authoritative_public_source": "https://www.alibabacloud.com/help/en/model-studio/model-pricing",
+    "authoritative_public_source": "https://help.aliyun.com/zh/model-studio/model-pricing",
     "retrieved_at": "2026-08-31",
     "public_rate_evidence": {
-      "currency": "USD",
+      "currency": "CNY",
       "unit": "per_1_million_tokens",
       "region": "China (Beijing)",
       "qwen3.8-max": {
-        "input": "1.65",
-        "output": "4.951",
+        "input": "12",
+        "output": "36",
         "token_tier": "0<Token<=1M"
       },
       "glm-5.2": {
-        "input": "1.100",
-        "output": "3.851",
+        "input": "8",
+        "output": "28",
         "token_tier": "flat-rate"
       }
     },
-    "public_rate_fact_digest": "sha256:db433418b7495647accbeb1fde13fa09be3eba321001f1351ab5259b5b20401c",
+    "public_rate_fact_digest": "sha256:fd32ad0e8802b6e2b4804b51a0ce7342db684bcc7247c037a781a93ac0568963",
     "required_inputs": [
       "billing_region_and_currency",
       "exact_deployed_model_id_for_qwen3.8-max",
