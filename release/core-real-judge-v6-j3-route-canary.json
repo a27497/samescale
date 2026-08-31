@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_GROK46_AIWANWU_RELAY_JUDGE_J3_ROUTE_CANARY_PREPARATION",
+  "state": "NOT_AUTHORIZED_NOT_RUN",
+  "route_canary_id": "core-real-judge-v6-j3-route-canary",
+  "route_canary_digest": "sha256:5fd668f2705514217db87df11bd01ae6ab9ef1c8bba092df32fde63033ceca33",
+  "qualification_plan_digest": "sha256:3e8bc9249171e1fcc8675e31d9efdd208c8173d2fcd2a41d00d374dc95fb06c8",
+  "profile_identity": "sha256:ceaa61e57ed362b9dab7825b0da33f7b283ba108ad014933f29eb39b852e305e",
+  "call_count": 1,
+  "application_retry_count": 0,
+  "selected_request": {
+    "slot_id": "sha256:66e203eeea190af04b760a0d954a93efd01bbd789b405f42a40efd85151d4ea6",
+    "case_id": "label-l0-fail",
+    "mode": "LABEL",
+    "request_identity_digest": "sha256:50f2cde237521e0c936e71e671b9c3f9752e42db6c0e76cf7d617c6d79f5744e"
+  },
+  "route": {
+    "requested_model": "grok-4.6",
+    "provider": "aiwanwu-relay",
+    "base_url": "https://aiwanwu.cc/v1",
+    "protocol": "chat_completions",
+    "path": "/chat/completions",
+    "credential_reference": "HARNESSLAB_AIWANWU_API_KEY",
+    "scientific_route_identity": "GROK_4_6_VIA_AIWANWU_RELAY",
+    "third_party_relay": true,
+    "xai_direct": false
+  },
+  "request_contract": {
+    "reasoning_effort": "high",
+    "response_format_type": "json_schema",
+    "strict": true,
+    "local_pydantic_parser": "UNCHANGED",
+    "temperature": null,
+    "top_p": null,
+    "frequency_penalty": null,
+    "presence_penalty": null,
+    "stop": null
+  },
+  "purpose": {
+    "credential_accepted": "MUST_VERIFY",
+    "relay_endpoint_reachable": "MUST_VERIFY",
+    "exact_requested_model_accepted": "MUST_VERIFY",
+    "observed_model_captured": "MUST_VERIFY",
+    "reasoning_effort_high_accepted": "MUST_VERIFY",
+    "strict_json_schema_accepted": "MUST_VERIFY",
+    "strict_local_parser_accepted": "MUST_VERIFY",
+    "usage_captured_if_exposed": "MUST_VERIFY",
+    "successful_billing_record_matchable": "MUST_VERIFY"
+  },
+  "future_evidence_requirements": [
+    "execution_timestamp",
+    "provider_request_or_response_id",
+    "requested_model",
+    "observed_model",
+    "input_tokens",
+    "output_tokens",
+    "reasoning_tokens_if_exposed",
+    "total_tokens",
+    "latency"
+  ],
+  "upstream_identity": {
+    "independently_observable": false,
+    "claim_policy": "REPORT_NOT_OBSERVABLE_DO_NOT_FABRICATE"
+  },
+  "qualification_evidence": {
+    "eligible": false,
+    "reuse_prohibited": true
+  },
+  "relay_price_state": "PENDING_EMPIRICAL_SUCCESSFUL_CALL_RECORD",
+  "qualification_spend_budget": "NOT_YET_FROZEN",
+  "authorization": {
+    "spend_authorized": false,
+    "route_canary_authorized": false,
+    "j3_qualification_authorized": false,
+    "matrix_authorized": false,
+    "real_calls": 0
+  }
+}

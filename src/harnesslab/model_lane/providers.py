@@ -663,11 +663,6 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
 
     def _payload(self, request: ProviderRequest) -> dict[str, object]:
         profile = request.profile
-        if profile.reasoning.effort is not None:
-            raise ProviderInvocationError(
-                ProviderFailureCategory.CONFIGURATION,
-                "generic Chat Completions does not define reasoning effort semantics",
-            )
         payload: dict[str, object] = {
             "model": profile.requested_model,
             "messages": [
@@ -675,10 +670,21 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
                 {"role": "user", "content": request.input},
             ],
         }
+        if profile.reasoning.effort is not None:
+            payload["reasoning_effort"] = profile.reasoning.effort
         if profile.reasoning.max_output_tokens is not None:
             payload["max_tokens"] = profile.reasoning.max_output_tokens
         if profile.reasoning.temperature is not None:
             payload["temperature"] = profile.reasoning.temperature
+        if request.output_json_schema is not None:
+            payload["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "judge_output",
+                    "strict": True,
+                    "schema": request.output_json_schema.value,
+                },
+            }
         if profile.thinking_transport is ThinkingTransport.DEEPSEEK_THINKING_OBJECT:
             assert profile.thinking_mode is not None
             payload["thinking"] = {"type": profile.thinking_mode.value}
@@ -722,6 +728,10 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
             )
         usage_raw = body.get("usage")
         usage = _object(usage_raw, "usage") if usage_raw is not None else {}
+        details_raw = usage.get("completion_tokens_details")
+        details = (
+            _object(details_raw, "completion token details") if details_raw is not None else {}
+        )
         request_id = body.get("id") if isinstance(body.get("id"), str) else None
         if request_id is None:
             request_id = response.headers.get("x-request-id")
@@ -740,6 +750,9 @@ class OpenAICompatibleChatAdapter(_HTTPProviderAdapter):
                     usage.get("completion_tokens"), "completion tokens"
                 ),
                 total_tokens=_optional_nonnegative(usage.get("total_tokens"), "total tokens"),
+                reasoning_tokens=_optional_nonnegative(
+                    details.get("reasoning_tokens"), "reasoning tokens"
+                ),
             ),
             stop_reason=finish_reason,
             response_status="truncated" if finish_reason == "length" else "completed",

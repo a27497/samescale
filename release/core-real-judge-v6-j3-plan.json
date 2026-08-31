@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_GROK46_AIWANWU_RELAY_JUDGE_J3_PREPARATION",
+  "state": "PREREGISTERED_NOT_AUTHORIZED_NOT_RUN",
+  "calibration_id": "core-real-judge-v6-j3",
+  "plan_digest": "sha256:3e8bc9249171e1fcc8675e31d9efdd208c8173d2fcd2a41d00d374dc95fb06c8",
+  "predecessor_result": {
+    "calibration_id": "core-real-judge-v6-j2",
+    "state": "ROUTE_UNAVAILABLE_PRE_INFERENCE",
+    "route_canary_digest": "sha256:2577d4458734ce07a3e45b60274b045390d69b77967344cd2dd866eb0010af9c",
+    "judge_failure_classification": false,
+    "retest_authorized": false
+  },
+  "judge_cell": {
+    "id": "judge-grok46-aiwanwu-relay-chat-completions",
+    "requested_model": "grok-4.6",
+    "provider": "aiwanwu-relay",
+    "base_url": "https://aiwanwu.cc/v1",
+    "protocol": "chat_completions",
+    "route": "/chat/completions",
+    "credential_reference": "HARNESSLAB_AIWANWU_API_KEY",
+    "scientific_route_identity": "GROK_4_6_VIA_AIWANWU_RELAY",
+    "profile_identity": "sha256:ceaa61e57ed362b9dab7825b0da33f7b283ba108ad014933f29eb39b852e305e",
+    "runner_contract": "provider-adapter-v1",
+    "reasoning_effort": "high",
+    "max_public_output_tokens": 256,
+    "temperature": null,
+    "top_p": null,
+    "frequency_penalty": null,
+    "presence_penalty": null,
+    "stop": null
+  },
+  "route_provenance": {
+    "classification": "THIRD_PARTY_RELAY",
+    "operator_observation": "RELAY_PREVIOUSLY_OBSERVED_SERVING_GROK_4_6",
+    "requested_model_claim": "grok-4.6",
+    "xai_direct": false,
+    "official_xai_endpoint": false,
+    "independent_upstream_identity_observable": false,
+    "unobservable_claims": [
+      "xAI request ID",
+      "xAI deployment region",
+      "official xAI billing",
+      "official xAI model fingerprint",
+      "exact upstream retry count"
+    ]
+  },
+  "structured_output": {
+    "provider_extension": "response_format",
+    "format_type": "json_schema",
+    "strict": true,
+    "modes": [
+      "LABEL",
+      "SCORE",
+      "PAIRWISE"
+    ],
+    "schema_source": "DETERMINISTIC_EXISTING_JUDGE_MODE_CONTRACT",
+    "schema_version": 1,
+    "all_fields_required": true,
+    "additional_properties_allowed": false,
+    "local_pydantic_parser": "UNCHANGED"
+  },
+  "calibration": {
+    "suite_reference": "judge_suites/core-calibration/1.0.0",
+    "suite_digest": "sha256:c2708196237eab94dac473581e3a06de2f7d0e2c50e8b55190b253e547fc43fb",
+    "definition_reference": "judge_suites/core-calibration/1.0.0/definition.yaml",
+    "definition_digest": "sha256:440c35dc374992849e19c51286b31cff07bc94bd937b076f7ecc75cf42d008bc",
+    "qualification_policy_digest": "sha256:82b84e9f0e3330e9d2f3f9068e054d9041158ae3bd7bba38a0044530e8fe6170",
+    "repeat_count": 3,
+    "evaluation_slot_count": 63,
+    "safe_parallelism": 1,
+    "application_retry_count": 0
+  },
+  "route_canary": {
+    "reference": "release/core-real-judge-v6-j3-route-canary.json",
+    "digest": "sha256:5fd668f2705514217db87df11bd01ae6ab9ef1c8bba092df32fde63033ceca33",
+    "call_count": 1,
+    "application_retry_count": 0,
+    "authorization_state": "NOT_AUTHORIZED_NOT_RUN",
+    "qualification_evidence_eligible": false,
+    "qualification_evidence_reuse_prohibited": true
+  },
+  "relay_price_state": "PENDING_EMPIRICAL_SUCCESSFUL_CALL_RECORD",
+  "qualification_spend_budget": "NOT_YET_FROZEN",
+  "billing_policy": {
+    "official_xai_direct_pricing_used": false,
+    "relay_cost_estimate": "NOT_INVENTED",
+    "future_excel_parsing_in_scope": false
+  },
+  "formal_matrix": {
+    "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+    "schedule_digest": "sha256:f3ac0384cddafd4b4dd7b811f66a0e117cdc7e68b758cd111d5e6a4d6726dd2a",
+    "profile_c": "UNCHANGED",
+    "j3_bound_into_matrix": false,
+    "authorization_state": "NOT_AUTHORIZED"
+  },
+  "authorization": {
+    "spend_authorized": false,
+    "route_canary_authorized": false,
+    "j3_qualification_authorized": false,
+    "matrix_authorized": false,
+    "real_provider_calls": 0,
+    "real_judge_calls": 0,
+    "real_matrix_calls": 0
+  }
+}

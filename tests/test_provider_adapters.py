@@ -463,6 +463,62 @@ async def test_openai_compatible_chat_completions_core_contract() -> None:
 
 
 @pytest.mark.asyncio
+async def test_openai_compatible_chat_supports_request_scoped_strict_schema_and_reasoning() -> None:
+    schema = ProviderJSONSchema(
+        value={
+            "type": "object",
+            "properties": {"schema_version": {"type": "integer", "const": 1}},
+            "required": ["schema_version"],
+            "additionalProperties": False,
+        }
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content)
+        assert payload["reasoning_effort"] == "high"
+        assert payload["response_format"] == {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "judge_output",
+                "strict": True,
+                "schema": schema.value,
+            },
+        }
+        return httpx.Response(
+            200,
+            json={
+                "id": "chatcmpl-strict-id",
+                "model": "observed-strict-model",
+                "choices": [
+                    {
+                        "message": {"content": '{"schema_version":1}'},
+                        "finish_reason": "stop",
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 10,
+                    "completion_tokens": 5,
+                    "total_tokens": 15,
+                    "completion_tokens_details": {"reasoning_tokens": 3},
+                },
+            },
+        )
+
+    request = provider_request(
+        Protocol.CHAT_COMPLETIONS,
+        effort="high",
+        temperature=None,
+        max_output_tokens=256,
+    ).model_copy(update={"output_json_schema": schema})
+    async with await client_for(handler) as client:
+        result = await OpenAICompatibleChatAdapter(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(request)
+
+    assert result.usage.reasoning_tokens == 3
+
+
+@pytest.mark.asyncio
 async def test_generic_chat_refusal_is_successful_public_result() -> None:
     body = {
         "id": "chat-refusal-id",
@@ -1116,13 +1172,24 @@ async def test_unsupported_official_effort_fails_before_http(
 
 
 @pytest.mark.asyncio
-async def test_generic_effort_is_rejected_instead_of_silently_transformed() -> None:
-    async with await client_for(lambda request: httpx.Response(500)) as client:
-        with pytest.raises(ProviderInvocationError) as caught:
-            await OpenAICompatibleChatAdapter(
-                client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
-            ).invoke(provider_request(Protocol.CHAT_COMPLETIONS, effort="high"))
-    assert caught.value.category is ProviderFailureCategory.CONFIGURATION
+async def test_generic_effort_is_forwarded_without_transformation() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert json.loads(request.content)["reasoning_effort"] == "high"
+        return httpx.Response(
+            200,
+            json={
+                "model": "observed-model",
+                "choices": [
+                    {"message": {"content": "{}"}, "finish_reason": "stop"},
+                ],
+            },
+        )
+
+    async with await client_for(handler) as client:
+        result = await OpenAICompatibleChatAdapter(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(provider_request(Protocol.CHAT_COMPLETIONS, effort="high"))
+    assert result.observed_model == "observed-model"
 
 
 @pytest.mark.asyncio

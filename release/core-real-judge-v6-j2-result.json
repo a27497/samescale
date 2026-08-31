@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_CLAUDE_OPUS5_JUDGE_J2_ROUTE_CLOSEOUT",
+  "state": "ROUTE_UNAVAILABLE_PRE_INFERENCE",
+  "calibration_id": "core-real-judge-v6-j2",
+  "final_route_state": "ROUTE_UNAVAILABLE_PRE_INFERENCE",
+  "historical_route_canary": {
+    "route_canary_digest": "sha256:2577d4458734ce07a3e45b60274b045390d69b77967344cd2dd866eb0010af9c",
+    "requested_model": "anthropic/claude-opus-5",
+    "route": "VERCEL_AI_GATEWAY_PINNED_ANTHROPIC",
+    "application_provider_calls": 1,
+    "application_retry_count": 0,
+    "http_status": 403,
+    "failure_stage": "PRE_INFERENCE",
+    "observed_model": "NOT_REPORTED",
+    "usable_model_output": false,
+    "qualification_evidence": false,
+    "historical_attempt_authorized": true,
+    "retest_authorized": false
+  },
+  "qualification": {
+    "status": "NOT_EVALUATED_ROUTE_UNAVAILABLE",
+    "judge_failure_classification": false,
+    "j2_qualification_calls": 0,
+    "matrix_calls": 0
+  },
+  "operator_side_diagnosis": {
+    "credential_check_endpoint": "/v1/credits",
+    "credential_authentication": "SUCCEEDED",
+    "credit_balance": 0,
+    "interpretation": "ROUTE_FAILURE_IS_NOT_CLAUDE_CAPABILITY_EVIDENCE"
+  },
+  "freeze_activity": {
+    "real_provider_calls": 0,
+    "real_judge_calls": 0,
+    "real_matrix_calls": 0
+  }
+}
