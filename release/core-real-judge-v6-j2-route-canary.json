@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_CLAUDE_OPUS5_JUDGE_J2_ROUTE_CANARY_PREPARATION",
+  "state": "NOT_AUTHORIZED_NOT_RUN",
+  "route_canary_id": "core-real-judge-v6-j2-route-canary",
+  "route_canary_digest": "sha256:2577d4458734ce07a3e45b60274b045390d69b77967344cd2dd866eb0010af9c",
+  "qualification_plan_digest": "sha256:51de0129138b7624d2a13bb8f047714aaeedf0a0154620dced0939aea3a267e7",
+  "profile_identity": "sha256:2906c91977b0f3a28c783c3cb888ec308309c46a7b036885bc62d8222b5ed204",
+  "call_count": 1,
+  "application_retry_count": 0,
+  "selected_request": {
+    "slot_id": "sha256:f83d1329cebf317666022f202b13e9421774e34f7ac9b12c4d595f59fcec7e5c",
+    "case_id": "label-l0-fail",
+    "mode": "LABEL",
+    "request_identity_digest": "sha256:50f2cde237521e0c936e71e671b9c3f9752e42db6c0e76cf7d617c6d79f5744e"
+  },
+  "route": {
+    "model": "anthropic/claude-opus-5",
+    "gateway": "https://ai-gateway.vercel.sh",
+    "protocol": "messages",
+    "path": "/v1/messages",
+    "credential_reference": "AI_GATEWAY_API_KEY",
+    "scientific_route_identity": "VERCEL_AI_GATEWAY_PINNED_ANTHROPIC",
+    "provider_options": {
+      "gateway": {
+        "only": [
+          "anthropic"
+        ]
+      }
+    },
+    "fallback_models": [],
+    "dynamic_routing": false,
+    "fast_mode": false
+  },
+  "request_contract": {
+    "thinking": {
+      "type": "disabled"
+    },
+    "temperature": null,
+    "max_public_output_tokens": 256,
+    "strict_mode_specific_json_schema": true,
+    "local_pydantic_parser": "UNCHANGED"
+  },
+  "purpose": {
+    "credential_works": "MUST_VERIFY",
+    "exact_opus5_identity": "MUST_VERIFY",
+    "anthropic_provider_pin": "MUST_VERIFY",
+    "strict_schema": "MUST_VERIFY",
+    "thinking_disabled": "MUST_VERIFY",
+    "routing_evidence_sufficient": "MUST_VERIFY"
+  },
+  "routing_evidence_requirements": {
+    "inspect_available_vercel_routing_metadata": true,
+    "final_provider": "anthropic",
+    "cross_provider_fallback": "PROHIBITED",
+    "model_fallback": "PROHIBITED",
+    "observable_upstream_attempt_rule": "EXACTLY_ONE_SUCCESSFUL_ANTHROPIC_ATTEMPT",
+    "unobservable_upstream_attempt_rule": "REPORT_NOT_OBSERVABLE_DO_NOT_FABRICATE"
+  },
+  "qualification_evidence": {
+    "eligible": false,
+    "reuse_prohibited": true
+  },
+  "key_handling": {
+    "tracked_secret_allowed": false,
+    "private_config_required": true,
+    "private_config_mode": "0600"
+  },
+  "authorization": {
+    "spend_authorized": false,
+    "route_canary_authorized": false,
+    "j2_qualification_authorized": false,
+    "matrix_authorized": false,
+    "real_calls": 0
+  }
+}

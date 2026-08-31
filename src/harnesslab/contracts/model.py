@@ -37,6 +37,16 @@ class ModelProfile(BaseModel):
     reasoning: ReasoningProfile = Field(default_factory=ReasoningProfile)
     thinking_mode: ThinkingMode | None = None
     thinking_transport: ThinkingTransport | None = None
+    vercel_gateway_route_identity: str | None = Field(
+        default=None,
+        max_length=100,
+        exclude_if=lambda value: value is None,
+    )
+    vercel_gateway_provider_only: tuple[str, ...] | None = Field(
+        default=None,
+        min_length=1,
+        exclude_if=lambda value: value is None,
+    )
     request_timeout_seconds: float = Field(default=60.0, gt=0, le=600)
     credential_reference: str | None = Field(
         default=None,
@@ -120,6 +130,24 @@ class ModelProfile(BaseModel):
             and self.protocol is not Protocol.CHAT_COMPLETIONS
         ):
             raise ValueError("typed thinking options require Chat Completions")
+        vercel_fields = (
+            self.vercel_gateway_route_identity,
+            self.vercel_gateway_provider_only,
+        )
+        if any(item is not None for item in vercel_fields):
+            if vercel_fields != (
+                "VERCEL_AI_GATEWAY_PINNED_ANTHROPIC",
+                ("anthropic",),
+            ):
+                raise ValueError("Vercel routing must be pinned only to Anthropic")
+            if (
+                self.provider != "vercel-ai-gateway"
+                or self.base_url != "https://ai-gateway.vercel.sh"
+                or self.protocol is not Protocol.MESSAGES
+                or self.route != "/v1/messages"
+                or self.credential_reference != "AI_GATEWAY_API_KEY"
+            ):
+                raise ValueError("pinned Vercel routing requires the exact Messages gateway route")
         return self
 
     @property

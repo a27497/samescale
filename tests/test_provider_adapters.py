@@ -301,6 +301,7 @@ async def test_anthropic_messages_adapter_contract_and_thinking_exclusion() -> N
         assert payload["max_tokens"] == 4000
         assert payload["output_config"] == {"effort": "medium"}
         assert "thinking" not in payload
+        assert "providerOptions" not in payload
         assert "tools" not in payload
         return httpx.Response(
             200,
@@ -355,6 +356,7 @@ async def test_anthropic_messages_emits_bailian_strict_json_schema_format() -> N
             "format": {"type": "json_schema", "schema": schema.value}
         }
         assert "thinking" not in payload
+        assert "providerOptions" not in payload
         assert "temperature" not in payload
         return httpx.Response(
             200,
@@ -851,6 +853,7 @@ async def test_unset_temperature_is_omitted_and_observed_model_is_optional(
         assert "reasoning" not in payload
         assert "output_config" not in payload
         assert "thinking" not in payload
+        assert "providerOptions" not in payload
         return httpx.Response(200, json=body)
 
     async with await client_for(handler) as client:

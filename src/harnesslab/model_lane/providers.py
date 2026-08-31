@@ -577,6 +577,10 @@ class AnthropicMessagesAdapter(_HTTPProviderAdapter):
         if profile.thinking_transport is ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT:
             assert profile.thinking_mode is not None
             payload["thinking"] = {"type": profile.thinking_mode.value}
+        if profile.vercel_gateway_provider_only is not None:
+            payload["providerOptions"] = {
+                "gateway": {"only": list(profile.vercel_gateway_provider_only)}
+            }
         output_config: dict[str, object] = {}
         if profile.reasoning.effort is not None:
             output_config["effort"] = profile.reasoning.effort

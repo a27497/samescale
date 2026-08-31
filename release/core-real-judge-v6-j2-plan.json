@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_CLAUDE_OPUS5_JUDGE_J2_QUALIFICATION_PREPARATION",
+  "state": "PREREGISTERED_NOT_AUTHORIZED_NOT_RUN",
+  "calibration_id": "core-real-judge-v6-j2",
+  "plan_digest": "sha256:51de0129138b7624d2a13bb8f047714aaeedf0a0154620dced0939aea3a267e7",
+  "predecessor_result": {
+    "calibration_id": "core-real-judge-v6-j1",
+    "state": "NOT_QUALIFIED_FOR_CORE_SUITE",
+    "report_digest": "sha256:78e4c26a4bb2820ead8d1b5350de933ed7c9172e7ec13a1b434b2326e55f267a",
+    "retune_authorized": false,
+    "rerun_authorized": false
+  },
+  "judge_cell": {
+    "id": "judge-claude-opus5-vercel-gateway-anthropic-messages",
+    "model": "anthropic/claude-opus-5",
+    "gateway": "vercel-ai-gateway",
+    "gateway_base_url": "https://ai-gateway.vercel.sh",
+    "protocol": "messages",
+    "route": "/v1/messages",
+    "credential_reference": "AI_GATEWAY_API_KEY",
+    "scientific_route_identity": "VERCEL_AI_GATEWAY_PINNED_ANTHROPIC",
+    "profile_identity": "sha256:2906c91977b0f3a28c783c3cb888ec308309c46a7b036885bc62d8222b5ed204",
+    "runner_contract": "provider-adapter-v1",
+    "thinking_mode": "EXPLICITLY_DISABLED",
+    "temperature": null,
+    "reasoning_effort": null,
+    "max_public_output_tokens": 256
+  },
+  "routing": {
+    "provider_options": {
+      "gateway": {
+        "only": [
+          "anthropic"
+        ]
+      }
+    },
+    "anthropic_direct_claim": false,
+    "bedrock_fallback": false,
+    "vertex_fallback": false,
+    "claudeaws_fallback": false,
+    "model_fallbacks": [],
+    "cost_dynamic_routing": false,
+    "latency_dynamic_routing": false,
+    "fast_mode": false,
+    "gateway_upstream_attempt_count": "NOT_OBSERVED_UNTIL_ROUTE_CANARY"
+  },
+  "structured_output": {
+    "provider_extension": "output_config.format",
+    "format_type": "json_schema",
+    "modes": [
+      "LABEL",
+      "SCORE",
+      "PAIRWISE"
+    ],
+    "schema_source": "DETERMINISTIC_EXISTING_JUDGE_MODE_CONTRACT",
+    "local_pydantic_parser": "UNCHANGED",
+    "additional_properties_allowed": false
+  },
+  "calibration": {
+    "suite_reference": "judge_suites/core-calibration/1.0.0",
+    "suite_digest": "sha256:c2708196237eab94dac473581e3a06de2f7d0e2c50e8b55190b253e547fc43fb",
+    "definition_reference": "judge_suites/core-calibration/1.0.0/definition.yaml",
+    "definition_digest": "sha256:440c35dc374992849e19c51286b31cff07bc94bd937b076f7ecc75cf42d008bc",
+    "qualification_policy_digest": "sha256:82b84e9f0e3330e9d2f3f9068e054d9041158ae3bd7bba38a0044530e8fe6170",
+    "repeat_count": 3,
+    "evaluation_slot_count": 63,
+    "safe_parallelism": 1,
+    "application_retry_count": 0
+  },
+  "route_canary": {
+    "reference": "release/core-real-judge-v6-j2-route-canary.json",
+    "digest": "sha256:2577d4458734ce07a3e45b60274b045390d69b77967344cd2dd866eb0010af9c",
+    "call_count": 1,
+    "authorization_state": "NOT_AUTHORIZED_NOT_RUN",
+    "qualification_evidence_eligible": false
+  },
+  "planning_budget": {
+    "input_tokens_per_call_ceiling": 8192,
+    "output_tokens_per_call_ceiling": 256,
+    "call_count": 63,
+    "input_usd_per_million_tokens": "5",
+    "output_usd_per_million_tokens": "25",
+    "worst_case_usd": "2.983680",
+    "classification": "PLANNING_WORST_CASE_NOT_ACTUAL_BILL",
+    "fast_mode": false
+  },
+  "vercel_free_credit": {
+    "eligible_class": "UNPAID_USERS",
+    "credit_usd": "5",
+    "renewal_period_days": 30,
+    "fact_only_not_spend_authorization": true,
+    "source": "https://vercel.com/ai-gateway/models/claude-opus-5"
+  },
+  "key_handling": {
+    "tracked_secret_allowed": false,
+    "private_config_required": true,
+    "private_config_mode": "0600"
+  },
+  "formal_matrix": {
+    "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+    "schedule_digest": "sha256:f3ac0384cddafd4b4dd7b811f66a0e117cdc7e68b758cd111d5e6a4d6726dd2a",
+    "profile_c": "UNCHANGED",
+    "j2_bound_into_matrix": false,
+    "authorization_state": "NOT_AUTHORIZED"
+  },
+  "authorization": {
+    "spend_authorized": false,
+    "route_canary_authorized": false,
+    "j2_qualification_authorized": false,
+    "matrix_authorized": false,
+    "real_provider_calls": 0,
+    "real_judge_calls": 0,
+    "real_matrix_calls": 0
+  }
+}
