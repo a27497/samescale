@@ -54,7 +54,8 @@ from harnesslab.sandbox.models import ImageIdentity
 from harnesslab.sandbox.preflight import docker_preflight
 from harnesslab.tasks.package import TaskPackage, digest_tree
 
-V6_CANARY_CONTROL_REFERENCE = Path("release/core-real-matrix-v6-canary-control.json")
+V6_CANARY_PREDECESSOR_CONTROL_REFERENCE = Path("release/core-real-matrix-v6-canary-control.json")
+V6_CANARY_CONTROL_REFERENCE = Path("release/core-real-matrix-v6-canary-control-r1.json")
 V6_OPERATOR_INPUT_TEMPLATE_REFERENCE = Path(
     "release/core-real-matrix-v6-operator-inputs.template.json"
 )
@@ -180,6 +181,9 @@ class V6CanaryControl(_FrozenModel):
         "NOT_REQUIRED_FOR_THREE_CALL_CANARY_FUTURE_MATRIX_AUTHORIZATION_MUST_BIND_FINAL_PROFILE"
     ]
     execution_state: Literal["NOT_RUN"]
+    predecessor_canary_plan_digest: Sha256Digest | None = None
+    successor_reason: Literal["CONFIRMED_INFRASTRUCTURE_EGRESS_FIX"] | None = None
+    treatment_change: Literal["EGRESS_OUTBOUND_NETWORK_IMPLEMENTATION"] | None = None
 
     @model_validator(mode="after")
     def exact_three_call_plan(self) -> V6CanaryControl:
@@ -236,11 +240,28 @@ class V6CanaryControl(_FrozenModel):
             "glm-5.2": V6_GLM_MODEL_REFERENCE,
         }:
             raise ValueError("V6 deployed-model references drifted")
+        successor_provenance = (
+            self.predecessor_canary_plan_digest,
+            self.successor_reason,
+            self.treatment_change,
+        )
+        if any(item is not None for item in successor_provenance) and any(
+            item is None for item in successor_provenance
+        ):
+            raise ValueError("V6 successor provenance must be complete")
         return self
 
     @property
     def digest(self) -> str:
-        return _digest(self.model_dump(mode="json"))
+        payload = self.model_dump(mode="json")
+        for field in (
+            "predecessor_canary_plan_digest",
+            "successor_reason",
+            "treatment_change",
+        ):
+            if payload[field] is None:
+                del payload[field]
+        return _digest(payload)
 
 
 class V6OperatorInputs(_FrozenModel):
@@ -347,9 +368,13 @@ class V6CanaryPreflightReceipt(_FrozenModel):
         return self
 
 
-def load_v6_canary_control(repository_root: Path) -> V6CanaryControl:
+def load_v6_canary_control(
+    repository_root: Path,
+    *,
+    control_reference: Path = V6_CANARY_CONTROL_REFERENCE,
+) -> V6CanaryControl:
     root = repository_root.resolve()
-    path = root / V6_CANARY_CONTROL_REFERENCE
+    path = root / control_reference
     try:
         control = load_control_manifest(path, V6CanaryControl)
     except PreflightInputError as exc:
@@ -381,15 +406,16 @@ async def collect_v6_host_observation(repository_root: Path) -> V6HostObservatio
     except Exception:
         pass
     if docker_ready:
-        try:
-            await preflight_egress_network_isolation()
-            egress_ready = True
-        except Exception:
-            pass
         with suppress(Exception):
             claude_image = await MultiHarnessRuntime(HarnessKind.CLAUDE_CODE).ensure_image()
         with suppress(Exception):
             proxy_image = await EgressProxyRuntime().ensure_image()
+        if proxy_image is not None:
+            try:
+                await preflight_egress_network_isolation(proxy_image=proxy_image)
+                egress_ready = True
+            except Exception:
+                pass
     try:
         disk_free = shutil.disk_usage(repository_root.resolve()).free
     except OSError:
@@ -572,6 +598,7 @@ class V6CanaryFailureCategory(StrEnum):
     OBSERVED_MODEL = "OBSERVED_MODEL"
     ARTIFACT = "ARTIFACT"
     INFRASTRUCTURE = "INFRASTRUCTURE"
+    UNKNOWN = "UNKNOWN"
 
 
 class V6CanaryLaunchMarker(_FrozenModel):
@@ -621,8 +648,8 @@ class V6CanaryCallEvidence(_FrozenModel):
     status: V6CanaryCallStatus
     safe_outcome: str = Field(pattern=r"^[A-Z][A-Z0-9_]*$", max_length=100)
     failure_category: V6CanaryFailureCategory | None = None
-    evidence_references: tuple[str, ...] = Field(min_length=1, max_length=4)
-    evidence_digests: tuple[Sha256Digest, ...] = Field(min_length=1, max_length=4)
+    evidence_references: tuple[str, ...] = Field(max_length=4)
+    evidence_digests: tuple[Sha256Digest, ...] = Field(max_length=4)
     primary_launches: Literal[1] = 1
     retry_count: Literal[0] = 0
     semantic_retry_count: Literal[0] = 0
@@ -637,6 +664,8 @@ class V6CanaryCallEvidence(_FrozenModel):
             raise ValueError("V6 call evidence references and digests disagree")
         if (self.status is V6CanaryCallStatus.FAILED) != (self.failure_category is not None):
             raise ValueError("V6 call failure state is incoherent")
+        if self.status is V6CanaryCallStatus.SUCCEEDED and not self.evidence_references:
+            raise ValueError("successful V6 call evidence requires a referenced artifact")
         expected = _digest(self.model_dump(mode="json", exclude={"evidence_digest"}))
         if self.evidence_digest != expected:
             raise ValueError("V6 call evidence digest mismatch")
@@ -1027,14 +1056,11 @@ class V6CanaryControlPlane:
                 _write_immutable_json(marker_path, marker)
                 try:
                     item = await invoker.invoke(call, marker)
-                except V6CanaryControlError:
-                    raise
-                except Exception as exc:
-                    raise V6CanaryControlError(
-                        "V6 canary invocation ended without terminal evidence; retries are zero"
-                    ) from exc
-                self._validate_call_evidence(item, call, marker)
-                self._verify_call_artifacts(item, output)
+                    self._validate_call_evidence(item, call, marker)
+                    self._verify_call_artifacts(item, output)
+                except Exception:
+                    provider_root.mkdir(parents=True, exist_ok=True)
+                    item = self._post_launch_failure(call, marker)
                 _write_immutable_json(evidence_path, item)
             evidence.append(item)
             if item.status is V6CanaryCallStatus.FAILED:
@@ -1045,6 +1071,38 @@ class V6CanaryControlPlane:
         closeout = self._closeout(preflight, authorization, tuple(evidence))
         _write_immutable_json(closeout_path, closeout)
         return closeout
+
+    @staticmethod
+    def _post_launch_failure(
+        call: V6CanaryCall,
+        marker: V6CanaryLaunchMarker,
+    ) -> V6CanaryCallEvidence:
+        raw = {
+            "experiment_id": V6_EXPERIMENT_ID,
+            "canary_plan_digest": marker.canary_plan_digest,
+            "launch_marker_digest": marker.marker_digest,
+            "call_id": call.call_id,
+            "ordinal": call.ordinal,
+            "role": call.role,
+            "provider_profile_id": call.provider_profile_id,
+            "provider_profile_identity": call.provider_profile_identity,
+            "execution_binding_identity": call.execution_binding_identity,
+            "requested_model": call.requested_model,
+            "observed_model": None,
+            "protocol": call.protocol,
+            "route_identity": call.route_identity,
+            "status": V6CanaryCallStatus.FAILED,
+            "safe_outcome": "POST_LAUNCH_FAILURE_PROVIDER_REQUESTS_UNKNOWN",
+            "failure_category": V6CanaryFailureCategory.UNKNOWN,
+            "evidence_references": (),
+            "evidence_digests": (),
+        }
+        draft = V6CanaryCallEvidence.model_construct(
+            **raw,  # type: ignore[arg-type]
+            evidence_digest="sha256:" + "0" * 64,
+        )
+        digest = _digest(draft.model_dump(mode="json", exclude={"evidence_digest"}))
+        return V6CanaryCallEvidence.model_validate({**raw, "evidence_digest": digest})
 
     def _validate_launch_authority(
         self,

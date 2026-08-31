@@ -33,6 +33,7 @@ from harnesslab.release.v6_canary import (
     V6OperatorInputs,
     assess_v6_canary_preflight,
     authorize_v6_canary,
+    collect_v6_host_observation,
     execute_real_v6_canary,
     load_v6_canary_control,
     persist_v6_preflight_receipt,
@@ -165,6 +166,17 @@ class _FakeInvoker:
         )
 
 
+class _ExplodingInvoker:
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    async def invoke(
+        self, call: V6CanaryCall, marker: V6CanaryLaunchMarker
+    ) -> V6CanaryCallEvidence:
+        self.calls.append(call.call_id)
+        raise RuntimeError(SECRET)
+
+
 def test_control_is_exactly_three_calls_with_structural_zero_retries(
     control: V6CanaryControl,
 ) -> None:
@@ -178,6 +190,94 @@ def test_control_is_exactly_three_calls_with_structural_zero_retries(
     assert control.matrix_execution_allowed is False
     assert control.judge_initial_state == "PROVISIONAL_PENDING_REAL_CANARY"
     assert control.throughput_profile_binding.startswith("NOT_REQUIRED_FOR_THREE_CALL_CANARY")
+    assert control.predecessor_canary_plan_digest == (
+        "sha256:01e958bc9d68b667b0258b78980773c97f8032ca9864a642d4136c0a88065dec"
+    )
+    assert control.successor_reason == "CONFIRMED_INFRASTRUCTURE_EGRESS_FIX"
+    assert control.treatment_change == "EGRESS_OUTBOUND_NETWORK_IMPLEMENTATION"
+
+
+def test_r1_successor_changes_only_egress_treatment_and_preserves_matrix_identity(
+    control: V6CanaryControl,
+) -> None:
+    predecessor = load_v6_canary_control(
+        ROOT,
+        control_reference=Path("release/core-real-matrix-v6-canary-control.json"),
+    )
+    matrix_control = json.loads(
+        (ROOT / "release/core-real-matrix-v6-control.json").read_text(encoding="utf-8")
+    )
+
+    assert predecessor.digest == control.predecessor_canary_plan_digest
+    assert control.digest != predecessor.digest
+    assert control.calls == predecessor.calls
+    predecessor_payload = predecessor.model_dump(mode="json")
+    successor_payload = control.model_dump(mode="json")
+    for field in (
+        "predecessor_canary_plan_digest",
+        "successor_reason",
+        "treatment_change",
+    ):
+        predecessor_payload.pop(field)
+        successor_payload.pop(field)
+    assert successor_payload == predecessor_payload
+    assert (
+        control.plan_digest
+        == matrix_control["plan_digest"]
+        == ("sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a")
+    )
+    assert matrix_control["schedule_digest"] == (
+        "sha256:f3ac0384cddafd4b4dd7b811f66a0e117cdc7e68b758cd111d5e6a4d6726dd2a"
+    )
+
+
+@pytest.mark.asyncio
+async def test_attempt1_preflight_and_authorization_cannot_authorize_r1(
+    tmp_path: Path, control: V6CanaryControl
+) -> None:
+    predecessor = load_v6_canary_control(
+        ROOT,
+        control_reference=Path("release/core-real-matrix-v6-canary-control.json"),
+    )
+    old_preflight = _preflight(predecessor)
+    old_authorization = _authorization(predecessor, old_preflight)
+    invoker = _FakeInvoker(tmp_path / "provider-evidence")
+
+    assert old_preflight.canary_plan_digest == predecessor.digest
+    assert old_authorization.canary_plan_digest == predecessor.digest
+    assert predecessor.digest != control.digest
+    assert not v6_preflights_are_execution_equivalent(old_preflight, _preflight(control))
+    with pytest.raises(V6CanaryControlError, match="authorization boundary mismatch"):
+        await V6CanaryControlPlane(control).execute(
+            preflight=old_preflight,
+            authorization=old_authorization,
+            invoker=invoker,
+            artifact_root=tmp_path / "must-not-exist",
+            allow_real_v6_canary=True,
+        )
+    assert invoker.calls == []
+    assert not (tmp_path / "must-not-exist").exists()
+
+
+def test_attempt1_incident_is_safe_append_only_and_non_resumable() -> None:
+    path = ROOT / "release/kb3-v6-canary-attempt1-infrastructure-incident.json"
+    incident = json.loads(path.read_text(encoding="utf-8"))
+
+    assert incident["append_only"] is True
+    assert incident["attempt_state"] == "NON_RESUMABLE"
+    assert incident["calls"][0]["status"] == "VERIFIED_PASS"
+    assert incident["calls"][1]["provider_request_consumption"] == "UNKNOWN"
+    assert incident["calls"][1]["confirmed_failure_stage"] == "EGRESS_PROVISIONING"
+    assert incident["calls"][2]["status"] == "SKIPPED"
+    assert incident["bounds_observed"] == {
+        "retries": 0,
+        "semantic_retries": 0,
+        "substitutions": 0,
+        "matrix_calls": 0,
+    }
+    assert incident["root_cause_reproduction"] == "KEYLESS"
+    assert incident["credential_transport_finding"] == "NOT_CAUSAL"
+    assert incident["immutability"]["old_artifacts_modified"] is False
 
 
 def test_v6_claude_adapter_binds_turn_and_output_limits(
@@ -325,6 +425,54 @@ def test_certified_tokyo_memory_passes_and_sub_16_gb_class_memory_blocks(
         below_floor.harness_provider_calls,
         below_floor.judge_calls,
     ) == (0, 0, 0)
+
+
+@pytest.mark.asyncio
+async def test_host_observation_requires_full_proxy_topology_preflight(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    host = _host()
+    checked_images: list[ImageIdentity] = []
+
+    async def docker_ready() -> None:
+        return None
+
+    async def claude_image_ready(self: object) -> ImageIdentity:
+        assert host.claude_image is not None
+        return host.claude_image
+
+    async def proxy_image_ready(self: object) -> ImageIdentity:
+        assert host.egress_proxy_image is not None
+        return host.egress_proxy_image
+
+    async def broken_outbound_topology(*, proxy_image: ImageIdentity) -> None:
+        checked_images.append(proxy_image)
+        raise RuntimeError("default bridge is unavailable")
+
+    monkeypatch.setattr(v6_canary_module, "docker_preflight", docker_ready)
+    monkeypatch.setattr(
+        v6_canary_module.MultiHarnessRuntime,
+        "ensure_image",
+        claude_image_ready,
+    )
+    monkeypatch.setattr(
+        v6_canary_module.EgressProxyRuntime,
+        "ensure_image",
+        proxy_image_ready,
+    )
+    monkeypatch.setattr(
+        v6_canary_module,
+        "preflight_egress_network_isolation",
+        broken_outbound_topology,
+    )
+
+    observation = await collect_v6_host_observation(ROOT)
+
+    assert checked_images == [host.egress_proxy_image]
+    assert observation.docker_ready is True
+    assert observation.egress_isolation_ready is False
+    assert observation.claude_image == host.claude_image
+    assert observation.egress_proxy_image == host.egress_proxy_image
 
 
 def test_ready_receipt_contains_only_references_and_fingerprints(
@@ -795,6 +943,52 @@ async def test_failure_stops_suffix_and_judge_remains_provisional(
     assert closeout.attempted_primary_calls == 2
     assert closeout.failing_call_id == EXPECTED_CALL_IDS[1]
     assert closeout.judge_state == "PROVISIONAL_PENDING_REAL_CANARY"
+
+
+@pytest.mark.asyncio
+async def test_post_launch_exception_persists_unknown_consumption_and_blocks_suffix(
+    tmp_path: Path, control: V6CanaryControl
+) -> None:
+    preflight = _preflight(control)
+    authorization = _authorization(control, preflight)
+    artifact_root = tmp_path / "post-launch-exception"
+    invoker = _ExplodingInvoker()
+    plane = V6CanaryControlPlane(control)
+
+    closeout = await plane.execute(
+        preflight=preflight,
+        authorization=authorization,
+        invoker=invoker,
+        artifact_root=artifact_root,
+        allow_real_v6_canary=True,
+    )
+    evidence_path = artifact_root / "per-call-evidence" / f"001-{EXPECTED_CALL_IDS[0]}.json"
+    evidence = V6CanaryCallEvidence.model_validate_json(evidence_path.read_text())
+    persisted = evidence_path.read_text()
+
+    assert invoker.calls == [EXPECTED_CALL_IDS[0]]
+    assert closeout.status.value == "ABORTED"
+    assert closeout.attempted_primary_calls == 1
+    assert closeout.failing_call_id == EXPECTED_CALL_IDS[0]
+    assert closeout.failure_category is V6CanaryFailureCategory.UNKNOWN
+    assert closeout.judge_state == "PROVISIONAL_PENDING_REAL_CANARY"
+    assert evidence.safe_outcome == "POST_LAUNCH_FAILURE_PROVIDER_REQUESTS_UNKNOWN"
+    assert evidence.failure_category is V6CanaryFailureCategory.UNKNOWN
+    assert evidence.evidence_references == evidence.evidence_digests == ()
+    assert SECRET not in persisted
+
+    resumed = _ExplodingInvoker()
+    assert (
+        await plane.execute(
+            preflight=preflight,
+            authorization=authorization,
+            invoker=resumed,
+            artifact_root=artifact_root,
+            allow_real_v6_canary=True,
+        )
+        == closeout
+    )
+    assert resumed.calls == []
 
 
 @pytest.mark.asyncio

@@ -1550,6 +1550,29 @@ def test_internal_network_create_argv_requires_isolated_gateway_mode() -> None:
         "com.docker.network.bridge.gateway_mode_ipv4=isolated",
         "review-internal",
     )
+    assert boundary.outbound_network_name == "review-internal-outbound"
+    assert boundary.create_outbound_network_argv() == (
+        "network",
+        "create",
+        "--driver",
+        "bridge",
+        "--ipv6=false",
+        "review-internal-outbound",
+    )
+    assert boundary.connect_proxy_outbound_argv() == (
+        "network",
+        "connect",
+        "review-internal-outbound",
+        "review-proxy",
+    )
+    with pytest.raises(EgressSecurityError, match="distinct network identities"):
+        ProviderScopedDockerBoundary(
+            EgressPolicy(allowed_hostname="provider.example.test"),
+            "unsafe-internal",
+            "unsafe-proxy",
+            _runtime().egress_proxy_image,
+            outbound_network_name="bridge",
+        )
 
 
 @pytest.mark.asyncio
@@ -1654,7 +1677,9 @@ async def test_egress_cleanup_attempts_every_resource_after_partial_failure() ->
         await boundary.cleanup(cli)
     assert ("rm", "--force", "review-proxy") in cli.calls
     assert ("network", "rm", "review-internal") in cli.calls
+    assert ("network", "rm", "review-internal-outbound") in cli.calls
     assert ("network", "inspect", "review-internal") in cli.calls
+    assert ("network", "inspect", "review-internal-outbound") in cli.calls
 
 
 @pytest.mark.asyncio
@@ -1691,6 +1716,7 @@ async def test_codex_and_multiharness_cleanup_continue_after_subject_failure() -
             )
         assert ("rm", "--force", f"{prefix}-proxy") in cli.calls
         assert ("network", "rm", f"{prefix}-internal") in cli.calls
+        assert ("network", "rm", f"{prefix}-internal-outbound") in cli.calls
 
 
 @pytest.mark.asyncio
@@ -1725,12 +1751,18 @@ async def test_actual_local_docker_egress_topology_denies_bypass_and_cleans_up()
         attestation = await boundary.provision(cli)
         provisioned = True
         assert attestation.image.image_id == identity.image_id
-        assert attestation.networks == tuple(sorted((network, "bridge")))
+        assert boundary.outbound_network_name != "bridge"
+        assert attestation.networks == tuple(sorted((network, boundary.outbound_network_name)))
         assert attestation.internal_network_is_internal
         assert attestation.internal_network_security.driver == "bridge"
         assert attestation.internal_network_security.internal is True
         assert attestation.internal_network_security.enable_ipv6 is False
         assert attestation.internal_network_security.gateway_mode_ipv4 == "isolated"
+        assert attestation.outbound_network == boundary.outbound_network_name
+        assert attestation.outbound_network_is_internal is False
+        assert attestation.outbound_network_security.driver == "bridge"
+        assert attestation.outbound_network_security.internal is False
+        assert attestation.outbound_network_security.enable_ipv6 is False
         assert not attestation.privileged
         assert attestation.read_only_rootfs
         assert attestation.user == "10001:10001"
@@ -1837,3 +1869,7 @@ sys.exit(12)
         assert not absent.stdout.strip()
     absent_network = await cli.run("network", "inspect", network, check=False)
     assert absent_network.returncode != 0
+    absent_outbound = await cli.run(
+        "network", "inspect", boundary.outbound_network_name, check=False
+    )
+    assert absent_outbound.returncode != 0

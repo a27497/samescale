@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_CANARY_ATTEMPT1_INFRASTRUCTURE_INCIDENT",
+  "append_only": true,
+  "experiment_id": "core-real-matrix-v6",
+  "attempt_id": "V6_CANARY_ATTEMPT_1",
+  "result": "ABORTED_INFRASTRUCTURE_EGRESS_PROVISIONING",
+  "attempt_state": "NON_RESUMABLE",
+  "control_identities": {
+    "canary_plan_digest": "sha256:01e958bc9d68b667b0258b78980773c97f8032ca9864a642d4136c0a88065dec",
+    "preflight_receipt_digest": "sha256:38565e2b070f8d2e0c7867083e6b0e2194b9941d2253c6153a4878a76c2dec93",
+    "authorization_receipt_digest": "sha256:6afd65a410bbf44687264952fa170183801854e68a2bbbd6895e014e1c870047"
+  },
+  "calls": [
+    {
+      "call_id": "v6-canary-1-direct-qwen38-alibaba-chat",
+      "ordinal": 1,
+      "status": "VERIFIED_PASS",
+      "requested_model": "qwen3.8-max",
+      "observed_model": "qwen3.8-max",
+      "call_evidence_digest": "sha256:1b58f0729abbae51fe8fadaaeb5d68f2d63fd628523bace5900c423fc7e24216",
+      "provider_artifact_digest": "sha256:b711a1372ec104d3bd350f5f23dfabc87d65403aaf88daeaf329d1198a383fd4"
+    },
+    {
+      "call_id": "v6-canary-2-claude-qwen38-alibaba-messages",
+      "ordinal": 2,
+      "status": "TERMINAL_EVIDENCE_ABSENT",
+      "launch_marker_digest": "sha256:9f5c9b42cbd3ac1e9bfaa42f6db0159daa88e82ec1c8e7dd82e29dab2ba2b640",
+      "provider_request_consumption": "UNKNOWN",
+      "confirmed_failure_stage": "EGRESS_PROVISIONING",
+      "confirmed_mechanism": "DOCKER_DEFAULT_BRIDGE_DEPENDS_ON_DOCKER0_PRODUCTION_DOCKER0_NOT_USABLE"
+    },
+    {
+      "call_id": "v6-canary-3-judge-glm52-alibaba-chat",
+      "ordinal": 3,
+      "status": "SKIPPED"
+    }
+  ],
+  "bounds_observed": {
+    "retries": 0,
+    "semantic_retries": 0,
+    "substitutions": 0,
+    "matrix_calls": 0
+  },
+  "root_cause_reproduction": "KEYLESS",
+  "credential_transport_finding": "NOT_CAUSAL",
+  "immutable_original_artifact_reference": "/tmp/harnesslab-v6-real-canary.zmnWWN",
+  "immutability": {
+    "old_artifacts_modified": false,
+    "call2_terminal_evidence_backfilled": false,
+    "call2_launch_marker_reused": false,
+    "attempt_continued": false,
+    "unknown_reinterpreted_as_zero": false,
+    "freeze_artifact_is_new_append_only_record": true
+  }
+}

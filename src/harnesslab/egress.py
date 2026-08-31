@@ -134,6 +134,17 @@ class NetworkSecurityAttestation(BaseModel):
         return "sha256:" + hashlib.sha256(self.canonical_json().encode()).hexdigest()
 
 
+class OutboundNetworkSecurityAttestation(BaseModel):
+    """Effective state of the proxy-only user-defined outbound bridge."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    network: str
+    driver: Literal["bridge"]
+    internal: Literal[False]
+    enable_ipv6: Literal[False]
+
+
 class ProxySecurityAttestation(BaseModel):
     """Effective, inspected proxy state recorded before a subject can start."""
 
@@ -150,6 +161,9 @@ class ProxySecurityAttestation(BaseModel):
     internal_network: str
     internal_network_is_internal: bool
     internal_network_security: NetworkSecurityAttestation
+    outbound_network: str
+    outbound_network_is_internal: bool
+    outbound_network_security: OutboundNetworkSecurityAttestation
     docker_socket_mounted: bool
 
     def canonical_json(self) -> str:
@@ -243,14 +257,20 @@ class ProviderScopedDockerBoundary:
     network_name: str
     proxy_name: str
     proxy_image: ImageIdentity
-    outbound_network_name: str = "bridge"
+    outbound_network_name: str = ""
 
     def __post_init__(self) -> None:
+        if not self.outbound_network_name:
+            object.__setattr__(self, "outbound_network_name", f"{self.network_name}-outbound")
         if self.proxy_image.reference != EGRESS_PROXY_IMAGE:
             raise EgressSecurityError("unexpected egress proxy image reference")
         if self.proxy_image.image_id == "sha256:" + "0" * 64:
             raise EgressSecurityError("egress proxy requires an inspected non-zero image identity")
-        if not self.network_name or self.network_name == self.outbound_network_name:
+        if (
+            not self.network_name
+            or self.outbound_network_name == "bridge"
+            or self.network_name == self.outbound_network_name
+        ):
             raise EgressSecurityError("egress boundary requires distinct network identities")
 
     @property
@@ -303,6 +323,16 @@ class ProviderScopedDockerBoundary:
             self.proxy_image.reference,
         )
 
+    def create_outbound_network_argv(self) -> tuple[str, ...]:
+        return (
+            "network",
+            "create",
+            "--driver",
+            INTERNAL_NETWORK_DRIVER,
+            "--ipv6=false",
+            self.outbound_network_name,
+        )
+
     def connect_proxy_outbound_argv(self) -> tuple[str, ...]:
         return ("network", "connect", self.outbound_network_name, self.proxy_name)
 
@@ -311,8 +341,9 @@ class ProviderScopedDockerBoundary:
         return {"HTTPS_PROXY": proxy, "https_proxy": proxy, "NO_PROXY": ""}
 
     async def provision(self, cli: Any) -> ProxySecurityAttestation:
-        await cli.run(*self.create_internal_network_argv())
         try:
+            await cli.run(*self.create_internal_network_argv())
+            await cli.run(*self.create_outbound_network_argv())
             await cli.run(*self.create_proxy_argv())
             await cli.run(*self.connect_proxy_outbound_argv())
             await cli.run("start", self.proxy_name)
@@ -332,6 +363,7 @@ class ProviderScopedDockerBoundary:
             ("kill", self.proxy_name),
             ("rm", "--force", self.proxy_name),
             ("network", "rm", self.network_name),
+            ("network", "rm", self.outbound_network_name),
         ):
             try:
                 await cli.run(*action, check=False)
@@ -351,12 +383,16 @@ class ProviderScopedDockerBoundary:
                 failures.append("proxy-present")
         except Exception as exc:
             failures.append(type(exc).__name__)
-        try:
-            network = await cli.run("network", "inspect", self.network_name, check=False)
-            if network.returncode == 0:
-                failures.append("network-present")
-        except Exception as exc:
-            failures.append(type(exc).__name__)
+        for network_name, failure_name in (
+            (self.network_name, "internal-network-present"),
+            (self.outbound_network_name, "outbound-network-present"),
+        ):
+            try:
+                network = await cli.run("network", "inspect", network_name, check=False)
+                if network.returncode == 0:
+                    failures.append(failure_name)
+            except Exception as exc:
+                failures.append(type(exc).__name__)
         if failures:
             raise EgressSecurityError(
                 "egress cleanup was not verified: " + ",".join(sorted(failures))
@@ -364,6 +400,7 @@ class ProviderScopedDockerBoundary:
 
     async def attest_effective_security(self, cli: Any) -> ProxySecurityAttestation:
         network_security = await self.attest_internal_network(cli)
+        outbound_network_security = await self.attest_outbound_network(cli)
         template = (
             "{{json .Image}}|{{json .HostConfig.Privileged}}|"
             "{{json .HostConfig.ReadonlyRootfs}}|{{json .Config.User}}|"
@@ -401,6 +438,7 @@ class ProviderScopedDockerBoundary:
             not port_bindings,
             actual_networks == expected_networks,
             network_security.internal is True,
+            outbound_network_security.internal is False,
             not docker_socket,
         )
         if not all(required):
@@ -417,6 +455,9 @@ class ProviderScopedDockerBoundary:
             internal_network=self.network_name,
             internal_network_is_internal=True,
             internal_network_security=network_security,
+            outbound_network=self.outbound_network_name,
+            outbound_network_is_internal=False,
+            outbound_network_security=outbound_network_security,
             docker_socket_mounted=False,
         )
 
@@ -446,6 +487,30 @@ class ProviderScopedDockerBoundary:
             internal=internal,
             enable_ipv6=enable_ipv6,
             gateway_mode_ipv4=gateway_mode,
+        )
+
+    async def attest_outbound_network(self, cli: Any) -> OutboundNetworkSecurityAttestation:
+        template = "{{json .Driver}}|{{json .Internal}}|{{json .EnableIPv6}}"
+        result = await cli.run(
+            "network", "inspect", self.outbound_network_name, "--format", template
+        )
+        values = [json.loads(value) for value in result.stdout.decode().strip().split("|")]
+        if len(values) != 3:
+            raise EgressNetworkIsolationUnavailable(
+                "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: unexpected outbound network "
+                "inspection output"
+            )
+        driver, internal, enable_ipv6 = values
+        if driver != INTERNAL_NETWORK_DRIVER or internal is not False or enable_ipv6 is not False:
+            raise EgressNetworkIsolationUnavailable(
+                "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: effective outbound network is not "
+                "a non-internal IPv4 user-defined bridge"
+            )
+        return OutboundNetworkSecurityAttestation(
+            network=self.outbound_network_name,
+            driver=driver,
+            internal=internal,
+            enable_ipv6=enable_ipv6,
         )
 
     def deterministic_fake_forward(
@@ -489,6 +554,8 @@ def boundary_for_provider_url(
 
 async def preflight_egress_network_isolation(
     cli: Any | None = None,
+    *,
+    proxy_image: ImageIdentity | None = None,
 ) -> NetworkSecurityAttestation:
     """Create, inspect, remove, and verify an isolated bridge without provider traffic."""
 
@@ -496,6 +563,27 @@ async def preflight_egress_network_isolation(
         _, environment = await _docker_runtime_preflight()
         cli = _DockerCLI(output_limit=1_000_000, environment=environment)
     network_name = f"hl-egress-preflight-{uuid4().hex[:12]}"
+    if proxy_image is not None:
+        boundary = ProviderScopedDockerBoundary(
+            EgressPolicy(allowed_hostname="preflight.invalid"),
+            network_name,
+            f"hl-egress-preflight-{uuid4().hex[:12]}-proxy",
+            proxy_image,
+        )
+        try:
+            proxy_attestation = await boundary.provision(cli)
+            return proxy_attestation.internal_network_security
+        except BaseException as exc:
+            raise EgressNetworkIsolationUnavailable(
+                "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: provider-scoped proxy topology failed"
+            ) from exc
+        finally:
+            try:
+                await boundary.cleanup(cli)
+            except BaseException as exc:
+                raise EgressNetworkIsolationUnavailable(
+                    "EGRESS_NETWORK_ISOLATION_UNAVAILABLE: preflight cleanup was not verified"
+                ) from exc
     boundary = ProviderScopedDockerBoundary(
         EgressPolicy(allowed_hostname="preflight.invalid"),
         network_name,
