@@ -624,7 +624,7 @@ def preflight_release_judge(
         ".", "--repository-root", help="Repository containing the frozen release plans."
     ),
 ) -> None:
-    """Resolve the existing v3 GLM profile and exact 63-slot suite without provider calls."""
+    """Resolve the V6 J1 GLM Messages profile and exact 63-slot suite without calls."""
 
     try:
         plan, _suite, _definitions = build_real_judge_plan(Path(repository_root))
@@ -644,7 +644,9 @@ def calibrate_release_judge(
         False, "--allow-real-judge", help="Explicitly authorize the exact 63-call campaign."
     ),
     artifact_root: str = typer.Option(
-        "artifacts/core-real-judge-v3", "--artifact-root", help="Immutable Judge artifacts."
+        "artifacts/core-real-judge-v6-j1",
+        "--artifact-root",
+        help="Immutable V6 J1 Judge artifacts.",
     ),
     repository_root: str = typer.Option(
         ".", "--repository-root", help="Repository containing the frozen release plans."

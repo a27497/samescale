@@ -14,6 +14,7 @@ from harnesslab.model_lane.models import (
     ProviderFailureCategory,
     ProviderIncompleteReason,
     ProviderInvocationError,
+    ProviderJSONSchema,
     ProviderReadTimeoutStage,
     ProviderRequest,
     ProviderTimeoutPhase,
@@ -330,6 +331,54 @@ async def test_anthropic_messages_adapter_contract_and_thinking_exclusion() -> N
     assert result.usage.total_tokens == 20
     assert "PRIVATE_ANTHROPIC_THINKING" not in serialized
     assert FAKE_KEY not in serialized
+
+
+@pytest.mark.asyncio
+async def test_anthropic_messages_emits_bailian_strict_json_schema_format() -> None:
+    schema = ProviderJSONSchema(
+        value={
+            "type": "object",
+            "properties": {
+                "schema_version": {"type": "integer", "const": 1},
+                "label": {"type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"]},
+                "reason": {"type": "string", "maxLength": 200},
+            },
+            "required": ["schema_version", "label", "reason"],
+            "additionalProperties": False,
+        }
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content)
+        assert payload["output_config"] == {
+            "format": {"type": "json_schema", "schema": schema.value}
+        }
+        assert "temperature" not in payload
+        return httpx.Response(
+            200,
+            json={
+                "id": "bailian-json-schema",
+                "model": "glm-5.2",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": '{"schema_version":1,"label":"PASS","reason":"ok"}',
+                    }
+                ],
+                "stop_reason": "end_turn",
+                "usage": {"input_tokens": 12, "output_tokens": 8},
+            },
+        )
+
+    request = provider_request(
+        Protocol.MESSAGES, effort=None, temperature=None, max_output_tokens=256
+    ).model_copy(update={"output_json_schema": schema})
+    async with await client_for(handler) as client:
+        result = await AnthropicMessagesAdapter(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(request)
+
+    assert result.observed_model == "glm-5.2"
 
 
 @pytest.mark.asyncio
@@ -807,6 +856,11 @@ async def test_unset_temperature_is_omitted_and_observed_model_is_optional(
         ).invoke(provider_request(protocol, effort=None, temperature=None))
 
     assert result.observed_model is None
+
+
+def test_provider_request_omits_absent_structured_output_from_serialization() -> None:
+    request = provider_request(Protocol.MESSAGES, effort=None, temperature=None)
+    assert "output_json_schema" not in request.model_dump(mode="json")
 
 
 @pytest.mark.asyncio

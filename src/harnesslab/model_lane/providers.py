@@ -566,8 +566,16 @@ class AnthropicMessagesAdapter(_HTTPProviderAdapter):
         }
         if profile.reasoning.temperature is not None:
             payload["temperature"] = profile.reasoning.temperature
+        output_config: dict[str, object] = {}
         if profile.reasoning.effort is not None:
-            payload["output_config"] = {"effort": profile.reasoning.effort}
+            output_config["effort"] = profile.reasoning.effort
+        if request.output_json_schema is not None:
+            output_config["format"] = {
+                "type": "json_schema",
+                "schema": request.output_json_schema.value,
+            }
+        if output_config:
+            payload["output_config"] = output_config
         return payload
 
     def _parse(

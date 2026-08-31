@@ -26,12 +26,17 @@ from harnesslab.judgelab.models import (
 )
 from harnesslab.judgelab.output import JudgeOutputError, parse_judge_output
 from harnesslab.judgelab.plan import build_calibration_plan, load_calibration_spec
-from harnesslab.judgelab.prompt import build_provider_request
+from harnesslab.judgelab.prompt import (
+    build_provider_request,
+    judge_output_json_schema,
+    judge_request_identity,
+)
 from harnesslab.judgelab.runner import JudgeRunner
 from harnesslab.judgelab.suite import (
     load_judge_definition,
     load_judge_suite,
 )
+from harnesslab.model_lane.models import ProviderJSONSchema
 
 ROOT = Path(__file__).resolve().parents[1]
 SUITE_ROOT = ROOT / "judge_suites/core-calibration/1.0.0"
@@ -235,6 +240,101 @@ def test_strict_label_score_pairwise_parsers(mode: str, raw: str, expected: obje
     parsed = parse_judge_output(raw, PublicCase.model_validate(kwargs), definition)
     value = getattr(parsed, "label", getattr(parsed, "score", getattr(parsed, "preference", None)))
     assert value == expected
+
+
+def test_judge_requests_bind_exact_mode_specific_json_schemas() -> None:
+    suite, definition, spec = _dependencies()
+    plan = _plan(suite, definition, spec)
+    cases = {case.mode: case for case in suite.public.cases}
+    schemas: dict[JudgeMode, dict[str, object]] = {}
+    for mode in JudgeMode:
+        case = cases[mode]
+        slot = next(
+            item
+            for item in plan.slots
+            if item.judge_cell_id == spec.judge_cells[0].id and item.case_id == case.case_id
+        )
+        request = build_provider_request(
+            definition=definition,
+            case=case,
+            slot=slot,
+            profile=spec.judge_cells[0].model_profile,
+        )
+        assert request.output_json_schema == judge_output_json_schema(definition, case)
+        schema = request.output_json_schema.value
+        schemas[mode] = schema
+        assert schema["type"] == "object"
+        assert schema["additionalProperties"] is False
+        assert schema["properties"]["schema_version"] == {"type": "integer", "const": 1}
+        assert set(schema["required"]) == set(schema["properties"])
+        assert schema["properties"]["reason"] == {"type": "string", "maxLength": 200}
+
+    assert schemas[JudgeMode.LABEL]["properties"]["label"]["enum"] == [
+        *cases[JudgeMode.LABEL].allowed_labels,
+        "UNKNOWN",
+    ]
+    assert schemas[JudgeMode.SCORE]["properties"]["score"] == {
+        "anyOf": [
+            {"type": "number", "minimum": 1.0, "maximum": 5.0},
+            {"type": "null"},
+        ]
+    }
+    assert schemas[JudgeMode.SCORE]["properties"]["abstain"] == {"type": "boolean"}
+    assert schemas[JudgeMode.PAIRWISE]["properties"]["preference"]["enum"] == [
+        "LEFT",
+        "RIGHT",
+        "TIE",
+        "UNKNOWN",
+    ]
+
+
+def test_judge_request_identity_changes_with_output_schema_only() -> None:
+    suite, definition, spec = _dependencies()
+    plan = _plan(suite, definition, spec)
+    case = next(item for item in suite.public.cases if item.mode is JudgeMode.LABEL)
+    slot = next(
+        item
+        for item in plan.slots
+        if item.judge_cell_id == spec.judge_cells[0].id and item.case_id == case.case_id
+    )
+    request = build_provider_request(
+        definition=definition,
+        case=case,
+        slot=slot,
+        profile=spec.judge_cells[0].model_profile,
+    )
+    assert request.output_json_schema is not None
+    changed_schema = dict(request.output_json_schema.value)
+    changed_properties = dict(changed_schema["properties"])
+    changed_reason = dict(changed_properties["reason"])
+    changed_reason["maxLength"] = 199
+    changed_properties["reason"] = changed_reason
+    changed_schema["properties"] = changed_properties
+    changed_request = request.model_copy(
+        update={"output_json_schema": ProviderJSONSchema(value=changed_schema)}
+    )
+    assert request.instructions == changed_request.instructions
+    assert request.input == changed_request.input
+    assert digest(judge_request_identity(request)) != digest(
+        judge_request_identity(changed_request)
+    )
+
+
+def test_judge_json_schema_excludes_unknown_when_abstention_is_disabled() -> None:
+    suite, definition, _spec = _dependencies()
+    no_abstention = definition.model_copy(update={"allow_abstention": False})
+    cases = {case.mode: case for case in suite.public.cases}
+    label = judge_output_json_schema(no_abstention, cases[JudgeMode.LABEL]).value
+    score = judge_output_json_schema(no_abstention, cases[JudgeMode.SCORE]).value
+    pairwise = judge_output_json_schema(no_abstention, cases[JudgeMode.PAIRWISE]).value
+    assert label["properties"]["label"]["enum"] == list(cases[JudgeMode.LABEL].allowed_labels)
+    assert score["properties"]["score"] == {
+        "type": "number",
+        "minimum": 1.0,
+        "maximum": 5.0,
+    }
+    assert score["properties"]["abstain"] == {"type": "boolean", "const": False}
+    assert pairwise["properties"]["preference"]["enum"] == ["LEFT", "RIGHT", "TIE"]
 
 
 @pytest.mark.parametrize(

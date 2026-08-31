@@ -20,7 +20,7 @@ from harnesslab.judgelab.models import (
     digest,
 )
 from harnesslab.judgelab.output import JudgeOutputError, parse_judge_output
-from harnesslab.judgelab.prompt import build_provider_request
+from harnesslab.judgelab.prompt import build_provider_request, judge_request_identity
 from harnesslab.model_lane.models import (
     ProviderAdapter,
     ProviderError,
@@ -81,7 +81,7 @@ class JudgeRunner:
         )
         if case.mode not in definition.supported_modes:
             raise ValueError("JudgeDefinition does not support the calibration case mode")
-        prompt_hash = digest({"instructions": request.instructions, "input": request.input})
+        prompt_hash = digest(judge_request_identity(request))
         provider_result = None
         provider_error = None
         parsed = None

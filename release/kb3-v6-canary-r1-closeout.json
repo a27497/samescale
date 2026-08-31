@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_CANARY_R1_SCIENTIFIC_CLOSEOUT",
+  "append_only": true,
+  "experiment_id": "core-real-matrix-v6",
+  "attempt_id": "V6_CANARY_R1",
+  "result": "ABORTED_JUDGE_OUTPUT_ERROR",
+  "canary_plan_digest": "sha256:e276417d78203008b4c6412c7bc62256cc4367af5adf56427b4d86df2aadab3a",
+  "execution_closeout_digest": "sha256:e863e4106032eac7181d2c4ce241d4017c3dd6d39540b232009c9c3d8edc8aa9",
+  "calls": [
+    {
+      "call_id": "v6-canary-1-direct-qwen38-alibaba-chat",
+      "role": "SUBJECT_DIRECT",
+      "requested_model": "qwen3.8-max",
+      "observed_model": "qwen3.8-max",
+      "status": "VERIFIED_PASS",
+      "call_evidence_digest": "sha256:2c45fc430dfd5dee95e497e14d7598cae9d297fcbadd8f2bf3e8f07e58f639f6"
+    },
+    {
+      "call_id": "v6-canary-2-claude-qwen38-alibaba-messages",
+      "role": "SUBJECT_HARNESS",
+      "requested_model": "qwen3.8-max",
+      "observed_model": "qwen3.8-max",
+      "status": "VERIFIED_PASS",
+      "call_evidence_digest": "sha256:3841840169951605f6a45d3bbfc97406e4be636f1418c1fcc208612f2210dd7a"
+    },
+    {
+      "call_id": "v6-canary-3-judge-glm52-alibaba-chat",
+      "role": "JUDGE",
+      "requested_model": "glm-5.2",
+      "observed_model": "glm-5.2",
+      "status": "JUDGE_OUTPUT_ERROR",
+      "judge_output_failure_kind": "STRICT_SCHEMA_VALIDATION",
+      "provider_failure": null,
+      "call_evidence_digest": "sha256:4912d472e48e2febc3a089caba2beddb05b400442707bddc3194edda0a3cc614"
+    }
+  ],
+  "scientific_classification": {
+    "subject_real_canary_paths_pass": true,
+    "glm_judge_qualified": false,
+    "successful_subject_calls_must_not_be_rerun": true,
+    "r1_evidence_reusable_as_j1_judge_evidence": false
+  },
+  "bounds_observed": {
+    "retries": 0,
+    "semantic_retries": 0,
+    "substitutions": 0,
+    "matrix_calls": 0
+  },
+  "real_call_effect": "HISTORICAL_R1_ONLY_NO_CALLS_FROM_THIS_CLOSEOUT"
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_GLM52_JUDGE_J1_QUALIFICATION_PREPARATION",
+  "state": "PREREGISTERED_NOT_AUTHORIZED_NOT_RUN",
+  "calibration_id": "core-real-judge-v6-j1",
+  "plan_digest": "sha256:0cf4222bc7a9fc896029a406eb81605c83c63ecacd681567a487189d1d6ecd06",
+  "treatment": {
+    "scope": "GLM_5_2_JUDGE_OUTPUT_CONTRACT_AND_REQUIRED_PROVIDER_ROUTE",
+    "r1_protocol": "chat_completions",
+    "j1_protocol": "messages",
+    "r1_base_url_reference": "HARNESSLAB_ALIBABA_BAILIAN_OPENAI_BASE_URL",
+    "j1_base_url_reference": "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL",
+    "j1_route": "/v1/messages",
+    "r1_structured_output": "NONE",
+    "j1_structured_output": "MODE_SPECIFIC_STRICT_JSON_SCHEMA",
+    "unchanged_model": "glm-5.2",
+    "unchanged_temperature": null,
+    "unchanged_reasoning_effort": null,
+    "unchanged_suite": true,
+    "unchanged_qualification_policy": true
+  },
+  "judge_cell": {
+    "id": "judge-glm52-alibaba-bailian-messages",
+    "provider": "alibaba-bailian",
+    "model": "glm-5.2",
+    "protocol": "messages",
+    "base_url_reference": "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL",
+    "route": "/v1/messages",
+    "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+    "profile_identity": "sha256:b2bd55542193e24d8182ce41399413782e0b8319dcfa9286b7744a7dc252d209",
+    "runner_contract": "provider-adapter-v1",
+    "max_output_tokens": 256
+  },
+  "calibration": {
+    "suite_reference": "judge_suites/core-calibration/1.0.0",
+    "suite_digest": "sha256:c2708196237eab94dac473581e3a06de2f7d0e2c50e8b55190b253e547fc43fb",
+    "definition_reference": "judge_suites/core-calibration/1.0.0/definition.yaml",
+    "definition_digest": "sha256:440c35dc374992849e19c51286b31cff07bc94bd937b076f7ecc75cf42d008bc",
+    "qualification_policy_digest": "sha256:82b84e9f0e3330e9d2f3f9068e054d9041158ae3bd7bba38a0044530e8fe6170",
+    "qualification_policy_status": "UNCHANGED",
+    "repeat_count": 3,
+    "evaluation_slot_count": 63,
+    "safe_parallelism": 1,
+    "persistence": "ONE_ORDERED_ASYNCSESSION_CAMPAIGN"
+  },
+  "structured_output": {
+    "provider_extension": "output_config.format",
+    "format_type": "json_schema",
+    "schema_source": "DETERMINISTIC_EXISTING_JUDGE_MODE_CONTRACT",
+    "local_parser_final_verification": true,
+    "additional_properties_allowed": false
+  },
+  "planning_budget": {
+    "input_tokens_per_call_ceiling": 8192,
+    "output_tokens_per_call_ceiling": 256,
+    "call_count": 63,
+    "input_cny_per_million_tokens": "8",
+    "output_cny_per_million_tokens": "28",
+    "worst_case_cny": "4.580352",
+    "classification": "PLANNING_WORST_CASE_NOT_ACTUAL_BILL"
+  },
+  "evidence_and_authorization": {
+    "r1_subject_evidence_reused_as_judge_evidence": false,
+    "spend_authorized": false,
+    "judge_execution_authorized": false,
+    "matrix_execution_authorized": false,
+    "real_provider_calls": 0,
+    "real_judge_calls": 0
+  },
+  "formal_matrix": {
+    "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+    "schedule_digest": "sha256:f3ac0384cddafd4b4dd7b811f66a0e117cdc7e68b758cd111d5e6a4d6726dd2a",
+    "profile_c": "UNCHANGED",
+    "subject_cells": "UNCHANGED",
+    "j1_bound_into_matrix": false,
+    "authorization_state": "NOT_AUTHORIZED"
+  }
+}

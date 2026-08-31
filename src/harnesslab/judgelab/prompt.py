@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 
 from harnesslab.judgelab.models import JudgeDefinition, JudgeEvaluationSlot, JudgeMode, PublicCase
-from harnesslab.model_lane.models import ProviderRequest
+from harnesslab.model_lane.models import ProviderJSONSchema, ProviderRequest
 
 
 def _public_case_payload(case: PublicCase, slot: JudgeEvaluationSlot) -> dict[str, object]:
@@ -29,6 +29,65 @@ def _public_case_payload(case: PublicCase, slot: JudgeEvaluationSlot) -> dict[st
         payload["candidate_right"] = right
         payload["display_labels"] = ["Candidate A", "Candidate B"]
     return payload
+
+
+def judge_output_json_schema(definition: JudgeDefinition, case: PublicCase) -> ProviderJSONSchema:
+    properties: dict[str, object] = {
+        "schema_version": {"type": "integer", "const": 1},
+    }
+    required = ["schema_version"]
+    if case.mode is JudgeMode.LABEL:
+        labels = list(case.allowed_labels)
+        if definition.allow_abstention:
+            labels.append("UNKNOWN")
+        properties["label"] = {"type": "string", "enum": labels}
+        required.append("label")
+    elif case.mode is JudgeMode.SCORE:
+        numeric_score: dict[str, object] = {
+            "type": "number",
+            "minimum": case.score_min,
+            "maximum": case.score_max,
+        }
+        properties["score"] = (
+            {"anyOf": [numeric_score, {"type": "null"}]}
+            if definition.allow_abstention
+            else numeric_score
+        )
+        properties["abstain"] = (
+            {"type": "boolean"}
+            if definition.allow_abstention
+            else {"type": "boolean", "const": False}
+        )
+        required.extend(("score", "abstain"))
+    else:
+        preferences = ["LEFT", "RIGHT", "TIE"]
+        if definition.allow_abstention:
+            preferences.append("UNKNOWN")
+        properties["preference"] = {"type": "string", "enum": preferences}
+        required.append("preference")
+    properties["reason"] = {
+        "type": "string",
+        "maxLength": definition.maximum_public_justification_length,
+    }
+    required.append("reason")
+    return ProviderJSONSchema(
+        value={
+            "type": "object",
+            "properties": properties,
+            "required": required,
+            "additionalProperties": False,
+        }
+    )
+
+
+def judge_request_identity(request: ProviderRequest) -> dict[str, object]:
+    identity: dict[str, object] = {
+        "instructions": request.instructions,
+        "input": request.input,
+    }
+    if request.output_json_schema is not None:
+        identity["output_json_schema"] = request.output_json_schema.value
+    return identity
 
 
 def build_provider_request(
@@ -69,4 +128,9 @@ def build_provider_request(
         separators=(",", ":"),
         ensure_ascii=False,
     )
-    return ProviderRequest(profile=model_profile, instructions=instructions, input=input_text)
+    return ProviderRequest(
+        profile=model_profile,
+        instructions=instructions,
+        input=input_text,
+        output_json_schema=judge_output_json_schema(definition, case),
+    )

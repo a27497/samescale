@@ -254,12 +254,38 @@ class ProviderUsage(BaseModel):
     reasoning_tokens: int | None = Field(default=None, ge=0)
 
 
+class ProviderJSONSchema(BaseModel):
+    """Exact request-scoped JSON Schema for providers that support structured output."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    value: dict[str, object]
+
+    @model_validator(mode="after")
+    def schema_is_strict_object(self) -> ProviderJSONSchema:
+        properties = self.value.get("properties")
+        required = self.value.get("required")
+        if (
+            self.value.get("type") != "object"
+            or self.value.get("additionalProperties") is not False
+            or not isinstance(properties, dict)
+            or not isinstance(required, list)
+            or not required
+            or set(required) != set(properties)
+        ):
+            raise ValueError("provider JSON Schema must be an exact strict object")
+        return self
+
+
 class ProviderRequest(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     profile: ModelProfile
     instructions: str = Field(min_length=1)
     input: str = Field(min_length=1)
+    output_json_schema: ProviderJSONSchema | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
 
 class GenerationSettings(BaseModel):
