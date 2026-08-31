@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from harnesslab.contracts.common import Protocol
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
+from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
 from harnesslab.registry.seeds import (
     ALIBABA_ANTHROPIC_BASE_URL_REFERENCE,
     ALIBABA_CREDENTIAL_REFERENCE,
@@ -14,6 +15,8 @@ def configured_alibaba_bailian_profile(
     protocol: Protocol,
     *,
     max_output_tokens: int = 2000,
+    thinking_mode: ThinkingMode | None = None,
+    thinking_transport: ThinkingTransport | None = None,
 ) -> ModelProfile:
     """Build a secret-free, operator-configured Bailian profile without probing it."""
 
@@ -44,6 +47,8 @@ def configured_alibaba_bailian_profile(
         route=route,
         protocol=protocol,
         reasoning=ReasoningProfile(max_output_tokens=max_output_tokens),
+        thinking_mode=thinking_mode,
+        thinking_transport=thinking_transport,
         request_timeout_seconds=180,
         credential_reference=ALIBABA_CREDENTIAL_REFERENCE,
     )

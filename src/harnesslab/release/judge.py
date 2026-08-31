@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from harnesslab.contracts.common import Protocol
+from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
 from harnesslab.core.config import Settings
 from harnesslab.db.session import create_engine, create_session_factory
 from harnesslab.judgelab.calibration import execute_calibration
@@ -28,7 +29,10 @@ REAL_JUDGE_CALIBRATION_ID = "core-real-judge-v6-j1"
 REAL_JUDGE_CELL_ID = "judge-glm52-alibaba-bailian-messages"
 REAL_JUDGE_CALLS = 63
 REAL_JUDGE_SAFE_PARALLELISM = 1
-REAL_JUDGE_PLAN_DIGEST = "sha256:0cf4222bc7a9fc896029a406eb81605c83c63ecacd681567a487189d1d6ecd06"
+REAL_JUDGE_PREDECESSOR_PLAN_DIGEST = (
+    "sha256:0cf4222bc7a9fc896029a406eb81605c83c63ecacd681567a487189d1d6ecd06"
+)
+REAL_JUDGE_PLAN_DIGEST = "sha256:542e114402b1faff63baf4c993a4a6d1d265df5f0c953e62a57345e4dcf29f86"
 
 
 class RealJudgeControlPlaneError(SmokeControlPlaneError):
@@ -41,7 +45,11 @@ def build_real_judge_plan(
 ) -> tuple[JudgeCalibrationPlan, JudgeSuite, dict[str, JudgeDefinition]]:
     del environment  # Plan construction is keyless; execution resolves the references.
     profile = configured_alibaba_bailian_profile(
-        "glm-5.2", Protocol.MESSAGES, max_output_tokens=256
+        "glm-5.2",
+        Protocol.MESSAGES,
+        max_output_tokens=256,
+        thinking_mode=ThinkingMode.DISABLED,
+        thinking_transport=ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT,
     ).model_copy(update={"request_timeout_seconds": 90})
     suite_root = repository_root / "judge_suites/core-calibration/1.0.0"
     base_spec = load_calibration_spec(suite_root / "calibration.yaml")

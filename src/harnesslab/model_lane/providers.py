@@ -548,6 +548,14 @@ class AnthropicMessagesAdapter(_HTTPProviderAdapter):
 
     def _payload(self, request: ProviderRequest) -> dict[str, object]:
         profile = request.profile
+        if profile.thinking_transport not in {
+            None,
+            ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT,
+        }:
+            raise ProviderInvocationError(
+                ProviderFailureCategory.CONFIGURATION,
+                "unsupported Anthropic Messages thinking transport",
+            )
         if profile.reasoning.effort not in {None, "low", "medium", "high", "xhigh", "max"}:
             raise ProviderInvocationError(
                 ProviderFailureCategory.CONFIGURATION,
@@ -566,6 +574,9 @@ class AnthropicMessagesAdapter(_HTTPProviderAdapter):
         }
         if profile.reasoning.temperature is not None:
             payload["temperature"] = profile.reasoning.temperature
+        if profile.thinking_transport is ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT:
+            assert profile.thinking_mode is not None
+            payload["thinking"] = {"type": profile.thinking_mode.value}
         output_config: dict[str, object] = {}
         if profile.reasoning.effort is not None:
             output_config["effort"] = profile.reasoning.effort

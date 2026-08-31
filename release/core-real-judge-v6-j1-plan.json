@@ -3,7 +3,9 @@
   "phase": "K_B3_V6_GLM52_JUDGE_J1_QUALIFICATION_PREPARATION",
   "state": "PREREGISTERED_NOT_AUTHORIZED_NOT_RUN",
   "calibration_id": "core-real-judge-v6-j1",
-  "plan_digest": "sha256:0cf4222bc7a9fc896029a406eb81605c83c63ecacd681567a487189d1d6ecd06",
+  "plan_digest": "sha256:542e114402b1faff63baf4c993a4a6d1d265df5f0c953e62a57345e4dcf29f86",
+  "predecessor_plan_digest": "sha256:0cf4222bc7a9fc896029a406eb81605c83c63ecacd681567a487189d1d6ecd06",
+  "predecessor_plan_state": "SUPERSEDED_MUST_NOT_BE_AUTHORIZED",
   "treatment": {
     "scope": "GLM_5_2_JUDGE_OUTPUT_CONTRACT_AND_REQUIRED_PROVIDER_ROUTE",
     "r1_protocol": "chat_completions",
@@ -13,6 +15,7 @@
     "j1_route": "/v1/messages",
     "r1_structured_output": "NONE",
     "j1_structured_output": "MODE_SPECIFIC_STRICT_JSON_SCHEMA",
+    "j1_thinking_mode": "EXPLICITLY_DISABLED",
     "unchanged_model": "glm-5.2",
     "unchanged_temperature": null,
     "unchanged_reasoning_effort": null,
@@ -27,9 +30,11 @@
     "base_url_reference": "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL",
     "route": "/v1/messages",
     "credential_reference": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
-    "profile_identity": "sha256:b2bd55542193e24d8182ce41399413782e0b8319dcfa9286b7744a7dc252d209",
+    "profile_identity": "sha256:1b8233c8b413f9c1fc2f84c051cf2baf0a5467a5c8c44c2a1889787fbcaae020",
     "runner_contract": "provider-adapter-v1",
-    "max_output_tokens": 256
+    "max_output_tokens": 256,
+    "thinking_mode": "EXPLICITLY_DISABLED",
+    "thinking_transport": "anthropic_messages_thinking_object"
   },
   "calibration": {
     "suite_reference": "judge_suites/core-calibration/1.0.0",

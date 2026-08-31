@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from harnesslab.comparability.models import ComparisonFacts, canonical_digest
+from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
 from harnesslab.egress import EGRESS_PROXY_IMAGE
 from harnesslab.experiment.evidence import validate_manifest_against_slot
 from harnesslab.harness_lane.profile import CODEX_IMAGE
@@ -170,6 +171,8 @@ def test_real_judge_plan_reuses_suite_and_thresholds_for_v6_j1_messages() -> Non
     assert profile.protocol.value == "messages"
     assert profile.base_url_reference == "HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL"
     assert profile.route == "/v1/messages"
+    assert profile.thinking_mode is ThinkingMode.DISABLED
+    assert profile.thinking_transport is ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT
     assert plan.judge_cells[0].runner_contract == "provider-adapter-v1"
     assert plan.qualification_policy.minimum_macro_f1 == 0.95
 

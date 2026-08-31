@@ -109,7 +109,16 @@ class ModelProfile(BaseModel):
             raise ValueError(f"{self.protocol.value} route must end with {expected_suffix}")
         if (self.thinking_mode is None) != (self.thinking_transport is None):
             raise ValueError("thinking mode and typed transport must be selected together")
-        if self.thinking_transport is not None and self.protocol is not Protocol.CHAT_COMPLETIONS:
+        if (
+            self.thinking_transport is ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT
+            and self.protocol is not Protocol.MESSAGES
+        ):
+            raise ValueError("Anthropic Messages thinking requires the Messages protocol")
+        if (
+            self.thinking_transport is not None
+            and self.thinking_transport is not ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT
+            and self.protocol is not Protocol.CHAT_COMPLETIONS
+        ):
             raise ValueError("typed thinking options require Chat Completions")
         return self
 

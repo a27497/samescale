@@ -32,6 +32,7 @@ class ThinkingMode(StrEnum):
 class ThinkingTransport(StrEnum):
     DEEPSEEK_THINKING_OBJECT = "deepseek_thinking_object"
     BAILIAN_ENABLE_THINKING = "bailian_enable_thinking"
+    ANTHROPIC_MESSAGES_THINKING_OBJECT = "anthropic_messages_thinking_object"
 
 
 class ProviderProfile(BaseModel):
@@ -99,7 +100,16 @@ class ProviderProfile(BaseModel):
             raise ValueError(f"{self.protocol.value} route must end with {suffix}")
         if (self.thinking_mode is None) != (self.thinking_transport is None):
             raise ValueError("thinking mode and transport must be selected together")
-        if self.thinking_transport is not None and self.protocol is not Protocol.CHAT_COMPLETIONS:
+        if (
+            self.thinking_transport is ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT
+            and self.protocol is not Protocol.MESSAGES
+        ):
+            raise ValueError("Anthropic Messages thinking requires the Messages protocol")
+        if (
+            self.thinking_transport is not None
+            and self.thinking_transport is not ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT
+            and self.protocol is not Protocol.CHAT_COMPLETIONS
+        ):
             raise ValueError("typed thinking options are supported only by Chat Completions")
         is_relay = self.provider_provenance is ProviderProvenance.TRUSTED_THIRD_PARTY_RELAY
         relay_claims = (

@@ -5,14 +5,17 @@ from decimal import Decimal
 from pathlib import Path
 
 from harnesslab.contracts.common import Protocol
-from harnesslab.judgelab.models import digest
+from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
+from harnesslab.judgelab.models import JudgeMode, digest
 from harnesslab.judgelab.plan import load_calibration_spec
 from harnesslab.judgelab.prompt import build_provider_request
+from harnesslab.model_lane.providers import AnthropicMessagesAdapter
 from harnesslab.release.judge import (
     REAL_JUDGE_CALIBRATION_ID,
     REAL_JUDGE_CALLS,
     REAL_JUDGE_CELL_ID,
     REAL_JUDGE_PLAN_DIGEST,
+    REAL_JUDGE_PREDECESSOR_PLAN_DIGEST,
     REAL_JUDGE_SAFE_PARALLELISM,
     build_real_judge_plan,
 )
@@ -68,6 +71,12 @@ def test_v6_j1_plan_is_exact_keyless_and_frozen() -> None:
     assert plan.calibration_id == REAL_JUDGE_CALIBRATION_ID == "core-real-judge-v6-j1"
     assert cell.id == REAL_JUDGE_CELL_ID == "judge-glm52-alibaba-bailian-messages"
     assert plan.plan_digest == REAL_JUDGE_PLAN_DIGEST == frozen["plan_digest"]
+    assert (
+        frozen["predecessor_plan_digest"]
+        == REAL_JUDGE_PREDECESSOR_PLAN_DIGEST
+        == ("sha256:0cf4222bc7a9fc896029a406eb81605c83c63ecacd681567a487189d1d6ecd06")
+    )
+    assert frozen["predecessor_plan_state"] == "SUPERSEDED_MUST_NOT_BE_AUTHORIZED"
     assert len(plan.judge_cells) == 1
     assert len(plan.slots) == REAL_JUDGE_CALLS == 63
     assert plan.repeat_count == 3
@@ -80,6 +89,15 @@ def test_v6_j1_plan_is_exact_keyless_and_frozen() -> None:
     assert profile.reasoning.max_output_tokens == 256
     assert profile.reasoning.effort is None
     assert profile.reasoning.temperature is None
+    assert profile.thinking_mode is ThinkingMode.DISABLED
+    assert profile.thinking_transport is ThinkingTransport.ANTHROPIC_MESSAGES_THINKING_OBJECT
+    assert (
+        cell.profile_identity
+        == frozen["judge_cell"]["profile_identity"]
+        == ("sha256:1b8233c8b413f9c1fc2f84c051cf2baf0a5467a5c8c44c2a1889787fbcaae020")
+    )
+    assert frozen["treatment"]["j1_thinking_mode"] == "EXPLICITLY_DISABLED"
+    assert frozen["judge_cell"]["thinking_mode"] == "EXPLICITLY_DISABLED"
     assert cell.runner_contract == "provider-adapter-v1"
     assert suite.suite_digest == frozen["calibration"]["suite_digest"]
     assert definitions[cell.id].definition_digest == frozen["calibration"]["definition_digest"]
@@ -114,6 +132,36 @@ def test_every_j1_slot_has_mode_specific_strict_schema_without_evidence_reuse() 
     assert authority["judge_execution_authorized"] is False
     assert authority["matrix_execution_authorized"] is False
     assert authority["real_provider_calls"] == authority["real_judge_calls"] == 0
+
+
+def test_j1_label_score_and_pairwise_payloads_disable_thinking_and_keep_schema() -> None:
+    plan, suite, definitions = build_real_judge_plan(ROOT)
+    cell = plan.judge_cells[0]
+    cases = {case.case_id: case for case in suite.public.cases}
+    definition = definitions[cell.id]
+    adapter = AnthropicMessagesAdapter()
+    seen_modes = set()
+    for slot in plan.slots:
+        if slot.case_mode in seen_modes:
+            continue
+        seen_modes.add(slot.case_mode)
+        request = build_provider_request(
+            definition=definition,
+            case=cases[slot.case_id],
+            slot=slot,
+            profile=cell.model_profile,
+        )
+        payload = adapter._payload(request)
+        assert payload["thinking"] == {"type": "disabled"}
+        assert payload["output_config"] == {
+            "format": {
+                "type": "json_schema",
+                "schema": request.output_json_schema.value,
+            }
+        }
+        assert "effort" not in payload["output_config"]
+        assert "temperature" not in payload
+    assert seen_modes == set(JudgeMode)
 
 
 def test_j1_budget_and_formal_matrix_bindings_are_unchanged() -> None:
