@@ -324,6 +324,7 @@ class QualificationPolicy(BaseModel):
     minimum_coverage: float = Field(ge=0, le=1)
     minimum_label_accuracy: float = Field(ge=0, le=1)
     minimum_macro_f1: float = Field(ge=0, le=1)
+    require_score_metrics: bool = Field(default=True, exclude_if=lambda value: value is True)
     maximum_score_mae: float = Field(ge=0)
     minimum_spearman_rho: float = Field(ge=-1, le=1)
     require_spearman: bool = True

@@ -85,8 +85,12 @@ class JudgeCalibrationReport(BaseModel):
                 f"{cell.label_metrics['macro_f1']}"
             )
             score_summary = (
-                f"- Score MAE / Spearman: {cell.score_metrics['mae']} / "
-                f"{cell.score_metrics['spearman_rho']}"
+                "- Score MAE / Spearman: not required (objective-only suite)"
+                if cell.score_metrics["case_count"] == 0
+                else (
+                    f"- Score MAE / Spearman: {cell.score_metrics['mae']} / "
+                    f"{cell.score_metrics['spearman_rho']}"
+                )
             )
             l0_summary = (
                 f"- L0 disagreements / overrides: {cell.l0_judge_disagreement_count} / "
@@ -355,13 +359,11 @@ def _threshold_reasons(
 
     parsed = QualificationPolicy.model_validate(policy)
     reasons: list[str] = []
-    checks = (
+    checks = [
         (label["coverage"], parsed.minimum_coverage, "label coverage", "min"),
         (label["accuracy"], parsed.minimum_label_accuracy, "label accuracy", "min"),
         (label["macro_f1"], parsed.minimum_macro_f1, "label macro F1", "min"),
-        (score["coverage"], parsed.minimum_coverage, "score coverage", "min"),
         (pairwise["coverage"], parsed.minimum_coverage, "pairwise coverage", "min"),
-        (score["mae"], parsed.maximum_score_mae, "score MAE", "max"),
         (pairwise["gold_accuracy"], parsed.minimum_pairwise_accuracy, "pairwise accuracy", "min"),
         (
             pairwise["position_consistency_rate"],
@@ -375,7 +377,14 @@ def _threshold_reasons(
             "verbosity bias rate",
             "max",
         ),
-    )
+    ]
+    if parsed.require_score_metrics:
+        checks.extend(
+            [
+                (score["coverage"], parsed.minimum_coverage, "score coverage", "min"),
+                (score["mae"], parsed.maximum_score_mae, "score MAE", "max"),
+            ]
+        )
     for value, threshold, name, direction in checks:
         if (
             value is None
@@ -383,8 +392,10 @@ def _threshold_reasons(
             or (direction == "max" and value > threshold)
         ):
             reasons.append(f"{name}={value} violates {direction}imum threshold {threshold}")
-    if parsed.require_spearman and (
-        score["spearman_rho"] is None or score["spearman_rho"] < parsed.minimum_spearman_rho
+    if (
+        parsed.require_score_metrics
+        and parsed.require_spearman
+        and (score["spearman_rho"] is None or score["spearman_rho"] < parsed.minimum_spearman_rho)
     ):
         reasons.append(
             f"Spearman={score['spearman_rho']} does not meet {parsed.minimum_spearman_rho}"
@@ -558,10 +569,24 @@ def build_judge_report(
         plan_digest=plan.plan_digest,
         definition_identities=identities,
         cells=tuple(reports),
-        limitations=(
-            "Qualification is bound only to this small repository-curated suite.",
-            "Curated human gold is not a large-scale human, expert-panel, or inter-rater study.",
-            "Verbosity measurements are probes and do not establish universal bias absence.",
-            "HarnessLab blinds controlled metadata but candidate text may self-identify.",
+        limitations=tuple(
+            [
+                "Qualification is bound only to this small repository-curated suite.",
+                *(
+                    [
+                        "Curated human gold is not a large-scale human, expert-panel, "
+                        "or inter-rater study."
+                    ]
+                    if any(
+                        item.gold_source is GoldSource.CURATED_HUMAN_L1 for item in suite.gold.gold
+                    )
+                    else [
+                        "Deterministic L0 gold tests controlled correctness and invariance, "
+                        "not universal human preference alignment."
+                    ]
+                ),
+                "Verbosity measurements are probes and do not establish universal bias absence.",
+                "HarnessLab blinds controlled metadata but candidate text may self-identify.",
+            ]
         ),
     )

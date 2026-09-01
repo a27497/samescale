@@ -1,0 +1,88 @@
+{
+  "authorization": {
+    "formal_matrix": "NOT_AUTHORIZED",
+    "new_real_judge_qualification": "NOT_AUTHORIZED",
+    "real_provider_calls": 0
+  },
+  "controlled_perturbation_families": [
+    "factual_error",
+    "missing_reference",
+    "paraphrase_only",
+    "prompt_injection",
+    "verbosity_only",
+    "violates_explicit_requirement",
+    "wrong_output",
+    "wrong_reference_fact"
+  ],
+  "gold_authority": {
+    "candidate_judge_outputs_can_change_gold": false,
+    "curated_human_l1_count": 0,
+    "deterministic_l0_count": 13
+  },
+  "historical_score_metrics": {
+    "absolute_score_mae_blocks_v2_qualification": false,
+    "j1_and_j3r1_results_retained": true,
+    "status": "DIAGNOSTIC_ONLY"
+  },
+  "methodology": {
+    "absolute_score_metrics": "DIAGNOSTIC_ONLY_NOT_QUALIFICATION_BLOCKING",
+    "core_qualification": [
+      "deterministic_label_accuracy",
+      "objective_pairwise_accuracy",
+      "controlled_degradation_detection",
+      "position_consistency",
+      "repeat_consistency",
+      "abstain_correctness",
+      "verbosity_invariance"
+    ],
+    "formal_matrix_authorized": false,
+    "human_annotation_required": false,
+    "methodology": "OBJECTIVE_JUDGE_QUALIFICATION_V2",
+    "multi_judge_jury": "P1_DIAGNOSTIC_ONLY_NOT_GOLD_AUTHORITY",
+    "rationale": "Core qualification uses synthetic or embedded-reference L0 gold so candidate Judge outcomes cannot redefine the answer key.",
+    "schema_version": 1
+  },
+  "p1_multi_judge_jury": {
+    "can_override_deterministic_l0": false,
+    "heterogeneous_model_families_required": true,
+    "purpose": "Measure disagreement on future non-objective cases without creating gold authority.",
+    "qualification_blocking": false,
+    "status": "DIAGNOSTIC_ONLY"
+  },
+  "phase": "K_B3_V7_OBJECTIVE_JUDGE_QUALIFICATION_METHODOLOGY",
+  "qualification_policy": {
+    "maximum_abstain_error_rate": 0.15,
+    "maximum_score_mae": 0.25,
+    "maximum_verbosity_bias_rate": 0.1,
+    "minimum_coverage": 0.8,
+    "minimum_label_accuracy": 0.8,
+    "minimum_macro_f1": 0.95,
+    "minimum_pairwise_accuracy": 0.8,
+    "minimum_position_consistency": 0.95,
+    "minimum_repeat_consistency": 0.95,
+    "minimum_spearman_rho": 0.95,
+    "policy_id": "core-objective-policy",
+    "qualification_rule": "ALL_REQUIRED_CHECKS_PASS",
+    "require_score_metrics": false,
+    "require_spearman": false,
+    "version": "2.0.0"
+  },
+  "schema_version": 1,
+  "state": "IMPLEMENTED_ZERO_PROVIDER_CALLS",
+  "suite": {
+    "case_count": 13,
+    "label_case_count": 5,
+    "pairwise_case_count": 8,
+    "reference": "judge_suites/core-calibration/2.0.0",
+    "repeat_count": 3,
+    "score_case_count": 0,
+    "slot_count": 63,
+    "suite_id": "core-calibration-objective",
+    "version": "2.0.0"
+  },
+  "supersedes": {
+    "approach": "THREE_HUMAN_BLIND_ANNOTATION",
+    "artifact": "release/core-real-judge-v6-methodology-v2-plan.json",
+    "reason": "Objective L0 qualification removes the human-annotation blocking dependency."
+  }
+}

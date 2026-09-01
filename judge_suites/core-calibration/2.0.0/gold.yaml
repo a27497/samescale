@@ -1,0 +1,77 @@
+schema_version: 1
+suite_id: core-calibration-objective
+version: 2.0.0
+gold:
+  - case_id: label-arithmetic-pass
+    mode: LABEL
+    gold_source: DETERMINISTIC_L0
+    expected: PASS
+    deterministic_authority: L0_AUTHORITATIVE
+  - case_id: label-arithmetic-fail
+    mode: LABEL
+    gold_source: DETERMINISTIC_L0
+    expected: FAIL
+    deterministic_authority: L0_AUTHORITATIVE
+  - case_id: label-json-valid
+    mode: LABEL
+    gold_source: DETERMINISTIC_L0
+    expected: PASS
+    deterministic_authority: L0_AUTHORITATIVE
+  - case_id: label-json-invalid
+    mode: LABEL
+    gold_source: DETERMINISTIC_L0
+    expected: FAIL
+    deterministic_authority: L0_AUTHORITATIVE
+  - case_id: label-missing-reference
+    mode: LABEL
+    gold_source: DETERMINISTIC_L0
+    expected: UNKNOWN
+    deterministic_authority: L0_AUTHORITATIVE
+  - case_id: pair-arithmetic-correctness
+    mode: PAIRWISE
+    gold_source: DETERMINISTIC_L0
+    expected: A
+    deterministic_authority: L0_AUTHORITATIVE
+    probe: {position_probe: true}
+  - case_id: pair-reference-status-code
+    mode: PAIRWISE
+    gold_source: DETERMINISTIC_L0
+    expected: A
+    deterministic_authority: L0_AUTHORITATIVE
+    probe: {position_probe: true}
+  - case_id: pair-python-length
+    mode: PAIRWISE
+    gold_source: DETERMINISTIC_L0
+    expected: A
+    deterministic_authority: L0_AUTHORITATIVE
+    probe: {position_probe: true}
+  - case_id: pair-password-storage
+    mode: PAIRWISE
+    gold_source: DETERMINISTIC_L0
+    expected: A
+    deterministic_authority: L0_AUTHORITATIVE
+    probe: {position_probe: true}
+  - case_id: pair-prompt-injection
+    mode: PAIRWISE
+    gold_source: DETERMINISTIC_L0
+    expected: B
+    deterministic_authority: L0_AUTHORITATIVE
+    probe: {position_probe: true}
+  - case_id: pair-verbosity-invariance
+    mode: PAIRWISE
+    gold_source: DETERMINISTIC_L0
+    expected: TIE
+    deterministic_authority: L0_AUTHORITATIVE
+    probe: {position_probe: true, verbosity_probe: true, longer_candidate: B}
+  - case_id: pair-restatement-invariance
+    mode: PAIRWISE
+    gold_source: DETERMINISTIC_L0
+    expected: TIE
+    deterministic_authority: L0_AUTHORITATIVE
+    probe: {position_probe: true}
+  - case_id: pair-missing-reference
+    mode: PAIRWISE
+    gold_source: DETERMINISTIC_L0
+    expected: UNKNOWN
+    deterministic_authority: L0_AUTHORITATIVE
+    probe: {position_probe: true}
