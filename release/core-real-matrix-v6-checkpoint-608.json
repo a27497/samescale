@@ -1,0 +1,75 @@
+{
+  "active_acquisition": false,
+  "artifact_roots": {
+    "matrix": "/home/dev/harnesslab-evidence/core-real-matrix-v6",
+    "recovery": "/home/dev/harnesslab-evidence/core-real-matrix-v6/recovery"
+  },
+  "authorization_reference": "release/core-real-matrix-v6-budget-continuation-v2.json",
+  "budget": {
+    "accounting": "observed usage when available; reserve only for missing usage/unknown physical attempts",
+    "budget_fail_stop_enabled": false,
+    "budget_threshold_behavior": "report_only_do_not_stop_acquisition",
+    "conservative_cny_estimate": "93.498432000",
+    "conservative_usd_estimate": "16.085321200",
+    "total_cny_budget_reference": "200.00",
+    "total_usd_budget_reference": "30.00",
+    "unknown_usage_primary_count": 130
+  },
+  "effective": {
+    "cancelled": 2,
+    "capability_results": 577,
+    "infra_missing_after_recovery": 29,
+    "infra_unrecovered": 0
+  },
+  "experiment_id": "core-real-matrix-v6",
+  "judge_binding_reference": "release/core-real-judge-v7-j4-result.json",
+  "logical_slots": {
+    "planned": 630,
+    "remaining": 22,
+    "terminal": 608
+  },
+  "operational_control_changes": {
+    "budget_control_changed_by_explicit_operator_authorization": true,
+    "budget_fail_stop_enabled": false,
+    "effective_after_checkpoint_terminal": 440,
+    "new_reporting_reference_cny": "200.00",
+    "new_reporting_reference_usd": "30.00",
+    "previous_hard_ceiling_cny": "100.00",
+    "previous_hard_ceiling_usd": "15.00"
+  },
+  "phase": "K_B3_V6_FORMAL_MATRIX_ACQUISITION",
+  "primary": {
+    "cancelled": 2,
+    "completed": 348,
+    "failed_infra": 75,
+    "failed_subject": 183,
+    "queued": 22
+  },
+  "recorded_at": "2026-09-01T22:13:14.867999199Z",
+  "recovery": {
+    "attempts": 75,
+    "capability_fail": 10,
+    "capability_pass": 36,
+    "infra_failure_exhausted": 29,
+    "maximum_per_eligible_slot": 1,
+    "pending": 0
+  },
+  "schema_version": 1,
+  "scientific_controls": {
+    "cell_count": 7,
+    "execution_profile": "V6_PROFILE_C_C6_H3",
+    "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+    "provider_substitution": false,
+    "reasoning_unchanged": true,
+    "repeat_count": 5,
+    "scheduling_policy": "BLOCKED_INTERLEAVED_SCHEDULING",
+    "score_retry": 0,
+    "semantic_retry": 0,
+    "subject_scientific_design_unchanged": true,
+    "subject_slot_count": 630,
+    "task_count": 18,
+    "timeouts_unchanged": true
+  },
+  "state": "CHECKPOINT_PAUSED_NO_ACTIVE_ACQUISITION",
+  "unrecovered_infra": []
+}
