@@ -1,0 +1,74 @@
+{
+  "active_acquisition": false,
+  "artifact_roots": {
+    "matrix": "/home/dev/harnesslab-evidence/core-real-matrix-v6",
+    "recovery": "/home/dev/harnesslab-evidence/core-real-matrix-v6/recovery"
+  },
+  "authorization_reference": "release/core-real-matrix-v6-budget-continuation.json",
+  "budget": {
+    "accounting": "observed usage when available; reserve only for missing usage/unknown physical attempts",
+    "conservative_cny_estimate": "31.048648000",
+    "conservative_usd_estimate": "4.995353940",
+    "total_cny_ceiling": "100.00",
+    "total_usd_ceiling": "15.00",
+    "unknown_usage_primary_count": 39
+  },
+  "effective": {
+    "cancelled": 2,
+    "capability_results": 204,
+    "infra_missing_after_recovery": 6,
+    "infra_unrecovered": 4
+  },
+  "experiment_id": "core-real-matrix-v6",
+  "judge_binding_reference": "release/core-real-judge-v7-j4-result.json",
+  "logical_slots": {
+    "planned": 630,
+    "remaining": 414,
+    "terminal": 216
+  },
+  "phase": "K_B3_V6_FORMAL_MATRIX_ACQUISITION",
+  "primary": {
+    "cancelled": 2,
+    "completed": 128,
+    "failed_infra": 21,
+    "failed_subject": 65,
+    "queued": 414
+  },
+  "recorded_at": "2026-09-01T15:27:11.914738+00:00",
+  "recovery": {
+    "attempts": 17,
+    "capability_fail": 5,
+    "capability_pass": 6,
+    "infra_failure_exhausted": 6,
+    "maximum_per_eligible_slot": 1
+  },
+  "schema_version": 1,
+  "scientific_controls_unchanged": true,
+  "state": "HANDOFF_CHECKPOINT_PAUSED_NO_ACTIVE_ACQUISITION",
+  "unrecovered_infra": [
+    {
+      "cell_id": "model-gpt56-relay-responses",
+      "slot_id": "sha256:96e56dc6df119d06e27cd5aa5ce045a7887dda04713078f9537469a034d1aff3",
+      "slot_order": 190,
+      "source_outcome": "provider_error"
+    },
+    {
+      "cell_id": "harness-codex-gpt56-medium",
+      "slot_id": "sha256:5416fe56b051dff959ee10316f35560a33d47513061621f86b185e77b33c91bc",
+      "slot_order": 191,
+      "source_outcome": "harness_error:protocol_error"
+    },
+    {
+      "cell_id": "harness-codex-gpt56-high",
+      "slot_id": "sha256:172cca3cc241be24087f504188d6777306ec3ba43ce9e26c5c2797e6be37b67e",
+      "slot_order": 195,
+      "source_outcome": "harness_error:protocol_error"
+    },
+    {
+      "cell_id": "model-qwen38-alibaba-bailian-chat",
+      "slot_id": "sha256:b950a0f10ec9574dacd0c47f1a585f57e5faba2f0eb648b043d8ec4a7d958712",
+      "slot_order": 203,
+      "source_outcome": "provider_error"
+    }
+  ]
+}
