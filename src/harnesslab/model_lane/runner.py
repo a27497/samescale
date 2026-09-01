@@ -67,6 +67,8 @@ class DirectModelRunner:
         sandbox: DockerSandbox | None = None,
         environment: Mapping[str, str] | None = None,
         allow_custom_endpoint: bool = False,
+        plan_profile_identity: str | None = None,
+        plan_harness_config_identity: str | None = None,
     ) -> None:
         base = Path(tempfile.gettempdir()) / "harnesslab-phase-d"
         self.artifact_root = (artifact_root or base / "artifacts").resolve()
@@ -76,6 +78,8 @@ class DirectModelRunner:
         self.sandbox = sandbox or DockerSandbox()
         self.environment = environment if environment is not None else os.environ
         self.allow_custom_endpoint = allow_custom_endpoint
+        self.plan_profile_identity = plan_profile_identity
+        self.plan_harness_config_identity = plan_harness_config_identity
 
     async def run(
         self,
@@ -358,6 +362,8 @@ class DirectModelRunner:
             workspace_input_digest=prompt.workspace_digest,
             workspace_output_digest=workspace_output_digest,
             context_digest=prompt.context_digest,
+            plan_profile_identity=self.plan_profile_identity,
+            plan_harness_config_identity=self.plan_harness_config_identity,
             prompt_template_version=prompt.template_version,
             prompt_hash=prompt.prompt_hash,
             requested_model=profile.requested_model,

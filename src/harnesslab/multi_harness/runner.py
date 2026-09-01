@@ -49,6 +49,8 @@ class MultiHarnessRunner:
         artifact_root: Path | None = None,
         runtime_root: Path | None = None,
         sandbox: DockerSandbox | None = None,
+        plan_profile_identity: str | None = None,
+        plan_harness_config_identity: str | None = None,
     ) -> None:
         base = Path(tempfile.gettempdir()) / "harnesslab-phase-f"
         self.artifact_root = (artifact_root or base / "artifacts").resolve()
@@ -56,6 +58,8 @@ class MultiHarnessRunner:
         self.artifact_root.mkdir(parents=True, exist_ok=True)
         self.runtime_root.mkdir(parents=True, exist_ok=True)
         self.sandbox = sandbox or DockerSandbox()
+        self.plan_profile_identity = plan_profile_identity
+        self.plan_harness_config_identity = plan_harness_config_identity
 
     async def run(
         self,
@@ -221,8 +225,8 @@ class MultiHarnessRunner:
                     materialized.cleanup()
             shutil.rmtree(run_root, ignore_errors=True)
 
-    @staticmethod
     def _evidence(
+        self,
         run_id: str,
         package: TaskPackage,
         profile: MultiHarnessProfile,
@@ -256,6 +260,8 @@ class MultiHarnessRunner:
             workspace_output_digest=output_digest,
             changed_paths=changed_paths,
             context_digest=context_digest,
+            plan_profile_identity=self.plan_profile_identity,
+            plan_harness_config_identity=self.plan_harness_config_identity,
             prompt_template_version=profile.prompt_template_version,
             prompt_hash=prompt_hash,
             harness=profile.harness,

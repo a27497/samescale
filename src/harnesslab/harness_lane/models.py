@@ -410,6 +410,12 @@ class HarnessLaneEvidence(BaseModel):
     workspace_output_digest: Sha256Digest
     changed_paths: tuple[ChangedPathEvidence, ...]
     context_digest: Sha256Digest | None = None
+    plan_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    plan_harness_config_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     prompt_template_version: str
     prompt_hash: Sha256Digest
     harness: Literal["codex"] = "codex"

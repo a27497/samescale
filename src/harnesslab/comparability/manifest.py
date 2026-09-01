@@ -228,7 +228,9 @@ def facts_from_manifest(
         network_policy=network,
         harness=harness,
         harness_version=version,
-        harness_profile_identity=_profile_identity(raw, profile),
+        harness_profile_identity=(
+            _string(raw.get("plan_profile_identity")) or _profile_identity(raw, profile)
+        ),
         provider_config_identity=_provider_config_identity(raw, profile),
         harness_image_identity=_harness_image_identity(profile),
         credential_reference_identity=(

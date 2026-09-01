@@ -373,6 +373,12 @@ class DirectModelEvidence(BaseModel):
     workspace_input_digest: Sha256Digest
     workspace_output_digest: Sha256Digest | None = None
     context_digest: Sha256Digest | None = None
+    plan_profile_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    plan_harness_config_identity: Sha256Digest | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     prompt_template_version: str
     prompt_hash: Sha256Digest
     requested_model: str

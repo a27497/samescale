@@ -52,8 +52,12 @@ def validate_manifest_against_slot(
         mismatches.append("verifier_control_identity")
     if facts.verifier_control_execution_status == "MISMATCH":
         mismatches.append("verifier_control_execution_identity")
+    plan_harness_config_identity = raw.get("plan_harness_config_identity")
     profile_hash = raw.get("profile_hash")
-    if profile_hash is not None and profile_hash != slot.harness_config_identity:
+    if plan_harness_config_identity is not None:
+        if plan_harness_config_identity != slot.harness_config_identity:
+            mismatches.append("harness_config_identity")
+    elif profile_hash is not None and profile_hash != slot.harness_config_identity:
         mismatches.append("harness_config_identity")
     generation = raw.get("generation_settings")
     profile = raw.get("profile")

@@ -106,6 +106,8 @@ class CodexHarnessRunner:
         runtime_root: Path | None = None,
         sandbox: DockerSandbox | None = None,
         adapter: CodexHarnessAdapter | None = None,
+        plan_profile_identity: str | None = None,
+        plan_harness_config_identity: str | None = None,
     ) -> None:
         base = Path(tempfile.gettempdir()) / "harnesslab-phase-e"
         self.artifact_root = (artifact_root or base / "artifacts").resolve()
@@ -114,6 +116,8 @@ class CodexHarnessRunner:
         self.runtime_root.mkdir(parents=True, exist_ok=True)
         self.sandbox = sandbox or DockerSandbox()
         self.adapter = adapter or CodexHarnessAdapter()
+        self.plan_profile_identity = plan_profile_identity
+        self.plan_harness_config_identity = plan_harness_config_identity
 
     async def run(
         self,
@@ -341,6 +345,8 @@ class CodexHarnessRunner:
             workspace_output_digest=output_digest,
             changed_paths=changed_paths,
             context_digest=context_digest,
+            plan_profile_identity=self.plan_profile_identity,
+            plan_harness_config_identity=self.plan_harness_config_identity,
             prompt_template_version=prompt_template_version,
             prompt_hash=prompt_hash,
             profile=profile,

@@ -366,12 +366,16 @@ class _DirectProductionBinding:
         environment: Mapping[str, str],
         artifact_root: Path,
         runtime_root: Path,
+        plan_profile_identity: str | None = None,
+        plan_harness_config_identity: str | None = None,
     ) -> None:
         self.profile = profile
         self.provider = provider
         self.environment = dict(environment)
         self.artifact_root = artifact_root
         self.runtime_root = runtime_root
+        self.plan_profile_identity = plan_profile_identity
+        self.plan_harness_config_identity = plan_harness_config_identity
 
     async def run(self, task_path: Path, run_id: str) -> DirectModelRunResult:
         return await DirectModelRunner(
@@ -379,6 +383,8 @@ class _DirectProductionBinding:
             runtime_root=self.runtime_root,
             environment=self.environment,
             allow_custom_endpoint=True,
+            plan_profile_identity=self.plan_profile_identity,
+            plan_harness_config_identity=self.plan_harness_config_identity,
         ).run(task_path, self.profile, adapter=self.provider, run_id=run_id)
 
 
@@ -392,6 +398,8 @@ class _CodexProductionBinding:
         credentials: Mapping[str, str],
         artifact_root: Path,
         runtime_root: Path,
+        plan_profile_identity: str | None = None,
+        plan_harness_config_identity: str | None = None,
     ) -> None:
         self.profile = profile
         self.provider_url = provider_url
@@ -399,6 +407,8 @@ class _CodexProductionBinding:
         self.credentials = dict(credentials)
         self.artifact_root = artifact_root
         self.runtime_root = runtime_root
+        self.plan_profile_identity = plan_profile_identity
+        self.plan_harness_config_identity = plan_harness_config_identity
 
     def _boundary(self, run_id: str) -> ProviderScopedDockerBoundary:
         token = hashlib.sha256(run_id.encode()).hexdigest()[:16]
@@ -418,6 +428,8 @@ class _CodexProductionBinding:
         return await CodexHarnessRunner(
             artifact_root=self.artifact_root,
             runtime_root=self.runtime_root,
+            plan_profile_identity=self.plan_profile_identity,
+            plan_harness_config_identity=self.plan_harness_config_identity,
         ).run(task_path, self.profile, backend=backend, run_id=run_id)
 
 
@@ -432,6 +444,8 @@ class _MultiProductionBinding:
         credentials: Mapping[str, str],
         artifact_root: Path,
         runtime_root: Path,
+        plan_profile_identity: str | None = None,
+        plan_harness_config_identity: str | None = None,
     ) -> None:
         self.profile = profile
         self.adapter = adapter
@@ -440,6 +454,8 @@ class _MultiProductionBinding:
         self.credentials = dict(credentials)
         self.artifact_root = artifact_root
         self.runtime_root = runtime_root
+        self.plan_profile_identity = plan_profile_identity
+        self.plan_harness_config_identity = plan_harness_config_identity
 
     def _boundary(self, run_id: str) -> ProviderScopedDockerBoundary:
         token = hashlib.sha256(run_id.encode()).hexdigest()[:16]
@@ -459,6 +475,8 @@ class _MultiProductionBinding:
         return await MultiHarnessRunner(
             artifact_root=self.artifact_root,
             runtime_root=self.runtime_root,
+            plan_profile_identity=self.plan_profile_identity,
+            plan_harness_config_identity=self.plan_harness_config_identity,
         ).run(
             task_path,
             self.profile,
