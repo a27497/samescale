@@ -1,0 +1,43 @@
+{
+  "authorization": {
+    "formal_matrix": "NOT_AUTHORIZED",
+    "j4_real_judge_calls": "NOT_AUTHORIZED",
+    "real_provider_calls": 0
+  },
+  "calibration_id": "core-real-judge-v7-j4",
+  "candidate": {
+    "reasoning_effort": "high",
+    "relay_observed_model_aliases": [
+      "grok-4.6",
+      "grok-4.6-build"
+    ],
+    "requested_model": "grok-4.6",
+    "route": "GROK_4_6_VIA_AIWANWU_RELAY",
+    "xai_direct": false
+  },
+  "cost_control": {
+    "ceiling": "1.000000",
+    "historical_j3r1_63_slot_cost_reference": "0.0775770",
+    "historical_reference_is_not_a_guarantee": true,
+    "stop_before_next_slot_at_ceiling": true,
+    "unit": "RELAY_BILLING_UNIT"
+  },
+  "evidence_reuse": {
+    "j3r1_outputs_reused": false,
+    "j3r1_used_only_as_methodology_history": true
+  },
+  "methodology": {
+    "application_retry_count": 0,
+    "repeat_count": 3,
+    "safe_parallelism": 1,
+    "score_metrics_required": false,
+    "slot_count": 63,
+    "suite_id": "core-calibration-objective",
+    "suite_reference": "judge_suites/core-calibration/2.0.0",
+    "suite_version": "2.0.0"
+  },
+  "phase": "K_B3_V7_GROK46_OBJECTIVE_JUDGE_J4_PREREGISTRATION",
+  "plan_digest": "sha256:2f22d2df516f0c4d45246efd1b2806dec571cb95457b8cde4f45ec9380a42d2e",
+  "schema_version": 1,
+  "state": "PREREGISTERED_NOT_AUTHORIZED_NOT_RUN"
+}
