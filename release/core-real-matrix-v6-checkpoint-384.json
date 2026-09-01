@@ -1,0 +1,49 @@
+{
+  "active_acquisition": false,
+  "artifact_roots": {
+    "matrix": "/home/dev/harnesslab-evidence/core-real-matrix-v6",
+    "recovery": "/home/dev/harnesslab-evidence/core-real-matrix-v6/recovery"
+  },
+  "authorization_reference": "release/core-real-matrix-v6-budget-continuation.json",
+  "budget": {
+    "accounting": "observed usage when available; reserve only for missing usage/unknown physical attempts",
+    "conservative_cny_estimate": "56.723488000",
+    "conservative_usd_estimate": "10.658136360",
+    "total_cny_ceiling": "100.00",
+    "total_usd_ceiling": "15.00",
+    "unknown_usage_primary_count": 82
+  },
+  "effective": {
+    "cancelled": 2,
+    "capability_results": 363,
+    "infra_missing_after_recovery": 19,
+    "infra_unrecovered": 0
+  },
+  "experiment_id": "core-real-matrix-v6",
+  "judge_binding_reference": "release/core-real-judge-v7-j4-result.json",
+  "logical_slots": {
+    "planned": 630,
+    "remaining": 246,
+    "terminal": 384
+  },
+  "phase": "K_B3_V6_FORMAL_MATRIX_ACQUISITION",
+  "primary": {
+    "cancelled": 2,
+    "completed": 224,
+    "failed_infra": 50,
+    "failed_subject": 108,
+    "queued": 246
+  },
+  "recorded_at": "2026-09-01T18:36:36.826888+00:00",
+  "recovery": {
+    "attempts": 50,
+    "capability_fail": 6,
+    "capability_pass": 25,
+    "infra_failure_exhausted": 19,
+    "maximum_per_eligible_slot": 1
+  },
+  "schema_version": 1,
+  "scientific_controls_unchanged": true,
+  "state": "CHECKPOINT_PAUSED_NO_ACTIVE_ACQUISITION",
+  "unrecovered_infra": []
+}
