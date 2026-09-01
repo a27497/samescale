@@ -1,0 +1,66 @@
+{
+  "authorization_receipt": {
+    "authorization_digest": "sha256:e8613cfa6317238efaca7a63c73666b46e705db7c6940971535de6152bfd2b3b",
+    "authorization_id": "formal-matrix-20260901-j4",
+    "authorized_at": "2026-09-01T10:38:35.663496Z",
+    "authorized_slot_count": 630,
+    "execution_profile_identity": "sha256:85117b2577f3456e0df573ed2467d19dee64bebca748e178bd92017dea6133b7",
+    "experiment_id": "core-real-matrix-v6",
+    "matrix_execution_authorized": true,
+    "operator_reference": "chat:2026-09-01-formal-matrix-usd4.50-cny15",
+    "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+    "pricing_inputs_digest": "sha256:e764c19c014c160d4f81e70cdb4a861ea36cdd352505a6a2b80ee10b3a83ff8f",
+    "schema_version": 1,
+    "scope": "CORE_REAL_MATRIX_V6_630_SLOT_MATRIX",
+    "spend_authorized": true
+  },
+  "budget": {
+    "alibaba_qwen_cny_per_million": {
+      "input": "12",
+      "output": "36"
+    },
+    "batch_size": 7,
+    "cache_policy": "CONSERVATIVE_ALL_INPUT_AS_NONCACHED_WHEN_CACHE_BREAKDOWN_UNAVAILABLE",
+    "cny_ceiling": "15.00",
+    "deepseek_peak_usd_per_million": {
+      "v4flash_input": "0.44",
+      "v4flash_output": "1.32",
+      "v4pro_input": "1.32",
+      "v4pro_output": "3.96"
+    },
+    "gpt_relay_usd_per_million": {
+      "input_uncached": "5.00",
+      "output": "30.00",
+      "planning_multiplier": "0.06"
+    },
+    "stop_policy": "STOP_BEFORE_NEXT_BLOCK_IF_EITHER_CUMULATIVE_ESTIMATE_REACHES_OR_EXCEEDS_CEILING",
+    "usd_ceiling": "4.50"
+  },
+  "controls": {
+    "blocked_interleaved_scheduling": true,
+    "global_concurrency": 6,
+    "max_direct_concurrency": 4,
+    "max_harness_concurrency": 3,
+    "profile": "V6_PROFILE_C_C6_H3",
+    "provider_concurrency": {
+      "alibaba-bailian": 2,
+      "deepseek-official": 2,
+      "gpt56-relay": 2
+    },
+    "provider_substitution": false,
+    "score_retry": 0,
+    "semantic_retry": 0
+  },
+  "experiment_id": "core-real-matrix-v6",
+  "judge_binding": {
+    "additional_judge_calls": 0,
+    "reference": "release/core-real-judge-v7-j4-result.json",
+    "status": "QUALIFIED_FOR_SUITE"
+  },
+  "phase": "K_B3_V6_FORMAL_MATRIX_J4_BINDING",
+  "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+  "schedule_digest": "sha256:f3ac0384cddafd4b4dd7b811f66a0e117cdc7e68b758cd111d5e6a4d6726dd2a",
+  "schema_version": 1,
+  "state": "AUTHORIZED_READY",
+  "subject_slot_count": 630
+}
