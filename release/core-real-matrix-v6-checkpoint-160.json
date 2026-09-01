@@ -1,0 +1,48 @@
+{
+  "authorization_reference": "release/core-real-matrix-v6-budget-continuation.json",
+  "budget": {
+    "accounting": "observed usage when available; conservative per-call reserve only when usage is unavailable or an earlier physical attempt is unobserved",
+    "conservative_cny_estimate": "24.836708000",
+    "conservative_usd_estimate": "3.885021780",
+    "total_cny_ceiling": "100.00",
+    "total_usd_ceiling": "15.00",
+    "unknown_usage_primary_count": 30
+  },
+  "effective": {
+    "cancelled": 2,
+    "capability_results": 152,
+    "infra_missing_after_recovery": 6
+  },
+  "experiment_id": "core-real-matrix-v6",
+  "judge_binding_reference": "release/core-real-judge-v7-j4-result.json",
+  "logical_slots": {
+    "planned": 630,
+    "remaining": 470,
+    "terminal": 160
+  },
+  "phase": "K_B3_V6_FORMAL_MATRIX_ACQUISITION",
+  "primary": {
+    "cancelled": 2,
+    "completed": 95,
+    "failed_infra": 17,
+    "failed_subject": 46,
+    "queued": 470
+  },
+  "recent_recovery_outcomes": {
+    "slot_110_codex_high": "CAPABILITY_FAIL_EXECUTION_BUDGET_EXHAUSTED",
+    "slot_113_codex_medium": "CAPABILITY_PASS_VERIFIED_PASS",
+    "slot_117_gpt_direct": "CAPABILITY_PASS_VERIFIED_PASS",
+    "slot_153_qwen_direct": "INFRA_RECOVERY_EXHAUSTED_PROVIDER_ERROR"
+  },
+  "recorded_at": "2026-09-01T14:23:42.575087+00:00",
+  "recovery": {
+    "attempts": 17,
+    "capability_fail": 5,
+    "capability_pass": 6,
+    "infra_failure_exhausted": 6,
+    "maximum_per_eligible_slot": 1
+  },
+  "schema_version": 1,
+  "scientific_controls_unchanged": true,
+  "state": "CHECKPOINT_PAUSED_NO_ACTIVE_ACQUISITION"
+}
