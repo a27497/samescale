@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_CORE_JUDGE_METHODOLOGY_AUDIT",
+  "state": "AUDIT_REQUIRED_BEFORE_ANY_NEW_JUDGE_CANDIDATE",
+  "trigger": {
+    "j1": {
+      "candidate": "GLM-5.2 via Alibaba Bailian",
+      "qualification": "NOT_QUALIFIED",
+      "score_mae": 0.75,
+      "score_spearman_rho": 0.948683
+    },
+    "j3r1": {
+      "candidate": "Grok 4.6 via aiwanwu relay",
+      "qualification": "NOT_QUALIFIED",
+      "score_mae": 0.625,
+      "score_spearman_rho": 0.948683
+    }
+  },
+  "score_suite_design_findings": [
+    "Public SCORE rubric defines anchors only for 1, 3, and 5.",
+    "Curated gold uses intermediate expected scores 2 and 4 although those anchors are not defined.",
+    "All four SCORE cases use score_tolerance=0.25, requiring near-exact absolute scoring despite under-specified intermediate anchors.",
+    "The SCORE calibration set contains only four distinct cases, so rank and absolute-score metrics are sensitive to a small number of judgments."
+  ],
+  "j3r1_score_case_observations": {
+    "score-arithmetic-fragment": {
+      "gold": 1.0,
+      "predictions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "score-security-caveat": {
+      "gold": 2.0,
+      "predictions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "score-deployment-guide": {
+      "gold": 4.0,
+      "predictions": [
+        3.5,
+        3.5,
+        3.0
+      ]
+    },
+    "score-citation-answer": {
+      "gold": 5.0,
+      "predictions": [
+        4.0,
+        5.0,
+        4.0
+      ]
+    }
+  },
+  "audit_interpretation": [
+    "J3r1 shows systematic downward absolute-score calibration rather than broad label or pairwise failure.",
+    "J1 and J3r1 independently reached the same Spearman value 0.948683 while both failed the absolute MAE threshold.",
+    "These observations justify auditing rubric/gold/threshold methodology; they do not justify changing thresholds or gold to make either candidate pass."
+  ],
+  "required_next_actions": [
+    "Do not search additional Judge candidates until the calibration methodology is audited.",
+    "Do not tune gold labels or thresholds from J1/J3r1 errors.",
+    "Independently define explicit semantic anchors for scores 1, 2, 3, 4, and 5.",
+    "Re-annotate SCORE cases with independent human ratings and adjudication, recording disagreement before setting tolerance.",
+    "Set absolute-score tolerance and qualification thresholds from the audited rubric and human disagreement, not from model outcomes.",
+    "Revisit SCORE sample size before another formal Judge qualification."
+  ],
+  "label_pairwise_status": "NO_METHODOLOGY_CHANGE_PROPOSED_FROM_J3R1; retain unless independent audit finds a separate issue.",
+  "formal_matrix_authorization": "NOT_AUTHORIZED"
+}

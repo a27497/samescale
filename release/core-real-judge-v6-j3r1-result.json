@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_GROK46_AIWANWU_RELAY_JUDGE_J3R1_QUALIFICATION",
+  "state": "NOT_QUALIFIED",
+  "calibration_id": "core-real-judge-v6-j3r1",
+  "scientific_route_identity": "GROK_4_6_VIA_AIWANWU_RELAY",
+  "requested_model": "grok-4.6",
+  "accepted_relay_observed_aliases": [
+    "grok-4.6",
+    "grok-4.6-build"
+  ],
+  "route_provenance": {
+    "classification": "THIRD_PARTY_RELAY",
+    "xai_direct": false,
+    "independent_upstream_identity_observable": false
+  },
+  "execution": {
+    "planned_slots": 63,
+    "judged": 54,
+    "abstained": 9,
+    "provider_failures": 0,
+    "judge_output_errors": 0,
+    "artifact_errors": 0,
+    "application_retry_count": 0,
+    "safe_parallelism": 1,
+    "cumulative_estimated_cost": "0.0775770",
+    "cost_unit": "RELAY_BILLING_UNIT",
+    "formal_matrix_calls": 0
+  },
+  "label_metrics": {
+    "abstains": 3,
+    "accuracy": 0.8,
+    "case_count": 5,
+    "confusion_matrix": {
+      "FAIL": {
+        "FAIL": 6,
+        "NO_VALID_JUDGMENT": 0,
+        "PASS": 0,
+        "UNKNOWN": 0
+      },
+      "PASS": {
+        "FAIL": 0,
+        "NO_VALID_JUDGMENT": 0,
+        "PASS": 6,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "FAIL": 0,
+        "NO_VALID_JUDGMENT": 3,
+        "PASS": 0,
+        "UNKNOWN": 0
+      }
+    },
+    "coverage": 1.0,
+    "evaluable_judgments": 15,
+    "judge_output_errors": 0,
+    "macro_f1": 1.0,
+    "planned_judgments": 15,
+    "provider_failures": 0,
+    "repeat_consistency": 1.0,
+    "valid_judgments": 12
+  },
+  "score_metrics": {
+    "abstains": 0,
+    "case_count": 4,
+    "coverage": 1.0,
+    "covered_case_count": 4,
+    "evaluable_judgments": 12,
+    "judge_output_errors": 0,
+    "mae": 0.625,
+    "mean_within_case_standard_deviation": 0.176777,
+    "planned_judgments": 12,
+    "provider_failures": 0,
+    "spearman_not_available_reason": null,
+    "spearman_rho": 0.948683
+  },
+  "pairwise_metrics": {
+    "capability_error_count": 3,
+    "capability_error_opportunities": 18,
+    "coverage": 1.0,
+    "evaluable_logical_pairs": 18,
+    "gold_accuracy": 1.0,
+    "judge_output_error_rate": 0.0,
+    "logical_pair_count": 18,
+    "longer_candidate_preference_count": 0,
+    "order_swapped_requests": 18,
+    "planned_logical_pairs": 18,
+    "position_consistency_rate": 1.0,
+    "position_evaluable_count": 18,
+    "provider_infra_count": 0,
+    "provider_infra_trials": 0,
+    "repeat_consistency": 1.0,
+    "tie_accuracy": 1.0,
+    "unknown_abstain_rate": 0.166667,
+    "verbosity_bias_rate": 0.0,
+    "verbosity_probe_count": 6
+  },
+  "capability_metrics": {
+    "abstain_output_error_count": 6,
+    "abstain_output_error_rate": 0.133333,
+    "evaluable_opportunities": 45
+  },
+  "qualification_reasons": [
+    "score MAE=0.625 violates maximum threshold 0.25",
+    "Spearman=0.948683 does not meet 0.95"
+  ],
+  "protocol_amendment": {
+    "timing": "BEFORE_QUALIFICATION_OUTCOME_ANALYSIS",
+    "reason": "relay_observed_model_alias_oscillation",
+    "accepted_aliases": [
+      "grok-4.6",
+      "grok-4.6-build"
+    ],
+    "scientific_route_unchanged": true,
+    "suite_prompt_schema_thresholds_unchanged": true,
+    "total_authorized_slots_unchanged": 63
+  },
+  "interpretation": "FAILED_FROZEN_CORE_JUDGE_QUALIFICATION_NOT_A_GENERAL_MODEL_QUALITY_CLAIM",
+  "next_state": "JUDGE_METHODOLOGY_AUDIT_REQUIRED",
+  "formal_matrix_authorization": "NOT_AUTHORIZED"
+}

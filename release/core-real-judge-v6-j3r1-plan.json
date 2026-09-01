@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_GROK46_AIWANWU_RELAY_JUDGE_J3R1_SUCCESSOR_FREEZE",
+  "state": "AUTHORIZED_PROTOCOL_AMENDMENT_BEFORE_OUTCOME_ANALYSIS",
+  "authorization": {
+    "j3r1_qualification_authorized": true,
+    "matrix_authorized": false,
+    "real_provider_calls": 0,
+    "real_judge_calls": 0,
+    "real_matrix_calls": 0
+  },
+  "control": {
+    "schema_version": 1,
+    "calibration_id": "core-real-judge-v6-j3r1",
+    "plan_digest": "sha256:13bba26a841386580651413c322d6cad60abb8de548a140bed1907943d68b241",
+    "profile_identity": "sha256:ceaa61e57ed362b9dab7825b0da33f7b283ba108ad014933f29eb39b852e305e",
+    "suite_digest": "sha256:c2708196237eab94dac473581e3a06de2f7d0e2c50e8b55190b253e547fc43fb",
+    "qualification_policy_digest": "sha256:82b84e9f0e3330e9d2f3f9068e054d9041158ae3bd7bba38a0044530e8fe6170",
+    "scientific_route_identity": "GROK_4_6_VIA_AIWANWU_RELAY",
+    "expected_observed_model": "grok-4.6",
+    "safe_parallelism": 1,
+    "application_retry_count": 0,
+    "operator_cost_ceiling": "1.000000",
+    "cost_unit": "RELAY_BILLING_UNIT",
+    "usage_normalization": {
+      "cached_input": "prompt_tokens_details.cached_tokens_or_zero",
+      "non_cached_input": "input_tokens_minus_cached_input",
+      "billable_output": "total_tokens_minus_input_tokens",
+      "reasoning_tokens": "preserve_separately",
+      "completion_field_check": "billable_output_gte_completion_tokens_when_present"
+    },
+    "predecessor_j3": {
+      "state": "STOPPED_MODEL_IDENTITY_DRIFT",
+      "completed_slots": 1,
+      "observed_relay_model": "grok-4.6",
+      "evidence_class": "DIAGNOSTIC_ONLY",
+      "qualification_reuse_prohibited": true,
+      "reconciled_cost": "0.0017712",
+      "cost_unit": "RELAY_BILLING_UNIT"
+    },
+    "formal_matrix_authorization": "NOT_AUTHORIZED",
+    "real_matrix_calls": 0,
+    "accepted_observed_models": [
+      "grok-4.6",
+      "grok-4.6-build"
+    ]
+  },
+  "plan_digest": "sha256:13bba26a841386580651413c322d6cad60abb8de548a140bed1907943d68b241",
+  "slot_count": 63,
+  "repeat_count": 3,
+  "qualification_evidence_reuse": {
+    "predecessor_j3_slot": "PROHIBITED",
+    "j3r1_slots": "FRESH_ONLY"
+  },
+  "protocol_amendment": {
+    "reason": "relay_observed_model_alias_oscillation",
+    "accepted_observed_models": [
+      "grok-4.6",
+      "grok-4.6-build"
+    ],
+    "scientific_route_identity": "GROK_4_6_VIA_AIWANWU_RELAY",
+    "qualification_outcomes_inspected_before_amendment": false,
+    "authorized_total_slots_unchanged": 63,
+    "completed_before_amendment": 2,
+    "remaining_after_amendment": 61
+  }
+}
