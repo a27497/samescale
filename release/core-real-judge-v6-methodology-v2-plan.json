@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V6_CORE_JUDGE_METHODOLOGY_V2",
+  "state": "READY_FOR_BLIND_HUMAN_ANNOTATION",
+  "scope": "SCORE_CALIBRATION_ONLY",
+  "inputs": {
+    "audit_reference": "release/core-real-judge-v6-methodology-audit.json",
+    "rubric_reference": "judge_suites/core-calibration-score-v2-draft/rubric.yaml",
+    "annotation_batch_reference": "judge_suites/core-calibration-score-v2-draft/annotation-batch.yaml",
+    "annotation_protocol_reference": "judge_suites/core-calibration-score-v2-draft/annotation-protocol.yaml"
+  },
+  "design": {
+    "score_anchor_count": 5,
+    "score_case_count": 12,
+    "independent_annotators_per_case": 3,
+    "required_initial_ratings": 36,
+    "legacy_score_gold_reused": false,
+    "j1_outputs_used_for_annotation": false,
+    "j3r1_outputs_used_for_annotation": false
+  },
+  "threshold_freeze": {
+    "status": "BLOCKED_PENDING_HUMAN_ANNOTATIONS",
+    "score_tolerance": null,
+    "maximum_score_mae": null,
+    "minimum_spearman_rho": null,
+    "must_freeze_before_new_judge_calls": true,
+    "may_use_model_outcomes": false
+  },
+  "unchanged_components": [
+    "LABEL calibration methodology",
+    "PAIRWISE calibration methodology",
+    "Judge prompt/parser contracts until an independent audit requires change"
+  ],
+  "execution_controls": {
+    "real_provider_calls": 0,
+    "real_judge_calls": 0,
+    "real_matrix_calls": 0,
+    "formal_matrix_authorization": "NOT_AUTHORIZED"
+  },
+  "next_gate": "COLLECT_36_BLIND_HUMAN_SCORE_RATINGS_AND_ADJUDICATE_LARGE_DISAGREEMENTS"
+}
