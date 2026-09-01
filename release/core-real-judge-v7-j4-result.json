@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "phase": "K_B3_V7_OBJECTIVE_JUDGE_J4_QUALIFICATION",
+  "state": "QUALIFIED_FOR_SUITE",
+  "calibration_id": "core-real-judge-v7-j4",
+  "candidate": {
+    "requested_model": "grok-4.6",
+    "route": "GROK_4_6_VIA_AIWANWU_RELAY",
+    "observed_model_aliases": [
+      "grok-4.6",
+      "grok-4.6-build"
+    ],
+    "reasoning_effort": "high",
+    "xai_direct": false
+  },
+  "execution": {
+    "planned_slots": 63,
+    "completed_slots": 63,
+    "application_retry_count": 0,
+    "safe_parallelism": 1,
+    "run_counts": {
+      "abstained": 9,
+      "artifact_errors": 0,
+      "judge_output_errors": 0,
+      "judged": 54,
+      "planned": 63,
+      "provider_failures": 0
+    },
+    "real_judge_calls": 63,
+    "real_matrix_calls": 0,
+    "cumulative_estimated_cost": "0.0788100",
+    "cost_unit": "RELAY_BILLING_UNIT"
+  },
+  "qualification": {
+    "status": "QUALIFIED_FOR_SUITE",
+    "reasons": [],
+    "label_accuracy": 1.0,
+    "label_macro_f1": 1.0,
+    "pairwise_accuracy": 1.0,
+    "position_consistency": 1.0,
+    "label_repeat_consistency": 1.0,
+    "pairwise_repeat_consistency": 1.0,
+    "verbosity_bias_rate": 0.0,
+    "abstain_output_error_rate": 0.0
+  },
+  "reporter_correction": {
+    "provider_calls_added": 0,
+    "issue": "Expected UNKNOWN judgments were previously counted as capability errors when represented as ABSTAINED.",
+    "resolution": "Treat abstention as correct when deterministic gold is UNKNOWN; recompute from the same immutable 63-slot evidence.",
+    "raw_pre_correction_status": "NOT_QUALIFIED",
+    "final_status": "QUALIFIED_FOR_SUITE"
+  },
+  "methodology": {
+    "suite": "core-calibration-objective@2.0.0",
+    "human_annotation_required": false,
+    "score_mae_blocking": false,
+    "multi_judge_jury": "DIAGNOSTIC_ONLY",
+    "gold_authority": "DETERMINISTIC_L0"
+  },
+  "formal_matrix_authorization": "NOT_AUTHORIZED"
+}

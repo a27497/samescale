@@ -123,7 +123,8 @@ async def test_persisted_good_vs_biased_judge_e2e_and_phase_g_read_only(
         biased = cells["biased-unstable-judge"]
         assert good.qualification_status is QualificationStatus.QUALIFIED_FOR_SUITE
         assert biased.qualification_status is QualificationStatus.NOT_QUALIFIED
-        assert good.label_metrics["accuracy"] == 0.8
+        assert good.label_metrics["accuracy"] == 1.0
+        assert good.label_metrics["abstain_errors"] == 0
         assert good.label_metrics["macro_f1"] == 1.0
         assert good.score_metrics["mae"] == 0.0
         assert good.score_metrics["spearman_rho"] == 1.0
@@ -184,26 +185,29 @@ async def test_persisted_good_vs_biased_judge_e2e_and_phase_g_read_only(
             )
             assert rebuilt_a.markdown() == rebuilt_b.markdown() == report.markdown()
             assert rebuilt_a.report_digest == report.report_digest
-            one_failure_plan = plan.model_copy(
+            strict_policy_plan = plan.model_copy(
                 update={
                     "qualification_policy": plan.qualification_policy.model_copy(
-                        update={"minimum_label_accuracy": 0.81}
+                        update={"minimum_label_accuracy": 1.0}
                     )
                 }
             )
-            one_failure = build_judge_report(
-                plan=one_failure_plan,
+            strict_policy = build_judge_report(
+                plan=strict_policy_plan,
                 suite=suite,
                 definitions={
                     cell_id: value.model_dump(mode="json") for cell_id, value in definitions.items()
                 },
                 records=records,
             )
-            one_failure_good = next(
-                cell for cell in one_failure.cells if cell.judge_cell_id == "good-judge"
+            strict_policy_good = next(
+                cell for cell in strict_policy.cells if cell.judge_cell_id == "good-judge"
             )
-            assert one_failure_good.qualification_status is QualificationStatus.NOT_QUALIFIED
-            assert len(one_failure_good.qualification_reasons) == 1
+            assert (
+                strict_policy_good.qualification_status
+                is QualificationStatus.QUALIFIED_FOR_SUITE
+            )
+            assert strict_policy_good.qualification_reasons == ()
             private_scan = json.dumps(
                 [
                     {
@@ -348,7 +352,7 @@ async def test_judge_artifact_reload_digest_and_slot_identity_fail_closed(
 
 
 @pytest.mark.integration
-async def test_provider_infra_only_lowers_coverage_and_cannot_dilute_capability_errors(
+async def test_provider_infra_only_lowers_coverage_without_fabricating_capability_errors(
     database_url: str, tmp_path: Path
 ) -> None:
     settings = Settings.without_dotenv(database_url=database_url)
@@ -399,7 +403,8 @@ async def test_provider_infra_only_lowers_coverage_and_cannot_dilute_capability_
             )
         cell = report.cells[0]
         assert cell.label_metrics["coverage"] == 0.6
-        assert cell.label_metrics["accuracy"] <= 0.8
+        assert cell.label_metrics["accuracy"] == 1.0
+        assert cell.label_metrics["abstain_errors"] == 0
         assert cell.label_metrics["macro_f1"] == 1.0
         assert cell.pairwise_metrics["planned_logical_pairs"] == 18
         assert cell.pairwise_metrics["evaluable_logical_pairs"] == 12
@@ -409,8 +414,8 @@ async def test_provider_infra_only_lowers_coverage_and_cannot_dilute_capability_
         assert cell.pairwise_metrics["position_consistency_rate"] == 1.0
         assert cell.pairwise_metrics["repeat_consistency"] == 1.0
         assert cell.capability_metrics["evaluable_opportunities"] == 33
-        assert cell.capability_metrics["abstain_output_error_count"] == 6
-        assert cell.capability_metrics["abstain_output_error_rate"] == 0.181818
+        assert cell.capability_metrics["abstain_output_error_count"] == 0
+        assert cell.capability_metrics["abstain_output_error_rate"] == 0.0
         assert cell.qualification_status is QualificationStatus.NOT_QUALIFIED
         assert any("coverage" in reason for reason in cell.qualification_reasons)
     finally:

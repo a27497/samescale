@@ -143,14 +143,19 @@ def _label_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[str
     items = [item for item in evidence if item.case_mode is JudgeMode.LABEL]
     counts = _counts(items)
     evaluable = [item for item in items if item.outcome is not JudgeRunOutcome.PROVIDER_ERROR]
-    valid = [item for item in evaluable if item.outcome is JudgeRunOutcome.JUDGED]
     predictions = {
         item.evaluation_id: str(item.parsed_judgment["label"])
-        for item in valid
+        for item in evaluable
         if item.parsed_judgment is not None
     }
     denominator = len(evaluable)
-    correct = sum(predictions.get(item.evaluation_id) == gold[item.case_id] for item in valid)
+    correct = sum(
+        predictions.get(item.evaluation_id) == gold[item.case_id] for item in evaluable
+    )
+    abstain_errors = sum(
+        item.outcome is JudgeRunOutcome.ABSTAINED and gold[item.case_id] != "UNKNOWN"
+        for item in evaluable
+    )
     classes = sorted({gold[item.case_id] for item in items if gold[item.case_id] != "UNKNOWN"})
     confusion = {
         expected: {
@@ -186,6 +191,7 @@ def _label_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[str
         "planned_judgments": counts["planned"],
         "valid_judgments": counts["judged"],
         "abstains": counts["abstained"],
+        "abstain_errors": abstain_errors,
         "judge_output_errors": counts["judge_output_errors"],
         "provider_failures": counts["provider_failures"],
         "evaluable_judgments": denominator,
@@ -279,8 +285,10 @@ def _pairwise_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[
             else None
         )
         capability_error = any(
-            item.outcome in {JudgeRunOutcome.ABSTAINED, JudgeRunOutcome.JUDGE_OUTPUT_ERROR}
-            for item in pair
+            item.outcome is JudgeRunOutcome.JUDGE_OUTPUT_ERROR for item in pair
+        ) or (
+            str(gold_items[case_id].expected) != "UNKNOWN"
+            and any(item.outcome is JudgeRunOutcome.ABSTAINED for item in pair)
         )
         logical.append(
             {
@@ -420,7 +428,7 @@ def _capability_metrics(
         + pairwise["capability_error_opportunities"]
     )
     errors = (
-        label["abstains"]
+        label["abstain_errors"]
         + label["judge_output_errors"]
         + score["abstains"]
         + score["judge_output_errors"]

@@ -32,3 +32,18 @@ def test_j4_is_objective_v2_and_zero_call_preregistered() -> None:
     assert frozen["evidence_reuse"]["j3r1_outputs_reused"] is False
     assert frozen["authorization"]["j4_real_judge_calls"] == "NOT_AUTHORIZED"
     assert frozen["authorization"]["formal_matrix"] == "NOT_AUTHORIZED"
+
+RESULT = ROOT / "release/core-real-judge-v7-j4-result.json"
+
+
+def test_j4_completed_and_correct_unknown_abstentions_are_not_errors() -> None:
+    result = json.loads(RESULT.read_text())
+    assert result["state"] == "QUALIFIED_FOR_SUITE"
+    assert result["execution"]["completed_slots"] == 63
+    assert result["execution"]["real_judge_calls"] == 63
+    assert result["execution"]["real_matrix_calls"] == 0
+    assert result["qualification"]["label_accuracy"] == 1.0
+    assert result["qualification"]["pairwise_accuracy"] == 1.0
+    assert result["qualification"]["abstain_output_error_rate"] == 0.0
+    assert result["reporter_correction"]["provider_calls_added"] == 0
+    assert result["formal_matrix_authorization"] == "NOT_AUTHORIZED"
