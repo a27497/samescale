@@ -9,9 +9,11 @@ import pytest
 from pydantic import ValidationError
 
 import harnesslab.release.v6_canary as v6_canary_module
+from harnesslab.egress import EgressProxyRuntime
 from harnesslab.multi_harness.models import HarnessKind
 from harnesslab.multi_harness.profile import configured_qwen_alibaba_bailian_claude_profile
 from harnesslab.multi_harness.prompt import render_harness_prompt
+from harnesslab.multi_harness.runtime import MultiHarnessRuntime
 from harnesslab.release.v6_authorization import (
     V6CanaryAuthorizationReceipt,
     V6CanaryAuthorizationRequest,
@@ -451,12 +453,12 @@ async def test_host_observation_requires_full_proxy_topology_preflight(
 
     monkeypatch.setattr(v6_canary_module, "docker_preflight", docker_ready)
     monkeypatch.setattr(
-        v6_canary_module.MultiHarnessRuntime,
+        MultiHarnessRuntime,
         "ensure_image",
         claude_image_ready,
     )
     monkeypatch.setattr(
-        v6_canary_module.EgressProxyRuntime,
+        EgressProxyRuntime,
         "ensure_image",
         proxy_image_ready,
     )

@@ -4,6 +4,7 @@ import hashlib
 import json
 from decimal import Decimal
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -127,6 +128,7 @@ def test_j2_payloads_pin_anthropic_disable_thinking_and_keep_strict_schemas() ->
             slot=slot,
             profile=cell.model_profile,
         )
+        assert request.output_json_schema is not None
         payload = adapter._payload(request)
         assert payload["model"] == "anthropic/claude-opus-5"
         assert payload["max_tokens"] == 256
@@ -138,7 +140,7 @@ def test_j2_payloads_pin_anthropic_disable_thinking_and_keep_strict_schemas() ->
                 "schema": request.output_json_schema.value,
             }
         }
-        schema = payload["output_config"]["format"]["schema"]
+        schema = cast(dict[str, Any], payload["output_config"]["format"]["schema"])
         assert schema["additionalProperties"] is False
         assert set(schema["required"]) == set(schema["properties"])
         assert "temperature" not in payload
@@ -159,7 +161,7 @@ def test_j2_profile_rejects_any_provider_allowlist_expansion() -> None:
 
 def test_j2_route_canary_is_one_call_separate_and_not_authorized() -> None:
     plan, suite, definitions = build_j2_plan(ROOT)
-    identity = build_j2_route_canary_identity(plan, suite, definitions)
+    identity = cast(dict[str, Any], build_j2_route_canary_identity(plan, suite, definitions))
     frozen = json.loads(J2_CANARY.read_text())
 
     assert (

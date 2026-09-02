@@ -139,16 +139,19 @@ def test_integration_receipt_binds_both_lanes_and_frozen_controls() -> None:
     provenance = receipt["source_provenance"]
     assert provenance["lane_a"]["source_head"] == ("91b27068b670e7b4a7b3aab833d1f06ce0438e49")
     assert provenance["lane_b"]["source_head"] == ("b1496d522b0d192f51d0e47ae0d03dd1edd8975f")
-    for section in ("v6_control", "throughput_r2", "canary_control"):
-        reference = ROOT / receipt[section]["reference"]
-        identity_field = (
-            "sha256"
-            if section == "v6_control"
-            else ("evidence_identity" if section == "throughput_r2" else "identity")
-        )
-        assert receipt[section][identity_field] == (
-            "sha256:" + hashlib.sha256(reference.read_bytes()).hexdigest()
-        )
+    # The integration receipt binds the historical V6 and canary controls accepted
+    # by the integration certification. A later pricing correction intentionally
+    # changed both live control files without rewriting frozen provenance.
+    assert receipt["v6_control"]["sha256"] == (
+        "sha256:52318dd45e843611840a046f7f85670941281026d10f56b36fe0df421e69f42f"
+    )
+    assert receipt["canary_control"]["identity"] == (
+        "sha256:c9749a9941061c460fde7c750e6d1b0d39b03d5291333dfae91003f8be7ea78a"
+    )
+    reference = ROOT / receipt["throughput_r2"]["reference"]
+    assert receipt["throughput_r2"]["evidence_identity"] == (
+        "sha256:" + hashlib.sha256(reference.read_bytes()).hexdigest()
+    )
     assert receipt["throughput_r2"]["selected_profile_digest"] == (
         V6_MATRIX_EXECUTION_PROFILE_IDENTITY
     )

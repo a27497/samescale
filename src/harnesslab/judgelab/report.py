@@ -149,9 +149,7 @@ def _label_metrics(evidence: list[JudgeEvidence], suite: JudgeSuite) -> dict[str
         if item.parsed_judgment is not None
     }
     denominator = len(evaluable)
-    correct = sum(
-        predictions.get(item.evaluation_id) == gold[item.case_id] for item in evaluable
-    )
+    correct = sum(predictions.get(item.evaluation_id) == gold[item.case_id] for item in evaluable)
     abstain_errors = sum(
         item.outcome is JudgeRunOutcome.ABSTAINED and gold[item.case_id] != "UNKNOWN"
         for item in evaluable

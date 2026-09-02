@@ -9,7 +9,7 @@ from contextlib import suppress
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal, cast
 from typing import Protocol as TypingProtocol
 from urllib.parse import urlsplit
 
@@ -523,10 +523,13 @@ def v6_preflights_are_execution_equivalent(
 
     if current.status is not V6CanaryStatus.READY:
         return False
-    excluded = {
-        "receipt_digest": True,
-        "host_observation": {"disk_free_bytes": True},
-    }
+    excluded = cast(
+        Any,
+        {
+            "receipt_digest": True,
+            "host_observation": {"disk_free_bytes": True},
+        },
+    )
     return authorized.model_dump(mode="json", exclude=excluded) == current.model_dump(
         mode="json", exclude=excluded
     )

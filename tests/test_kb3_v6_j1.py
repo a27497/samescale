@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from decimal import Decimal
 from pathlib import Path
+from typing import Any, cast
 
 from harnesslab.contracts.common import Protocol
 from harnesslab.contracts.provider import ThinkingMode, ThinkingTransport
@@ -120,7 +121,7 @@ def test_every_j1_slot_has_mode_specific_strict_schema_without_evidence_reuse() 
             profile=cell.model_profile,
         )
         assert request.output_json_schema is not None
-        schema = request.output_json_schema.value
+        schema = cast(dict[str, Any], request.output_json_schema.value)
         assert schema["type"] == "object"
         assert schema["additionalProperties"] is False
         assert set(schema["required"]) == set(schema["properties"])
@@ -151,6 +152,7 @@ def test_j1_label_score_and_pairwise_payloads_disable_thinking_and_keep_schema()
             slot=slot,
             profile=cell.model_profile,
         )
+        assert request.output_json_schema is not None
         payload = adapter._payload(request)
         assert payload["thinking"] == {"type": "disabled"}
         assert payload["output_config"] == {

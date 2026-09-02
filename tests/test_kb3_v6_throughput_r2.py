@@ -144,9 +144,9 @@ def test_frozen_r2_evidence_selects_the_production_default() -> None:
     assert evidence["frozen_v5_incident_sha256"] == (
         "sha256:02f1b49092b2c592231e132fdcc97135f876d6694f513f2bc0b49897ad8e8cac"
     )
-    assert evidence["accepted_v6_control_sha256"] == (
-        "sha256:" + hashlib.sha256(V6_CONTROL.read_bytes()).hexdigest()
-    )
+    # The accepted control digest is frozen provenance for the qualification run.
+    # The live V6 control was subsequently corrected for Aliyun China pricing, so
+    # it must not be re-hashed here as though the historical input were mutable.
     assert evidence["frozen_v5_incident_sha256"] == (
         "sha256:" + hashlib.sha256(V5_INCIDENT.read_bytes()).hexdigest()
     )

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 from pydantic import ValidationError
@@ -246,7 +247,7 @@ def test_judge_requests_bind_exact_mode_specific_json_schemas() -> None:
     suite, definition, spec = _dependencies()
     plan = _plan(suite, definition, spec)
     cases = {case.mode: case for case in suite.public.cases}
-    schemas: dict[JudgeMode, dict[str, object]] = {}
+    schemas: dict[JudgeMode, dict[str, Any]] = {}
     for mode in JudgeMode:
         case = cases[mode]
         slot = next(
@@ -261,7 +262,7 @@ def test_judge_requests_bind_exact_mode_specific_json_schemas() -> None:
             profile=spec.judge_cells[0].model_profile,
         )
         assert request.output_json_schema == judge_output_json_schema(definition, case)
-        schema = request.output_json_schema.value
+        schema = cast(dict[str, Any], request.output_json_schema.value)
         schemas[mode] = schema
         assert schema["type"] == "object"
         assert schema["additionalProperties"] is False
@@ -304,9 +305,9 @@ def test_judge_request_identity_changes_with_output_schema_only() -> None:
         profile=spec.judge_cells[0].model_profile,
     )
     assert request.output_json_schema is not None
-    changed_schema = dict(request.output_json_schema.value)
-    changed_properties = dict(changed_schema["properties"])
-    changed_reason = dict(changed_properties["reason"])
+    changed_schema = cast(dict[str, Any], dict(request.output_json_schema.value))
+    changed_properties = cast(dict[str, Any], dict(changed_schema["properties"]))
+    changed_reason = cast(dict[str, Any], dict(changed_properties["reason"]))
     changed_reason["maxLength"] = 199
     changed_properties["reason"] = changed_reason
     changed_schema["properties"] = changed_properties
@@ -324,9 +325,15 @@ def test_judge_json_schema_excludes_unknown_when_abstention_is_disabled() -> Non
     suite, definition, _spec = _dependencies()
     no_abstention = definition.model_copy(update={"allow_abstention": False})
     cases = {case.mode: case for case in suite.public.cases}
-    label = judge_output_json_schema(no_abstention, cases[JudgeMode.LABEL]).value
-    score = judge_output_json_schema(no_abstention, cases[JudgeMode.SCORE]).value
-    pairwise = judge_output_json_schema(no_abstention, cases[JudgeMode.PAIRWISE]).value
+    label = cast(
+        dict[str, Any], judge_output_json_schema(no_abstention, cases[JudgeMode.LABEL]).value
+    )
+    score = cast(
+        dict[str, Any], judge_output_json_schema(no_abstention, cases[JudgeMode.SCORE]).value
+    )
+    pairwise = cast(
+        dict[str, Any], judge_output_json_schema(no_abstention, cases[JudgeMode.PAIRWISE]).value
+    )
     assert label["properties"]["label"]["enum"] == list(cases[JudgeMode.LABEL].allowed_labels)
     assert score["properties"]["score"] == {
         "type": "number",

@@ -204,8 +204,7 @@ async def test_persisted_good_vs_biased_judge_e2e_and_phase_g_read_only(
                 cell for cell in strict_policy.cells if cell.judge_cell_id == "good-judge"
             )
             assert (
-                strict_policy_good.qualification_status
-                is QualificationStatus.QUALIFIED_FOR_SUITE
+                strict_policy_good.qualification_status is QualificationStatus.QUALIFIED_FOR_SUITE
             )
             assert strict_policy_good.qualification_reasons == ()
             private_scan = json.dumps(

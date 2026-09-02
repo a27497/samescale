@@ -98,7 +98,7 @@ class ClaudeCodeAdapter:
         task_id: str,
     ) -> HarnessExecutionPlan:
         _safe_paths(workspace, context)
-        argv = (
+        argv: tuple[str, ...] = (
             "claude",
             "-p",
             prompt.text,

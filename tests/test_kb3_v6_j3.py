@@ -130,6 +130,7 @@ def test_j3_payloads_bind_high_reasoning_and_existing_strict_mode_schemas() -> N
             slot=slot,
             profile=cell.model_profile,
         )
+        assert request.output_json_schema is not None
         payload = adapter._payload(request)
         assert payload["model"] == "grok-4.6"
         assert payload["reasoning_effort"] == "high"

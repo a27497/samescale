@@ -33,6 +33,7 @@ def test_j4_is_objective_v2_and_zero_call_preregistered() -> None:
     assert frozen["authorization"]["j4_real_judge_calls"] == "NOT_AUTHORIZED"
     assert frozen["authorization"]["formal_matrix"] == "NOT_AUTHORIZED"
 
+
 RESULT = ROOT / "release/core-real-judge-v7-j4-result.json"
 
 
