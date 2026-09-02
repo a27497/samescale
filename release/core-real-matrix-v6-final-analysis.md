@@ -25,7 +25,8 @@ This is a deterministic statistical readout of the frozen 630-row analysis datas
 
 ## GPT Harness Effect
 
-Baseline: `model-gpt56-relay-responses`  
+Baseline: `model-gpt56-relay-responses`
+
 Variant: `harness-codex-gpt56-medium`
 
 **CAPABILITY EFFECT** (both members capability-evaluable; equal task weighting):
@@ -46,7 +47,8 @@ Paired primary latency: n=77/90; median variant−baseline=93,649 ms.
 
 ## Reasoning Effort Effect
 
-Baseline: `harness-codex-gpt56-medium`  
+Baseline: `harness-codex-gpt56-medium`
+
 Variant: `harness-codex-gpt56-high`
 
 **CAPABILITY EFFECT** (both members capability-evaluable; equal task weighting):
@@ -67,7 +69,8 @@ Paired primary latency: n=90/90; median variant−baseline=3,876 ms.
 
 ## Qwen Harness Effect
 
-Baseline: `model-qwen38-alibaba-bailian-chat`  
+Baseline: `model-qwen38-alibaba-bailian-chat`
+
 Variant: `harness-claude-qwen38-alibaba-bailian`
 
 **CAPABILITY EFFECT** (both members capability-evaluable; equal task weighting):
