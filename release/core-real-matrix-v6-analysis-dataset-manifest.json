@@ -1,0 +1,65 @@
+{
+  "accounting_disclosure": "Conservative cost is HarnessLab accounting, not necessarily actual provider billing. The exact aggregate conservative accounting and its row decomposition are authoritative for this frozen dataset.",
+  "accounting_methodology": {
+    "alibaba_bailian_cny_per_million": {
+      "cache_write_input": "12",
+      "cached_input": "12",
+      "input": "12",
+      "output": "36"
+    },
+    "deepseek_peak_usd_per_million": {
+      "deepseek-v4-flash": {
+        "input": "0.44",
+        "output": "1.32"
+      },
+      "deepseek-v4-pro": {
+        "input": "1.32",
+        "output": "3.96"
+      }
+    },
+    "gpt_relay_effective_usd_per_million": {
+      "basis": "frozen base rates multiplied by observed maximum multiplier 0.06",
+      "input": "0.30",
+      "output": "1.80"
+    },
+    "missing_usage_reserve_per_call": {
+      "cny": "0.850000000",
+      "usd": "0.100000000"
+    },
+    "observed_usage": "frozen primary DB fields and recovery sidecar fields",
+    "unobserved_extra_primary_attempts": "primary_attempt_count minus one, reserved in the route currency"
+  },
+  "budget_control_changed_by_explicit_operator_authorization": true,
+  "budget_fail_stop_enabled": false,
+  "cancelled": 2,
+  "cell_count": 7,
+  "conservative_cny": "94.307760000",
+  "conservative_usd": "16.895947520",
+  "dataset_encoding": "UTF-8 JSON Lines; canonical sorted keys; newline terminated",
+  "dataset_order": "slot_order ascending",
+  "dataset_path": "release/core-real-matrix-v6-analysis-dataset.jsonl",
+  "dataset_sha256": "sha256:d07f6c96e3bd7882137355cb8b5d2d5682e3d51bffcedce6292375d4a54bbd1d",
+  "effective_after_checkpoint_terminal": 440,
+  "effective_capability_results": 599,
+  "experiment_id": "core-real-matrix-v6",
+  "infra_missing_after_recovery": 29,
+  "pending_recovery": 0,
+  "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+  "primary_cancelled": 2,
+  "primary_completed": 363,
+  "primary_failed_infra": 79,
+  "primary_failed_subject": 186,
+  "recovery_capability_fail": 10,
+  "recovery_capability_pass": 40,
+  "recovery_infra_exhausted": 29,
+  "recovery_total": 79,
+  "repeat_count": 5,
+  "row_count": 630,
+  "rows_per_cell": 90,
+  "schema_version": 1,
+  "source_checkpoint": "release/core-real-matrix-v6-checkpoint-630.json",
+  "source_checkpoint_commit": "0ecaa2090c4dd9e40ddac8f418cb5f37669d70a6",
+  "source_checkpoint_recorded_at": "2026-09-02T04:48:05.620171986Z",
+  "subject_scientific_design_unchanged": true,
+  "task_count": 18
+}
