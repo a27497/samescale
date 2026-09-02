@@ -1,0 +1,1624 @@
+{
+  "cancelled_rows": [
+    {
+      "capability_estimand_treatment": "excluded",
+      "cell_id": "harness-codex-gpt56-high",
+      "effective_outcome": "cancelled",
+      "operational_estimand_treatment": "non_pass",
+      "repeat_index": 0,
+      "slot_id": "sha256:703591dddf316db4eb546818e05682a66cd1587293e43170a068f9a86825e8dd",
+      "task_id": "core-java-feature-flag"
+    },
+    {
+      "capability_estimand_treatment": "excluded",
+      "cell_id": "harness-codex-gpt56-medium",
+      "effective_outcome": "cancelled",
+      "operational_estimand_treatment": "non_pass",
+      "repeat_index": 0,
+      "slot_id": "sha256:da86e48c1a599999bbbb68f5c8ccca1ce19474dcf4d20502b377311bca8232f3",
+      "task_id": "core-java-feature-flag"
+    }
+  ],
+  "cell_summaries": {
+    "harness-claude-qwen38-alibaba-bailian": {
+      "cancelled": 0,
+      "cancelled_rate": 0.0,
+      "capability_evaluable": 90,
+      "capability_fail": 21,
+      "capability_pass": 69,
+      "capability_pass_rate": 0.766666666667,
+      "capability_pass_rate_wilson_95": {
+        "high": 0.842018056156,
+        "low": 0.669482943543
+      },
+      "infra_missing": 0,
+      "infra_missing_rate": 0.0,
+      "logical_slots": 90,
+      "operational_pass_rate": 0.766666666667,
+      "operational_pass_rate_wilson_95": {
+        "high": 0.842018056156,
+        "low": 0.669482943543
+      }
+    },
+    "harness-codex-gpt56-high": {
+      "cancelled": 1,
+      "cancelled_rate": 0.011111111111,
+      "capability_evaluable": 85,
+      "capability_fail": 38,
+      "capability_pass": 47,
+      "capability_pass_rate": 0.552941176471,
+      "capability_pass_rate_wilson_95": {
+        "high": 0.654063443083,
+        "low": 0.447240611572
+      },
+      "infra_missing": 4,
+      "infra_missing_rate": 0.044444444444,
+      "logical_slots": 90,
+      "operational_pass_rate": 0.522222222222,
+      "operational_pass_rate_wilson_95": {
+        "high": 0.62237944418,
+        "low": 0.420245639129
+      }
+    },
+    "harness-codex-gpt56-medium": {
+      "cancelled": 1,
+      "cancelled_rate": 0.011111111111,
+      "capability_evaluable": 86,
+      "capability_fail": 21,
+      "capability_pass": 65,
+      "capability_pass_rate": 0.755813953488,
+      "capability_pass_rate_wilson_95": {
+        "high": 0.834380349401,
+        "low": 0.655371270592
+      },
+      "infra_missing": 3,
+      "infra_missing_rate": 0.033333333333,
+      "logical_slots": 90,
+      "operational_pass_rate": 0.722222222222,
+      "operational_pass_rate_wilson_95": {
+        "high": 0.804203108053,
+        "low": 0.622047725029
+      }
+    },
+    "model-deepseek-v4flash-chat": {
+      "cancelled": 0,
+      "cancelled_rate": 0.0,
+      "capability_evaluable": 90,
+      "capability_fail": 59,
+      "capability_pass": 31,
+      "capability_pass_rate": 0.344444444444,
+      "capability_pass_rate_wilson_95": {
+        "high": 0.447165276593,
+        "low": 0.254459140249
+      },
+      "infra_missing": 0,
+      "infra_missing_rate": 0.0,
+      "logical_slots": 90,
+      "operational_pass_rate": 0.344444444444,
+      "operational_pass_rate_wilson_95": {
+        "high": 0.447165276593,
+        "low": 0.254459140249
+      }
+    },
+    "model-deepseek-v4pro-chat": {
+      "cancelled": 0,
+      "cancelled_rate": 0.0,
+      "capability_evaluable": 90,
+      "capability_fail": 50,
+      "capability_pass": 40,
+      "capability_pass_rate": 0.444444444444,
+      "capability_pass_rate_wilson_95": {
+        "high": 0.54728073544,
+        "low": 0.346156556289
+      },
+      "infra_missing": 0,
+      "infra_missing_rate": 0.0,
+      "logical_slots": 90,
+      "operational_pass_rate": 0.444444444444,
+      "operational_pass_rate_wilson_95": {
+        "high": 0.54728073544,
+        "low": 0.346156556289
+      }
+    },
+    "model-gpt56-relay-responses": {
+      "cancelled": 0,
+      "cancelled_rate": 0.0,
+      "capability_evaluable": 86,
+      "capability_fail": 3,
+      "capability_pass": 83,
+      "capability_pass_rate": 0.96511627907,
+      "capability_pass_rate_wilson_95": {
+        "high": 0.988066201923,
+        "low": 0.902391288974
+      },
+      "infra_missing": 4,
+      "infra_missing_rate": 0.044444444444,
+      "logical_slots": 90,
+      "operational_pass_rate": 0.922222222222,
+      "operational_pass_rate_wilson_95": {
+        "high": 0.961815184683,
+        "low": 0.848061398174
+      }
+    },
+    "model-qwen38-alibaba-bailian-chat": {
+      "cancelled": 0,
+      "cancelled_rate": 0.0,
+      "capability_evaluable": 72,
+      "capability_fail": 4,
+      "capability_pass": 68,
+      "capability_pass_rate": 0.944444444444,
+      "capability_pass_rate_wilson_95": {
+        "high": 0.978185784019,
+        "low": 0.86567984034
+      },
+      "infra_missing": 18,
+      "infra_missing_rate": 0.2,
+      "logical_slots": 90,
+      "operational_pass_rate": 0.755555555556,
+      "operational_pass_rate_wilson_95": {
+        "high": 0.832672169338,
+        "low": 0.657516288707
+      }
+    }
+  },
+  "cost": {
+    "accounting_basis": "HarnessLab conservative estimated accounting",
+    "by_cell": {
+      "harness-claude-qwen38-alibaba-bailian": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "cost_per_operational_pass": 0.7610594782608696,
+        "estimated_cost_per_capability_pass": 0.7610594782608696,
+        "mean_estimated_cost_per_capability_evaluable_result": 0.5834789333333333,
+        "mean_estimated_cost_per_logical_slot": 0.5834789333333333,
+        "native_currency": "CNY",
+        "operational_passes": 69,
+        "total_estimated_cny": 52.513104,
+        "total_estimated_usd": null
+      },
+      "harness-codex-gpt56-high": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "cost_per_operational_pass": 0.16237111276595745,
+        "estimated_cost_per_capability_pass": 0.16237111276595745,
+        "mean_estimated_cost_per_capability_evaluable_result": 0.08978167411764706,
+        "mean_estimated_cost_per_logical_slot": 0.08479380333333333,
+        "native_currency": "USD",
+        "operational_passes": 47,
+        "total_estimated_cny": null,
+        "total_estimated_usd": 7.6314423
+      },
+      "harness-codex-gpt56-medium": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "cost_per_operational_pass": 0.10116138461538461,
+        "estimated_cost_per_capability_pass": 0.10116138461538461,
+        "mean_estimated_cost_per_capability_evaluable_result": 0.07645918604651163,
+        "mean_estimated_cost_per_logical_slot": 0.073061,
+        "native_currency": "USD",
+        "operational_passes": 65,
+        "total_estimated_cny": null,
+        "total_estimated_usd": 6.57549
+      },
+      "model-deepseek-v4flash-chat": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "cost_per_operational_pass": 0.006771316129032258,
+        "estimated_cost_per_capability_pass": 0.006771316129032258,
+        "mean_estimated_cost_per_capability_evaluable_result": 0.0023323422222222222,
+        "mean_estimated_cost_per_logical_slot": 0.0023323422222222222,
+        "native_currency": "USD",
+        "operational_passes": 31,
+        "total_estimated_cny": null,
+        "total_estimated_usd": 0.2099108
+      },
+      "model-deepseek-v4pro-chat": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "cost_per_operational_pass": 0.014533728,
+        "estimated_cost_per_capability_pass": 0.014533728,
+        "mean_estimated_cost_per_capability_evaluable_result": 0.006459434666666666,
+        "mean_estimated_cost_per_logical_slot": 0.006459434666666666,
+        "native_currency": "USD",
+        "operational_passes": 40,
+        "total_estimated_cny": null,
+        "total_estimated_usd": 0.58134912
+      },
+      "model-gpt56-relay-responses": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "cost_per_operational_pass": 0.022864521686746988,
+        "estimated_cost_per_capability_pass": 0.022864521686746988,
+        "mean_estimated_cost_per_capability_evaluable_result": 0.022066922093023255,
+        "mean_estimated_cost_per_logical_slot": 0.02108617,
+        "native_currency": "USD",
+        "operational_passes": 83,
+        "total_estimated_cny": null,
+        "total_estimated_usd": 1.8977553
+      },
+      "model-qwen38-alibaba-bailian-chat": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "cost_per_operational_pass": 0.614627294117647,
+        "estimated_cost_per_capability_pass": 0.614627294117647,
+        "mean_estimated_cost_per_capability_evaluable_result": 0.5804813333333333,
+        "mean_estimated_cost_per_logical_slot": 0.4643850666666667,
+        "native_currency": "CNY",
+        "operational_passes": 68,
+        "total_estimated_cny": 41.794656,
+        "total_estimated_usd": null
+      }
+    },
+    "currency_conversion_performed": false,
+    "not_billing_truth": true,
+    "totals": {
+      "manifest_total_estimated_cny": 94.30776,
+      "manifest_total_estimated_usd": 16.89594752,
+      "reconciled": true,
+      "total_estimated_cny": 94.30776,
+      "total_estimated_usd": 16.89594752
+    }
+  },
+  "dataset_validation": {
+    "analysis_outcome_mapping": {
+      "infra_failure": "infra_missing"
+    },
+    "cell_count": 7,
+    "cost_cny_reconciled": true,
+    "cost_usd_reconciled": true,
+    "dataset_sha256": "sha256:d07f6c96e3bd7882137355cb8b5d2d5682e3d51bffcedce6292375d4a54bbd1d",
+    "dataset_sha_matches_manifest": true,
+    "effective_totals_reconciled": true,
+    "frozen_effective_outcomes": {
+      "cancelled": 2,
+      "capability_fail": 196,
+      "capability_pass": 403,
+      "infra_failure": 29
+    },
+    "paired_task_repeat_identities": 90,
+    "primary_totals_reconciled": true,
+    "recovery_totals_reconciled": true,
+    "repeat_count": 5,
+    "row_count": 630,
+    "rows_per_cell": {
+      "harness-claude-qwen38-alibaba-bailian": 90,
+      "harness-codex-gpt56-high": 90,
+      "harness-codex-gpt56-medium": 90,
+      "model-deepseek-v4flash-chat": 90,
+      "model-deepseek-v4pro-chat": 90,
+      "model-gpt56-relay-responses": 90,
+      "model-qwen38-alibaba-bailian-chat": 90
+    },
+    "status": "PASS",
+    "task_count": 18,
+    "unique_slots": 630
+  },
+  "direct_route_comparison": {
+    "cells": {
+      "model-deepseek-v4flash-chat": {
+        "cancelled": 0,
+        "cancelled_rate": 0.0,
+        "capability_evaluable": 90,
+        "capability_fail": 59,
+        "capability_pass": 31,
+        "capability_pass_rate": 0.344444444444,
+        "capability_pass_rate_wilson_95": {
+          "high": 0.447165276593,
+          "low": 0.254459140249
+        },
+        "infra_missing": 0,
+        "infra_missing_rate": 0.0,
+        "logical_slots": 90,
+        "operational_pass_rate": 0.344444444444,
+        "operational_pass_rate_wilson_95": {
+          "high": 0.447165276593,
+          "low": 0.254459140249
+        }
+      },
+      "model-deepseek-v4pro-chat": {
+        "cancelled": 0,
+        "cancelled_rate": 0.0,
+        "capability_evaluable": 90,
+        "capability_fail": 50,
+        "capability_pass": 40,
+        "capability_pass_rate": 0.444444444444,
+        "capability_pass_rate_wilson_95": {
+          "high": 0.54728073544,
+          "low": 0.346156556289
+        },
+        "infra_missing": 0,
+        "infra_missing_rate": 0.0,
+        "logical_slots": 90,
+        "operational_pass_rate": 0.444444444444,
+        "operational_pass_rate_wilson_95": {
+          "high": 0.54728073544,
+          "low": 0.346156556289
+        }
+      },
+      "model-gpt56-relay-responses": {
+        "cancelled": 0,
+        "cancelled_rate": 0.0,
+        "capability_evaluable": 86,
+        "capability_fail": 3,
+        "capability_pass": 83,
+        "capability_pass_rate": 0.96511627907,
+        "capability_pass_rate_wilson_95": {
+          "high": 0.988066201923,
+          "low": 0.902391288974
+        },
+        "infra_missing": 4,
+        "infra_missing_rate": 0.044444444444,
+        "logical_slots": 90,
+        "operational_pass_rate": 0.922222222222,
+        "operational_pass_rate_wilson_95": {
+          "high": 0.961815184683,
+          "low": 0.848061398174
+        }
+      },
+      "model-qwen38-alibaba-bailian-chat": {
+        "cancelled": 0,
+        "cancelled_rate": 0.0,
+        "capability_evaluable": 72,
+        "capability_fail": 4,
+        "capability_pass": 68,
+        "capability_pass_rate": 0.944444444444,
+        "capability_pass_rate_wilson_95": {
+          "high": 0.978185784019,
+          "low": 0.86567984034
+        },
+        "infra_missing": 18,
+        "infra_missing_rate": 0.2,
+        "logical_slots": 90,
+        "operational_pass_rate": 0.755555555556,
+        "operational_pass_rate_wilson_95": {
+          "high": 0.832672169338,
+          "low": 0.657516288707
+        }
+      }
+    },
+    "limitation": "Direct-model comparisons are model/provider-route comparisons. Model identity and provider/route are confounded, so they must not be presented as clean causal model effects."
+  },
+  "infra_and_recovery": {
+    "harness-claude-qwen38-alibaba-bailian": {
+      "final_infra_missing": 0,
+      "final_infra_missing_rate": 0.0,
+      "primary_cancelled": 0,
+      "primary_completed": 68,
+      "primary_failed_infra": 2,
+      "primary_failed_subject": 20,
+      "primary_infra_rate": 0.022222222222,
+      "recovery_attempted": 2,
+      "recovery_capability_fail": 1,
+      "recovery_capability_pass": 1,
+      "recovery_infra_exhausted": 0,
+      "recovery_resolution_rate": 1.0
+    },
+    "harness-codex-gpt56-high": {
+      "final_infra_missing": 4,
+      "final_infra_missing_rate": 0.044444444444,
+      "primary_cancelled": 1,
+      "primary_completed": 38,
+      "primary_failed_infra": 19,
+      "primary_failed_subject": 32,
+      "primary_infra_rate": 0.211111111111,
+      "recovery_attempted": 19,
+      "recovery_capability_fail": 6,
+      "recovery_capability_pass": 9,
+      "recovery_infra_exhausted": 4,
+      "recovery_resolution_rate": 0.789473684211
+    },
+    "harness-codex-gpt56-medium": {
+      "final_infra_missing": 3,
+      "final_infra_missing_rate": 0.033333333333,
+      "primary_cancelled": 1,
+      "primary_completed": 50,
+      "primary_failed_infra": 19,
+      "primary_failed_subject": 20,
+      "primary_infra_rate": 0.211111111111,
+      "recovery_attempted": 19,
+      "recovery_capability_fail": 1,
+      "recovery_capability_pass": 15,
+      "recovery_infra_exhausted": 3,
+      "recovery_resolution_rate": 0.842105263158
+    },
+    "model-deepseek-v4flash-chat": {
+      "final_infra_missing": 0,
+      "final_infra_missing_rate": 0.0,
+      "primary_cancelled": 0,
+      "primary_completed": 31,
+      "primary_failed_infra": 1,
+      "primary_failed_subject": 58,
+      "primary_infra_rate": 0.011111111111,
+      "recovery_attempted": 1,
+      "recovery_capability_fail": 1,
+      "recovery_capability_pass": 0,
+      "recovery_infra_exhausted": 0,
+      "recovery_resolution_rate": 1.0
+    },
+    "model-deepseek-v4pro-chat": {
+      "final_infra_missing": 0,
+      "final_infra_missing_rate": 0.0,
+      "primary_cancelled": 0,
+      "primary_completed": 40,
+      "primary_failed_infra": 1,
+      "primary_failed_subject": 49,
+      "primary_infra_rate": 0.011111111111,
+      "recovery_attempted": 1,
+      "recovery_capability_fail": 1,
+      "recovery_capability_pass": 0,
+      "recovery_infra_exhausted": 0,
+      "recovery_resolution_rate": 1.0
+    },
+    "model-gpt56-relay-responses": {
+      "final_infra_missing": 4,
+      "final_infra_missing_rate": 0.044444444444,
+      "primary_cancelled": 0,
+      "primary_completed": 73,
+      "primary_failed_infra": 14,
+      "primary_failed_subject": 3,
+      "primary_infra_rate": 0.155555555556,
+      "recovery_attempted": 14,
+      "recovery_capability_fail": 0,
+      "recovery_capability_pass": 10,
+      "recovery_infra_exhausted": 4,
+      "recovery_resolution_rate": 0.714285714286
+    },
+    "model-qwen38-alibaba-bailian-chat": {
+      "final_infra_missing": 18,
+      "final_infra_missing_rate": 0.2,
+      "primary_cancelled": 0,
+      "primary_completed": 63,
+      "primary_failed_infra": 23,
+      "primary_failed_subject": 4,
+      "primary_infra_rate": 0.255555555556,
+      "recovery_attempted": 23,
+      "recovery_capability_fail": 0,
+      "recovery_capability_pass": 5,
+      "recovery_infra_exhausted": 18,
+      "recovery_resolution_rate": 0.217391304348
+    }
+  },
+  "latency": {
+    "harness-claude-qwen38-alibaba-bailian": {
+      "latency_coverage": 1.0,
+      "latency_observed_n": 90,
+      "mean_ms": 102229.41111111111,
+      "median_ms": 86911.0,
+      "p25_ms": 56779.0,
+      "p75_ms": 156239.5,
+      "p90_ms": 181260.0,
+      "recovery_latency_coverage_of_attempts": 1.0,
+      "recovery_latency_observed_n": 2,
+      "recovery_median_ms": 130576.0,
+      "recovery_p90_ms": 171235.2
+    },
+    "harness-codex-gpt56-high": {
+      "latency_coverage": 1.0,
+      "latency_observed_n": 90,
+      "mean_ms": 120854.03333333334,
+      "median_ms": 121861.5,
+      "p25_ms": 78187.25,
+      "p75_ms": 180643.0,
+      "p90_ms": 180741.4,
+      "recovery_latency_coverage_of_attempts": 1.0,
+      "recovery_latency_observed_n": 19,
+      "recovery_median_ms": 121088,
+      "recovery_p90_ms": 180657.2
+    },
+    "harness-codex-gpt56-medium": {
+      "latency_coverage": 1.0,
+      "latency_observed_n": 90,
+      "mean_ms": 111041.85555555555,
+      "median_ms": 108293.5,
+      "p25_ms": 64825.25,
+      "p75_ms": 174242.5,
+      "p90_ms": 180697.1,
+      "recovery_latency_coverage_of_attempts": 1.0,
+      "recovery_latency_observed_n": 19,
+      "recovery_median_ms": 69714,
+      "recovery_p90_ms": 127016.2
+    },
+    "model-deepseek-v4flash-chat": {
+      "latency_coverage": 1.0,
+      "latency_observed_n": 90,
+      "mean_ms": 14949.222222222223,
+      "median_ms": 17590.5,
+      "p25_ms": 12853.0,
+      "p75_ms": 19546.0,
+      "p90_ms": 20597.8,
+      "recovery_latency_coverage_of_attempts": 1.0,
+      "recovery_latency_observed_n": 1,
+      "recovery_median_ms": 18850,
+      "recovery_p90_ms": 18850
+    },
+    "model-deepseek-v4pro-chat": {
+      "latency_coverage": 1.0,
+      "latency_observed_n": 90,
+      "mean_ms": 27082.355555555554,
+      "median_ms": 29973.0,
+      "p25_ms": 13453.5,
+      "p75_ms": 38697.0,
+      "p90_ms": 42935.80000000001,
+      "recovery_latency_coverage_of_attempts": 1.0,
+      "recovery_latency_observed_n": 1,
+      "recovery_median_ms": 39807,
+      "recovery_p90_ms": 39807
+    },
+    "model-gpt56-relay-responses": {
+      "latency_coverage": 0.855555555556,
+      "latency_observed_n": 77,
+      "mean_ms": 23420.506493506495,
+      "median_ms": 14971,
+      "p25_ms": 10438,
+      "p75_ms": 27580,
+      "p90_ms": 51956.40000000009,
+      "recovery_latency_coverage_of_attempts": 0.714285714286,
+      "recovery_latency_observed_n": 10,
+      "recovery_median_ms": 7132.5,
+      "recovery_p90_ms": 51258.19999999999
+    },
+    "model-qwen38-alibaba-bailian-chat": {
+      "latency_coverage": 0.744444444444,
+      "latency_observed_n": 67,
+      "mean_ms": 52018.94029850746,
+      "median_ms": 44698,
+      "p25_ms": 18972.0,
+      "p75_ms": 74404.0,
+      "p90_ms": 115758.59999999999,
+      "recovery_latency_coverage_of_attempts": 0.217391304348,
+      "recovery_latency_observed_n": 5,
+      "recovery_median_ms": 149843,
+      "recovery_p90_ms": 167568.4
+    }
+  },
+  "limitations": [
+    "Capability and operational estimands use different denominators and must not be conflated.",
+    "Capability paired effects exclude pairs unless both rows are capability-evaluable.",
+    "Task-cluster percentile bootstrap resamples 18 tasks and uses equal task weighting.",
+    "Exact McNemar tests are secondary evidence, not the sole significance rule.",
+    "Direct model/provider-route comparisons are confounded and descriptive rather than clean causal model effects.",
+    "Individual task estimates have at most five repeats and should not be overinterpreted.",
+    "Missing latency and usage values are not zero-filled; recovery is reported separately.",
+    "Harness and Direct cached-token semantics may differ.",
+    "Frozen conservative cost estimates are HarnessLab accounting, not billing truth; currencies are not converted."
+  ],
+  "metadata": {
+    "bootstrap_method": "task_cluster_percentile",
+    "bootstrap_replicates": 50000,
+    "bootstrap_seed": 20260902,
+    "capability_effect_task_weighting": "equal_task",
+    "dataset": "release/core-real-matrix-v6-analysis-dataset.jsonl",
+    "dataset_freeze_commit": "728aa22aec0c64204b3151ddf9748a8c6746f78a",
+    "deterministic": true,
+    "experiment_id": "core-real-matrix-v6",
+    "manifest": "release/core-real-matrix-v6-analysis-dataset-manifest.json"
+  },
+  "paired_comparisons": {
+    "gpt_harness_effect": {
+      "baseline_cell": "model-gpt56-relay-responses",
+      "capability": {
+        "baseline_pass_rate": 0.963414634146,
+        "both_fail": 2,
+        "both_pass": 62,
+        "cluster_bootstrap_ci": {
+          "high": -0.128703703704,
+          "low": -0.257407407407,
+          "method": "task_cluster_percentile",
+          "replicates_requested": 50000,
+          "replicates_skipped_no_evaluable_tasks": 0,
+          "replicates_used": 50000,
+          "seed": 20260902,
+          "task_weighting": "equal_task"
+        },
+        "complete_pair_row_weighted_delta": -0.19512195122,
+        "complete_pairs": 82,
+        "delta": -0.193518518519,
+        "delta_estimand": "equal-task mean of within-task paired deltas",
+        "discordant_baseline_fail_variant_pass": 1,
+        "discordant_baseline_pass_variant_fail": 17,
+        "mcnemar_exact_p": 0.000144958496,
+        "tasks_with_pairs": 18,
+        "total_possible_pairs": 90,
+        "variant_pass_rate": 0.768292682927
+      },
+      "cost_and_efficiency": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "baseline_mean_cost_per_logical_slot": 0.02108617,
+        "cost_delta_per_logical_slot": 0.05197483,
+        "cost_multiplier": 3.464877689974,
+        "currency": "USD",
+        "incremental_mean_cost_per_slot": 0.05197483,
+        "incremental_operational_pass_rate_delta": -0.2,
+        "variant_mean_cost_per_logical_slot": 0.073061
+      },
+      "latency": {
+        "baseline_primary_median_ms": 14971,
+        "coverage_materially_incomplete": true,
+        "median_variant_minus_baseline_ms": 93649,
+        "paired_latency_coverage": 0.855555555556,
+        "paired_latency_n": 77,
+        "variant_primary_median_ms": 109349
+      },
+      "missingness": {
+        "baseline_final_infra_rate": 0.044444444444,
+        "capability_complete_pair_coverage": 0.911111111111,
+        "capability_minus_operational_delta": 0.006481481481,
+        "excluded_due_to_baseline_infra": 4,
+        "excluded_due_to_cancelled": 1,
+        "excluded_due_to_variant_infra": 3,
+        "exclusion_reason_counts_are_overlapping": true,
+        "infrastructure_reliability_changes_practical_conclusion": false,
+        "material_difference_rule": "absolute gap >= 0.05 or opposite signs",
+        "variant_final_infra_rate": 0.033333333333
+      },
+      "operational": {
+        "baseline_pass_rate": 0.922222222222,
+        "cluster_bootstrap_ci": {
+          "high": -0.111111111111,
+          "low": -0.288888888889,
+          "method": "task_cluster_percentile",
+          "replicates_requested": 50000,
+          "replicates_skipped_no_evaluable_tasks": 0,
+          "replicates_used": 50000,
+          "seed": 20260902,
+          "task_weighting": "equal_task"
+        },
+        "delta": -0.2,
+        "delta_estimand": "equal-task mean of within-task paired operational deltas",
+        "pair_count": 90,
+        "variant_pass_rate": 0.722222222222
+      },
+      "task_heterogeneity": {
+        "tasks": [
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.25,
+            "task_id": "core-java-deduplicate",
+            "variant_capability_pass_fraction": 0.75
+          },
+          {
+            "available_capability_complete_repeats": 3,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.333333333333,
+            "task_id": "core-java-feature-flag",
+            "variant_capability_pass_fraction": 0.666666666667
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.2,
+            "task_id": "core-java-quota",
+            "variant_capability_pass_fraction": 0.8
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.4,
+            "task_id": "core-java-settings-merge",
+            "variant_capability_pass_fraction": 0.6
+          },
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "core-java-slugify",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.4,
+            "delta": 0.0,
+            "task_id": "core-python-deduplicate",
+            "variant_capability_pass_fraction": 0.4
+          },
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "core-python-feature-flag",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.25,
+            "task_id": "core-python-quota",
+            "variant_capability_pass_fraction": 0.75
+          },
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.25,
+            "task_id": "core-python-settings-merge",
+            "variant_capability_pass_fraction": 0.75
+          },
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "core-python-slugify",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.2,
+            "task_id": "core-typescript-deduplicate",
+            "variant_capability_pass_fraction": 0.8
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.2,
+            "task_id": "core-typescript-feature-flag",
+            "variant_capability_pass_fraction": 0.8
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.2,
+            "task_id": "core-typescript-quota",
+            "variant_capability_pass_fraction": 0.8
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.4,
+            "task_id": "core-typescript-settings-merge",
+            "variant_capability_pass_fraction": 0.6
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.2,
+            "task_id": "core-typescript-slugify",
+            "variant_capability_pass_fraction": 0.8
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.4,
+            "task_id": "micro-java-clamp",
+            "variant_capability_pass_fraction": 0.6
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "micro-python-clamp",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.2,
+            "task_id": "micro-typescript-clamp",
+            "variant_capability_pass_fraction": 0.8
+          }
+        ],
+        "tasks_favoring_baseline": 13,
+        "tasks_favoring_variant": 0,
+        "tasks_tied": 5,
+        "tasks_without_capability_pairs": 0
+      },
+      "variant_cell": "harness-codex-gpt56-medium"
+    },
+    "qwen_harness_effect": {
+      "baseline_cell": "model-qwen38-alibaba-bailian-chat",
+      "capability": {
+        "baseline_pass_rate": 0.944444444444,
+        "both_fail": 0,
+        "both_pass": 60,
+        "cluster_bootstrap_ci": {
+          "high": 0.041176470588,
+          "low": -0.305882352941,
+          "method": "task_cluster_percentile",
+          "replicates_requested": 50000,
+          "replicates_skipped_no_evaluable_tasks": 0,
+          "replicates_used": 50000,
+          "seed": 20260902,
+          "task_weighting": "equal_task"
+        },
+        "complete_pair_row_weighted_delta": -0.055555555556,
+        "complete_pairs": 72,
+        "delta": -0.11875,
+        "delta_estimand": "equal-task mean of within-task paired deltas",
+        "discordant_baseline_fail_variant_pass": 4,
+        "discordant_baseline_pass_variant_fail": 8,
+        "mcnemar_exact_p": 0.3876953125,
+        "tasks_with_pairs": 16,
+        "total_possible_pairs": 90,
+        "variant_pass_rate": 0.888888888889
+      },
+      "cost_and_efficiency": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "baseline_mean_cost_per_logical_slot": 0.4643850666666667,
+        "cost_delta_per_logical_slot": 0.119093866667,
+        "cost_multiplier": 1.25645498793,
+        "currency": "CNY",
+        "incremental_mean_cost_per_slot": 0.119093866667,
+        "incremental_operational_pass_rate_delta": 0.011111111111,
+        "variant_mean_cost_per_logical_slot": 0.5834789333333333
+      },
+      "latency": {
+        "baseline_primary_median_ms": 44698,
+        "coverage_materially_incomplete": true,
+        "median_variant_minus_baseline_ms": 28510,
+        "paired_latency_coverage": 0.744444444444,
+        "paired_latency_n": 67,
+        "variant_primary_median_ms": 68953
+      },
+      "missingness": {
+        "baseline_final_infra_rate": 0.2,
+        "capability_complete_pair_coverage": 0.8,
+        "capability_minus_operational_delta": -0.129861111111,
+        "excluded_due_to_baseline_infra": 18,
+        "excluded_due_to_cancelled": 0,
+        "excluded_due_to_variant_infra": 0,
+        "exclusion_reason_counts_are_overlapping": true,
+        "infrastructure_reliability_changes_practical_conclusion": true,
+        "material_difference_rule": "absolute gap >= 0.05 or opposite signs",
+        "variant_final_infra_rate": 0.0
+      },
+      "operational": {
+        "baseline_pass_rate": 0.755555555556,
+        "cluster_bootstrap_ci": {
+          "high": 0.111111111111,
+          "low": -0.111111111111,
+          "method": "task_cluster_percentile",
+          "replicates_requested": 50000,
+          "replicates_skipped_no_evaluable_tasks": 0,
+          "replicates_used": 50000,
+          "seed": 20260902,
+          "task_weighting": "equal_task"
+        },
+        "delta": 0.011111111111,
+        "delta_estimand": "equal-task mean of within-task paired operational deltas",
+        "pair_count": 90,
+        "variant_pass_rate": 0.766666666667
+      },
+      "task_heterogeneity": {
+        "tasks": [
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.8,
+            "task_id": "core-java-deduplicate",
+            "variant_capability_pass_fraction": 0.2
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.2,
+            "task_id": "core-java-feature-flag",
+            "variant_capability_pass_fraction": 0.8
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "core-java-quota",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 1,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -1.0,
+            "task_id": "core-java-settings-merge",
+            "variant_capability_pass_fraction": 0.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "core-java-slugify",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": 0.2,
+            "task_id": "core-python-deduplicate",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "core-python-feature-flag",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": 0.2,
+            "task_id": "core-python-quota",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.6,
+            "delta": 0.4,
+            "task_id": "core-python-settings-merge",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "core-python-slugify",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.2,
+            "task_id": "core-typescript-deduplicate",
+            "variant_capability_pass_fraction": 0.8
+          },
+          {
+            "available_capability_complete_repeats": 0,
+            "baseline_capability_pass_fraction": null,
+            "delta": null,
+            "task_id": "core-typescript-feature-flag",
+            "variant_capability_pass_fraction": null
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "core-typescript-quota",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 0,
+            "baseline_capability_pass_fraction": null,
+            "delta": null,
+            "task_id": "core-typescript-settings-merge",
+            "variant_capability_pass_fraction": null
+          },
+          {
+            "available_capability_complete_repeats": 2,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.5,
+            "task_id": "core-typescript-slugify",
+            "variant_capability_pass_fraction": 0.5
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "micro-java-clamp",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "micro-python-clamp",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "micro-typescript-clamp",
+            "variant_capability_pass_fraction": 1.0
+          }
+        ],
+        "tasks_favoring_baseline": 5,
+        "tasks_favoring_variant": 3,
+        "tasks_tied": 8,
+        "tasks_without_capability_pairs": 2
+      },
+      "variant_cell": "harness-claude-qwen38-alibaba-bailian"
+    },
+    "reasoning_effort_effect": {
+      "baseline_cell": "harness-codex-gpt56-medium",
+      "capability": {
+        "baseline_pass_rate": 0.746987951807,
+        "both_fail": 12,
+        "both_pass": 37,
+        "cluster_bootstrap_ci": {
+          "high": -0.072222222222,
+          "low": -0.338888888889,
+          "method": "task_cluster_percentile",
+          "replicates_requested": 50000,
+          "replicates_skipped_no_evaluable_tasks": 0,
+          "replicates_used": 50000,
+          "seed": 20260902,
+          "task_weighting": "equal_task"
+        },
+        "complete_pair_row_weighted_delta": -0.192771084337,
+        "complete_pairs": 83,
+        "delta": -0.205555555556,
+        "delta_estimand": "equal-task mean of within-task paired deltas",
+        "discordant_baseline_fail_variant_pass": 9,
+        "discordant_baseline_pass_variant_fail": 25,
+        "mcnemar_exact_p": 0.009041185491,
+        "tasks_with_pairs": 18,
+        "total_possible_pairs": 90,
+        "variant_pass_rate": 0.55421686747
+      },
+      "cost_and_efficiency": {
+        "accounting_basis": "HarnessLab conservative estimated accounting",
+        "baseline_mean_cost_per_logical_slot": 0.073061,
+        "cost_delta_per_logical_slot": 0.011732803333,
+        "cost_multiplier": 1.160589142406,
+        "currency": "USD",
+        "incremental_mean_cost_per_slot": 0.011732803333,
+        "incremental_operational_pass_rate_delta": -0.2,
+        "variant_mean_cost_per_logical_slot": 0.08479380333333333
+      },
+      "latency": {
+        "baseline_primary_median_ms": 108293.5,
+        "coverage_materially_incomplete": false,
+        "median_variant_minus_baseline_ms": 3876.5,
+        "paired_latency_coverage": 1.0,
+        "paired_latency_n": 90,
+        "variant_primary_median_ms": 121861.5
+      },
+      "missingness": {
+        "baseline_final_infra_rate": 0.033333333333,
+        "capability_complete_pair_coverage": 0.922222222222,
+        "capability_minus_operational_delta": -0.005555555556,
+        "excluded_due_to_baseline_infra": 3,
+        "excluded_due_to_cancelled": 1,
+        "excluded_due_to_variant_infra": 4,
+        "exclusion_reason_counts_are_overlapping": true,
+        "infrastructure_reliability_changes_practical_conclusion": false,
+        "material_difference_rule": "absolute gap >= 0.05 or opposite signs",
+        "variant_final_infra_rate": 0.044444444444
+      },
+      "operational": {
+        "baseline_pass_rate": 0.722222222222,
+        "cluster_bootstrap_ci": {
+          "high": -0.077777777778,
+          "low": -0.322222222222,
+          "method": "task_cluster_percentile",
+          "replicates_requested": 50000,
+          "replicates_skipped_no_evaluable_tasks": 0,
+          "replicates_used": 50000,
+          "seed": 20260902,
+          "task_weighting": "equal_task"
+        },
+        "delta": -0.2,
+        "delta_estimand": "equal-task mean of within-task paired operational deltas",
+        "pair_count": 90,
+        "variant_pass_rate": 0.522222222222
+      },
+      "task_heterogeneity": {
+        "tasks": [
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 0.75,
+            "delta": -0.75,
+            "task_id": "core-java-deduplicate",
+            "variant_capability_pass_fraction": 0.0
+          },
+          {
+            "available_capability_complete_repeats": 2,
+            "baseline_capability_pass_fraction": 0.5,
+            "delta": -0.5,
+            "task_id": "core-java-feature-flag",
+            "variant_capability_pass_fraction": 0.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": -0.2,
+            "task_id": "core-java-quota",
+            "variant_capability_pass_fraction": 0.6
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.6,
+            "delta": -0.4,
+            "task_id": "core-java-settings-merge",
+            "variant_capability_pass_fraction": 0.2
+          },
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 0.75,
+            "delta": -0.5,
+            "task_id": "core-java-slugify",
+            "variant_capability_pass_fraction": 0.25
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.4,
+            "delta": -0.4,
+            "task_id": "core-python-deduplicate",
+            "variant_capability_pass_fraction": 0.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": 0.2,
+            "task_id": "core-python-feature-flag",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 0.75,
+            "delta": 0.25,
+            "task_id": "core-python-quota",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": 0.0,
+            "task_id": "core-python-settings-merge",
+            "variant_capability_pass_fraction": 0.8
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": -0.2,
+            "task_id": "core-python-slugify",
+            "variant_capability_pass_fraction": 0.8
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": -0.4,
+            "task_id": "core-typescript-deduplicate",
+            "variant_capability_pass_fraction": 0.4
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": -0.6,
+            "task_id": "core-typescript-feature-flag",
+            "variant_capability_pass_fraction": 0.2
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": 0.2,
+            "task_id": "core-typescript-quota",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.6,
+            "delta": -0.2,
+            "task_id": "core-typescript-settings-merge",
+            "variant_capability_pass_fraction": 0.4
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": -0.2,
+            "task_id": "core-typescript-slugify",
+            "variant_capability_pass_fraction": 0.6
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.6,
+            "delta": -0.2,
+            "task_id": "micro-java-clamp",
+            "variant_capability_pass_fraction": 0.4
+          },
+          {
+            "available_capability_complete_repeats": 4,
+            "baseline_capability_pass_fraction": 1.0,
+            "delta": 0.0,
+            "task_id": "micro-python-clamp",
+            "variant_capability_pass_fraction": 1.0
+          },
+          {
+            "available_capability_complete_repeats": 5,
+            "baseline_capability_pass_fraction": 0.8,
+            "delta": 0.2,
+            "task_id": "micro-typescript-clamp",
+            "variant_capability_pass_fraction": 1.0
+          }
+        ],
+        "tasks_favoring_baseline": 12,
+        "tasks_favoring_variant": 4,
+        "tasks_tied": 2,
+        "tasks_without_capability_pairs": 0
+      },
+      "variant_cell": "harness-codex-gpt56-high"
+    }
+  },
+  "repeat_variability": {
+    "harness-claude-qwen38-alibaba-bailian": {
+      "mean_within_task_repeat_variance": 0.072222222222,
+      "median_task_pass_fraction": 1.0,
+      "mixed_task_rate": 0.333333333333,
+      "tasks_with_2plus_evaluable_repeats": 18,
+      "tasks_with_mixed_pass_fail": 6
+    },
+    "harness-codex-gpt56-high": {
+      "mean_within_task_repeat_variance": 0.160185185185,
+      "median_task_pass_fraction": 0.5,
+      "mixed_task_rate": 0.611111111111,
+      "tasks_with_2plus_evaluable_repeats": 18,
+      "tasks_with_mixed_pass_fail": 11
+    },
+    "harness-codex-gpt56-medium": {
+      "mean_within_task_repeat_variance": 0.212962962963,
+      "median_task_pass_fraction": 0.8,
+      "mixed_task_rate": 0.888888888889,
+      "tasks_with_2plus_evaluable_repeats": 18,
+      "tasks_with_mixed_pass_fail": 16
+    },
+    "model-deepseek-v4flash-chat": {
+      "mean_within_task_repeat_variance": 0.105555555556,
+      "median_task_pass_fraction": 0.3,
+      "mixed_task_rate": 0.388888888889,
+      "tasks_with_2plus_evaluable_repeats": 18,
+      "tasks_with_mixed_pass_fail": 7
+    },
+    "model-deepseek-v4pro-chat": {
+      "mean_within_task_repeat_variance": 0.1,
+      "median_task_pass_fraction": 0.4,
+      "mixed_task_rate": 0.388888888889,
+      "tasks_with_2plus_evaluable_repeats": 18,
+      "tasks_with_mixed_pass_fail": 7
+    },
+    "model-gpt56-relay-responses": {
+      "mean_within_task_repeat_variance": 0.016666666667,
+      "median_task_pass_fraction": 1.0,
+      "mixed_task_rate": 0.055555555556,
+      "tasks_with_2plus_evaluable_repeats": 18,
+      "tasks_with_mixed_pass_fail": 1
+    },
+    "model-qwen38-alibaba-bailian-chat": {
+      "mean_within_task_repeat_variance": 0.046666666667,
+      "median_task_pass_fraction": 1.0,
+      "mixed_task_rate": 0.2,
+      "tasks_with_2plus_evaluable_repeats": 15,
+      "tasks_with_mixed_pass_fail": 3
+    }
+  },
+  "usage": {
+    "harness-claude-qwen38-alibaba-bailian": {
+      "primary": {
+        "cache_write_input_tokens_observed_n": 70,
+        "cached_input_tokens_observed_n": 70,
+        "input_tokens_observed_n": 71,
+        "mean_cache_write_input_tokens": 4448.628571428571,
+        "mean_cached_input_tokens": 26547.314285714285,
+        "mean_input_tokens": 189.929577464789,
+        "mean_output_tokens": 3091.464788732394,
+        "mean_reasoning_output_tokens": null,
+        "median_cache_write_input_tokens": 4301.0,
+        "median_cached_input_tokens": 22835.5,
+        "median_input_tokens": 174,
+        "median_output_tokens": 2742,
+        "median_reasoning_output_tokens": null,
+        "output_tokens_observed_n": 71,
+        "primary_usage_coverage": 0.788888888889,
+        "primary_usage_observed_n": 71,
+        "reasoning_output_tokens_observed_n": 0,
+        "total_cache_write_input_tokens": 311404,
+        "total_cached_input_tokens": 1858312,
+        "total_input_tokens": 13485,
+        "total_output_tokens": 219494,
+        "total_reasoning_output_tokens": null
+      },
+      "recovery": {
+        "cache_write_input_tokens_observed_n": 1,
+        "cached_input_tokens_observed_n": 1,
+        "input_tokens_observed_n": 1,
+        "mean_cache_write_input_tokens": 3636.0,
+        "mean_cached_input_tokens": 33519.0,
+        "mean_input_tokens": 232.0,
+        "mean_output_tokens": 3174.0,
+        "mean_reasoning_output_tokens": null,
+        "median_cache_write_input_tokens": 3636,
+        "median_cached_input_tokens": 33519,
+        "median_input_tokens": 232,
+        "median_output_tokens": 3174,
+        "median_reasoning_output_tokens": null,
+        "output_tokens_observed_n": 1,
+        "reasoning_output_tokens_observed_n": 0,
+        "recovery_usage_coverage": 0.5,
+        "recovery_usage_observed_n": 1,
+        "total_cache_write_input_tokens": 3636,
+        "total_cached_input_tokens": 33519,
+        "total_input_tokens": 232,
+        "total_output_tokens": 3174,
+        "total_reasoning_output_tokens": null
+      }
+    },
+    "harness-codex-gpt56-high": {
+      "primary": {
+        "cache_write_input_tokens_observed_n": 44,
+        "cached_input_tokens_observed_n": 44,
+        "input_tokens_observed_n": 44,
+        "mean_cache_write_input_tokens": 0.0,
+        "mean_cached_input_tokens": 85338.52272727272,
+        "mean_input_tokens": 107624.13636363637,
+        "mean_output_tokens": 2710.613636363636,
+        "mean_reasoning_output_tokens": 1412.386363636364,
+        "median_cache_write_input_tokens": 0.0,
+        "median_cached_input_tokens": 69120.0,
+        "median_input_tokens": 96988.5,
+        "median_output_tokens": 2230.5,
+        "median_reasoning_output_tokens": 1061.5,
+        "output_tokens_observed_n": 44,
+        "primary_usage_coverage": 0.488888888889,
+        "primary_usage_observed_n": 44,
+        "reasoning_output_tokens_observed_n": 44,
+        "total_cache_write_input_tokens": 0,
+        "total_cached_input_tokens": 3754895,
+        "total_input_tokens": 4735462,
+        "total_output_tokens": 119267,
+        "total_reasoning_output_tokens": 62145
+      },
+      "recovery": {
+        "cache_write_input_tokens_observed_n": 9,
+        "cached_input_tokens_observed_n": 9,
+        "input_tokens_observed_n": 9,
+        "mean_cache_write_input_tokens": 0.0,
+        "mean_cached_input_tokens": 82033.77777777778,
+        "mean_input_tokens": 98304.55555555556,
+        "mean_output_tokens": 1895.111111111111,
+        "mean_reasoning_output_tokens": 851.888888888889,
+        "median_cache_write_input_tokens": 0,
+        "median_cached_input_tokens": 80128,
+        "median_input_tokens": 94786,
+        "median_output_tokens": 1671,
+        "median_reasoning_output_tokens": 792,
+        "output_tokens_observed_n": 9,
+        "reasoning_output_tokens_observed_n": 9,
+        "recovery_usage_coverage": 0.473684210526,
+        "recovery_usage_observed_n": 9,
+        "total_cache_write_input_tokens": 0,
+        "total_cached_input_tokens": 738304,
+        "total_input_tokens": 884741,
+        "total_output_tokens": 17056,
+        "total_reasoning_output_tokens": 7667
+      }
+    },
+    "harness-codex-gpt56-medium": {
+      "primary": {
+        "cache_write_input_tokens_observed_n": 54,
+        "cached_input_tokens_observed_n": 54,
+        "input_tokens_observed_n": 54,
+        "mean_cache_write_input_tokens": 0.0,
+        "mean_cached_input_tokens": 85020.61111111111,
+        "mean_input_tokens": 104503.44444444444,
+        "mean_output_tokens": 2088.462962962963,
+        "mean_reasoning_output_tokens": 865.333333333333,
+        "median_cache_write_input_tokens": 0.0,
+        "median_cached_input_tokens": 75520.0,
+        "median_input_tokens": 98220.0,
+        "median_output_tokens": 1744.5,
+        "median_reasoning_output_tokens": 636.0,
+        "output_tokens_observed_n": 54,
+        "primary_usage_coverage": 0.6,
+        "primary_usage_observed_n": 54,
+        "reasoning_output_tokens_observed_n": 54,
+        "total_cache_write_input_tokens": 0,
+        "total_cached_input_tokens": 4591113,
+        "total_input_tokens": 5643186,
+        "total_output_tokens": 112777,
+        "total_reasoning_output_tokens": 46728
+      },
+      "recovery": {
+        "cache_write_input_tokens_observed_n": 15,
+        "cached_input_tokens_observed_n": 15,
+        "input_tokens_observed_n": 15,
+        "mean_cache_write_input_tokens": 0.0,
+        "mean_cached_input_tokens": 81041.06666666667,
+        "mean_input_tokens": 96970.26666666666,
+        "mean_output_tokens": 1598.866666666667,
+        "mean_reasoning_output_tokens": 502.6,
+        "median_cache_write_input_tokens": 0,
+        "median_cached_input_tokens": 81152,
+        "median_input_tokens": 96221,
+        "median_output_tokens": 1428,
+        "median_reasoning_output_tokens": 447,
+        "output_tokens_observed_n": 15,
+        "reasoning_output_tokens_observed_n": 15,
+        "recovery_usage_coverage": 0.789473684211,
+        "recovery_usage_observed_n": 15,
+        "total_cache_write_input_tokens": 0,
+        "total_cached_input_tokens": 1215616,
+        "total_input_tokens": 1454554,
+        "total_output_tokens": 23983,
+        "total_reasoning_output_tokens": 7539
+      }
+    },
+    "model-deepseek-v4flash-chat": {
+      "primary": {
+        "cache_write_input_tokens_observed_n": 0,
+        "cached_input_tokens_observed_n": 0,
+        "input_tokens_observed_n": 90,
+        "mean_cache_write_input_tokens": null,
+        "mean_cached_input_tokens": null,
+        "mean_input_tokens": 435.833333333333,
+        "mean_output_tokens": 1597.855555555556,
+        "mean_reasoning_output_tokens": 1541.213483146067,
+        "median_cache_write_input_tokens": null,
+        "median_cached_input_tokens": null,
+        "median_input_tokens": 435.5,
+        "median_output_tokens": 2000.0,
+        "median_reasoning_output_tokens": 2000,
+        "output_tokens_observed_n": 90,
+        "primary_usage_coverage": 1.0,
+        "primary_usage_observed_n": 90,
+        "reasoning_output_tokens_observed_n": 89,
+        "total_cache_write_input_tokens": null,
+        "total_cached_input_tokens": null,
+        "total_input_tokens": 39225,
+        "total_output_tokens": 143807,
+        "total_reasoning_output_tokens": 137168
+      },
+      "recovery": {
+        "cache_write_input_tokens_observed_n": 0,
+        "cached_input_tokens_observed_n": 0,
+        "input_tokens_observed_n": 1,
+        "mean_cache_write_input_tokens": null,
+        "mean_cached_input_tokens": null,
+        "mean_input_tokens": 424.0,
+        "mean_output_tokens": 2000.0,
+        "mean_reasoning_output_tokens": 2000.0,
+        "median_cache_write_input_tokens": null,
+        "median_cached_input_tokens": null,
+        "median_input_tokens": 424,
+        "median_output_tokens": 2000,
+        "median_reasoning_output_tokens": 2000,
+        "output_tokens_observed_n": 1,
+        "reasoning_output_tokens_observed_n": 1,
+        "recovery_usage_coverage": 1.0,
+        "recovery_usage_observed_n": 1,
+        "total_cache_write_input_tokens": null,
+        "total_cached_input_tokens": null,
+        "total_input_tokens": 424,
+        "total_output_tokens": 2000,
+        "total_reasoning_output_tokens": 2000
+      }
+    },
+    "model-deepseek-v4pro-chat": {
+      "primary": {
+        "cache_write_input_tokens_observed_n": 0,
+        "cached_input_tokens_observed_n": 0,
+        "input_tokens_observed_n": 90,
+        "mean_cache_write_input_tokens": null,
+        "mean_cached_input_tokens": null,
+        "mean_input_tokens": 435.833333333333,
+        "mean_output_tokens": 1462.1,
+        "mean_reasoning_output_tokens": 1369.988764044944,
+        "median_cache_write_input_tokens": null,
+        "median_cached_input_tokens": null,
+        "median_input_tokens": 435.5,
+        "median_output_tokens": 2000.0,
+        "median_reasoning_output_tokens": 1790,
+        "output_tokens_observed_n": 90,
+        "primary_usage_coverage": 1.0,
+        "primary_usage_observed_n": 90,
+        "reasoning_output_tokens_observed_n": 89,
+        "total_cache_write_input_tokens": null,
+        "total_cached_input_tokens": null,
+        "total_input_tokens": 39225,
+        "total_output_tokens": 131589,
+        "total_reasoning_output_tokens": 121929
+      },
+      "recovery": {
+        "cache_write_input_tokens_observed_n": 0,
+        "cached_input_tokens_observed_n": 0,
+        "input_tokens_observed_n": 1,
+        "mean_cache_write_input_tokens": null,
+        "mean_cached_input_tokens": null,
+        "mean_input_tokens": 424.0,
+        "mean_output_tokens": 2000.0,
+        "mean_reasoning_output_tokens": 2000.0,
+        "median_cache_write_input_tokens": null,
+        "median_cached_input_tokens": null,
+        "median_input_tokens": 424,
+        "median_output_tokens": 2000,
+        "median_reasoning_output_tokens": 2000,
+        "output_tokens_observed_n": 1,
+        "reasoning_output_tokens_observed_n": 1,
+        "recovery_usage_coverage": 1.0,
+        "recovery_usage_observed_n": 1,
+        "total_cache_write_input_tokens": null,
+        "total_cached_input_tokens": null,
+        "total_input_tokens": 424,
+        "total_output_tokens": 2000,
+        "total_reasoning_output_tokens": 2000
+      }
+    },
+    "model-gpt56-relay-responses": {
+      "primary": {
+        "cache_write_input_tokens_observed_n": 0,
+        "cached_input_tokens_observed_n": 0,
+        "input_tokens_observed_n": 77,
+        "mean_cache_write_input_tokens": null,
+        "mean_cached_input_tokens": null,
+        "mean_input_tokens": 348.220779220779,
+        "mean_output_tokens": 599.532467532468,
+        "mean_reasoning_output_tokens": 362.922077922078,
+        "median_cache_write_input_tokens": null,
+        "median_cached_input_tokens": null,
+        "median_input_tokens": 340,
+        "median_output_tokens": 396,
+        "median_reasoning_output_tokens": 176,
+        "output_tokens_observed_n": 77,
+        "primary_usage_coverage": 0.855555555556,
+        "primary_usage_observed_n": 77,
+        "reasoning_output_tokens_observed_n": 77,
+        "total_cache_write_input_tokens": null,
+        "total_cached_input_tokens": null,
+        "total_input_tokens": 26813,
+        "total_output_tokens": 46164,
+        "total_reasoning_output_tokens": 27945
+      },
+      "recovery": {
+        "cache_write_input_tokens_observed_n": 0,
+        "cached_input_tokens_observed_n": 0,
+        "input_tokens_observed_n": 10,
+        "mean_cache_write_input_tokens": null,
+        "mean_cached_input_tokens": null,
+        "mean_input_tokens": 314.2,
+        "mean_output_tokens": 315.2,
+        "mean_reasoning_output_tokens": 122.8,
+        "median_cache_write_input_tokens": null,
+        "median_cached_input_tokens": null,
+        "median_input_tokens": 303.5,
+        "median_output_tokens": 192.5,
+        "median_reasoning_output_tokens": 38.5,
+        "output_tokens_observed_n": 10,
+        "reasoning_output_tokens_observed_n": 10,
+        "recovery_usage_coverage": 0.714285714286,
+        "recovery_usage_observed_n": 10,
+        "total_cache_write_input_tokens": null,
+        "total_cached_input_tokens": null,
+        "total_input_tokens": 3142,
+        "total_output_tokens": 3152,
+        "total_reasoning_output_tokens": 1228
+      }
+    },
+    "model-qwen38-alibaba-bailian-chat": {
+      "primary": {
+        "cache_write_input_tokens_observed_n": 0,
+        "cached_input_tokens_observed_n": 0,
+        "input_tokens_observed_n": 67,
+        "mean_cache_write_input_tokens": null,
+        "mean_cached_input_tokens": null,
+        "mean_input_tokens": 382.089552238806,
+        "mean_output_tokens": 1954.686567164179,
+        "mean_reasoning_output_tokens": 1753.044776119403,
+        "median_cache_write_input_tokens": null,
+        "median_cached_input_tokens": null,
+        "median_input_tokens": 377,
+        "median_output_tokens": 1679,
+        "median_reasoning_output_tokens": 1470,
+        "output_tokens_observed_n": 67,
+        "primary_usage_coverage": 0.744444444444,
+        "primary_usage_observed_n": 67,
+        "reasoning_output_tokens_observed_n": 67,
+        "total_cache_write_input_tokens": null,
+        "total_cached_input_tokens": null,
+        "total_input_tokens": 25600,
+        "total_output_tokens": 130964,
+        "total_reasoning_output_tokens": 117454
+      },
+      "recovery": {
+        "cache_write_input_tokens_observed_n": 0,
+        "cached_input_tokens_observed_n": 0,
+        "input_tokens_observed_n": 5,
+        "mean_cache_write_input_tokens": null,
+        "mean_cached_input_tokens": null,
+        "mean_input_tokens": 385.0,
+        "mean_output_tokens": 5831.4,
+        "mean_reasoning_output_tokens": 5460.6,
+        "median_cache_write_input_tokens": null,
+        "median_cached_input_tokens": null,
+        "median_input_tokens": 377,
+        "median_output_tokens": 5908,
+        "median_reasoning_output_tokens": 5556,
+        "output_tokens_observed_n": 5,
+        "reasoning_output_tokens_observed_n": 5,
+        "recovery_usage_coverage": 0.217391304348,
+        "recovery_usage_observed_n": 5,
+        "total_cache_write_input_tokens": null,
+        "total_cached_input_tokens": null,
+        "total_input_tokens": 1925,
+        "total_output_tokens": 29157,
+        "total_reasoning_output_tokens": 27303
+      }
+    }
+  }
+}
