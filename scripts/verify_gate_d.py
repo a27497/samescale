@@ -77,7 +77,7 @@ CRITICAL_TESTS = {
     "test_example_profiles_contain_only_credential_references[messages]",
     "test_example_profiles_contain_only_credential_references[responses]",
     "test_fake_provider_m_lane_e2e_uses_isolated_verifier_and_safe_evidence",
-    "test_generic_effort_is_rejected_instead_of_silently_transformed",
+    "test_generic_effort_is_forwarded_without_transformation",
     "test_generation_settings_are_deeply_immutable",
     "test_http_provider_failures_are_distinct_and_not_retried[auth-401]",
     "test_http_provider_failures_are_distinct_and_not_retried[rate-limit-429]",

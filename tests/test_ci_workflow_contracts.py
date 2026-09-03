@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import importlib.util
 import sys
 from pathlib import Path
@@ -40,6 +41,19 @@ def _workflow(path: Path) -> dict[str, Any]:
 
 def _check_names(checks: tuple[Any, ...]) -> tuple[str, ...]:
     return tuple(check.name for check in checks)
+
+
+def test_gate_d_and_h_critical_test_names_resolve_in_selected_suites() -> None:
+    for gate in ("D", "H"):
+        verifier = _load_verifier(f"verify_gate_{gate.lower()}")
+        defined = {
+            node.name
+            for path in getattr(verifier, f"PHASE_{gate}_TESTS")
+            for node in ast.parse((ROOT / path).read_text()).body
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
+        }
+        required = {name.split("[", 1)[0] for name in verifier.CRITICAL_TESTS}
+        assert required <= defined, f"Gate {gate} references absent tests: {required - defined}"
 
 
 def test_gate_c_standalone_keeps_prerequisites_and_leaf_keeps_own_evidence() -> None:
