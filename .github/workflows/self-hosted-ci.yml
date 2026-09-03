@@ -72,6 +72,7 @@ jobs:
           tests/test_kb4_timeout_sensitivity.py
           tests/test_kb4_discordant_pairs.py
           tests/test_kb4_badcase_freeze.py
+          tests/test_kb4_final_attribution.py
       - name: Remove job-owned PostgreSQL
         if: ${{ always() }}
         run: scripts/ci_job_postgres.sh cleanup-current

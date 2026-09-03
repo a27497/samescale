@@ -2,9 +2,12 @@
 
 K-B4.3 freezes the three real verifier-backed V6 cases in `release/badcases.json`, with exact
 selection and digest reconciliation in `release/kb4-badcase-freeze.json`. Timeout Sensitivity
-and Discordant Pair Attribution are complete. The Final Attribution Report and K-B4 Final Gate
-are not complete; K-C is not started. This BadCase freeze does not promote the prospective
-release manifest or authorize a tag. See `docs/BADCASES.md` for evidence and causal boundaries.
+and Discordant Pair Attribution are complete. K-B4.4 adds the reproducible final synthesis in
+`release/kb4-final-attribution-report.json` and `.md`, with native Analyst assertions and a
+requirement checklist. Reasoning-ablation evidence is present with limitations; controlled
+attribution claims remain zero. The K-B4 Final Gate is not run, K-B4 is not approved, and K-C
+is not started. These evidence artifacts do not promote the prospective release manifest or
+authorize a tag. See `docs/BADCASES.md` for evidence and causal boundaries.
 
 The Phase K hard stop is implemented by strict models in `src/harnesslab/release`, canonical JSON artifacts in `release/`, and `scripts/verify_gate_k.py`. Documentation does not make evidence true; identities, digests, authoritative source references, state, and independent validation do.
 

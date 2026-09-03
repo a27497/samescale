@@ -1,0 +1,3577 @@
+{
+  "ablation": {
+    "comparable_discordances": [
+      {
+        "both_member_bundles_verified": false,
+        "current_task_comparable_n": 2,
+        "current_task_evidence_tier": "INSUFFICIENT",
+        "pair_id": "codex-gpt56-reasoning-effort:sha256:798c9b68cc47c0b1ddaf18f1438cbcc6e81ead5e7c77ac38ea770fb09053d3e2",
+        "repeat_index": 0,
+        "task_id": "core-java-settings-merge",
+        "task_version": "1.0.2"
+      },
+      {
+        "both_member_bundles_verified": false,
+        "current_task_comparable_n": 4,
+        "current_task_evidence_tier": "INFORMAL",
+        "pair_id": "codex-gpt56-reasoning-effort:sha256:6d91da38c3b1bc42c758eb6fa35e0961161bdce83afc997ca3513e54954f4a77",
+        "repeat_index": 2,
+        "task_id": "core-python-deduplicate",
+        "task_version": "1.0.2"
+      }
+    ],
+    "controlled_attribution_claims": 0,
+    "declaration": {
+      "base_cell_id": "harness-codex-gpt56-medium",
+      "changed_dimension": "reasoning_effort",
+      "id": "codex-gpt56-reasoning-effort",
+      "variant_cell_id": "harness-codex-gpt56-high"
+    },
+    "formal_eligible": false,
+    "status": "ABLATION_EVIDENCE_PRESENT_WITH_LIMITATIONS"
+  },
+  "badcases": [
+    {
+      "canonical_reference": "release/badcases.json",
+      "claim_id": "B01",
+      "engineering_lesson": "Check that the required implementation changed and inspect deterministic verifier results before declaring completion. This is an engineering safeguard, not a verified remedy for the unknown cause.",
+      "json_pointer": "/slots/0",
+      "manifest_digest": "sha256:f2f4a1fd5bd9351589cdb7c844f587ed79b88051aa49b0a4e5d5249bbadaa8ba",
+      "run_identity": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+      "slot_id": "badcase-1",
+      "trace_status": "REPORTED"
+    },
+    {
+      "canonical_reference": "release/badcases.json",
+      "claim_id": "B02",
+      "engineering_lesson": "Review public contract and boundary-case checks together before interpreting the failure. Explicit empty-key expectations are a proposed engineering clarification, not a proven causal remedy; the frozen task and verifier remain unchanged.",
+      "json_pointer": "/slots/1",
+      "manifest_digest": "sha256:be7fc1d19b70ebe03fc1cb761a46d510d7ea2a0f245b87bdb84db7daf64f7d36",
+      "run_identity": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+      "slot_id": "badcase-2",
+      "trace_status": "REPORTED"
+    },
+    {
+      "canonical_reference": "release/badcases.json",
+      "claim_id": "B03",
+      "engineering_lesson": "Review public contract and boundary-case checks together before interpreting the failure. Explicit empty-key expectations are a proposed engineering clarification, not a proven causal remedy; the frozen task and verifier remain unchanged.",
+      "json_pointer": "/slots/2",
+      "manifest_digest": "sha256:1a5945444b5ba2d0d9c1709c058af738ca3d9474afda22424cc7fbf01349758d",
+      "run_identity": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+      "slot_id": "badcase-3",
+      "trace_status": "NOT_REPORTED"
+    }
+  ],
+  "base_commit": "ac869396b9bcd9d7ed129fd9c8e7bc70d0e53eb9",
+  "canonical_badcase_model_digest": "sha256:bac98037203f7e674e1731a5f8520c93d4e813d0284909a3548ef2e5b54aab46",
+  "catalog_bindings": {
+    "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort": {
+      "digest_bindings": [
+        "sha256:266b86492642816223dbc542178474356ee2f2de09c7d49782b8c2fa54a6ef9d",
+        "sha256:59b4e083c54d2d4a3bb1dfd2ad59129c45db81543f5cc5ae51de18a927590252",
+        "sha256:6ab0d87c64dbee112fd17e7c46c6c8374d4aa8a5fbf9e2e31af0a93395b754ff",
+        "sha256:f7f981dab4026941e08a51f1166250fa49edf88c608c9719b6db57fa29239962"
+      ],
+      "fields": {
+        "accepted_association": {
+          "path": [
+            "findings",
+            1
+          ],
+          "source": "release/kb4-discordant-pair-attribution.json"
+        },
+        "comparability": {
+          "path": [
+            "pairs",
+            "codex-gpt56-reasoning-effort",
+            "summary",
+            "effective"
+          ],
+          "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+        },
+        "declaration": {
+          "path": [],
+          "source": "src/harnesslab/release/v6.py"
+        },
+        "discordances": {
+          "path": [
+            "summaries",
+            "codex-gpt56-reasoning-effort"
+          ],
+          "source": "release/kb4-discordant-pair-attribution.json"
+        },
+        "statistics": {
+          "path": [
+            "paired_comparisons",
+            "reasoning_effort_effect"
+          ],
+          "source": "release/core-real-matrix-v6-final-analysis.json"
+        }
+      },
+      "tool": "get_ablation"
+    },
+    "cell:core-real-matrix-v6:harness-codex-gpt56-high": {
+      "digest_bindings": [
+        "sha256:59b4e083c54d2d4a3bb1dfd2ad59129c45db81543f5cc5ae51de18a927590252",
+        "sha256:f7f981dab4026941e08a51f1166250fa49edf88c608c9719b6db57fa29239962"
+      ],
+      "fields": {
+        "attempts": {
+          "path": [
+            "by_cell",
+            "harness-codex-gpt56-high"
+          ],
+          "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+        },
+        "control": {
+          "path": [
+            "controls",
+            "harness-codex-gpt56-high",
+            "digest_verified_binding"
+          ],
+          "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+        },
+        "outcomes": {
+          "path": [
+            "cell_summaries",
+            "harness-codex-gpt56-high"
+          ],
+          "source": "release/core-real-matrix-v6-final-analysis.json"
+        },
+        "usage": {
+          "path": [
+            "usage",
+            "harness-codex-gpt56-high"
+          ],
+          "source": "release/core-real-matrix-v6-final-analysis.json"
+        }
+      },
+      "tool": "query_runs"
+    },
+    "cell:core-real-matrix-v6:harness-codex-gpt56-medium": {
+      "digest_bindings": [
+        "sha256:59b4e083c54d2d4a3bb1dfd2ad59129c45db81543f5cc5ae51de18a927590252",
+        "sha256:f7f981dab4026941e08a51f1166250fa49edf88c608c9719b6db57fa29239962"
+      ],
+      "fields": {
+        "attempts": {
+          "path": [
+            "by_cell",
+            "harness-codex-gpt56-medium"
+          ],
+          "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+        },
+        "control": {
+          "path": [
+            "controls",
+            "harness-codex-gpt56-medium",
+            "digest_verified_binding"
+          ],
+          "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+        },
+        "outcomes": {
+          "path": [
+            "cell_summaries",
+            "harness-codex-gpt56-medium"
+          ],
+          "source": "release/core-real-matrix-v6-final-analysis.json"
+        },
+        "usage": {
+          "path": [
+            "usage",
+            "harness-codex-gpt56-medium"
+          ],
+          "source": "release/core-real-matrix-v6-final-analysis.json"
+        }
+      },
+      "tool": "query_runs"
+    },
+    "cell:core-real-matrix-v6:model-gpt56-relay-responses": {
+      "digest_bindings": [
+        "sha256:59b4e083c54d2d4a3bb1dfd2ad59129c45db81543f5cc5ae51de18a927590252",
+        "sha256:f7f981dab4026941e08a51f1166250fa49edf88c608c9719b6db57fa29239962"
+      ],
+      "fields": {
+        "attempts": {
+          "path": [
+            "by_cell",
+            "model-gpt56-relay-responses"
+          ],
+          "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+        },
+        "control": {
+          "path": [
+            "controls",
+            "model-gpt56-relay-responses",
+            "digest_verified_binding"
+          ],
+          "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+        },
+        "outcomes": {
+          "path": [
+            "cell_summaries",
+            "model-gpt56-relay-responses"
+          ],
+          "source": "release/core-real-matrix-v6-final-analysis.json"
+        },
+        "usage": {
+          "path": [
+            "usage",
+            "model-gpt56-relay-responses"
+          ],
+          "source": "release/core-real-matrix-v6-final-analysis.json"
+        }
+      },
+      "tool": "query_runs"
+    },
+    "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex": {
+      "namespaces": [
+        {
+          "digest_bindings": [
+            "sha256:59b4e083c54d2d4a3bb1dfd2ad59129c45db81543f5cc5ae51de18a927590252",
+            "sha256:6ab0d87c64dbee112fd17e7c46c6c8374d4aa8a5fbf9e2e31af0a93395b754ff",
+            "sha256:f7f981dab4026941e08a51f1166250fa49edf88c608c9719b6db57fa29239962"
+          ],
+          "fields": {
+            "comparability": {
+              "path": [
+                "pairs",
+                "gpt56-relay-direct-vs-codex",
+                "summary",
+                "effective"
+              ],
+              "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+            },
+            "discordances": {
+              "path": [
+                "summaries",
+                "gpt56-relay-direct-vs-codex"
+              ],
+              "source": "release/kb4-discordant-pair-attribution.json"
+            },
+            "statistics": {
+              "path": [
+                "paired_comparisons",
+                "gpt_harness_effect"
+              ],
+              "source": "release/core-real-matrix-v6-final-analysis.json"
+            }
+          },
+          "tool": "compare_cells"
+        },
+        {
+          "digest_bindings": [
+            "sha256:6ab0d87c64dbee112fd17e7c46c6c8374d4aa8a5fbf9e2e31af0a93395b754ff",
+            "sha256:ba06b29841d427ef02c468cf616c0075cec389a78aa16b00f71146bea16db9c7",
+            "sha256:dad4043c059f0fdaf0b4985f091f16894671364c410e50a741e43cab1bc0f443",
+            "sha256:f7f981dab4026941e08a51f1166250fa49edf88c608c9719b6db57fa29239962"
+          ],
+          "fields": {
+            "accepted_findings": {
+              "path": [
+                "findings"
+              ],
+              "source": "release/kb4-discordant-pair-attribution.json"
+            },
+            "audit": {
+              "path": [
+                "reconciliation"
+              ],
+              "source": "release/kb4-discordant-pair-attribution.json"
+            },
+            "campaign": {
+              "path": [],
+              "source": "release/core-real-matrix-v6-analysis-dataset-manifest.json"
+            },
+            "checkpoint": {
+              "path": [
+                "effective"
+              ],
+              "source": "release/core-real-matrix-v6-checkpoint-630.json"
+            },
+            "counterfactual": {
+              "path": [
+                "counterfactual_status"
+              ],
+              "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+            },
+            "execution_scopes": {
+              "path": [
+                "plan_budget_contract_source_defined"
+              ],
+              "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+            },
+            "taxonomy": {
+              "path": [
+                "summaries"
+              ],
+              "source": "release/kb4-discordant-pair-attribution.json"
+            },
+            "timeouts": {
+              "path": [
+                "by_cell"
+              ],
+              "source": "release/kb4-gpt-codex-timeout-sensitivity.json"
+            }
+          },
+          "tool": "inspect_failure"
+        }
+      ]
+    },
+    "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4": {
+      "digest_bindings": [
+        "sha256:8f2ac7d3ecc745ef0f9ba19204e9ec0ea0947b0c7388c4eee260205b34996082"
+      ],
+      "fields": {
+        "badcase": {
+          "path": [
+            "slots",
+            2
+          ],
+          "source": "release/badcases.json"
+        }
+      },
+      "tool": "inspect_failure"
+    },
+    "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a": {
+      "digest_bindings": [
+        "sha256:8f2ac7d3ecc745ef0f9ba19204e9ec0ea0947b0c7388c4eee260205b34996082"
+      ],
+      "fields": {
+        "badcase": {
+          "path": [
+            "slots",
+            0
+          ],
+          "source": "release/badcases.json"
+        }
+      },
+      "tool": "inspect_failure"
+    },
+    "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00": {
+      "digest_bindings": [
+        "sha256:8f2ac7d3ecc745ef0f9ba19204e9ec0ea0947b0c7388c4eee260205b34996082"
+      ],
+      "fields": {
+        "badcase": {
+          "path": [
+            "slots",
+            1
+          ],
+          "source": "release/badcases.json"
+        }
+      },
+      "tool": "inspect_failure"
+    }
+  },
+  "claim_ledger": [
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F01",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "Capability uses pass+fail; operational pass rates retain planned slots. Infra/cancelled and missing usage remain explicit, never zero-filled into capability or usage. Existing cost estimates are accounting, not billing truth.",
+        "The corpus is 18 Tier-A micro-contract tasks with at most five repeats per task. Descriptive configuration results do not establish universal coding capability or population-wide causal rankings."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "cell:core-real-matrix-v6:model-gpt56-relay-responses",
+            "expected_value": {
+              "cancelled": 0,
+              "cancelled_rate": 0.0,
+              "capability_evaluable": 86,
+              "capability_fail": 3,
+              "capability_pass": 83,
+              "capability_pass_rate": 0.96511627907,
+              "capability_pass_rate_wilson_95": {
+                "high": 0.988066201923,
+                "low": 0.902391288974
+              },
+              "infra_missing": 4,
+              "infra_missing_rate": 0.044444444444,
+              "logical_slots": 90,
+              "operational_pass_rate": 0.922222222222,
+              "operational_pass_rate_wilson_95": {
+                "high": 0.961815184683,
+                "low": 0.848061398174
+              }
+            },
+            "field_path": [
+              "outcomes"
+            ],
+            "operator": "EQ",
+            "tool": "query_runs"
+          },
+          {
+            "evidence_ref": "cell:core-real-matrix-v6:model-gpt56-relay-responses",
+            "expected_value": {
+              "cancelled": 0,
+              "capability_n": 86,
+              "infra_count": 4,
+              "missing_count": 4,
+              "outcomes": {
+                "capability_fail": 3,
+                "capability_pass": 83,
+                "infra_failure": 4
+              },
+              "recovery_attempt_count": 14
+            },
+            "field_path": [
+              "attempts",
+              "effective"
+            ],
+            "operator": "EQ",
+            "tool": "query_runs"
+          },
+          {
+            "evidence_ref": "cell:core-real-matrix-v6:model-gpt56-relay-responses",
+            "expected_value": "medium",
+            "field_path": [
+              "control",
+              "reasoning_effort"
+            ],
+            "operator": "EQ",
+            "tool": "query_runs"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "cell:core-real-matrix-v6:model-gpt56-relay-responses"
+        ],
+        "statement": "Observed query_runs[cell:core-real-matrix-v6:model-gpt56-relay-responses].outcomes EQ {\"cancelled\":0,\"cancelled_rate\":0.0,\"capability_evaluable\":86,\"capability_fail\":3,\"capability_pass\":83,\"capability_pass_rate\":0.96511627907,\"capability_pass_rate_wilson_95\":{\"high\":0.988066201923,\"low\":0.902391288974},\"infra_missing\":4,\"infra_missing_rate\":0.044444444444,\"logical_slots\":90,\"operational_pass_rate\":0.922222222222,\"operational_pass_rate_wilson_95\":{\"high\":0.961815184683,\"low\":0.848061398174}}; query_runs[cell:core-real-matrix-v6:model-gpt56-relay-responses].attempts.effective EQ {\"cancelled\":0,\"capability_n\":86,\"infra_count\":4,\"missing_count\":4,\"outcomes\":{\"capability_fail\":3,\"capability_pass\":83,\"infra_failure\":4},\"recovery_attempt_count\":14}; query_runs[cell:core-real-matrix-v6:model-gpt56-relay-responses].control.reasoning_effort EQ \"medium\"."
+      },
+      "statement": "Direct GPT records 83 passes and 3 failures among 86 capability results; 4 infrastructure and 0 cancellations remain separate from its 90 planned slots."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F02",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "Capability uses pass+fail; operational pass rates retain planned slots. Infra/cancelled and missing usage remain explicit, never zero-filled into capability or usage. Existing cost estimates are accounting, not billing truth.",
+        "The corpus is 18 Tier-A micro-contract tasks with at most five repeats per task. Descriptive configuration results do not establish universal coding capability or population-wide causal rankings."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "cell:core-real-matrix-v6:harness-codex-gpt56-medium",
+            "expected_value": {
+              "cancelled": 1,
+              "cancelled_rate": 0.011111111111,
+              "capability_evaluable": 86,
+              "capability_fail": 21,
+              "capability_pass": 65,
+              "capability_pass_rate": 0.755813953488,
+              "capability_pass_rate_wilson_95": {
+                "high": 0.834380349401,
+                "low": 0.655371270592
+              },
+              "infra_missing": 3,
+              "infra_missing_rate": 0.033333333333,
+              "logical_slots": 90,
+              "operational_pass_rate": 0.722222222222,
+              "operational_pass_rate_wilson_95": {
+                "high": 0.804203108053,
+                "low": 0.622047725029
+              }
+            },
+            "field_path": [
+              "outcomes"
+            ],
+            "operator": "EQ",
+            "tool": "query_runs"
+          },
+          {
+            "evidence_ref": "cell:core-real-matrix-v6:harness-codex-gpt56-medium",
+            "expected_value": {
+              "cancelled": 1,
+              "capability_n": 86,
+              "infra_count": 3,
+              "missing_count": 4,
+              "outcomes": {
+                "cancelled": 1,
+                "capability_fail": 21,
+                "capability_pass": 65,
+                "infra_failure": 3
+              },
+              "recovery_attempt_count": 19
+            },
+            "field_path": [
+              "attempts",
+              "effective"
+            ],
+            "operator": "EQ",
+            "tool": "query_runs"
+          },
+          {
+            "evidence_ref": "cell:core-real-matrix-v6:harness-codex-gpt56-medium",
+            "expected_value": "medium",
+            "field_path": [
+              "control",
+              "reasoning_effort"
+            ],
+            "operator": "EQ",
+            "tool": "query_runs"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "cell:core-real-matrix-v6:harness-codex-gpt56-medium"
+        ],
+        "statement": "Observed query_runs[cell:core-real-matrix-v6:harness-codex-gpt56-medium].outcomes EQ {\"cancelled\":1,\"cancelled_rate\":0.011111111111,\"capability_evaluable\":86,\"capability_fail\":21,\"capability_pass\":65,\"capability_pass_rate\":0.755813953488,\"capability_pass_rate_wilson_95\":{\"high\":0.834380349401,\"low\":0.655371270592},\"infra_missing\":3,\"infra_missing_rate\":0.033333333333,\"logical_slots\":90,\"operational_pass_rate\":0.722222222222,\"operational_pass_rate_wilson_95\":{\"high\":0.804203108053,\"low\":0.622047725029}}; query_runs[cell:core-real-matrix-v6:harness-codex-gpt56-medium].attempts.effective EQ {\"cancelled\":1,\"capability_n\":86,\"infra_count\":3,\"missing_count\":4,\"outcomes\":{\"cancelled\":1,\"capability_fail\":21,\"capability_pass\":65,\"infra_failure\":3},\"recovery_attempt_count\":19}; query_runs[cell:core-real-matrix-v6:harness-codex-gpt56-medium].control.reasoning_effort EQ \"medium\"."
+      },
+      "statement": "Codex medium records 65 passes and 21 failures among 86 capability results; 3 infrastructure and 1 cancellations remain separate from its 90 planned slots."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F03",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "Capability uses pass+fail; operational pass rates retain planned slots. Infra/cancelled and missing usage remain explicit, never zero-filled into capability or usage. Existing cost estimates are accounting, not billing truth.",
+        "The corpus is 18 Tier-A micro-contract tasks with at most five repeats per task. Descriptive configuration results do not establish universal coding capability or population-wide causal rankings."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "cell:core-real-matrix-v6:harness-codex-gpt56-high",
+            "expected_value": {
+              "cancelled": 1,
+              "cancelled_rate": 0.011111111111,
+              "capability_evaluable": 85,
+              "capability_fail": 38,
+              "capability_pass": 47,
+              "capability_pass_rate": 0.552941176471,
+              "capability_pass_rate_wilson_95": {
+                "high": 0.654063443083,
+                "low": 0.447240611572
+              },
+              "infra_missing": 4,
+              "infra_missing_rate": 0.044444444444,
+              "logical_slots": 90,
+              "operational_pass_rate": 0.522222222222,
+              "operational_pass_rate_wilson_95": {
+                "high": 0.62237944418,
+                "low": 0.420245639129
+              }
+            },
+            "field_path": [
+              "outcomes"
+            ],
+            "operator": "EQ",
+            "tool": "query_runs"
+          },
+          {
+            "evidence_ref": "cell:core-real-matrix-v6:harness-codex-gpt56-high",
+            "expected_value": {
+              "cancelled": 1,
+              "capability_n": 85,
+              "infra_count": 4,
+              "missing_count": 5,
+              "outcomes": {
+                "cancelled": 1,
+                "capability_fail": 38,
+                "capability_pass": 47,
+                "infra_failure": 4
+              },
+              "recovery_attempt_count": 19
+            },
+            "field_path": [
+              "attempts",
+              "effective"
+            ],
+            "operator": "EQ",
+            "tool": "query_runs"
+          },
+          {
+            "evidence_ref": "cell:core-real-matrix-v6:harness-codex-gpt56-high",
+            "expected_value": "high",
+            "field_path": [
+              "control",
+              "reasoning_effort"
+            ],
+            "operator": "EQ",
+            "tool": "query_runs"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "cell:core-real-matrix-v6:harness-codex-gpt56-high"
+        ],
+        "statement": "Observed query_runs[cell:core-real-matrix-v6:harness-codex-gpt56-high].outcomes EQ {\"cancelled\":1,\"cancelled_rate\":0.011111111111,\"capability_evaluable\":85,\"capability_fail\":38,\"capability_pass\":47,\"capability_pass_rate\":0.552941176471,\"capability_pass_rate_wilson_95\":{\"high\":0.654063443083,\"low\":0.447240611572},\"infra_missing\":4,\"infra_missing_rate\":0.044444444444,\"logical_slots\":90,\"operational_pass_rate\":0.522222222222,\"operational_pass_rate_wilson_95\":{\"high\":0.62237944418,\"low\":0.420245639129}}; query_runs[cell:core-real-matrix-v6:harness-codex-gpt56-high].attempts.effective EQ {\"cancelled\":1,\"capability_n\":85,\"infra_count\":4,\"missing_count\":5,\"outcomes\":{\"cancelled\":1,\"capability_fail\":38,\"capability_pass\":47,\"infra_failure\":4},\"recovery_attempt_count\":19}; query_runs[cell:core-real-matrix-v6:harness-codex-gpt56-high].control.reasoning_effort EQ \"high\"."
+      },
+      "statement": "Codex high records 47 passes and 38 failures among 85 capability results; 4 infrastructure and 1 cancellations remain separate from its 90 planned slots."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F04",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "All 82 Direct/medium complete pairs are PARTIALLY_COMPARABLE: observed model, provider configuration, and trace coverage limit interpretation. No causal Harness uplift is established.",
+        "Frozen confidence intervals and McNemar p-values remain descriptive; numerical significance cannot override Comparability."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "baseline_pass_rate": 0.963414634146,
+              "both_fail": 2,
+              "both_pass": 62,
+              "cluster_bootstrap_ci": {
+                "high": -0.128703703704,
+                "low": -0.257407407407,
+                "method": "task_cluster_percentile",
+                "replicates_requested": 50000,
+                "replicates_skipped_no_evaluable_tasks": 0,
+                "replicates_used": 50000,
+                "seed": 20260902,
+                "task_weighting": "equal_task"
+              },
+              "complete_pair_row_weighted_delta": -0.19512195122,
+              "complete_pairs": 82,
+              "delta": -0.193518518519,
+              "delta_estimand": "equal-task mean of within-task paired deltas",
+              "discordant_baseline_fail_variant_pass": 1,
+              "discordant_baseline_pass_variant_fail": 17,
+              "mcnemar_exact_p": 0.000144958496,
+              "tasks_with_pairs": 18,
+              "total_possible_pairs": 90,
+              "variant_pass_rate": 0.768292682927
+            },
+            "field_path": [
+              "statistics",
+              "capability"
+            ],
+            "operator": "EQ",
+            "tool": "compare_cells"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "baseline_pass_rate": 0.922222222222,
+              "cluster_bootstrap_ci": {
+                "high": -0.111111111111,
+                "low": -0.288888888889,
+                "method": "task_cluster_percentile",
+                "replicates_requested": 50000,
+                "replicates_skipped_no_evaluable_tasks": 0,
+                "replicates_used": 50000,
+                "seed": 20260902,
+                "task_weighting": "equal_task"
+              },
+              "delta": -0.2,
+              "delta_estimand": "equal-task mean of within-task paired operational deltas",
+              "pair_count": 90,
+              "variant_pass_rate": 0.722222222222
+            },
+            "field_path": [
+              "statistics",
+              "operational"
+            ],
+            "operator": "EQ",
+            "tool": "compare_cells"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "COMPARABLE": 0,
+              "NOT_COMPARABLE": 0,
+              "PARTIALLY_COMPARABLE": 82
+            },
+            "field_path": [
+              "comparability",
+              "complete_pair_comparability"
+            ],
+            "operator": "EQ",
+            "tool": "compare_cells"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": false,
+            "field_path": [
+              "comparability",
+              "formal_eligible"
+            ],
+            "operator": "EQ",
+            "tool": "compare_cells"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "COMPARABLE": {
+                "direction": {},
+                "discordant_pairs": 0,
+                "failure_taxonomy": {}
+              },
+              "NOT_COMPARABLE": {
+                "direction": {},
+                "discordant_pairs": 0,
+                "failure_taxonomy": {}
+              },
+              "PARTIALLY_COMPARABLE": {
+                "direction": {
+                  "LEFT_FAIL_RIGHT_PASS": 1,
+                  "LEFT_PASS_RIGHT_FAIL": 17
+                },
+                "discordant_pairs": 18,
+                "failure_taxonomy": {
+                  "Test Failure": 2,
+                  "Timeout": 16
+                }
+              }
+            },
+            "field_path": [
+              "discordances",
+              "by_comparability"
+            ],
+            "operator": "EQ",
+            "tool": "compare_cells"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex"
+        ],
+        "statement": "Observed compare_cells[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].statistics.capability EQ {\"baseline_pass_rate\":0.963414634146,\"both_fail\":2,\"both_pass\":62,\"cluster_bootstrap_ci\":{\"high\":-0.128703703704,\"low\":-0.257407407407,\"method\":\"task_cluster_percentile\",\"replicates_requested\":50000,\"replicates_skipped_no_evaluable_tasks\":0,\"replicates_used\":50000,\"seed\":20260902,\"task_weighting\":\"equal_task\"},\"complete_pair_row_weighted_delta\":-0.19512195122,\"complete_pairs\":82,\"delta\":-0.193518518519,\"delta_estimand\":\"equal-task mean of within-task paired deltas\",\"discordant_baseline_fail_variant_pass\":1,\"discordant_baseline_pass_variant_fail\":17,\"mcnemar_exact_p\":0.000144958496,\"tasks_with_pairs\":18,\"total_possible_pairs\":90,\"variant_pass_rate\":0.768292682927}; compare_cells[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].statistics.operational EQ {\"baseline_pass_rate\":0.922222222222,\"cluster_bootstrap_ci\":{\"high\":-0.111111111111,\"low\":-0.288888888889,\"method\":\"task_cluster_percentile\",\"replicates_requested\":50000,\"replicates_skipped_no_evaluable_tasks\":0,\"replicates_used\":50000,\"seed\":20260902,\"task_weighting\":\"equal_task\"},\"delta\":-0.2,\"delta_estimand\":\"equal-task mean of within-task paired operational deltas\",\"pair_count\":90,\"variant_pass_rate\":0.722222222222}; compare_cells[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].comparability.complete_pair_comparability EQ {\"COMPARABLE\":0,\"NOT_COMPARABLE\":0,\"PARTIALLY_COMPARABLE\":82}; compare_cells[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].comparability.formal_eligible EQ false; compare_cells[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].discordances.by_comparability EQ {\"COMPARABLE\":{\"direction\":{},\"discordant_pairs\":0,\"failure_taxonomy\":{}},\"NOT_COMPARABLE\":{\"direction\":{},\"discordant_pairs\":0,\"failure_taxonomy\":{}},\"PARTIALLY_COMPARABLE\":{\"direction\":{\"LEFT_FAIL_RIGHT_PASS\":1,\"LEFT_PASS_RIGHT_FAIL\":17},\"discordant_pairs\":18,\"failure_taxonomy\":{\"Test Failure\":2,\"Timeout\":16}}}."
+      },
+      "statement": "Direct GPT→Codex medium has 82/90 complete pairs, discordances 17/1 (left-pass/right-fail versus reverse), and a descriptive equal-task capability delta of -19.35 percentage points; formal eligibility is false."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F05",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "Medium/high has 42 COMPARABLE and 41 NOT_COMPARABLE complete pairs; no task has five comparable repeats and formal eligibility is false. The 41 excluded controls cannot contribute controlled claims.",
+        "Frozen confidence intervals and McNemar p-values remain descriptive; numerical significance cannot override Comparability."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": {
+              "baseline_pass_rate": 0.746987951807,
+              "both_fail": 12,
+              "both_pass": 37,
+              "cluster_bootstrap_ci": {
+                "high": -0.072222222222,
+                "low": -0.338888888889,
+                "method": "task_cluster_percentile",
+                "replicates_requested": 50000,
+                "replicates_skipped_no_evaluable_tasks": 0,
+                "replicates_used": 50000,
+                "seed": 20260902,
+                "task_weighting": "equal_task"
+              },
+              "complete_pair_row_weighted_delta": -0.192771084337,
+              "complete_pairs": 83,
+              "delta": -0.205555555556,
+              "delta_estimand": "equal-task mean of within-task paired deltas",
+              "discordant_baseline_fail_variant_pass": 9,
+              "discordant_baseline_pass_variant_fail": 25,
+              "mcnemar_exact_p": 0.009041185491,
+              "tasks_with_pairs": 18,
+              "total_possible_pairs": 90,
+              "variant_pass_rate": 0.55421686747
+            },
+            "field_path": [
+              "statistics",
+              "capability"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          },
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": {
+              "baseline_pass_rate": 0.722222222222,
+              "cluster_bootstrap_ci": {
+                "high": -0.077777777778,
+                "low": -0.322222222222,
+                "method": "task_cluster_percentile",
+                "replicates_requested": 50000,
+                "replicates_skipped_no_evaluable_tasks": 0,
+                "replicates_used": 50000,
+                "seed": 20260902,
+                "task_weighting": "equal_task"
+              },
+              "delta": -0.2,
+              "delta_estimand": "equal-task mean of within-task paired operational deltas",
+              "pair_count": 90,
+              "variant_pass_rate": 0.522222222222
+            },
+            "field_path": [
+              "statistics",
+              "operational"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          },
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": {
+              "COMPARABLE": 42,
+              "NOT_COMPARABLE": 41,
+              "PARTIALLY_COMPARABLE": 0
+            },
+            "field_path": [
+              "comparability",
+              "complete_pair_comparability"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          },
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": false,
+            "field_path": [
+              "comparability",
+              "formal_eligible"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          },
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": {
+              "COMPARABLE": {
+                "direction": {
+                  "LEFT_PASS_RIGHT_FAIL": 2
+                },
+                "discordant_pairs": 2,
+                "failure_taxonomy": {
+                  "No Modification": 1,
+                  "Test Failure": 1
+                }
+              },
+              "NOT_COMPARABLE": {
+                "direction": {
+                  "LEFT_FAIL_RIGHT_PASS": 9,
+                  "LEFT_PASS_RIGHT_FAIL": 23
+                },
+                "discordant_pairs": 32,
+                "failure_taxonomy": {
+                  "Timeout": 32
+                }
+              },
+              "PARTIALLY_COMPARABLE": {
+                "direction": {},
+                "discordant_pairs": 0,
+                "failure_taxonomy": {}
+              }
+            },
+            "field_path": [
+              "discordances",
+              "by_comparability"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort"
+        ],
+        "statement": "Observed get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].statistics.capability EQ {\"baseline_pass_rate\":0.746987951807,\"both_fail\":12,\"both_pass\":37,\"cluster_bootstrap_ci\":{\"high\":-0.072222222222,\"low\":-0.338888888889,\"method\":\"task_cluster_percentile\",\"replicates_requested\":50000,\"replicates_skipped_no_evaluable_tasks\":0,\"replicates_used\":50000,\"seed\":20260902,\"task_weighting\":\"equal_task\"},\"complete_pair_row_weighted_delta\":-0.192771084337,\"complete_pairs\":83,\"delta\":-0.205555555556,\"delta_estimand\":\"equal-task mean of within-task paired deltas\",\"discordant_baseline_fail_variant_pass\":9,\"discordant_baseline_pass_variant_fail\":25,\"mcnemar_exact_p\":0.009041185491,\"tasks_with_pairs\":18,\"total_possible_pairs\":90,\"variant_pass_rate\":0.55421686747}; get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].statistics.operational EQ {\"baseline_pass_rate\":0.722222222222,\"cluster_bootstrap_ci\":{\"high\":-0.077777777778,\"low\":-0.322222222222,\"method\":\"task_cluster_percentile\",\"replicates_requested\":50000,\"replicates_skipped_no_evaluable_tasks\":0,\"replicates_used\":50000,\"seed\":20260902,\"task_weighting\":\"equal_task\"},\"delta\":-0.2,\"delta_estimand\":\"equal-task mean of within-task paired operational deltas\",\"pair_count\":90,\"variant_pass_rate\":0.522222222222}; get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].comparability.complete_pair_comparability EQ {\"COMPARABLE\":42,\"NOT_COMPARABLE\":41,\"PARTIALLY_COMPARABLE\":0}; get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].comparability.formal_eligible EQ false; get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].discordances.by_comparability EQ {\"COMPARABLE\":{\"direction\":{\"LEFT_PASS_RIGHT_FAIL\":2},\"discordant_pairs\":2,\"failure_taxonomy\":{\"No Modification\":1,\"Test Failure\":1}},\"NOT_COMPARABLE\":{\"direction\":{\"LEFT_FAIL_RIGHT_PASS\":9,\"LEFT_PASS_RIGHT_FAIL\":23},\"discordant_pairs\":32,\"failure_taxonomy\":{\"Timeout\":32}},\"PARTIALLY_COMPARABLE\":{\"direction\":{},\"discordant_pairs\":0,\"failure_taxonomy\":{}}}."
+      },
+      "statement": "Codex medium→Codex high has 83/90 complete pairs, discordances 25/9 (left-pass/right-fail versus reverse), and a descriptive equal-task capability delta of -20.56 percentage points; formal eligibility is false."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F06",
+      "hypothesis": null,
+      "level": "DIAGNOSTIC_ASSOCIATION",
+      "limitations": [
+        "Medium/high has 42 COMPARABLE and 41 NOT_COMPARABLE complete pairs; no task has five comparable repeats and formal eligibility is false. The 41 excluded controls cannot contribute controlled claims.",
+        "The two COMPARABLE discordances support recorded pair-level contrasts under the operator-trusted route, not a causal mechanism or population-wide reasoning-effort effect. Their passing comparator trees are integrity-limited."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": {
+              "base_cell_id": "harness-codex-gpt56-medium",
+              "changed_dimension": "reasoning_effort",
+              "id": "codex-gpt56-reasoning-effort",
+              "variant_cell_id": "harness-codex-gpt56-high"
+            },
+            "field_path": [
+              "declaration"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          },
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": 42,
+            "field_path": [
+              "comparability",
+              "formal_comparable"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          },
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": 0,
+            "field_path": [
+              "comparability",
+              "tasks_with_five_formal_pairs"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          },
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": {
+              "direction": {
+                "LEFT_PASS_RIGHT_FAIL": 2
+              },
+              "discordant_pairs": 2,
+              "failure_taxonomy": {
+                "No Modification": 1,
+                "Test Failure": 1
+              }
+            },
+            "field_path": [
+              "discordances",
+              "by_comparability",
+              "COMPARABLE"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          },
+          {
+            "evidence_ref": "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+            "expected_value": {
+              "evidence_refs": [
+                "comparisons/codex-gpt56-reasoning-effort"
+              ],
+              "level": "DIAGNOSTIC_ASSOCIATION",
+              "statement": "Two medium/high discordances are frozen COMPARABLE pair-level contrasts, both medium PASS/high FAIL. Repository semantics permit only controlled-ablation association. Passing medium bundles now have digest mismatches, further restricting full trajectory audit; no controlled causal claim is made."
+            },
+            "field_path": [
+              "accepted_association"
+            ],
+            "operator": "EQ",
+            "tool": "get_ablation"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort"
+        ],
+        "statement": "Observed get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].declaration EQ {\"base_cell_id\":\"harness-codex-gpt56-medium\",\"changed_dimension\":\"reasoning_effort\",\"id\":\"codex-gpt56-reasoning-effort\",\"variant_cell_id\":\"harness-codex-gpt56-high\"}; get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].comparability.formal_comparable EQ 42; get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].comparability.tasks_with_five_formal_pairs EQ 0; get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].discordances.by_comparability.COMPARABLE EQ {\"direction\":{\"LEFT_PASS_RIGHT_FAIL\":2},\"discordant_pairs\":2,\"failure_taxonomy\":{\"No Modification\":1,\"Test Failure\":1}}; get_ablation[ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort].accepted_association EQ {\"evidence_refs\":[\"comparisons/codex-gpt56-reasoning-effort\"],\"level\":\"DIAGNOSTIC_ASSOCIATION\",\"statement\":\"Two medium/high discordances are frozen COMPARABLE pair-level contrasts, both medium PASS/high FAIL. Repository semantics permit only controlled-ablation association. Passing medium bundles now have digest mismatches, further restricting full trajectory audit; no controlled causal claim is made.\"}."
+      },
+      "statement": "The declared reasoning_effort treatment has real medium/high V6 observations and 42 comparable pairs, but no task has five comparable repeats. Its two comparable discordances favor medium; this supports bounded pair-level association, not a formal effect or verified mechanism."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F07",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "The corpus is 18 Tier-A micro-contract tasks with at most five repeats per task. Descriptive configuration results do not establish universal coding capability or population-wide causal rankings.",
+        "Capability uses pass+fail; operational pass rates retain planned slots. Infra/cancelled and missing usage remain explicit, never zero-filled into capability or usage. Existing cost estimates are accounting, not billing truth."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 630,
+            "field_path": [
+              "campaign",
+              "row_count"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+            "field_path": [
+              "campaign",
+              "plan_digest"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": "sha256:d07f6c96e3bd7882137355cb8b5d2d5682e3d51bffcedce6292375d4a54bbd1d",
+            "field_path": [
+              "campaign",
+              "dataset_sha256"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "cancelled": 2,
+              "capability_results": 599,
+              "infra_missing_after_recovery": 29,
+              "infra_unrecovered": 0
+            },
+            "field_path": [
+              "checkpoint"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex"
+        ],
+        "statement": "Observed inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].campaign.row_count EQ 630; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].campaign.plan_digest EQ \"sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a\"; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].campaign.dataset_sha256 EQ \"sha256:d07f6c96e3bd7882137355cb8b5d2d5682e3d51bffcedce6292375d4a54bbd1d\"; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].checkpoint EQ {\"cancelled\":2,\"capability_results\":599,\"infra_missing_after_recovery\":29,\"infra_unrecovered\":0}."
+      },
+      "statement": "The frozen V6 campaign contains 630 logical slots (18 tasks × 5 repeats × 7 cells), with 599 capability results, 29 infrastructure outcomes and two cancellations after bounded recovery."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F08",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "Five physical-primary timeout facts are unknown (four extra attempts plus one rejected primary); timeout counts are observed minima. Missingness is not established as random.",
+        "No longer-timeout treatment exists. Longer budgets improving results, reasoning causing expiry, or timeout causing the capability delta are unsupported counterfactual claims."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "entered_recovery": 0,
+              "primary_infra_timeout_slots": 0,
+              "recovery_outcomes": {},
+              "recovery_source_outcomes": {},
+              "unresolved": 0
+            },
+            "field_path": [
+              "timeouts",
+              "model-gpt56-relay-responses",
+              "timeout_affected_recovery"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 1,
+            "field_path": [
+              "timeouts",
+              "model-gpt56-relay-responses",
+              "extra_primary_attempts_without_selected_manifest"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 0,
+            "field_path": [
+              "timeouts",
+              "model-gpt56-relay-responses",
+              "selected_primary_manifest_unavailable"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "entered_recovery": 4,
+              "primary_infra_timeout_slots": 4,
+              "recovery_outcomes": {
+                "capability_pass": 3,
+                "infra_failure": 1
+              },
+              "recovery_source_outcomes": {
+                "harness_error:protocol_error": 1,
+                "verified_pass": 3
+              },
+              "unresolved": 1
+            },
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-medium",
+              "timeout_affected_recovery"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 2,
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-medium",
+              "extra_primary_attempts_without_selected_manifest"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 0,
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-medium",
+              "selected_primary_manifest_unavailable"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "entered_recovery": 1,
+              "primary_infra_timeout_slots": 1,
+              "recovery_outcomes": {
+                "infra_failure": 1
+              },
+              "recovery_source_outcomes": {
+                "harness_error:protocol_error": 1
+              },
+              "unresolved": 1
+            },
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-high",
+              "timeout_affected_recovery"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 1,
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-high",
+              "extra_primary_attempts_without_selected_manifest"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 1,
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-high",
+              "selected_primary_manifest_unavailable"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex"
+        ],
+        "statement": "Observed inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.model-gpt56-relay-responses.timeout_affected_recovery EQ {\"entered_recovery\":0,\"primary_infra_timeout_slots\":0,\"recovery_outcomes\":{},\"recovery_source_outcomes\":{},\"unresolved\":0}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.model-gpt56-relay-responses.extra_primary_attempts_without_selected_manifest EQ 1; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.model-gpt56-relay-responses.selected_primary_manifest_unavailable EQ 0; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-medium.timeout_affected_recovery EQ {\"entered_recovery\":4,\"primary_infra_timeout_slots\":4,\"recovery_outcomes\":{\"capability_pass\":3,\"infra_failure\":1},\"recovery_source_outcomes\":{\"harness_error:protocol_error\":1,\"verified_pass\":3},\"unresolved\":1}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-medium.extra_primary_attempts_without_selected_manifest EQ 2; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-medium.selected_primary_manifest_unavailable EQ 0; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-high.timeout_affected_recovery EQ {\"entered_recovery\":1,\"primary_infra_timeout_slots\":1,\"recovery_outcomes\":{\"infra_failure\":1},\"recovery_source_outcomes\":{\"harness_error:protocol_error\":1},\"unresolved\":1}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-high.extra_primary_attempts_without_selected_manifest EQ 1; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-high.selected_primary_manifest_unavailable EQ 1."
+      },
+      "statement": "5 primary infrastructure timeouts were observed; 3 recovered to capability evidence and 2 remain unresolved with final protocol errors. 5 physical-primary timeout facts remain unknown."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F09",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "No longer-timeout treatment exists. Longer budgets improving results, reasoning causing expiry, or timeout causing the capability delta are unsupported counterfactual claims.",
+        "The 180-second provider request, 180-second Codex process, 90-second task, 15-second verifier and 300-second plan scopes are distinct."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "capability": {
+                "duration_available": 17,
+                "max_ms": 181740,
+                "median_ms": 180695,
+                "min_ms": 180624,
+                "observations": 17,
+                "within_1000ms_of_configured_boundary": 16
+              },
+              "infrastructure": {
+                "duration_available": 4,
+                "max_ms": 180711,
+                "median_ms": 180681.0,
+                "min_ms": 180630,
+                "observations": 4,
+                "within_1000ms_of_configured_boundary": 4
+              }
+            },
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-medium",
+              "primary",
+              "timeout_duration_by_class"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "capability": {
+                "duration_available": 1,
+                "max_ms": 180597,
+                "median_ms": 180597,
+                "min_ms": 180597,
+                "observations": 1,
+                "within_1000ms_of_configured_boundary": 1
+              },
+              "infrastructure": {
+                "duration_available": 0,
+                "max_ms": null,
+                "median_ms": null,
+                "min_ms": null,
+                "observations": 0,
+                "within_1000ms_of_configured_boundary": 0
+              }
+            },
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-medium",
+              "recovery",
+              "timeout_duration_by_class"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "capability": {
+                "duration_available": 27,
+                "max_ms": 181737,
+                "median_ms": 180713,
+                "min_ms": 180586,
+                "observations": 27,
+                "within_1000ms_of_configured_boundary": 26
+              },
+              "infrastructure": {
+                "duration_available": 1,
+                "max_ms": 180737,
+                "median_ms": 180737,
+                "min_ms": 180737,
+                "observations": 1,
+                "within_1000ms_of_configured_boundary": 1
+              }
+            },
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-high",
+              "primary",
+              "timeout_duration_by_class"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "capability": {
+                "duration_available": 6,
+                "max_ms": 180708,
+                "median_ms": 180648.0,
+                "min_ms": 180606,
+                "observations": 6,
+                "within_1000ms_of_configured_boundary": 6
+              },
+              "infrastructure": {
+                "duration_available": 0,
+                "max_ms": null,
+                "median_ms": null,
+                "min_ms": null,
+                "observations": 0,
+                "within_1000ms_of_configured_boundary": 0
+              }
+            },
+            "field_path": [
+              "timeouts",
+              "harness-codex-gpt56-high",
+              "recovery",
+              "timeout_duration_by_class"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "max_cost": {
+                "scopes": [
+                  "NOT_AVAILABLE"
+                ],
+                "status": "NOT_AVAILABLE",
+                "unit": "USD",
+                "value": null
+              },
+              "max_model_turns": {
+                "scopes": [
+                  "NOT_AVAILABLE"
+                ],
+                "status": "NOT_AVAILABLE",
+                "unit": "turns",
+                "value": null
+              },
+              "max_output_tokens": {
+                "scopes": [
+                  "PER_PROVIDER_REQUEST"
+                ],
+                "status": "ENFORCED",
+                "unit": "tokens",
+                "value": 2000
+              },
+              "max_provider_requests": {
+                "scopes": [
+                  "NOT_AVAILABLE"
+                ],
+                "status": "NOT_AVAILABLE",
+                "unit": "requests",
+                "value": null
+              },
+              "max_tool_calls": {
+                "scopes": [
+                  "NOT_AVAILABLE"
+                ],
+                "status": "NOT_AVAILABLE",
+                "unit": "calls",
+                "value": null
+              },
+              "max_wall_time": {
+                "scopes": [
+                  "PER_LOGICAL_RUN"
+                ],
+                "status": "ENFORCED",
+                "unit": "seconds",
+                "value": 300
+              }
+            },
+            "field_path": [
+              "execution_scopes"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex"
+        ],
+        "statement": "Observed inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-medium.primary.timeout_duration_by_class EQ {\"capability\":{\"duration_available\":17,\"max_ms\":181740,\"median_ms\":180695,\"min_ms\":180624,\"observations\":17,\"within_1000ms_of_configured_boundary\":16},\"infrastructure\":{\"duration_available\":4,\"max_ms\":180711,\"median_ms\":180681.0,\"min_ms\":180630,\"observations\":4,\"within_1000ms_of_configured_boundary\":4}}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-medium.recovery.timeout_duration_by_class EQ {\"capability\":{\"duration_available\":1,\"max_ms\":180597,\"median_ms\":180597,\"min_ms\":180597,\"observations\":1,\"within_1000ms_of_configured_boundary\":1},\"infrastructure\":{\"duration_available\":0,\"max_ms\":null,\"median_ms\":null,\"min_ms\":null,\"observations\":0,\"within_1000ms_of_configured_boundary\":0}}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-high.primary.timeout_duration_by_class EQ {\"capability\":{\"duration_available\":27,\"max_ms\":181737,\"median_ms\":180713,\"min_ms\":180586,\"observations\":27,\"within_1000ms_of_configured_boundary\":26},\"infrastructure\":{\"duration_available\":1,\"max_ms\":180737,\"median_ms\":180737,\"min_ms\":180737,\"observations\":1,\"within_1000ms_of_configured_boundary\":1}}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].timeouts.harness-codex-gpt56-high.recovery.timeout_duration_by_class EQ {\"capability\":{\"duration_available\":6,\"max_ms\":180708,\"median_ms\":180648.0,\"min_ms\":180606,\"observations\":6,\"within_1000ms_of_configured_boundary\":6},\"infrastructure\":{\"duration_available\":0,\"max_ms\":null,\"median_ms\":null,\"min_ms\":null,\"observations\":0,\"within_1000ms_of_configured_boundary\":0}}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].execution_scopes EQ {\"max_cost\":{\"scopes\":[\"NOT_AVAILABLE\"],\"status\":\"NOT_AVAILABLE\",\"unit\":\"USD\",\"value\":null},\"max_model_turns\":{\"scopes\":[\"NOT_AVAILABLE\"],\"status\":\"NOT_AVAILABLE\",\"unit\":\"turns\",\"value\":null},\"max_output_tokens\":{\"scopes\":[\"PER_PROVIDER_REQUEST\"],\"status\":\"ENFORCED\",\"unit\":\"tokens\",\"value\":2000},\"max_provider_requests\":{\"scopes\":[\"NOT_AVAILABLE\"],\"status\":\"NOT_AVAILABLE\",\"unit\":\"requests\",\"value\":null},\"max_tool_calls\":{\"scopes\":[\"NOT_AVAILABLE\"],\"status\":\"NOT_AVAILABLE\",\"unit\":\"calls\",\"value\":null},\"max_wall_time\":{\"scopes\":[\"PER_LOGICAL_RUN\"],\"status\":\"ENFORCED\",\"unit\":\"seconds\",\"value\":300}}."
+      },
+      "statement": "All five observed primary infrastructure timeouts and most trace-proven capability budget exhaustions cluster within one second of the recorded 180-second Codex process boundary. This is a duration observation, not evidence that more time would change results."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F10",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "The two comparison intents are not pooled as one treatment; repeated medium membership is not a new run."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "Test Failure": 2,
+              "Timeout": 16
+            },
+            "field_path": [
+              "taxonomy",
+              "gpt56-relay-direct-vs-codex",
+              "failure_taxonomy"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "No Modification": 1,
+              "Test Failure": 1,
+              "Timeout": 32
+            },
+            "field_path": [
+              "taxonomy",
+              "codex-gpt56-reasoning-effort",
+              "failure_taxonomy"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex"
+        ],
+        "statement": "Observed inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].taxonomy.gpt56-relay-direct-vs-codex.failure_taxonomy EQ {\"Test Failure\":2,\"Timeout\":16}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].taxonomy.codex-gpt56-reasoning-effort.failure_taxonomy EQ {\"No Modification\":1,\"Test Failure\":1,\"Timeout\":32}."
+      },
+      "statement": "Direct/medium discordances contain 16 native Timeout and two Test Failure observations; medium/high contain 32 Timeout, one No Modification and one Test Failure. Trace-proven execution_budget_exhausted stays capability failure; infrastructure/protocol gaps remain excluded."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "F11",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "K-B4.2's 17 workspace and 9 verifier-tree mismatches remain historical audit limitations; this report does not repair or reclassify them. K-B4.3 independently verified the selected failures' required bundles.",
+        "The two COMPARABLE discordances support recorded pair-level contrasts under the operator-trusted route, not a causal mechanism or population-wide reasoning-effort effect. Their passing comparator trees are integrity-limited."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 95,
+            "field_path": [
+              "audit",
+              "unique_inspected_slots"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 17,
+            "field_path": [
+              "audit",
+              "workspace_digest_mismatches"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 9,
+            "field_path": [
+              "audit",
+              "verifier_tree_digest_mismatches"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex"
+        ],
+        "statement": "Observed inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].audit.unique_inspected_slots EQ 95; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].audit.workspace_digest_mismatches EQ 17; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].audit.verifier_tree_digest_mismatches EQ 9."
+      },
+      "statement": "K-B4.2 inspected 95 unique discordant members and retained 17 workspace-tree and nine verifier-tree mismatches, with independently matching available source/trace/verifier-output bindings."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "A01",
+      "hypothesis": null,
+      "level": "DIAGNOSTIC_ASSOCIATION",
+      "limitations": [
+        "No longer-timeout treatment exists. Longer budgets improving results, reasoning causing expiry, or timeout causing the capability delta are unsupported counterfactual claims.",
+        "Selected discordant failures are not a population failure-rate sample."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "Test Failure": 2,
+              "Timeout": 16
+            },
+            "field_path": [
+              "taxonomy",
+              "gpt56-relay-direct-vs-codex",
+              "failure_taxonomy"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 18,
+            "field_path": [
+              "taxonomy",
+              "gpt56-relay-direct-vs-codex",
+              "discordant_pairs"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "No Modification": 1,
+              "Test Failure": 1,
+              "Timeout": 32
+            },
+            "field_path": [
+              "taxonomy",
+              "codex-gpt56-reasoning-effort",
+              "failure_taxonomy"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": 34,
+            "field_path": [
+              "taxonomy",
+              "codex-gpt56-reasoning-effort",
+              "discordant_pairs"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex",
+            "expected_value": {
+              "evidence_refs": [
+                "summaries",
+                "release/kb4-gpt-codex-timeout-sensitivity.json"
+              ],
+              "level": "DIAGNOSTIC_ASSOCIATION",
+              "statement": "Execution-budget failures dominate discordances (16/18 Direct/medium; 32/34 medium/high). This describes selected discordant evidence, not the cause of the difference or a population failure rate."
+            },
+            "field_path": [
+              "accepted_findings",
+              0
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex"
+        ],
+        "statement": "Observed inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].taxonomy.gpt56-relay-direct-vs-codex.failure_taxonomy EQ {\"Test Failure\":2,\"Timeout\":16}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].taxonomy.gpt56-relay-direct-vs-codex.discordant_pairs EQ 18; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].taxonomy.codex-gpt56-reasoning-effort.failure_taxonomy EQ {\"No Modification\":1,\"Test Failure\":1,\"Timeout\":32}; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].taxonomy.codex-gpt56-reasoning-effort.discordant_pairs EQ 34; inspect_failure[pair:core-real-matrix-v6:gpt56-relay-direct-vs-codex].accepted_findings[0] EQ {\"evidence_refs\":[\"summaries\",\"release/kb4-gpt-codex-timeout-sensitivity.json\"],\"level\":\"DIAGNOSTIC_ASSOCIATION\",\"statement\":\"Execution-budget failures dominate discordances (16/18 Direct/medium; 32/34 medium/high). This describes selected discordant evidence, not the cause of the difference or a population failure rate.\"}."
+      },
+      "statement": "Execution-budget exhaustion dominates the selected discordances (16/18 Direct/medium; 32/34 medium/high). This is a diagnostic association, not proof that timeout or reasoning effort caused the capability difference."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "B01",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "A factual verifier failure does not establish a causal mechanism. Root cause is null.",
+        "No Harness-uplift or formal reasoning-effort effect is established; formal eligibility remains false.",
+        "The three cases cover two failure signatures; the Python cases are related observations.",
+        "The failure bundle is intact, but the passing comparison member has a tree-integrity limitation. Frozen comparability is retained; complete paired-trajectory audit and causal attribution are not claimed."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": "badcase-1",
+            "field_path": [
+              "badcase",
+              "slot_id"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": "task:core-java-settings-merge@1.0.2#sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+            "field_path": [
+              "badcase",
+              "task_identity"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": "cell:harness-codex-gpt56-high",
+            "field_path": [
+              "badcase",
+              "cell_identity"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": "The workspace is unchanged. The deterministic verifier fails normalizes, preserves-order, duplicate-rejected, and invalid-rejected; input-unchanged passes.",
+            "field_path": [
+              "badcase",
+              "observed_failure"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": "OBSERVED_FACT",
+            "field_path": [
+              "badcase",
+              "attribution_classification"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": null,
+            "field_path": [
+              "badcase",
+              "root_cause"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": "Check that the required implementation changed and inspect deterministic verifier results before declaring completion. This is an engineering safeguard, not a verified remedy for the unknown cause.",
+            "field_path": [
+              "badcase",
+              "mitigation_lesson"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": [
+              "TRACE_EVENT_TYPE:AGENT_MESSAGE",
+              "TRACE_EVENT_TYPE:THREAD_STARTED",
+              "TRACE_EVENT_TYPE:TURN_COMPLETED",
+              "TRACE_EVENT_TYPE:TURN_STARTED"
+            ],
+            "field_path": [
+              "badcase",
+              "safe_trace_facts"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": "sha256:f2f4a1fd5bd9351589cdb7c844f587ed79b88051aa49b0a4e5d5249bbadaa8ba",
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "manifest_digest"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": 0,
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "repeat_index"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": {
+              "checks": [
+                {
+                  "detail": null,
+                  "name": "normalizes",
+                  "passed": false,
+                  "score": 0.0
+                },
+                {
+                  "detail": null,
+                  "name": "preserves-order",
+                  "passed": false,
+                  "score": 0.0
+                },
+                {
+                  "detail": null,
+                  "name": "input-unchanged",
+                  "passed": true,
+                  "score": 1.0
+                },
+                {
+                  "detail": null,
+                  "name": "duplicate-rejected",
+                  "passed": false,
+                  "score": 0.0
+                },
+                {
+                  "detail": null,
+                  "name": "invalid-rejected",
+                  "passed": false,
+                  "score": 0.0
+                }
+              ],
+              "passed": false,
+              "schema_version": 1,
+              "score": 0.2,
+              "summary": "Java HTTP header normalization cases"
+            },
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "verifier_report"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": "REPORTED",
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "trace_status"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": "No Modification",
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "failure_class"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+            "expected_value": [
+              "Four trace events: thread start, turn start, public agent message, turn completion; no commands or file edits.",
+              "The public workspace-unavailable statement is unverified self-report; no runtime cause is established."
+            ],
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "safe_tool_facts"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a"
+        ],
+        "statement": "Observed inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.slot_id EQ \"badcase-1\"; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.task_identity EQ \"task:core-java-settings-merge@1.0.2#sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47\"; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.cell_identity EQ \"cell:harness-codex-gpt56-high\"; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.observed_failure EQ \"The workspace is unchanged. The deterministic verifier fails normalizes, preserves-order, duplicate-rejected, and invalid-rejected; input-unchanged passes.\"; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.attribution_classification EQ \"OBSERVED_FACT\"; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.root_cause EQ null; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.mitigation_lesson EQ \"Check that the required implementation changed and inspect deterministic verifier results before declaring completion. This is an engineering safeguard, not a verified remedy for the unknown cause.\"; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.safe_trace_facts EQ [\"TRACE_EVENT_TYPE:AGENT_MESSAGE\",\"TRACE_EVENT_TYPE:THREAD_STARTED\",\"TRACE_EVENT_TYPE:TURN_COMPLETED\",\"TRACE_EVENT_TYPE:TURN_STARTED\"]; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.frozen_evidence.manifest_digest EQ \"sha256:f2f4a1fd5bd9351589cdb7c844f587ed79b88051aa49b0a4e5d5249bbadaa8ba\"; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.frozen_evidence.repeat_index EQ 0; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.frozen_evidence.verifier_report EQ {\"checks\":[{\"detail\":null,\"name\":\"normalizes\",\"passed\":false,\"score\":0.0},{\"detail\":null,\"name\":\"preserves-order\",\"passed\":false,\"score\":0.0},{\"detail\":null,\"name\":\"input-unchanged\",\"passed\":true,\"score\":1.0},{\"detail\":null,\"name\":\"duplicate-rejected\",\"passed\":false,\"score\":0.0},{\"detail\":null,\"name\":\"invalid-rejected\",\"passed\":false,\"score\":0.0}],\"passed\":false,\"schema_version\":1,\"score\":0.2,\"summary\":\"Java HTTP header normalization cases\"}; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.frozen_evidence.trace_status EQ \"REPORTED\"; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.frozen_evidence.failure_class EQ \"No Modification\"; inspect_failure[run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a].badcase.frozen_evidence.safe_tool_facts EQ [\"Four trace events: thread start, turn start, public agent message, turn completion; no commands or file edits.\",\"The public workspace-unavailable statement is unverified self-report; no runtime cause is established.\"]."
+      },
+      "statement": "harness-codex-gpt56-high / core-java-settings-merge@1.0.2 / repeat 0: No Modification, deterministic verifier score 0.2. The workspace is unchanged. The deterministic verifier fails normalizes, preserves-order, duplicate-rejected, and invalid-rejected; input-unchanged passes. Classification remains OBSERVED_FACT and root_cause is null."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "B02",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "A factual verifier failure does not establish a causal mechanism. Root cause is null.",
+        "No Harness-uplift or formal reasoning-effort effect is established; formal eligibility remains false.",
+        "The three cases cover two failure signatures; the Python cases are related observations.",
+        "The public instruction specifies non-empty-key behavior without expressly requiring empty-key rejection; the frozen verifier does require rejection. This limitation does not alter the frozen score.",
+        "The failure bundle is intact, but the passing comparison member has a tree-integrity limitation. Frozen comparability is retained; complete paired-trajectory audit and causal attribution are not claimed."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": "badcase-2",
+            "field_path": [
+              "badcase",
+              "slot_id"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": "task:core-python-deduplicate@1.0.2#sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+            "field_path": [
+              "badcase",
+              "task_identity"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": "cell:harness-codex-gpt56-high",
+            "field_path": [
+              "badcase",
+              "cell_identity"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": "The deterministic verifier fails empty-key-rejected (score 0.8); first-records, identical-retry-idempotent, conflict-rejected, and conflict-preserves-original pass. The digest-bound events.py implementation stores an empty key and returns True.",
+            "field_path": [
+              "badcase",
+              "observed_failure"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": "OBSERVED_FACT",
+            "field_path": [
+              "badcase",
+              "attribution_classification"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": null,
+            "field_path": [
+              "badcase",
+              "root_cause"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": "Review public contract and boundary-case checks together before interpreting the failure. Explicit empty-key expectations are a proposed engineering clarification, not a proven causal remedy; the frozen task and verifier remain unchanged.",
+            "field_path": [
+              "badcase",
+              "mitigation_lesson"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": [
+              "TRACE_EVENT_TYPE:AGENT_MESSAGE",
+              "TRACE_EVENT_TYPE:COMMAND_EXECUTION",
+              "TRACE_EVENT_TYPE:FILE_CHANGE",
+              "TRACE_EVENT_TYPE:THREAD_STARTED",
+              "TRACE_EVENT_TYPE:TURN_COMPLETED",
+              "TRACE_EVENT_TYPE:TURN_STARTED"
+            ],
+            "field_path": [
+              "badcase",
+              "safe_trace_facts"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": "sha256:be7fc1d19b70ebe03fc1cb761a46d510d7ea2a0f245b87bdb84db7daf64f7d36",
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "manifest_digest"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": 2,
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "repeat_index"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": {
+              "checks": [
+                {
+                  "detail": null,
+                  "name": "first-records",
+                  "passed": true,
+                  "score": 1.0
+                },
+                {
+                  "detail": null,
+                  "name": "identical-retry-idempotent",
+                  "passed": true,
+                  "score": 1.0
+                },
+                {
+                  "detail": null,
+                  "name": "conflict-rejected",
+                  "passed": true,
+                  "score": 1.0
+                },
+                {
+                  "detail": null,
+                  "name": "conflict-preserves-original",
+                  "passed": true,
+                  "score": 1.0
+                },
+                {
+                  "detail": null,
+                  "name": "empty-key-rejected",
+                  "passed": false,
+                  "score": 0.0
+                }
+              ],
+              "passed": false,
+              "schema_version": 1,
+              "score": 0.8,
+              "summary": "idempotent retry-ledger cases"
+            },
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "verifier_report"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": "REPORTED",
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "trace_status"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": "Test Failure",
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "failure_class"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": [
+              "The bound trace contains file changes and public commands with assertions accepting empty keys.",
+              "A git command exits 128; that incidental tool fact does not supersede the verifier-backed Test Failure.",
+              "Issued assertion and byte-compile syntax does not prove every shell subcommand ran or passed."
+            ],
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "safe_tool_facts"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00"
+        ],
+        "statement": "Observed inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.slot_id EQ \"badcase-2\"; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.task_identity EQ \"task:core-python-deduplicate@1.0.2#sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5\"; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.cell_identity EQ \"cell:harness-codex-gpt56-high\"; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.observed_failure EQ \"The deterministic verifier fails empty-key-rejected (score 0.8); first-records, identical-retry-idempotent, conflict-rejected, and conflict-preserves-original pass. The digest-bound events.py implementation stores an empty key and returns True.\"; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.attribution_classification EQ \"OBSERVED_FACT\"; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.root_cause EQ null; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.mitigation_lesson EQ \"Review public contract and boundary-case checks together before interpreting the failure. Explicit empty-key expectations are a proposed engineering clarification, not a proven causal remedy; the frozen task and verifier remain unchanged.\"; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.safe_trace_facts EQ [\"TRACE_EVENT_TYPE:AGENT_MESSAGE\",\"TRACE_EVENT_TYPE:COMMAND_EXECUTION\",\"TRACE_EVENT_TYPE:FILE_CHANGE\",\"TRACE_EVENT_TYPE:THREAD_STARTED\",\"TRACE_EVENT_TYPE:TURN_COMPLETED\",\"TRACE_EVENT_TYPE:TURN_STARTED\"]; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.frozen_evidence.manifest_digest EQ \"sha256:be7fc1d19b70ebe03fc1cb761a46d510d7ea2a0f245b87bdb84db7daf64f7d36\"; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.frozen_evidence.repeat_index EQ 2; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.frozen_evidence.verifier_report EQ {\"checks\":[{\"detail\":null,\"name\":\"first-records\",\"passed\":true,\"score\":1.0},{\"detail\":null,\"name\":\"identical-retry-idempotent\",\"passed\":true,\"score\":1.0},{\"detail\":null,\"name\":\"conflict-rejected\",\"passed\":true,\"score\":1.0},{\"detail\":null,\"name\":\"conflict-preserves-original\",\"passed\":true,\"score\":1.0},{\"detail\":null,\"name\":\"empty-key-rejected\",\"passed\":false,\"score\":0.0}],\"passed\":false,\"schema_version\":1,\"score\":0.8,\"summary\":\"idempotent retry-ledger cases\"}; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.frozen_evidence.trace_status EQ \"REPORTED\"; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.frozen_evidence.failure_class EQ \"Test Failure\"; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.frozen_evidence.safe_tool_facts EQ [\"The bound trace contains file changes and public commands with assertions accepting empty keys.\",\"A git command exits 128; that incidental tool fact does not supersede the verifier-backed Test Failure.\",\"Issued assertion and byte-compile syntax does not prove every shell subcommand ran or passed.\"]."
+      },
+      "statement": "harness-codex-gpt56-high / core-python-deduplicate@1.0.2 / repeat 2: Test Failure, deterministic verifier score 0.8. The deterministic verifier fails empty-key-rejected (score 0.8); first-records, identical-retry-idempotent, conflict-rejected, and conflict-preserves-original pass. The digest-bound events.py implementation stores an empty key and returns True. Classification remains OBSERVED_FACT and root_cause is null."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "B03",
+      "hypothesis": null,
+      "level": "VERIFIED_FACT",
+      "limitations": [
+        "A factual verifier failure does not establish a causal mechanism. Root cause is null.",
+        "No Harness-uplift or formal reasoning-effort effect is established; formal eligibility remains false.",
+        "The three cases cover two failure signatures; the Python cases are related observations.",
+        "The public instruction specifies non-empty-key behavior without expressly requiring empty-key rejection; the frozen verifier does require rejection. This limitation does not alter the frozen score.",
+        "Direct has no normalized agent trace. No command, edit sequence, or private reasoning is reconstructed; the factual explanation uses verifier output and the final source diff.",
+        "The failure bundle is intact, but the passing comparison member has a tree-integrity limitation. Frozen comparability is retained; complete paired-trajectory audit and causal attribution are not claimed."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": "badcase-3",
+            "field_path": [
+              "badcase",
+              "slot_id"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": "task:core-python-deduplicate@1.0.2#sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+            "field_path": [
+              "badcase",
+              "task_identity"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": "cell:model-gpt56-relay-responses",
+            "field_path": [
+              "badcase",
+              "cell_identity"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": "The deterministic verifier fails empty-key-rejected (score 0.8); first-records, identical-retry-idempotent, conflict-rejected, and conflict-preserves-original pass. The digest-bound events.py implementation stores an empty key and returns True.",
+            "field_path": [
+              "badcase",
+              "observed_failure"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": "OBSERVED_FACT",
+            "field_path": [
+              "badcase",
+              "attribution_classification"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": null,
+            "field_path": [
+              "badcase",
+              "root_cause"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": "Review public contract and boundary-case checks together before interpreting the failure. Explicit empty-key expectations are a proposed engineering clarification, not a proven causal remedy; the frozen task and verifier remain unchanged.",
+            "field_path": [
+              "badcase",
+              "mitigation_lesson"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": [],
+            "field_path": [
+              "badcase",
+              "safe_trace_facts"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": "sha256:1a5945444b5ba2d0d9c1709c058af738ca3d9474afda22424cc7fbf01349758d",
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "manifest_digest"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": 0,
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "repeat_index"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": {
+              "checks": [
+                {
+                  "detail": null,
+                  "name": "first-records",
+                  "passed": true,
+                  "score": 1.0
+                },
+                {
+                  "detail": null,
+                  "name": "identical-retry-idempotent",
+                  "passed": true,
+                  "score": 1.0
+                },
+                {
+                  "detail": null,
+                  "name": "conflict-rejected",
+                  "passed": true,
+                  "score": 1.0
+                },
+                {
+                  "detail": null,
+                  "name": "conflict-preserves-original",
+                  "passed": true,
+                  "score": 1.0
+                },
+                {
+                  "detail": null,
+                  "name": "empty-key-rejected",
+                  "passed": false,
+                  "score": 0.0
+                }
+              ],
+              "passed": false,
+              "schema_version": 1,
+              "score": 0.8,
+              "summary": "idempotent retry-ledger cases"
+            },
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "verifier_report"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": "NOT_REPORTED",
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "trace_status"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": "Test Failure",
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "failure_class"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+            "expected_value": [],
+            "field_path": [
+              "badcase",
+              "frozen_evidence",
+              "safe_tool_facts"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4"
+        ],
+        "statement": "Observed inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.slot_id EQ \"badcase-3\"; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.task_identity EQ \"task:core-python-deduplicate@1.0.2#sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5\"; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.cell_identity EQ \"cell:model-gpt56-relay-responses\"; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.observed_failure EQ \"The deterministic verifier fails empty-key-rejected (score 0.8); first-records, identical-retry-idempotent, conflict-rejected, and conflict-preserves-original pass. The digest-bound events.py implementation stores an empty key and returns True.\"; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.attribution_classification EQ \"OBSERVED_FACT\"; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.root_cause EQ null; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.mitigation_lesson EQ \"Review public contract and boundary-case checks together before interpreting the failure. Explicit empty-key expectations are a proposed engineering clarification, not a proven causal remedy; the frozen task and verifier remain unchanged.\"; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.safe_trace_facts EQ []; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.frozen_evidence.manifest_digest EQ \"sha256:1a5945444b5ba2d0d9c1709c058af738ca3d9474afda22424cc7fbf01349758d\"; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.frozen_evidence.repeat_index EQ 0; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.frozen_evidence.verifier_report EQ {\"checks\":[{\"detail\":null,\"name\":\"first-records\",\"passed\":true,\"score\":1.0},{\"detail\":null,\"name\":\"identical-retry-idempotent\",\"passed\":true,\"score\":1.0},{\"detail\":null,\"name\":\"conflict-rejected\",\"passed\":true,\"score\":1.0},{\"detail\":null,\"name\":\"conflict-preserves-original\",\"passed\":true,\"score\":1.0},{\"detail\":null,\"name\":\"empty-key-rejected\",\"passed\":false,\"score\":0.0}],\"passed\":false,\"schema_version\":1,\"score\":0.8,\"summary\":\"idempotent retry-ledger cases\"}; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.frozen_evidence.trace_status EQ \"NOT_REPORTED\"; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.frozen_evidence.failure_class EQ \"Test Failure\"; inspect_failure[run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4].badcase.frozen_evidence.safe_tool_facts EQ []."
+      },
+      "statement": "model-gpt56-relay-responses / core-python-deduplicate@1.0.2 / repeat 0: Test Failure, deterministic verifier score 0.8. The deterministic verifier fails empty-key-rejected (score 0.8); first-records, identical-retry-idempotent, conflict-rejected, and conflict-preserves-original pass. The digest-bound events.py implementation stores an empty key and returns True. Classification remains OBSERVED_FACT and root_cause is null."
+    },
+    {
+      "causal_language_permitted": false,
+      "claim_id": "H01",
+      "hypothesis": {
+        "additional_evidence_needed": "Review the frozen subject instruction, contract, bound source edits and public local-check commands. A causal test would require separately authorized explicit-contract control versus original-contract treatment; none is needed to freeze a factual verifier-failure case with this limitation.",
+        "classification": "HYPOTHESIS",
+        "evidence_refs": [
+          "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+          "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4"
+        ],
+        "statement": "A public-contract interpretation gap may explain repeated empty-key acceptance. The instruction specifies behavior for non-empty keys without expressly requiring rejection of empty keys, while the frozen verifier requires ValueError. This does not establish the model's private reasoning or invalidate frozen scores."
+      },
+      "level": "ATTRIBUTION_HYPOTHESIS",
+      "limitations": [
+        "The three BadCases span two failure signatures. Python specification interpretation remains a hypothesis, and every canonical root_cause remains null.",
+        "A public-contract clarification would require a separately authorized causal control; it is not performed or required for this factual synthesis."
+      ],
+      "proof": {
+        "assertions": [
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": {
+              "classification": "ATTRIBUTION_HYPOTHESIS",
+              "evidence_refs": [
+                "tasks/core-python-deduplicate/1.0.2/instruction.md",
+                "tasks/core-python-deduplicate/1.0.2/verifier/subject_probe.py"
+              ],
+              "statement": "A public-contract interpretation gap may explain repeated empty-key acceptance. The instruction specifies behavior for non-empty keys without expressly requiring rejection of empty keys, while the frozen verifier requires ValueError. This does not establish the model's private reasoning or invalidate frozen scores.",
+              "verify_or_falsify": "Review the frozen subject instruction, contract, bound source edits and public local-check commands. A causal test would require separately authorized explicit-contract control versus original-contract treatment; none is needed to freeze a factual verifier-failure case with this limitation."
+            },
+            "field_path": [
+              "badcase",
+              "hypotheses",
+              0
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          },
+          {
+            "evidence_ref": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+            "expected_value": null,
+            "field_path": [
+              "badcase",
+              "root_cause"
+            ],
+            "operator": "EQ",
+            "tool": "inspect_failure"
+          }
+        ],
+        "classification": "VERIFIED_FACT",
+        "evidence_refs": [
+          "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00"
+        ],
+        "statement": "Observed inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.hypotheses[0] EQ {\"classification\":\"ATTRIBUTION_HYPOTHESIS\",\"evidence_refs\":[\"tasks/core-python-deduplicate/1.0.2/instruction.md\",\"tasks/core-python-deduplicate/1.0.2/verifier/subject_probe.py\"],\"statement\":\"A public-contract interpretation gap may explain repeated empty-key acceptance. The instruction specifies behavior for non-empty keys without expressly requiring rejection of empty keys, while the frozen verifier requires ValueError. This does not establish the model's private reasoning or invalidate frozen scores.\",\"verify_or_falsify\":\"Review the frozen subject instruction, contract, bound source edits and public local-check commands. A causal test would require separately authorized explicit-contract control versus original-contract treatment; none is needed to freeze a factual verifier-failure case with this limitation.\"}; inspect_failure[run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00].badcase.root_cause EQ null."
+      },
+      "statement": "A public-contract interpretation gap may explain repeated empty-key acceptance. The instruction specifies behavior for non-empty keys without expressly requiring rejection of empty keys, while the frozen verifier requires ValueError. This does not establish the model's private reasoning or invalidate frozen scores."
+    }
+  ],
+  "comparisons": {
+    "codex-gpt56-reasoning-effort": {
+      "causal_interpretation_permitted": false,
+      "comparability": {
+        "by_task": [
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 0,
+            "formal_comparable": 0,
+            "task_id": "core-java-deduplicate"
+          },
+          {
+            "capability_complete": 2,
+            "exploratory_eligible": 0,
+            "formal_comparable": 0,
+            "task_id": "core-java-feature-flag"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 3,
+            "formal_comparable": 3,
+            "task_id": "core-java-quota"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 2,
+            "formal_comparable": 2,
+            "task_id": "core-java-settings-merge"
+          },
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 1,
+            "formal_comparable": 1,
+            "task_id": "core-java-slugify"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 4,
+            "formal_comparable": 4,
+            "task_id": "core-python-deduplicate"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 4,
+            "formal_comparable": 4,
+            "task_id": "core-python-feature-flag"
+          },
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 3,
+            "formal_comparable": 3,
+            "task_id": "core-python-quota"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 3,
+            "formal_comparable": 3,
+            "task_id": "core-python-settings-merge"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 4,
+            "formal_comparable": 4,
+            "task_id": "core-python-slugify"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 1,
+            "formal_comparable": 1,
+            "task_id": "core-typescript-deduplicate"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 0,
+            "formal_comparable": 0,
+            "task_id": "core-typescript-feature-flag"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 4,
+            "formal_comparable": 4,
+            "task_id": "core-typescript-quota"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 1,
+            "formal_comparable": 1,
+            "task_id": "core-typescript-settings-merge"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 2,
+            "formal_comparable": 2,
+            "task_id": "core-typescript-slugify"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 2,
+            "formal_comparable": 2,
+            "task_id": "micro-java-clamp"
+          },
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 4,
+            "formal_comparable": 4,
+            "task_id": "micro-python-clamp"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 4,
+            "formal_comparable": 4,
+            "task_id": "micro-typescript-clamp"
+          }
+        ],
+        "capability_complete": 83,
+        "complete_pair_comparability": {
+          "COMPARABLE": 42,
+          "NOT_COMPARABLE": 41,
+          "PARTIALLY_COMPARABLE": 0
+        },
+        "exploratory_eligible": 42,
+        "formal_comparable": 42,
+        "formal_eligible": false,
+        "tasks_with_five_complete_pairs": 13,
+        "tasks_with_five_formal_pairs": 0
+      },
+      "descriptive_statistics": {
+        "capability": {
+          "baseline_pass_rate": 0.746987951807,
+          "both_fail": 12,
+          "both_pass": 37,
+          "cluster_bootstrap_ci": {
+            "high": -0.072222222222,
+            "low": -0.338888888889,
+            "method": "task_cluster_percentile",
+            "replicates_requested": 50000,
+            "replicates_skipped_no_evaluable_tasks": 0,
+            "replicates_used": 50000,
+            "seed": 20260902,
+            "task_weighting": "equal_task"
+          },
+          "complete_pair_row_weighted_delta": -0.192771084337,
+          "complete_pairs": 83,
+          "delta": -0.205555555556,
+          "delta_estimand": "equal-task mean of within-task paired deltas",
+          "discordant_baseline_fail_variant_pass": 9,
+          "discordant_baseline_pass_variant_fail": 25,
+          "mcnemar_exact_p": 0.009041185491,
+          "tasks_with_pairs": 18,
+          "total_possible_pairs": 90,
+          "variant_pass_rate": 0.55421686747
+        },
+        "latency": {
+          "baseline_primary_median_ms": 108293.5,
+          "coverage_materially_incomplete": false,
+          "median_variant_minus_baseline_ms": 3876.5,
+          "paired_latency_coverage": 1.0,
+          "paired_latency_n": 90,
+          "variant_primary_median_ms": 121861.5
+        },
+        "missingness": {
+          "baseline_final_infra_rate": 0.033333333333,
+          "capability_complete_pair_coverage": 0.922222222222,
+          "capability_minus_operational_delta": -0.005555555556,
+          "excluded_due_to_baseline_infra": 3,
+          "excluded_due_to_cancelled": 1,
+          "excluded_due_to_variant_infra": 4,
+          "exclusion_reason_counts_are_overlapping": true,
+          "infrastructure_reliability_changes_practical_conclusion": false,
+          "material_difference_rule": "absolute gap >= 0.05 or opposite signs",
+          "variant_final_infra_rate": 0.044444444444
+        },
+        "operational": {
+          "baseline_pass_rate": 0.722222222222,
+          "cluster_bootstrap_ci": {
+            "high": -0.077777777778,
+            "low": -0.322222222222,
+            "method": "task_cluster_percentile",
+            "replicates_requested": 50000,
+            "replicates_skipped_no_evaluable_tasks": 0,
+            "replicates_used": 50000,
+            "seed": 20260902,
+            "task_weighting": "equal_task"
+          },
+          "delta": -0.2,
+          "delta_estimand": "equal-task mean of within-task paired operational deltas",
+          "pair_count": 90,
+          "variant_pass_rate": 0.522222222222
+        }
+      },
+      "discordance_summary": {
+        "by_comparability": {
+          "COMPARABLE": {
+            "direction": {
+              "LEFT_PASS_RIGHT_FAIL": 2
+            },
+            "discordant_pairs": 2,
+            "failure_taxonomy": {
+              "No Modification": 1,
+              "Test Failure": 1
+            }
+          },
+          "NOT_COMPARABLE": {
+            "direction": {
+              "LEFT_FAIL_RIGHT_PASS": 9,
+              "LEFT_PASS_RIGHT_FAIL": 23
+            },
+            "discordant_pairs": 32,
+            "failure_taxonomy": {
+              "Timeout": 32
+            }
+          },
+          "PARTIALLY_COMPARABLE": {
+            "direction": {},
+            "discordant_pairs": 0,
+            "failure_taxonomy": {}
+          }
+        },
+        "by_task": {
+          "core-java-deduplicate": 3,
+          "core-java-feature-flag": 1,
+          "core-java-quota": 1,
+          "core-java-settings-merge": 2,
+          "core-java-slugify": 2,
+          "core-python-deduplicate": 2,
+          "core-python-feature-flag": 1,
+          "core-python-quota": 1,
+          "core-python-settings-merge": 2,
+          "core-python-slugify": 1,
+          "core-typescript-deduplicate": 4,
+          "core-typescript-feature-flag": 5,
+          "core-typescript-quota": 1,
+          "core-typescript-settings-merge": 3,
+          "core-typescript-slugify": 3,
+          "micro-java-clamp": 1,
+          "micro-typescript-clamp": 1
+        },
+        "complete_pair_comparability": {
+          "COMPARABLE": 42,
+          "NOT_COMPARABLE": 41,
+          "PARTIALLY_COMPARABLE": 0
+        },
+        "concordant_pairs": 49,
+        "controlled_attribution_claims": 0,
+        "current_complete_bundles_for_both_members": 24,
+        "direction": {
+          "LEFT_FAIL_RIGHT_PASS": 9,
+          "LEFT_PASS_RIGHT_FAIL": 25
+        },
+        "discordant_pairs": 34,
+        "effective_complete_pairs": 83,
+        "excluded_missing_pairs": 7,
+        "failure_attempt_source": {
+          "primary": 29,
+          "recovery": 5
+        },
+        "failure_taxonomy": {
+          "No Modification": 1,
+          "Test Failure": 1,
+          "Timeout": 32
+        },
+        "formal_eligible": false,
+        "planned_pairs": 90,
+        "timeout_affected_missing_pairs": 2
+      },
+      "intent": "CONTROLLED_ABLATION",
+      "left_cell": "harness-codex-gpt56-medium",
+      "right_cell": "harness-codex-gpt56-high"
+    },
+    "gpt56-relay-direct-vs-codex": {
+      "causal_interpretation_permitted": false,
+      "comparability": {
+        "by_task": [
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 4,
+            "formal_comparable": 0,
+            "task_id": "core-java-deduplicate"
+          },
+          {
+            "capability_complete": 3,
+            "exploratory_eligible": 3,
+            "formal_comparable": 0,
+            "task_id": "core-java-feature-flag"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "core-java-quota"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "core-java-settings-merge"
+          },
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 4,
+            "formal_comparable": 0,
+            "task_id": "core-java-slugify"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "core-python-deduplicate"
+          },
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 4,
+            "formal_comparable": 0,
+            "task_id": "core-python-feature-flag"
+          },
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 4,
+            "formal_comparable": 0,
+            "task_id": "core-python-quota"
+          },
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 4,
+            "formal_comparable": 0,
+            "task_id": "core-python-settings-merge"
+          },
+          {
+            "capability_complete": 4,
+            "exploratory_eligible": 4,
+            "formal_comparable": 0,
+            "task_id": "core-python-slugify"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "core-typescript-deduplicate"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "core-typescript-feature-flag"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "core-typescript-quota"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "core-typescript-settings-merge"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "core-typescript-slugify"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "micro-java-clamp"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "micro-python-clamp"
+          },
+          {
+            "capability_complete": 5,
+            "exploratory_eligible": 5,
+            "formal_comparable": 0,
+            "task_id": "micro-typescript-clamp"
+          }
+        ],
+        "capability_complete": 82,
+        "complete_pair_comparability": {
+          "COMPARABLE": 0,
+          "NOT_COMPARABLE": 0,
+          "PARTIALLY_COMPARABLE": 82
+        },
+        "exploratory_eligible": 82,
+        "formal_comparable": 0,
+        "formal_eligible": false,
+        "tasks_with_five_complete_pairs": 11,
+        "tasks_with_five_formal_pairs": 0
+      },
+      "descriptive_statistics": {
+        "capability": {
+          "baseline_pass_rate": 0.963414634146,
+          "both_fail": 2,
+          "both_pass": 62,
+          "cluster_bootstrap_ci": {
+            "high": -0.128703703704,
+            "low": -0.257407407407,
+            "method": "task_cluster_percentile",
+            "replicates_requested": 50000,
+            "replicates_skipped_no_evaluable_tasks": 0,
+            "replicates_used": 50000,
+            "seed": 20260902,
+            "task_weighting": "equal_task"
+          },
+          "complete_pair_row_weighted_delta": -0.19512195122,
+          "complete_pairs": 82,
+          "delta": -0.193518518519,
+          "delta_estimand": "equal-task mean of within-task paired deltas",
+          "discordant_baseline_fail_variant_pass": 1,
+          "discordant_baseline_pass_variant_fail": 17,
+          "mcnemar_exact_p": 0.000144958496,
+          "tasks_with_pairs": 18,
+          "total_possible_pairs": 90,
+          "variant_pass_rate": 0.768292682927
+        },
+        "latency": {
+          "baseline_primary_median_ms": 14971,
+          "coverage_materially_incomplete": true,
+          "median_variant_minus_baseline_ms": 93649,
+          "paired_latency_coverage": 0.855555555556,
+          "paired_latency_n": 77,
+          "variant_primary_median_ms": 109349
+        },
+        "missingness": {
+          "baseline_final_infra_rate": 0.044444444444,
+          "capability_complete_pair_coverage": 0.911111111111,
+          "capability_minus_operational_delta": 0.006481481481,
+          "excluded_due_to_baseline_infra": 4,
+          "excluded_due_to_cancelled": 1,
+          "excluded_due_to_variant_infra": 3,
+          "exclusion_reason_counts_are_overlapping": true,
+          "infrastructure_reliability_changes_practical_conclusion": false,
+          "material_difference_rule": "absolute gap >= 0.05 or opposite signs",
+          "variant_final_infra_rate": 0.033333333333
+        },
+        "operational": {
+          "baseline_pass_rate": 0.922222222222,
+          "cluster_bootstrap_ci": {
+            "high": -0.111111111111,
+            "low": -0.288888888889,
+            "method": "task_cluster_percentile",
+            "replicates_requested": 50000,
+            "replicates_skipped_no_evaluable_tasks": 0,
+            "replicates_used": 50000,
+            "seed": 20260902,
+            "task_weighting": "equal_task"
+          },
+          "delta": -0.2,
+          "delta_estimand": "equal-task mean of within-task paired operational deltas",
+          "pair_count": 90,
+          "variant_pass_rate": 0.722222222222
+        }
+      },
+      "discordance_summary": {
+        "by_comparability": {
+          "COMPARABLE": {
+            "direction": {},
+            "discordant_pairs": 0,
+            "failure_taxonomy": {}
+          },
+          "NOT_COMPARABLE": {
+            "direction": {},
+            "discordant_pairs": 0,
+            "failure_taxonomy": {}
+          },
+          "PARTIALLY_COMPARABLE": {
+            "direction": {
+              "LEFT_FAIL_RIGHT_PASS": 1,
+              "LEFT_PASS_RIGHT_FAIL": 17
+            },
+            "discordant_pairs": 18,
+            "failure_taxonomy": {
+              "Test Failure": 2,
+              "Timeout": 16
+            }
+          }
+        },
+        "by_task": {
+          "core-java-deduplicate": 1,
+          "core-java-feature-flag": 1,
+          "core-java-quota": 1,
+          "core-java-settings-merge": 2,
+          "core-python-deduplicate": 2,
+          "core-python-quota": 1,
+          "core-python-settings-merge": 1,
+          "core-typescript-deduplicate": 1,
+          "core-typescript-feature-flag": 1,
+          "core-typescript-quota": 1,
+          "core-typescript-settings-merge": 2,
+          "core-typescript-slugify": 1,
+          "micro-java-clamp": 2,
+          "micro-typescript-clamp": 1
+        },
+        "complete_pair_comparability": {
+          "COMPARABLE": 0,
+          "NOT_COMPARABLE": 0,
+          "PARTIALLY_COMPARABLE": 82
+        },
+        "concordant_pairs": 64,
+        "controlled_attribution_claims": 0,
+        "current_complete_bundles_for_both_members": 12,
+        "direction": {
+          "LEFT_FAIL_RIGHT_PASS": 1,
+          "LEFT_PASS_RIGHT_FAIL": 17
+        },
+        "discordant_pairs": 18,
+        "effective_complete_pairs": 82,
+        "excluded_missing_pairs": 8,
+        "failure_attempt_source": {
+          "primary": 17,
+          "recovery": 1
+        },
+        "failure_taxonomy": {
+          "Test Failure": 2,
+          "Timeout": 16
+        },
+        "formal_eligible": false,
+        "planned_pairs": 90,
+        "timeout_affected_missing_pairs": 1
+      },
+      "intent": "HARNESS_UPLIFT",
+      "left_cell": "model-gpt56-relay-responses",
+      "right_cell": "harness-codex-gpt56-medium"
+    }
+  },
+  "controlled_attribution_claim_count": 0,
+  "core_results": {
+    "harness-codex-gpt56-high": {
+      "attempts": {
+        "effective": {
+          "cancelled": 1,
+          "capability_n": 85,
+          "infra_count": 4,
+          "missing_count": 5,
+          "outcomes": {
+            "cancelled": 1,
+            "capability_fail": 38,
+            "capability_pass": 47,
+            "infra_failure": 4
+          },
+          "recovery_attempt_count": 19
+        },
+        "extra_primary_attempts_without_selected_manifest": 1,
+        "planned": 90,
+        "primary": {
+          "attempts": 90,
+          "execution_budget_capability_failures": 27,
+          "failure_categories": {
+            "control_identity_mismatch": 1,
+            "protocol_error": 17,
+            "timeout": 1
+          },
+          "outcomes": {
+            "cancelled": 1,
+            "capability_fail": 32,
+            "capability_pass": 38,
+            "infra_failure": 19
+          },
+          "source_outcomes": {
+            "control_identity_mismatch": 1,
+            "harness_error:cancelled": 1,
+            "harness_error:execution_budget_exhausted": 27,
+            "harness_error:protocol_error": 17,
+            "harness_error:timeout": 1,
+            "verified_fail": 5,
+            "verified_pass": 38
+          },
+          "timeout_duration_by_class": {
+            "capability": {
+              "duration_available": 27,
+              "max_ms": 181737,
+              "median_ms": 180713,
+              "min_ms": 180586,
+              "observations": 27,
+              "within_1000ms_of_configured_boundary": 26
+            },
+            "infrastructure": {
+              "duration_available": 1,
+              "max_ms": 180737,
+              "median_ms": 180737,
+              "min_ms": 180737,
+              "observations": 1,
+              "within_1000ms_of_configured_boundary": 1
+            }
+          },
+          "timeout_facts": {
+            "NOT_OBSERVED": 61,
+            "NOT_VERIFIED": 1,
+            "OBSERVED": 28
+          },
+          "timeout_infrastructure": 1
+        },
+        "recorded_physical_primary_attempts": 91,
+        "recovery": {
+          "attempts": 19,
+          "execution_budget_capability_failures": 6,
+          "failure_categories": {
+            "protocol_error": 4
+          },
+          "outcomes": {
+            "capability_fail": 6,
+            "capability_pass": 9,
+            "infra_failure": 4
+          },
+          "source_outcomes": {
+            "harness_error:execution_budget_exhausted": 6,
+            "harness_error:protocol_error": 4,
+            "verified_pass": 9
+          },
+          "timeout_duration_by_class": {
+            "capability": {
+              "duration_available": 6,
+              "max_ms": 180708,
+              "median_ms": 180648.0,
+              "min_ms": 180606,
+              "observations": 6,
+              "within_1000ms_of_configured_boundary": 6
+            },
+            "infrastructure": {
+              "duration_available": 0,
+              "max_ms": null,
+              "median_ms": null,
+              "min_ms": null,
+              "observations": 0,
+              "within_1000ms_of_configured_boundary": 0
+            }
+          },
+          "timeout_facts": {
+            "NOT_OBSERVED": 13,
+            "OBSERVED": 6
+          },
+          "timeout_infrastructure": 0
+        },
+        "selected_primary_manifest_unavailable": 1,
+        "timeout_affected_recovery": {
+          "entered_recovery": 1,
+          "primary_infra_timeout_slots": 1,
+          "recovery_outcomes": {
+            "infra_failure": 1
+          },
+          "recovery_source_outcomes": {
+            "harness_error:protocol_error": 1
+          },
+          "unresolved": 1
+        }
+      },
+      "outcomes": {
+        "cancelled": 1,
+        "cancelled_rate": 0.011111111111,
+        "capability_evaluable": 85,
+        "capability_fail": 38,
+        "capability_pass": 47,
+        "capability_pass_rate": 0.552941176471,
+        "capability_pass_rate_wilson_95": {
+          "high": 0.654063443083,
+          "low": 0.447240611572
+        },
+        "infra_missing": 4,
+        "infra_missing_rate": 0.044444444444,
+        "logical_slots": 90,
+        "operational_pass_rate": 0.522222222222,
+        "operational_pass_rate_wilson_95": {
+          "high": 0.62237944418,
+          "low": 0.420245639129
+        }
+      },
+      "usage": {
+        "primary": {
+          "cache_write_input_tokens_observed_n": 44,
+          "cached_input_tokens_observed_n": 44,
+          "input_tokens_observed_n": 44,
+          "mean_cache_write_input_tokens": 0.0,
+          "mean_cached_input_tokens": 85338.52272727272,
+          "mean_input_tokens": 107624.13636363637,
+          "mean_output_tokens": 2710.613636363636,
+          "mean_reasoning_output_tokens": 1412.386363636364,
+          "median_cache_write_input_tokens": 0.0,
+          "median_cached_input_tokens": 69120.0,
+          "median_input_tokens": 96988.5,
+          "median_output_tokens": 2230.5,
+          "median_reasoning_output_tokens": 1061.5,
+          "output_tokens_observed_n": 44,
+          "primary_usage_coverage": 0.488888888889,
+          "primary_usage_observed_n": 44,
+          "reasoning_output_tokens_observed_n": 44,
+          "total_cache_write_input_tokens": 0,
+          "total_cached_input_tokens": 3754895,
+          "total_input_tokens": 4735462,
+          "total_output_tokens": 119267,
+          "total_reasoning_output_tokens": 62145
+        },
+        "recovery": {
+          "cache_write_input_tokens_observed_n": 9,
+          "cached_input_tokens_observed_n": 9,
+          "input_tokens_observed_n": 9,
+          "mean_cache_write_input_tokens": 0.0,
+          "mean_cached_input_tokens": 82033.77777777778,
+          "mean_input_tokens": 98304.55555555556,
+          "mean_output_tokens": 1895.111111111111,
+          "mean_reasoning_output_tokens": 851.888888888889,
+          "median_cache_write_input_tokens": 0,
+          "median_cached_input_tokens": 80128,
+          "median_input_tokens": 94786,
+          "median_output_tokens": 1671,
+          "median_reasoning_output_tokens": 792,
+          "output_tokens_observed_n": 9,
+          "reasoning_output_tokens_observed_n": 9,
+          "recovery_usage_coverage": 0.473684210526,
+          "recovery_usage_observed_n": 9,
+          "total_cache_write_input_tokens": 0,
+          "total_cached_input_tokens": 738304,
+          "total_input_tokens": 884741,
+          "total_output_tokens": 17056,
+          "total_reasoning_output_tokens": 7667
+        }
+      }
+    },
+    "harness-codex-gpt56-medium": {
+      "attempts": {
+        "effective": {
+          "cancelled": 1,
+          "capability_n": 86,
+          "infra_count": 3,
+          "missing_count": 4,
+          "outcomes": {
+            "cancelled": 1,
+            "capability_fail": 21,
+            "capability_pass": 65,
+            "infra_failure": 3
+          },
+          "recovery_attempt_count": 19
+        },
+        "extra_primary_attempts_without_selected_manifest": 2,
+        "planned": 90,
+        "primary": {
+          "attempts": 90,
+          "execution_budget_capability_failures": 17,
+          "failure_categories": {
+            "protocol_error": 15,
+            "timeout": 4
+          },
+          "outcomes": {
+            "cancelled": 1,
+            "capability_fail": 20,
+            "capability_pass": 50,
+            "infra_failure": 19
+          },
+          "source_outcomes": {
+            "harness_error:cancelled": 1,
+            "harness_error:execution_budget_exhausted": 17,
+            "harness_error:protocol_error": 15,
+            "harness_error:timeout": 4,
+            "verified_fail": 3,
+            "verified_pass": 50
+          },
+          "timeout_duration_by_class": {
+            "capability": {
+              "duration_available": 17,
+              "max_ms": 181740,
+              "median_ms": 180695,
+              "min_ms": 180624,
+              "observations": 17,
+              "within_1000ms_of_configured_boundary": 16
+            },
+            "infrastructure": {
+              "duration_available": 4,
+              "max_ms": 180711,
+              "median_ms": 180681.0,
+              "min_ms": 180630,
+              "observations": 4,
+              "within_1000ms_of_configured_boundary": 4
+            }
+          },
+          "timeout_facts": {
+            "NOT_OBSERVED": 69,
+            "OBSERVED": 21
+          },
+          "timeout_infrastructure": 4
+        },
+        "recorded_physical_primary_attempts": 92,
+        "recovery": {
+          "attempts": 19,
+          "execution_budget_capability_failures": 1,
+          "failure_categories": {
+            "protocol_error": 3
+          },
+          "outcomes": {
+            "capability_fail": 1,
+            "capability_pass": 15,
+            "infra_failure": 3
+          },
+          "source_outcomes": {
+            "harness_error:execution_budget_exhausted": 1,
+            "harness_error:protocol_error": 3,
+            "verified_pass": 15
+          },
+          "timeout_duration_by_class": {
+            "capability": {
+              "duration_available": 1,
+              "max_ms": 180597,
+              "median_ms": 180597,
+              "min_ms": 180597,
+              "observations": 1,
+              "within_1000ms_of_configured_boundary": 1
+            },
+            "infrastructure": {
+              "duration_available": 0,
+              "max_ms": null,
+              "median_ms": null,
+              "min_ms": null,
+              "observations": 0,
+              "within_1000ms_of_configured_boundary": 0
+            }
+          },
+          "timeout_facts": {
+            "NOT_OBSERVED": 18,
+            "OBSERVED": 1
+          },
+          "timeout_infrastructure": 0
+        },
+        "selected_primary_manifest_unavailable": 0,
+        "timeout_affected_recovery": {
+          "entered_recovery": 4,
+          "primary_infra_timeout_slots": 4,
+          "recovery_outcomes": {
+            "capability_pass": 3,
+            "infra_failure": 1
+          },
+          "recovery_source_outcomes": {
+            "harness_error:protocol_error": 1,
+            "verified_pass": 3
+          },
+          "unresolved": 1
+        }
+      },
+      "outcomes": {
+        "cancelled": 1,
+        "cancelled_rate": 0.011111111111,
+        "capability_evaluable": 86,
+        "capability_fail": 21,
+        "capability_pass": 65,
+        "capability_pass_rate": 0.755813953488,
+        "capability_pass_rate_wilson_95": {
+          "high": 0.834380349401,
+          "low": 0.655371270592
+        },
+        "infra_missing": 3,
+        "infra_missing_rate": 0.033333333333,
+        "logical_slots": 90,
+        "operational_pass_rate": 0.722222222222,
+        "operational_pass_rate_wilson_95": {
+          "high": 0.804203108053,
+          "low": 0.622047725029
+        }
+      },
+      "usage": {
+        "primary": {
+          "cache_write_input_tokens_observed_n": 54,
+          "cached_input_tokens_observed_n": 54,
+          "input_tokens_observed_n": 54,
+          "mean_cache_write_input_tokens": 0.0,
+          "mean_cached_input_tokens": 85020.61111111111,
+          "mean_input_tokens": 104503.44444444444,
+          "mean_output_tokens": 2088.462962962963,
+          "mean_reasoning_output_tokens": 865.333333333333,
+          "median_cache_write_input_tokens": 0.0,
+          "median_cached_input_tokens": 75520.0,
+          "median_input_tokens": 98220.0,
+          "median_output_tokens": 1744.5,
+          "median_reasoning_output_tokens": 636.0,
+          "output_tokens_observed_n": 54,
+          "primary_usage_coverage": 0.6,
+          "primary_usage_observed_n": 54,
+          "reasoning_output_tokens_observed_n": 54,
+          "total_cache_write_input_tokens": 0,
+          "total_cached_input_tokens": 4591113,
+          "total_input_tokens": 5643186,
+          "total_output_tokens": 112777,
+          "total_reasoning_output_tokens": 46728
+        },
+        "recovery": {
+          "cache_write_input_tokens_observed_n": 15,
+          "cached_input_tokens_observed_n": 15,
+          "input_tokens_observed_n": 15,
+          "mean_cache_write_input_tokens": 0.0,
+          "mean_cached_input_tokens": 81041.06666666667,
+          "mean_input_tokens": 96970.26666666666,
+          "mean_output_tokens": 1598.866666666667,
+          "mean_reasoning_output_tokens": 502.6,
+          "median_cache_write_input_tokens": 0,
+          "median_cached_input_tokens": 81152,
+          "median_input_tokens": 96221,
+          "median_output_tokens": 1428,
+          "median_reasoning_output_tokens": 447,
+          "output_tokens_observed_n": 15,
+          "reasoning_output_tokens_observed_n": 15,
+          "recovery_usage_coverage": 0.789473684211,
+          "recovery_usage_observed_n": 15,
+          "total_cache_write_input_tokens": 0,
+          "total_cached_input_tokens": 1215616,
+          "total_input_tokens": 1454554,
+          "total_output_tokens": 23983,
+          "total_reasoning_output_tokens": 7539
+        }
+      }
+    },
+    "model-gpt56-relay-responses": {
+      "attempts": {
+        "effective": {
+          "cancelled": 0,
+          "capability_n": 86,
+          "infra_count": 4,
+          "missing_count": 4,
+          "outcomes": {
+            "capability_fail": 3,
+            "capability_pass": 83,
+            "infra_failure": 4
+          },
+          "recovery_attempt_count": 14
+        },
+        "extra_primary_attempts_without_selected_manifest": 1,
+        "planned": 90,
+        "primary": {
+          "attempts": 90,
+          "execution_budget_capability_failures": 0,
+          "failure_categories": {
+            "http_error": 2,
+            "infra_error": 1,
+            "malformed_response": 10,
+            "rate_limit": 1
+          },
+          "outcomes": {
+            "capability_fail": 3,
+            "capability_pass": 73,
+            "infra_failure": 14
+          },
+          "source_outcomes": {
+            "infra_error": 1,
+            "provider_error": 13,
+            "subject_output_error": 1,
+            "verified_fail": 2,
+            "verified_pass": 73
+          },
+          "timeout_duration_by_class": {
+            "capability": {
+              "duration_available": 0,
+              "max_ms": null,
+              "median_ms": null,
+              "min_ms": null,
+              "observations": 0,
+              "within_1000ms_of_configured_boundary": 0
+            },
+            "infrastructure": {
+              "duration_available": 0,
+              "max_ms": null,
+              "median_ms": null,
+              "min_ms": null,
+              "observations": 0,
+              "within_1000ms_of_configured_boundary": 0
+            }
+          },
+          "timeout_facts": {
+            "NOT_OBSERVED": 90
+          },
+          "timeout_infrastructure": 0
+        },
+        "recorded_physical_primary_attempts": 91,
+        "recovery": {
+          "attempts": 14,
+          "execution_budget_capability_failures": 0,
+          "failure_categories": {
+            "malformed_response": 4
+          },
+          "outcomes": {
+            "capability_pass": 10,
+            "infra_failure": 4
+          },
+          "source_outcomes": {
+            "provider_error": 4,
+            "verified_pass": 10
+          },
+          "timeout_duration_by_class": {
+            "capability": {
+              "duration_available": 0,
+              "max_ms": null,
+              "median_ms": null,
+              "min_ms": null,
+              "observations": 0,
+              "within_1000ms_of_configured_boundary": 0
+            },
+            "infrastructure": {
+              "duration_available": 0,
+              "max_ms": null,
+              "median_ms": null,
+              "min_ms": null,
+              "observations": 0,
+              "within_1000ms_of_configured_boundary": 0
+            }
+          },
+          "timeout_facts": {
+            "NOT_OBSERVED": 14
+          },
+          "timeout_infrastructure": 0
+        },
+        "selected_primary_manifest_unavailable": 0,
+        "timeout_affected_recovery": {
+          "entered_recovery": 0,
+          "primary_infra_timeout_slots": 0,
+          "recovery_outcomes": {},
+          "recovery_source_outcomes": {},
+          "unresolved": 0
+        }
+      },
+      "outcomes": {
+        "cancelled": 0,
+        "cancelled_rate": 0.0,
+        "capability_evaluable": 86,
+        "capability_fail": 3,
+        "capability_pass": 83,
+        "capability_pass_rate": 0.96511627907,
+        "capability_pass_rate_wilson_95": {
+          "high": 0.988066201923,
+          "low": 0.902391288974
+        },
+        "infra_missing": 4,
+        "infra_missing_rate": 0.044444444444,
+        "logical_slots": 90,
+        "operational_pass_rate": 0.922222222222,
+        "operational_pass_rate_wilson_95": {
+          "high": 0.961815184683,
+          "low": 0.848061398174
+        }
+      },
+      "usage": {
+        "primary": {
+          "cache_write_input_tokens_observed_n": 0,
+          "cached_input_tokens_observed_n": 0,
+          "input_tokens_observed_n": 77,
+          "mean_cache_write_input_tokens": null,
+          "mean_cached_input_tokens": null,
+          "mean_input_tokens": 348.220779220779,
+          "mean_output_tokens": 599.532467532468,
+          "mean_reasoning_output_tokens": 362.922077922078,
+          "median_cache_write_input_tokens": null,
+          "median_cached_input_tokens": null,
+          "median_input_tokens": 340,
+          "median_output_tokens": 396,
+          "median_reasoning_output_tokens": 176,
+          "output_tokens_observed_n": 77,
+          "primary_usage_coverage": 0.855555555556,
+          "primary_usage_observed_n": 77,
+          "reasoning_output_tokens_observed_n": 77,
+          "total_cache_write_input_tokens": null,
+          "total_cached_input_tokens": null,
+          "total_input_tokens": 26813,
+          "total_output_tokens": 46164,
+          "total_reasoning_output_tokens": 27945
+        },
+        "recovery": {
+          "cache_write_input_tokens_observed_n": 0,
+          "cached_input_tokens_observed_n": 0,
+          "input_tokens_observed_n": 10,
+          "mean_cache_write_input_tokens": null,
+          "mean_cached_input_tokens": null,
+          "mean_input_tokens": 314.2,
+          "mean_output_tokens": 315.2,
+          "mean_reasoning_output_tokens": 122.8,
+          "median_cache_write_input_tokens": null,
+          "median_cached_input_tokens": null,
+          "median_input_tokens": 303.5,
+          "median_output_tokens": 192.5,
+          "median_reasoning_output_tokens": 38.5,
+          "output_tokens_observed_n": 10,
+          "reasoning_output_tokens_observed_n": 10,
+          "recovery_usage_coverage": 0.714285714286,
+          "recovery_usage_observed_n": 10,
+          "total_cache_write_input_tokens": null,
+          "total_cached_input_tokens": null,
+          "total_input_tokens": 3142,
+          "total_output_tokens": 3152,
+          "total_reasoning_output_tokens": 1228
+        }
+      }
+    }
+  },
+  "external_execution": {
+    "ablation": 0,
+    "analyst_llm": 0,
+    "harness": 0,
+    "judge": 0,
+    "matrix": 0,
+    "provider": 0
+  },
+  "final_gate": "NOT_RUN",
+  "kb4_approved": false,
+  "kc": "NOT_RUN",
+  "limitations": [
+    "All 82 Direct/medium complete pairs are PARTIALLY_COMPARABLE: observed model, provider configuration, and trace coverage limit interpretation. No causal Harness uplift is established.",
+    "Medium/high has 42 COMPARABLE and 41 NOT_COMPARABLE complete pairs; no task has five comparable repeats and formal eligibility is false. The 41 excluded controls cannot contribute controlled claims.",
+    "The two COMPARABLE discordances support recorded pair-level contrasts under the operator-trusted route, not a causal mechanism or population-wide reasoning-effort effect. Their passing comparator trees are integrity-limited.",
+    "Direct lacks an equivalent agent trace. Private reasoning and complete Codex provider-call timing are unavailable; no reasoning reconstruction or relay-phase causal claim is possible.",
+    "Five physical-primary timeout facts are unknown (four extra attempts plus one rejected primary); timeout counts are observed minima. Missingness is not established as random.",
+    "The three BadCases span two failure signatures. Python specification interpretation remains a hypothesis, and every canonical root_cause remains null.",
+    "No longer-timeout treatment exists. Longer budgets improving results, reasoning causing expiry, or timeout causing the capability delta are unsupported counterfactual claims.",
+    "The corpus is 18 Tier-A micro-contract tasks with at most five repeats per task. Descriptive configuration results do not establish universal coding capability or population-wide causal rankings.",
+    "Capability uses pass+fail; operational pass rates retain planned slots. Infra/cancelled and missing usage remain explicit, never zero-filled into capability or usage. Existing cost estimates are accounting, not billing truth.",
+    "K-B4.2's 17 workspace and 9 verifier-tree mismatches remain historical audit limitations; this report does not repair or reclassify them. K-B4.3 independently verified the selected failures' required bundles."
+  ],
+  "new_experimental_evidence": false,
+  "phase": "K-B4.4",
+  "provenance": {
+    "as_of": "2026-09-02T04:48:05.620171986Z",
+    "catalog_mode": "Offline projection into native Analyst tool namespaces; no tool or backend execution.",
+    "dataset_sha256": "sha256:d07f6c96e3bd7882137355cb8b5d2d5682e3d51bffcedce6292375d4a54bbd1d",
+    "experiment_id": "core-real-matrix-v6",
+    "plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+    "sources_sha256": {
+      "docs/ANALYST.md": "sha256:d793cfbd1f0a2aad650161058fe874ddded30a7399475b26626327b1413eac39",
+      "docs/BADCASES.md": "sha256:1b26c3a0a4fac490457109a51276baaf46cdb90e34ba91669f51ee4cfa10396c",
+      "docs/EVAL_METHODOLOGY.md": "sha256:8ec3229a0e79ff042871a943fb288cdbb37fdc260cdee0a1f8b8abdd9a36fd91",
+      "docs/EVAL_METHODOLOGY_V2.md": "sha256:ddd69a01430a15064e2fd0fc6538dce511203ede6cc6e8ac24737b29c9f3be45",
+      "docs/EXPERIMENT_STATISTICS.md": "sha256:17035ced7883fd6186e5bfd6c8d837c37fea9d8c9fd82058fc117576efe3aea4",
+      "docs/FAIRNESS_CONTRACT.md": "sha256:1bcd0e91876ed31a57f706fbf603c6f7fc14bf7dca472b992bc97edee967085f",
+      "docs/HARNESS_COMPARABILITY.md": "sha256:fee4bc710783348abf3073866bf80ab007bfc6fd7c597246211e83b584349fe9",
+      "release/badcases.json": "sha256:8f2ac7d3ecc745ef0f9ba19204e9ec0ea0947b0c7388c4eee260205b34996082",
+      "release/core-real-matrix-v6-analysis-dataset-manifest.json": "sha256:dad4043c059f0fdaf0b4985f091f16894671364c410e50a741e43cab1bc0f443",
+      "release/core-real-matrix-v6-analysis-dataset.jsonl": "sha256:d07f6c96e3bd7882137355cb8b5d2d5682e3d51bffcedce6292375d4a54bbd1d",
+      "release/core-real-matrix-v6-checkpoint-630.json": "sha256:ba06b29841d427ef02c468cf616c0075cec389a78aa16b00f71146bea16db9c7",
+      "release/core-real-matrix-v6-control.json": "sha256:9061656741e62d6683cb231a7d26c05d26c934f00f4c76a4dae3a8a2e4851e50",
+      "release/core-real-matrix-v6-final-analysis.json": "sha256:59b4e083c54d2d4a3bb1dfd2ad59129c45db81543f5cc5ae51de18a927590252",
+      "release/core-real-matrix-v6-final-analysis.md": "sha256:5572bcb71eaa4592efab4301dce483c6a5487c7e8482a3ea5086f293993a0f03",
+      "release/core-real-matrix-v6-gpt-relay-attribution-source-audit.json": "sha256:7b06fd33ffdbe9f35f473857efbcf9a0d8326e5fb356f4ef17972cc63f3926c3",
+      "release/core-real-matrix-v6-gpt-relay-match-map.jsonl": "sha256:2a4d2a789a1ff63081b0353966bbc0971ffe6c680be94f450dd4df258654155e",
+      "release/kb4-badcase-freeze.json": "sha256:0cf5b63aa5c5a40a1853e7c10dacf7e7452b8cf09548e4a130030de22325123b",
+      "release/kb4-discordant-pair-attribution.json": "sha256:6ab0d87c64dbee112fd17e7c46c6c8374d4aa8a5fbf9e2e31af0a93395b754ff",
+      "release/kb4-discordant-pair-attribution.md": "sha256:0ca41a034fb6f9f9ffdeec1c4b19490df471ed7b8642bc6aade11e02cefcb7f9",
+      "release/kb4-gpt-codex-timeout-sensitivity.json": "sha256:f7f981dab4026941e08a51f1166250fa49edf88c608c9719b6db57fa29239962",
+      "release/kb4-gpt-codex-timeout-sensitivity.md": "sha256:4d2895b925f7af6fe0522f1923e6a1f9c302e7d7645483ee0f5c84cf8cf0d229",
+      "scripts/build_kb4_final_attribution.py": "sha256:2d86cf2d3e1468d96379623e97368af948b83ec3e67f5d11fe27f9c6786b54fa",
+      "src/harnesslab/analyst/models.py": "sha256:83f4ba1a7f0614883e638259c50b3f2640247e1a87a5ee2bd592a07984c5e168",
+      "src/harnesslab/analyst/report.py": "sha256:a8c74a81f9dde2148dd34add7ac1cccc0d04a3ff93f370e86631cf0cbf95ceab",
+      "src/harnesslab/release/v6.py": "sha256:266b86492642816223dbc542178474356ee2f2de09c7d49782b8c2fa54a6ef9d"
+    }
+  },
+  "reproduce": "uv run --locked python -m scripts.build_kb4_final_attribution --check",
+  "requirement_reconciliation": [
+    {
+      "claim_ids": [
+        "F05",
+        "F06"
+      ],
+      "evidence_refs": [
+        "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort"
+      ],
+      "limitations": [
+        "Medium/high has 42 COMPARABLE and 41 NOT_COMPARABLE complete pairs; no task has five comparable repeats and formal eligibility is false. The 41 excluded controls cannot contribute controlled claims.",
+        "The two COMPARABLE discordances support recorded pair-level contrasts under the operator-trusted route, not a causal mechanism or population-wide reasoning-effort effect. Their passing comparator trees are integrity-limited."
+      ],
+      "requirement": "Codex medium/high reasoning ablation",
+      "status": "ABLATION_EVIDENCE_PRESENT_WITH_LIMITATIONS"
+    },
+    {
+      "claim_ids": [
+        "B01",
+        "B02",
+        "B03"
+      ],
+      "evidence_refs": [
+        "release/badcases.json",
+        "release/kb4-badcase-freeze.json"
+      ],
+      "limitations": [
+        "The three BadCases span two failure signatures. Python specification interpretation remains a hypothesis, and every canonical root_cause remains null."
+      ],
+      "requirement": "Three real verifier-backed BadCases",
+      "status": "FROZEN_VERIFIED"
+    },
+    {
+      "claim_ids": [
+        "F10",
+        "A01"
+      ],
+      "evidence_refs": [
+        "release/kb4-discordant-pair-attribution.json"
+      ],
+      "limitations": [
+        "Diagnostic associations do not establish causes."
+      ],
+      "requirement": "Failure taxonomy",
+      "status": "EVIDENCE_PRESENT"
+    },
+    {
+      "claim_ids": [
+        "F11",
+        "B01",
+        "B02",
+        "B03"
+      ],
+      "evidence_refs": [
+        "release/kb4-discordant-pair-attribution.json",
+        "release/badcases.json"
+      ],
+      "limitations": [
+        "The two COMPARABLE discordances support recorded pair-level contrasts under the operator-trusted route, not a causal mechanism or population-wide reasoning-effort effect. Their passing comparator trees are integrity-limited.",
+        "Direct lacks an equivalent agent trace. Private reasoning and complete Codex provider-call timing are unavailable; no reasoning reconstruction or relay-phase causal claim is possible.",
+        "K-B4.2's 17 workspace and 9 verifier-tree mismatches remain historical audit limitations; this report does not repair or reclassify them. K-B4.3 independently verified the selected failures' required bundles."
+      ],
+      "requirement": "Trace diagnosis",
+      "status": "EVIDENCE_PRESENT_WITH_LIMITATIONS"
+    },
+    {
+      "claim_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "A01",
+        "B01",
+        "B02",
+        "B03",
+        "H01"
+      ],
+      "evidence_refs": [
+        "release/kb4-final-attribution-report.json",
+        "release/kb4-final-attribution-report.md"
+      ],
+      "limitations": [
+        "Evidence reconciliation only; K-B4 is not approved and the Final Gate is not run."
+      ],
+      "requirement": "Attribution report",
+      "status": "REPORT_COMPLETE"
+    }
+  ],
+  "schema_version": 1,
+  "statistical_authority": {
+    "frozen_method": {
+      "bootstrap_method": "task_cluster_percentile",
+      "bootstrap_replicates": 50000,
+      "bootstrap_seed": 20260902,
+      "capability_effect_task_weighting": "equal_task",
+      "dataset": "release/core-real-matrix-v6-analysis-dataset.jsonl",
+      "dataset_freeze_commit": "728aa22aec0c64204b3151ddf9748a8c6746f78a",
+      "deterministic": true,
+      "experiment_id": "core-real-matrix-v6",
+      "manifest": "release/core-real-matrix-v6-analysis-dataset-manifest.json"
+    },
+    "interpretation_control": "Comparability eligibility controls interpretation authority; numerical significance is not causal evidence.",
+    "new_statistics_computed": false
+  },
+  "status": "READY_FOR_KB4_FINAL_GATE",
+  "timeout_sensitivity": {
+    "counterfactual_status": "INSUFFICIENT_EVIDENCE_FOR_COUNTERFACTUAL",
+    "execution_scopes": {
+      "max_cost": {
+        "scopes": [
+          "NOT_AVAILABLE"
+        ],
+        "status": "NOT_AVAILABLE",
+        "unit": "USD",
+        "value": null
+      },
+      "max_model_turns": {
+        "scopes": [
+          "NOT_AVAILABLE"
+        ],
+        "status": "NOT_AVAILABLE",
+        "unit": "turns",
+        "value": null
+      },
+      "max_output_tokens": {
+        "scopes": [
+          "PER_PROVIDER_REQUEST"
+        ],
+        "status": "ENFORCED",
+        "unit": "tokens",
+        "value": 2000
+      },
+      "max_provider_requests": {
+        "scopes": [
+          "NOT_AVAILABLE"
+        ],
+        "status": "NOT_AVAILABLE",
+        "unit": "requests",
+        "value": null
+      },
+      "max_tool_calls": {
+        "scopes": [
+          "NOT_AVAILABLE"
+        ],
+        "status": "NOT_AVAILABLE",
+        "unit": "calls",
+        "value": null
+      },
+      "max_wall_time": {
+        "scopes": [
+          "PER_LOGICAL_RUN"
+        ],
+        "status": "ENFORCED",
+        "unit": "seconds",
+        "value": 300
+      }
+    },
+    "observed_primary_infra_timeouts": 5,
+    "recovered_to_capability": 3,
+    "unknown_physical_primary_timeout_facts": 5,
+    "unresolved": 2
+  }
+}
