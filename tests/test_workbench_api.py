@@ -909,9 +909,17 @@ async def test_core_readiness_is_evidence_driven_and_stays_not_ready(
     task_check = next(check for check in body["checks"] if check["key"] == "TASK_CORPUS")
     assert task_check["status"] == "READY"
     assert "15-25" in task_check["evidence"]
-    assert "REAL_MATRIX_EVIDENCE" in body["blockers"]
-    assert "JUDGE_EVIDENCE" in body["blockers"]
-    assert "MODEL_ONLY_PROFILES" in body["blockers"]
+    for key in (
+        "REAL_MATRIX_EVIDENCE",
+        "JUDGE_EVIDENCE",
+        "MODEL_ONLY_PROFILES",
+        "PAIRED_LANE",
+        "ABLATION",
+    ):
+        assert next(check for check in body["checks"] if check["key"] == key)["status"] == "READY"
+    assert "RELEASE_EVIDENCE" in body["blockers"]
+    assert "REMOTE_CI" in body["blockers"]
+    assert "CORE_TAG" in body["blockers"]
     assert "PHASE_J" not in body["blockers"]
 
 

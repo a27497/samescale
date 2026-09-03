@@ -4,7 +4,9 @@ import copy
 import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
+from unittest.mock import AsyncMock
 
 import pytest
 from pydantic import ValidationError
@@ -130,6 +132,42 @@ def test_kc_stable_contract_preserves_science_history_and_hard_stop() -> None:
                 },
             }
         )
+
+
+async def test_kc_workbench_uses_verified_candidate_and_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from harnesslab.api import workbench_service as workbench
+
+    session = AsyncMock()
+    session.scalars.return_value = SimpleNamespace(all=lambda: [])
+    response = await workbench.core_readiness(session, ())
+    checks = {check.key: check for check in response.checks}
+    assert response.status == "NOT_READY"
+    for key in ("TASK_CORPUS", "REAL_MATRIX_EVIDENCE", "JUDGE_EVIDENCE", "PAIRED_LANE", "ABLATION"):
+        assert checks[key].status == "READY"
+    assert "82/90 complete, all PARTIALLY_COMPARABLE" in checks["PAIRED_LANE"].evidence
+    assert "42 COMPARABLE, 41 NOT_COMPARABLE" in checks["ABLATION"].evidence
+    assert "formal eligibility false" in checks["ABLATION"].evidence
+    assert "causal reasoning-effort claims forbidden" in checks["ABLATION"].evidence
+    assert "DEFERRED_NOT_VERIFIED" in checks["HARNESS_MATRIX_PLAN"].evidence
+    assert {"RELEASE_EVIDENCE", "REMOTE_CI", "CORE_TAG"} <= set(response.blockers)
+
+    def corrupt_candidate(root: Path) -> Any:
+        raise CoreReleaseError("accepted source digest mismatch")
+
+    monkeypatch.setattr(workbench, "verify_candidate", corrupt_candidate)
+    rejected = await workbench.core_readiness(session, ())
+    assert rejected.status == "NOT_READY"
+    for check in rejected.checks:
+        if check.key in {
+            "TASK_CORPUS",
+            "REAL_MATRIX_EVIDENCE",
+            "JUDGE_EVIDENCE",
+            "PAIRED_LANE",
+            "ABLATION",
+        }:
+            assert check.status == "NOT_VERIFIED"
 
 
 @pytest.mark.parametrize(

@@ -79,6 +79,7 @@ from harnesslab.release.contracts import (
     load_resume_claim_map,
 )
 from harnesslab.release.models import EvidenceState
+from harnesslab.release.reconciliation import load_accepted_plan, verify_candidate
 
 TERMINAL_RUN_STATUSES = {
     RunStatus.COMPLETED.value,
@@ -926,12 +927,20 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
         judge_count += 1
     repository_root = Path(__file__).resolve().parents[3]
     badcases_ready = False
+    accepted_v6 = False
     try:
-        corpus = load_core_corpus(repository_root / "release/core-corpus.json")
-        release_plan = load_real_evidence_plan(
-            repository_root / "release/core-real-evidence-plan.json"
-        )
         release_evidence = load_release_evidence(repository_root / "release/release-evidence.json")
+        if release_evidence.schema_version == 2:
+            release_evidence = verify_candidate(repository_root)
+            accepted_plan = load_accepted_plan(repository_root)
+            corpus = load_core_corpus(repository_root / accepted_plan.corpus_reference)
+            release_plan = None
+            accepted_v6 = True
+        else:
+            corpus = load_core_corpus(repository_root / "release/core-corpus.json")
+            release_plan = load_real_evidence_plan(
+                repository_root / "release/core-real-evidence-plan.json"
+            )
         claim_map = load_resume_claim_map(repository_root / "release/resume-claim-evidence.json")
         badcases = load_badcase_plan(repository_root / "release/badcases.json")
         with suppress(OSError, ValueError):
@@ -942,7 +951,9 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
             and len(corpus.tasks) == 18
             and all(not task.baseline.passed and task.oracle.passed for task in corpus.tasks)
         )
-        matrix_plan_ready = len(release_plan.cells) == 7
+        matrix_plan_ready = accepted_v6 or (
+            release_plan is not None and len(release_plan.cells) == 7
+        )
         docs_ready = all(
             (repository_root / path).is_file()
             for path in (
@@ -967,6 +978,7 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
         release_plan = None
         release_evidence = None
         badcases = None
+        accepted_v6 = False
         corpus_ready = matrix_plan_ready = docs_ready = phase_j_ready = False
         release_contracts_available = False
     release_task_count = len(corpus.tasks) if corpus is not None else 0
@@ -978,7 +990,7 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
         if release_evidence is not None
         else "NOT_VERIFIED"
     )
-    checks = (
+    checks: tuple[ReadinessCheck, ...] = (
         ReadinessCheck(
             key="TASK_CORPUS",
             label="Canonical Core task corpus",
@@ -1104,6 +1116,39 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
             evidence="Tag creation is refused until final release verification passes",
         ),
     )
+    if accepted_v6 and release_evidence is not None:
+        # Show validated stable evidence; detached final authorization is not
+        # persisted in this view and cannot make the committed candidate ready.
+        current_checks = {
+            "MODEL_ONLY_PROFILES": ReadinessCheck(
+                key="MODEL_ONLY_PROFILES",
+                label="Frozen Model-only profiles",
+                status="READY",
+                evidence="Frozen profiles bound to the accepted V6 ExperimentPlan",
+            ),
+            "HARNESS_MATRIX_PLAN": ReadinessCheck(
+                key="HARNESS_MATRIX_PLAN",
+                label="Core Harness Matrix plan",
+                status="READY",
+                evidence=(
+                    "Accepted V6: 7 cells and 630 slots; DeepSeek Harness E1 is outside Core "
+                    "scope and REAL_DEEPSEEK_SMOKE remains DEFERRED_NOT_VERIFIED"
+                ),
+            ),
+            "PAIRED_LANE": ReadinessCheck(
+                key="PAIRED_LANE",
+                label="Real Pair evidence",
+                status="READY",
+                evidence=release_evidence.paired_lane.limitation or "",
+            ),
+            "ABLATION": ReadinessCheck(
+                key="ABLATION",
+                label="Real ablation evidence",
+                status="READY",
+                evidence=release_evidence.controlled_ablation.limitation or "",
+            ),
+        }
+        checks = tuple(current_checks.get(check.key, check) for check in checks)
     blockers = tuple(check.key for check in checks if check.status != "READY")
     return CoreReadinessResponse(
         status="NOT_READY" if blockers else "READY",
