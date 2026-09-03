@@ -67,3 +67,4 @@ jobs:
           tests/test_kb3_v6_canary.py
           tests/test_kb3_v6_integration.py
           tests/test_kb3_v6_throughput_r2.py
+          tests/test_kb4_timeout_sensitivity.py
