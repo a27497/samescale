@@ -19,6 +19,7 @@ from harnesslab.egress import (
     EgressProxyRuntime,
     preflight_egress_network_isolation,
 )
+from harnesslab.release.badcases import verify_frozen_badcases
 from harnesslab.release.contracts import (
     CoreReleaseError,
     build_corpus_manifest,
@@ -69,7 +70,7 @@ CRITICAL_TESTS = {
     "test_release_evidence_is_strict_keyless_and_not_ready",
     "test_verified_evidence_and_resume_claims_cannot_be_forged",
     "test_resume_claim_map_refs_exist_and_real_claims_remain_unverified",
-    "test_three_badcase_slots_are_explicitly_pending",
+    "test_three_badcase_slots_are_frozen_real_failures",
     "test_tag_guard_refuses_incomplete_release_and_tag_is_absent",
     "test_release_docs_and_fresh_setup_contract_exist",
     "test_ci_runs_keyless_gate_k_after_gate_j_without_real_execution",
@@ -238,10 +239,11 @@ def verify_contract_mode() -> bool:
     ):
         print("FAIL: VERIFIED resume claim references missing evidence")
         return False
-    if len(badcases.slots) != 3 or any(
-        slot.status is not EvidenceState.NOT_VERIFIED for slot in badcases.slots
-    ):
-        print("FAIL: K-A BadCase placeholders are not fail-closed")
+    try:
+        if badcases != verify_frozen_badcases(ROOT):
+            raise ValueError("canonical BadCase mismatch")
+    except (OSError, ValueError) as exc:
+        print(f"FAIL: frozen BadCase contract invalid: {exc}")
         return False
     workflow = (ROOT / ".github/workflows/full-ci.yml").read_text(encoding="utf-8")
     if workflow.index("scripts/verify_gate_j.py") >= workflow.index("scripts/verify_gate_k.py"):

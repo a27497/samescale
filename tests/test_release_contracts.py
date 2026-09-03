@@ -15,6 +15,7 @@ from harnesslab.comparability.models import (
     ComparisonFacts,
     canonical_digest,
 )
+from harnesslab.release.badcases import verify_frozen_badcases
 from harnesslab.release.contracts import (
     CoreReleaseError,
     build_corpus_manifest,
@@ -209,12 +210,12 @@ def test_resume_claim_map_refs_exist_and_real_claims_remain_unverified() -> None
     )
 
 
-def test_three_badcase_slots_are_explicitly_pending() -> None:
+def test_three_badcase_slots_are_frozen_real_failures() -> None:
     plan = load_badcase_plan(RELEASE / "badcases.json")
     assert len(plan.slots) == 3
-    assert all(slot.status is EvidenceState.NOT_VERIFIED for slot in plan.slots)
-    assert all(slot.placeholder == "NOT_VERIFIED — REAL EVIDENCE PENDING" for slot in plan.slots)
-    assert all(not slot.evidence_refs for slot in plan.slots)
+    assert all(slot.status is EvidenceState.VERIFIED for slot in plan.slots)
+    assert all(slot.placeholder is None for slot in plan.slots)
+    assert plan == verify_frozen_badcases(ROOT)
 
 
 def test_tag_guard_refuses_incomplete_release_and_tag_is_absent() -> None:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from contextlib import suppress
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
@@ -68,6 +69,7 @@ from harnesslab.experiment.report import (
 from harnesslab.experiment.spec import ExperimentSpecError
 from harnesslab.experiment.statistics import summarize_cell
 from harnesslab.judgelab.report import JudgeCalibrationReport
+from harnesslab.release.badcases import verify_frozen_badcases
 from harnesslab.release.contracts import (
     CoreReleaseError,
     load_badcase_plan,
@@ -923,6 +925,7 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
             continue
         judge_count += 1
     repository_root = Path(__file__).resolve().parents[3]
+    badcases_ready = False
     try:
         corpus = load_core_corpus(repository_root / "release/core-corpus.json")
         release_plan = load_real_evidence_plan(
@@ -931,6 +934,8 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
         release_evidence = load_release_evidence(repository_root / "release/release-evidence.json")
         claim_map = load_resume_claim_map(repository_root / "release/resume-claim-evidence.json")
         badcases = load_badcase_plan(repository_root / "release/badcases.json")
+        with suppress(OSError, ValueError):
+            badcases_ready = badcases == verify_frozen_badcases(repository_root)
         corpus_ready = (
             release_evidence.core_corpus.state is EvidenceState.VERIFIED
             and release_evidence.core_corpus.digest == corpus.digest
@@ -1059,10 +1064,12 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
         ReadinessCheck(
             key="BADCASE_EVIDENCE",
             label="Three real BadCases",
-            status="NOT_VERIFIED",
+            status="READY" if badcases_ready else "NOT_VERIFIED",
             evidence=(
-                f"{len(badcases.slots) if badcases else 0} placeholders; "
-                "NOT_VERIFIED — REAL EVIDENCE PENDING"
+                "Three verifier-backed V6 BadCases frozen with checked source bindings; "
+                "final release remains gated"
+                if badcases_ready
+                else "Canonical BadCase freeze is unavailable or fails validation"
             ),
         ),
         ReadinessCheck(

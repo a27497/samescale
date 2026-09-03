@@ -2,52 +2,492 @@
   "schema_version": 1,
   "slots": [
     {
+      "attribution_classification": "OBSERVED_FACT",
+      "cell_identity": "cell:harness-codex-gpt56-high",
+      "evidence_refs": [
+        "cell:harness-codex-gpt56-high",
+        "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/manifest.json",
+        "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/native/codex.sanitized.jsonl",
+        "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/trace/normalized.json",
+        "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/verifier",
+        "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/verifier/manifest.json",
+        "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/verifier/stderr.txt",
+        "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/verifier/stdout.txt",
+        "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/workspace",
+        "manifest:sha256:f2f4a1fd5bd9351589cdb7c844f587ed79b88051aa49b0a4e5d5249bbadaa8ba",
+        "release/kb4-discordant-pair-attribution.json",
+        "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+        "task:core-java-settings-merge@1.0.2#sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+        "tasks/core-java-settings-merge/1.0.2/instruction.md",
+        "tasks/core-java-settings-merge/1.0.2/oracle/Settings.java",
+        "tasks/core-java-settings-merge/1.0.2/task.yaml",
+        "tasks/core-java-settings-merge/1.0.2/verifier/health_workspace/Defaults.java",
+        "tasks/core-java-settings-merge/1.0.2/verifier/health_workspace/Settings.java",
+        "tasks/core-java-settings-merge/1.0.2/verifier/health_workspace/contract.txt",
+        "tasks/core-java-settings-merge/1.0.2/verifier/subject_probe.py",
+        "tasks/core-java-settings-merge/1.0.2/verifier/subject_worker.py",
+        "tasks/core-java-settings-merge/1.0.2/verifier/verify.py",
+        "tasks/core-java-settings-merge/1.0.2/workspace/Defaults.java",
+        "tasks/core-java-settings-merge/1.0.2/workspace/Settings.java",
+        "tasks/core-java-settings-merge/1.0.2/workspace/contract.txt",
+        "trace:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a#sha256:6817add2b19d5525ba3ae702cf5dde152e9b0f5535c47a86faca5360895c572c",
+        "verifier:sha256:e10c25e47889d60f7fc56a8324028ff8e82646c6cddec78d4aa62cab1425e871"
+      ],
+      "frozen_evidence": {
+        "candidate_id": "kb4-candidate-ab5922b348dbc889",
+        "comparisons": [
+          {
+            "both_member_bundles_verified": false,
+            "comparison_id": "codex-gpt56-reasoning-effort",
+            "controlled_attribution_claimed": false,
+            "formal_eligible": false,
+            "pair_id": "codex-gpt56-reasoning-effort:sha256:798c9b68cc47c0b1ddaf18f1438cbcc6e81ead5e7c77ac38ea770fb09053d3e2",
+            "reason_codes": [
+              "INTENDED_TREATMENT_DIFFERENCE",
+              "OPERATOR_TRUSTED_ROUTE_MODEL_NOT_RUNTIME_EXPOSED"
+            ],
+            "status": "COMPARABLE"
+          }
+        ],
+        "complete_failure_bundle_verified": true,
+        "effective_source": "primary",
+        "execution_run_identity": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1",
+        "experiment_id": "core-real-matrix-v6",
+        "experiment_slot_id": "sha256:c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+        "failure_class": "No Modification",
+        "file_digests": {
+          "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/manifest.json": "sha256:f2f4a1fd5bd9351589cdb7c844f587ed79b88051aa49b0a4e5d5249bbadaa8ba",
+          "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/native/codex.sanitized.jsonl": "sha256:640c0b6af9753302b94ec46c7b767368a4c5772a31cf07673c867aba3a79a8d6",
+          "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/trace/normalized.json": "sha256:6817add2b19d5525ba3ae702cf5dde152e9b0f5535c47a86faca5360895c572c",
+          "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/verifier/manifest.json": "sha256:3834271a2bafa09c24bbb6777408f80d3ff972e0cc94e41aeaa940e0daffe27b",
+          "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/verifier/stderr.txt": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/verifier/stdout.txt": "sha256:0b3b406e94cae4487ca53611ea0072ad855802ec1bffbc360abdb026fa7b6d09",
+          "tasks/core-java-settings-merge/1.0.2/instruction.md": "sha256:3538a43a4ba64fa697500ac1e86d9bf628fdd1bb31dc89d5fb897a1d056f59ea",
+          "tasks/core-java-settings-merge/1.0.2/oracle/Settings.java": "sha256:cf84465f7d86d74d593b011b1d99642f87cde827d5f09ebe656dd2786eeac277",
+          "tasks/core-java-settings-merge/1.0.2/task.yaml": "sha256:c374b15c1c93e804d9cd55a81e218433703bbd2fd183a5303b042d43f8c97016",
+          "tasks/core-java-settings-merge/1.0.2/verifier/health_workspace/Defaults.java": "sha256:fb503dd7bbf3a704ceba06152031657d0fc46a14b303a0a08400f1134fa377a3",
+          "tasks/core-java-settings-merge/1.0.2/verifier/health_workspace/Settings.java": "sha256:cf84465f7d86d74d593b011b1d99642f87cde827d5f09ebe656dd2786eeac277",
+          "tasks/core-java-settings-merge/1.0.2/verifier/health_workspace/contract.txt": "sha256:bf124089b56b69f10c257fa3f389e11ebf7de5e5838e0c0c66e63e4e4de22fe9",
+          "tasks/core-java-settings-merge/1.0.2/verifier/subject_probe.py": "sha256:d12e15bc880e9bb8116cb1a105d5cf5f7b16e888b1254cb3a579b72fe5aa7748",
+          "tasks/core-java-settings-merge/1.0.2/verifier/subject_worker.py": "sha256:76bccff356ad45f76a785776d2afd9690a75a5acb625e3a17cc850a96ec912fd",
+          "tasks/core-java-settings-merge/1.0.2/verifier/verify.py": "sha256:e1f903093a96017b4babd0e91fb075240ff71dd68213a858c1a4a9d27fa94178",
+          "tasks/core-java-settings-merge/1.0.2/workspace/Defaults.java": "sha256:fb503dd7bbf3a704ceba06152031657d0fc46a14b303a0a08400f1134fa377a3",
+          "tasks/core-java-settings-merge/1.0.2/workspace/Settings.java": "sha256:79fa7115e8b06c694fc59a43999ce9a2fefbf67b4d41cc178fc5aeebc3f18321",
+          "tasks/core-java-settings-merge/1.0.2/workspace/contract.txt": "sha256:bf124089b56b69f10c257fa3f389e11ebf7de5e5838e0c0c66e63e4e4de22fe9"
+        },
+        "harness_config_identity": "sha256:7317647c90c0fe058b83e2b18190ad4774a30235a44f5186f9cf5379f21a9ad2",
+        "manifest_digest": "sha256:f2f4a1fd5bd9351589cdb7c844f587ed79b88051aa49b0a4e5d5249bbadaa8ba",
+        "normalized_trace_digest": "sha256:6817add2b19d5525ba3ae702cf5dde152e9b0f5535c47a86faca5360895c572c",
+        "primary_run_identity": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1",
+        "profile_identity": "sha256:c3912c1340bc84b772a2c9c1535001ece19c7a28dab19c57482deadaf1856ffd",
+        "recovery_run_identity": null,
+        "repeat_index": 0,
+        "safe_tool_facts": [
+          "Four trace events: thread start, turn start, public agent message, turn completion; no commands or file edits.",
+          "The public workspace-unavailable statement is unverified self-report; no runtime cause is established."
+        ],
+        "source_diffs": [],
+        "trace_status": "REPORTED",
+        "tree_digests": {
+          "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/verifier": "sha256:85d1c46e290e2e2b883e56fada03355528706161a8f26cdade1011ca4c6566e6",
+          "evidence:harness-codex-gpt56-high/run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a-a1/workspace": "sha256:7b888545e7872e402c37157efaf096975df5d61616c511dbd65323695dab594a"
+        },
+        "verifier_report": {
+          "checks": [
+            {
+              "detail": null,
+              "name": "normalizes",
+              "passed": false,
+              "score": 0.0
+            },
+            {
+              "detail": null,
+              "name": "preserves-order",
+              "passed": false,
+              "score": 0.0
+            },
+            {
+              "detail": null,
+              "name": "input-unchanged",
+              "passed": true,
+              "score": 1.0
+            },
+            {
+              "detail": null,
+              "name": "duplicate-rejected",
+              "passed": false,
+              "score": 0.0
+            },
+            {
+              "detail": null,
+              "name": "invalid-rejected",
+              "passed": false,
+              "score": 0.0
+            }
+          ],
+          "passed": false,
+          "schema_version": 1,
+          "score": 0.2,
+          "summary": "Java HTTP header normalization cases"
+        }
+      },
+      "harnesslab_detection": "HarnessLab binds the failed_subject/capability_fail run to its manifest, verifies artifact digests, and retains individual deterministic checks, source differences, and available safe trace facts. This exposes unchanged implementation or an empty-key boundary failure hidden by aggregate pass rates.",
+      "hypotheses": [],
+      "limitations": [
+        "A factual verifier failure does not establish a causal mechanism. Root cause is null.",
+        "No Harness-uplift or formal reasoning-effort effect is established; formal eligibility remains false.",
+        "The three cases cover two failure signatures; the Python cases are related observations.",
+        "The failure bundle is intact, but the passing comparison member has a tree-integrity limitation. Frozen comparability is retained; complete paired-trajectory audit and causal attribution are not claimed."
+      ],
+      "mitigation_lesson": "Check that the required implementation changed and inspect deterministic verifier results before declaring completion. This is an engineering safeguard, not a verified remedy for the unknown cause.",
+      "observed_failure": "The workspace is unchanged. The deterministic verifier fails normalizes, preserves-order, duplicate-rejected, and invalid-rejected; input-unchanged passes.",
+      "placeholder": null,
+      "root_cause": null,
+      "run_identity": "run:run-c2e4e8b22b0696a1c080f57deee651e363390f8a7a7ca7ac22a8042895d5591a",
+      "safe_trace_facts": [
+        "TRACE_EVENT_TYPE:AGENT_MESSAGE",
+        "TRACE_EVENT_TYPE:THREAD_STARTED",
+        "TRACE_EVENT_TYPE:TURN_COMPLETED",
+        "TRACE_EVENT_TYPE:TURN_STARTED"
+      ],
       "slot_id": "badcase-1",
-      "status": "NOT_VERIFIED",
-      "task_identity": null,
-      "run_identity": null,
-      "cell_identity": null,
-      "evidence_refs": [],
-      "observed_failure": null,
-      "safe_trace_facts": [],
-      "verifier_result": null,
-      "attribution_classification": null,
-      "root_cause": null,
-      "mitigation_lesson": null,
-      "harnesslab_detection": null,
-      "placeholder": "NOT_VERIFIED — REAL EVIDENCE PENDING"
+      "status": "VERIFIED",
+      "task_identity": "task:core-java-settings-merge@1.0.2#sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+      "verifier_result": "capability_fail:verified_fail"
     },
     {
+      "attribution_classification": "OBSERVED_FACT",
+      "cell_identity": "cell:harness-codex-gpt56-high",
+      "evidence_refs": [
+        "cell:harness-codex-gpt56-high",
+        "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/manifest.json",
+        "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/native/codex.sanitized.jsonl",
+        "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/trace/normalized.json",
+        "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/verifier",
+        "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/verifier/manifest.json",
+        "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/verifier/stderr.txt",
+        "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/verifier/stdout.txt",
+        "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/workspace",
+        "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/workspace/events.py",
+        "manifest:sha256:be7fc1d19b70ebe03fc1cb761a46d510d7ea2a0f245b87bdb84db7daf64f7d36",
+        "release/kb4-discordant-pair-attribution.json",
+        "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+        "task:core-python-deduplicate@1.0.2#sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "tasks/core-python-deduplicate/1.0.2/instruction.md",
+        "tasks/core-python-deduplicate/1.0.2/oracle/events.py",
+        "tasks/core-python-deduplicate/1.0.2/task.yaml",
+        "tasks/core-python-deduplicate/1.0.2/verifier/health_workspace/contract.txt",
+        "tasks/core-python-deduplicate/1.0.2/verifier/health_workspace/events.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/python_subject_boundary.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/subject_execution.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/subject_probe.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/subject_worker.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/verify.py",
+        "tasks/core-python-deduplicate/1.0.2/workspace/contract.txt",
+        "tasks/core-python-deduplicate/1.0.2/workspace/events.py",
+        "trace:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00#sha256:20702015455f1148b99745a5ec0a05c491d32b87170610716bc704f9d2d65286",
+        "verifier:sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919"
+      ],
+      "frozen_evidence": {
+        "candidate_id": "kb4-candidate-93e0206579a4fa92",
+        "comparisons": [
+          {
+            "both_member_bundles_verified": false,
+            "comparison_id": "codex-gpt56-reasoning-effort",
+            "controlled_attribution_claimed": false,
+            "formal_eligible": false,
+            "pair_id": "codex-gpt56-reasoning-effort:sha256:6d91da38c3b1bc42c758eb6fa35e0961161bdce83afc997ca3513e54954f4a77",
+            "reason_codes": [
+              "INTENDED_TREATMENT_DIFFERENCE",
+              "OPERATOR_TRUSTED_ROUTE_MODEL_NOT_RUNTIME_EXPOSED"
+            ],
+            "status": "COMPARABLE"
+          }
+        ],
+        "complete_failure_bundle_verified": true,
+        "effective_source": "primary",
+        "execution_run_identity": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1",
+        "experiment_id": "core-real-matrix-v6",
+        "experiment_slot_id": "sha256:d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+        "failure_class": "Test Failure",
+        "file_digests": {
+          "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/manifest.json": "sha256:be7fc1d19b70ebe03fc1cb761a46d510d7ea2a0f245b87bdb84db7daf64f7d36",
+          "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/native/codex.sanitized.jsonl": "sha256:1296561188009f7af284c34d88ed88b5e043fc3f0fcdecd42006ef373b36ad9b",
+          "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/trace/normalized.json": "sha256:20702015455f1148b99745a5ec0a05c491d32b87170610716bc704f9d2d65286",
+          "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/verifier/manifest.json": "sha256:9b547b902de933736d9f51cb07bb7490694ead9fcdce485ea613746e7045a03d",
+          "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/verifier/stderr.txt": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/verifier/stdout.txt": "sha256:1c5c9c608f06f515546ad3cffa3c33ffe3a31f33ca91a89133d5fa368fc225bc",
+          "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/workspace/events.py": "sha256:2811cbe8a5788e4c6ccced90f4dd303e3c8c6cd0b267bb88118044a5eec88d69",
+          "tasks/core-python-deduplicate/1.0.2/instruction.md": "sha256:4f64515977a9ee15c1c1ef9ce110fbc34ab71f41e6c9f0835dae46657f1cf3df",
+          "tasks/core-python-deduplicate/1.0.2/oracle/events.py": "sha256:dc4dd8e40e71d0f750482896658bcac1379feda0296e1e105ff3c7f9ac81ff3b",
+          "tasks/core-python-deduplicate/1.0.2/task.yaml": "sha256:c47d503d5a7b7fc0d5ef506a68330cb466a79e87216601111a292aa6a6ae993b",
+          "tasks/core-python-deduplicate/1.0.2/verifier/health_workspace/contract.txt": "sha256:5bd9a5accdde8f3863bb8c11f5c347b8c4f49fa74155b904c59744e124c40943",
+          "tasks/core-python-deduplicate/1.0.2/verifier/health_workspace/events.py": "sha256:dc4dd8e40e71d0f750482896658bcac1379feda0296e1e105ff3c7f9ac81ff3b",
+          "tasks/core-python-deduplicate/1.0.2/verifier/python_subject_boundary.py": "sha256:861d0e819ee5322b4181802dbe1e71c1e280b890e6fb68e2daac54452f1f6bd1",
+          "tasks/core-python-deduplicate/1.0.2/verifier/subject_execution.py": "sha256:26e69bf429b428f9cce0f95dfe133bc8e3ac2b86749db8d30685649ae04c455c",
+          "tasks/core-python-deduplicate/1.0.2/verifier/subject_probe.py": "sha256:eaab72d5f162adb7ded8999c26eb5d62beebf119f0e47615ce6bf25933847bbd",
+          "tasks/core-python-deduplicate/1.0.2/verifier/subject_worker.py": "sha256:76bccff356ad45f76a785776d2afd9690a75a5acb625e3a17cc850a96ec912fd",
+          "tasks/core-python-deduplicate/1.0.2/verifier/verify.py": "sha256:e1f903093a96017b4babd0e91fb075240ff71dd68213a858c1a4a9d27fa94178",
+          "tasks/core-python-deduplicate/1.0.2/workspace/contract.txt": "sha256:5bd9a5accdde8f3863bb8c11f5c347b8c4f49fa74155b904c59744e124c40943",
+          "tasks/core-python-deduplicate/1.0.2/workspace/events.py": "sha256:b46230b231c9f80180643150d563803532bf4d5c957e76b7a353eb71e824ba7e"
+        },
+        "harness_config_identity": "sha256:7317647c90c0fe058b83e2b18190ad4774a30235a44f5186f9cf5379f21a9ad2",
+        "manifest_digest": "sha256:be7fc1d19b70ebe03fc1cb761a46d510d7ea2a0f245b87bdb84db7daf64f7d36",
+        "normalized_trace_digest": "sha256:20702015455f1148b99745a5ec0a05c491d32b87170610716bc704f9d2d65286",
+        "primary_run_identity": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1",
+        "profile_identity": "sha256:c3912c1340bc84b772a2c9c1535001ece19c7a28dab19c57482deadaf1856ffd",
+        "recovery_run_identity": null,
+        "repeat_index": 2,
+        "safe_tool_facts": [
+          "The bound trace contains file changes and public commands with assertions accepting empty keys.",
+          "A git command exits 128; that incidental tool fact does not supersede the verifier-backed Test Failure.",
+          "Issued assertion and byte-compile syntax does not prove every shell subcommand ran or passed."
+        ],
+        "source_diffs": [
+          "--- baseline/events.py\n+++ observed/events.py\n@@ -3,6 +3,11 @@\n         self._results: dict[str, str] = {}\n \n     def record_success(self, operation_key: str, result: str) -> bool:\n+        if operation_key and operation_key in self._results:\n+            if self._results[operation_key] == result:\n+                return False\n+            raise ValueError(\"operation_key already has a different result\")\n+\n         self._results[operation_key] = result\n         return True\n \n"
+        ],
+        "trace_status": "REPORTED",
+        "tree_digests": {
+          "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/verifier": "sha256:332c617fe6768485bcddde0cc15513e7a6d601e20107b5edf064bd6a2a9a90ad",
+          "evidence:harness-codex-gpt56-high/run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00-a1/workspace": "sha256:2b6bbf3ac2c865b6e93eb36bf2ca7ed773791466c113e2d5ea1ae7ef368ba2cf"
+        },
+        "verifier_report": {
+          "checks": [
+            {
+              "detail": null,
+              "name": "first-records",
+              "passed": true,
+              "score": 1.0
+            },
+            {
+              "detail": null,
+              "name": "identical-retry-idempotent",
+              "passed": true,
+              "score": 1.0
+            },
+            {
+              "detail": null,
+              "name": "conflict-rejected",
+              "passed": true,
+              "score": 1.0
+            },
+            {
+              "detail": null,
+              "name": "conflict-preserves-original",
+              "passed": true,
+              "score": 1.0
+            },
+            {
+              "detail": null,
+              "name": "empty-key-rejected",
+              "passed": false,
+              "score": 0.0
+            }
+          ],
+          "passed": false,
+          "schema_version": 1,
+          "score": 0.8,
+          "summary": "idempotent retry-ledger cases"
+        }
+      },
+      "harnesslab_detection": "HarnessLab binds the failed_subject/capability_fail run to its manifest, verifies artifact digests, and retains individual deterministic checks, source differences, and available safe trace facts. This exposes unchanged implementation or an empty-key boundary failure hidden by aggregate pass rates.",
+      "hypotheses": [
+        {
+          "classification": "ATTRIBUTION_HYPOTHESIS",
+          "evidence_refs": [
+            "tasks/core-python-deduplicate/1.0.2/instruction.md",
+            "tasks/core-python-deduplicate/1.0.2/verifier/subject_probe.py"
+          ],
+          "statement": "A public-contract interpretation gap may explain repeated empty-key acceptance. The instruction specifies behavior for non-empty keys without expressly requiring rejection of empty keys, while the frozen verifier requires ValueError. This does not establish the model's private reasoning or invalidate frozen scores.",
+          "verify_or_falsify": "Review the frozen subject instruction, contract, bound source edits and public local-check commands. A causal test would require separately authorized explicit-contract control versus original-contract treatment; none is needed to freeze a factual verifier-failure case with this limitation."
+        }
+      ],
+      "limitations": [
+        "A factual verifier failure does not establish a causal mechanism. Root cause is null.",
+        "No Harness-uplift or formal reasoning-effort effect is established; formal eligibility remains false.",
+        "The three cases cover two failure signatures; the Python cases are related observations.",
+        "The public instruction specifies non-empty-key behavior without expressly requiring empty-key rejection; the frozen verifier does require rejection. This limitation does not alter the frozen score.",
+        "The failure bundle is intact, but the passing comparison member has a tree-integrity limitation. Frozen comparability is retained; complete paired-trajectory audit and causal attribution are not claimed."
+      ],
+      "mitigation_lesson": "Review public contract and boundary-case checks together before interpreting the failure. Explicit empty-key expectations are a proposed engineering clarification, not a proven causal remedy; the frozen task and verifier remain unchanged.",
+      "observed_failure": "The deterministic verifier fails empty-key-rejected (score 0.8); first-records, identical-retry-idempotent, conflict-rejected, and conflict-preserves-original pass. The digest-bound events.py implementation stores an empty key and returns True.",
+      "placeholder": null,
+      "root_cause": null,
+      "run_identity": "run:run-d2fdf5b3e14b70f4e00c6c73496a5b64252a3d38c7bf25bb7d19a23d1674ae00",
+      "safe_trace_facts": [
+        "TRACE_EVENT_TYPE:AGENT_MESSAGE",
+        "TRACE_EVENT_TYPE:COMMAND_EXECUTION",
+        "TRACE_EVENT_TYPE:FILE_CHANGE",
+        "TRACE_EVENT_TYPE:THREAD_STARTED",
+        "TRACE_EVENT_TYPE:TURN_COMPLETED",
+        "TRACE_EVENT_TYPE:TURN_STARTED"
+      ],
       "slot_id": "badcase-2",
-      "status": "NOT_VERIFIED",
-      "task_identity": null,
-      "run_identity": null,
-      "cell_identity": null,
-      "evidence_refs": [],
-      "observed_failure": null,
-      "safe_trace_facts": [],
-      "verifier_result": null,
-      "attribution_classification": null,
-      "root_cause": null,
-      "mitigation_lesson": null,
-      "harnesslab_detection": null,
-      "placeholder": "NOT_VERIFIED — REAL EVIDENCE PENDING"
+      "status": "VERIFIED",
+      "task_identity": "task:core-python-deduplicate@1.0.2#sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "verifier_result": "capability_fail:verified_fail"
     },
     {
-      "slot_id": "badcase-3",
-      "status": "NOT_VERIFIED",
-      "task_identity": null,
-      "run_identity": null,
-      "cell_identity": null,
-      "evidence_refs": [],
-      "observed_failure": null,
-      "safe_trace_facts": [],
-      "verifier_result": null,
-      "attribution_classification": null,
+      "attribution_classification": "OBSERVED_FACT",
+      "cell_identity": "cell:model-gpt56-relay-responses",
+      "evidence_refs": [
+        "cell:model-gpt56-relay-responses",
+        "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/manifest.json",
+        "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/verifier",
+        "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/verifier/manifest.json",
+        "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/verifier/stderr.txt",
+        "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/verifier/stdout.txt",
+        "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/workspace",
+        "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/workspace/events.py",
+        "manifest:sha256:1a5945444b5ba2d0d9c1709c058af738ca3d9474afda22424cc7fbf01349758d",
+        "release/kb4-discordant-pair-attribution.json",
+        "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+        "task:core-python-deduplicate@1.0.2#sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+        "tasks/core-python-deduplicate/1.0.2/instruction.md",
+        "tasks/core-python-deduplicate/1.0.2/oracle/events.py",
+        "tasks/core-python-deduplicate/1.0.2/task.yaml",
+        "tasks/core-python-deduplicate/1.0.2/verifier/health_workspace/contract.txt",
+        "tasks/core-python-deduplicate/1.0.2/verifier/health_workspace/events.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/python_subject_boundary.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/subject_execution.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/subject_probe.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/subject_worker.py",
+        "tasks/core-python-deduplicate/1.0.2/verifier/verify.py",
+        "tasks/core-python-deduplicate/1.0.2/workspace/contract.txt",
+        "tasks/core-python-deduplicate/1.0.2/workspace/events.py",
+        "verifier:sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919"
+      ],
+      "frozen_evidence": {
+        "candidate_id": "kb4-candidate-4d16e08b5834b3fb",
+        "comparisons": [
+          {
+            "both_member_bundles_verified": false,
+            "comparison_id": "gpt56-relay-direct-vs-codex",
+            "controlled_attribution_claimed": false,
+            "formal_eligible": false,
+            "pair_id": "gpt56-relay-direct-vs-codex:sha256:06e1d5f836e9e51650db2f418784db3ca15338a3cbeec8b3aaf1af7a9a021d83",
+            "reason_codes": [
+              "OBSERVED_MODEL_MISSING",
+              "INTENDED_TREATMENT_DIFFERENCE",
+              "INTENDED_TREATMENT_DIFFERENCE",
+              "INTENDED_TREATMENT_DIFFERENCE",
+              "GENERAL_EVIDENCE_GAP",
+              "INTENDED_TREATMENT_DIFFERENCE",
+              "TRACE_COVERAGE_LIMITED"
+            ],
+            "status": "PARTIALLY_COMPARABLE"
+          }
+        ],
+        "complete_failure_bundle_verified": true,
+        "effective_source": "primary",
+        "execution_run_identity": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1",
+        "experiment_id": "core-real-matrix-v6",
+        "experiment_slot_id": "sha256:4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+        "failure_class": "Test Failure",
+        "file_digests": {
+          "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/manifest.json": "sha256:1a5945444b5ba2d0d9c1709c058af738ca3d9474afda22424cc7fbf01349758d",
+          "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/verifier/manifest.json": "sha256:751898dfec94e9cbd2161270d9e0fe8b10a945a08a6345d761442490219161c5",
+          "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/verifier/stderr.txt": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/verifier/stdout.txt": "sha256:1c5c9c608f06f515546ad3cffa3c33ffe3a31f33ca91a89133d5fa368fc225bc",
+          "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/workspace/events.py": "sha256:93fef0b1b77e2022998a3bbb6a77af0fb325ae4ebfc1aabde34fa84ca5e29017",
+          "tasks/core-python-deduplicate/1.0.2/instruction.md": "sha256:4f64515977a9ee15c1c1ef9ce110fbc34ab71f41e6c9f0835dae46657f1cf3df",
+          "tasks/core-python-deduplicate/1.0.2/oracle/events.py": "sha256:dc4dd8e40e71d0f750482896658bcac1379feda0296e1e105ff3c7f9ac81ff3b",
+          "tasks/core-python-deduplicate/1.0.2/task.yaml": "sha256:c47d503d5a7b7fc0d5ef506a68330cb466a79e87216601111a292aa6a6ae993b",
+          "tasks/core-python-deduplicate/1.0.2/verifier/health_workspace/contract.txt": "sha256:5bd9a5accdde8f3863bb8c11f5c347b8c4f49fa74155b904c59744e124c40943",
+          "tasks/core-python-deduplicate/1.0.2/verifier/health_workspace/events.py": "sha256:dc4dd8e40e71d0f750482896658bcac1379feda0296e1e105ff3c7f9ac81ff3b",
+          "tasks/core-python-deduplicate/1.0.2/verifier/python_subject_boundary.py": "sha256:861d0e819ee5322b4181802dbe1e71c1e280b890e6fb68e2daac54452f1f6bd1",
+          "tasks/core-python-deduplicate/1.0.2/verifier/subject_execution.py": "sha256:26e69bf429b428f9cce0f95dfe133bc8e3ac2b86749db8d30685649ae04c455c",
+          "tasks/core-python-deduplicate/1.0.2/verifier/subject_probe.py": "sha256:eaab72d5f162adb7ded8999c26eb5d62beebf119f0e47615ce6bf25933847bbd",
+          "tasks/core-python-deduplicate/1.0.2/verifier/subject_worker.py": "sha256:76bccff356ad45f76a785776d2afd9690a75a5acb625e3a17cc850a96ec912fd",
+          "tasks/core-python-deduplicate/1.0.2/verifier/verify.py": "sha256:e1f903093a96017b4babd0e91fb075240ff71dd68213a858c1a4a9d27fa94178",
+          "tasks/core-python-deduplicate/1.0.2/workspace/contract.txt": "sha256:5bd9a5accdde8f3863bb8c11f5c347b8c4f49fa74155b904c59744e124c40943",
+          "tasks/core-python-deduplicate/1.0.2/workspace/events.py": "sha256:b46230b231c9f80180643150d563803532bf4d5c957e76b7a353eb71e824ba7e"
+        },
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "manifest_digest": "sha256:1a5945444b5ba2d0d9c1709c058af738ca3d9474afda22424cc7fbf01349758d",
+        "normalized_trace_digest": null,
+        "primary_run_identity": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1",
+        "profile_identity": "sha256:ee031ffc0db5b8182ddb10f5e63bb24c63af325215eeb3b62ff80542a7484ee2",
+        "recovery_run_identity": null,
+        "repeat_index": 0,
+        "safe_tool_facts": [],
+        "source_diffs": [
+          "--- baseline/events.py\n+++ observed/events.py\n@@ -3,6 +3,11 @@\n         self._results: dict[str, str] = {}\n \n     def record_success(self, operation_key: str, result: str) -> bool:\n+        if operation_key in self._results:\n+            if self._results[operation_key] == result:\n+                return False\n+            raise ValueError(\"operation key already has a different result\")\n+\n         self._results[operation_key] = result\n         return True\n \n"
+        ],
+        "trace_status": "NOT_REPORTED",
+        "tree_digests": {
+          "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/verifier": "sha256:1d920a726ba8af332cfedde7792b05587f4289f9bbf9ae8598dc52650804394c",
+          "evidence:model-gpt56-relay-responses/run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4-a1/workspace": "sha256:af8557d02d6ae167f0f08b7ecd4a49a8164a7cc2416751a2df5ef2350ac882cb"
+        },
+        "verifier_report": {
+          "checks": [
+            {
+              "detail": null,
+              "name": "first-records",
+              "passed": true,
+              "score": 1.0
+            },
+            {
+              "detail": null,
+              "name": "identical-retry-idempotent",
+              "passed": true,
+              "score": 1.0
+            },
+            {
+              "detail": null,
+              "name": "conflict-rejected",
+              "passed": true,
+              "score": 1.0
+            },
+            {
+              "detail": null,
+              "name": "conflict-preserves-original",
+              "passed": true,
+              "score": 1.0
+            },
+            {
+              "detail": null,
+              "name": "empty-key-rejected",
+              "passed": false,
+              "score": 0.0
+            }
+          ],
+          "passed": false,
+          "schema_version": 1,
+          "score": 0.8,
+          "summary": "idempotent retry-ledger cases"
+        }
+      },
+      "harnesslab_detection": "HarnessLab binds the failed_subject/capability_fail run to its manifest, verifies artifact digests, and retains individual deterministic checks, source differences, and available safe trace facts. This exposes unchanged implementation or an empty-key boundary failure hidden by aggregate pass rates.",
+      "hypotheses": [
+        {
+          "classification": "ATTRIBUTION_HYPOTHESIS",
+          "evidence_refs": [
+            "tasks/core-python-deduplicate/1.0.2/instruction.md",
+            "tasks/core-python-deduplicate/1.0.2/verifier/subject_probe.py"
+          ],
+          "statement": "A public-contract interpretation gap may explain repeated empty-key acceptance. The instruction specifies behavior for non-empty keys without expressly requiring rejection of empty keys, while the frozen verifier requires ValueError. This does not establish the model's private reasoning or invalidate frozen scores.",
+          "verify_or_falsify": "Review the frozen subject instruction, contract, bound source edits and public local-check commands. A causal test would require separately authorized explicit-contract control versus original-contract treatment; none is needed to freeze a factual verifier-failure case with this limitation."
+        }
+      ],
+      "limitations": [
+        "A factual verifier failure does not establish a causal mechanism. Root cause is null.",
+        "No Harness-uplift or formal reasoning-effort effect is established; formal eligibility remains false.",
+        "The three cases cover two failure signatures; the Python cases are related observations.",
+        "The public instruction specifies non-empty-key behavior without expressly requiring empty-key rejection; the frozen verifier does require rejection. This limitation does not alter the frozen score.",
+        "Direct has no normalized agent trace. No command, edit sequence, or private reasoning is reconstructed; the factual explanation uses verifier output and the final source diff.",
+        "The failure bundle is intact, but the passing comparison member has a tree-integrity limitation. Frozen comparability is retained; complete paired-trajectory audit and causal attribution are not claimed."
+      ],
+      "mitigation_lesson": "Review public contract and boundary-case checks together before interpreting the failure. Explicit empty-key expectations are a proposed engineering clarification, not a proven causal remedy; the frozen task and verifier remain unchanged.",
+      "observed_failure": "The deterministic verifier fails empty-key-rejected (score 0.8); first-records, identical-retry-idempotent, conflict-rejected, and conflict-preserves-original pass. The digest-bound events.py implementation stores an empty key and returns True.",
+      "placeholder": null,
       "root_cause": null,
-      "mitigation_lesson": null,
-      "harnesslab_detection": null,
-      "placeholder": "NOT_VERIFIED — REAL EVIDENCE PENDING"
+      "run_identity": "run:run-4b9f1267620233e0656eeba898ed4cde10ff55d1a3303dfc3bdfc4e3cbab89e4",
+      "safe_trace_facts": [],
+      "slot_id": "badcase-3",
+      "status": "VERIFIED",
+      "task_identity": "task:core-python-deduplicate@1.0.2#sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "verifier_result": "capability_fail:verified_fail"
     }
   ]
 }

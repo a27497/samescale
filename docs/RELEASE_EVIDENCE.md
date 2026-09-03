@@ -1,5 +1,11 @@
 # Core Release Evidence
 
+K-B4.3 freezes the three real verifier-backed V6 cases in `release/badcases.json`, with exact
+selection and digest reconciliation in `release/kb4-badcase-freeze.json`. Timeout Sensitivity
+and Discordant Pair Attribution are complete. The Final Attribution Report and K-B4 Final Gate
+are not complete; K-C is not started. This BadCase freeze does not promote the prospective
+release manifest or authorize a tag. See `docs/BADCASES.md` for evidence and causal boundaries.
+
 The Phase K hard stop is implemented by strict models in `src/harnesslab/release`, canonical JSON artifacts in `release/`, and `scripts/verify_gate_k.py`. Documentation does not make evidence true; identities, digests, authoritative source references, state, and independent validation do.
 
 ## Core real-evidence v3 convergence contract
@@ -71,7 +77,7 @@ price snapshot, it reports `PRICE_INPUT_REQUIRED` rather than inventing cost dat
 - `release-evidence.json` is the prospective `v1.0.0-core` evidence manifest. `REAL_PROVIDER_SMOKE` and `REAL_CODEX_SMOKE` are `NOT_VERIFIED`; the other four `REAL_*` states are `NOT_RUN`, and readiness is false.
 - Its `remote_ci` binding remains prospective and `NOT_VERIFIED`. R12 exact-head keyless GitHub Actions run `32996166257` succeeded at `6abac258e81d89f7ad45aa51dce2541f911a6033`, but final-release CI must bind the exact head containing all mandatory real evidence and a ready manifest; engineering CI success is not final release verification.
 - `resume-claim-evidence.json` maps engineering claims to source/gate evidence and leaves real-performance claims `NOT_VERIFIED`.
-- `badcases.json` reserves exactly three empty evidence slots.
+- `badcases.json` originally reserved three empty slots; K-B4.3 now binds the three factual V6 failures documented above.
 
 Canonical models reject extra fields. `VERIFIED` bindings require both an identity and SHA-256 digest. `NOT_RUN` and `DEFERRED_NOT_VERIFIED` cannot carry a result identity or digest. Readiness is derived from mandatory bindings and cannot be independently set true.
 
@@ -81,7 +87,7 @@ Canonical models reject extra fields. `VERIFIED` bindings require both an identi
 uv run --locked python scripts/verify_gate_k.py
 ```
 
-It validates the task corpus from source, v1 history, OpenCode Go routes/transport/provenance, exact smoke bindings and mutation rejection, smoke and Matrix ceilings, Pair/ablation structure, immutable proxy identity, effective Docker egress topology, docs, resume references, BadCase placeholders, secret boundaries, CI ordering, fresh-clone contract, and tag guard. Passing means the hard stop works. Expected R4 output includes `OUTPUT_BUDGET_TRUNCATION_SEMANTICS=PASS`, `OPENCODE_GO_ROUTE_CONTRACT=PASS`, `OPENCODE_GO_CREDENTIAL_TRANSPORT=PASS`, `OPENCODE_GO_PROVENANCE=PASS`, `V1_HISTORY_PRESERVED=PASS`, `V2_SMOKE_PLAN=8_CALLS_14256_TOKENS`, `CORE_RELEASE_READY=FALSE`, and `REAL_CALLS_THIS_REPAIR=0`.
+It validates the task corpus from source, v1 history, OpenCode Go routes/transport/provenance, exact smoke bindings and mutation rejection, smoke and Matrix ceilings, Pair/ablation structure, immutable proxy identity, effective Docker egress topology, docs, resume references, the frozen BadCase contract, secret boundaries, CI ordering, fresh-clone contract, and tag guard. Passing means the hard stop works. Expected R4 output includes `OUTPUT_BUDGET_TRUNCATION_SEMANTICS=PASS`, `OPENCODE_GO_ROUTE_CONTRACT=PASS`, `OPENCODE_GO_CREDENTIAL_TRANSPORT=PASS`, `OPENCODE_GO_PROVENANCE=PASS`, `V1_HISTORY_PRESERVED=PASS`, `V2_SMOKE_PLAN=8_CALLS_14256_TOKENS`, `CORE_RELEASE_READY=FALSE`, and `REAL_CALLS_THIS_REPAIR=0`.
 
 ## Final release mode
 

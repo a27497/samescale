@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from harnesslab.comparability.models import ComparabilityIntent, canonical_digest
+from harnesslab.contracts.common import EvaluationLane
 from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import ExperimentRecord
 from harnesslab.db.models.judgelab import JudgeCalibrationRecord, JudgeEvaluationRecord
@@ -31,9 +32,11 @@ from harnesslab.experiment.report import (
 )
 from harnesslab.judgelab.models import JudgeCalibrationPlan
 from harnesslab.judgelab.report import JudgeCalibrationReport
+from harnesslab.release.badcases import build_badcases
 from harnesslab.release.contracts import CoreReleaseError
 from harnesslab.release.models import (
     BadCasePlan,
+    BadCaseSlot,
     CanonicalModel,
     CoreCorpusManifest,
     EvidenceState,
@@ -65,6 +68,7 @@ class RunEvidenceSummary(StrictModel):
     safe_trace_available: bool
     normalized_trace_digest: str | None
     safe_trace_facts: tuple[str, ...]
+    lane: EvaluationLane | None = None
 
 
 class PairEvidenceSummary(CanonicalModel):
@@ -296,6 +300,7 @@ async def _resolve_snapshot_in_session(
                 safe_trace_available=trace_digest is not None and bool(trace_facts),
                 normalized_trace_digest=trace_digest,
                 safe_trace_facts=trace_facts,
+                lane=planned_slots[run.slot_id].lane,
             )
         )
     if len(evidence.plan.paired_comparisons) != 1 or len(evidence.plan.ablations) != 1:
@@ -708,12 +713,43 @@ def _verify_judge(
     )
 
 
+def _badcase_trace_matches(slot: BadCaseSlot, run: RunEvidenceSummary) -> bool:
+    if run.safe_trace_available:
+        return bool(slot.safe_trace_facts) and set(slot.safe_trace_facts) <= set(
+            run.safe_trace_facts
+        )
+    detail = slot.frozen_evidence
+    # A genuinely trace-less Direct run is supported by verifier/source evidence.
+    # Missing or corrupt Harness traces never enter this exception.
+    return (
+        run.lane is EvaluationLane.MODEL
+        and run.normalized_trace_digest is None
+        and not run.safe_trace_facts
+        and not slot.safe_trace_facts
+        and detail is not None
+        and detail.trace_status == "NOT_REPORTED"
+        and detail.normalized_trace_digest is None
+        and detail.manifest_digest == run.evidence_digest
+        and detail.experiment_slot_id == run.slot_id
+        and detail.repeat_index == run.repeat_index
+        and bool(detail.source_diffs)
+        and not detail.verifier_report.passed
+    )
+
+
 def _verify_badcases_and_claims(
     manifest: ReleaseEvidenceManifest,
     badcases: BadCasePlan,
     claims: ResumeClaimMap,
     snapshot: AuthoritativeReleaseSnapshot,
 ) -> None:
+    frozen_slots = {}
+    if any(slot.frozen_evidence is not None for slot in badcases.slots):
+        try:
+            expected = build_badcases(Path(__file__).resolve().parents[3])
+        except (OSError, ValueError) as exc:
+            raise CoreReleaseError("frozen BadCase source bindings cannot be verified") from exc
+        frozen_slots = {slot.slot_id: slot for slot in expected.slots}
     runs = {item.run_id: item for item in snapshot.experiment.runs}
     authoritative_refs = {
         f"experiment-report:{snapshot.experiment.experiment_id}",
@@ -722,6 +758,8 @@ def _verify_badcases_and_claims(
         f"judge-report:{snapshot.judge.calibration_id}",
     }
     for index, slot in enumerate(badcases.slots):
+        if slot.frozen_evidence is not None and slot != frozen_slots.get(slot.slot_id):
+            raise CoreReleaseError(f"BadCase {slot.slot_id} frozen evidence drifted")
         if slot.status is not EvidenceState.VERIFIED or slot.run_identity is None:
             raise CoreReleaseError("all three BadCases require VERIFIED real evidence")
         run_id = slot.run_identity.removeprefix("run:")
@@ -743,13 +781,13 @@ def _verify_badcases_and_claims(
             task_identity,
             f"verifier:{run.verifier_identity}",
             f"manifest:{run.evidence_digest}",
-            f"trace:{run.run_id}#{run.normalized_trace_digest}",
         }
+        if run.normalized_trace_digest is not None:
+            required_refs.add(f"trace:{run.run_id}#{run.normalized_trace_digest}")
         if (
             slot.task_identity != task_identity
             or slot.cell_identity != f"cell:{run.cell_id}"
-            or not run.safe_trace_available
-            or not set(slot.safe_trace_facts) <= set(run.safe_trace_facts)
+            or not _badcase_trace_matches(slot, run)
             or not required_refs <= set(slot.evidence_refs)
             or slot.verifier_result != f"{run.normalized_outcome}:{run.source_outcome}"
         ):

@@ -8,8 +8,11 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from harnesslab.comparability.models import ComparabilityStatus, ReasonCode
 from harnesslab.contracts.common import Identifier, Sha256Digest
 from harnesslab.contracts.provider import ConfigurationState, ProviderProfile
+from harnesslab.diagnosis.models import FailureClass
+from harnesslab.tasks.models import VerifierReport
 
 
 class StrictModel(BaseModel):
@@ -749,6 +752,59 @@ class ResumeClaimMap(CanonicalModel):
         return self
 
 
+class BadCaseHypothesis(StrictModel):
+    classification: Literal["ATTRIBUTION_HYPOTHESIS"] = "ATTRIBUTION_HYPOTHESIS"
+    statement: str
+    verify_or_falsify: str
+    evidence_refs: tuple[str, ...]
+
+
+class BadCaseComparison(StrictModel):
+    comparison_id: str
+    pair_id: str
+    status: ComparabilityStatus
+    reason_codes: tuple[ReasonCode, ...]
+    both_member_bundles_verified: bool
+    formal_eligible: Literal[False] = False
+    controlled_attribution_claimed: Literal[False] = False
+
+
+class FrozenBadCaseEvidence(StrictModel):
+    """Factual V6 freeze context; no inference from missing or private traces."""
+
+    candidate_id: Identifier
+    experiment_id: str
+    experiment_slot_id: Sha256Digest
+    repeat_index: int = Field(ge=0)
+    effective_source: Literal["primary", "recovery"]
+    execution_run_identity: str
+    primary_run_identity: str
+    recovery_run_identity: str | None
+    manifest_digest: Sha256Digest
+    profile_identity: Sha256Digest
+    harness_config_identity: Sha256Digest
+    failure_class: FailureClass
+    verifier_report: VerifierReport
+    trace_status: Literal["REPORTED", "NOT_REPORTED"]
+    normalized_trace_digest: Sha256Digest | None
+    safe_tool_facts: tuple[str, ...]
+    source_diffs: tuple[str, ...]
+    file_digests: dict[str, Sha256Digest]
+    tree_digests: dict[str, Sha256Digest]
+    comparisons: tuple[BadCaseComparison, ...]
+    complete_failure_bundle_verified: Literal[True] = True
+
+    @model_validator(mode="after")
+    def factual_failure_only(self) -> FrozenBadCaseEvidence:
+        if self.verifier_report.passed or not any(
+            not check.passed for check in self.verifier_report.checks
+        ):
+            raise ValueError("frozen BadCase requires a deterministic verifier failure")
+        if (self.trace_status == "REPORTED") != (self.normalized_trace_digest is not None):
+            raise ValueError("BadCase trace status and digest disagree")
+        return self
+
+
 class BadCaseSlot(StrictModel):
     slot_id: Identifier
     status: Literal[EvidenceState.NOT_VERIFIED, EvidenceState.VERIFIED]
@@ -764,6 +820,9 @@ class BadCaseSlot(StrictModel):
     mitigation_lesson: str | None = None
     harnesslab_detection: str | None = None
     placeholder: str | None = None
+    frozen_evidence: FrozenBadCaseEvidence | None = None
+    hypotheses: tuple[BadCaseHypothesis, ...] = ()
+    limitations: tuple[str, ...] = ()
 
     @model_validator(mode="after")
     def state_matches_badcase_evidence(self) -> BadCaseSlot:
@@ -778,6 +837,8 @@ class BadCaseSlot(StrictModel):
             self.harnesslab_detection,
         )
         if self.status is EvidenceState.NOT_VERIFIED:
+            if self.frozen_evidence is not None or self.hypotheses or self.limitations:
+                raise ValueError("pending BadCase cannot carry frozen evidence")
             if any(value is not None for value in evidence_fields) or self.evidence_refs:
                 raise ValueError("pending BadCase cannot carry real evidence")
             if self.safe_trace_facts or self.root_cause is not None:
@@ -787,10 +848,15 @@ class BadCaseSlot(StrictModel):
         elif (
             any(value is None for value in evidence_fields)
             or not self.evidence_refs
-            or not self.safe_trace_facts
+            or (not self.safe_trace_facts and self.frozen_evidence is None)
             or self.placeholder is not None
         ):
             raise ValueError("VERIFIED BadCase requires bound real evidence and no placeholder")
+        if self.frozen_evidence is not None:
+            if self.root_cause is not None or self.attribution_classification != "OBSERVED_FACT":
+                raise ValueError("frozen V6 BadCase supports facts and typed hypotheses only")
+            if self.frozen_evidence.trace_status == "NOT_REPORTED" and self.safe_trace_facts:
+                raise ValueError("missing trace cannot carry trajectory facts")
         return self
 
 

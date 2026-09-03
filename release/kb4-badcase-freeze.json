@@ -1,0 +1,51 @@
+{
+  "accepted_source_commit": "b3c36154871225d8af1cf4247258b129f8698f1c",
+  "canonical_model_digest": "sha256:bac98037203f7e674e1731a5f8520c93d4e813d0284909a3548ef2e5b54aab46",
+  "canonical_reference": "release/badcases.json",
+  "controlled_attribution_claims": 0,
+  "distinct_failure_signatures": 2,
+  "external_execution": {
+    "ablation": 0,
+    "harness": 0,
+    "judge": 0,
+    "matrix": 0,
+    "provider": 0
+  },
+  "integrity": "All three required original failure bundles independently revalidated before freeze; file/tree digests are in the canonical records.",
+  "later_phases": {
+    "final_attribution_report": "NOT_RUN",
+    "kb4_final_gate": "NOT_RUN",
+    "kc": "NOT_RUN"
+  },
+  "phase": "K-B4.3",
+  "portable_check_scope": "Schema, exact accepted selection, frozen source bindings, canonical bytes and receipt. Original external files require the CLI --check with the persisted evidence root.",
+  "schema_version": 1,
+  "selected": [
+    {
+      "candidate_id": "kb4-candidate-ab5922b348dbc889",
+      "manifest_digest": "sha256:f2f4a1fd5bd9351589cdb7c844f587ed79b88051aa49b0a4e5d5249bbadaa8ba",
+      "slot_id": "badcase-1"
+    },
+    {
+      "candidate_id": "kb4-candidate-93e0206579a4fa92",
+      "manifest_digest": "sha256:be7fc1d19b70ebe03fc1cb761a46d510d7ea2a0f245b87bdb84db7daf64f7d36",
+      "slot_id": "badcase-2"
+    },
+    {
+      "candidate_id": "kb4-candidate-4d16e08b5834b3fb",
+      "manifest_digest": "sha256:1a5945444b5ba2d0d9c1709c058af738ca3d9474afda22424cc7fbf01349758d",
+      "slot_id": "badcase-3"
+    }
+  ],
+  "source_digests": {
+    "release/kb4-discordant-pair-attribution.json": "sha256:6ab0d87c64dbee112fd17e7c46c6c8374d4aa8a5fbf9e2e31af0a93395b754ff",
+    "release/kb4-discordant-pair-attribution.md": "sha256:0ca41a034fb6f9f9ffdeec1c4b19490df471ed7b8642bc6aade11e02cefcb7f9",
+    "release/kb4-gpt-codex-timeout-sensitivity.json": "sha256:f7f981dab4026941e08a51f1166250fa49edf88c608c9719b6db57fa29239962",
+    "release/kb4-gpt-codex-timeout-sensitivity.md": "sha256:4d2895b925f7af6fe0522f1923e6a1f9c302e7d7645483ee0f5c84cf8cf0d229"
+  },
+  "status": "READY_FOR_FINAL_ATTRIBUTION_REPORT",
+  "superseded_kb42_inputs": {
+    "docs/BADCASES.md": "sha256:965d01a29510f8dcceed95a526f98183bba4afffc72fa17afd11ef4c321daa80",
+    "release/badcases.json": "sha256:f6da6f36ca1ce2cce002765398000ab51d42eaa8da8a22ed45cf201e5dd4f817"
+  }
+}

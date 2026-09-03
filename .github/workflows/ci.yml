@@ -69,3 +69,4 @@ jobs:
           tests/test_kb3_v6_throughput_r2.py
           tests/test_kb4_timeout_sensitivity.py
           tests/test_kb4_discordant_pairs.py
+          tests/test_kb4_badcase_freeze.py
