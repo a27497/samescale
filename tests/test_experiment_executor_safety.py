@@ -17,6 +17,8 @@ from harnesslab.experiment.executor import ExperimentRunExecutor, attempt_execut
 from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.plan import ExperimentPlan, build_experiment_plan
 from harnesslab.experiment.queue import (
+    ExperimentConflict,
+    RunSnapshot,
     claim_next_run,
     enqueue_plan,
     inspect_run,
@@ -87,12 +89,16 @@ async def _wait_for_status(factory: Any, run_id: str, status: RunStatus) -> None
 @pytest.mark.integration
 async def test_executor_heartbeat_protects_active_run_and_lost_owner_cannot_write(
     database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     engine = create_engine(Settings.without_dotenv(database_url=database_url))
     factory = create_session_factory(engine)
     experiment_id = f"phase-g-heartbeat-{uuid4().hex[:12]}"
     binding = BlockingBinding()
     ttl = timedelta(milliseconds=120)
+    now = datetime.now(UTC)
+    renewed = asyncio.Event()
+    lost_owner = asyncio.Event()
     try:
         async with factory() as session, session.begin():
             await enqueue_plan(session, _single_run_plan(experiment_id))
@@ -103,19 +109,39 @@ async def test_executor_heartbeat_protects_active_run_and_lost_owner_cannot_writ
             owner="worker-a",
             lease_ttl=ttl,
             heartbeat_cadence=timedelta(milliseconds=20),
+            clock=lambda: now,
         )
         claimed = await executor.claim(experiment_id)
         assert claimed is not None
+        initial_expiry = claimed.lease_expires_at
+        assert initial_expiry is not None
+        heartbeat = executor._heartbeat
+
+        async def observe_heartbeat(run_id: str) -> RunSnapshot:
+            try:
+                snapshot = await heartbeat(run_id)
+            except ExperimentConflict:
+                lost_owner.set()
+                raise
+            if snapshot.lease_expires_at is not None and snapshot.lease_expires_at > initial_expiry:
+                renewed.set()
+            return snapshot
+
+        monkeypatch.setattr(executor, "_heartbeat", observe_heartbeat)
         execution = asyncio.create_task(executor.execute(claimed))
         await asyncio.wait_for(binding.entered.wait(), timeout=5)
 
-        await asyncio.sleep(0.15)
+        # Observe a committed renewal before advancing past the original lease.
+        # Host scheduling latency must not decide whether this lease is expired.
+        now += ttl / 2
+        await asyncio.wait_for(renewed.wait(), timeout=5)
+        now = initial_expiry
         async with factory() as session, session.begin():
             cannot_reclaim = await claim_next_run(
                 session,
                 experiment_id,
                 "worker-b",
-                now=datetime.now(UTC),
+                now=now,
                 ttl=ttl,
             )
         assert cannot_reclaim is None
@@ -124,10 +150,10 @@ async def test_executor_heartbeat_protects_active_run_and_lost_owner_cannot_writ
             durable = await session.get(ExperimentRunRecord, claimed.run_id, with_for_update=True)
             assert durable is not None
             durable.lease_owner = "worker-b"
-            durable.lease_expires_at = datetime.now(UTC) + ttl
+            durable.lease_expires_at = now + ttl
             durable.attempt += 1
             durable.status = RunStatus.CLAIMED.value
-        await asyncio.sleep(0.05)
+        await asyncio.wait_for(lost_owner.wait(), timeout=5)
         binding.release.set()
         stale_result = await asyncio.wait_for(execution, timeout=5)
 
