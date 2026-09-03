@@ -318,7 +318,7 @@ def semantic_fixture() -> dict[str, Any]:
         )
     badcases = BadCasePlan(slots=tuple(slots))
 
-    base_claims = load_resume_claim_map(ROOT / "release/resume-claim-evidence.json")
+    base_claims = load_resume_claim_map(ROOT / "release/history/pre-kc-resume-claim-evidence.json")
     updates = {
         "real-matrix-results": (f"experiment-report:{plan.experiment_id}",),
         "real-judge-quality": (f"judge-report:{judge.calibration_id}",),
@@ -342,7 +342,7 @@ def semantic_fixture() -> dict[str, Any]:
         successful_gates=EXPECTED_GATES,
         url="https://github.com/example/harnesslab/actions/runs/123456",
     )
-    base_manifest = load_release_evidence(ROOT / "release/release-evidence.json")
+    base_manifest = load_release_evidence(ROOT / "release/history/pre-kc-release-evidence.json")
 
     def verified(identity: str, value: str) -> EvidenceBinding:
         return EvidenceBinding(state=EvidenceState.VERIFIED, identity=identity, digest=value)

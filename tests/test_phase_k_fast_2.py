@@ -118,7 +118,7 @@ def test_v2_plans_and_attempts_1_through_12_remain_byte_identical() -> None:
 def test_attempt_13_and_diagnostic_are_safe_separate_and_non_promotable() -> None:
     history = json.loads((ROOT / "release/history/core-real-v2-attempt-13.json").read_text())
     diagnostic = json.loads((ROOT / "release/diagnostics/core-real-v2-attempt-13.json").read_text())
-    manifest = load_release_evidence(ROOT / "release/release-evidence.json")
+    manifest = load_release_evidence(ROOT / "release/history/pre-kc-release-evidence.json")
 
     assert history["receipt_digest"] == (
         "sha256:0f0480013e61a1dffdf0503f19e32e99a58ce757a1272745d8ad5e4e27d3b2da"

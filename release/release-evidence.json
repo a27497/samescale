@@ -1,23 +1,23 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "release_id": "v1.0.0-core",
   "core_corpus": {
     "state": "VERIFIED",
     "identity": "harnesslab-core-18-v1",
-    "digest": "sha256:5d73190e0cf809f7518bb19e925909ed5a8366400056ef13e24c1b208bb893b3",
-    "limitation": "Keyless corpus contract evidence; no real performance implication."
+    "digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+    "limitation": null
   },
   "release_commit": {
     "state": "NOT_VERIFIED",
     "identity": null,
     "digest": null,
-    "limitation": "Final release commit is bound only after Phase K-B evidence is checked in."
+    "limitation": "Deferred: detached finalization must bind the exact final Git commit without changing that commit."
   },
   "experiment_plan": {
-    "state": "NOT_VERIFIED",
-    "identity": "core-real-evidence-v2",
-    "digest": "sha256:9ed4e586a663b5f1aba161718bbca584a6dc306bcb895fe1bc05d7b94aa3b4eb",
-    "limitation": "The OpenCode Go v2 routes are configured. All thirteen immutable v2 attempts aborted before completing the frozen smoke. Attempt 13 reached Calls 1-4: GPT produced a subject-output error, Qwen passed, DeepSeek scored 0.8, and Codex medium timed out after THREAD_STARTED and TURN_STARTED without meaningful agent progress. Calls 5-8 were NOT_RUN in the release smoke and exist only in a separately namespaced DIAGNOSTIC_ONLY report. No complete smoke, Matrix, or release verification exists."
+    "state": "VERIFIED",
+    "identity": "experiment-plan:core-real-matrix-v6",
+    "digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+    "limitation": null
   },
   "release_history": {
     "smoke_plan_id": "core-real-smoke-v2",
@@ -58,82 +58,82 @@
     "release_verification": "NOT_VERIFIED"
   },
   "real_matrix": {
-    "state": "NOT_RUN",
-    "identity": null,
-    "digest": null,
-    "limitation": "Explicit user authorization is required."
+    "state": "VERIFIED",
+    "identity": "experiment-report:core-real-matrix-v6",
+    "digest": "sha256:59b4e083c54d2d4a3bb1dfd2ad59129c45db81543f5cc5ae51de18a927590252",
+    "limitation": "Accepted V6 report over the exact frozen 630-slot effective dataset; infrastructure and cancellations stay outside capability results."
   },
   "paired_lane": {
-    "state": "NOT_RUN",
-    "identity": null,
-    "digest": null,
-    "limitation": "The relay Direct/Codex route is configured but comparability remains unverified until a separately reauthorized smoke completes."
+    "state": "VERIFIED",
+    "identity": "experiment-pair:gpt56-relay-direct-vs-codex",
+    "digest": "sha256:37020ac73419c389a51b6575048612c669021f5359312e062be65a20546584f4",
+    "limitation": "82/90 complete, all PARTIALLY_COMPARABLE; formal eligibility false; no Harness uplift."
   },
   "controlled_ablation": {
-    "state": "NOT_RUN",
-    "identity": null,
-    "digest": null,
-    "limitation": "No real ablation observations exist."
+    "state": "VERIFIED",
+    "identity": "experiment-ablation:codex-gpt56-reasoning-effort",
+    "digest": "sha256:e70138b4006570a41746b74151e78d1c66f63528c55b4405cff0d1f1d352ce0b",
+    "limitation": "Integrity VERIFIED; 83/90 complete, 42 COMPARABLE, 41 NOT_COMPARABLE; formal eligibility false; causal reasoning-effort claims forbidden."
   },
   "judge_suite": {
     "state": "VERIFIED",
-    "identity": "core-calibration@1.0.0",
-    "digest": "sha256:c2708196237eab94dac473581e3a06de2f7d0e2c50e8b55190b253e547fc43fb",
-    "limitation": "Suite identity is verified; real Judge execution is not."
+    "identity": "judge-suite:core-calibration-objective@2.0.0",
+    "digest": "sha256:3109e3b2803c24fd5ef8c6b1faa3709ef2403efd625390286fa345190c7d0045",
+    "limitation": null
   },
   "judge_report": {
-    "state": "NOT_RUN",
-    "identity": null,
-    "digest": null,
-    "limitation": "REAL_JUDGE_SMOKE requires explicit user authorization."
+    "state": "VERIFIED",
+    "identity": "judge-report:core-real-judge-v7-j4",
+    "digest": "sha256:26a7690787b8845c99e16e4f02508cc2cf4761459ede48438d0958eca48ee623",
+    "limitation": "Real execution verified through J4 plan, all 63 persisted evaluations, qualification and report; historical report smoke field remains NOT_RUN."
   },
   "analyst_report": {
-    "state": "NOT_RUN",
-    "identity": null,
-    "digest": null,
-    "limitation": "Optional release analysis has not been produced."
+    "state": "VERIFIED",
+    "identity": "kb4-attribution:final",
+    "digest": "sha256:392e9f3597997a37d0a1e753f4bf4cbb0c8aedb281dbbb4d516cf386118031cb",
+    "limitation": "Accepted factual synthesis; zero controlled attribution claims."
   },
   "badcase_evidence": [
     {
-      "state": "NOT_VERIFIED",
-      "identity": null,
-      "digest": null,
-      "limitation": "BadCase 1 awaits real run evidence."
+      "state": "VERIFIED",
+      "identity": "badcase:badcase-1",
+      "digest": "sha256:46969b3be918cc9c05a960737adc8587d611aed6004619c1eed19402843afe3e",
+      "limitation": null
     },
     {
-      "state": "NOT_VERIFIED",
-      "identity": null,
-      "digest": null,
-      "limitation": "BadCase 2 awaits real run evidence."
+      "state": "VERIFIED",
+      "identity": "badcase:badcase-2",
+      "digest": "sha256:8027e88b915dcbfe9f4c2c818754bc9ab6c839db64b12cbe79fdd9841df96dc7",
+      "limitation": null
     },
     {
-      "state": "NOT_VERIFIED",
-      "identity": null,
-      "digest": null,
-      "limitation": "BadCase 3 awaits real run evidence."
+      "state": "VERIFIED",
+      "identity": "badcase:badcase-3",
+      "digest": "sha256:3177d35aac3233f599dcab8ea0519a0004e0ed9e5b237a66f25ad41e4fca0362",
+      "limitation": null
     }
   ],
   "resume_claim_map": {
     "state": "VERIFIED",
     "identity": "release/resume-claim-evidence.json",
-    "digest": "sha256:160bd1c6b0eefb32557db9859af098738d32a9bb3c6de0642b46e243d244326e",
-    "limitation": "Real-performance claims remain NOT_VERIFIED."
+    "digest": "sha256:0bcd8ce4a937697ad48a71acd961ec74657462a0a1b25ccc6fdf908d9b2c0406",
+    "limitation": null
   },
   "remote_ci": {
     "state": "NOT_VERIFIED",
     "identity": null,
     "digest": null,
-    "limitation": "R12 exact-head keyless GitHub Actions run 32996166257 succeeded at 6abac258e81d89f7ad45aa51dce2541f911a6033. This field is reserved for final-release exact-head CI binding after all mandatory real evidence is checked in, so the prospective manifest remains NOT_VERIFIED."
+    "limitation": "Deferred: exact final-head Full Release CI is required at the later candidate gate; K-B4 CI is historical evidence only."
   },
-  "paired_claim_policy": "NOT_SELECTED",
+  "paired_claim_policy": "NO_HARNESS_UPLIFT_CLAIM",
   "real_statuses": {
-    "REAL_PROVIDER_SMOKE": "NOT_VERIFIED",
-    "REAL_CODEX_SMOKE": "NOT_VERIFIED",
-    "REAL_CLAUDE_SMOKE": "NOT_RUN",
-    "REAL_DEEPSEEK_SMOKE": "NOT_RUN",
-    "REAL_MATRIX_EVIDENCE": "NOT_RUN",
-    "REAL_JUDGE_SMOKE": "NOT_RUN"
+    "REAL_PROVIDER_SMOKE": "VERIFIED",
+    "REAL_CODEX_SMOKE": "VERIFIED",
+    "REAL_CLAUDE_SMOKE": "VERIFIED",
+    "REAL_DEEPSEEK_SMOKE": "DEFERRED_NOT_VERIFIED",
+    "REAL_MATRIX_EVIDENCE": "VERIFIED",
+    "REAL_JUDGE_SMOKE": "VERIFIED"
   },
   "core_release_ready": false,
-  "real_evidence_authorization_required": true
+  "real_evidence_authorization_required": false
 }

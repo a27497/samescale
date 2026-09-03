@@ -463,7 +463,7 @@ def test_kb0_pair_is_configured_but_never_claims_comparable_or_uplift() -> None:
     assert plan.paired_lane.comparability_state is EvidenceState.NOT_VERIFIED
     observed_states = {item.observed_model_state for item in plan.selected_profiles}
     assert observed_states == {"NOT_VERIFIED_UNTIL_SMOKE"}
-    evidence = load_release_evidence(RELEASE / "release-evidence.json")
+    evidence = load_release_evidence(RELEASE / "history/pre-kc-release-evidence.json")
     assert evidence.paired_claim_policy is PairedClaimPolicy.NOT_SELECTED
     direct = comparison(left.provider_route or "", "gpt-5.6-sol", "direct-model")
     assert (
@@ -491,7 +491,7 @@ def test_kb0_pair_is_configured_but_never_claims_comparable_or_uplift() -> None:
 def test_kb0_smoke_plan_is_exact_bounded_and_unexecuted() -> None:
     release = load_real_evidence_plan(RELEASE / "core-real-evidence-plan.json")
     smoke = load_real_smoke_plan(RELEASE / "core-real-smoke-plan.json")
-    evidence = load_release_evidence(RELEASE / "release-evidence.json")
+    evidence = load_release_evidence(RELEASE / "history/pre-kc-release-evidence.json")
     assert smoke.release_plan_digest == release.digest
     assert len(smoke.calls) == smoke.max_top_level_launch_count == 8
     assert smoke.max_output_token_ceiling == 14_256

@@ -12,9 +12,7 @@
         "scripts/verify_gate_b.py"
       ],
       "source_phase": "B",
-      "limitations": [
-        "This verifies repository behavior, not real-model task performance."
-      ]
+      "limitations": ["This verifies repository behavior, not real-model task performance."]
     },
     {
       "claim_id": "direct-model-lane",
@@ -26,9 +24,7 @@
         "scripts/verify_gate_c.py"
       ],
       "source_phase": "C",
-      "limitations": [
-        "No real provider result is claimed."
-      ]
+      "limitations": ["No real provider result is claimed."]
     },
     {
       "claim_id": "codex-harness-lane",
@@ -40,9 +36,7 @@
         "scripts/verify_gate_d.py"
       ],
       "source_phase": "D",
-      "limitations": [
-        "Keyless fixtures do not establish real Codex quality."
-      ]
+      "limitations": ["Keyless fixtures do not establish real Codex quality."]
     },
     {
       "claim_id": "multi-harness-lanes",
@@ -54,9 +48,7 @@
         "scripts/verify_gate_e.py"
       ],
       "source_phase": "E",
-      "limitations": [
-        "DeepSeek E2 and real harness outcomes are not verified."
-      ]
+      "limitations": ["DeepSeek E2 and real harness outcomes are not verified."]
     },
     {
       "claim_id": "judge-calibration",
@@ -69,9 +61,7 @@
         "scripts/verify_gate_f.py"
       ],
       "source_phase": "F",
-      "limitations": [
-        "No real Judge provider quality is claimed."
-      ]
+      "limitations": ["No real Judge provider quality is claimed."]
     },
     {
       "claim_id": "experiment-comparability",
@@ -84,9 +74,7 @@
         "scripts/verify_gate_g.py"
       ],
       "source_phase": "G",
-      "limitations": [
-        "The contracts do not by themselves establish causal uplift."
-      ]
+      "limitations": ["The contracts do not by themselves establish causal uplift."]
     },
     {
       "claim_id": "durable-execution-control-plane",
@@ -99,9 +87,7 @@
         "scripts/verify_gate_h.py"
       ],
       "source_phase": "H",
-      "limitations": [
-        "This is repository-scale orchestration, not a claim of internet-scale operations."
-      ]
+      "limitations": ["This is repository-scale orchestration, not a claim of internet-scale operations."]
     },
     {
       "claim_id": "read-only-workbench",
@@ -114,9 +100,7 @@
         "scripts/verify_gate_i.py"
       ],
       "source_phase": "I",
-      "limitations": [
-        "The UI presents persisted evidence and does not trigger evaluations."
-      ]
+      "limitations": ["The UI presents persisted evidence and does not trigger evaluations."]
     },
     {
       "claim_id": "evidence-bound-analyst",
@@ -128,9 +112,7 @@
         "scripts/verify_gate_j.py"
       ],
       "source_phase": "J",
-      "limitations": [
-        "The approved implementation uses a deterministic fake backend for keyless proof."
-      ]
+      "limitations": ["The approved implementation uses a deterministic fake backend for keyless proof."]
     },
     {
       "claim_id": "core-corpus-18",
@@ -142,22 +124,16 @@
         "tasks"
       ],
       "source_phase": "K-A",
-      "limitations": [
-        "Corpus readiness does not imply real model or harness performance."
-      ]
+      "limitations": ["Corpus readiness does not imply real model or harness performance."]
     },
     {
       "claim_id": "real-matrix-results",
       "claim": "Measured real Model-only and Harness performance on the frozen Core Matrix.",
-      "status": "VERIFIED",
+      "status": "NOT_VERIFIED",
       "required_evidence_type": "trusted real ExperimentPlan, run manifests, and report",
-      "evidence_refs": [
-        "experiment-report:core-real-matrix-v6"
-      ],
+      "evidence_refs": [],
       "source_phase": "K-B",
-      "limitations": [
-        "630 logical slots: 599 capability results, 29 infrastructure outcomes, and 2 cancellations; bounded recoveries remain separately recorded."
-      ]
+      "limitations": ["REAL_MATRIX_EVIDENCE is NOT_RUN pending explicit authorization."]
     },
     {
       "claim_id": "harness-uplift",
@@ -166,37 +142,25 @@
       "required_evidence_type": "COMPARABLE paired real evidence with frozen hard controls",
       "evidence_refs": [],
       "source_phase": "K-B",
-      "limitations": [
-        "All 82 capability-complete Direct/Codex pairs are PARTIALLY_COMPARABLE; formal eligibility is false. No Harness-uplift causal claim is supported."
-      ]
+      "limitations": ["The relay Direct/Codex route is configured, but only authorized smoke plus ComparabilityEngine may establish COMPARABLE evidence."]
     },
     {
       "claim_id": "real-judge-quality",
-      "claim": "Qualified the real grok-4.6 Judge via the approved relay on core-calibration-objective@2.0.0.",
-      "status": "VERIFIED",
+      "claim": "Established real Judge quality on the frozen calibration suite.",
+      "status": "NOT_VERIFIED",
       "required_evidence_type": "trusted real Judge calibration report",
-      "evidence_refs": [
-        "judge-report:core-real-judge-v7-j4"
-      ],
+      "evidence_refs": [],
       "source_phase": "K-B",
-      "limitations": [
-        "63 evaluations, 54 judged and 9 correct UNKNOWN abstentions; zero L0 overrides. Qualification is limited to this repository-curated suite, not universal Judge quality."
-      ]
+      "limitations": ["REAL_JUDGE_SMOKE is NOT_RUN pending explicit authorization."]
     },
     {
       "claim_id": "real-badcases",
-      "claim": "Documented three canonical verifier-backed factual V6 failures.",
-      "status": "VERIFIED",
+      "claim": "Documented three evidence-backed real failure cases and lessons.",
+      "status": "NOT_VERIFIED",
       "required_evidence_type": "three real run/cell/task evidence bundles",
-      "evidence_refs": [
-        "badcase:badcase-1",
-        "badcase:badcase-2",
-        "badcase:badcase-3"
-      ],
+      "evidence_refs": [],
       "source_phase": "K-B",
-      "limitations": [
-        "All root causes are null; controlled attribution claims remain zero."
-      ]
+      "limitations": ["No real BadCase is invented during K-A."]
     }
   ]
 }

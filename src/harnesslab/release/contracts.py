@@ -239,12 +239,15 @@ def validate_dynamic_v2_history(
 
 def evaluate_release_readiness(manifest: ReleaseEvidenceManifest) -> ReleaseReadiness:
     checks = {
+        "CORE_CORPUS": manifest.core_corpus,
         "RELEASE_COMMIT": manifest.release_commit,
         "EXPERIMENT_PLAN": manifest.experiment_plan,
         "REAL_MATRIX_EVIDENCE": manifest.real_matrix,
         "PAIRED_LANE": manifest.paired_lane,
         "ABLATION": manifest.controlled_ablation,
         "JUDGE_EVIDENCE": manifest.judge_report,
+        "JUDGE_SUITE": manifest.judge_suite,
+        "CLAIM_MAP": manifest.resume_claim_map,
         "REMOTE_CI": manifest.remote_ci,
     }
     blockers = tuple(
@@ -254,7 +257,7 @@ def evaluate_release_readiness(manifest: ReleaseEvidenceManifest) -> ReleaseRead
         blockers += ("BADCASE_EVIDENCE",)
     blockers += tuple(
         key
-        for key, state in sorted(manifest.real_statuses.items())
+        for key, state in sorted(manifest.required_real_statuses.items())
         if state is not EvidenceState.VERIFIED
     )
     return ReleaseReadiness(
@@ -265,6 +268,17 @@ def evaluate_release_readiness(manifest: ReleaseEvidenceManifest) -> ReleaseRead
 
 
 def validate_keyless_contract_state(manifest: ReleaseEvidenceManifest) -> None:
+    if manifest.schema_version == 2:
+        if manifest.core_release_ready:
+            raise CoreReleaseError("keyless candidate cannot report CORE_RELEASE_READY")
+        if any(
+            binding.state is not EvidenceState.NOT_VERIFIED
+            or binding.identity is not None
+            or binding.digest is not None
+            for binding in (manifest.release_commit, manifest.remote_ci)
+        ):
+            raise CoreReleaseError("keyless candidate cannot bind final head or CI")
+        return
     expected = {
         "REAL_PROVIDER_SMOKE": EvidenceState.NOT_VERIFIED,
         "REAL_CODEX_SMOKE": EvidenceState.NOT_VERIFIED,
@@ -285,6 +299,14 @@ def tag_creation_authorized(
     manifest: ReleaseEvidenceManifest, receipt: SemanticReleaseReceipt | None = None
 ) -> bool:
     readiness = evaluate_release_readiness(manifest)
+    if manifest.schema_version == 2 and (
+        receipt is None
+        or receipt.candidate_manifest_digest is None
+        or receipt.ci_attestation_digest != manifest.remote_ci.digest
+        or manifest.release_commit.identity != f"git:{receipt.release_head}"
+        or manifest.remote_ci.identity != f"github-actions:{receipt.remote_ci_run_id}"
+    ):
+        return False
     return (
         readiness.core_release_ready
         and not readiness.real_evidence_authorization_required

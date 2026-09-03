@@ -1,0 +1,33 @@
+{
+  "schema_version": 4,
+  "plan_id": "core-real-evidence-v6",
+  "supersedes_plan_id": "core-real-evidence-v5",
+  "experiment_id": "core-real-matrix-v6",
+  "experiment_plan_digest": "sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a",
+  "corpus_reference": "release/core-corpus-v4.json",
+  "corpus_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+  "judge_calibration_id": "core-real-judge-v7-j4",
+  "judge_plan_digest": "sha256:2f22d2df516f0c4d45246efd1b2806dec571cb95457b8cde4f45ec9380a42d2e",
+  "judge_report_digest": "sha256:26a7690787b8845c99e16e4f02508cc2cf4761459ede48438d0958eca48ee623",
+  "source_digests": {
+    "release/core-corpus-v4.json": "sha256:8fdf26537cb897603af0bae98092fb29d4927bc0f9a0dfb45cea86760f90642d",
+    "release/core-real-matrix-v6-control.json": "sha256:9061656741e62d6683cb231a7d26c05d26c934f00f4c76a4dae3a8a2e4851e50",
+    "release/core-real-matrix-v6-analysis-dataset.jsonl": "sha256:d07f6c96e3bd7882137355cb8b5d2d5682e3d51bffcedce6292375d4a54bbd1d",
+    "release/core-real-matrix-v6-analysis-dataset-manifest.json": "sha256:dad4043c059f0fdaf0b4985f091f16894671364c410e50a741e43cab1bc0f443",
+    "release/core-real-matrix-v6-final-analysis.json": "sha256:59b4e083c54d2d4a3bb1dfd2ad59129c45db81543f5cc5ae51de18a927590252",
+    "release/kb4-gpt-codex-timeout-sensitivity.json": "sha256:f7f981dab4026941e08a51f1166250fa49edf88c608c9719b6db57fa29239962",
+    "release/badcases.json": "sha256:8f2ac7d3ecc745ef0f9ba19204e9ec0ea0947b0c7388c4eee260205b34996082",
+    "release/kb4-badcase-freeze.json": "sha256:0cf5b63aa5c5a40a1853e7c10dacf7e7452b8cf09548e4a130030de22325123b",
+    "release/kb4-final-attribution-report.json": "sha256:c896dd5b57899638577560046b316da03320a2ed5fec41f56807f05280815f04",
+    "release/core-real-judge-v7-j4-plan.json": "sha256:45bd0c5f7cf69ed9badb56c7a8db3f2ccfcf283f9f794560199a62e953654d73",
+    "release/core-real-judge-v7-j4-result.json": "sha256:5d4095d14238e16976ed68962b123d77c607a6a4bad711bfa7165d5322b30e8e",
+    "release/core-real-judge-v7-j4-report.json": "sha256:1e154a019a68da8f3a8b816c27d32abe27ab79299f257f64a48a7d7cbcecf730",
+    "release/core-real-matrix-v6-j4-binding.json": "sha256:d01ed24fbfccd226960c0f4f15b2ee653fe9b12a44544f5b26ec4d819e06a3a1",
+    "release/kb2r-r2-core-qualification.json": "sha256:bf68bdb17115ddff155dea0c711755cc2172b38c862c64694c05a837dcc75252",
+    "release/history/pre-kc-release-evidence.json": "sha256:eb734ecf0ddaeffbb57649e2870f94b190816979dfca2d56bb5161ca7bf3a4c2",
+    "release/history/pre-kc-resume-claim-evidence.json": "sha256:fa45db6ba0c718efea7a0467027524a3af4880b71dfb18b6a25d10651b36b193"
+  },
+  "evidence_requirement": "INTEGRITY_WITH_REPORTED_ELIGIBILITY",
+  "causal_reasoning_effort_claim": false,
+  "external_execution_authorized": false
+}

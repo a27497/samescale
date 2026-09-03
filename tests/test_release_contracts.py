@@ -164,7 +164,7 @@ def test_ablation_plan_freezes_hard_controls_and_is_not_run() -> None:
 
 
 def test_release_evidence_is_strict_keyless_and_not_ready() -> None:
-    manifest = load_release_evidence(RELEASE / "release-evidence.json")
+    manifest = load_release_evidence(RELEASE / "history/pre-kc-release-evidence.json")
     validate_keyless_contract_state(manifest)
     readiness = evaluate_release_readiness(manifest)
 
@@ -198,7 +198,7 @@ def test_verified_evidence_and_resume_claims_cannot_be_forged() -> None:
 
 
 def test_resume_claim_map_refs_exist_and_real_claims_remain_unverified() -> None:
-    claim_map = load_resume_claim_map(RELEASE / "resume-claim-evidence.json")
+    claim_map = load_resume_claim_map(RELEASE / "history/pre-kc-resume-claim-evidence.json")
     for claim in claim_map.claims:
         if claim.status is EvidenceState.VERIFIED:
             assert claim.evidence_refs

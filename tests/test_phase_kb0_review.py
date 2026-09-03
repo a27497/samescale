@@ -256,7 +256,7 @@ def test_smoke_production_control_plane_exact_eight_call_binding() -> None:
 def test_top_level_release_history_covers_repository_attempts_through_r16() -> None:
     histories, expected_references = load_contiguous_v2_histories(ROOT / "release/history", ROOT)
     expected_attempts = tuple(range(1, len(histories) + 1))
-    manifest = load_release_evidence(ROOT / "release/release-evidence.json")
+    manifest = load_release_evidence(ROOT / "release/history/pre-kc-release-evidence.json")
     summary = manifest.release_history
 
     assert len(histories) == 13
@@ -300,9 +300,9 @@ def test_top_level_release_history_covers_repository_attempts_through_r16() -> N
 
 
 def test_release_history_summary_accepts_a_future_contiguous_attempt() -> None:
-    raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
-        "release_history"
-    ]
+    raw = json.loads(
+        (ROOT / "release/history/pre-kc-release-evidence.json").read_text(encoding="utf-8")
+    )["release_history"]
     raw["attempt_references"].append("release/history/core-real-v2-attempt-14.json")
     raw["latest_attempt_id"] = "core-real-smoke-v2-attempt-14"
     raw["latest_attempt_status"] = "SUCCEEDED"
@@ -317,9 +317,9 @@ def test_release_history_summary_accepts_a_future_contiguous_attempt() -> None:
 
 
 def test_release_history_summary_rejects_a_removed_attempt_reference() -> None:
-    raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
-        "release_history"
-    ]
+    raw = json.loads(
+        (ROOT / "release/history/pre-kc-release-evidence.json").read_text(encoding="utf-8")
+    )["release_history"]
     raw["attempt_references"].pop()
 
     with pytest.raises(ValidationError, match="latest attempt id"):
@@ -327,9 +327,9 @@ def test_release_history_summary_rejects_a_removed_attempt_reference() -> None:
 
 
 def test_release_history_summary_rejects_a_gap() -> None:
-    raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
-        "release_history"
-    ]
+    raw = json.loads(
+        (ROOT / "release/history/pre-kc-release-evidence.json").read_text(encoding="utf-8")
+    )["release_history"]
     del raw["attempt_references"][4]
 
     with pytest.raises(ValidationError, match="contiguous"):
@@ -337,9 +337,9 @@ def test_release_history_summary_rejects_a_gap() -> None:
 
 
 def test_release_history_summary_rejects_latest_attempt_id_mismatch() -> None:
-    raw = json.loads((ROOT / "release/release-evidence.json").read_text(encoding="utf-8"))[
-        "release_history"
-    ]
+    raw = json.loads(
+        (ROOT / "release/history/pre-kc-release-evidence.json").read_text(encoding="utf-8")
+    )["release_history"]
     raw["latest_attempt_id"] = "core-real-smoke-v2-attempt-9"
 
     with pytest.raises(ValidationError, match="latest attempt id"):
@@ -348,7 +348,7 @@ def test_release_history_summary_rejects_latest_attempt_id_mismatch() -> None:
 
 def test_gate_k_dynamic_history_rejects_latest_failing_call_mismatch() -> None:
     histories, references = load_contiguous_v2_histories(ROOT / "release/history", ROOT)
-    manifest = load_release_evidence(ROOT / "release/release-evidence.json")
+    manifest = load_release_evidence(ROOT / "release/history/pre-kc-release-evidence.json")
     summary = manifest.release_history.model_copy(
         update={"latest_failing_call_id": EXPECTED_CALL_IDS[1]}
     )

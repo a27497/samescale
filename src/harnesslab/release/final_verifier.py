@@ -35,6 +35,7 @@ from harnesslab.judgelab.report import JudgeCalibrationReport
 from harnesslab.release.badcases import build_badcases
 from harnesslab.release.contracts import CoreReleaseError
 from harnesslab.release.models import (
+    AcceptedRealEvidencePlan,
     BadCasePlan,
     BadCaseSlot,
     CanonicalModel,
@@ -91,6 +92,8 @@ class AblationEvidenceSummary(CanonicalModel):
     changed_dimension: str
     total_observations: int
     comparable: int
+    partially_comparable: int = 0
+    not_comparable: int = 0
     per_task_observations: dict[str, int]
     formal_eligible: bool
     source_digest: str
@@ -108,6 +111,7 @@ class ExperimentEvidenceSummary(StrictModel):
     pair: PairEvidenceSummary
     ablation: AblationEvidenceSummary
     authoritative_loader_verified: bool
+    accepted_successor_digest: str | None = None
 
 
 class JudgeEvidenceSummary(StrictModel):
@@ -139,6 +143,7 @@ class RemoteCIAttestation(CanonicalModel):
     workflow_name: str
     conclusion: Literal["success"]
     successful_gates: tuple[str, ...]
+    successful_jobs: tuple[str, ...] = ()
     url: str = Field(min_length=1)
 
 
@@ -248,7 +253,8 @@ async def _resolve_snapshot_in_session(
     experiment_record = await session.get(ExperimentRecord, experiment_id)
     if experiment_record is None:
         raise CoreReleaseError("authoritative experiment record does not exist")
-    if experiment_record.status != "completed":
+    accepted_v6 = experiment_id == "core-real-matrix-v6"
+    if experiment_record.status != "completed" and not accepted_v6:
         raise CoreReleaseError("authoritative experiment is not completed")
 
     def guard(path: Path) -> Path:
@@ -257,11 +263,12 @@ async def _resolve_snapshot_in_session(
     evidence = await load_verified_experiment_evidence(
         session, experiment_id, artifact_path_guard=guard
     )
-    report = await build_experiment_report(
-        session,
-        experiment_id,
-        bootstrap_resamples=9_999,
-        artifact_path_guard=guard,
+    report = (
+        None
+        if accepted_v6
+        else await build_experiment_report(
+            session, experiment_id, bootstrap_resamples=9_999, artifact_path_guard=guard
+        )
     )
     planned_slots = {slot.slot_id: slot for slot in evidence.plan.run_slots}
     run_summaries: list[RunEvidenceSummary] = []
@@ -307,18 +314,44 @@ async def _resolve_snapshot_in_session(
         raise CoreReleaseError(
             "authoritative ExperimentPlan must declare one pair and one ablation"
         )
+    if accepted_v6:
+        from harnesslab.release.reconciliation import (
+            MATRIX_PREFIX,
+            accepted_comparison_summaries,
+            raw_digest,
+            stable_sources,
+            verify_v6_live_sources,
+        )
+
+        root = Path(__file__).resolve().parents[3]
+        verify_v6_live_sources(root, evidence, artifact_roots)
+        accepted_plan, _rows, pairs = stable_sources(root)
+        pair, ablation = accepted_comparison_summaries(pairs)
+        report_id = experiment_id
+        report_plan_digest = evidence.plan.digest
+        report_count = len(evidence.runs)
+        report_digest = raw_digest(root / (MATRIX_PREFIX + "final-analysis.json"))
+        successor_digest = accepted_plan.digest
+    else:
+        assert report is not None
+        report_id, report_plan_digest = report.experiment_id, report.plan_digest
+        report_count, report_digest = report.plan_run_count, report.digest
+        pair = _summarize_pair(report, evidence.plan, evidence.plan.paired_comparisons[0].id)
+        ablation = _summarize_ablation(report, evidence.plan, evidence.plan.ablations[0].id)
+        successor_digest = None
     experiment_summary = ExperimentEvidenceSummary(
         experiment_id=experiment_id,
         record_status=experiment_record.status,
         plan=evidence.plan,
         runs=tuple(run_summaries),
-        report_experiment_id=report.experiment_id,
-        report_plan_digest=report.plan_digest,
-        report_run_count=report.plan_run_count,
-        report_digest=report.digest,
-        pair=_summarize_pair(report, evidence.plan, evidence.plan.paired_comparisons[0].id),
-        ablation=_summarize_ablation(report, evidence.plan, evidence.plan.ablations[0].id),
+        report_experiment_id=report_id,
+        report_plan_digest=report_plan_digest,
+        report_run_count=report_count,
+        report_digest=report_digest,
+        pair=pair,
+        ablation=ablation,
         authoritative_loader_verified=True,
+        accepted_successor_digest=successor_digest,
     )
 
     judge_record = await session.get(JudgeCalibrationRecord, calibration_id)
@@ -353,6 +386,10 @@ async def _resolve_snapshot_in_session(
     observed = tuple(
         sorted({item.observed_judge_model for item in evaluations if item.observed_judge_model})
     )
+    if accepted_v6:
+        from harnesslab.release.reconciliation import verify_j4_live_report
+
+        verify_j4_live_report(root, judge_plan, judge_report, evaluations, artifact_roots)
     judge_summary = JudgeEvidenceSummary(
         calibration_id=calibration_id,
         record_status=judge_record.status,
@@ -367,7 +404,7 @@ async def _resolve_snapshot_in_session(
         report_suite_digest=judge_report.suite_digest,
         report_digest=judge_report.report_digest,
         l0_override_count=sum(cell.l0_override_count for cell in judge_report.cells),
-        real_judge_smoke=judge_report.real_judge_smoke,
+        real_judge_smoke="VERIFIED" if accepted_v6 else judge_report.real_judge_smoke,
         authoritative_report_verified=True,
     )
     return AuthoritativeReleaseSnapshot(experiment=experiment_summary, judge=judge_summary)
@@ -410,6 +447,9 @@ def resolve_github_ci(run_id: str) -> RemoteCIAttestation:
         workflow_name=raw["workflowName"],
         conclusion=raw["conclusion"],
         successful_gates=successful_gates,
+        successful_jobs=tuple(
+            sorted(job["name"] for job in raw.get("jobs", []) if job.get("conclusion") == "success")
+        ),
         url=raw["url"],
     )
 
@@ -800,6 +840,7 @@ def _verify_badcases_and_claims(
         ):
             raise CoreReleaseError(f"BadCase {slot.slot_id} release binding drifted")
         authoritative_refs.update(required_refs)
+        authoritative_refs.add(f"badcase:{slot.slot_id}")
 
     _binding(manifest, "resume_claim_map", "release/resume-claim-evidence.json", claims.digest)
     by_id = {item.claim_id: item for item in claims.claims}
@@ -841,7 +882,7 @@ def verify_semantic_final_release(
     repository_root: Path,
     checked_corpus: CoreCorpusManifest,
     rebuilt_corpus: CoreCorpusManifest,
-    release_plan: RealEvidencePlan,
+    release_plan: RealEvidencePlan | AcceptedRealEvidencePlan,
     manifest: ReleaseEvidenceManifest,
     claims: ResumeClaimMap,
     badcases: BadCasePlan,
@@ -849,6 +890,19 @@ def verify_semantic_final_release(
     ci: RemoteCIAttestation,
     local_head: str,
 ) -> SemanticReleaseReceipt:
+    if isinstance(release_plan, AcceptedRealEvidencePlan):
+        return _verify_accepted_final_release(
+            repository_root=repository_root,
+            checked_corpus=checked_corpus,
+            rebuilt_corpus=rebuilt_corpus,
+            release_plan=release_plan,
+            manifest=manifest,
+            claims=claims,
+            badcases=badcases,
+            snapshot=snapshot,
+            ci=ci,
+            local_head=local_head,
+        )
     if checked_corpus != rebuilt_corpus:
         raise CoreReleaseError("checked corpus differs from authoritative reconstruction")
     _binding(manifest, "core_corpus", checked_corpus.corpus_id, checked_corpus.digest)
@@ -902,4 +956,126 @@ def verify_semantic_final_release(
         release_manifest_digest=manifest.digest,
         release_head=local_head,
         remote_ci_run_id=ci.run_id,
+    )
+
+
+REQUIRED_RELEASE_JOBS = frozenset(
+    [f"gate-{letter}" for letter in "ABCDEFGHIJK"]
+    + [
+        f"qualification ({name})"
+        for name in ("robustness-v2", "model-chat-v3", "model-chat-v3r1", "v6-canary-control")
+    ]
+    + ["fresh-setup"]
+)
+
+
+def bind_final_head(
+    candidate: ReleaseEvidenceManifest, ci: RemoteCIAttestation, local_head: str
+) -> ReleaseEvidenceManifest:
+    """Build an ephemeral manifest; never write a final SHA or CI ID into its own commit.
+
+    This does not issue a semantic receipt or authorize a tag. Final verification
+    must independently validate the checkout, all scientific evidence and exact CI.
+    """
+    from harnesslab.release.contracts import validate_keyless_contract_state
+    from harnesslab.release.reconciliation import verified
+
+    validate_keyless_contract_state(candidate)
+    if candidate.schema_version != 2 or ci.head_sha != local_head:
+        raise CoreReleaseError("detached binding requires a V6 candidate and exact-head CI")
+    return ReleaseEvidenceManifest.model_validate(
+        {
+            **candidate.model_dump(mode="json"),
+            "release_commit": verified(
+                f"git:{local_head}", canonical_digest({"git_commit": local_head})
+            ),
+            "remote_ci": verified(f"github-actions:{ci.run_id}", ci.digest),
+            "core_release_ready": True,
+        }
+    )
+
+
+def _verify_final_checkout(root: Path, head: str, candidate: ReleaseEvidenceManifest) -> None:
+    def git(*args: str) -> str:
+        return subprocess.run(
+            ("git", *args), cwd=root, check=True, capture_output=True, text=True, timeout=30
+        ).stdout
+
+    if (
+        git("rev-parse", "HEAD").strip() != head
+        or git("status", "--porcelain", "--untracked-files=no").strip()
+    ):
+        raise CoreReleaseError("final release requires the exact clean committed checkout")
+    committed = ReleaseEvidenceManifest.model_validate_json(
+        git("show", "HEAD:release/release-evidence.json")
+    )
+    if committed != candidate:
+        raise CoreReleaseError("committed candidate differs from the verified stable manifest")
+    from harnesslab.release.reconciliation import PLAN_REFERENCE, load_accepted_plan
+
+    git(
+        "ls-files",
+        "--error-unmatch",
+        PLAN_REFERENCE,
+        "release/resume-claim-evidence.json",
+        *load_accepted_plan(root).source_digests,
+    )
+    if git("tag", "--list", "v1.0.0-core").strip():
+        raise CoreReleaseError("v1.0.0-core already exists before semantic authorization")
+
+
+def _verify_accepted_final_release(
+    *,
+    repository_root: Path,
+    checked_corpus: CoreCorpusManifest,
+    rebuilt_corpus: CoreCorpusManifest,
+    release_plan: AcceptedRealEvidencePlan,
+    manifest: ReleaseEvidenceManifest,
+    claims: ResumeClaimMap,
+    badcases: BadCasePlan,
+    snapshot: AuthoritativeReleaseSnapshot,
+    ci: RemoteCIAttestation,
+    local_head: str,
+) -> SemanticReleaseReceipt:
+    from harnesslab.release.reconciliation import (
+        build_candidate,
+        load_accepted_plan,
+        verify_candidate,
+        verify_v6_snapshot,
+    )
+
+    candidate = verify_candidate(repository_root)
+    _, expected_claims = build_candidate(repository_root)
+    if release_plan != load_accepted_plan(repository_root):
+        raise CoreReleaseError("wrong accepted release plan")
+    if checked_corpus != rebuilt_corpus or checked_corpus.digest != release_plan.corpus_digest:
+        raise CoreReleaseError("accepted V6 corpus does not reproduce")
+    verify_v6_snapshot(repository_root, snapshot)
+    if claims != expected_claims:
+        raise CoreReleaseError("accepted Claim Map changed or introduced an unauthorized claim")
+    if badcases != build_badcases(repository_root):
+        raise CoreReleaseError("canonical frozen BadCases changed")
+    _verify_badcases_and_claims(manifest, badcases, claims, snapshot)
+    if (
+        ci.head_sha != local_head
+        or ci.workflow_name != EXPECTED_WORKFLOW
+        or ci.conclusion != "success"
+        or ci.successful_gates != EXPECTED_GATES
+        or not set(ci.successful_jobs) >= REQUIRED_RELEASE_JOBS
+    ):
+        raise CoreReleaseError(
+            "exact-head Full Release CI including qualifications and fresh-setup is required"
+        )
+    expected = bind_final_head(candidate, ci, local_head)
+    if manifest != expected:
+        raise CoreReleaseError(
+            "final manifest must be the exact detached binding of the committed candidate"
+        )
+    _verify_final_checkout(repository_root, local_head, candidate)
+    return SemanticReleaseReceipt(
+        release_manifest_digest=manifest.digest,
+        release_head=local_head,
+        remote_ci_run_id=ci.run_id,
+        candidate_manifest_digest=candidate.digest,
+        ci_attestation_digest=ci.digest,
     )

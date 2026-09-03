@@ -658,8 +658,29 @@ class ReleaseHistorySummary(StrictModel):
         return self
 
 
+class AcceptedRealEvidencePlan(CanonicalModel):
+    """Successor evidence selection, without prospective execution authorization."""
+
+    schema_version: Literal[4] = 4
+    plan_id: Literal["core-real-evidence-v6"] = "core-real-evidence-v6"
+    supersedes_plan_id: Literal["core-real-evidence-v5"] = "core-real-evidence-v5"
+    experiment_id: Literal["core-real-matrix-v6"] = "core-real-matrix-v6"
+    experiment_plan_digest: Sha256Digest
+    corpus_reference: Literal["release/core-corpus-v4.json"] = "release/core-corpus-v4.json"
+    corpus_digest: Sha256Digest
+    judge_calibration_id: Literal["core-real-judge-v7-j4"] = "core-real-judge-v7-j4"
+    judge_plan_digest: Sha256Digest
+    judge_report_digest: Sha256Digest
+    source_digests: dict[str, Sha256Digest]
+    evidence_requirement: Literal["INTEGRITY_WITH_REPORTED_ELIGIBILITY"] = (
+        "INTEGRITY_WITH_REPORTED_ELIGIBILITY"
+    )
+    causal_reasoning_effort_claim: Literal[False] = False
+    external_execution_authorized: Literal[False] = False
+
+
 class ReleaseEvidenceManifest(CanonicalModel):
-    schema_version: Literal[1] = 1
+    schema_version: Literal[1, 2] = 1
     release_id: Literal["v1.0.0-core"] = "v1.0.0-core"
     core_corpus: EvidenceBinding
     release_commit: EvidenceBinding
@@ -679,6 +700,16 @@ class ReleaseEvidenceManifest(CanonicalModel):
     core_release_ready: bool
     real_evidence_authorization_required: bool
 
+    @property
+    def required_real_statuses(self) -> dict[str, EvidenceState]:
+        # V5 removed DeepSeek E1 from the selected Core cells. Preserve its lack of
+        # release evidence; direct DeepSeek calls never verify a Harness smoke.
+        return {
+            key: state
+            for key, state in self.real_statuses.items()
+            if self.schema_version == 1 or key != "REAL_DEEPSEEK_SMOKE"
+        }
+
     @model_validator(mode="after")
     def release_readiness_cannot_be_forged(self) -> ReleaseEvidenceManifest:
         required_real = {
@@ -691,6 +722,12 @@ class ReleaseEvidenceManifest(CanonicalModel):
         }
         if set(self.real_statuses) != required_real:
             raise ValueError("release evidence REAL_* status set is incomplete")
+        if self.schema_version == 2 and (
+            self.experiment_plan.identity != "experiment-plan:core-real-matrix-v6"
+            or self.real_statuses["REAL_DEEPSEEK_SMOKE"] is not EvidenceState.DEFERRED_NOT_VERIFIED
+            or self.paired_claim_policy is not PairedClaimPolicy.NO_HARNESS_UPLIFT_CLAIM
+        ):
+            raise ValueError("accepted V6 release scope or non-causal claim policy drifted")
         mandatory = (
             self.core_corpus,
             self.release_commit,
@@ -705,7 +742,7 @@ class ReleaseEvidenceManifest(CanonicalModel):
             self.remote_ci,
         )
         complete = all(binding.state is EvidenceState.VERIFIED for binding in mandatory) and all(
-            state is EvidenceState.VERIFIED for state in self.real_statuses.values()
+            state is EvidenceState.VERIFIED for state in self.required_real_statuses.values()
         )
         if self.core_release_ready != complete:
             raise ValueError("CORE_RELEASE_READY must be derived from all mandatory evidence")
@@ -721,6 +758,8 @@ class SemanticReleaseReceipt(StrictModel):
     release_manifest_digest: Sha256Digest
     release_head: str = Field(pattern=r"^[0-9a-f]{40}$")
     remote_ci_run_id: str = Field(min_length=1, max_length=100)
+    candidate_manifest_digest: Sha256Digest | None = None
+    ci_attestation_digest: Sha256Digest | None = None
 
 
 class ResumeClaim(StrictModel):

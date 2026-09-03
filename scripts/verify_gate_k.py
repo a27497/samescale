@@ -41,10 +41,12 @@ from harnesslab.release.final_verifier import (
     verify_semantic_final_release,
 )
 from harnesslab.release.matrix import MatrixControlPlane
-from harnesslab.release.models import EvidenceState
+from harnesslab.release.models import AcceptedRealEvidencePlan, EvidenceState, RealEvidencePlan
 from harnesslab.release.smoke import SmokeControlPlane, resolve_runtime_identities
 
 ROOT = Path(__file__).resolve().parents[1]
+# Frozen analysis builders live in the audited repository scripts package.
+sys.path.insert(0, str(ROOT))
 JUNIT = ROOT / "gate-k-results.xml"
 REQUIRED_DOCS = (
     "README.md",
@@ -59,6 +61,10 @@ REQUIRED_DOCS = (
     "docs/REAL_EVIDENCE_AUTHORIZATION.md",
 )
 CRITICAL_TESTS = {
+    "test_kc_stable_contract_preserves_science_history_and_hard_stop",
+    "test_kc_rejects_fabricated_stronger_ablation",
+    "test_kc_rejects_relabeling_one_not_comparable_pair",
+    "test_kc_detached_fixture_preserves_committed_candidate_and_requires_receipt",
     "test_core_corpus_is_exact_balanced_deterministic_and_validated",
     "test_corpus_has_sixteen_semantic_families_and_one_cross_language_control",
     "test_corpus_rejects_duplicate_independent_scenario_family",
@@ -222,6 +228,11 @@ def verify_contract_mode() -> bool:
         claims = load_resume_claim_map(ROOT / "release/resume-claim-evidence.json")
         badcases = load_badcase_plan(ROOT / "release/badcases.json")
         validate_keyless_contract_state(evidence)
+        if evidence.schema_version == 2:
+            from harnesslab.release.reconciliation import verify_candidate
+
+            verify_candidate(ROOT)
+            print("KC_STABLE_CONTRACT=PASS")
     except CoreReleaseError as exc:
         print(f"FAIL: release contract invalid: {exc}")
         return False
@@ -235,6 +246,7 @@ def verify_contract_mode() -> bool:
         not (ROOT / reference).exists()
         for claim in claims.claims
         if claim.status is EvidenceState.VERIFIED
+        and (claim.source_phase != "K-B" or evidence.schema_version != 2)
         for reference in claim.evidence_refs
     ):
         print("FAIL: VERIFIED resume claim references missing evidence")
@@ -788,7 +800,9 @@ def verify_contract_mode() -> bool:
     print("CODEX_OUTER_DOCKER_SECURITY=PASS")
     print("P_LANE_EFFECTIVE_NETWORK_CONTROL=PASS")
     print("CORE_RELEASE_READY=FALSE")
-    print("REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE")
+    print(
+        f"REAL_EVIDENCE_AUTHORIZATION_REQUIRED={str(evidence.real_evidence_authorization_required).upper()}"
+    )
     print("PHASE_K_B1_R6_RUNTIME_CONFIGURATION_EVIDENCE_IDENTITY_SEPARATION_KEYLESS")
     print("PHASE_K_B1_R7_CODEX_GENERATED_PROVIDER_PROFILE_ACTIVATION_KEYLESS")
     for key, state in sorted(evidence.real_statuses.items()):
@@ -803,8 +817,16 @@ async def verify_final_release(
     try:
         checked = load_core_corpus(ROOT / "release/core-corpus.json")
         rebuilt = build_corpus_manifest(ROOT)
-        plan = load_real_evidence_plan(ROOT / "release/core-real-evidence-plan.json")
+        plan: RealEvidencePlan | AcceptedRealEvidencePlan = load_real_evidence_plan(
+            ROOT / "release/core-real-evidence-plan.json"
+        )
         manifest = load_release_evidence(ROOT / "release/release-evidence.json")
+        if manifest.schema_version == 2:
+            from harnesslab.release.reconciliation import load_accepted_plan
+
+            plan = load_accepted_plan(ROOT)
+            checked = load_core_corpus(ROOT / plan.corpus_reference)
+            rebuilt = build_corpus_manifest(ROOT, task_version="1.0.2")
         claims = load_resume_claim_map(ROOT / "release/resume-claim-evidence.json")
         badcases = load_badcase_plan(ROOT / "release/badcases.json")
         if not database_url or not artifact_root_raw or not github_run_id:
@@ -826,6 +848,10 @@ async def verify_final_release(
             calibration_id=calibration_id,
         )
         ci = resolve_github_ci(github_run_id)
+        if manifest.schema_version == 2:
+            from harnesslab.release.final_verifier import bind_final_head
+
+            manifest = bind_final_head(manifest, ci, local_head)
         receipt = verify_semantic_final_release(
             repository_root=ROOT,
             checked_corpus=checked,
@@ -883,6 +909,7 @@ def main() -> int:
                 "--locked",
                 "pytest",
                 "tests/test_release_contracts.py",
+                "tests/test_kc_release_reconciliation.py",
                 "tests/test_release_semantic_verifier.py",
                 "tests/test_phase_kb0.py",
                 "tests/test_phase_kb0_review.py",
