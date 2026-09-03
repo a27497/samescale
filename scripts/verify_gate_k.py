@@ -62,7 +62,14 @@ REQUIRED_DOCS = (
 )
 CRITICAL_TESTS = {
     "test_kc_stable_contract_preserves_science_history_and_hard_stop",
-    "test_kc_rejects_fabricated_stronger_ablation",
+    "test_kc_rejects_fabricated_stronger_ablation[comparable-count]",
+    "test_kc_rejects_fabricated_stronger_ablation[complete-count]",
+    "test_kc_rejects_fabricated_stronger_ablation[formal-eligibility]",
+    "test_kc_rejects_fabricated_stronger_ablation[not-comparable-count]",
+    "test_kc_rejects_fabricated_stronger_ablation[treatment]",
+    "test_kc_rejects_fabricated_stronger_ablation[source-digest]",
+    "test_kc_rejects_fabricated_stronger_ablation[base-cell]",
+    "test_gate_k_junit_requires_every_ablation_adversarial_case",
     "test_kc_rejects_relabeling_one_not_comparable_pair",
     "test_kc_detached_fixture_preserves_committed_candidate_and_requires_receipt",
     "test_core_corpus_is_exact_balanced_deterministic_and_validated",

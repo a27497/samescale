@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
@@ -142,6 +143,15 @@ def test_kc_stable_contract_preserves_science_history_and_hard_stop() -> None:
         ("source_digest", "sha256:" + "0" * 64),
         ("base_cell_id", "model-gpt56-relay-responses"),
     ],
+    ids=(
+        "comparable-count",
+        "complete-count",
+        "formal-eligibility",
+        "not-comparable-count",
+        "treatment",
+        "source-digest",
+        "base-cell",
+    ),
 )
 def test_kc_rejects_fabricated_stronger_ablation(
     snapshot: final.AuthoritativeReleaseSnapshot,
@@ -152,6 +162,35 @@ def test_kc_rejects_fabricated_stronger_ablation(
     experiment = snapshot.experiment.model_copy(update={"ablation": ablation})
     with pytest.raises(CoreReleaseError, match="Pair/Ablation"):
         kc.verify_v6_snapshot(ROOT, snapshot.model_copy(update={"experiment": experiment}))
+
+
+def test_gate_k_junit_requires_every_ablation_adversarial_case(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from scripts import verify_gate_k as gate
+
+    junit = tmp_path / "gate-k.xml"
+    monkeypatch.setattr(gate, "JUNIT", junit)
+    prefix = "test_kc_rejects_fabricated_stronger_ablation"
+    required = {name for name in gate.CRITICAL_TESTS if name.startswith(prefix + "[")}
+    assert len(required) == 7
+
+    def write_cases(names: set[str], skipped: str | None = None) -> None:
+        suite = ET.Element("testsuite")
+        for name in sorted(names):
+            case = ET.SubElement(suite, "testcase", name=name)
+            if name == skipped:
+                ET.SubElement(case, "skipped")
+        ET.ElementTree(suite).write(junit)
+
+    write_cases(gate.CRITICAL_TESTS)
+    assert gate.verify_junit()
+    for name in sorted(required):
+        # A bare function name cannot substitute for a missing adversarial case.
+        write_cases((gate.CRITICAL_TESTS - {name}) | {prefix})
+        assert not gate.verify_junit()
+        write_cases(gate.CRITICAL_TESTS, skipped=name)
+        assert not gate.verify_junit()
 
 
 def test_kc_rejects_relabeling_one_not_comparable_pair(monkeypatch: pytest.MonkeyPatch) -> None:
