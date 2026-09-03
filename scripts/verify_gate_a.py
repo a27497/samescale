@@ -154,7 +154,9 @@ def main() -> int:
                 "-q",
                 f"--junitxml={JUNIT}",
             ),
-            timeout_seconds=900,
+            # The full suite now includes the V6 release reconstruction tests.
+            # Keep every test and a bounded budget inside the 25-minute CI job.
+            timeout_seconds=1200,
         ),
         Check("Ruff check", ("uv", "run", "--locked", "ruff", "check", ".")),
         Check("Ruff format", ("uv", "run", "--locked", "ruff", "format", "--check", ".")),
