@@ -449,9 +449,12 @@ async def test_workbench_routes_are_read_only_and_have_no_execution_or_analyst_s
         for path, methods in schema["paths"].items()
         if path.startswith("/api/workbench")
     }
-    assert len(paths) == 15
+    assert len(paths) == 16
     assert paths["/api/workbench/regression/compare"] == {"post"}
     assert paths["/api/workbench/experiments/{experiment_id}/diagnosis/badcases"] == {"post"}
+    assert paths["/api/workbench/experiments/{experiment_id}/diagnosis/projected-clusters"] == {
+        "post"
+    }
     assert paths["/api/workbench/experiments/{experiment_id}/model-comparison-analysis"] == {"get"}
     assert all(
         methods == {"get"}
@@ -460,6 +463,7 @@ async def test_workbench_routes_are_read_only_and_have_no_execution_or_analyst_s
         not in {
             "/api/workbench/regression/compare",
             "/api/workbench/experiments/{experiment_id}/diagnosis/badcases",
+            "/api/workbench/experiments/{experiment_id}/diagnosis/projected-clusters",
         }
     )
     serialized = json.dumps(
@@ -743,6 +747,51 @@ async def test_trace_rejects_client_paths_and_symlink_escape(
     finally:
         trace_path.unlink()
         trace_path.write_bytes(original)
+
+
+@pytest.mark.integration
+async def test_projected_diagnosis_api_is_explicit_versioned_and_allowlisted(
+    client: AsyncClient, phase_i_evidence: PhaseIEvidence
+) -> None:
+    response = await client.post(
+        f"/api/workbench/experiments/{phase_i_evidence.multi_task_id}/diagnosis/projected-clusters",
+        json={
+            "attempt_selection": "PRIMARY_ONLY",
+            "projection": {
+                "projection_id": "workbench-broad-failures",
+                "projection_version": "1",
+                "dimensions": ["FAILURE_CLASS", "FAILURE_SCOPE", "TRACE_PATTERN"],
+                "missing_value_policy": "SEPARATE_UNKNOWN",
+                "namespace": "workbench",
+            },
+        },
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["attempt_selection"] == "PRIMARY_ONLY"
+    assert body["projection"]["projection_version"] == "1"
+    assert body["cohort"]["diagnostic_only"] is True
+    assert body["cohort"]["comparability_claim"] is False
+    assert body["attempt_reads"]
+    assert all(item["read_path"] == "LEGACY_COMPATIBILITY" for item in body["attempt_reads"])
+    serialized = json.dumps(body)
+    assert "/home/" not in serialized
+    assert "credential" not in serialized.lower()
+    assert PRIVATE_SENTINEL not in serialized
+
+    invalid = await client.post(
+        f"/api/workbench/experiments/{phase_i_evidence.multi_task_id}/diagnosis/projected-clusters",
+        json={
+            "attempt_selection": "PRIMARY_ONLY",
+            "projection": {
+                "projection_id": "invalid",
+                "projection_version": "1",
+                "dimensions": ["ARBITRARY_FIELD"],
+                "namespace": "workbench",
+            },
+        },
+    )
+    assert invalid.status_code == 422
 
 
 @pytest.mark.integration

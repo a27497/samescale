@@ -38,7 +38,16 @@ from harnesslab.api.workbench_service import (
     run_detail,
     trace_detail,
 )
-from harnesslab.diagnosis.models import BadCaseExport, BadCaseExportRequest, DiagnosisReport
+from harnesslab.diagnosis.models import (
+    BadCaseExport,
+    BadCaseExportRequest,
+    DiagnosisReport,
+)
+from harnesslab.diagnosis.projection_models import (
+    ProjectedClusterReadRequest,
+    ProjectedClusterReport,
+)
+from harnesslab.diagnosis.projection_service import read_projected_failure_clusters
 from harnesslab.diagnosis.service import (
     DiagnosisEvidenceError,
     DiagnosisRequestError,
@@ -165,6 +174,36 @@ async def export_badcases(
         return build_badcase_export(report, request)
     except DiagnosisRequestError as exc:
         raise WorkbenchAPIError(422, "INVALID_BADCASE_EXPORT", str(exc)) from exc
+
+
+@router.post(
+    "/experiments/{experiment_id}/diagnosis/projected-clusters",
+    response_model=ProjectedClusterReport,
+)
+async def projected_failure_clusters(
+    experiment_id: str,
+    request: ProjectedClusterReadRequest,
+    session: Session,
+    artifact_roots: ArtifactRoots,
+) -> ProjectedClusterReport:
+    try:
+        return await read_projected_failure_clusters(
+            session,
+            experiment_id,
+            request,
+            artifact_roots,
+            repository_root=REPOSITORY_ROOT,
+        )
+    except DiagnosisRequestError as exc:
+        status = 404 if str(exc) == "experiment does not exist" else 422
+        code = "NOT_FOUND" if status == 404 else "INVALID_CLUSTER_PROJECTION"
+        raise WorkbenchAPIError(status, code, str(exc)) from exc
+    except DiagnosisEvidenceError as exc:
+        raise WorkbenchAPIError(
+            409,
+            "ARTIFACT_INTEGRITY_ERROR",
+            "projected diagnosis evidence cannot be verified",
+        ) from exc
 
 
 @router.get("/experiments/{experiment_id}/status", response_model=ExperimentStatusResponse)

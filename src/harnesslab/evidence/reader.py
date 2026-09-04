@@ -4,11 +4,10 @@ import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from pydantic import ValidationError
 
-from harnesslab.db.models.experiment import ExperimentRunRecord
 from harnesslab.harness_lane.models import NormalizedTrace
 from harnesslab.sandbox.artifacts import sha256_file
 
@@ -21,6 +20,22 @@ class EvidenceReadError(RuntimeError):
 class VerifiedManifest:
     raw: dict[str, Any]
     path: Path
+
+
+class EvidenceRecord(Protocol):
+    """Minimal immutable identity needed to verify one physical run attempt's evidence."""
+
+    @property
+    def run_id(self) -> str: ...
+
+    @property
+    def attempt(self) -> int: ...
+
+    @property
+    def artifact_manifest_path(self) -> str | None: ...
+
+    @property
+    def evidence_digest(self) -> str | None: ...
 
 
 def trusted_artifact_path(raw_path: str | Path, roots: tuple[Path, ...]) -> Path:
@@ -36,7 +51,7 @@ def trusted_artifact_path(raw_path: str | Path, roots: tuple[Path, ...]) -> Path
     return resolved
 
 
-def _expected_manifest_run_id(run: ExperimentRunRecord) -> str:
+def _expected_manifest_run_id(run: EvidenceRecord) -> str:
     suffix = f"-a{run.attempt}"
     expected = f"{run.run_id}{suffix}"
     if len(expected) <= 100:
@@ -46,7 +61,7 @@ def _expected_manifest_run_id(run: ExperimentRunRecord) -> str:
     return f"{run.run_id[:prefix_length]}-{identity_digest}{suffix}"
 
 
-def load_verified_manifest(run: ExperimentRunRecord, roots: tuple[Path, ...]) -> VerifiedManifest:
+def load_verified_manifest(run: EvidenceRecord, roots: tuple[Path, ...]) -> VerifiedManifest:
     if run.artifact_manifest_path is None or run.evidence_digest is None:
         raise EvidenceReadError("run artifact is not reported")
     path = trusted_artifact_path(run.artifact_manifest_path, roots)
@@ -64,7 +79,7 @@ def load_verified_manifest(run: ExperimentRunRecord, roots: tuple[Path, ...]) ->
 
 
 def load_normalized_trace(
-    run: ExperimentRunRecord, roots: tuple[Path, ...]
+    run: EvidenceRecord, roots: tuple[Path, ...]
 ) -> tuple[NormalizedTrace, str, str | None]:
     manifest = load_verified_manifest(run, roots)
     digest = manifest.raw.get("normalized_trace_digest")
