@@ -43,6 +43,7 @@ ALLOWED_TRANSITIONS: dict[LifecycleState, frozenset[LifecycleState]] = {
     LifecycleState.QUEUED: frozenset(
         {
             LifecycleState.PREPARING,
+            LifecycleState.FAILED_INFRA,
             LifecycleState.CANCELLED,
             LifecycleState.BUDGET_EXHAUSTED,
         }

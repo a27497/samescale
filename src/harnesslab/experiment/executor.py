@@ -6,6 +6,7 @@ import json
 from collections.abc import Callable, Collection, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 from typing import Protocol
 
@@ -17,6 +18,17 @@ from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.model import ModelProfile
 from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
+from harnesslab.evaluation_suites.models import ImmutableArtifactReference
+from harnesslab.experiment.authoritative import (
+    ObservedResourceDimension,
+    ObservedResourceUsage,
+    ReconciliationReceipt,
+    ReconciliationStatus,
+    ResourceAvailability,
+    current_attempt_record,
+    durable_reservation_for_attempt,
+    reconcile_attempt_resources,
+)
 from harnesslab.experiment.evidence import (
     ManifestControlMismatch,
     validate_manifest_against_slot,
@@ -27,6 +39,7 @@ from harnesslab.experiment.outcomes import (
     source_taxonomy_from_lane_evidence,
 )
 from harnesslab.experiment.queue import (
+    AuthoritativeClaimGate,
     RunSnapshot,
     claim_next_run,
     finish_run,
@@ -156,6 +169,37 @@ def _now() -> datetime:
     return datetime.now(UTC)
 
 
+def _observed(value: int | Decimal | None, unit: str) -> ObservedResourceDimension:
+    if value is None:
+        return ObservedResourceDimension(
+            availability=ResourceAvailability.NOT_AVAILABLE,
+            unit=unit,
+        )
+    return ObservedResourceDimension(
+        availability=ResourceAvailability.AVAILABLE,
+        value=Decimal(value),
+        unit=unit,
+    )
+
+
+def _observed_usage(metrics: ExecutionMetrics | None) -> ObservedResourceUsage:
+    return ObservedResourceUsage(
+        wall_time=_observed(
+            (
+                None
+                if metrics is None or metrics.duration_ms is None
+                else Decimal(metrics.duration_ms) / 1000
+            ),
+            "seconds",
+        ),
+        output_tokens=_observed(None if metrics is None else metrics.output_tokens, "tokens"),
+        model_turns=_observed(None, "turns"),
+        tool_calls=_observed(None if metrics is None else metrics.tool_calls, "calls"),
+        provider_requests=_observed(None, "requests"),
+        monetary_cost=_observed(None, "USD"),
+    )
+
+
 def attempt_execution_id(claimed: RunSnapshot) -> str:
     """Keep logical queue identity stable while isolating each physical attempt artifact."""
 
@@ -183,6 +227,7 @@ class ExperimentRunExecutor:
         lease_ttl: timedelta = timedelta(minutes=15),
         heartbeat_cadence: timedelta | None = None,
         clock: Callable[[], datetime] = _now,
+        authoritative_claim_gate: AuthoritativeClaimGate | None = None,
     ) -> None:
         self.repository_root = repository_root.resolve()
         self.session_factory = session_factory
@@ -195,11 +240,21 @@ class ExperimentRunExecutor:
         if self.heartbeat_cadence > lease_ttl / 3:
             raise ValueError("heartbeat cadence must not exceed one third of the lease ttl")
         self.clock = clock
+        self.authoritative_claim_gate = authoritative_claim_gate
 
     async def claim(
         self, experiment_id: str, *, slot_ids: Collection[str] | None = None
     ) -> RunSnapshot | None:
         async with self.session_factory() as session, session.begin():
+            if self.authoritative_claim_gate is not None:
+                return await self.authoritative_claim_gate.claim(
+                    session,
+                    experiment_id,
+                    self.owner,
+                    now=self.clock(),
+                    ttl=self.lease_ttl,
+                    slot_ids=slot_ids,
+                )
             return await claim_next_run(
                 session,
                 experiment_id,
@@ -226,6 +281,40 @@ class ExperimentRunExecutor:
     async def _inspect(self, run_id: str) -> RunSnapshot:
         async with self.session_factory() as session:
             return await inspect_run(session, run_id)
+
+    async def _reconcile_terminal(
+        self,
+        run_id: str,
+        *,
+        metrics: ExecutionMetrics | None,
+        evidence_digest: str | None,
+    ) -> ReconciliationReceipt | None:
+        if self.authoritative_claim_gate is None:
+            return None
+        async with self.session_factory() as session, session.begin():
+            attempt = await current_attempt_record(session, run_id, lock=True)
+            if attempt is None:
+                raise RuntimeError("authoritative execution lost its physical attempt")
+            reservation = await durable_reservation_for_attempt(session, attempt.attempt_id)
+            if reservation is None:
+                raise RuntimeError("authoritative execution terminated without a reservation")
+            reference = (
+                None
+                if evidence_digest is None
+                else ImmutableArtifactReference(
+                    artifact_id=f"attempt-evidence-{attempt.attempt_id.removeprefix('sha256:')[:32]}",
+                    schema_version=1,
+                    artifact_digest=evidence_digest,
+                )
+            )
+            return await reconcile_attempt_resources(
+                session,
+                attempt_id=attempt.attempt_id,
+                reservation=reservation,
+                usage=_observed_usage(metrics),
+                evidence_reference=reference,
+                now=self.clock(),
+            )
 
     async def _maintain_heartbeat(
         self,
@@ -258,9 +347,11 @@ class ExperimentRunExecutor:
         binding = self.bindings.get(claimed.cell_id)
         preparing = await self._transition(claimed.run_id, RunStatus.PREPARING)
         if preparing.status is RunStatus.CANCELLED:
+            await self._reconcile_terminal(claimed.run_id, metrics=None, evidence_digest=None)
             return preparing
         running = await self._transition(claimed.run_id, RunStatus.RUNNING)
         if running.status is RunStatus.CANCELLED:
+            await self._reconcile_terminal(claimed.run_id, metrics=None, evidence_digest=None)
             return running
         result: LaneRunResult | None = None
         error: Exception | None = None
@@ -287,13 +378,25 @@ class ExperimentRunExecutor:
             await heartbeat_task
 
         if heartbeat_lost.is_set() or heartbeat_cancelled.is_set():
-            return await self._inspect(claimed.run_id)
+            interrupted = await self._inspect(claimed.run_id)
+            if self.authoritative_claim_gate is not None and interrupted.status in {
+                RunStatus.FAILED_INFRA,
+                RunStatus.CANCELLED,
+            }:
+                await self._reconcile_terminal(
+                    claimed.run_id,
+                    metrics=None if result is None else _metrics(result.evidence),
+                    evidence_digest=None,
+                )
+            return interrupted
 
         verifying = await self._transition(claimed.run_id, RunStatus.VERIFYING)
         if verifying.status is RunStatus.CANCELLED:
+            await self._reconcile_terminal(claimed.run_id, metrics=None, evidence_digest=None)
             return verifying
         scoring = await self._transition(claimed.run_id, RunStatus.SCORING)
         if scoring.status is RunStatus.CANCELLED:
+            await self._reconcile_terminal(claimed.run_id, metrics=None, evidence_digest=None)
             return scoring
         if result is None:
             return await self._finish_infra(claimed.run_id, error)
@@ -327,6 +430,16 @@ class ExperimentRunExecutor:
             digest = None
             failure_detail = f"persisted manifest validation failed: {type(exc).__name__}"
         metrics = _metrics(evidence)
+        reconciliation = await self._reconcile_terminal(
+            claimed.run_id,
+            metrics=metrics,
+            evidence_digest=digest,
+        )
+        if (
+            reconciliation is not None
+            and reconciliation.status is ReconciliationStatus.ENVELOPE_EXCEEDED
+        ):
+            return await self._inspect(claimed.run_id)
         async with self.session_factory() as session, session.begin():
             return await finish_run(
                 session,
@@ -347,6 +460,7 @@ class ExperimentRunExecutor:
 
     async def _finish_infra(self, run_id: str, error: Exception | None) -> RunSnapshot:
         detail = type(error).__name__ if error is not None else "unknown worker failure"
+        await self._reconcile_terminal(run_id, metrics=None, evidence_digest=None)
         async with self.session_factory() as session, session.begin():
             return await finish_run(
                 session,
@@ -409,6 +523,7 @@ class ExperimentRunExecutor:
             RunStatus.FAILED_INFRA.value,
             RunStatus.FAILED_SUBJECT.value,
             RunStatus.CANCELLED.value,
+            RunStatus.BUDGET_EXHAUSTED.value,
         )
         async with self.session_factory() as session, session.begin():
             experiment = await session.get(ExperimentRecord, experiment_id, with_for_update=True)

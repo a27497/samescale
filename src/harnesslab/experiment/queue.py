@@ -4,18 +4,39 @@ from collections.abc import Collection
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, exists, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from harnesslab.budget.durable import DurableBudgetReservationReceipt, reserve_budget
+from harnesslab.budget.plan import PlanBudgetEstimate
+from harnesslab.budget.reservation import (
+    ReservationDecision,
+    ReservationScope,
+    ReservationUnit,
+    build_reservation_request,
+)
 from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import (
+    BudgetScopeLedgerRecord,
     ExperimentAblationRecord,
+    ExperimentAttemptReconciliationRecord,
     ExperimentCellRecord,
     ExperimentPairRecord,
     ExperimentRecord,
+    ExperimentRunAttemptRecord,
     ExperimentRunRecord,
 )
+from harnesslab.experiment.authoritative import (
+    ControlState,
+    append_attempt_transition,
+    control_state,
+    current_attempt_record,
+    durable_reservation_for_attempt,
+    reconcile_attempt_resources,
+    unavailable_resource_usage,
+)
+from harnesslab.experiment.lifecycle import TERMINAL_STATES, LifecycleState
 from harnesslab.experiment.methodology import ProviderAvailability
 from harnesslab.experiment.outcomes import StatisticalOutcome, terminal_status_for_outcome
 from harnesslab.experiment.plan import (
@@ -23,6 +44,11 @@ from harnesslab.experiment.plan import (
     ExperimentRunSlot,
     MethodologyV2ExperimentPlan,
     load_experiment_plan_payload,
+)
+from harnesslab.preflight.unified import (
+    UnifiedPreflightReceipt,
+    UnifiedPreflightSpecification,
+    UnifiedPreflightStatus,
 )
 
 
@@ -42,6 +68,7 @@ TERMINAL_STATUSES = {
     RunStatus.FAILED_INFRA.value,
     RunStatus.FAILED_SUBJECT.value,
     RunStatus.CANCELLED.value,
+    RunStatus.BUDGET_EXHAUSTED.value,
 }
 TRANSITIONS = {
     RunStatus.CLAIMED.value: {RunStatus.PREPARING.value},
@@ -77,6 +104,44 @@ class RunSnapshot:
     evidence_digest: str | None
     normalized_outcome: StatisticalOutcome | None
     source_outcome: str | None
+
+
+@dataclass(frozen=True)
+class AuthoritativeClaimGate:
+    """M.6 configuration injected into the existing executor; it is not a second executor."""
+
+    preflight: UnifiedPreflightReceipt
+    specification: UnifiedPreflightSpecification
+    estimate: PlanBudgetEstimate
+    reservation_scope: ReservationScope
+    reservation_scope_id: str
+    reservation_units: tuple[ReservationUnit, ...]
+
+    async def claim(
+        self,
+        session: AsyncSession,
+        experiment_id: str,
+        owner: str,
+        *,
+        now: datetime,
+        ttl: timedelta,
+        slot_ids: Collection[str] | None = None,
+    ) -> RunSnapshot | None:
+        claimed, _ = await claim_authoritative_run(
+            session,
+            experiment_id,
+            owner,
+            now=now,
+            ttl=ttl,
+            preflight=self.preflight,
+            specification=self.specification,
+            estimate=self.estimate,
+            reservation_scope=self.reservation_scope,
+            reservation_scope_id=self.reservation_scope_id,
+            reservation_units=self.reservation_units,
+            slot_ids=slot_ids,
+        )
+        return claimed
 
 
 def _snapshot(run: ExperimentRunRecord) -> RunSnapshot:
@@ -207,6 +272,7 @@ async def claim_next_run(
         ExperimentRunRecord.experiment_id == experiment_id,
         ExperimentRunRecord.cancellation_requested.is_(False),
         or_(ExperimentRunRecord.status == RunStatus.QUEUED.value, reclaimable),
+        ~exists().where(ExperimentRunAttemptRecord.run_id == ExperimentRunRecord.run_id),
     ]
     experiment = await session.get(ExperimentRecord, experiment_id)
     if experiment is None:
@@ -250,6 +316,179 @@ async def claim_next_run(
     return _snapshot(run)
 
 
+async def expire_authoritative_leases(
+    session: AsyncSession, experiment_id: str, *, now: datetime
+) -> tuple[str, ...]:
+    """Terminalize lost physical attempts; never reclaim or create a retry."""
+
+    runs = tuple(
+        (
+            await session.scalars(
+                select(ExperimentRunRecord)
+                .where(
+                    ExperimentRunRecord.experiment_id == experiment_id,
+                    ExperimentRunRecord.status.in_(ACTIVE_STATUSES),
+                    ExperimentRunRecord.lease_expires_at <= now,
+                    exists().where(ExperimentRunAttemptRecord.run_id == ExperimentRunRecord.run_id),
+                )
+                .with_for_update(skip_locked=True)
+            )
+        ).all()
+    )
+    expired: list[str] = []
+    for run in runs:
+        attempt = await current_attempt_record(session, run.run_id, lock=True)
+        if attempt is None or LifecycleState(attempt.current_state) in TERMINAL_STATES:
+            continue
+        await append_attempt_transition(
+            session,
+            attempt_id=attempt.attempt_id,
+            target=LifecycleState.FAILED_INFRA,
+            occurred_at=now,
+            reason_code="LEASE_EXPIRED",
+        )
+        reservation = await durable_reservation_for_attempt(session, attempt.attempt_id)
+        if reservation is None:
+            raise ExperimentConflict("expired authoritative attempt lacks its reservation")
+        reconciled = await session.scalar(
+            select(ExperimentAttemptReconciliationRecord.reconciliation_digest).where(
+                ExperimentAttemptReconciliationRecord.attempt_id == attempt.attempt_id
+            )
+        )
+        if reconciled is None:
+            await reconcile_attempt_resources(
+                session,
+                attempt_id=attempt.attempt_id,
+                reservation=reservation,
+                usage=unavailable_resource_usage(),
+                evidence_reference=None,
+                now=now,
+            )
+        run.status = RunStatus.FAILED_INFRA.value
+        run.lease_owner = None
+        run.lease_expires_at = None
+        run.heartbeat_at = now
+        if attempt.role == "PRIMARY":
+            run.normalized_outcome = StatisticalOutcome.INFRA_FAILURE.value
+            run.source_outcome = "lease_expired"
+            run.failure_detail = "authoritative physical attempt lease expired"
+            run.finished_at = now
+        expired.append(attempt.attempt_id)
+    await session.flush()
+    return tuple(expired)
+
+
+async def claim_authoritative_run(
+    session: AsyncSession,
+    experiment_id: str,
+    owner: str,
+    *,
+    now: datetime,
+    ttl: timedelta,
+    preflight: UnifiedPreflightReceipt,
+    specification: UnifiedPreflightSpecification,
+    estimate: PlanBudgetEstimate,
+    reservation_scope: ReservationScope,
+    reservation_scope_id: str,
+    reservation_units: tuple[ReservationUnit, ...],
+    slot_ids: Collection[str] | None = None,
+) -> tuple[RunSnapshot | None, DurableBudgetReservationReceipt | None]:
+    """Claim one authoritative slot only after exact preflight and durable reservation."""
+
+    if not owner or len(owner) > 100 or ttl <= timedelta(0):
+        raise ValueError("authoritative lease owner and ttl must be valid")
+    experiment = await session.get(ExperimentRecord, experiment_id, with_for_update=True)
+    if experiment is None:
+        return None, None
+    expected_specification = specification.specification_digest
+    if (
+        preflight.status is not UnifiedPreflightStatus.READY
+        or preflight.specification.artifact_digest != expected_specification
+        or preflight.candidate_plan.artifact_digest != experiment.plan_digest
+        or preflight.target_material != specification.target_material
+        or preflight.methodology != specification.methodology
+        or preflight.budget_estimate != estimate
+    ):
+        raise ExperimentConflict("authoritative claim requires exact READY M.5 evidence")
+    durable_scope = await session.get(BudgetScopeLedgerRecord, reservation_scope_id)
+    if (
+        durable_scope is None
+        or durable_scope.plan_digest != experiment.plan_digest
+        or durable_scope.preflight_digest != preflight.receipt_digest
+        or durable_scope.budget_estimate_digest != estimate.estimate_digest
+        or durable_scope.stage != preflight.target_stage.value
+        or durable_scope.scope != reservation_scope.value
+    ):
+        raise ExperimentConflict("authoritative claim requires exact durable M.5 binding")
+    if await control_state(session, experiment_id) is not ControlState.ACTIVE:
+        return None, None
+    await expire_authoritative_leases(session, experiment_id, now=now)
+    filters = [
+        ExperimentRunRecord.experiment_id == experiment_id,
+        ExperimentRunRecord.status == RunStatus.QUEUED.value,
+        ExperimentRunRecord.cancellation_requested.is_(False),
+        exists().where(
+            ExperimentRunAttemptRecord.run_id == ExperimentRunRecord.run_id,
+            ExperimentRunAttemptRecord.current_state == LifecycleState.QUEUED.value,
+        ),
+    ]
+    if slot_ids is not None:
+        selected = tuple(slot_ids)
+        if not selected:
+            return None, None
+        filters.append(ExperimentRunRecord.slot_id.in_(selected))
+    run = await session.scalar(
+        select(ExperimentRunRecord)
+        .where(*filters)
+        .order_by(ExperimentRunRecord.slot_order)
+        .limit(1)
+        .with_for_update(skip_locked=True)
+    )
+    if run is None:
+        return None, None
+    attempt = await current_attempt_record(session, run.run_id, lock=True)
+    if attempt is None or attempt.current_state != LifecycleState.QUEUED.value:
+        raise ExperimentConflict("authoritative claim lacks an eligible physical attempt")
+    units = {item.logical_unit_id: item for item in reservation_units}
+    unit = units.get(run.slot_id)
+    if unit is None:
+        raise ExperimentConflict("authoritative claim lacks an exact reservation unit")
+    request = build_reservation_request(
+        request_id=f"claim-{attempt.attempt_id.removeprefix('sha256:')[:32]}",
+        plan=preflight.candidate_plan,
+        stage=preflight.target_stage,
+        scope=reservation_scope,
+        scope_id=reservation_scope_id,
+        unit=unit,
+        budget_estimate=estimate,
+    )
+    reservation = await reserve_budget(
+        session, request=request, estimate=estimate, unit=unit, now=now
+    )
+    attempt.reservation_digest = reservation.receipt_digest
+    if reservation.decision is ReservationDecision.DENIED:
+        await append_attempt_transition(
+            session,
+            attempt_id=attempt.attempt_id,
+            target=LifecycleState.BUDGET_EXHAUSTED,
+            occurred_at=now,
+            reason_code="CAMPAIGN_OR_STAGE_BUDGET_EXHAUSTED",
+        )
+        run.status = RunStatus.BUDGET_EXHAUSTED.value
+        run.finished_at = now
+        run.source_outcome = "campaign_or_stage_budget_exhausted"
+        await session.flush()
+        return None, reservation
+    run.status = RunStatus.CLAIMED.value
+    run.lease_owner = owner
+    run.heartbeat_at = now
+    run.lease_expires_at = now + ttl
+    run.attempt = attempt.attempt_number
+    run.started_at = run.started_at or now
+    await session.flush()
+    return _snapshot(run), reservation
+
+
 async def _locked_run(session: AsyncSession, run_id: str) -> ExperimentRunRecord:
     run = await session.scalar(
         select(ExperimentRunRecord).where(ExperimentRunRecord.run_id == run_id).with_for_update()
@@ -280,7 +519,16 @@ async def heartbeat_run(
     _require_active_owner(run, owner, now)
     if run.status not in ACTIVE_STATUSES:
         raise ExperimentConflict("terminal or queued run cannot heartbeat")
+    authoritative = await current_attempt_record(session, run_id, lock=True)
     if run.cancellation_requested:
+        if authoritative is not None:
+            await append_attempt_transition(
+                session,
+                attempt_id=authoritative.attempt_id,
+                target=LifecycleState.CANCELLED,
+                occurred_at=now,
+                reason_code="OPERATOR_CANCELLED",
+            )
         run.status = RunStatus.CANCELLED.value
         run.normalized_outcome = StatisticalOutcome.CANCELLED.value
         run.source_outcome = "cancellation_requested"
@@ -300,6 +548,8 @@ async def release_run(
 ) -> RunSnapshot:
     run = await _locked_run(session, run_id)
     _require_active_owner(run, owner, now)
+    if await current_attempt_record(session, run_id, lock=True) is not None:
+        raise ExperimentConflict("authoritative attempts cannot be released and silently reused")
     if run.status not in ACTIVE_STATUSES:
         raise ExperimentConflict("terminal or queued run cannot be released")
     run.status = RunStatus.QUEUED.value
@@ -314,8 +564,17 @@ async def request_run_cancellation(
     session: AsyncSession, run_id: str, *, now: datetime
 ) -> RunSnapshot:
     run = await _locked_run(session, run_id)
+    authoritative = await current_attempt_record(session, run_id, lock=True)
     run.cancellation_requested = True
     if run.status == RunStatus.QUEUED.value:
+        if authoritative is not None:
+            await append_attempt_transition(
+                session,
+                attempt_id=authoritative.attempt_id,
+                target=LifecycleState.CANCELLED,
+                occurred_at=now,
+                reason_code="OPERATOR_CANCELLED",
+            )
         run.status = RunStatus.CANCELLED.value
         run.normalized_outcome = StatisticalOutcome.CANCELLED.value
         run.source_outcome = "cancellation_requested"
@@ -334,6 +593,8 @@ async def requeue_failed_infra_after_repair(
     """Authorize one new physical attempt without changing the logical slot or old artifacts."""
 
     run = await _locked_run(session, run_id)
+    if await current_attempt_record(session, run_id, lock=True) is not None:
+        raise ExperimentConflict("authoritative recovery requires a new immutable physical attempt")
     experiment = await session.get(ExperimentRecord, run.experiment_id)
     if experiment is None:
         raise ExperimentConflict("experiment does not exist")
@@ -378,7 +639,16 @@ async def transition_run(
 ) -> RunSnapshot:
     run = await _locked_run(session, run_id)
     _require_active_owner(run, owner, now)
+    authoritative = await current_attempt_record(session, run_id, lock=True)
     if run.cancellation_requested:
+        if authoritative is not None:
+            await append_attempt_transition(
+                session,
+                attempt_id=authoritative.attempt_id,
+                target=LifecycleState.CANCELLED,
+                occurred_at=now,
+                reason_code="OPERATOR_CANCELLED",
+            )
         run.status = RunStatus.CANCELLED.value
         run.normalized_outcome = StatisticalOutcome.CANCELLED.value
         run.source_outcome = "cancellation_requested"
@@ -390,6 +660,18 @@ async def transition_run(
         raise ExperimentConflict(f"invalid run lifecycle transition: {run.status}->{status.value}")
     else:
         run.status = status.value
+        target = {
+            RunStatus.PREPARING: LifecycleState.PREPARING,
+            RunStatus.RUNNING: LifecycleState.RUNNING,
+            RunStatus.VERIFYING: LifecycleState.VERIFYING,
+        }.get(status)
+        if authoritative is not None and target is not None:
+            await append_attempt_transition(
+                session,
+                attempt_id=authoritative.attempt_id,
+                target=target,
+                occurred_at=now,
+            )
     await session.flush()
     return _snapshot(run)
 
@@ -422,17 +704,48 @@ async def finish_run(
         evidence_digest = None
         failure_detail = None
     terminal = terminal_status_for_outcome(normalized_outcome)
+    authoritative = await current_attempt_record(session, run_id, lock=True)
+    if authoritative is not None:
+        reconciled = await session.scalar(
+            select(ExperimentAttemptReconciliationRecord.reconciliation_digest).where(
+                ExperimentAttemptReconciliationRecord.attempt_id == authoritative.attempt_id
+            )
+        )
+        if reconciled is None:
+            raise ExperimentConflict(
+                "authoritative attempt resources must reconcile before terminal outcome"
+            )
+        lifecycle_terminal = {
+            StatisticalOutcome.CAPABILITY_PASS: LifecycleState.COMPLETED,
+            StatisticalOutcome.CAPABILITY_FAIL: LifecycleState.FAILED_CAPABILITY,
+            StatisticalOutcome.INFRA_FAILURE: LifecycleState.FAILED_INFRA,
+            StatisticalOutcome.CANCELLED: LifecycleState.CANCELLED,
+        }[normalized_outcome]
+        await append_attempt_transition(
+            session,
+            attempt_id=authoritative.attempt_id,
+            target=lifecycle_terminal,
+            occurred_at=now,
+            reason_code=(
+                None
+                if lifecycle_terminal is LifecycleState.COMPLETED
+                else source_outcome.upper()[:100]
+            ),
+        )
+        authoritative.artifact_manifest_path = artifact_manifest_path
+        authoritative.evidence_digest = evidence_digest
     run.status = terminal.value
-    run.normalized_outcome = normalized_outcome.value
-    run.source_outcome = source_outcome
-    run.artifact_manifest_path = artifact_manifest_path
-    run.evidence_digest = evidence_digest
-    run.failure_detail = failure_detail
-    run.duration_ms = duration_ms
-    run.input_tokens = input_tokens
-    run.output_tokens = output_tokens
-    run.tool_calls = tool_calls
-    run.steps = steps
+    if authoritative is None or authoritative.role == "PRIMARY":
+        run.normalized_outcome = normalized_outcome.value
+        run.source_outcome = source_outcome
+        run.artifact_manifest_path = artifact_manifest_path
+        run.evidence_digest = evidence_digest
+        run.failure_detail = failure_detail
+        run.duration_ms = duration_ms
+        run.input_tokens = input_tokens
+        run.output_tokens = output_tokens
+        run.tool_calls = tool_calls
+        run.steps = steps
     run.finished_at = now
     run.lease_owner = None
     run.lease_expires_at = None

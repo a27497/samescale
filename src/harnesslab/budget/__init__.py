@@ -1,5 +1,11 @@
 """Deterministic pre-spend budget and cost estimation."""
 
+from harnesslab.budget.durable import (
+    DurableBudgetError,
+    DurableBudgetReservationReceipt,
+    initialize_budget_scope,
+    reserve_budget,
+)
 from harnesslab.budget.estimator import estimate_budget, estimate_matrix_budget
 from harnesslab.budget.models import (
     BudgetCeilingStatus,
@@ -56,6 +62,8 @@ __all__ = [
     "BudgetReservationStore",
     "CallResourceCeiling",
     "CostProjection",
+    "DurableBudgetError",
+    "DurableBudgetReservationReceipt",
     "ExpectedCallUsage",
     "InMemoryBudgetReservationStore",
     "JudgeCampaignBudget",
@@ -84,5 +92,7 @@ __all__ = [
     "estimate_budget",
     "estimate_matrix_budget",
     "estimate_plan_budget",
+    "initialize_budget_scope",
     "reservation_units_for_plan",
+    "reserve_budget",
 ]

@@ -121,6 +121,163 @@ class ExperimentRunRecord(Base):
     )
 
 
+class ExperimentRunAttemptRecord(Base):
+    __tablename__ = "experiment_run_attempt"
+
+    attempt_id: Mapped[str] = mapped_column(String(71), primary_key=True)
+    run_id: Mapped[str] = mapped_column(
+        String(100), ForeignKey("experiment_run.run_id", ondelete="CASCADE"), nullable=False
+    )
+    plan_digest: Mapped[str] = mapped_column(String(71), nullable=False)
+    attempt_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    role: Mapped[str] = mapped_column(String(20), nullable=False)
+    authorization_json: Mapped[dict[str, Any] | None] = mapped_column(JSON_DOCUMENT)
+    reservation_digest: Mapped[str | None] = mapped_column(
+        String(71), ForeignKey("budget_reservation.reservation_digest")
+    )
+    current_state: Mapped[str] = mapped_column(String(30), nullable=False)
+    artifact_manifest_path: Mapped[str | None] = mapped_column(Text)
+    evidence_digest: Mapped[str | None] = mapped_column(String(71))
+    terminal_reason: Mapped[str | None] = mapped_column(String(100))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    terminal_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    __table_args__ = (
+        UniqueConstraint("run_id", "attempt_number", name="uq_run_attempt_number"),
+        CheckConstraint("attempt_number >= 1", name="ck_run_attempt_number"),
+        CheckConstraint("role IN ('PRIMARY', 'RECOVERY')", name="ck_run_attempt_role"),
+        Index("ix_run_attempt_current", "run_id", "attempt_number"),
+    )
+
+
+class ExperimentAttemptEventRecord(Base):
+    __tablename__ = "experiment_attempt_event"
+
+    event_id: Mapped[str] = mapped_column(String(71), primary_key=True)
+    attempt_id: Mapped[str] = mapped_column(
+        String(71),
+        ForeignKey("experiment_run_attempt.attempt_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    sequence: Mapped[int] = mapped_column(Integer, nullable=False)
+    from_state: Mapped[str] = mapped_column(String(30), nullable=False)
+    to_state: Mapped[str] = mapped_column(String(30), nullable=False)
+    reason_code: Mapped[str | None] = mapped_column(String(100))
+    previous_event_digest: Mapped[str | None] = mapped_column(String(71))
+    event_digest: Mapped[str] = mapped_column(String(71), nullable=False, unique=True)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("attempt_id", "sequence", name="uq_attempt_event_sequence"),
+        Index("ix_attempt_event_chain", "attempt_id", "sequence"),
+    )
+
+
+class ExperimentResourceEventRecord(Base):
+    __tablename__ = "experiment_resource_event"
+
+    event_id: Mapped[str] = mapped_column(String(71), primary_key=True)
+    attempt_id: Mapped[str] = mapped_column(
+        String(71),
+        ForeignKey("experiment_run_attempt.attempt_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    reservation_digest: Mapped[str] = mapped_column(
+        String(71), ForeignKey("budget_reservation.reservation_digest"), nullable=False
+    )
+    resource_envelope_identity: Mapped[str] = mapped_column(String(71), nullable=False)
+    usage_json: Mapped[dict[str, Any]] = mapped_column(JSON_DOCUMENT, nullable=False)
+    evidence_reference_json: Mapped[dict[str, Any] | None] = mapped_column(JSON_DOCUMENT)
+    event_digest: Mapped[str] = mapped_column(String(71), nullable=False, unique=True)
+    observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class ExperimentControlEventRecord(Base):
+    __tablename__ = "experiment_control_event"
+
+    event_id: Mapped[str] = mapped_column(String(71), primary_key=True)
+    experiment_id: Mapped[str] = mapped_column(
+        String(100), ForeignKey("experiment.id", ondelete="CASCADE"), nullable=False
+    )
+    sequence: Mapped[int] = mapped_column(Integer, nullable=False)
+    plan_digest: Mapped[str] = mapped_column(String(71), nullable=False)
+    stage: Mapped[str] = mapped_column(String(30), nullable=False)
+    control_type: Mapped[str] = mapped_column(String(40), nullable=False)
+    actor_identity: Mapped[str] = mapped_column(String(71), nullable=False)
+    authorization_identity: Mapped[str] = mapped_column(String(71), nullable=False)
+    reason: Mapped[str] = mapped_column(String(500), nullable=False)
+    selected_slot_ids_json: Mapped[list[str]] = mapped_column(JSON_DOCUMENT, nullable=False)
+    preflight_digest: Mapped[str | None] = mapped_column(String(71))
+    budget_estimate_digest: Mapped[str | None] = mapped_column(String(71))
+    previous_event_digest: Mapped[str | None] = mapped_column(String(71))
+    event_digest: Mapped[str] = mapped_column(String(71), nullable=False, unique=True)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("experiment_id", "sequence", name="uq_control_event_sequence"),
+        Index("ix_control_event_chain", "experiment_id", "sequence"),
+    )
+
+
+class BudgetScopeLedgerRecord(Base):
+    __tablename__ = "budget_scope_ledger"
+
+    scope_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    plan_digest: Mapped[str] = mapped_column(String(71), nullable=False)
+    preflight_digest: Mapped[str] = mapped_column(String(71), nullable=False)
+    budget_estimate_digest: Mapped[str] = mapped_column(String(71), nullable=False)
+    stage: Mapped[str] = mapped_column(String(30), nullable=False)
+    scope: Mapped[str] = mapped_column(String(20), nullable=False)
+    ceilings_json: Mapped[dict[str, Any]] = mapped_column(JSON_DOCUMENT, nullable=False)
+    reserved_totals_json: Mapped[dict[str, Any]] = mapped_column(JSON_DOCUMENT, nullable=False)
+    consumed_totals_json: Mapped[dict[str, Any]] = mapped_column(JSON_DOCUMENT, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class BudgetReservationRecord(Base):
+    __tablename__ = "budget_reservation"
+
+    reservation_digest: Mapped[str] = mapped_column(String(71), primary_key=True)
+    scope_id: Mapped[str] = mapped_column(
+        String(100), ForeignKey("budget_scope_ledger.scope_id", ondelete="CASCADE"), nullable=False
+    )
+    logical_unit_id: Mapped[str] = mapped_column(String(71), nullable=False)
+    request_digest: Mapped[str] = mapped_column(String(71), nullable=False, unique=True)
+    decision: Mapped[str] = mapped_column(String(20), nullable=False)
+    reason_code: Mapped[str] = mapped_column(String(100), nullable=False)
+    receipt_json: Mapped[dict[str, Any]] = mapped_column(JSON_DOCUMENT, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    __table_args__ = (Index("ix_budget_reservation_unit", "scope_id", "logical_unit_id"),)
+
+
+class ExperimentAttemptReconciliationRecord(Base):
+    __tablename__ = "experiment_attempt_reconciliation"
+
+    reconciliation_digest: Mapped[str] = mapped_column(String(71), primary_key=True)
+    attempt_id: Mapped[str] = mapped_column(
+        String(71),
+        ForeignKey("experiment_run_attempt.attempt_id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    resource_event_digest: Mapped[str] = mapped_column(
+        String(71), ForeignKey("experiment_resource_event.event_id"), nullable=False
+    )
+    reservation_digest: Mapped[str] = mapped_column(
+        String(71),
+        ForeignKey("budget_reservation.reservation_digest"),
+        nullable=False,
+    )
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    reason_code: Mapped[str] = mapped_column(String(100), nullable=False)
+    released_json: Mapped[dict[str, Any]] = mapped_column(JSON_DOCUMENT, nullable=False)
+    receipt_json: Mapped[dict[str, Any]] = mapped_column(JSON_DOCUMENT, nullable=False)
+    reconciled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
 class ExperimentPairRecord(Base):
     __tablename__ = "experiment_pair"
 

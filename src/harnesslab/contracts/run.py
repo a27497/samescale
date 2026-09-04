@@ -21,6 +21,7 @@ class RunStatus(StrEnum):
     FAILED_INFRA = "failed_infra"
     FAILED_SUBJECT = "failed_subject"
     CANCELLED = "cancelled"
+    BUDGET_EXHAUSTED = "budget_exhausted"
 
 
 class RunRecord(BaseModel):

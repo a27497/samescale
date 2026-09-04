@@ -122,9 +122,10 @@ def _fixture(
     unknown_pricing: bool = False,
     stage_cost: float = 1,
     formal_comparability_required: bool = False,
+    experiment_id: str = "phase-g-test",
 ) -> M5Fixture:
     per_slot = _contract()
-    base = basic_spec(repeat_count=1)
+    base = basic_spec(repeat_count=1).model_copy(update={"experiment_id": experiment_id})
     cells = tuple(
         cell.model_copy(
             update={
