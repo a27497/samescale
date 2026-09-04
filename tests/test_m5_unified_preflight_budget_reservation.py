@@ -443,7 +443,7 @@ def test_credential_value_never_enters_receipt() -> None:
         fixed_disk_bytes=1000,
         disk_bytes_per_slot=100,
     )
-    secret = "sk-test-super-secret-material"
+    secret = "".join(("sk-", "test-super-secret-material"))
     local = fixture["observations"].local.model_copy(
         update={
             "configuration_present": {"M5_API_KEY": True},

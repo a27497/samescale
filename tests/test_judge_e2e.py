@@ -10,6 +10,7 @@ import psycopg
 import pytest
 from alembic import command
 from alembic.config import Config
+from alembic.script import ScriptDirectory
 from psycopg import sql
 from sqlalchemy import delete, select
 from sqlalchemy.engine import make_url
@@ -614,6 +615,8 @@ def test_phase_g_to_phase_h_migration_preserves_experiment_evidence(
         os.environ["DATABASE_URL"] = test_url.render_as_string(hide_password=False)
         get_settings.cache_clear()
         config = Config("alembic.ini")
+        expected_revision = ScriptDirectory.from_config(config).get_current_head()
+        assert expected_revision is not None
         command.upgrade(config, "20260823_0003")
         with psycopg.connect(test_dsn, autocommit=True) as connection:
             connection.execute(
@@ -629,7 +632,7 @@ def test_phase_g_to_phase_h_migration_preserves_experiment_evidence(
             ).fetchone()
             revision = connection.execute("SELECT version_num FROM alembic_version").fetchone()
         assert row == ("preserved-phase-g", "completed", "sha256:" + "1" * 64)
-        assert revision == ("20260828_0005",)
+        assert revision == (expected_revision,)
     finally:
         if previous is None:
             os.environ.pop("DATABASE_URL", None)

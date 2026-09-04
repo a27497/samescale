@@ -7,6 +7,7 @@ import psycopg
 import pytest
 from alembic import command
 from alembic.config import Config
+from alembic.script import ScriptDirectory
 from psycopg import sql
 from sqlalchemy.engine import make_url
 
@@ -38,6 +39,8 @@ def test_migration_from_empty_database(database_url: str, monkeypatch: pytest.Mo
         monkeypatch.setenv("DATABASE_URL", temporary_url)
         get_settings.cache_clear()
         config = Config("alembic.ini")
+        expected_revision = ScriptDirectory.from_config(config).get_current_head()
+        assert expected_revision is not None
         command.upgrade(config, "head")
 
         with psycopg.connect(temporary_psycopg_url) as connection:
@@ -63,7 +66,7 @@ def test_migration_from_empty_database(database_url: str, monkeypatch: pytest.Mo
             "judge_calibration",
             "judge_evaluation",
             "registry_experiment_snapshot",
-            "20260828_0005",
+            expected_revision,
         )
     finally:
         get_settings.cache_clear()
