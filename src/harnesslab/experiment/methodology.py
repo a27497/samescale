@@ -54,6 +54,8 @@ class FunnelStage(StrEnum):
 
 
 class StageDecision(StrEnum):
+    """Historical methodology-v2 value; never authorizes Funnel-v3 admission."""
+
     GO = "GO"
     STOP = "STOP"
 
@@ -666,6 +668,8 @@ def project_default_portfolio(policy: DefaultPortfolioPolicy) -> PortfolioProjec
 
 
 def next_funnel_stage(current: FunnelStage, decision: StageDecision) -> FunnelStage | None:
+    """Navigate frozen v2 vocabulary only; this is not authoritative v3 admission."""
+
     if decision is StageDecision.STOP:
         return None
     stages = tuple(FunnelStage)
