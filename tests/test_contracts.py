@@ -259,6 +259,7 @@ def test_run_status_taxonomy_distinguishes_infra_and_subject_failures() -> None:
         "failed_infra",
         "failed_subject",
         "cancelled",
+        "budget_exhausted",
     }
     assert len({RunStatus.FAILED_INFRA, RunStatus.FAILED_SUBJECT}) == 2
 
