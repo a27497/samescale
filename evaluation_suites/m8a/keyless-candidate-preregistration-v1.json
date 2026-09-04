@@ -1,0 +1,2072 @@
+{
+  "bundle_digest": "sha256:b861f17752bb38ca6c767cc309dcb6efb455ef09a4924389a473e61877e9aaa1",
+  "bundle_id": "phase-m8a-keyless-preregistration-v1",
+  "discriminative_policy": {
+    "comparable_only": true,
+    "configuration_universe": [
+      {
+        "configuration_id": "direct-direct-alibaba-bailian-deepseek-v4-pro-chat",
+        "configuration_identity": "sha256:ddec9878a0a509ec04c3d882eb22a85225c0dd05cb330113c8c3c875e3aac94f",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-alibaba-bailian-deepseek-v4-pro-chat",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "DeepSeek V4",
+        "model_id": "deepseek-v4-pro",
+        "provider_id": "alibaba-bailian",
+        "provider_profile_id": "alibaba-bailian-deepseek-v4-pro-chat",
+        "provider_profile_identity": "sha256:a1f8a6250b1b630f13fda6daa390b7f07bce81821317de6445c1cf8b025891bc",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-alibaba-bailian-deepseek-v4-pro-responses",
+        "configuration_identity": "sha256:c98518959932d25abec7b838e9d829999a890b44714a096da22b609c82aebac7",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-alibaba-bailian-deepseek-v4-pro-responses",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "DeepSeek V4",
+        "model_id": "deepseek-v4-pro",
+        "provider_id": "alibaba-bailian",
+        "provider_profile_id": "alibaba-bailian-deepseek-v4-pro-responses",
+        "provider_profile_identity": "sha256:9ba7a7dddd98d35f7889af4d05dd99b0ba49fe74c23780c6520903a4fcf6a015",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-alibaba-bailian-qwen3.8-max-chat",
+        "configuration_identity": "sha256:34de27bf93479dec65f6825cc2fa4ddea810daea908598b0e344ffb91576a2fc",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-alibaba-bailian-qwen3.8-max-chat",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "Qwen",
+        "model_id": "qwen3.8-max",
+        "provider_id": "alibaba-bailian",
+        "provider_profile_id": "alibaba-bailian-qwen3.8-max-chat",
+        "provider_profile_identity": "sha256:ffad5076ae53c873021c238a50f75b98e5e55e44697d951544ecfdb424cbe832",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-alibaba-bailian-qwen3.8-max-messages",
+        "configuration_identity": "sha256:4e74e20ccbc18fada3954f7807c32a26524a8db58bb2d33dbcd567a447337e65",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-alibaba-bailian-qwen3.8-max-messages",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "Qwen",
+        "model_id": "qwen3.8-max",
+        "provider_id": "alibaba-bailian",
+        "provider_profile_id": "alibaba-bailian-qwen3.8-max-messages",
+        "provider_profile_identity": "sha256:5b9b98387009f3fd1670b4efd729a5782ec55565b50b2da61dda2f12db665af4",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-alibaba-bailian-qwen3.8-max-responses",
+        "configuration_identity": "sha256:52469429cf078f0f531d7b011a7800994bfd97f9894872743492034c836054db",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-alibaba-bailian-qwen3.8-max-responses",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "Qwen",
+        "model_id": "qwen3.8-max",
+        "provider_id": "alibaba-bailian",
+        "provider_profile_id": "alibaba-bailian-qwen3.8-max-responses",
+        "provider_profile_identity": "sha256:eb2ac8a6ed69f3f22156653e6fdf11264dc7b959e30ff3c9d70340b284bc271d",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-deepseek-official-v4flash-chat",
+        "configuration_identity": "sha256:39782297e00285219f9542f285025bb0f0e93c87dbc81345719d9aa543fbdede",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-deepseek-official-v4flash-chat",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "DeepSeek V4",
+        "model_id": "deepseek-v4-flash",
+        "provider_id": "deepseek-official",
+        "provider_profile_id": "deepseek-official-v4flash-chat",
+        "provider_profile_identity": "sha256:1a26362658ee5ceedfc813e5fe7509d5a4d8df4a316d1872fdc1f22fdf5e838c",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-deepseek-official-v4pro-chat",
+        "configuration_identity": "sha256:abfa3feef752d6cac4060494c7fd8e5e3e41594bc97519a1a172da4e804f5a1b",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-deepseek-official-v4pro-chat",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "DeepSeek V4",
+        "model_id": "deepseek-v4-pro",
+        "provider_id": "deepseek-official",
+        "provider_profile_id": "deepseek-official-v4pro-chat",
+        "provider_profile_identity": "sha256:72dffb2aad2c713365cc47c4944045871f0cb2732a4d15a02b0db99cf3b9b4de",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-gpt56-relay-gpt56-responses",
+        "configuration_identity": "sha256:d1b6092c3efc9e9be3538188dbd7f4d4c358ee3f0c84ab649bba9a04a5697691",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-gpt56-relay-gpt56-responses",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "GPT-5.6",
+        "model_id": "gpt-5.6-sol",
+        "provider_id": "gpt56-relay",
+        "provider_profile_id": "gpt56-relay-gpt56-responses",
+        "provider_profile_identity": "sha256:85c1f3bd8f6cb6dd72a3f8246b66f72c04733c17572b151e1219c40f3b48fbfa",
+        "reasoning_effort": "medium",
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-opencode-go-qwen38-messages",
+        "configuration_identity": "sha256:7ee4721a4571c70b41f5250075a70913e1b04daa96eefd841145c176c6eb3f0f",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-opencode-go-qwen38-messages",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "Qwen",
+        "model_id": "qwen3.8-max",
+        "provider_id": "opencode-go",
+        "provider_profile_id": "opencode-go-qwen38-messages",
+        "provider_profile_identity": "sha256:70e402e2300c1f1ee06be620e1290f50fb97606725969074a602f03b18c7ec79",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "harness-claude-qwen38-alibaba-bailian",
+        "configuration_identity": "sha256:34c4f07bcf5c668c37c5098d02dd7581863eabd795f959ba03d76c921ae606f0",
+        "harness_config_identity": "sha256:beb79a0303fab3b3e8e94fcc562795139189eb128d70ac52e3c72c40200999cc",
+        "harness_id": "claude-code",
+        "harness_profile_id": "claude-qwen38-alibaba-bailian",
+        "harness_version": "2.1.241",
+        "lane": "HARNESS",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "Qwen",
+        "model_id": "qwen3.8-max",
+        "provider_id": "alibaba-bailian",
+        "provider_profile_id": "alibaba-bailian-qwen3.8-max-messages",
+        "provider_profile_identity": "sha256:5b9b98387009f3fd1670b4efd729a5782ec55565b50b2da61dda2f12db665af4",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "claude-code-harness-v1",
+        "tool_surface": [
+          "Read",
+          "Edit",
+          "Write",
+          "Bash"
+        ]
+      },
+      {
+        "configuration_id": "harness-claude-qwen38-opencode-go",
+        "configuration_identity": "sha256:e3f5b593f8320f6eae3a0727bfb950e19d3aad6da4ab57851e34018952df9d7d",
+        "harness_config_identity": "sha256:2209800f26b5727b3570c72adb92860e86b7d09c2b9c6f0fd3597c50b1405421",
+        "harness_id": "claude-code",
+        "harness_profile_id": "claude-qwen38-opencode-go",
+        "harness_version": "2.1.241",
+        "lane": "HARNESS",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "Qwen",
+        "model_id": "qwen3.8-max",
+        "provider_id": "opencode-go",
+        "provider_profile_id": "opencode-go-qwen38-messages",
+        "provider_profile_identity": "sha256:70e402e2300c1f1ee06be620e1290f50fb97606725969074a602f03b18c7ec79",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "claude-code-harness-v1",
+        "tool_surface": [
+          "Read",
+          "Edit",
+          "Write",
+          "Bash"
+        ]
+      },
+      {
+        "configuration_id": "harness-codex-gpt56-high",
+        "configuration_identity": "sha256:53a3b206b81e7a2e25287cf6c36197f729fcfc6019180f6c085caf24d79eeae5",
+        "harness_config_identity": "sha256:7317647c90c0fe058b83e2b18190ad4774a30235a44f5186f9cf5379f21a9ad2",
+        "harness_id": "codex",
+        "harness_profile_id": "codex-gpt56-high",
+        "harness_version": "0.149.0",
+        "lane": "HARNESS",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "GPT-5.6",
+        "model_id": "gpt-5.6-sol",
+        "provider_id": "gpt56-relay",
+        "provider_profile_id": "gpt56-relay-gpt56-responses",
+        "provider_profile_identity": "sha256:85c1f3bd8f6cb6dd72a3f8246b66f72c04733c17572b151e1219c40f3b48fbfa",
+        "reasoning_effort": "high",
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "codex-harness-v1",
+        "tool_surface": [
+          "shell",
+          "workspace"
+        ]
+      },
+      {
+        "configuration_id": "harness-codex-gpt56-medium",
+        "configuration_identity": "sha256:eff191ffb9173972c9d8281f89578488ae19fd16fee263e618d272c57766d178",
+        "harness_config_identity": "sha256:fb5be749febba4845a5d405aa20344505054921b69d41db7f69817494e926110",
+        "harness_id": "codex",
+        "harness_profile_id": "codex-gpt56-medium",
+        "harness_version": "0.149.0",
+        "lane": "HARNESS",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "GPT-5.6",
+        "model_id": "gpt-5.6-sol",
+        "provider_id": "gpt56-relay",
+        "provider_profile_id": "gpt56-relay-gpt56-responses",
+        "provider_profile_identity": "sha256:85c1f3bd8f6cb6dd72a3f8246b66f72c04733c17572b151e1219c40f3b48fbfa",
+        "reasoning_effort": "medium",
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "codex-harness-v1",
+        "tool_surface": [
+          "shell",
+          "workspace"
+        ]
+      },
+      {
+        "configuration_id": "harness-deepseek-harness-v4flash",
+        "configuration_identity": "sha256:a9706f7c316c1f0c1a570d7dcea2650915b1abec76971baa9ebbd2036fe8d600",
+        "harness_config_identity": "sha256:87abf143015ca1881b672b314a5009c52365f90dd62d1af38abd84c12b6c6723",
+        "harness_id": "deepseek-harness",
+        "harness_profile_id": "deepseek-harness-v4flash",
+        "harness_version": "0.1.1-rc.2",
+        "lane": "HARNESS",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "DeepSeek V4",
+        "model_id": "deepseek-v4-flash",
+        "provider_id": "deepseek-official",
+        "provider_profile_id": "deepseek-official-v4flash-chat",
+        "provider_profile_identity": "sha256:1a26362658ee5ceedfc813e5fe7509d5a4d8df4a316d1872fdc1f22fdf5e838c",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "deepseek-harness-v1",
+        "tool_surface": [
+          "headless-profile-public-contract"
+        ]
+      }
+    ],
+    "development_only": true,
+    "direction_neutral": true,
+    "empirical_execution_authorization_required": true,
+    "execution_control_identity": "sha256:600da231de36e346a48f3415fd93d99112f8251a1296bbae5e2255de30c78eec",
+    "first_block_repetitions": 3,
+    "live_provider_availability_claimed": false,
+    "minimum_absolute_pass_rate_gap_denominator": 3,
+    "minimum_absolute_pass_rate_gap_numerator": 2,
+    "minimum_capability_eligible_coverage_denominator": 5,
+    "minimum_capability_eligible_coverage_numerator": 4,
+    "minimum_configurations": 6,
+    "minimum_first_block_discordant_pairs": 2,
+    "minimum_stability_block_discordant_pairs": 1,
+    "named_winner": null,
+    "policy_digest": "sha256:62b77a37887ea546ac3128b497d3e72338cc3ee2171af76a03d7d28ee6200ddc",
+    "policy_label": "discriminative-admission-v1",
+    "policy_reference": {
+      "policy_digest": "sha256:1ab6cd95fc919bda701456188664d53066a09f25d06cecd57b3ebbd5d98e963c",
+      "policy_id": "discriminative-admission",
+      "policy_version": "1.0.0"
+    },
+    "preregistered_pairs": [
+      {
+        "direction_neutral": true,
+        "left_configuration_id": "direct-direct-deepseek-official-v4flash-chat",
+        "pair_id": "direct-vs-harness-deepseek-v4-flash",
+        "right_configuration_id": "harness-deepseek-harness-v4flash",
+        "same_model_direct_harness_contrast": true
+      },
+      {
+        "direction_neutral": true,
+        "left_configuration_id": "direct-direct-gpt56-relay-gpt56-responses",
+        "pair_id": "direct-vs-harness-gpt-5.6-sol",
+        "right_configuration_id": "harness-codex-gpt56-high",
+        "same_model_direct_harness_contrast": true
+      },
+      {
+        "direction_neutral": true,
+        "left_configuration_id": "direct-direct-alibaba-bailian-qwen3.8-max-messages",
+        "pair_id": "direct-vs-harness-qwen3.8-max",
+        "right_configuration_id": "harness-claude-qwen38-alibaba-bailian",
+        "same_model_direct_harness_contrast": true
+      }
+    ],
+    "representation_rule": {
+      "benchmark_role_axis_required": true,
+      "language_axis": [
+        "java",
+        "python",
+        "typescript"
+      ],
+      "minimum_per_represented_benchmark_role": 1,
+      "minimum_per_represented_language": 1,
+      "minimum_per_represented_scenario": 1,
+      "minimum_per_represented_task_family": 1,
+      "outcome_based_tiebreaking_allowed": false,
+      "overflow_rule": "INCLUDE_ALL_QUALIFYING_CANDIDATES_IN_TASK_IDENTITY_ORDER",
+      "rejected_candidates_retained": true,
+      "scenario_axis_required": true,
+      "task_family_axis": [
+        "CORE",
+        "REPO_ENGINEERING"
+      ],
+      "underfilled_strata_rule": "REPORT_GAP_WITHOUT_OUTCOME_BASED_BACKFILL"
+    },
+    "require_at_least_one_pass_and_capability_fail": true,
+    "require_same_stability_direction": true,
+    "rerun_until_success_allowed": false,
+    "schema_version": 1,
+    "selected_panel": [
+      {
+        "configuration_id": "direct-direct-alibaba-bailian-qwen3.8-max-messages",
+        "configuration_identity": "sha256:4e74e20ccbc18fada3954f7807c32a26524a8db58bb2d33dbcd567a447337e65",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-alibaba-bailian-qwen3.8-max-messages",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "Qwen",
+        "model_id": "qwen3.8-max",
+        "provider_id": "alibaba-bailian",
+        "provider_profile_id": "alibaba-bailian-qwen3.8-max-messages",
+        "provider_profile_identity": "sha256:5b9b98387009f3fd1670b4efd729a5782ec55565b50b2da61dda2f12db665af4",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-deepseek-official-v4flash-chat",
+        "configuration_identity": "sha256:39782297e00285219f9542f285025bb0f0e93c87dbc81345719d9aa543fbdede",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-deepseek-official-v4flash-chat",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "DeepSeek V4",
+        "model_id": "deepseek-v4-flash",
+        "provider_id": "deepseek-official",
+        "provider_profile_id": "deepseek-official-v4flash-chat",
+        "provider_profile_identity": "sha256:1a26362658ee5ceedfc813e5fe7509d5a4d8df4a316d1872fdc1f22fdf5e838c",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "direct-direct-gpt56-relay-gpt56-responses",
+        "configuration_identity": "sha256:d1b6092c3efc9e9be3538188dbd7f4d4c358ee3f0c84ab649bba9a04a5697691",
+        "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10",
+        "harness_id": "direct-model",
+        "harness_profile_id": "direct-gpt56-relay-gpt56-responses",
+        "harness_version": "evidence-schema-1",
+        "lane": "DIRECT",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "GPT-5.6",
+        "model_id": "gpt-5.6-sol",
+        "provider_id": "gpt56-relay",
+        "provider_profile_id": "gpt56-relay-gpt56-responses",
+        "provider_profile_identity": "sha256:85c1f3bd8f6cb6dd72a3f8246b66f72c04733c17572b151e1219c40f3b48fbfa",
+        "reasoning_effort": "medium",
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "direct-model-v1",
+        "tool_surface": []
+      },
+      {
+        "configuration_id": "harness-claude-qwen38-alibaba-bailian",
+        "configuration_identity": "sha256:34c4f07bcf5c668c37c5098d02dd7581863eabd795f959ba03d76c921ae606f0",
+        "harness_config_identity": "sha256:beb79a0303fab3b3e8e94fcc562795139189eb128d70ac52e3c72c40200999cc",
+        "harness_id": "claude-code",
+        "harness_profile_id": "claude-qwen38-alibaba-bailian",
+        "harness_version": "2.1.241",
+        "lane": "HARNESS",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "Qwen",
+        "model_id": "qwen3.8-max",
+        "provider_id": "alibaba-bailian",
+        "provider_profile_id": "alibaba-bailian-qwen3.8-max-messages",
+        "provider_profile_identity": "sha256:5b9b98387009f3fd1670b4efd729a5782ec55565b50b2da61dda2f12db665af4",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "claude-code-harness-v1",
+        "tool_surface": [
+          "Read",
+          "Edit",
+          "Write",
+          "Bash"
+        ]
+      },
+      {
+        "configuration_id": "harness-codex-gpt56-high",
+        "configuration_identity": "sha256:53a3b206b81e7a2e25287cf6c36197f729fcfc6019180f6c085caf24d79eeae5",
+        "harness_config_identity": "sha256:7317647c90c0fe058b83e2b18190ad4774a30235a44f5186f9cf5379f21a9ad2",
+        "harness_id": "codex",
+        "harness_profile_id": "codex-gpt56-high",
+        "harness_version": "0.149.0",
+        "lane": "HARNESS",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "GPT-5.6",
+        "model_id": "gpt-5.6-sol",
+        "provider_id": "gpt56-relay",
+        "provider_profile_id": "gpt56-relay-gpt56-responses",
+        "provider_profile_identity": "sha256:85c1f3bd8f6cb6dd72a3f8246b66f72c04733c17572b151e1219c40f3b48fbfa",
+        "reasoning_effort": "high",
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "codex-harness-v1",
+        "tool_surface": [
+          "shell",
+          "workspace"
+        ]
+      },
+      {
+        "configuration_id": "harness-deepseek-harness-v4flash",
+        "configuration_identity": "sha256:a9706f7c316c1f0c1a570d7dcea2650915b1abec76971baa9ebbd2036fe8d600",
+        "harness_config_identity": "sha256:87abf143015ca1881b672b314a5009c52365f90dd62d1af38abd84c12b6c6723",
+        "harness_id": "deepseek-harness",
+        "harness_profile_id": "deepseek-harness-v4flash",
+        "harness_version": "0.1.1-rc.2",
+        "lane": "HARNESS",
+        "live_provider_availability": "NOT_ASSESSED",
+        "model_family": "DeepSeek V4",
+        "model_id": "deepseek-v4-flash",
+        "provider_id": "deepseek-official",
+        "provider_profile_id": "deepseek-official-v4flash-chat",
+        "provider_profile_identity": "sha256:1a26362658ee5ceedfc813e5fe7509d5a4d8df4a316d1872fdc1f22fdf5e838c",
+        "reasoning_effort": null,
+        "registry_digest": "sha256:2465b523ab737124529f866558d78db333d7bbe35ee665df0d0027f3ad721261",
+        "registry_id": "harnesslab-unified-registry-lite-v1",
+        "runner_contract": "deepseek-harness-v1",
+        "tool_surface": [
+          "headless-profile-public-contract"
+        ]
+      }
+    ],
+    "selection_uses_historical_outcomes": false,
+    "stability_block_repetitions": 3,
+    "stability_independently_scheduled": true
+  },
+  "external_calls": {
+    "harness": 0,
+    "judge": 0,
+    "llm_explanation": 0,
+    "matrix": 0,
+    "provider": 0
+  },
+  "frozen_evidence_modified": false,
+  "gap_report": {
+    "candidates_screenable_now": 21,
+    "current_discriminative_memberships": 0,
+    "current_stress_memberships": 0,
+    "empirical_discriminative_evidence_required": true,
+    "missing_representation_or_stress_coverage": [
+      "DISCRIMINATIVE_FIRST_N3_BLOCK_NOT_RUN",
+      "DISCRIMINATIVE_INDEPENDENT_STABILITY_N3_BLOCK_NOT_RUN",
+      "DISCRIMINATIVE_MEMBERSHIP_EMPTY",
+      "STRESS_ANCHOR_DIMENSIONS_UNPROVEN",
+      "STRESS_MEMBER_THRESHOLD_UNMET",
+      "STRESS_MULTI_FILE_PORTFOLIO_FLOOR_UNMET",
+      "STRESS_PORTFOLIO_CREDIT_SHARE_FLOOR_UNMET"
+    ],
+    "new_tasks_required": true,
+    "report_digest": "sha256:cb99fce93354c8607f2fe535ea2658e83c1b39910669314f061c4823e1a55028",
+    "report_id": "m8a-coverage-gap-report-v1",
+    "required_new_task_coverage": [
+      "ADD_A_THIRD_KEYLESS_MULTI_FILE_CROSS_BOUNDARY_CANDIDATE",
+      "ADD_CONTEXT_TASKS_WITH_20_RELEVANT_FILES_OR_50_KIB_AND_A_RELEVANCE_MANIFEST",
+      "ADD_NATURAL_TASKS_SO_EACH_FUTURE_MEMBER_CAN_PROVE_AT_LEAST_THREE_DIMENSIONS",
+      "ADD_PROTOCOL_TASKS_WITH_TWO_CLASSIFIED_FAULT_INJECTIONS",
+      "ADD_TASK_COVERAGE_FOR_TRAJECTORY_CONTEXT_OR_PROTOCOL_ANCHOR_EVIDENCE",
+      "ENSURE_EACH_REPRESENTED_DIMENSION_HAS_THREE_TASKS_ACROSS_TWO_LANGUAGES",
+      "ENSURE_NO_TASK_EXCEEDS_ONE_THIRD_OF_TOTAL_DIMENSION_CREDITS"
+    ],
+    "schema_version": 1,
+    "stress_suite_release_ready": false
+  },
+  "inventory": {
+    "candidates": [
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:3f8763d20f149ddf27cdb4a5a363e1096512cd04dbb7ad4add64bf953e906cc7",
+        "category": "serialization-codec",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "java",
+        "package_path": "tasks/core-java-deduplicate/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:04d9b0ef0e51390098ce2734065436432dd2d02fd7f5937f76971d70ff7b92e0",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:fa98fe75e89f7a3051200af71e7869a0d01333a2e6ba8b7565934d882a8862c4",
+            "task_id": "core-java-deduplicate",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:c35bca0195d7b0c4bbf5f8fc0a7fe62d3d6bf498d6f4ebacc9940637c961e699",
+            "workspace_digest": "sha256:86c02d6e8c301f55c826ece4c70b00a2539966295d90a6508bac96c191793f12"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "length-prefixed-record-codec",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:fa98fe75e89f7a3051200af71e7869a0d01333a2e6ba8b7565934d882a8862c4",
+          "task_id": "core-java-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:c35bca0195d7b0c4bbf5f8fc0a7fe62d3d6bf498d6f4ebacc9940637c961e699",
+          "workspace_digest": "sha256:86c02d6e8c301f55c826ece4c70b00a2539966295d90a6508bac96c191793f12"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:c00b4872c72b1780a3cfdc08973f69e8f3af363afc3392b3ad2924cd403e117b",
+        "category": "exception-propagation",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "java",
+        "package_path": "tasks/core-java-feature-flag/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:300d6d69342ed0ef70247298cde707bda5e84fe4372f60f166edbf33d1f0755b",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:2666e71704d3a21cf1155b8ea10ffca6f0c19a8ed55ca7f6105b15b29e3e2d42",
+            "task_id": "core-java-feature-flag",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:1abf8a46369dbbc08ba32c7a8f89dc44fdba70ec932bcfb5240a54b1d1094724",
+            "workspace_digest": "sha256:5aa14e3cf1083b95c10e7aaa267e93ac9e9a3efde9302552d2c0e2fa5ea2f190"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "service-exception-cause-propagation",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:2666e71704d3a21cf1155b8ea10ffca6f0c19a8ed55ca7f6105b15b29e3e2d42",
+          "task_id": "core-java-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:1abf8a46369dbbc08ba32c7a8f89dc44fdba70ec932bcfb5240a54b1d1094724",
+          "workspace_digest": "sha256:5aa14e3cf1083b95c10e7aaa267e93ac9e9a3efde9302552d2c0e2fa5ea2f190"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:583f1e3130485a62b0c28695a491e07c01ff0b9c75d98f7b00c535522e6d460b",
+        "category": "state-machine",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "java",
+        "package_path": "tasks/core-java-quota/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:0770e29f79eb2fb9fb0dc5c2fa2e2025d148724bcfb45405dc4eccd65b39e713",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+            "task_id": "core-java-quota",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:3df38ecadc317a23b9fede3dfafd9ef6d443d877e0fc77644c486a0aa3c7e465",
+            "workspace_digest": "sha256:e4100bd5d966558f86e830dc5cf964460dd01b942b396c4580684e3b5e3db0b6"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "reservation-transition-state-machine",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+          "task_id": "core-java-quota",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:3df38ecadc317a23b9fede3dfafd9ef6d443d877e0fc77644c486a0aa3c7e465",
+          "workspace_digest": "sha256:e4100bd5d966558f86e830dc5cf964460dd01b942b396c4580684e3b5e3db0b6"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:059dd3ee2407f99633090a518a116282f4b6d7c2b7692d47f85dd04ab124d15a",
+        "category": "protocol-normalization",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "java",
+        "package_path": "tasks/core-java-settings-merge/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:669546c4614c42fed0895ff95335cd564de28021fb1a3ba12e6ef7e25c62123a",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+            "task_id": "core-java-settings-merge",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:e10c25e47889d60f7fc56a8324028ff8e82646c6cddec78d4aa62cab1425e871",
+            "workspace_digest": "sha256:7b888545e7872e402c37157efaf096975df5d61616c511dbd65323695dab594a"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "http-header-canonicalization",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+          "task_id": "core-java-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:e10c25e47889d60f7fc56a8324028ff8e82646c6cddec78d4aa62cab1425e871",
+          "workspace_digest": "sha256:7b888545e7872e402c37157efaf096975df5d61616c511dbd65323695dab594a"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:447bcc52f46a5c23d8524e0c517f4a66321c9012d580c68fe7aa58bf6d603ae3",
+        "category": "collection-partitioning",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "java",
+        "package_path": "tasks/core-java-slugify/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:0538514489009a14f0f2f703cb6a4e5450a1cf5d2f4c985cd700b4e68ade71d2",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:f8b28b8a3c9bdf5bd75c6a90392adcd321ff4a1f4d19500180de41547f6751dd",
+            "task_id": "core-java-slugify",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:ab31a3c1f109058c056127b08c9fd2e55015d1fe067ba519038be74124fa2266",
+            "workspace_digest": "sha256:d8b45b3a35728d6b8ebb40b9e2630f4c9a9b0a680368e5d1e933977b413f450d"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "mutable-batch-partitioning",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:f8b28b8a3c9bdf5bd75c6a90392adcd321ff4a1f4d19500180de41547f6751dd",
+          "task_id": "core-java-slugify",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:ab31a3c1f109058c056127b08c9fd2e55015d1fe067ba519038be74124fa2266",
+          "workspace_digest": "sha256:d8b45b3a35728d6b8ebb40b9e2630f4c9a9b0a680368e5d1e933977b413f450d"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:a20e21f623b175b105b1418111d7ac0df1c14c7476c874f3ded76adbef16a88d",
+        "category": "retry-idempotency",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "python",
+        "package_path": "tasks/core-python-deduplicate/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:e443a7a2879576dab02febe5bca2f6ffeeb7c35872aaa0bd5fd945fd5678c115",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+            "task_id": "core-python-deduplicate",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+            "workspace_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "retry-ledger-idempotency",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+          "task_id": "core-python-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+          "workspace_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:30410c6120ee21049fb6c08e92b8e6b94a96306ac329f4b0767c2f1e23e069d2",
+        "category": "parsing-normalization",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "python",
+        "package_path": "tasks/core-python-feature-flag/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:6584a6794603360b75e2efb8600476d869d96693263e60388221c88eb832db96",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:92fdb8dd6796d4890b57b2be9fd1ef0049b28da10969c3694453d0e327bb41dc",
+            "task_id": "core-python-feature-flag",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:cf870fecb06d8d351b9b175b86ba74b00b5578cd941c9e07f2c894f8996ce691",
+            "workspace_digest": "sha256:d9ed3ea18266ee8f6ff45e06db91fd00757148a883d5ce122e8e52f1f9c7d821"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "integer-window-expression-parser",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:92fdb8dd6796d4890b57b2be9fd1ef0049b28da10969c3694453d0e327bb41dc",
+          "task_id": "core-python-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:cf870fecb06d8d351b9b175b86ba74b00b5578cd941c9e07f2c894f8996ce691",
+          "workspace_digest": "sha256:d9ed3ea18266ee8f6ff45e06db91fd00757148a883d5ce122e8e52f1f9c7d821"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:ce2c7f9edcb253cfebb3fdff33ea9ab2da1fea5bd5d65b9d2450a8328ef2cc22",
+        "category": "cache-collection-behavior",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "python",
+        "package_path": "tasks/core-python-quota/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:2f4b824db434e0f753c6335f872ef4f23e5b084abe08b8cd48199907be28375a",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+            "task_id": "core-python-quota",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:a9d4129b205e0b750a21f183c882e82b16c432eb2390135c586a9a3f834896b6",
+            "workspace_digest": "sha256:3261aaabd4c8387ef737461c3f0e453a03de8dbaf7f21015aae7c16bbbe7f5c2"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "lru-cache-recency-eviction",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+          "task_id": "core-python-quota",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:a9d4129b205e0b750a21f183c882e82b16c432eb2390135c586a9a3f834896b6",
+          "workspace_digest": "sha256:3261aaabd4c8387ef737461c3f0e453a03de8dbaf7f21015aae7c16bbbe7f5c2"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:36b5de665cb89fe8e5eb24998448fcf41a95994cd5966065af8270fb5b26fc54",
+        "category": "resource-lifecycle",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "python",
+        "package_path": "tasks/core-python-settings-merge/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:e4fd7159524932ed15eaa77d3a007f46463a06eb2f20ba297f41eb3aa48624fc",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:ecf6c3666533d8ccb7cab4b947b439bd4780024ac03a4ef414cee47654705ac5",
+            "task_id": "core-python-settings-merge",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:d536f7ec77e2c27ba36620d07a17db92aad8a3569317715bbaaec5c7f78e172a",
+            "workspace_digest": "sha256:9b0e4c281bc1b21273429a104ed9d24e53227bfa2f3d006fd4af4ed55be1d8d0"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "managed-session-close-lifecycle",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:ecf6c3666533d8ccb7cab4b947b439bd4780024ac03a4ef414cee47654705ac5",
+          "task_id": "core-python-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:d536f7ec77e2c27ba36620d07a17db92aad8a3569317715bbaaec5c7f78e172a",
+          "workspace_digest": "sha256:9b0e4c281bc1b21273429a104ed9d24e53227bfa2f3d006fd4af4ed55be1d8d0"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:f8fd9034ad43ef41282cbbf47b8832c64748242f15d25bf89649309bbdb4db32",
+        "category": "ordering-stability",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "python",
+        "package_path": "tasks/core-python-slugify/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:3c75a207e45cf1701294ecfc7cbfb39e890f352452d20392387895d942c98b3e",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:565ce44fca6fc76909382df6f46a46d7306cda3d0da40e5e1522745fde9e7cc3",
+            "task_id": "core-python-slugify",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:e5810b14068935553f6fc93a429e5c38f1a6b5c21b4623d444e5ddec1590e781",
+            "workspace_digest": "sha256:9f78419af52d4a0e7baced19d08d5abdea5f2a55397491b681b9ed56c8ce4e94"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "stable-priority-scheduling",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:565ce44fca6fc76909382df6f46a46d7306cda3d0da40e5e1522745fde9e7cc3",
+          "task_id": "core-python-slugify",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:e5810b14068935553f6fc93a429e5c38f1a6b5c21b4623d444e5ddec1590e781",
+          "workspace_digest": "sha256:9f78419af52d4a0e7baced19d08d5abdea5f2a55397491b681b9ed56c8ce4e94"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:ad49efbf6d328d8eb836d7e8e3368e14a1b784896be819755a52371297659bce",
+        "category": "pagination-contract",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "typescript",
+        "package_path": "tasks/core-typescript-deduplicate/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:45a392269b7474ee2cca59856c8014abc77b5f1c9fe1ca0baf87dd05e9ea4d95",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:d987c52866294dc3df41e55dc48e080e16359d1259c5cd7cacc82010872b4987",
+            "task_id": "core-typescript-deduplicate",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:7f5517f13ac2cb1e98918b4c361530c5970df00ae7fe875630a9492faa923725",
+            "workspace_digest": "sha256:935b5579534bb9d3b464008fff6c34b32945dc22a74962aa81d605f8503fa5f5"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "canonical-pagination-cursor",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:d987c52866294dc3df41e55dc48e080e16359d1259c5cd7cacc82010872b4987",
+          "task_id": "core-typescript-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:7f5517f13ac2cb1e98918b4c361530c5970df00ae7fe875630a9492faa923725",
+          "workspace_digest": "sha256:935b5579534bb9d3b464008fff6c34b32945dc22a74962aa81d605f8503fa5f5"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:99b8e9e9bade3e37d059410584df9d9ea9e3aaf63a5689d31176d1892e0ffdd7",
+        "category": "discriminated-validation",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "typescript",
+        "package_path": "tasks/core-typescript-feature-flag/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:d0524feecbb536633b5445c797d2736ec3dde2e136b7f5b658904e76b256897b",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:577490584252656803af23f76ee59546d0bcfa1d08f7a398906356552a79b615",
+            "task_id": "core-typescript-feature-flag",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:1fd666a40b4660eb624ef56519600da29a3eecaba3bfad347a143e75b17e51b5",
+            "workspace_digest": "sha256:fd982de77d159f10ce4fddc1c97185383aea5b99d5b2f3dc6673a9765bf4f610"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "discriminated-request-union-validation",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:577490584252656803af23f76ee59546d0bcfa1d08f7a398906356552a79b615",
+          "task_id": "core-typescript-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:1fd666a40b4660eb624ef56519600da29a3eecaba3bfad347a143e75b17e51b5",
+          "workspace_digest": "sha256:fd982de77d159f10ce4fddc1c97185383aea5b99d5b2f3dc6673a9765bf4f610"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:b77de648ca2bb44ec7b338e246f2245f9a948c22ef5c3aa253f3ad8b57a2cbba",
+        "category": "retry-backoff",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "typescript",
+        "package_path": "tasks/core-typescript-quota/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:2720df41ae1ecbf56fcee78fff03816898f91c544e620ddb33a35b84eec3aac8",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+            "task_id": "core-typescript-quota",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:d51bb52c000c76c2f1893c18fb93cb30ffdc6e056176fcb7f082462c4d3fd4b1",
+            "workspace_digest": "sha256:8ac984147b60c89188614e325fb33f6bba69503797f9b2254459fe250dc25dd7"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "capped-exponential-retry-schedule",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+          "task_id": "core-typescript-quota",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:d51bb52c000c76c2f1893c18fb93cb30ffdc6e056176fcb7f082462c4d3fd4b1",
+          "workspace_digest": "sha256:8ac984147b60c89188614e325fb33f6bba69503797f9b2254459fe250dc25dd7"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:94307a1a09b229186369cebe86082b731d400911b6c5b7fb49eaf29b75557d19",
+        "category": "recursive-data-safety",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "typescript",
+        "package_path": "tasks/core-typescript-settings-merge/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:0b77169fb71cbe2ff477d42011a6356ef40ea0ab7c7ce068ead0834e5ece6827",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:18e0c8e81b7b8682f3f3e6e674736388af835d1e471d99d6f1e43ff83387bbad",
+            "task_id": "core-typescript-settings-merge",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:e4d4a840854d2fe0ec4159d4d3379e4167604197ee1dfcf06669662bbfc32fb3",
+            "workspace_digest": "sha256:4a16e177fc7c1887538d7fba773ff9426fa03121786acfa8cbbbd1a463737e8a"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "recursive-json-secret-redaction",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:18e0c8e81b7b8682f3f3e6e674736388af835d1e471d99d6f1e43ff83387bbad",
+          "task_id": "core-typescript-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:e4d4a840854d2fe0ec4159d4d3379e4167604197ee1dfcf06669662bbfc32fb3",
+          "workspace_digest": "sha256:4a16e177fc7c1887538d7fba773ff9426fa03121786acfa8cbbbd1a463737e8a"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:06739a7d010f3951a0e4c4a8cafd1de4ef3d2d827c3e3a3d04a439d63028d4be",
+        "category": "event-subscription",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "typescript",
+        "package_path": "tasks/core-typescript-slugify/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:b7b436741c98ec66caa520f8368a2f73dee818f036b909fb3f85630c6a510c00",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:d7de51fe56f8fd472e90bae9b1842f4165a9931a47a21f251d71a86205c514c9",
+            "task_id": "core-typescript-slugify",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:b527c9496a57e86b5890bb70368710ee99569d9f9d55e0e659fbb457377030a8",
+            "workspace_digest": "sha256:3e23765a05dbd17d7d4447f017f95041d7b35707870931a2ee67add290d1bb55"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "idempotent-event-subscription-disposal",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:d7de51fe56f8fd472e90bae9b1842f4165a9931a47a21f251d71a86205c514c9",
+          "task_id": "core-typescript-slugify",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:b527c9496a57e86b5890bb70368710ee99569d9f9d55e0e659fbb457377030a8",
+          "workspace_digest": "sha256:3e23765a05dbd17d7d4447f017f95041d7b35707870931a2ee67add290d1bb55"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "CROSS_LANGUAGE_CONTROL",
+        "candidate_identity": "sha256:2c41fcca16a664b75e1e1ab0664a59060fd82dcc3722db68b3f78c69a55e7878",
+        "category": "targeted-bug-fix",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "java",
+        "package_path": "tasks/micro-java-clamp/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:4f9e00e01dd0ac132223932b4c5b593aaad431b6127b93486ee9fff10cdce6c3",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:a57f7dbbbd0ce2087fc409c706c78052761631ba2ab44e9467bb98198bf40558",
+            "task_id": "micro-java-clamp",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:c4ad0f8f2e2df3a791fbbe292e2b8bac858db6b0fda6a4066274b2db20adc537",
+            "workspace_digest": "sha256:b60bdd77053ebd3c115d4f05e07f53d1593c158fe62ea00d6d8371bbe5d98c05"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "clamp-boundary-control",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:a57f7dbbbd0ce2087fc409c706c78052761631ba2ab44e9467bb98198bf40558",
+          "task_id": "micro-java-clamp",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:c4ad0f8f2e2df3a791fbbe292e2b8bac858db6b0fda6a4066274b2db20adc537",
+          "workspace_digest": "sha256:b60bdd77053ebd3c115d4f05e07f53d1593c158fe62ea00d6d8371bbe5d98c05"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "CROSS_LANGUAGE_CONTROL",
+        "candidate_identity": "sha256:3299b2f4838be70bbf467e82cbd247c00bf05e95bfa3764ca4cb2338330174d4",
+        "category": "targeted-bug-fix",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "python",
+        "package_path": "tasks/micro-python-clamp/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:ac85ebc150859fb208f32a556c19aa10e5b8a4953a141d876e273fcc151409da",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:ed33a19d23a2a0233f2b20ed754bc373f807cfa19db22291cc6c2af875e291bf",
+            "task_id": "micro-python-clamp",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:55f8158f938fca41038050a53356e5ae1be8a06083364de7b0272712e69fced1",
+            "workspace_digest": "sha256:3d8015dfb283950af119b9a89da1e070580ed1a85174e2ee8d3110e6bb6dfa65"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "clamp-boundary-control",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:ed33a19d23a2a0233f2b20ed754bc373f807cfa19db22291cc6c2af875e291bf",
+          "task_id": "micro-python-clamp",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:55f8158f938fca41038050a53356e5ae1be8a06083364de7b0272712e69fced1",
+          "workspace_digest": "sha256:3d8015dfb283950af119b9a89da1e070580ed1a85174e2ee8d3110e6bb6dfa65"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "CROSS_LANGUAGE_CONTROL",
+        "candidate_identity": "sha256:1328f733a4e91daf951063bc62869bb5b11cee4e7224ae0fa33a640a05a1af88",
+        "category": "targeted-bug-fix",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "typescript",
+        "package_path": "tasks/micro-typescript-clamp/1.0.2",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/core-corpus-v4.json",
+        "provenance_identity": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+        "qualification": {
+          "qualification_id": "harnesslab-core-18-v1-task-integrity",
+          "qualification_identity": "sha256:c35bc0f016dffa5e8e15c3944f78a29570d9037ce3468f87bb1b0c96cad05e1f",
+          "source_artifact": "release/core-corpus-v4.json",
+          "source_artifact_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+          "task": {
+            "task_digest": "sha256:201aec0dbece5a7167fb6390f3e6e39297e71b1f79d03b1038b1bd27f1c33847",
+            "task_id": "micro-typescript-clamp",
+            "task_version": "1.0.2",
+            "verifier_digest": "sha256:90b41761c29a14b1fc14c7ffdf5a50316091a9129aa272b9a46f8ac3f7496d7c",
+            "workspace_digest": "sha256:f1eaeb0669e89fa0b2449129f06d622832829d26973b8b9ce787ddcab7b32c1e"
+          }
+        },
+        "reason_codes": [
+          "CORE_DEVELOPMENT_EXPOSED",
+          "CORE_NOT_A_CREDIBLE_STRESS_CANDIDATE",
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED"
+        ],
+        "role": "CORE",
+        "scenario_family": "clamp-boundary-control",
+        "stress_eligibility": "INELIGIBLE",
+        "task": {
+          "task_digest": "sha256:201aec0dbece5a7167fb6390f3e6e39297e71b1f79d03b1038b1bd27f1c33847",
+          "task_id": "micro-typescript-clamp",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:90b41761c29a14b1fc14c7ffdf5a50316091a9129aa272b9a46f8ac3f7496d7c",
+          "workspace_digest": "sha256:f1eaeb0669e89fa0b2449129f06d622832829d26973b8b9ce787ddcab7b32c1e"
+        },
+        "task_family": "CORE"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:b93a0f1552c3fbe0f8a67275f197e4791d76769b66478e38d6b25dd21e56310a",
+        "category": "service-api-persistence-contract",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "java",
+        "package_path": "tasks/repo-java-widget-update/1.0.0",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/tier-b-qualification-v1.json",
+        "provenance_identity": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88",
+        "qualification": {
+          "qualification_id": "tier-b-repo-engineering-v1",
+          "qualification_identity": "sha256:03fe36498b09723fd125f9638111b2d06fdb8ba30bc3a60ba0b447df0d89d2f8",
+          "source_artifact": "release/tier-b-qualification-v1.json",
+          "source_artifact_digest": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88",
+          "task": {
+            "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+            "task_id": "repo-java-widget-update",
+            "task_version": "1.0.0",
+            "verifier_digest": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73",
+            "workspace_digest": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9"
+          }
+        },
+        "reason_codes": [
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED",
+          "TIER_B_DEVELOPMENT_EXPOSED",
+          "TIER_B_DOES_NOT_IMPLY_STRESS"
+        ],
+        "role": "TIER_B",
+        "scenario_family": "optimistic-versioned-widget-update",
+        "stress_eligibility": "CANDIDATE_REQUIRES_EVIDENCE",
+        "task": {
+          "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+          "task_id": "repo-java-widget-update",
+          "task_version": "1.0.0",
+          "verifier_digest": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73",
+          "workspace_digest": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9"
+        },
+        "task_family": "REPO_ENGINEERING"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:aa8dcc011cc11d2d349d18c5b99fb49aa194eca057e060d881c7deed4012445e",
+        "category": "persistence-transaction-regression",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "python",
+        "package_path": "tasks/repo-python-ledger-transfer/1.0.0",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/tier-b-qualification-v1.json",
+        "provenance_identity": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88",
+        "qualification": {
+          "qualification_id": "tier-b-repo-engineering-v1",
+          "qualification_identity": "sha256:1796258cc996237e764dc36f6d1ce81c2ab8b0ad5907a0c9ae011cc2e7ae8298",
+          "source_artifact": "release/tier-b-qualification-v1.json",
+          "source_artifact_digest": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88",
+          "task": {
+            "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+            "task_id": "repo-python-ledger-transfer",
+            "task_version": "1.0.0",
+            "verifier_digest": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652",
+            "workspace_digest": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480"
+          }
+        },
+        "reason_codes": [
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED",
+          "TIER_B_DEVELOPMENT_EXPOSED",
+          "TIER_B_DOES_NOT_IMPLY_STRESS"
+        ],
+        "role": "TIER_B",
+        "scenario_family": "sqlite-atomic-idempotent-transfer",
+        "stress_eligibility": "CANDIDATE_REQUIRES_EVIDENCE",
+        "task": {
+          "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+          "task_id": "repo-python-ledger-transfer",
+          "task_version": "1.0.0",
+          "verifier_digest": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652",
+          "workspace_digest": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480"
+        },
+        "task_family": "REPO_ENGINEERING"
+      },
+      {
+        "benchmark_role": "INDEPENDENT",
+        "candidate_identity": "sha256:a802bfeac2a550e2d69482a463a4d03774442d7e0109bd64a7d2d0973e794699",
+        "category": "configuration-dependency-regression",
+        "development_exposure": "USED",
+        "discriminative_eligibility": "ELIGIBLE_FOR_EMPIRICAL_SCREENING",
+        "exposure_state": "EXPOSED",
+        "holdout_eligible": false,
+        "language": "typescript",
+        "package_path": "tasks/repo-typescript-resilient-client/1.0.0",
+        "population": "DEVELOPMENT",
+        "provenance_artifact": "release/tier-b-qualification-v1.json",
+        "provenance_identity": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88",
+        "qualification": {
+          "qualification_id": "tier-b-repo-engineering-v1",
+          "qualification_identity": "sha256:073a1e12648b00dc4934247967f994a74b2cccc035e11895d46512397aeb0508",
+          "source_artifact": "release/tier-b-qualification-v1.json",
+          "source_artifact_digest": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88",
+          "task": {
+            "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+            "task_id": "repo-typescript-resilient-client",
+            "task_version": "1.0.0",
+            "verifier_digest": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02",
+            "workspace_digest": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e"
+          }
+        },
+        "reason_codes": [
+          "DISCRIMINATIVE_REQUIRES_EMPIRICAL_EVIDENCE",
+          "HOLDOUT_INELIGIBLE",
+          "TASK_INTEGRITY_QUALIFIED",
+          "TIER_B_DEVELOPMENT_EXPOSED",
+          "TIER_B_DOES_NOT_IMPLY_STRESS"
+        ],
+        "role": "TIER_B",
+        "scenario_family": "environment-driven-resilient-api-client",
+        "stress_eligibility": "CANDIDATE_REQUIRES_EVIDENCE",
+        "task": {
+          "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+          "task_id": "repo-typescript-resilient-client",
+          "task_version": "1.0.0",
+          "verifier_digest": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02",
+          "workspace_digest": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e"
+        },
+        "task_family": "REPO_ENGINEERING"
+      }
+    ],
+    "core_count": 18,
+    "core_source_digest": "sha256:487d7d79ef47e09cb6483e6d6d87d6df906ddedbc43d1fd831a74838757af8c1",
+    "inventory_digest": "sha256:93ab0a53c127562a5b1d4883bef4dda2cc6a76eba9118c6bd37c4ca3ebabb411",
+    "inventory_id": "m8a-keyless-candidate-inventory-v1",
+    "inventory_version": "1.0.0",
+    "schema_version": 1,
+    "tier_b_count": 3,
+    "tier_b_source_digest": "sha256:d3b9bb8512de9b6e847c0daf93b75049e6e99737e4bdcd47ad8c0dd217e01a88"
+  },
+  "retrospective": {
+    "current_memberships_created": 0,
+    "historical_analysis_digest": "sha256:20bea8a67463eb918587bd1c48f751ab8f7d2abfa5f1e2c17eb9b6929b215553",
+    "historical_analysis_path": "release/core-real-matrix-v6-final-analysis.json",
+    "historical_configuration_count": 7,
+    "historical_control_digest": "sha256:80bf6f1ab78526350a602de823dd3f96937dd66980ee7b0e263627651359695d",
+    "historical_control_path": "release/core-real-matrix-v6-control.json",
+    "historical_repetitions": 5,
+    "historical_task_count": 18,
+    "policy_reference": {
+      "policy_digest": "sha256:1ab6cd95fc919bda701456188664d53066a09f25d06cecd57b3ebbd5d98e963c",
+      "policy_id": "discriminative-admission",
+      "policy_version": "1.0.0"
+    },
+    "results": [
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:fa98fe75e89f7a3051200af71e7869a0d01333a2e6ba8b7565934d882a8862c4",
+          "task_id": "core-java-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:c35bca0195d7b0c4bbf5f8fc0a7fe62d3d6bf498d6f4ebacc9940637c961e699",
+          "workspace_digest": "sha256:86c02d6e8c301f55c826ece4c70b00a2539966295d90a6508bac96c191793f12"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:2666e71704d3a21cf1155b8ea10ffca6f0c19a8ed55ca7f6105b15b29e3e2d42",
+          "task_id": "core-java-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:1abf8a46369dbbc08ba32c7a8f89dc44fdba70ec932bcfb5240a54b1d1094724",
+          "workspace_digest": "sha256:5aa14e3cf1083b95c10e7aaa267e93ac9e9a3efde9302552d2c0e2fa5ea2f190"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:28e5b9c85902bd83ed1b6f7ef5c6d7a0777fbe263c6eecb4b3713e1096e19086",
+          "task_id": "core-java-quota",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:3df38ecadc317a23b9fede3dfafd9ef6d443d877e0fc77644c486a0aa3c7e465",
+          "workspace_digest": "sha256:e4100bd5d966558f86e830dc5cf964460dd01b942b396c4580684e3b5e3db0b6"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:a1284207c94e368c07c37207f9bc4c23f2d69c07185ae165e371abbb50725c47",
+          "task_id": "core-java-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:e10c25e47889d60f7fc56a8324028ff8e82646c6cddec78d4aa62cab1425e871",
+          "workspace_digest": "sha256:7b888545e7872e402c37157efaf096975df5d61616c511dbd65323695dab594a"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:f8b28b8a3c9bdf5bd75c6a90392adcd321ff4a1f4d19500180de41547f6751dd",
+          "task_id": "core-java-slugify",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:ab31a3c1f109058c056127b08c9fd2e55015d1fe067ba519038be74124fa2266",
+          "workspace_digest": "sha256:d8b45b3a35728d6b8ebb40b9e2630f4c9a9b0a680368e5d1e933977b413f450d"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+          "task_id": "core-python-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+          "workspace_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:92fdb8dd6796d4890b57b2be9fd1ef0049b28da10969c3694453d0e327bb41dc",
+          "task_id": "core-python-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:cf870fecb06d8d351b9b175b86ba74b00b5578cd941c9e07f2c894f8996ce691",
+          "workspace_digest": "sha256:d9ed3ea18266ee8f6ff45e06db91fd00757148a883d5ce122e8e52f1f9c7d821"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:7cca2b9b2cc51b646ec85ab2c7a1eb170f43359ba62f9052232e887409da95dc",
+          "task_id": "core-python-quota",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:a9d4129b205e0b750a21f183c882e82b16c432eb2390135c586a9a3f834896b6",
+          "workspace_digest": "sha256:3261aaabd4c8387ef737461c3f0e453a03de8dbaf7f21015aae7c16bbbe7f5c2"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:ecf6c3666533d8ccb7cab4b947b439bd4780024ac03a4ef414cee47654705ac5",
+          "task_id": "core-python-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:d536f7ec77e2c27ba36620d07a17db92aad8a3569317715bbaaec5c7f78e172a",
+          "workspace_digest": "sha256:9b0e4c281bc1b21273429a104ed9d24e53227bfa2f3d006fd4af4ed55be1d8d0"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:565ce44fca6fc76909382df6f46a46d7306cda3d0da40e5e1522745fde9e7cc3",
+          "task_id": "core-python-slugify",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:e5810b14068935553f6fc93a429e5c38f1a6b5c21b4623d444e5ddec1590e781",
+          "workspace_digest": "sha256:9f78419af52d4a0e7baced19d08d5abdea5f2a55397491b681b9ed56c8ce4e94"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:d987c52866294dc3df41e55dc48e080e16359d1259c5cd7cacc82010872b4987",
+          "task_id": "core-typescript-deduplicate",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:7f5517f13ac2cb1e98918b4c361530c5970df00ae7fe875630a9492faa923725",
+          "workspace_digest": "sha256:935b5579534bb9d3b464008fff6c34b32945dc22a74962aa81d605f8503fa5f5"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:577490584252656803af23f76ee59546d0bcfa1d08f7a398906356552a79b615",
+          "task_id": "core-typescript-feature-flag",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:1fd666a40b4660eb624ef56519600da29a3eecaba3bfad347a143e75b17e51b5",
+          "workspace_digest": "sha256:fd982de77d159f10ce4fddc1c97185383aea5b99d5b2f3dc6673a9765bf4f610"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:6a37fbed1ecaa00e978651a4923c4a0ec66b0d51e95c563ed85b157522ab1766",
+          "task_id": "core-typescript-quota",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:d51bb52c000c76c2f1893c18fb93cb30ffdc6e056176fcb7f082462c4d3fd4b1",
+          "workspace_digest": "sha256:8ac984147b60c89188614e325fb33f6bba69503797f9b2254459fe250dc25dd7"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:18e0c8e81b7b8682f3f3e6e674736388af835d1e471d99d6f1e43ff83387bbad",
+          "task_id": "core-typescript-settings-merge",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:e4d4a840854d2fe0ec4159d4d3379e4167604197ee1dfcf06669662bbfc32fb3",
+          "workspace_digest": "sha256:4a16e177fc7c1887538d7fba773ff9426fa03121786acfa8cbbbd1a463737e8a"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:d7de51fe56f8fd472e90bae9b1842f4165a9931a47a21f251d71a86205c514c9",
+          "task_id": "core-typescript-slugify",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:b527c9496a57e86b5890bb70368710ee99569d9f9d55e0e659fbb457377030a8",
+          "workspace_digest": "sha256:3e23765a05dbd17d7d4447f017f95041d7b35707870931a2ee67add290d1bb55"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:a57f7dbbbd0ce2087fc409c706c78052761631ba2ab44e9467bb98198bf40558",
+          "task_id": "micro-java-clamp",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:c4ad0f8f2e2df3a791fbbe292e2b8bac858db6b0fda6a4066274b2db20adc537",
+          "workspace_digest": "sha256:b60bdd77053ebd3c115d4f05e07f53d1593c158fe62ea00d6d8371bbe5d98c05"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:ed33a19d23a2a0233f2b20ed754bc373f807cfa19db22291cc6c2af875e291bf",
+          "task_id": "micro-python-clamp",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:55f8158f938fca41038050a53356e5ae1be8a06083364de7b0272712e69fced1",
+          "workspace_digest": "sha256:3d8015dfb283950af119b9a89da1e070580ed1a85174e2ee8d3110e6bb6dfa65"
+        }
+      },
+      {
+        "historical_behavior_available": true,
+        "reason_codes": [
+          "FIRST_N3_BLOCK_MISSING",
+          "HISTORICAL_MATRIX_NOT_PREREGISTERED_FOR_POLICY",
+          "HISTORICAL_PANEL_IDENTITY_MISMATCH",
+          "INDEPENDENT_STABILITY_N3_BLOCK_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:201aec0dbece5a7167fb6390f3e6e39297e71b1f79d03b1038b1bd27f1c33847",
+          "task_id": "micro-typescript-clamp",
+          "task_version": "1.0.2",
+          "verifier_digest": "sha256:90b41761c29a14b1fc14c7ffdf5a50316091a9129aa272b9a46f8ac3f7496d7c",
+          "workspace_digest": "sha256:f1eaeb0669e89fa0b2449129f06d622832829d26973b8b9ce787ddcab7b32c1e"
+        }
+      },
+      {
+        "historical_behavior_available": false,
+        "reason_codes": [
+          "HISTORICAL_EVIDENCE_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+          "task_id": "repo-java-widget-update",
+          "task_version": "1.0.0",
+          "verifier_digest": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73",
+          "workspace_digest": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9"
+        }
+      },
+      {
+        "historical_behavior_available": false,
+        "reason_codes": [
+          "HISTORICAL_EVIDENCE_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+          "task_id": "repo-python-ledger-transfer",
+          "task_version": "1.0.0",
+          "verifier_digest": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652",
+          "workspace_digest": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480"
+        }
+      },
+      {
+        "historical_behavior_available": false,
+        "reason_codes": [
+          "HISTORICAL_EVIDENCE_MISSING"
+        ],
+        "status": "RETROSPECTIVE_NON_QUALIFYING",
+        "task": {
+          "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+          "task_id": "repo-typescript-resilient-client",
+          "task_version": "1.0.0",
+          "verifier_digest": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02",
+          "workspace_digest": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e"
+        }
+      }
+    ],
+    "schema_version": 1,
+    "screen_digest": "sha256:0e386a89df92eca92e1de3cc1d167a9cb72de53dbfab421fc5806fb63cfeddd1",
+    "screen_id": "m8a-v6-retrospective-screen-v1",
+    "status": "RETROSPECTIVE_NON_QUALIFYING"
+  },
+  "schema_version": 1,
+  "source_main_sha": "3335668f4f11e384a9f99fb0a8692f07d8937902",
+  "stress_audit": {
+    "audit_digest": "sha256:a69d1582411e391f539e0aa07a3ed88d8953576f093b8bc748950e9d5f4edcde",
+    "audit_id": "m8a-keyless-stress-audit-v1",
+    "candidates": [
+      {
+        "dimensions": [
+          {
+            "dimension": "CONTEXT",
+            "evidence_identity": null,
+            "reason_code": "RELEVANCE_MANIFEST_AND_CONTEXT_THRESHOLD_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "DEPENDENCY_BUILD",
+            "evidence_identity": null,
+            "reason_code": "LOCK_IDENTITY_AND_TWO_PHASE_BUILD_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "MULTI_FILE",
+            "evidence_identity": "sha256:0dd04ca54ca4e2ce0aa10892b7e8c36827e07c87dc3536876ebb1bea3435be50",
+            "reason_code": "THREE_FILES_AND_DECLARED_MODULE_BOUNDARY_PROVEN",
+            "status": "PROVEN_KEYLESS"
+          },
+          {
+            "dimension": "PROTOCOL",
+            "evidence_identity": null,
+            "reason_code": "TWO_PROTOCOL_FAULT_INJECTIONS_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "REPAIR_LOOP",
+            "evidence_identity": null,
+            "reason_code": "PARTIAL_MILESTONES_AND_TRACE_RECOVERY_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "TOOL_USE",
+            "evidence_identity": null,
+            "reason_code": "CAPABILITY_WITHHOLDING_BOUNDARIES_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "TRAJECTORY",
+            "evidence_identity": null,
+            "reason_code": "TWO_INDEPENDENT_NORMALIZED_TRACE_BLOCKS_REQUIRED",
+            "status": "REQUIRES_EMPIRICAL_EVIDENCE"
+          }
+        ],
+        "has_required_anchor_dimension": false,
+        "proven_dimension_count": 1,
+        "qualification_identity": "sha256:03fe36498b09723fd125f9638111b2d06fdb8ba30bc3a60ba0b447df0d89d2f8",
+        "stress_member_eligible": false,
+        "task": {
+          "task_digest": "sha256:59f4a69f0c1cf3bff758ff96af2f4539aacb3d0a122c5118b954cdedc21c1e6e",
+          "task_id": "repo-java-widget-update",
+          "task_version": "1.0.0",
+          "verifier_digest": "sha256:ba288b9036ae8270680614bfe3cba4987db9a1f69b26e2aeb9a00f26c5d79f73",
+          "workspace_digest": "sha256:0d0229f9ddfc51c89a2e7ba80107aa33bf8e01dcfb73ab687695d66c60c1c6a9"
+        }
+      },
+      {
+        "dimensions": [
+          {
+            "dimension": "CONTEXT",
+            "evidence_identity": null,
+            "reason_code": "RELEVANCE_MANIFEST_AND_CONTEXT_THRESHOLD_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "DEPENDENCY_BUILD",
+            "evidence_identity": null,
+            "reason_code": "LOCK_IDENTITY_AND_TWO_PHASE_BUILD_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "MULTI_FILE",
+            "evidence_identity": null,
+            "reason_code": "THREE_FILE_CROSS_BOUNDARY_THRESHOLD_NOT_PROVEN",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "PROTOCOL",
+            "evidence_identity": null,
+            "reason_code": "TWO_PROTOCOL_FAULT_INJECTIONS_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "REPAIR_LOOP",
+            "evidence_identity": null,
+            "reason_code": "PARTIAL_MILESTONES_AND_TRACE_RECOVERY_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "TOOL_USE",
+            "evidence_identity": null,
+            "reason_code": "CAPABILITY_WITHHOLDING_BOUNDARIES_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "TRAJECTORY",
+            "evidence_identity": null,
+            "reason_code": "TWO_INDEPENDENT_NORMALIZED_TRACE_BLOCKS_REQUIRED",
+            "status": "REQUIRES_EMPIRICAL_EVIDENCE"
+          }
+        ],
+        "has_required_anchor_dimension": false,
+        "proven_dimension_count": 0,
+        "qualification_identity": "sha256:1796258cc996237e764dc36f6d1ce81c2ab8b0ad5907a0c9ae011cc2e7ae8298",
+        "stress_member_eligible": false,
+        "task": {
+          "task_digest": "sha256:1b12a7a6b828eda101dafb1fe914f773ddba2377ae51d815aa37dfc8bd9facb8",
+          "task_id": "repo-python-ledger-transfer",
+          "task_version": "1.0.0",
+          "verifier_digest": "sha256:926f8551771d415e8abc68c724f41160ac7ca38ecdfed5a3608063cb5f967652",
+          "workspace_digest": "sha256:8a7f16d44501f8c89b0d46ffcfe021c7d39d174e5f70f8063dd86a5fb1fda480"
+        }
+      },
+      {
+        "dimensions": [
+          {
+            "dimension": "CONTEXT",
+            "evidence_identity": null,
+            "reason_code": "RELEVANCE_MANIFEST_AND_CONTEXT_THRESHOLD_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "DEPENDENCY_BUILD",
+            "evidence_identity": null,
+            "reason_code": "LOCK_IDENTITY_AND_TWO_PHASE_BUILD_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "MULTI_FILE",
+            "evidence_identity": "sha256:d3fb0a7023ecde47641844969aa32a25ed453f6d534d8d2ed83b5c15d32bda00",
+            "reason_code": "THREE_FILES_AND_DECLARED_MODULE_BOUNDARY_PROVEN",
+            "status": "PROVEN_KEYLESS"
+          },
+          {
+            "dimension": "PROTOCOL",
+            "evidence_identity": null,
+            "reason_code": "TWO_PROTOCOL_FAULT_INJECTIONS_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "REPAIR_LOOP",
+            "evidence_identity": null,
+            "reason_code": "PARTIAL_MILESTONES_AND_TRACE_RECOVERY_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "TOOL_USE",
+            "evidence_identity": null,
+            "reason_code": "CAPABILITY_WITHHOLDING_BOUNDARIES_NOT_EVIDENCED",
+            "status": "NOT_PROVEN"
+          },
+          {
+            "dimension": "TRAJECTORY",
+            "evidence_identity": null,
+            "reason_code": "TWO_INDEPENDENT_NORMALIZED_TRACE_BLOCKS_REQUIRED",
+            "status": "REQUIRES_EMPIRICAL_EVIDENCE"
+          }
+        ],
+        "has_required_anchor_dimension": false,
+        "proven_dimension_count": 1,
+        "qualification_identity": "sha256:073a1e12648b00dc4934247967f994a74b2cccc035e11895d46512397aeb0508",
+        "stress_member_eligible": false,
+        "task": {
+          "task_digest": "sha256:21223ee90e265c196c57a1541901e3f721ec1e7f36cda77bcf1d0e362658a4c6",
+          "task_id": "repo-typescript-resilient-client",
+          "task_version": "1.0.0",
+          "verifier_digest": "sha256:00cb42bd9a06bd8cbb0f1bf8c0c7e2d40ec4c23dfa95db55b13bfc7902ed6a02",
+          "workspace_digest": "sha256:2a23524eca0d4d0674f81443116ba6ef5e9ea988433e21c198a9d2f050b8b16e"
+        }
+      }
+    ],
+    "maximum_single_task_credit_share_denominator": 3,
+    "maximum_single_task_credit_share_numerator": 1,
+    "minimum_dimensions_per_member": 3,
+    "minimum_languages_for_language_independent_dimension": 2,
+    "minimum_tasks_per_represented_dimension": 3,
+    "portfolio_reason_codes": [
+      "NO_CANDIDATE_PROVES_THREE_STRESS_DIMENSIONS",
+      "NO_CANDIDATE_PROVES_TRAJECTORY_CONTEXT_OR_PROTOCOL",
+      "REPRESENTED_MULTI_FILE_DIMENSION_HAS_FEWER_THAN_THREE_TASKS",
+      "SINGLE_TASK_CREDIT_SHARE_EXCEEDS_ONE_THIRD",
+      "TIER_B_QUALIFICATION_IS_NOT_STRESS_MEMBERSHIP"
+    ],
+    "required_anchor_dimensions": [
+      "CONTEXT",
+      "PROTOCOL",
+      "TRAJECTORY"
+    ],
+    "schema_version": 1,
+    "stress_suite_release_ready": false
+  }
+}
