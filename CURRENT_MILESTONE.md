@@ -1,11 +1,12 @@
 # SameScale Product — Current Milestone
 
-Updated: 2026-09-09. Milestone: **Post-S1 macro-route planning freeze**.
-State: **S1 ACCEPTED; forward route frozen; S1.5/S2 NOT_STARTED**.
+Updated: 2026-09-09. Milestone: **S1.5 — mainline integration preparation**.
+State: **IN_PROGRESS — S1.5 execution authorized; main merge/canonical rename NOT_RUN; S2 NOT_STARTED**.
 S1 implementation, local tests and Browser QA remain accepted at
-`0c6c6c9be89f22fe2e8f345a7d6e84720bb609f3`. This handoff changes planning only.
-The planning delivery identity is the Git commit containing this update; remote push/CI must be
-checked against that exact commit rather than inferred from local documentation checks.
+`0c6c6c9be89f22fe2e8f345a7d6e84720bb609f3`. The prepared candidate is
+`89cb54070bdec79414399f21fa141cd8134ea518`, plus this local documentation handoff.
+No new runtime capability was implemented. A future committed delivery must record its exact
+remote SHA/CI; candidate CI is not proof that main or the renamed repository was verified.
 
 This is the single live handoff. [Project Blueprint](docs/PROJECT_BLUEPRINT.md) owns the frozen
 macro-route and S1.5/S2 acceptance criteria;
@@ -18,21 +19,22 @@ handoff is preserved in Git at `eceefeccbfb47607cb0463ad410ef429fc2c032c`.
 - Existing repository/remote: `git@github.com:a27497/harnesslab-ai.git`.
 - Worktree: `/home/dev/projects/harnesslab-ai-integration`.
 - Feature branch: `codex/l-real-agent-main-integration`, tracking the same branch on origin.
-- Planning starting HEAD / accepted S1: `0c6c6c9be89f22fe2e8f345a7d6e84720bb609f3`;
-  starting worktree clean and branch tracking origin. S1 originally started from
+- S1.5 preparation starting HEAD: `89cb54070bdec79414399f21fa141cd8134ea518`;
+  starting worktree clean and branch tracking origin. Accepted S1 is
+  `0c6c6c9be89f22fe2e8f345a7d6e84720bb609f3`; S1 originally started from
   `eceefeccbfb47607cb0463ad410ef429fc2c032c`.
 - Frozen P0 commit remains `20d90700e5963ca9db3c86379e190da27cafb258`.
-- Current user explicitly authorizes updating PROJECT_BLUEPRINT and CURRENT_MILESTONE with the
-  forward plan and source-grounded S1.5/S2 acceptance criteria, then commit/push of this branch.
-  **Planning only:** no S1.5/S2 implementation, merge, repository/remote rename, tag, deployment,
-  external connector or new paid campaign is authorized in this task.
-- Six other worktrees were observed and are not task targets. This planning task does not start,
-  stop or modify product/database resources.
+- The user explicitly authorized committing/pushing this preparation, creating/merging the PR,
+  renaming the existing private repository to `a27497/samescale`, and completing S1.5 verification.
+  This includes active canonical-reference/origin reconciliation and its verified main handoff.
+  S2, tags, deployment and paid campaigns remain outside scope.
+- Six other worktrees are not task targets. A new disposable PostgreSQL container and local QA
+  server were used for this preparation; existing demo/restore resources were not used or changed.
 
 ## Current route and planning handoff
 
-S0 and S1 are complete. The next planned stage is **S1.5 — mainline integration and SameScale
-canonical identity**, currently **NOT_STARTED**. S2 is **Local Productization & Developer
+S0 and S1 are complete. **S1.5 — mainline integration and SameScale
+canonical identity** is **IN_PROGRESS**, not accepted. S2 is **Local Productization & Developer
 Experience**, also **NOT_STARTED**. The authoritative sequence is
 **S1.5 → S2 → S3 restricted public Demo → S4 Portfolio/Release → P1 minimal Observe → P2 one
 read-only external connector**. Observe is not S2. Goals and detailed acceptance live only in the
@@ -50,7 +52,33 @@ remains unchanged. The additive CLI belongs to S2, while package/env/API/schema/
 evidence identities retain HarnessLab compatibility. These future exceptions do not change today's
 [public product contract](PUBLIC_PRODUCT_CONTRACT.md).
 
-## Planning verification
+## S1.5 preparation results
+
+- Remote main `3335668f4f11e384a9f99fb0a8692f07d8937902` is an ancestor of candidate
+  `89cb54070bdec79414399f21fa141cd8134ea518`: five candidate commits, no main-only commits;
+  113 changed files include the existing Real Analyst/P0/S0/S1 and planning work.
+- Candidate [Fast CI](https://github.com/a27497/harnesslab-ai/actions/runs/34385963877) is
+  **SUCCESS** on that exact SHA. This closes the previously pending route-freeze CI result.
+- Fresh focused Python acceptance: **157 passed in 36.00s**, zero skipped, with disposable
+  PostgreSQL 18 migrated through `20260908_0007`. Frontend: **53 passed**, type check/build passed.
+- Actual Chromium desktop/mobile QA: **7 grouped checks passed**, covering offline/history,
+  persisted Fake reload/report/review, citation navigation and explicit error retry. The injected
+  historical failure is labeled separately; screenshots were inspected. No runtime source changed.
+- Server-log review found an existing advanced Core Readiness API failure on Overview navigation:
+  `ModuleNotFoundError: scripts` in release reconciliation. Its imports exist in both main and
+  accepted S1. The route rendered, but that background endpoint did not pass; this is isolated
+  from the checked investigation journey and remains an explicit S2 startup/distribution gap.
+- [Dated preparation evidence](docs/evidence/SAMESCALE_S15_PREPARATION_20260909.md) records exact
+  repository/tag identity, test scope, known limits and the active/historical reference inventory.
+  The blueprint owns the merge/rename/rollback procedure; other worktrees remain intact.
+- All 27 local documentation links/anchors resolve; `git diff --check` passes. This preparation
+  handoff contains documentation only. The task's temporary QA server and PostgreSQL
+  container/volume were removed after verification; historical/demo resources remain untouched.
+- Main integration, repository/remote rename and their final CI/continuity checks: **NOT_RUN**.
+  S1.5 remains incomplete; S2 implementation and clean-environment product acceptance remain
+  **NOT_RUN**. No model campaign or historical database migration was performed.
+
+## Retained route-freeze verification
 
 - Reviewed source entrypoints, CLI registration, lifecycle/trusted manifest selection, Compose and
   Docker build, static assets, showcase and router, plus existing distribution/lifecycle/CLI and
@@ -61,10 +89,9 @@ evidence identities retain HarnessLab compatibility. These future exceptions do 
   passed. Only the two planning documents changed; source, public claims, lockfiles and frozen
   evidence remain unchanged. Link verification used the locked uv Python environment because
   plain `python` is not on this shell's PATH.
-- S1.5 main integration/canonical rename and S2 implementation/fresh-environment acceptance:
-  **NOT_RUN**. No new runtime/browser/database acceptance is claimed by this planning update.
-- Planning commit push and remote CI are reported against its exact SHA after commit; remote CI
-  is not implied by the local results below.
+- Route-freeze commit `89cb54070bdec79414399f21fa141cd8134ea518` was pushed and its exact CI
+  subsequently passed, as recorded above. These 32 tests are the earlier documentation check,
+  not additional tests to add to the current 157-test result.
 
 ## Retained S1 delivery
 
@@ -114,11 +141,12 @@ frontend check preserves the backend's character contract. No application assert
 
 ## Stopping point and limits
 
-S1 is complete. Stop this task after the two planning documents are checked and committed/pushed
-to the current feature branch, with exact remote SHA and CI status reported separately. Wait for a
-new scoped request before executing S1.5 or S2; the roadmap itself does not start either stage.
-The S1 handoff recorded removal of temporary S1 PostgreSQL/volume and QA server after acceptance,
-with historical/demo resources retained; this planning task does not repeat that cleanup.
+S1.5 execution is authorized. The pending action is to commit/push the prepared
+handoff, create and merge the feature-branch PR with history preserved, and rename the existing
+private repository to `a27497/samescale`, then reconcile active canonical references and verify
+exact main CI/identity continuity. This handoff does not claim those actions have happened.
+Do not start S2. This task's temporary PostgreSQL container/volume and QA server have been removed;
+existing historical/demo resources and other worktrees remain intact.
 
 New live Real execution, full A–K/release acceptance, clean-clone reproduction, physical-device and
 non-Chromium testing are **NOT_RUN** in S1. Original real-session restoration and human ownership

@@ -114,6 +114,42 @@ unavailable, retain the concrete blocker and mark the corresponding acceptance *
 verified. Do not start S2 automatically. No tag, public launch, package-wide rename, new campaign,
 or historical evidence rewrite is part of this stage.
 
+#### Prepared integration and rename procedure
+
+Use the existing `codex/l-real-agent-main-integration` branch as the candidate, retaining all
+five accepted commits from the original main baseline through the route freeze. The integration
+includes the preceding Real Analyst/P0/S0 work, not just S1 display changes. The dated
+[preparation evidence](evidence/SAMESCALE_S15_PREPARATION_20260909.md) records exact inputs and
+verification; CURRENT_MILESTONE records whether the external steps have actually occurred.
+
+1. Commit/push the preparation handoff on the feature branch and obtain passing CI on that exact
+   head. Re-read remote main and candidate before creating a PR; if either changed, reassess the
+   affected delta. Use a normal merge commit into `main`, preserving the accepted S1 ancestor;
+   do not squash, rebase published history, force-push, or delete the source branch.
+2. Verify the merged remote main SHA and its CI. Leave the other worktrees' local branches/files
+   intact; the existing main worktree may remain behind remote main until its owner updates it.
+3. Rename the existing private repository to `a27497/samescale` without changing its owner,
+   visibility, access policy, default branch or numeric repository identity. Verify canonical
+   API/Git access and old-URL behavior; do not recreate or transfer the repository. Preserve tags,
+   issue/PR history and original Actions run identities.
+4. Reconcile active README/public-contract/current-handoff references and clone instructions with
+   the verified canonical URL. Retain `harnesslab-ai` in Python metadata, all historical documents
+   and frozen source/evidence. The existing historical CI link in FIRST_APPLICATION remains a
+   historical reference; verify its accessibility instead of rewriting its evidence identity.
+5. Update `origin` to `git@github.com:a27497/samescale.git` and verify fetch/readback. Git remote
+   configuration is shared across these linked worktrees: disclose that effect, but do not rename
+   their directories, switch/reset their branches, or clean their files. Reconcile the small
+   canonical-document follow-up through the same reviewed feature-branch/merge path and check
+   its exact main CI before marking S1.5 accepted.
+
+Rollback is forward and evidence-preserving: on pre-merge failure, keep main unchanged and correct
+the candidate; on post-merge regression, use a reviewed revert of the recorded merge commit and
+its dependent documentation, never reset published main. Do not downgrade any historical database
+as an automatic rollback. If rename validation fails, retain the verified repository ID and restore
+the old slug/remote only if available and authorized; otherwise record the actual accessible URL
+and blocker. Keep all existing commits, tags and data throughout recovery. No speculative cleanup
+or repeated unchanged retry is part of this procedure.
+
 ### S2 — Local Productization & Developer Experience
 
 The minimum supported acceptance environment is a fresh Linux environment using the locked
@@ -168,6 +204,9 @@ Run additional PostgreSQL/Analyst checks only for affected persistence contracts
 restart journey; full A–K is not automatically a local-product acceptance prerequisite.
 S2 excludes Observe/import, external connectors, public hosting, SaaS authentication, automatic
 repair, new paid runs and a new Agent runtime.
+The S1.5 preparation also observed an existing console-launch Core Readiness import failure
+(`scripts` namespace unavailable). Include that concrete startup/distribution case in S2-1/S2-5;
+do not use the successful investigation journey to claim all advanced endpoints are healthy.
 
 ### S3 / S4 / P1 / P2 boundaries
 
