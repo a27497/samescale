@@ -3,10 +3,21 @@
 SameScale is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
 reproducible Model × Harness × Judge execution and verifier-backed evidence.
 
-SameScale Product continues the existing P0 Analyst application. The repository, package/CLI names,
-configuration, and historical evidence retain HarnessLab compatibility. S1 presents SameScale in
-the application shell and makes investigation entry, cited reports, and saved sessions the primary
+SameScale Product continues the existing P0 Analyst application in the canonical private repository
+[a27497/samescale](https://github.com/a27497/samescale), renamed in place from `a27497/harnesslab-ai`.
+Git history, package/CLI names, configuration, and historical evidence retain HarnessLab compatibility.
+S1 presents SameScale in the application shell and makes investigation entry, cited reports, and saved sessions the primary
 experience. The runtime and existing evaluation routes remain compatible.
+
+Clone the canonical repository with an account that has access:
+
+```bash
+git clone git@github.com:a27497/samescale.git
+cd samescale
+```
+
+The supported executable is still `harnesslab`; the additive `samescale` CLI and `demo` launcher
+belong to S2 and are not implemented yet. Existing checkout directories can keep their names.
 
 ## Codex development entry (source checkout)
 

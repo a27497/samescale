@@ -57,7 +57,12 @@ contains investigation entry and saved sessions; evaluation tools remain in an e
 area, automatically expanded when visiting their existing routes. No route is removed or renamed.
 Top-level CLI help and API documentation display SameScale with an explicit HarnessLab compatibility
 note. Package-version help, technical identifiers, and historical/evidence text retain their identity.
-Preserve the Git repository/remote/history, `harnesslab-ai` Python distribution,
+S1.5 integrates the accepted work into `main` and renames the existing private GitHub repository
+in place from `a27497/harnesslab-ai` to [a27497/samescale](https://github.com/a27497/samescale).
+The canonical Git remote is `git@github.com:a27497/samescale.git`; repository identity, privacy,
+Git history and historical tags/evidence are retained. The additive `samescale` CLI is still a
+future S2 deliverable; use the compatible `harnesslab` executable today.
+Preserve the `harnesslab-ai` Python distribution,
 `harnesslab-workbench` npm package, `src/harnesslab`, `harnesslab` CLI, `HARNESSLAB_*` environment
 variables, API paths, database schema/migrations, task/profile/session IDs, and artifact digests.
 The P0 home-route change is recorded above; it is not an API or data migration.
