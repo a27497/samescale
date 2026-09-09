@@ -1,12 +1,12 @@
 # SameScale Product — Current Milestone
 
-Updated: 2026-09-09. Milestone: **S1.5 — mainline integration preparation**.
-State: **IN_PROGRESS — S1.5 execution authorized; main merge/canonical rename NOT_RUN; S2 NOT_STARTED**.
+Updated: 2026-09-09. Milestone: **S1.5 — mainline integration and SameScale canonical identity**.
+State: **ACCEPTED — main integration and canonical identity verified; S2 NOT_STARTED**.
 S1 implementation, local tests and Browser QA remain accepted at
-`0c6c6c9be89f22fe2e8f345a7d6e84720bb609f3`. The prepared candidate is
-`89cb54070bdec79414399f21fa141cd8134ea518`, plus this local documentation handoff.
-No new runtime capability was implemented. A future committed delivery must record its exact
-remote SHA/CI; candidate CI is not proof that main or the renamed repository was verified.
+`0c6c6c9be89f22fe2e8f345a7d6e84720bb609f3`. The verified main integration is
+`e3ac8dde59f4d8fd6755541363bf3f1e4010ac69` (PR #1); its exact main CI passed.
+The canonical-document handoff is the commit containing this update and its subsequent merge;
+verify that final remote SHA/CI separately after publication. No new runtime capability was added.
 
 This is the single live handoff. [Project Blueprint](docs/PROJECT_BLUEPRINT.md) owns the frozen
 macro-route and S1.5/S2 acceptance criteria;
@@ -16,7 +16,8 @@ handoff is preserved in Git at `eceefeccbfb47607cb0463ad410ef429fc2c032c`.
 
 ## Baseline and authorization
 
-- Existing repository/remote: `git@github.com:a27497/harnesslab-ai.git`.
+- Canonical repository/remote: `git@github.com:a27497/samescale.git` (private).
+  Renamed in place from `a27497/harnesslab-ai`; repository ID `1342785518` is unchanged.
 - Worktree: `/home/dev/projects/harnesslab-ai-integration`.
 - Feature branch: `codex/l-real-agent-main-integration`, tracking the same branch on origin.
 - S1.5 preparation starting HEAD: `89cb54070bdec79414399f21fa141cd8134ea518`;
@@ -34,7 +35,7 @@ handoff is preserved in Git at `eceefeccbfb47607cb0463ad410ef429fc2c032c`.
 ## Current route and planning handoff
 
 S0 and S1 are complete. **S1.5 — mainline integration and SameScale
-canonical identity** is **IN_PROGRESS**, not accepted. S2 is **Local Productization & Developer
+canonical identity** is **ACCEPTED**. S2 is **Local Productization & Developer
 Experience**, also **NOT_STARTED**. The authoritative sequence is
 **S1.5 → S2 → S3 restricted public Demo → S4 Portfolio/Release → P1 minimal Observe → P2 one
 read-only external connector**. Observe is not S2. Goals and detailed acceptance live only in the
@@ -47,10 +48,33 @@ established by S1 acceptance. The S2 plan therefore builds on these components a
 standalone demo readiness from database-backed `/api/health`.
 
 S1.5 preparation and completed integration/rename have separate acceptance states in the blueprint.
-The target repository name `a27497/samescale` is planned, not current; the existing origin above
-remains unchanged. The additive CLI belongs to S2, while package/env/API/schema/volume and frozen
-evidence identities retain HarnessLab compatibility. These future exceptions do not change today's
-[public product contract](PUBLIC_PRODUCT_CONTRACT.md).
+The canonical repository is now `a27497/samescale`, and the shared origin points there. The additive
+CLI belongs to S2, while package/env/API/schema/volume and frozen evidence identities retain
+HarnessLab compatibility. The [public product contract](PUBLIC_PRODUCT_CONTRACT.md) and README
+record the verified repository identity while preserving current runtime claims.
+
+## S1.5 integration and identity acceptance
+
+| Check | Verified result |
+| --- | --- |
+| Feature candidate | `3f2578ad9e2c7e747d5806b98822c02af3ce943e`; [Fast CI 34387656649](https://github.com/a27497/samescale/actions/runs/34387656649) SUCCESS |
+| Main integration | [PR #1](https://github.com/a27497/samescale/pull/1), merge commit `e3ac8dde59f4d8fd6755541363bf3f1e4010ac69`; accepted S1 remains an ancestor; merge tree equals the tested candidate |
+| Main CI | [Fast CI 34388340034](https://github.com/a27497/samescale/actions/runs/34388340034) SUCCESS on the exact merge SHA |
+| Repository identity | Same numeric ID `1342785518` / node ID `R_kgDOUAlH7g`; name now `a27497/samescale`; private, default branch main, unarchived, same observed account permissions |
+| Canonical access | New Git URL fetch/ls-remote passed; independent temporary shallow clone resolved the exact main merge SHA and was removed afterward; this is Git access verification, not S2 clean-install reproduction |
+| Old-address compatibility | Old API URL resolves to the same renamed repository; old SSH Git URL resolves the same main/tag; the historical FIRST_APPLICATION Actions run remains accessible under its original URL |
+| History continuity | PR #1 retains ID `4488064589` and merge SHA; main CI retains run ID `34388340034`; tag `v1.0.0-core` retains object `d7e7d92155a1588128ef6a4beb7db286a5b3119b` and commit `e3cab6f180f2bbcd6c8f134aa3d710c503fe6e87` |
+| Local compatibility | Shared origin updated to canonical SSH URL; all six other worktrees retain their directories/branch tips; their common remote destination changes, not their files |
+| Runtime/evidence | Source, frontend, migrations, package/lock identities, Docker configuration and frozen Real/S1 evidence unchanged from accepted S1; no new CLI, database migration or paid execution |
+
+The prepared runtime acceptance below remains applicable because the merged source is identical.
+The current follow-up changes only README, the public identity contract and this live handoff.
+Its local documentation/distribution/CI contracts passed: **32 tests in 19.27s**; all **34** local
+links/anchors resolve and `git diff --check` passes. Six other worktree records match the captured
+pre-rename state exactly; only their shared remote destination changes.
+Final follow-up commit/main CI must be checked against their exact SHAs; earlier successes are not
+substitutes. The known advanced Core Readiness failure remains explicitly outside the accepted
+investigation journey and is tracked for S2 startup/distribution work.
 
 ## S1.5 preparation results
 
@@ -74,9 +98,9 @@ evidence identities retain HarnessLab compatibility. These future exceptions do 
 - All 27 local documentation links/anchors resolve; `git diff --check` passes. This preparation
   handoff contains documentation only. The task's temporary QA server and PostgreSQL
   container/volume were removed after verification; historical/demo resources remain untouched.
-- Main integration, repository/remote rename and their final CI/continuity checks: **NOT_RUN**.
-  S1.5 remains incomplete; S2 implementation and clean-environment product acceptance remain
-  **NOT_RUN**. No model campaign or historical database migration was performed.
+- The earlier preparation record's merge/rename **NOT_RUN** status is historical; the table above
+  records the subsequently verified integration and identity. S2 implementation and clean-environment
+  product acceptance remain **NOT_RUN**. No model campaign or historical database migration occurred.
 
 ## Retained route-freeze verification
 
@@ -141,12 +165,11 @@ frontend check preserves the backend's character contract. No application assert
 
 ## Stopping point and limits
 
-S1.5 execution is authorized. The pending action is to commit/push the prepared
-handoff, create and merge the feature-branch PR with history preserved, and rename the existing
-private repository to `a27497/samescale`, then reconcile active canonical references and verify
-exact main CI/identity continuity. This handoff does not claim those actions have happened.
-Do not start S2. This task's temporary PostgreSQL container/volume and QA server have been removed;
-existing historical/demo resources and other worktrees remain intact.
+S1.5 main integration and repository rename are verified. Finish the authorized canonical-document
+handoff on the feature branch, merge it with history preserved and check its exact main CI; then
+stop. Do not start S2. The existing main worktree remains at its owner's local tip; updating that
+worktree is not required to change the verified remote main. Temporary QA resources were removed;
+historical/demo resources and all other worktrees remain intact.
 
 New live Real execution, full A–K/release acceptance, clean-clone reproduction, physical-device and
 non-Chromium testing are **NOT_RUN** in S1. Original real-session restoration and human ownership
