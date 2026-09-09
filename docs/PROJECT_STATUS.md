@@ -1,10 +1,13 @@
 # HarnessLab Project Status
 
-Updated 2026-09-09. Active scope: **P0 — Agent application main path closeout**.
+Updated 2026-09-09. **Compatibility evidence record: P0 and real-smoke closeout.**
+Live SameScale scope, verification, and NEXT now belong to
+[Current Milestone](../CURRENT_MILESTONE.md). The records below retain their original scope and
+test totals; they do not describe new S0 executions or grant future campaign authorization.
 
 ## P0 application closeout
 
-- Work continues on `codex/l-real-agent-main-integration` at `79056a1`; no commit, push or merge.
+- At the P0 handoff, work was on `codex/l-real-agent-main-integration` at `79056a1`, uncommitted.
   Pre-existing edits to this file and FIRST_APPLICATION are retained.
 - `/` now opens Analyst with separate offline Fake, frozen historical Real, and current database
   session entrypoints. Advanced evaluation pages remain available; Overview moves to `/overview`.
@@ -34,7 +37,7 @@ rehearsal. Human ownership is still **NOT_VERIFIED**. The accepted real smoke be
 by frozen artifacts; its original database session row was not found in the databases checked
 during this closeout. Do not claim it has been restored into the current Workbench.
 
-## Current result
+## Accepted real-smoke result
 
 **REAL_AGENT_SMOKE = VERIFIED / COMPLETED** for the bounded Attribution Analyst vertical slice.
 
@@ -125,7 +128,7 @@ unresolved-test status. No new real Provider/Harness/Judge/Matrix campaign was r
 - Phase L technical closeout remains `ACCEPTED_WITH_KNOWN_DEBT`: F1/F2/F3/F4/F6 accepted; F5 durable
   cancellation/orphan-process interruption remains known debt.
 
-## NEXT
+## Prior first-application handoff (historical NEXT)
 
 The delivery candidate and exact-SHA Fast CI have been checked: source
 `79056a1a4619863970b8d5b37102434427cec5f3`, successful run `34344469107`.

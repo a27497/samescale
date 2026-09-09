@@ -1,0 +1,4 @@
+interface:
+  display_name: "SameScale Product"
+  short_description: "Develop SameScale from the existing P0 baseline"
+  default_prompt: "Use $samescale-product to complete the authorized milestone from CURRENT_MILESTONE.md and verify its acceptance."

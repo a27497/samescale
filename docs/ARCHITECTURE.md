@@ -333,7 +333,8 @@ not a claim that the excluded technologies are universally unsuitable.
 ## Future scope
 
 Long-term expansion and architectural exclusions are maintained in
-[Project Blueprint](PROJECT_BLUEPRINT.md); phase progress is in [Project Status](PROJECT_STATUS.md).
+[Project Blueprint](PROJECT_BLUEPRINT.md); live progress is in
+[Current Milestone](../CURRENT_MILESTONE.md), with prior evidence in [Project Status](PROJECT_STATUS.md).
 
 ## Phase K Core release boundary
 

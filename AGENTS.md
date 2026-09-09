@@ -1,17 +1,22 @@
-# HarnessLab
+# SameScale Product (HarnessLab-compatible)
 
-HarnessLab is an evidence-diagnosis and regression Agent workbench for AI Coding, backed by
-reproducible Model × Harness × Judge execution and verifier-validated evidence.
+SameScale Product continues the existing HarnessLab P0 evidence-diagnosis and regression Agent
+workbench for AI Coding. Keep the existing repository, Git history, and implementation identities.
 
 ## Start here
 
-- Read [Project Blueprint](docs/PROJECT_BLUEPRINT.md) for first-application scope and acceptance,
-  and [Project Status](docs/PROJECT_STATUS.md) for the active task, baseline, and next step.
-  [README](README.md) provides setup and verification entrypoints; read specialist docs as needed.
+- Read [Current Milestone](CURRENT_MILESTONE.md) for active scope, baseline, acceptance results,
+  and the stopping point; [Public Product Contract](PUBLIC_PRODUCT_CONTRACT.md) for supported
+  user-facing claims; then [README](README.md) for setup and verification.
+- [Project Blueprint](docs/PROJECT_BLUEPRINT.md) owns plans and architecture constraints.
+  [Project Status](docs/PROJECT_STATUS.md) retains the P0/real-smoke evidence and historical handoff.
+  It links to current state rather than maintaining a competing NEXT.
+- Use the repo-local [samescale-product Skill](.agents/skills/samescale-product/SKILL.md) for
+  SameScale product implementation, migration, and acceptance work. Read specialist docs as needed.
 - The user's current instructions govern task scope and override project/skill guidance within
   system and developer constraints. Source and tests establish implemented behavior; immutable
   artifacts establish observed results. Report discrepancies rather than making prose into proof.
-- Maintain plans only in the blueprint and live state only in status. Dated audits, campaign
+- Maintain plans only in the blueprint and live state only in CURRENT_MILESTONE. Dated audits, campaign
   records, and historical authorizations describe their original scope; they do not start work.
 
 ## Invariants and authority
@@ -31,6 +36,15 @@ reproducible Model × Harness × Judge execution and verifier-validated evidence
 
 ## Work and acceptance
 
+- Start with `git status --short --branch`, `git branch --show-current`, `git worktree list`,
+  and `git remote -v`. Inspect the diff before editing; do not reinitialize Git or change remotes
+  for product naming. One writer per worktree; other worktrees are not cleanup targets.
+- SameScale is the product name. Preserve `src/harnesslab`, the `harnesslab` CLI, `HARNESSLAB_*`
+  configuration, package/database/API identities, and frozen evidence. Rename only an explicitly
+  scoped product surface; never globally replace HarnessLab or rewrite historical reports.
+- Codex is the development environment, not a new product runtime or permission to change subject
+  models. Reuse the locked Python/FastAPI/PostgreSQL/LangGraph/Vue stack. No new framework,
+  multi-agent runtime, dependency upgrade, or paid campaign is implied by setup.
 - Complete the requested outcome autonomously through routine, reversible implementation choices.
   State reasonable assumptions; ask only when a material scope/contract decision or permission
   boundary cannot be resolved from existing authorization. Continue independent authorized work.
@@ -43,3 +57,7 @@ reproducible Model × Harness × Judge execution and verifier-validated evidence
   consistency, and affected documentation contracts. For behavior changes, run focused checks;
   expand only for failures, cross-cutting risk, or an explicitly required acceptance/release gate.
   Once sufficient checks pass, stop testing. Report what ran, results, and material limitations.
+- Use the README quickstart for the keyless demo. PostgreSQL-backed tests need an isolated,
+  disposable database and migrations; never point destructive fixtures at historical/demo data.
+  Update CURRENT_MILESTONE with actual results and blockers. Commit/push only within the current
+  user's authorization; verify the pushed branch SHA and report CI separately from local checks.

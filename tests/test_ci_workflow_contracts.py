@@ -311,7 +311,7 @@ def test_fast_ci_checks_frontend_and_dto_without_full_release_gates() -> None:
             "npm ci --no-audit --no-fund",
             "npm run type-check",
             "npm run test -- tests/workbench.spec.ts tests/registry.spec.ts "
-            "tests/diagnosis.spec.ts tests/analyst.spec.ts",
+            "tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts",
         ]
         assert "continue-on-error" not in frontend
         assert any("actions/setup-node@" in step.get("uses", "") for step in steps)
@@ -320,6 +320,7 @@ def test_fast_ci_checks_frontend_and_dto_without_full_release_gates() -> None:
         assert "tests/test_experiment_queue.py" in commands
         assert "tests/test_experiment_tool_metrics.py" in commands
         assert "tests/test_analyst_sessions.py" in commands
+        assert "tests/test_analyst_showcase.py" in commands
         assert (
             "tests/test_workbench_api.py::"
             "test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel"

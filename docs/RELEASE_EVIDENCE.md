@@ -1,7 +1,8 @@
 # Core Release Evidence
 
-This is a versioned release-contract reference. [Project Status](PROJECT_STATUS.md) owns current
-phase/release status; instructions here apply only to an explicitly authorized release task.
+This is a versioned release-contract reference. [Current Milestone](../CURRENT_MILESTONE.md) owns
+live scope/status; [Project Status](PROJECT_STATUS.md) retains prior evidence. Instructions here
+apply only to an explicitly authorized release task.
 Historical sections describe their named campaign and do not authorize execution.
 
 The accepted K-B4 completion record is at `3e9fcfeca9cb635d8c40c9206fc278928df9f044`, with recorded

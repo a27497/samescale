@@ -1,7 +1,24 @@
-# HarnessLab AI
+# SameScale Product · HarnessLab AI
 
 HarnessLab AI is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
 reproducible Model × Harness × Judge execution and verifier-backed evidence.
+
+SameScale Product continues the existing P0 Analyst application. The repository, package/CLI names,
+configuration, and historical evidence retain HarnessLab compatibility; S0 adds the Codex development
+entry without changing the product runtime or globally renaming the application.
+
+## Codex development entry (source checkout)
+
+Read root `AGENTS.md`, `CURRENT_MILESTONE.md` (live scope/results), and
+`PUBLIC_PRODUCT_CONTRACT.md` (supported behavior/claims). Plans remain in Project Blueprint;
+Project Status preserves the earlier P0 and real-smoke evidence.
+
+The repo-local Skill is `.agents/skills/samescale-product/SKILL.md`. From this checkout, invoke
+`$samescale-product` with a bounded task. Its location follows the
+[official Codex skill discovery convention](https://learn.chatgpt.com/docs/build-skills);
+root guidance follows [AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
+These are source-development files, not a new runtime dependency or a prerequisite for running
+the installed application. No personal Codex configuration or plugin installation is required.
 
 ## 先体验工程问题调查（无 Provider Key）
 
@@ -32,7 +49,8 @@ HARNESSLAB_ANALYST_REAL_ENABLED=0 uv run --locked harnesslab serve
 
 - [Project Blueprint](docs/PROJECT_BLUEPRINT.md): product direction, architecture choices, phase
   requirements, and acceptance scope.
-- [Project Status](docs/PROJECT_STATUS.md): workspace baseline, active task, evidence position, and NEXT.
+- [Project Status](docs/PROJECT_STATUS.md): preserved P0/real-smoke evidence and historical handoff;
+  links to the current SameScale milestone in source checkouts.
 - `AGENTS.md` in source checkouts: development-agent guidance and permission boundaries.
 - [Architecture](docs/ARCHITECTURE.md): implemented execution and evidence contracts.
 - [Productization](docs/PRODUCTIZATION.md): bundled local product operation.
@@ -40,7 +58,7 @@ HARNESSLAB_ANALYST_REAL_ENABLED=0 uv run --locked harnesslab serve
 - [First Application](docs/FIRST_APPLICATION.md): bounded demo script, capability draft, and human
   ownership checkpoints.
 
-Current phase and capability completion claims are maintained in Project Status. Domain documents
+Current milestone results are maintained in root CURRENT_MILESTONE.md. Domain documents
 explain component behavior; dated audits and campaign records retain their original scope.
 
 ## Implemented Capabilities

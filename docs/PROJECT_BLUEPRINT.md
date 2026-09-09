@@ -2,12 +2,30 @@
 
 Planning authority: **HL-BLUEPRINT-2026-09-05**, the user-supplied authoritative blueprint and
 first-application delivery contract, synchronized on 2026-09-09. The user's latest explicit
-decisions govern scope. [Project Status](PROJECT_STATUS.md) records current evidence and NEXT;
+decisions govern scope. [Current Milestone](../CURRENT_MILESTONE.md) records live state and NEXT;
+[Project Status](PROJECT_STATUS.md) retains P0 and real-smoke evidence;
 this document defines goals and acceptance, not completion or execution authorization.
 
 The [2026-08-25 phase map](FINAL_BLUEPRINT_PHASE_MAP_2026-08-25.md) is historical reference.
 Its K-B4 or sequential M-S roadmap does not override this route. Preserve historical phase records
 and evidence rather than rewriting them to match a new product description.
+
+## SameScale Product S0 amendment — 2026-09-09
+
+The current user request authorizes a bounded start of SameScale productization from existing P0.
+Reuse the current repository, feature branch, and dirty P0 implementation; do not initialize Git
+or rebuild Core. This amendment supersedes only the older deferral of SameScale for S0.
+
+S0 acceptance: inspect Git/worktrees and preserve user work; verify P0 offline/history/current-session
+boundaries; establish root AGENTS, CURRENT_MILESTONE, PUBLIC_PRODUCT_CONTRACT, and a discoverable
+repo-local `samescale-product` Skill; reconcile entrypoint documentation; retain frozen evidence and
+HarnessLab runtime compatibility; run focused keyless checks; then commit and push the current
+feature branch as explicitly requested. Verification results belong to CURRENT_MILESTONE.
+
+SameScale is the product direction; the [public contract](../PUBLIC_PRODUCT_CONTRACT.md) freezes
+the supported P0 claims and naming boundaries. S0 does not include global rebranding, a new runtime,
+new paid campaigns, database restoration, public launch, merge, or implementation of S1 onward.
+The first-application and architecture constraints below remain applicable within that scope.
 
 ## Product and first application
 
