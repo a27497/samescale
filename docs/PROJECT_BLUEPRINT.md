@@ -12,7 +12,7 @@ and evidence rather than rewriting them to match a new product description.
 
 ## SameScale Product S0 amendment — 2026-09-09
 
-The current user request authorizes a bounded start of SameScale productization from existing P0.
+The S0 user request authorized a bounded start of SameScale productization from existing P0.
 Reuse the current repository, feature branch, and dirty P0 implementation; do not initialize Git
 or rebuild Core. This amendment supersedes only the older deferral of SameScale for S0.
 
@@ -26,6 +26,31 @@ SameScale is the product direction; the [public contract](../PUBLIC_PRODUCT_CONT
 the supported P0 claims and naming boundaries. S0 does not include global rebranding, a new runtime,
 new paid campaigns, database restoration, public launch, merge, or implementation of S1 onward.
 The first-application and architecture constraints below remain applicable within that scope.
+
+## SameScale Product S1 amendment — 2026-09-09
+
+The current user authorizes S1 implementation, tests, Browser QA, and commit/push of the existing
+feature branch. This supersedes S0's branding deferral for the following surfaces.
+
+- Present SameScale in the application shell, browser metadata, CLI/API display descriptions, and
+  current README entry. Preserve
+  HarnessLab CLI/package/env/API/schema identities and historical evidence bytes.
+- Make investigation entry and saved sessions the primary navigation; keep evaluation routes in
+  an expandable advanced area that opens on direct evaluation navigation.
+- Give new users a clear offline starting point, separate historical Real and current Fake/Real
+  entries, explicit loading/error/retry states, and focus moved to the loaded result.
+- Refactor the shared report into navigable conclusion, verified evidence, limitations/hypotheses,
+  and next steps. Citations reveal exact tool data/digests and return to their originating fact;
+  absent references stay unavailable.
+- Separate current-session selection, new setup, progress/results, and proposal review. Preserve
+  existing backend calls, frozen budgets, Real confirmation, stale-state clearing, and review-only
+  approval bindings. No new runtime or database migration.
+- Accept with frontend regressions/build, focused Analyst/compatibility contracts, disposable
+  PostgreSQL checks, and desktop/mobile Browser QA of the built local app. Label browser fixtures
+  separately from real API/database verification.
+
+Results belong in CURRENT_MILESTONE. Stop after S1: no S2/Observe import, new campaign, production
+deployment, merge, or tag is authorized.
 
 ## Product and first application
 
@@ -167,8 +192,8 @@ SDK/runtime, complex multi-agent coordination, full SaaS/RBAC/Billing, or a seco
 delivery. RAG, vectors, MCP, and long-term memory are not prerequisites.
 
 Deeper Observe, cross-Episode investigation, Replay, regression-suite management, discriminative/
-stress evidence, Custom Evaluation, SDKs, external benchmarks, and SameScale productization are
-possible later scopes. Existing modules remain unless removal is independently justified.
+stress evidence, Custom Evaluation, SDKs, external benchmarks, and productization beyond the
+authorized S0/S1 amendments are possible later scopes. Existing modules remain unless removal is independently justified.
 Historical M/N/O/P/Q/R/S numbering is a capability map, not a mandatory sequence before a demo.
 
 ## Application readiness and collaboration

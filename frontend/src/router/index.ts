@@ -71,8 +71,8 @@ const router = createRouter({
       component: () => import('@/views/RegressionView.vue'),
       meta: { title: 'Regression', section: 'Evidence' },
     },
-    { path: '/analyst', name: 'analyst', component: () => import('@/views/AnalystHomeView.vue'), meta: { title: 'Analyst · 工程问题调查', section: 'Investigation' } },
-    { path: '/analyst/sessions', name: 'analyst-sessions', component: () => import('@/views/AnalystView.vue'), meta: { title: '当前调查会话', section: 'Investigation' } },
+    { path: '/analyst', name: 'analyst', component: () => import('@/views/AnalystHomeView.vue'), meta: { title: '工程问题调查', section: 'Investigation' } },
+    { path: '/analyst/sessions', name: 'analyst-sessions', component: () => import('@/views/AnalystView.vue'), meta: { title: '已保存调查', section: 'Investigation' } },
     {
       path: '/diagnosis',
       name: 'diagnosis',

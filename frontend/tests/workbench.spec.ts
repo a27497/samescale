@@ -164,13 +164,21 @@ describe('Workbench contracts', () => {
         },
       },
     })
-    expect(wrapper.text()).toContain('工程问题调查')
+    expect(wrapper.text()).toContain('SameScale')
+    expect(wrapper.text()).toContain('调查工作区')
+    expect(document.title).toBe('Run Control · SameScale')
+    expect(wrapper.get('.advanced-nav').attributes('open')).toBeDefined()
     expect(wrapper.findAll('.nav-link')[0]!.attributes('href')).toBe('/analyst')
     expect(wrapper.text()).toContain('Registry')
     expect(wrapper.text()).toContain('评测证据 · Advanced')
     expect(wrapper.find('.topbar h1').text()).toBe('Run Control')
     await wrapper.get('.mobile-menu-button').trigger('click')
     expect(wrapper.get('.workbench-shell').classes()).toContain('nav-open')
+    await router.push('/analyst/sessions'); await flushPromises()
+    expect(document.title).toBe('已保存调查 · SameScale')
+    expect(wrapper.get('.advanced-nav').attributes('open')).toBeUndefined()
+    expect(wrapper.findAll('.nav-current').map(link => link.attributes('href'))).toEqual(['/analyst/sessions'])
+    expect(wrapper.get('.workbench-shell').classes()).not.toContain('nav-open')
     wrapper.unmount()
   })
 

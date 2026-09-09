@@ -1,11 +1,12 @@
-# SameScale Product · HarnessLab AI
+# SameScale
 
-HarnessLab AI is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
+SameScale is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
 reproducible Model × Harness × Judge execution and verifier-backed evidence.
 
 SameScale Product continues the existing P0 Analyst application. The repository, package/CLI names,
-configuration, and historical evidence retain HarnessLab compatibility; S0 adds the Codex development
-entry without changing the product runtime or globally renaming the application.
+configuration, and historical evidence retain HarnessLab compatibility. S1 presents SameScale in
+the application shell and makes investigation entry, cited reports, and saved sessions the primary
+experience. The runtime and existing evaluation routes remain compatible.
 
 ## Codex development entry (source checkout)
 
@@ -22,7 +23,7 @@ the installed application. No personal Codex configuration or plugin installatio
 
 ## 先体验工程问题调查（无 Provider Key）
 
-打开首页即进入 **Analyst / 工程问题调查**。第一次使用不需要了解 Phase、Matrix 或 Judge。
+打开首页即进入 **SameScale / 工程问题调查**。第一次使用不需要了解 Phase、Matrix 或 Judge。
 
 ```bash
 uv sync --locked
@@ -43,7 +44,9 @@ HARNESSLAB_ANALYST_REAL_ENABLED=0 uv run --locked harnesslab serve
 
 报告按 **结论 → 证据 → 限制 → 下一步** 展示。审批仅保存审阅记录，不执行回归或自动修复。
 离线模式仍需本地 Python API 与构建后的前端；首次安装依赖需要网络。
-旧 Overview 位于 `/overview`；Experiments、Matrix、JudgeLab 等保留在评测导航内。
+报告章节导航可跳转到结论、证据、限制和下一步；引用展开工具数据与摘要后，可返回引用处。
+已保存调查先显示会话范围与结果，新建表单和回归审阅可按需展开。
+旧 Overview 位于 `/overview`；Experiments、Matrix、JudgeLab 等保留在可展开的「评测工具」内。
 
 ## Project entrypoints
 

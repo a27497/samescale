@@ -164,3 +164,27 @@ it('does not show an old Fake session under a newly selected Real session after 
   expect(api.resume).not.toHaveBeenCalled()
   expect(wrapper.text()).toContain('request failed')
 })
+
+it('prioritizes saved results and keeps new setup available when the scope is empty', async () => {
+  workbench.listExperiments.mockResolvedValue({ items: [{ experiment_id: 'experiment-one', name: 'One' }, { experiment_id: 'empty', name: 'Empty' }] })
+  const wrapper = mount(AnalystView); await flushPromises()
+  expect(wrapper.get('.setup-panel').attributes('open')).toBeUndefined()
+  expect(wrapper.get('.proposal-panel').attributes('open')).toBeUndefined()
+  api.list.mockResolvedValue({ items: [] })
+  await wrapper.get('[aria-label="Analyst experiment"]').setValue('empty'); await flushPromises()
+  expect(wrapper.get('.setup-panel').attributes('open')).toBeDefined()
+  expect(wrapper.find('[aria-label="Investigation details"]').exists()).toBe(false)
+  expect(wrapper.text()).toContain('此实验还没有已保存调查')
+  expect(api.resume).not.toHaveBeenCalled()
+})
+
+it('rejects reviewer labels outside the existing backend contract before approval', async () => {
+  api.list.mockResolvedValue({ items: [fixture({ proposed_plan: { objective: 'Original', task_ids: ['task'], cell_ids: ['cell'], evidence_refs: ['run:run'], acceptance_criteria: ['Pass'], repeat_count: 1 }, proposal_digest: 'digest' })] })
+  const wrapper = mount(AnalystView); await flushPromises()
+  await wrapper.get('[aria-label="Reviewer label"]').setValue('reviewer (local)')
+  expect(wrapper.get('[aria-label="Reviewer label"]').attributes('aria-invalid')).toBe('true')
+  expect(button(wrapper, 'Approve proposal only').attributes('disabled')).toBeDefined()
+  expect(api.approve).not.toHaveBeenCalled()
+  await wrapper.get('[aria-label="Reviewer label"]').setValue('local-reviewer')
+  expect(button(wrapper, 'Approve proposal only').attributes('disabled')).toBeUndefined()
+})

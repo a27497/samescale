@@ -20,9 +20,11 @@ from harnesslab.custom_eval.api import router as custom_eval_router
 
 def create_app(*, workbench_dist: Path | None = None) -> FastAPI:
     application = FastAPI(
-        title="HarnessLab AI Control API",
+        title="SameScale Control API",
         version=__version__,
-        description="HarnessLab evidence Workbench and keyless Registry Lite control API",
+        description=(
+            "SameScale evidence workbench and keyless Registry Lite API (HarnessLab-compatible)"
+        ),
     )
     application.include_router(health_router, prefix="/api")
     application.include_router(analyst_router, prefix="/api")

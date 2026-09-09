@@ -27,11 +27,13 @@ const sessions = ref<AnalystSession[]>([])
 const selectedId = ref('')
 const current = ref<AnalystSession | null>(null)
 const busy = ref(false)
+const setupOpen = ref(true)
 const error = ref('')
 const confirmReal = ref(false)
 const objective = ref('')
 const criteria = ref('')
 const reviewedBy = ref('')
+const reviewerValid = computed(() => reviewedBy.value.trim().length > 0 && /^[A-Za-z0-9 ._@-]+$/.test(reviewedBy.value))
 const proposalEvidence = ref<string[]>([])
 const canResume = computed(() => current.value && ['PAUSED', 'RUNNING', 'FAILED'].includes(current.value.status)
   && (current.value.backend === 'fake' || confirmReal.value))
@@ -42,6 +44,7 @@ const proposalDirty = computed(() => objective.value !== current.value?.proposed
 function display(value: AnalystSession) {
   preflight.value = null
   current.value = value
+  setupOpen.value = false
   selectedId.value = value.session_id
   const index = sessions.value.findIndex(item => item.session_id === value.session_id)
   if (index >= 0) sessions.value[index] = value
@@ -59,6 +62,7 @@ async function action(work: () => Promise<void>) {
   finally { busy.value = false }
 }
 async function loadSessions() {
+  setupOpen.value = true
   current.value = null; selectedId.value = ''; sessions.value = []; confirmReal.value = false; preflight.value = null
   sessions.value = (await analystApi.list(experimentId.value)).items
   if (sessions.value[0]) display(sessions.value[0])
@@ -112,6 +116,7 @@ onMounted(async () => {
     experiments.value = runs.value.items
     experimentId.value = runs.value.items[0]?.experiment_id ?? ''
     if (experimentId.value) await action(loadSessions)
+    if (backend.value === 'real') setupOpen.value = true
   } else {
     error.value = '当前实验无法加载，数据库或历史计划校验可能不可用。可返回首页运行独立的离线演示。'
   }
@@ -121,15 +126,22 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section>
-    <div class="page-heading"><div><h2>当前数据库调查会话</h2><p>Inspect existing evidence, resume a bounded investigation, and review a regression proposal.</p></div></div>
-    <p><a href="/analyst">返回 Analyst 首页：离线演示 / 历史真实记录</a></p>
+  <section class="sessions-workspace">
+    <div class="page-heading"><div><span class="eyebrow">SAMESCALE / INVESTIGATIONS</span><h2>继续追踪一个工程问题</h2><p>选择已有证据，继续调查，或审阅下一步回归方案。</p></div></div>
+    <p><a href="/analyst">← 开始调查：离线演示 / 历史真实记录</a></p>
     <p v-if="!busy && !experiments.length">当前没有可用实验。离线演示无需导入历史数据库；Real 调查需要先提供可验证的实验记录。</p>
-    <p>Fake is deterministic and keyless. Real uses the selected Registry profile and requires server enablement. Approving a proposal never starts an experiment.</p>
+    <p>当前数据库会话会保存调查进度。Fake 使用固定决策；Real 需要启用模型与逐步确认。审批方案只记录审阅结果。</p>
     <p v-if="error" role="alert">{{ error }}</p>
+    <fieldset :disabled="busy"><legend>1 · 选择调查范围与会话</legend>
+      <label>Experiment <select v-model="experimentId" aria-label="Analyst experiment" @change="action(loadSessions)"><option v-for="item in experiments" :key="item.experiment_id" :value="item.experiment_id">{{ item.name }}</option></select></label>
+      <label>已保存调查<select v-model="selectedId" aria-label="Saved investigation" @change="selectSaved"><option v-for="value in sessions" :key="value.session_id" :value="value.session_id">{{ value.backend.toUpperCase() }} · {{ value.status }} · {{ value.request.question }} · {{ value.session_id }}</option></select></label>
+      <button :disabled="!selectedId" @click="action(async () => display(await analystApi.get(selectedId)))">Refresh session</button>
+      <p v-if="!busy && experimentId && !sessions.length">此实验还没有已保存调查。展开下方表单开始。</p>
+    </fieldset>
+    <details :open="setupOpen" class="setup-panel" @toggle="setupOpen = ($event.target as HTMLDetailsElement).open">
+      <summary>新建调查 <span>选择问题、模式与预算</span></summary>
     <fieldset :disabled="busy">
       <legend>New investigation</legend>
-      <label>Experiment <select v-model="experimentId" aria-label="Analyst experiment" @change="action(loadSessions)"><option v-for="item in experiments" :key="item.experiment_id" :value="item.experiment_id">{{ item.name }}</option></select></label>
       <label>Goal <textarea v-model="goal" aria-label="Investigation goal" maxlength="2000" /></label>
       <label>Backend <select v-model="backend" aria-label="Analyst backend"><option value="fake">Fake — keyless</option><option value="real">Real — model driven</option></select></label>
       <label v-if="backend === 'real'">Registry profile <select v-model="profileId" aria-label="Analyst profile"><option v-for="profile in profiles" :key="profile.profile_id" :value="profile.profile_id">{{ profile.profile_id }}</option></select></label>
@@ -146,16 +158,15 @@ onMounted(async () => {
       </template>
       <button :disabled="!experimentId || !goal.trim() || (backend === 'real' && (!profileId || tokenCeiling <= 0 || requestCeiling > decisionLimit))" @click="create">Create investigation</button>
     </fieldset>
-    <fieldset :disabled="busy"><legend>Saved investigations</legend>
-      <select v-model="selectedId" aria-label="Saved investigation" @change="selectSaved"><option v-for="value in sessions" :key="value.session_id" :value="value.session_id">{{ value.backend.toUpperCase() }} · {{ value.status }} · {{ value.session_id }}</option></select>
-      <button :disabled="!selectedId" @click="action(async () => display(await analystApi.get(selectedId)))">Refresh session</button>
-    </fieldset>
-    <article v-if="current" aria-label="Investigation details">
+    </details>
+    <p v-if="busy" role="status">正在读取或保存调查状态…</p>
+    <article v-if="current" class="session-detail" aria-label="Investigation details">
+      <span class="eyebrow">2 · 调查进度与结果</span>
       <p class="session-origin">{{ current.backend === 'fake' ? 'FAKE · 当前数据库会话 · 固定决策，不调用真实模型' : 'REAL · 当前数据库会话 · 模型调用需要逐步确认' }}</p>
-      <h3>{{ current.request.question }}</h3><p>{{ current.session_id }} · {{ current.status }} · {{ current.backend }}</p>
-      <p>{{ current.provider ?? (current.backend === 'fake' ? 'Fake' : 'Unknown provider') }} / {{ current.model ?? (current.backend === 'fake' ? 'Deterministic' : 'Unknown model') }} · {{ current.profile_id ?? 'No provider profile' }}</p><p v-if="current.route">Route: {{ current.route }}</p>
+      <h3>{{ current.request.question }}</h3>
+      <p><span class="status-pill" :class="current.status === 'COMPLETED' ? 'good' : current.status === 'FAILED' ? 'bad' : 'neutral'">{{ current.status }}</span></p>
+      <p class="session-guidance">{{ current.report ? '报告已生成。核对引用与限制后，审阅回归方案。' : current.status === 'FAILED' ? '调查失败。先刷新已保存状态，再按剩余预算决定是否继续。' : ['PAUSED', 'RUNNING'].includes(current.status) ? '调查尚未完成。每次继续一步，状态与已消耗预算都会保存。' : '调查已停止，当前没有可用报告。请检查状态与限制。' }}</p>
       <p>Decisions {{ current.decision_iterations }}/{{ current.decision_limit }} · Tools {{ current.tool_calls }}/{{ current.tool_limit }} · Provider invocations {{ current.request_count ?? 'Unknown' }} · Request budget used {{ current.request_budget_used }}</p>
-      <p>Input tokens {{ current.totals.input_tokens ?? 'Unknown' }} · Output tokens {{ current.totals.output_tokens ?? 'Unknown' }} · Cost USD {{ current.totals.cost_usd ?? 'Unknown' }} · Latency {{ current.totals.latency_ms ?? 'Unknown' }} ms</p>
       <p v-if="current.error" role="alert">{{ current.error }}</p>
       <label v-if="current.backend === 'real'"><input v-model="confirmReal" type="checkbox" aria-label="Confirm one real model decision" />Allow one real model decision with this profile and remaining limits ({{ current.max_output_tokens_per_request }} output tokens/request; {{ current.request_timeout_seconds }} seconds).</label>
       <button :disabled="busy || !canResume" @click="resumeCurrent">Resume one step</button>
@@ -164,9 +175,17 @@ onMounted(async () => {
         <button :disabled="busy" @click="action(async () => { preflight = await analystApi.preflight(current!.session_id) })">Check smoke preflight</button>
         <div v-if="preflight" aria-label="Smoke preflight"><strong>{{ preflight.status }}</strong><pre>{{ preflight }}</pre><p>Keyless snapshot only. READY is not execution authorization.</p></div>
       </template>
+      <details class="session-metadata"><summary>会话来源与用量</summary>
+      <p>{{ current.session_id }} · {{ current.backend }}</p>
+      <p>{{ current.provider ?? (current.backend === 'fake' ? 'Fake' : 'Unknown provider') }} / {{ current.model ?? (current.backend === 'fake' ? 'Deterministic' : 'Unknown model') }} · {{ current.profile_id ?? 'No provider profile' }}</p><p v-if="current.route">Route: {{ current.route }}</p>
+      <p>Input tokens {{ current.totals.input_tokens ?? 'Unknown' }} · Output tokens {{ current.totals.output_tokens ?? 'Unknown' }} · Cost USD {{ current.totals.cost_usd ?? 'Unknown' }} · Latency {{ current.totals.latency_ms ?? 'Unknown' }} ms</p>
+      </details>
       <details><summary>调查过程与已完成工具（{{ current.completed_calls.length }}）</summary><ul><li v-for="call in current.completed_calls" :key="call.key">{{ call.call.name }} · {{ call.status }}</li></ul></details>
       <InvestigationReport v-if="current.report" :key="current.session_id" :report="current.report" :evidence="current.evidence" />
       <p v-else>尚未形成结论。恢复一步以查询证据；失败后先刷新状态，已消耗预算不会重置。</p>
+      <details class="proposal-panel">
+        <summary>3 · 审阅回归方案 <span>{{ current.approval ? '已有审阅记录' : current.proposed_plan ? '待审阅' : '准备下一步' }}</span></summary>
+        <p>先核对报告证据，再保存方案和审阅记录。实验执行需要另行授权。</p>
       <fieldset :disabled="busy || !current.evidence.length"><legend>Review-only regression proposal</legend>
         <label>Objective <textarea v-model="objective" aria-label="Regression objective" maxlength="2000" /></label>
         <label>Acceptance criteria, one per line <textarea v-model="criteria" aria-label="Regression acceptance criteria" /></label>
@@ -180,16 +199,25 @@ onMounted(async () => {
         <button :disabled="!proposalEvidence.length || proposalEvidence.length > 100" @click="saveProposal">Save proposal</button>
         <p>Proposal digest: {{ current.proposal_digest ?? 'Not proposed' }}</p>
         <p>Reviewer label 是本地审阅标签，不是已认证身份。审批仅保存方案，不授权执行。</p>
-        <label>Reviewer label <input v-model="reviewedBy" aria-label="Reviewer label" maxlength="100" /></label>
-        <button :disabled="!current.proposal_digest || proposalDirty || !reviewedBy.trim()" @click="action(async () => display(await analystApi.approve(current!.session_id, { scope_digest: current!.scope_digest, proposal_digest: current!.proposal_digest!, reviewed_by: reviewedBy })))">Approve proposal only</button>
+        <label>Reviewer label <input v-model="reviewedBy" aria-label="Reviewer label" maxlength="100" :aria-invalid="reviewedBy.length > 0 && !reviewerValid" aria-describedby="reviewer-format" /></label>
+        <p id="reviewer-format">审阅标签支持英文字母、数字、空格及 . _ @ -；例如 local-reviewer。</p>
+        <button :disabled="!current.proposal_digest || proposalDirty || !reviewerValid" @click="action(async () => display(await analystApi.approve(current!.session_id, { scope_digest: current!.scope_digest, proposal_digest: current!.proposal_digest!, reviewed_by: reviewedBy })))">Approve proposal only</button>
         <p v-if="current.approval">Approved by {{ current.approval.reviewed_by }} · {{ current.approval.approved_at }}. Execution is not authorized.</p>
         <p v-else>Awaiting approval. Saving changed content invalidates previous approval.</p>
       </fieldset>
+      </details>
     </article>
   </section>
 </template>
 
 <style scoped>
+.setup-panel, .proposal-panel, .session-detail { padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); margin: 18px 0; }
+.setup-panel > summary, .proposal-panel > summary { font-weight: 600; }
+summary > span { font-size: 12px; color: var(--muted); margin-left: 12px; font-weight: 400; }
+.session-guidance { padding: 14px; border-left: 3px solid var(--accent); background: var(--accent-soft); }
+.session-metadata { margin: 20px 0 12px; }
+.session-origin { color: var(--accent); font-size: 12px; }
+@media (max-width: 600px) { .setup-panel, .proposal-panel, .session-detail { padding: 14px; } }
 section, article, fieldset { min-width: 0; max-width: 100%; }
 section { font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
 fieldset { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 14px; margin: 20px 0; padding: 16px 0; border: 0; border-top: 1px solid var(--line); }

@@ -36,7 +36,7 @@ a { color: inherit; }
 .nav-group-label { padding: 0 10px 5px; color: #6f8294; font: 700 9px/1 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
 .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 6px; text-decoration: none; color: #aebac6; font-size: 13px; }
 .nav-link:hover, .nav-link.router-link-active { color: #fff; background: #263746; }
-.nav-link.router-link-active { box-shadow: inset 3px 0 0 #4fc2b7; }
+.nav-link.router-link-active, .nav-link.nav-current { box-shadow: inset 3px 0 0 #4fc2b7; }
 .nav-mark { color: #6f8294; font: 700 10px/1 ui-monospace, monospace; width: 22px; }
 .sidebar-foot { margin-top: auto; color: #91a0af; font: 600 10px/1.4 ui-monospace, monospace; padding: 22px 8px 4px; }
 .sidebar-foot small { display: block; margin: 5px 0 0 14px; color: #718294; font-size: 9px; }
@@ -319,3 +319,13 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .sidebar { transition: none; }
 }
+
+/* SameScale investigation navigation; evaluation routes retain their layout. */
+.nav-link.nav-current { color: #fff; background: #263746; }
+.advanced-nav { border-top: 1px solid #314152; padding-top: 18px; }
+.advanced-nav > summary { padding: 8px 10px; color: #b7c6d4; font-size: 12px; cursor: pointer; }
+.advanced-nav .nav-group { margin-top: 20px; }
+.nav-group-label { color: #9bacbd; line-height: 1.4; }
+.brand-mark { flex: none; border-radius: 10px; }
+:is(a, button, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.sidebar :focus-visible { outline-color: #8bd4cd; }
