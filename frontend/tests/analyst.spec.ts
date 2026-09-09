@@ -135,3 +135,32 @@ describe('Analyst Workbench contracts', () => {
   })
 
 })
+
+it('keeps Fake sessions usable when Registry loading fails', async () => {
+  registry.models.mockRejectedValue(new Error('Registry unavailable'))
+  const wrapper = mount(AnalystView); await flushPromises()
+  expect(api.list).toHaveBeenCalledWith('experiment-one')
+  expect(wrapper.text()).toContain('Registry 加载失败')
+  expect(wrapper.text()).toContain('analyst-saved')
+  expect(button(wrapper, 'Resume one step').attributes('disabled')).toBeUndefined()
+})
+
+it('clears stale sessions and confirmation when experiment loading fails', async () => {
+  workbench.listExperiments.mockResolvedValue({ items: [{ experiment_id: 'experiment-one', name: 'One' }, { experiment_id: 'experiment-two', name: 'Two' }] })
+  const wrapper = mount(AnalystView); await flushPromises()
+  api.list.mockRejectedValue(new Error('Invalid plan'))
+  await wrapper.get('[aria-label="Analyst experiment"]').setValue('experiment-two'); await flushPromises()
+  expect(wrapper.find('[aria-label="Investigation details"]').exists()).toBe(false)
+  expect(wrapper.get('[aria-label="Saved investigation"]').findAll('option')).toHaveLength(0)
+  expect(api.resume).not.toHaveBeenCalled()
+})
+
+it('does not show an old Fake session under a newly selected Real session after read failure', async () => {
+  api.list.mockResolvedValue({ items: [fixture(), fixture({ session_id: 'real-session', backend: 'real' })] })
+  const wrapper = mount(AnalystView); await flushPromises()
+  api.get.mockRejectedValue(new Error('Missing session'))
+  await wrapper.get('[aria-label="Saved investigation"]').setValue('real-session'); await flushPromises()
+  expect(wrapper.find('[aria-label="Investigation details"]').exists()).toBe(false)
+  expect(api.resume).not.toHaveBeenCalled()
+  expect(wrapper.text()).toContain('request failed')
+})

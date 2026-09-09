@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import InvestigationReport from '@/components/InvestigationReport.vue'
 
 import { analystApi } from '@/api/analyst'
 import { registryApi, workbenchApi } from '@/api/client'
@@ -10,7 +11,7 @@ import type { ExperimentSummary } from '@/types/workbench'
 const experiments = ref<ExperimentSummary[]>([])
 const profiles = ref<ProviderModelProfile[]>([])
 const experimentId = ref('')
-const backend = ref<'fake' | 'real'>('fake')
+const backend = ref<'fake' | 'real'>(new URLSearchParams(window.location.search).get('backend') === 'real' ? 'real' : 'fake')
 const profileId = ref('')
 const goal = ref('Explain the observed failures and propose a bounded regression check.')
 const decisionLimit = ref(8)
@@ -42,6 +43,8 @@ function display(value: AnalystSession) {
   preflight.value = null
   current.value = value
   selectedId.value = value.session_id
+  const index = sessions.value.findIndex(item => item.session_id === value.session_id)
+  if (index >= 0) sessions.value[index] = value
   objective.value = value.proposed_plan?.objective ?? value.request.question
   criteria.value = value.proposed_plan?.acceptance_criteria.join('\n') ?? 'Verify the selected cases using deterministic evidence.'
   const cited = [...new Set(value.report?.verified_facts.flatMap(fact => fact.evidence_refs) ?? [])]
@@ -56,9 +59,14 @@ async function action(work: () => Promise<void>) {
   finally { busy.value = false }
 }
 async function loadSessions() {
-  current.value = null; selectedId.value = ''
+  current.value = null; selectedId.value = ''; sessions.value = []; confirmReal.value = false; preflight.value = null
   sessions.value = (await analystApi.list(experimentId.value)).items
   if (sessions.value[0]) display(sessions.value[0])
+}
+async function selectSaved() {
+  const id = selectedId.value
+  current.value = null; confirmReal.value = false; preflight.value = null
+  await action(async () => display(await analystApi.get(id)))
 }
 async function create() {
   await action(async () => {
@@ -90,19 +98,33 @@ async function saveProposal() {
     repeat_count: value.proposed_plan?.repeat_count ?? 1,
   })))
 }
-onMounted(() => action(async () => {
-  const [runs, models] = await Promise.all([workbenchApi.listExperiments({ limit: 100 }), registryApi.models()])
-  experiments.value = runs.items
-  profiles.value = models.provider_profiles.filter(p => p.enabled && p.automation_allowed)
-  profileId.value = profiles.value[0]?.profile_id ?? ''
-  experimentId.value = runs.items[0]?.experiment_id ?? ''
-  if (experimentId.value) await loadSessions()
-}))
+onMounted(async () => {
+  busy.value = true
+  const results = await Promise.allSettled([
+    workbenchApi.listExperiments({ limit: 100 }), registryApi.models(),
+  ])
+  const [runs, models] = results
+  if (models.status === 'fulfilled') {
+    profiles.value = models.value.provider_profiles.filter(p => p.enabled && p.automation_allowed)
+    profileId.value = profiles.value[0]?.profile_id ?? ''
+  }
+  if (runs.status === 'fulfilled') {
+    experiments.value = runs.value.items
+    experimentId.value = runs.value.items[0]?.experiment_id ?? ''
+    if (experimentId.value) await action(loadSessions)
+  } else {
+    error.value = '当前实验无法加载，数据库或历史计划校验可能不可用。可返回首页运行独立的离线演示。'
+  }
+  if (models.status === 'rejected') error.value += ' Registry 加载失败；Real 暂不可用，Fake 仍可使用。'
+  busy.value = false
+})
 </script>
 
 <template>
   <section>
-    <div class="page-heading"><div><h2>Analyst investigations</h2><p>Inspect existing evidence, resume a bounded investigation, and review a regression proposal.</p></div></div>
+    <div class="page-heading"><div><h2>当前数据库调查会话</h2><p>Inspect existing evidence, resume a bounded investigation, and review a regression proposal.</p></div></div>
+    <p><a href="/analyst">返回 Analyst 首页：离线演示 / 历史真实记录</a></p>
+    <p v-if="!busy && !experiments.length">当前没有可用实验。离线演示无需导入历史数据库；Real 调查需要先提供可验证的实验记录。</p>
     <p>Fake is deterministic and keyless. Real uses the selected Registry profile and requires server enablement. Approving a proposal never starts an experiment.</p>
     <p v-if="error" role="alert">{{ error }}</p>
     <fieldset :disabled="busy">
@@ -125,12 +147,13 @@ onMounted(() => action(async () => {
       <button :disabled="!experimentId || !goal.trim() || (backend === 'real' && (!profileId || tokenCeiling <= 0 || requestCeiling > decisionLimit))" @click="create">Create investigation</button>
     </fieldset>
     <fieldset :disabled="busy"><legend>Saved investigations</legend>
-      <select v-model="selectedId" aria-label="Saved investigation" @change="action(async () => display(await analystApi.get(selectedId)))"><option v-for="value in sessions" :key="value.session_id" :value="value.session_id">{{ value.session_id }}</option></select>
+      <select v-model="selectedId" aria-label="Saved investigation" @change="selectSaved"><option v-for="value in sessions" :key="value.session_id" :value="value.session_id">{{ value.backend.toUpperCase() }} · {{ value.status }} · {{ value.session_id }}</option></select>
       <button :disabled="!selectedId" @click="action(async () => display(await analystApi.get(selectedId)))">Refresh session</button>
     </fieldset>
     <article v-if="current" aria-label="Investigation details">
+      <p class="session-origin">{{ current.backend === 'fake' ? 'FAKE · 当前数据库会话 · 固定决策，不调用真实模型' : 'REAL · 当前数据库会话 · 模型调用需要逐步确认' }}</p>
       <h3>{{ current.request.question }}</h3><p>{{ current.session_id }} · {{ current.status }} · {{ current.backend }}</p>
-      <p>{{ current.provider ?? 'Fake' }} / {{ current.model ?? 'Deterministic' }} · {{ current.profile_id ?? 'No provider profile' }}</p><p v-if="current.route">Route: {{ current.route }}</p>
+      <p>{{ current.provider ?? (current.backend === 'fake' ? 'Fake' : 'Unknown provider') }} / {{ current.model ?? (current.backend === 'fake' ? 'Deterministic' : 'Unknown model') }} · {{ current.profile_id ?? 'No provider profile' }}</p><p v-if="current.route">Route: {{ current.route }}</p>
       <p>Decisions {{ current.decision_iterations }}/{{ current.decision_limit }} · Tools {{ current.tool_calls }}/{{ current.tool_limit }} · Provider invocations {{ current.request_count ?? 'Unknown' }} · Request budget used {{ current.request_budget_used }}</p>
       <p>Input tokens {{ current.totals.input_tokens ?? 'Unknown' }} · Output tokens {{ current.totals.output_tokens ?? 'Unknown' }} · Cost USD {{ current.totals.cost_usd ?? 'Unknown' }} · Latency {{ current.totals.latency_ms ?? 'Unknown' }} ms</p>
       <p v-if="current.error" role="alert">{{ current.error }}</p>
@@ -141,9 +164,9 @@ onMounted(() => action(async () => {
         <button :disabled="busy" @click="action(async () => { preflight = await analystApi.preflight(current!.session_id) })">Check smoke preflight</button>
         <div v-if="preflight" aria-label="Smoke preflight"><strong>{{ preflight.status }}</strong><pre>{{ preflight }}</pre><p>Keyless snapshot only. READY is not execution authorization.</p></div>
       </template>
-      <h3>Completed calls</h3><ul><li v-for="call in current.completed_calls" :key="call.key">{{ call.call.name }} · {{ call.status }}</li></ul>
-      <details class="evidence-catalog"><summary>Evidence ({{ current.evidence.length }})</summary><ul><li v-for="entry in current.evidence" :key="entry.ref.id"><strong>{{ entry.ref.id }}</strong><details><summary>Observed evidence and digests</summary><pre>{{ entry.data_by_tool }}</pre><p>{{ entry.digest_bindings.join(', ') }}</p></details></li></ul></details>
-      <template v-if="current.report"><h3>Analysis</h3><p>{{ current.report.summary }}</p><h4>Verified facts</h4><ul><li v-for="fact in current.report.verified_facts" :key="fact.statement">{{ fact.statement }}</li></ul><h4>Hypotheses</h4><ul><li v-for="hypothesis in current.report.hypotheses" :key="hypothesis.statement">{{ hypothesis.statement }} Additional evidence: {{ hypothesis.additional_evidence_needed }}</li></ul><ul><li v-for="limit in current.report.limitations" :key="limit">{{ limit }}</li></ul></template>
+      <details><summary>调查过程与已完成工具（{{ current.completed_calls.length }}）</summary><ul><li v-for="call in current.completed_calls" :key="call.key">{{ call.call.name }} · {{ call.status }}</li></ul></details>
+      <InvestigationReport v-if="current.report" :key="current.session_id" :report="current.report" :evidence="current.evidence" />
+      <p v-else>尚未形成结论。恢复一步以查询证据；失败后先刷新状态，已消耗预算不会重置。</p>
       <fieldset :disabled="busy || !current.evidence.length"><legend>Review-only regression proposal</legend>
         <label>Objective <textarea v-model="objective" aria-label="Regression objective" maxlength="2000" /></label>
         <label>Acceptance criteria, one per line <textarea v-model="criteria" aria-label="Regression acceptance criteria" /></label>
@@ -156,6 +179,7 @@ onMounted(() => action(async () => {
         </label>
         <button :disabled="!proposalEvidence.length || proposalEvidence.length > 100" @click="saveProposal">Save proposal</button>
         <p>Proposal digest: {{ current.proposal_digest ?? 'Not proposed' }}</p>
+        <p>Reviewer label 是本地审阅标签，不是已认证身份。审批仅保存方案，不授权执行。</p>
         <label>Reviewer label <input v-model="reviewedBy" aria-label="Reviewer label" maxlength="100" /></label>
         <button :disabled="!current.proposal_digest || proposalDirty || !reviewedBy.trim()" @click="action(async () => display(await analystApi.approve(current!.session_id, { scope_digest: current!.scope_digest, proposal_digest: current!.proposal_digest!, reviewed_by: reviewedBy })))">Approve proposal only</button>
         <p v-if="current.approval">Approved by {{ current.approval.reviewed_by }} · {{ current.approval.approved_at }}. Execution is not authorized.</p>

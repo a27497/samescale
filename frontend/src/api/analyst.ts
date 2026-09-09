@@ -1,8 +1,10 @@
 import { apiClient } from '@/api/client'
-import type { AnalystSession, AnalystSpendLimits, AnalystPreflight, RegressionProposal } from '@/types/analyst'
+import type { InvestigationExample, AnalystSession, AnalystSpendLimits, AnalystPreflight, RegressionProposal } from '@/types/analyst'
 
 const path = (id: string) => `/analyst/sessions/${encodeURIComponent(id)}`
 export const analystApi = {
+  offline: async () => (await apiClient.post<InvestigationExample>('/analyst/examples/offline')).data,
+  historical: async () => (await apiClient.get<InvestigationExample>('/analyst/examples/historical')).data,
   list: async (experimentId: string) => (await apiClient.get<{ items: AnalystSession[] }>('/analyst/sessions', { params: { experiment_id: experimentId } })).data,
   get: async (id: string) => (await apiClient.get<AnalystSession>(path(id))).data,
   create: async (body: { experiment_id: string; question: string; backend: 'fake' | 'real'; provider_profile_id: string | null; decision_limit: number; tool_limit: number; spend_limits: AnalystSpendLimits | null }) =>

@@ -3,6 +3,31 @@
 HarnessLab AI is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
 reproducible Model × Harness × Judge execution and verifier-backed evidence.
 
+## 先体验工程问题调查（无 Provider Key）
+
+打开首页即进入 **Analyst / 工程问题调查**。第一次使用不需要了解 Phase、Matrix 或 Judge。
+
+```bash
+uv sync --locked
+npm ci --prefix frontend
+npm run build --prefix frontend
+HARNESSLAB_ANALYST_REAL_ENABLED=0 uv run --locked harnesslab serve
+```
+
+打开 <http://127.0.0.1:8000/>，选择：
+
+- **运行离线演示**：固定去重失败案例，使用合成工具数据运行现有 LangGraph 与事实校验。
+  无模型请求，无需 PostgreSQL、Docker 或凭据。结果不保存，刷新后可以重新运行。
+- **查看历史真实记录**：只读加载并校验仓库内冻结报告，点击引用定位具体工具证据。
+  这是过去的真实调查；原数据库会话尚未恢复，不提供恢复或审批按钮。
+- **进入 Real 调查 / Fake 与已保存会话**：使用当前数据库的已有实验。
+  需要下方完整环境设置；Fake 可演练持久化与方案审阅，Real 还需要可用 Registry profile、
+  服务端显式启用、预算和逐步调用确认。创建与预检不调用模型；失败不会自动回退 Fake。
+
+报告按 **结论 → 证据 → 限制 → 下一步** 展示。审批仅保存审阅记录，不执行回归或自动修复。
+离线模式仍需本地 Python API 与构建后的前端；首次安装依赖需要网络。
+旧 Overview 位于 `/overview`；Experiments、Matrix、JudgeLab 等保留在评测导航内。
+
 ## Project entrypoints
 
 - [Project Blueprint](docs/PROJECT_BLUEPRINT.md): product direction, architecture choices, phase

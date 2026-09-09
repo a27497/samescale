@@ -1,6 +1,33 @@
 # HarnessLab Project Status
 
-Updated 2026-09-09. Active scope: **First-application delivery candidate and human ownership**.
+Updated 2026-09-09. Active scope: **P0 — Agent application main path closeout**.
+
+## P0 application closeout
+
+- Work continues on `codex/l-real-agent-main-integration` at `79056a1`; no commit, push or merge.
+  Pre-existing edits to this file and FIRST_APPLICATION are retained.
+- `/` now opens Analyst with separate offline Fake, frozen historical Real, and current database
+  session entrypoints. Advanced evaluation pages remain available; Overview moves to `/overview`.
+- The offline deduplication case runs the existing graph and structured fact validator against
+  explicitly synthetic tools with a fixed Fake script: 2 decisions, 2 tools, zero Provider requests.
+  It requires the local API/build but no PostgreSQL, Docker or credentials. It does not persist.
+- Historical display reads hash-checked frozen files directly, including source data and digest
+  bindings. No original session row is reconstructed. The effective 4/4 limit correction is shown
+  separately; original report bytes remain unchanged.
+- Reports show conclusion, navigable evidence, limitations/hypotheses, and next steps. Current
+  sessions retain persisted resume/proposal/approval behavior and explicit Real confirmation.
+  Registry failure no longer blocks Fake; failed scope changes clear stale session controls.
+- Validation: 19 focused backend tests and 78 Analyst session/E2E tests passed; the latter used a
+  new disposable PostgreSQL database. All 50 frontend tests, type checking and production build passed.
+  Focused Ruff/format and mypy checks passed; all five frozen evidence files retained their hashes.
+  Real browser checks passed at 1440/390 pixels for routing, offline/history separation, citations,
+  refresh and no horizontal overflow. No provider or historical database was used by the browser.
+- Suggested next step: rehearse the three entrypoints using the README quickstart. Locate a
+  verifiable backup only if original-session restoration is needed; do not reconstruct it from
+  summaries. Human ownership and prior security/runtime debts remain separate and unverified.
+
+The sections below retain the previous real-smoke and first-application closeout evidence. Their
+past test totals are historical, not additional tests executed by this P0 task.
 
 The integrated source now has a complete local backend regression and a working keyless browser
 rehearsal. Human ownership is still **NOT_VERIFIED**. The accepted real smoke below is supported
@@ -100,8 +127,18 @@ unresolved-test status. No new real Provider/Harness/Judge/Matrix campaign was r
 
 ## NEXT
 
-Review the committed delivery candidate and exact-SHA CI, then complete the user's A/B/C ownership
-checkpoints. Prepare applications using the supplied draft and the bounded demonstration. Locating
+The delivery candidate and exact-SHA Fast CI have been checked: source
+`79056a1a4619863970b8d5b37102434427cec5f3`, successful run `34344469107`.
+At the user's request, pause the continuous ownership questions and proceed with first-application
+materials and demonstration preparation. Guided behavior predictions, a completed `None` assertion,
+and a predicted test failure are recorded in [the participation log](FIRST_APPLICATION.md).
+The AI demonstrated a temporary incorrect counter against an existing test; this was not a new
+user-authored repair. B/C and overall human ownership remain **NOT_VERIFIED**, not waived.
+
+Use the project introduction and separated frozen-real/Fake demonstration script; omit the personal
+core-repair demonstration until actually completed. The local demo entry returned HTTP 200 during
+this materials update; the earlier full browser rehearsal remains the interaction evidence. No
+application submission, publication, merge, or paid execution was performed by this update. Locating
 a verifiable backup of the missing original real session remains an explicit runtime-recovery task;
 do not reconstruct a supposedly original row from public summaries or rerun paid calls to hide it.
 

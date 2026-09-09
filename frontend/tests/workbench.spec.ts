@@ -164,9 +164,10 @@ describe('Workbench contracts', () => {
         },
       },
     })
-    expect(wrapper.text()).toContain('Workspace')
+    expect(wrapper.text()).toContain('工程问题调查')
+    expect(wrapper.findAll('.nav-link')[0]!.attributes('href')).toBe('/analyst')
     expect(wrapper.text()).toContain('Registry')
-    expect(wrapper.text()).toContain('Evidence')
+    expect(wrapper.text()).toContain('评测证据 · Advanced')
     expect(wrapper.find('.topbar h1').text()).toBe('Run Control')
     await wrapper.get('.mobile-menu-button').trigger('click')
     expect(wrapper.get('.workbench-shell').classes()).toContain('nav-open')

@@ -8,10 +8,11 @@ const section = computed(() => String(route.meta.section ?? 'Workbench'))
 const mobileNavOpen = ref(false)
 
 const navigation = [
+  { label: '工程问题调查', items: [{ to: '/analyst', label: 'Analyst · 开始调查', mark: 'AN' }] },
   {
-    label: 'Workspace',
+    label: '评测实验 · Advanced',
     items: [
-      { to: '/', label: 'Overview', mark: 'OV' },
+      { to: '/overview', label: 'Overview', mark: 'OV' },
       { to: '/experiments', label: 'Experiments', mark: 'EX' },
       { to: '/run-control', label: 'Run Control', mark: 'RC' },
     ],
@@ -26,10 +27,9 @@ const navigation = [
     ],
   },
   {
-    label: 'Evidence',
+    label: '评测证据 · Advanced',
     items: [
       { to: '/regression', label: 'Regression', mark: 'RG' },
-      { to: '/analyst', label: 'Analyst', mark: 'AN' },
       { to: '/diagnosis', label: 'Diagnosis', mark: 'DX' },
       { to: '/judgelab', label: 'JudgeLab', mark: 'JL' },
       { to: '/core-readiness', label: 'Core Readiness', mark: 'CR' },
@@ -58,7 +58,7 @@ watch(
         <span class="brand-mark">HL</span>
         <div>
           <strong>HarnessLab</strong>
-          <small>CONTROLLED EVIDENCE</small>
+          <small>ENGINEERING INVESTIGATION</small>
         </div>
       </div>
       <nav aria-label="Product areas">
@@ -71,7 +71,7 @@ watch(
         </div>
       </nav>
       <div class="sidebar-foot">
-        <div><span class="readonly-dot" />KEYLESS BY DEFAULT</div>
+        <div><span class="readonly-dot" />LOCAL WORKBENCH</div>
         <small>Secrets stay server-side</small>
       </div>
     </aside>
@@ -94,7 +94,7 @@ watch(
         </div>
         <div class="topbar-status">
           <span class="status-pill neutral">SERVER AUTHORITY</span>
-          <span class="status-pill info"><span class="readonly-dot" /> KEYLESS DEFAULT</span>
+          <span class="status-pill info">EXPLICIT EXECUTION</span>
         </div>
       </header>
       <div class="page-container">

@@ -47,8 +47,17 @@ export interface AnalystSession {
   evidence: { ref: { id: string }; digest_bindings: string[]; data_by_tool: Record<string, unknown> }[]
   completed_calls: { key: string; call: { name: string }; status: string; evidence_refs: string[] }[]
   error: string | null
-  report: { summary: string; verified_facts: { statement: string; evidence_refs: string[] }[]; hypotheses: { statement: string; additional_evidence_needed: string }[]; limitations: string[] } | null
+  report: { summary: string; verified_facts: { statement: string; evidence_refs: string[]; assertions?: { tool: string; field_path: (string | number)[]; expected_value: unknown }[] }[]; hypotheses: { statement: string; additional_evidence_needed: string; evidence_refs?: string[] }[]; limitations: string[] } | null
   proposed_plan: RegressionProposal | null
   proposal_digest: string | null
   approval: { session_id: string; reviewed_by: string; approved_at: string; proposal_digest: string; scope_digest: string; execution_authorized: false } | null
+}
+
+export interface InvestigationExample {
+  kind: 'offline_fake' | 'historical_real'
+  provenance: string
+  report: NonNullable<AnalystSession['report']> & { evidence_catalog: AnalystSession['evidence'] }
+  next_steps: string[]
+  metadata: Record<string, unknown>
+  proposal: RegressionProposal | null
 }

@@ -15,6 +15,7 @@ from harnesslab.analyst.api_models import (
 from harnesslab.analyst.evidence import AnalystEvidenceError
 from harnesslab.analyst.models import ProposedRegressionPlan, StrictModel
 from harnesslab.analyst.sessions import AnalystSessions, ApprovalRequest, CreateInvestigation
+from harnesslab.analyst.showcase import InvestigationExample, historical_example, offline_demo
 from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.core.config import get_settings
 from harnesslab.db.session import create_engine
@@ -91,3 +92,25 @@ async def propose(
 @router.post("/sessions/{session_id}/approval", response_model=AnalystSessionView)
 async def approve(session_id: str, request: ApprovalRequest, service: Service) -> dict[str, object]:
     return (await service.approve(session_id, request)).public_view()
+
+
+@router.post("/examples/offline", response_model=InvestigationExample)
+async def run_offline_example() -> InvestigationExample:
+    try:
+        return await offline_demo()
+    except ValueError as exc:
+        raise WorkbenchAPIError(
+            409, "OFFLINE_DEMO_REJECTED", "Offline demo did not produce validated evidence."
+        ) from exc
+
+
+@router.get("/examples/historical", response_model=InvestigationExample)
+async def read_historical_example() -> InvestigationExample:
+    try:
+        return historical_example(ROOT)
+    except (OSError, ValueError) as exc:
+        raise WorkbenchAPIError(
+            409,
+            "HISTORICAL_EVIDENCE_UNAVAILABLE",
+            "Frozen historical evidence is missing or failed digest validation.",
+        ) from exc
