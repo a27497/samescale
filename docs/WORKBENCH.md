@@ -3,9 +3,11 @@
 ## Read-only architecture
 
 The Phase I Workbench observes persisted evidence. Operators still create experiments and Judge
-calibrations through the approved CLI paths. The browser has no route that starts a provider,
-Harness, experiment worker, or Judge; it cannot cancel/delete runs, change outcomes or scores, or
-modify tasks and gold.
+calibrations through the approved CLI paths. Evidence pages cannot start a subject provider,
+Harness, experiment worker, or Judge; they cannot cancel/delete runs, change outcomes or scores,
+or modify tasks and gold. The separate Analyst page can request one explicitly confirmed model
+decision for a saved investigation when the server enables its real backend. Proposal approval
+records review only; it cannot start any external execution.
 
 FastAPI routes live under `/api/workbench`. They use strict Pydantic response DTOs rather than
 serializing SQLAlchemy rows. PostgreSQL supplies durable identity and lifecycle state. Existing
@@ -151,5 +153,6 @@ Gate I is deterministic and keyless:
 - `REAL_MATRIX_EVIDENCE=NOT_RUN`
 - `REAL_JUDGE_SMOKE=NOT_RUN`
 
-No Phase J Analyst, LangGraph, RAG, scheduler, remote worker, authentication, pricing, or SaaS
-surface is part of Phase I.
+The original Phase I evidence views remain distinct from the later Analyst investigation controls.
+LangGraph stays server-side in the Analyst package; no RAG, scheduler, remote worker, authentication,
+or SaaS platform is added by this slice. [Analyst](ANALYST.md) documents the current API and UI.

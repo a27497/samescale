@@ -86,5 +86,6 @@ hardened. Keyless pinned-binary tests prove that the split profile avoids Bubble
 intended workspace read/write operations, denies outer rootfs and context writes, and returns
 `EPERM` for an AF_INET socket from a Codex-sandboxed tool process. R8's legacy-Landlock alternative
 was rejected because pinned 0.149.0 requires direct runtime enforcement for its normal
-workspace-write profile. The current Gate E result remains `REAL_CODEX_SMOKE=NOT_VERIFIED`, and no
-real Codex model success is claimed.
+workspace-write profile. Gate E qualifies the pinned runtime keylessly; campaign-level real
+execution evidence is tracked in [Project Status](PROJECT_STATUS.md). This evaluated subject runtime
+is separate from the development agent and is not upgraded by an instruction-layer migration.

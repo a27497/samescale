@@ -1,0 +1,16 @@
+{
+  "experiment_id": "core-real-matrix-v6",
+  "question": "Compare Codex high and Claude on core-java-deduplicate, inspect relevant failures and traces, report only evidence-backed facts and limitations, and propose one review-only regression plan if justified.",
+  "backend": "real",
+  "provider_profile_id": "deepseek-official-v4flash-responses-smoke-v2",
+  "decision_limit": 3,
+  "tool_limit": 6,
+  "spend_limits": {
+    "provider_requests": 3,
+    "output_tokens_per_request": 8192,
+    "input_bytes_per_request": 256000,
+    "cumulative_tokens": 1150000,
+    "timeout_seconds": 90,
+    "usd": "0.50"
+  }
+}

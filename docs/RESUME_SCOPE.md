@@ -1,5 +1,19 @@
 # Evidence and resume scope
 
+> Historical evidence snapshot (2026-08-27), retained for provenance and existing documentation
+> contracts. All status and future-tense statements below apply to that snapshot. They do not
+> describe current progress; use [Project Status](PROJECT_STATUS.md).
+
+## Current override — 2026-09-09
+
+The historical snapshot below remains unchanged as provenance. Current Project Status supersedes
+its `DESIGN_ONLY` / `NOT_VERIFIED` statements for the bounded provider-backed Attribution Analyst:
+the Real Agent vertical slice is now live-verified with a host-validated report, persisted usage/
+cost accounting, bounded semantic finalization recovery, a validated review-only proposal, and
+digest-bound approval with `execution_authorized=false`. RAG and multi-agent attribution remain
+design-only. This update does not strengthen historical V6 Matrix causal claims. Evidence:
+[`REAL_AGENT_SMOKE_20260909`](evidence/REAL_AGENT_SMOKE_20260909.md).
+
 This file separates repository evidence from intended design. A capability moves to
 `IMPLEMENTED_AND_VERIFIED` only after its named gate has produced current evidence.
 

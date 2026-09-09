@@ -15,6 +15,7 @@ from harnesslab.analyst.models import (
     EvidenceEntry,
     FactAssertion,
     FinalDecision,
+    FinalizationRejectionCode,
     GetAblationArgs,
     GetAblationCall,
     GetTaskContractArgs,
@@ -40,7 +41,7 @@ assertion over returned evidence; the trusted host alone renders factual prose a
 
 
 class AnalystBackend(Protocol):
-    """Injected decision boundary; it has no direct database, filesystem, or provider access."""
+    """Decision boundary; the host owns evidence tools and all database/file access."""
 
     async def decide(
         self,
@@ -50,6 +51,7 @@ class AnalystBackend(Protocol):
         evidence: tuple[EvidenceEntry, ...],
         iteration: int,
         remaining_tool_calls: int,
+        finalization_rejections: tuple[FinalizationRejectionCode, ...] = (),
     ) -> BackendDecision: ...
 
 
@@ -64,8 +66,9 @@ class FakeAnalystBackend:
         evidence: tuple[EvidenceEntry, ...],
         iteration: int,
         remaining_tool_calls: int,
+        finalization_rejections: tuple[FinalizationRejectionCode, ...] = (),
     ) -> BackendDecision:
-        del request
+        del request, finalization_rejections
         if iteration == 1:
             calls: list[
                 QueryRunsCall
@@ -237,8 +240,9 @@ class ScriptedFakeAnalystBackend:
         evidence: tuple[EvidenceEntry, ...],
         iteration: int,
         remaining_tool_calls: int,
+        finalization_rejections: tuple[FinalizationRejectionCode, ...] = (),
     ) -> BackendDecision:
-        del request, scope, evidence, remaining_tool_calls
+        del request, scope, evidence, remaining_tool_calls, finalization_rejections
         index = iteration - 1
         if index < len(self._decisions):
             return self._decisions[index]

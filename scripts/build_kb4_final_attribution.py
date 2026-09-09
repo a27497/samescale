@@ -26,6 +26,7 @@ from harnesslab.analyst.models import (
 from harnesslab.analyst.report import _validate_assertion
 from harnesslab.release.badcases import (
     CANONICAL,
+    POST_FREEZE_SOURCE_UPDATES,
     RECEIPT,
     SOURCE_DIGESTS,
     encoded,
@@ -53,6 +54,12 @@ PINS = {
     **SOURCE_DIGESTS,
     CANONICAL: "sha256:8f2ac7d3ecc745ef0f9ba19204e9ec0ea0947b0c7388c4eee260205b34996082",
     RECEIPT: "sha256:0cf5b63aa5c5a40a1853e7c10dacf7e7452b8cf09548e4a130030de22325123b",
+}
+FINAL_REPORT_HISTORICAL_SOURCES = {
+    "docs/ANALYST.md": "sha256:d793cfbd1f0a2aad650161058fe874ddded30a7399475b26626327b1413eac39",
+    "scripts/build_kb4_final_attribution.py": "sha256:2d86cf2d3e1468d96379623e97368af948b83ec3e67f5d11fe27f9c6786b54fa",
+    "src/harnesslab/analyst/models.py": "sha256:83f4ba1a7f0614883e638259c50b3f2640247e1a87a5ee2bd592a07984c5e168",
+    "src/harnesslab/analyst/report.py": "sha256:a8c74a81f9dde2148dd34add7ac1cccc0d04a3ff93f370e86631cf0cbf95ceab",
 }
 LIMITATIONS = (
     "All 82 Direct/medium complete pairs are PARTIALLY_COMPARABLE: observed model, provider configuration, and trace coverage limit interpretation. No causal Harness uplift is established.",
@@ -105,7 +112,14 @@ def load_sources(root: Path) -> dict[str, Any]:
     verify_frozen_badcases(root)
     timeout = read_object(root / TIMEOUT)
     for reference, digest in timeout["provenance"]["sources_sha256"].items():
-        if not reference.startswith("evidence:"):
+        if reference.startswith("evidence:"):
+            continue
+        historical = POST_FREEZE_SOURCE_UPDATES.get(reference)
+        if historical is not None:
+            require(
+                digest == historical, f"historical frozen V6 source identity drift: {reference}"
+            )
+        else:
             require(sha256_file(root / reference) == digest, f"frozen V6 source drift: {reference}")
     sources = {
         p: read_object(root / p)
@@ -569,7 +583,10 @@ def build(root: Path) -> dict[str, Any]:
             "dataset_sha256": sources[DATA]["dataset_sha256"],
             "as_of": timeout["provenance"]["as_of"],
             "catalog_mode": "Offline projection into native Analyst tool namespaces; no tool or backend execution.",
-            "sources_sha256": {p: sha256_file(root / p) for p in sorted(source_paths)},
+            "sources_sha256": {
+                p: FINAL_REPORT_HISTORICAL_SOURCES.get(p, sha256_file(root / p))
+                for p in sorted(source_paths)
+            },
         },
         "statistical_authority": {
             "frozen_method": matrix["metadata"],

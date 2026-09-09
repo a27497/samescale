@@ -1,0 +1,27 @@
+{
+  "acceptance_criteria": [
+    "Report verified_pass and verified_fail counts per cell on core-java-deduplicate.",
+    "Separately report infra failures (control_identity_mismatch, protocol_error, timeout) and execution_budget_exhausted outcomes per cell.",
+    "Provide at least one run with a verifier outcome (verified_pass or verified_fail) for each of the two cells.",
+    "Minimum number of completed capability runs reached to enable a formal pairwise statement, or explicitly return INSUFFICIENT if infra/budget losses remain too high."
+  ],
+  "cell_ids": [
+    "harness-codex-gpt56-high",
+    "harness-claude-qwen38-alibaba-bailian"
+  ],
+  "evidence_refs": [
+    "ablation:core-real-matrix-v6:codex-gpt56-reasoning-effort",
+    "cell:core-real-matrix-v6:harness-claude-qwen38-alibaba-bailian",
+    "cell:core-real-matrix-v6:harness-codex-gpt56-high",
+    "task:core-java-deduplicate@1.0.2",
+    "run:run-4951b4e6892aee3ef282aea1bec01ac7c8628656a5b495a06ea71cb1145176b5",
+    "run:run-3281366a33295f9067e3bf83d6f5524ec3795a0c012b76ac748554b52ed38cfb",
+    "run:run-4c96b4cbdf258ed4b3a1cd1db06f07bdc69b109f6055647d7f05cb7f05b7d707",
+    "run:run-d88afd54e3a2c198106b41b511ae15e00a3644b68c4bf3c0ae1f2004d47a8772"
+  ],
+  "objective": "Obtain a clean per-task comparison on core-java-deduplicate between harness-codex-gpt56-high and harness-claude-qwen38-alibaba-bailian by re-running with infra/protocol/budget failures tracked separately so verified pass/fail capability outcomes can be compared formally.",
+  "repeat_count": 5,
+  "task_ids": [
+    "core-java-deduplicate"
+  ]
+}

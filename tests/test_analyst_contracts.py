@@ -21,6 +21,7 @@ from harnesslab.analyst.models import (
     ExecutionStatus,
     FactAssertion,
     HypothesisClaim,
+    InvestigationState,
     QueryRunsArgs,
     QueryRunsCall,
     ToolCall,
@@ -135,6 +136,39 @@ async def test_langgraph_stops_at_eight_decision_iterations() -> None:
     assert report.execution.decision_iterations == 8
     assert report.execution.tool_calls == 8
     assert "decision iteration limit" in report.limitations[0]
+
+
+@pytest.mark.parametrize("decision_limit, tool_limit", [(2, 3), (4, 1)])
+async def test_report_preserves_effective_session_limits(
+    decision_limit: int, tool_limit: int
+) -> None:
+    backend = ScriptedFakeAnalystBackend((_query_decision(),), repeat_last=True)
+    state = InvestigationState(
+        request=_request(),
+        scope=_scope(),
+        max_decision_iterations=decision_limit,
+        max_tool_calls=tool_limit,
+    )
+    result = await AttributionGraph(backend, EmptyTools()).advance(state)
+    assert result.report is not None
+    report = result.report
+    assert report.execution.status is ExecutionStatus.LIMIT_REACHED
+    assert report.execution.max_decision_iterations == decision_limit
+    assert report.execution.max_tool_calls == tool_limit
+    assert report.execution.decision_iterations <= decision_limit
+    assert report.execution.tool_calls <= tool_limit
+    assert f"/{decision_limit} decisions" in report.markdown()
+    assert f"/{tool_limit} tool calls" in report.markdown()
+
+
+def test_frozen_real_report_keeps_its_original_digest_and_recorded_limits() -> None:
+    path = Path(__file__).resolve().parents[1] / "docs/evidence/real-agent-smoke-v6/report.json"
+    report = AttributionReport.model_validate_json(path.read_bytes())
+    assert (
+        report.digest == "sha256:1733eace25488c8e435e2fd1f7d5e6d1ae7c676a047259ab3edc3dd6315c19b1"
+    )
+    assert report.execution.max_decision_iterations == 8
+    assert AttributionReport.model_validate_json(report.canonical_json()) == report
 
 
 def test_fabricated_evidence_reference_is_rejected() -> None:

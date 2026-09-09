@@ -1,0 +1,122 @@
+{
+  "approval": {
+    "approved_at": "2026-09-09T09:38:54.117943Z",
+    "execution_authorized": false,
+    "proposal_digest": "sha256:24eec75a37c2695d39c1383b64208fa57ef56f3ef606873c75e3291aaa4b7820",
+    "reviewed_by": "ChatGPT-Technical-Lead",
+    "scope_digest": "sha256:d3d026cfbfbe014b943705a894ad06e125f59ad6060b73c05daf84588b7aa73e",
+    "session_id": "analyst-0be376756a4f447bbdeeb44a58b292b5"
+  },
+  "decision_iterations": 4,
+  "decision_limit": 4,
+  "finalization_rejections": [
+    "UNKNOWN"
+  ],
+  "profile_digest": "sha256:79ef9941dadca567c46ad1345a93e544e2c58a6346e5dc2489d6124e0638cfad",
+  "profile_id": "deepseek-official-v4flash-responses-smoke-v6",
+  "proposal_digest": "sha256:24eec75a37c2695d39c1383b64208fa57ef56f3ef606873c75e3291aaa4b7820",
+  "report_digest": "sha256:1733eace25488c8e435e2fd1f7d5e6d1ae7c676a047259ab3edc3dd6315c19b1",
+  "request_budget_used": 4,
+  "scope_digest": "sha256:d3d026cfbfbe014b943705a894ad06e125f59ad6060b73c05daf84588b7aa73e",
+  "session_id": "analyst-0be376756a4f447bbdeeb44a58b292b5",
+  "spend_limits": {
+    "cumulative_tokens": 1250000,
+    "input_bytes_per_request": 256000,
+    "output_tokens_per_request": 32768,
+    "provider_requests": 4,
+    "timeout_seconds": 90.0,
+    "usd": "0.60"
+  },
+  "status": "COMPLETED",
+  "terminal_preflight": {
+    "observed_totals": {
+      "cost_usd": "0.09146104",
+      "input_tokens": 161015,
+      "latency_ms": 107305,
+      "output_tokens": 15617,
+      "total_tokens": 176632
+    },
+    "reasons": [
+      "REQUEST_CEILING_REACHED",
+      "SESSION_TERMINAL",
+      "DECISION_CEILING_REACHED"
+    ],
+    "request_budget_used": 4,
+    "status": "BLOCKED"
+  },
+  "tool_calls": 9,
+  "tool_limit": 12,
+  "totals": {
+    "cost_usd": "0.09146104",
+    "input_tokens": 161015,
+    "latency_ms": 107305,
+    "output_tokens": 15617,
+    "total_tokens": 176632
+  },
+  "usage": [
+    {
+      "cost_usd": "0.01497540",
+      "failure": null,
+      "input_bytes": 67506,
+      "invocation_started": true,
+      "iteration": 1,
+      "latency_ms": 4724,
+      "observed_model": "deepseek-v4-flash",
+      "status": "COMPLETED",
+      "tokens": {
+        "input_tokens": 32211,
+        "output_tokens": 608,
+        "reasoning_tokens": 425,
+        "total_tokens": 32819
+      }
+    },
+    {
+      "cost_usd": "0.01862784",
+      "failure": null,
+      "input_bytes": 79358,
+      "invocation_started": true,
+      "iteration": 2,
+      "latency_ms": 14398,
+      "observed_model": "deepseek-v4-flash",
+      "status": "COMPLETED",
+      "tokens": {
+        "input_tokens": 36882,
+        "output_tokens": 1818,
+        "reasoning_tokens": 1521,
+        "total_tokens": 38700
+      }
+    },
+    {
+      "cost_usd": "0.02547072",
+      "failure": null,
+      "input_bytes": 91738,
+      "invocation_started": true,
+      "iteration": 3,
+      "latency_ms": 36724,
+      "observed_model": "deepseek-v4-flash",
+      "status": "COMPLETED",
+      "tokens": {
+        "input_tokens": 41136,
+        "output_tokens": 5584,
+        "reasoning_tokens": 3183,
+        "total_tokens": 46720
+      }
+    },
+    {
+      "cost_usd": "0.03238708",
+      "failure": null,
+      "input_bytes": 124628,
+      "invocation_started": true,
+      "iteration": 4,
+      "latency_ms": 51459,
+      "observed_model": "deepseek-v4-flash",
+      "status": "COMPLETED",
+      "tokens": {
+        "input_tokens": 50786,
+        "output_tokens": 7607,
+        "reasoning_tokens": 3519,
+        "total_tokens": 58393
+      }
+    }
+  ]
+}

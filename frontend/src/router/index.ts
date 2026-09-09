@@ -3,8 +3,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    { path: '/', redirect: '/analyst' },
     {
-      path: '/',
+      path: '/overview',
       name: 'overview',
       component: () => import('@/views/OverviewView.vue'),
       meta: { title: 'Overview', section: 'Workspace' },
@@ -70,6 +71,8 @@ const router = createRouter({
       component: () => import('@/views/RegressionView.vue'),
       meta: { title: 'Regression', section: 'Evidence' },
     },
+    { path: '/analyst', name: 'analyst', component: () => import('@/views/AnalystHomeView.vue'), meta: { title: '工程问题调查', section: 'Investigation' } },
+    { path: '/analyst/sessions', name: 'analyst-sessions', component: () => import('@/views/AnalystView.vue'), meta: { title: '已保存调查', section: 'Investigation' } },
     {
       path: '/diagnosis',
       name: 'diagnosis',

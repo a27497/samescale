@@ -247,6 +247,11 @@ async def test_keyless_experiment_e2e_uses_queue_runners_manifests_and_report(
         assert all(run.artifact_manifest_path for run in persisted_runs)
         assert all(Path(run.artifact_manifest_path or "").is_file() for run in persisted_runs)
         assert all(run.evidence_digest for run in persisted_runs)
+        # The real executor must persist the verified invocation count, not unknown
+        # merely because the metric reader lost its artifact path during integration.
+        assert all(
+            run.tool_calls == (0 if run.cell_id == "direct" else 1) for run in persisted_runs
+        )
         assert {
             evidence.comparability
             for evidence in first.pair_evidence

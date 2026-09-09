@@ -32,6 +32,19 @@ class PricingAvailability(StrEnum):
     UNKNOWN = "UNKNOWN"
 
 
+class AnalystSpendLimits(BaseModel):
+    """Explicit immutable limits in the Analyst session's existing journal."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    provider_requests: int = Field(ge=1, le=8)
+    output_tokens_per_request: int = Field(gt=0)
+    input_bytes_per_request: int = Field(gt=0, le=256_000)
+    cumulative_tokens: int = Field(gt=0)
+    usd: Decimal | None = Field(default=None, gt=0, allow_inf_nan=False)
+    timeout_seconds: float = Field(gt=0, le=600)
+
+
 class BudgetCeilingStatus(StrEnum):
     NOT_CONFIGURED = "NOT_CONFIGURED"
     WITHIN_CEILING = "WITHIN_CEILING"

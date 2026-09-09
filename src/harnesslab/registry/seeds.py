@@ -5,7 +5,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from pydantic import TypeAdapter, ValidationError
+from pydantic import BaseModel, ConfigDict, PositiveInt, TypeAdapter, ValidationError
 
 from harnesslab.contracts.common import Identifier, Protocol
 from harnesslab.contracts.provider import validate_provider_base_url
@@ -193,14 +193,14 @@ def _provider_definitions(environment: Mapping[str, str]) -> tuple[ProviderDefin
             display_name="DeepSeek official API",
             provider_family="DeepSeek",
             region="global",
-            protocols=(Protocol.CHAT_COMPLETIONS,),
+            protocols=(Protocol.CHAT_COMPLETIONS, Protocol.RESPONSES),
             endpoint_class=EndpointClass.PUBLIC_OFFICIAL,
             credential_reference="DEEPSEEK_API_KEY",
             billing_mode=BillingMode.PAY_AS_YOU_GO,
             automation_allowed=True,
             enabled=_enabled(environment, "deepseek-official"),
             health_status=_status(environment, "deepseek-official"),
-            capabilities=("chat-completions", "thinking-control"),
+            capabilities=("chat-completions", "responses", "json_schema", "thinking-control"),
         ),
         ProviderDefinition(
             provider_id="alibaba-bailian",
@@ -280,10 +280,11 @@ def _model_definitions(environment: Mapping[str, str]) -> tuple[ModelDefinition,
             model_id="deepseek-v4-flash",
             display_name="DeepSeek V4 Flash",
             model_family="DeepSeek V4",
-            capabilities=("coding",),
-            context_metadata_status="NOT_AVAILABLE",
+            capabilities=("coding", "json_schema"),
+            context_metadata_status="KNOWN",
+            context_window_tokens=1_000_000,
             reasoning_controls=ReasoningControls(),
-            supported_protocols=(Protocol.CHAT_COMPLETIONS,),
+            supported_protocols=(Protocol.CHAT_COMPLETIONS, Protocol.RESPONSES),
         ),
     )
     configured = tuple(
@@ -395,6 +396,80 @@ def _profiles(environment: Mapping[str, str]) -> tuple[ProviderModelProfile, ...
             enabled=provider_by_id["deepseek-official"].enabled,
         ),
     ]
+    profiles.append(
+        freeze_provider_model_profile(
+            profile_id="deepseek-official-v4flash-responses",
+            model_id="deepseek-v4-flash",
+            provider_id="deepseek-official",
+            requested_model="deepseek-v4-flash",
+            protocol=Protocol.RESPONSES,
+            route="/responses",
+            provider_route_identity="deepseek-official|responses|https://api.deepseek.com/responses",
+            credential_reference="DEEPSEEK_API_KEY",
+            max_output_tokens=1200,
+            request_timeout_seconds=90,
+            observed_model_capability=ObservedModelCapability.RUN_EVIDENCE_ONLY,
+            automation_allowed=True,
+            enabled=provider_by_id["deepseek-official"].enabled,
+            pricing_snapshot_reference="profiles/pricing/deepseek-v4flash-responses-20260908.json",
+        )
+    )
+    profiles.append(
+        freeze_provider_model_profile(
+            profile_id="deepseek-official-v4flash-responses-smoke-v2",
+            model_id="deepseek-v4-flash",
+            provider_id="deepseek-official",
+            requested_model="deepseek-v4-flash",
+            protocol=Protocol.RESPONSES,
+            route="/responses",
+            provider_route_identity="deepseek-official|responses|https://api.deepseek.com/responses",
+            credential_reference="DEEPSEEK_API_KEY",
+            max_output_tokens=8192,
+            request_timeout_seconds=90,
+            observed_model_capability=ObservedModelCapability.RUN_EVIDENCE_ONLY,
+            automation_allowed=True,
+            enabled=provider_by_id["deepseek-official"].enabled,
+            pricing_snapshot_reference="profiles/pricing/deepseek-v4flash-responses-20260908.json",
+        )
+    )
+    profiles.append(
+        freeze_provider_model_profile(
+            profile_id="deepseek-official-v4flash-responses-smoke-v4",
+            model_id="deepseek-v4-flash",
+            provider_id="deepseek-official",
+            requested_model="deepseek-v4-flash",
+            protocol=Protocol.RESPONSES,
+            route="/responses",
+            provider_route_identity="deepseek-official|responses|https://api.deepseek.com/responses",
+            credential_reference="DEEPSEEK_API_KEY",
+            reasoning_effort="low",
+            max_output_tokens=8192,
+            request_timeout_seconds=90,
+            observed_model_capability=ObservedModelCapability.RUN_EVIDENCE_ONLY,
+            automation_allowed=True,
+            enabled=provider_by_id["deepseek-official"].enabled,
+            pricing_snapshot_reference="profiles/pricing/deepseek-v4flash-responses-20260908.json",
+        )
+    )
+    profiles.append(
+        freeze_provider_model_profile(
+            profile_id="deepseek-official-v4flash-responses-smoke-v6",
+            model_id="deepseek-v4-flash",
+            provider_id="deepseek-official",
+            requested_model="deepseek-v4-flash",
+            protocol=Protocol.RESPONSES,
+            route="/responses",
+            provider_route_identity="deepseek-official|responses|https://api.deepseek.com/responses",
+            credential_reference="DEEPSEEK_API_KEY",
+            reasoning_effort="low",
+            max_output_tokens=32768,
+            request_timeout_seconds=90,
+            observed_model_capability=ObservedModelCapability.RUN_EVIDENCE_ONLY,
+            automation_allowed=True,
+            enabled=provider_by_id["deepseek-official"].enabled,
+            pricing_snapshot_reference="profiles/pricing/deepseek-v4flash-responses-20260908.json",
+        )
+    )
     official_alibaba_profiles = (
         ("qwen3.8-max", Protocol.CHAT_COMPLETIONS, "chat", "/chat/completions"),
         ("qwen3.8-max", Protocol.RESPONSES, "responses", "/responses"),
@@ -654,6 +729,14 @@ def _defaults(environment: Mapping[str, str], profile_ids: set[str]) -> Registry
     )
 
 
+class _SpendMetadata(BaseModel):
+    """Optional current operator metadata; never changes frozen release profiles."""
+
+    model_config = ConfigDict(extra="forbid")
+    model_context_windows: dict[str, PositiveInt]
+    profile_pricing_references: dict[str, str]
+
+
 def build_registry_catalog(
     repository_root: Path,
     environment: Mapping[str, str],
@@ -662,9 +745,42 @@ def build_registry_catalog(
 ) -> RegistryCatalog:
     providers = _provider_definitions(environment)
     profiles = _profiles(environment)
+    models = _model_definitions(environment)
+    reference = environment.get("HARNESSLAB_REGISTRY_SPEND_METADATA")
+    if reference:
+        path = (repository_root / reference).resolve()
+        if not path.is_relative_to(repository_root.resolve()):
+            raise ValueError("Registry spend metadata must be repository-local")
+        metadata = _SpendMetadata.model_validate_json(path.read_bytes(), strict=True)
+        if set(metadata.model_context_windows) - {m.model_id for m in models} or set(
+            metadata.profile_pricing_references
+        ) - {p.profile_id for p in profiles}:
+            raise ValueError("Registry spend metadata contains unknown identities")
+        models = tuple(
+            m.model_copy(
+                update={
+                    "context_window_tokens": metadata.model_context_windows[m.model_id],
+                    "context_metadata_status": "KNOWN",
+                }
+            )
+            if m.model_id in metadata.model_context_windows
+            else m
+            for m in models
+        )
+        profiles = tuple(
+            freeze_provider_model_profile(
+                **{
+                    **p.model_dump(exclude={"profile_identity"}),
+                    "pricing_snapshot_reference": metadata.profile_pricing_references[p.profile_id],
+                }
+            )
+            if p.profile_id in metadata.profile_pricing_references
+            else p
+            for p in profiles
+        )
     return RegistryCatalog(
         providers=providers,
-        models=_model_definitions(environment),
+        models=models,
         provider_model_profiles=profiles,
         harnesses=_harnesses(environment),
         tasks=_tasks(repository_root, task_corpus_path),

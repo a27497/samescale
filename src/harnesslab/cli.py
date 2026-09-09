@@ -79,7 +79,7 @@ from harnesslab.sandbox.preflight import DockerPreflightError, docker_preflight
 from harnesslab.tasks.package import TaskPackageError
 from harnesslab.tasks.validation import validate_task_package
 
-app = typer.Typer(no_args_is_help=True, help="HarnessLab AI control CLI.")
+app = typer.Typer(no_args_is_help=True, help="SameScale control CLI (HarnessLab-compatible).")
 task_app = typer.Typer(no_args_is_help=True, help="Inspect and validate versioned task packages.")
 sandbox_app = typer.Typer(no_args_is_help=True, help="Inspect the Phase C Docker sandbox boundary.")
 model_app = typer.Typer(no_args_is_help=True, help="Run Phase D direct-model evaluations.")
@@ -737,7 +737,7 @@ def main(
         help="Show the HarnessLab package version and exit.",
     ),
 ) -> None:
-    """Manage and inspect the HarnessLab control plane."""
+    """Manage and inspect the SameScale control plane (HarnessLab-compatible)."""
 
 
 @app.command()

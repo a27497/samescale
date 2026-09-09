@@ -75,6 +75,7 @@ from harnesslab.experiment.lifecycle import (
 from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.queue import (
     AuthoritativeClaimGate,
+    ExperimentConflict,
     claim_authoritative_run,
     claim_next_run,
     enqueue_plan,
@@ -178,7 +179,7 @@ def test_m6_migration_upgrades_fresh_database_without_fabricating_attempts(
         get_settings.cache_clear()
         config = Config("alembic.ini")
         command.upgrade(config, "20260828_0005")
-        command.upgrade(config, "head")
+        command.upgrade(config, "20260904_0006")
         with psycopg.connect(temporary_psycopg) as connection:
             row = connection.execute(
                 "SELECT (SELECT version_num FROM alembic_version), "
@@ -368,6 +369,7 @@ async def test_authoritative_lifecycle_controls_recovery_and_reconciliation(
                     claimed.run_id,
                     "worker",
                     status,
+                    attempt=claimed.attempt,
                     now=NOW + timedelta(seconds=offset),
                 )
         async with factory() as session, session.begin():
@@ -383,6 +385,7 @@ async def test_authoritative_lifecycle_controls_recovery_and_reconciliation(
                 session,
                 claimed.run_id,
                 "worker",
+                attempt=claimed.attempt,
                 now=NOW + timedelta(seconds=11),
                 normalized_outcome=StatisticalOutcome.CAPABILITY_FAIL,
                 source_outcome="verified_fail",
@@ -539,6 +542,7 @@ async def test_authoritative_lifecycle_controls_recovery_and_reconciliation(
                 lost.run_id,
                 "lost-worker",
                 RunStatus.PREPARING,
+                attempt=lost.attempt,
                 now=NOW + timedelta(seconds=15),
             )
         async with factory() as session, session.begin():
@@ -628,6 +632,7 @@ async def test_authoritative_lifecycle_controls_recovery_and_reconciliation(
                 recovery_claim.run_id,
                 "recovery-worker",
                 RunStatus.PREPARING,
+                attempt=recovery_claim.attempt,
                 now=NOW + timedelta(seconds=25),
             )
         async with factory() as session, session.begin():
@@ -654,6 +659,7 @@ async def test_authoritative_lifecycle_controls_recovery_and_reconciliation(
                 session,
                 recovery_claim.run_id,
                 "recovery-worker",
+                attempt=recovery_claim.attempt,
                 now=NOW + timedelta(seconds=27),
                 ttl=timedelta(minutes=1),
             )
@@ -847,7 +853,14 @@ async def test_actual_over_reservation_fails_closed_and_legacy_queue_remains_rea
                 ttl=timedelta(minutes=1),
             )
             assert claimed is not None
-            await transition_run(session, claimed.run_id, "worker", RunStatus.PREPARING, now=NOW)
+            await transition_run(
+                session,
+                claimed.run_id,
+                "worker",
+                RunStatus.PREPARING,
+                attempt=claimed.attempt,
+                now=NOW,
+            )
         async with factory() as session, session.begin():
             projection = await read_authoritative_projection(session, claimed.run_id)
             assert projection is not None
@@ -925,6 +938,27 @@ async def test_existing_executor_uses_durable_gate_and_reconciles_terminal_attem
     try:
         claimed = await executor.claim(experiment_id)
         assert claimed is not None
+        from dataclasses import replace
+
+        with pytest.raises(ExperimentConflict, match="stale claim"):
+            await executor._reconcile_terminal(
+                replace(claimed, attempt=claimed.attempt + 1),
+                metrics=None,
+                evidence_digest=None,
+            )
+        async with factory() as session:
+            assert (
+                await session.scalar(
+                    select(ExperimentAttemptReconciliationRecord)
+                    .join(
+                        ExperimentRunAttemptRecord,
+                        ExperimentRunAttemptRecord.attempt_id
+                        == ExperimentAttemptReconciliationRecord.attempt_id,
+                    )
+                    .where(ExperimentRunAttemptRecord.run_id == claimed.run_id)
+                )
+                is None
+            )
         finished = await executor.execute(claimed)
         assert finished.status is RunStatus.FAILED_INFRA
         async with factory() as session:

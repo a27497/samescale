@@ -54,12 +54,24 @@ jobs:
           uv run --locked ruff format --check .
           uv run --locked mypy src tests scripts
           git diff --check
+      - name: Check frontend contracts
+        working-directory: frontend
+        run: |
+          npm ci --no-audit --no-fund
+          npm run type-check
+          npm run test -- tests/workbench.spec.ts tests/registry.spec.ts tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts
       - name: Run bounded deterministic core regressions
         run: >-
           uv run --locked pytest -q
+          tests/test_analyst_sessions.py
+          tests/test_analyst_contracts.py
+          tests/test_analyst_showcase.py
           tests/test_api_health.py
           tests/test_contracts.py
+          tests/test_workbench_api.py::test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel
           tests/test_experiment_executor_safety.py
+          tests/test_experiment_queue.py
+          tests/test_experiment_tool_metrics.py
           tests/test_model_comparison_analysis.py
           tests/test_model_chat_plan_v3.py
           tests/test_model_chat_plan_v3r1.py

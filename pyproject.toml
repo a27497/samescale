@@ -43,6 +43,10 @@ dev = [
 packages = ["src/harnesslab"]
 
 [tool.hatch.build.targets.wheel.force-include]
+"AGENTS.md" = "harnesslab/productization/distribution/AGENTS.md"
+"CURRENT_MILESTONE.md" = "harnesslab/productization/distribution/CURRENT_MILESTONE.md"
+"PUBLIC_PRODUCT_CONTRACT.md" = "harnesslab/productization/distribution/PUBLIC_PRODUCT_CONTRACT.md"
+".agents/skills/samescale-product" = "harnesslab/productization/distribution/.agents/skills/samescale-product"
 ".dockerignore" = "harnesslab/productization/distribution/.dockerignore"
 "alembic" = "harnesslab/productization/distribution/alembic"
 "alembic.ini" = "harnesslab/productization/distribution/alembic.ini"

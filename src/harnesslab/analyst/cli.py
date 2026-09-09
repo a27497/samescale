@@ -46,13 +46,18 @@ def analyze(
     report_root: str = typer.Option(
         "harnesslab-artifacts/analyst", help="Controlled Analyst report root."
     ),
-    backend: str = typer.Option("fake", help="Analyst backend; Phase J permits only fake."),
+    backend: str = typer.Option(
+        "fake", help="Legacy one-shot backend; real uses Workbench Analyst sessions."
+    ),
     json_output: bool = typer.Option(False, "--json", help="Emit canonical report JSON."),
 ) -> None:
     """Analyze existing immutable evidence without executing or changing it."""
 
     if backend != "fake":
-        typer.echo("FAIL real Analyst backends are not authorized in Phase J")
+        typer.echo(
+            "FAIL real Analyst is not authorized through the legacy one-shot command; "
+            "use Analyst sessions"
+        )
         raise typer.Exit(code=2)
     try:
         request = AnalysisRequest(experiment_id=experiment_id, question=question)

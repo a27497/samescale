@@ -44,7 +44,6 @@ from harnesslab.api.workbench_models import (
 )
 from harnesslab.comparability.engine import ComparabilityEngine
 from harnesslab.comparability.models import ComparabilityIntent
-from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
 from harnesslab.db.models.judgelab import JudgeCalibrationRecord
 from harnesslab.evidence.reader import (
@@ -60,6 +59,7 @@ from harnesslab.experiment.model_comparison import (
 )
 from harnesslab.experiment.outcomes import StatisticalOutcome
 from harnesslab.experiment.plan import AnyExperimentPlan, load_experiment_plan_payload
+from harnesslab.experiment.queue import TERMINAL_STATUSES as TERMINAL_RUN_STATUSES
 from harnesslab.experiment.report import (
     ExperimentReport,
     ExperimentReportError,
@@ -81,12 +81,6 @@ from harnesslab.release.contracts import (
 from harnesslab.release.models import EvidenceState
 from harnesslab.release.reconciliation import load_accepted_plan, verify_candidate
 
-TERMINAL_RUN_STATUSES = {
-    RunStatus.COMPLETED.value,
-    RunStatus.FAILED_INFRA.value,
-    RunStatus.FAILED_SUBJECT.value,
-    RunStatus.CANCELLED.value,
-}
 TERMINAL_EXPERIMENT_STATUSES = {"completed", "failed", "cancelled"}
 COMPARABILITY_ORDER: dict[str, int] = {
     "COMPARABLE": 0,

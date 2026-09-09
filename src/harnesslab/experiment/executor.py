@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import hashlib
 import json
 from collections.abc import Callable, Collection, Mapping
 from dataclasses import dataclass
@@ -39,7 +38,9 @@ from harnesslab.experiment.outcomes import (
     source_taxonomy_from_lane_evidence,
 )
 from harnesslab.experiment.queue import (
+    TERMINAL_STATUSES,
     AuthoritativeClaimGate,
+    ExperimentConflict,
     RunSnapshot,
     claim_next_run,
     finish_run,
@@ -47,12 +48,15 @@ from harnesslab.experiment.queue import (
     inspect_run,
     transition_run,
 )
+from harnesslab.experiment.queue import (
+    attempt_execution_id as attempt_execution_id,
+)
+from harnesslab.experiment.tool_metrics import manifest_tool_calls
 from harnesslab.harness_lane.adapter import CodexBackend
 from harnesslab.harness_lane.models import (
     CodexHarnessProfile,
     HarnessLaneEvidence,
     HarnessLaneRunResult,
-    TraceEventType,
 )
 from harnesslab.harness_lane.runner import CodexHarnessRunner
 from harnesslab.model_lane.models import (
@@ -137,7 +141,7 @@ class ExecutionMetrics:
     steps: int | None
 
 
-def _metrics(evidence: LaneEvidence) -> ExecutionMetrics:
+def _metrics(evidence: LaneEvidence, manifest_path: Path | None = None) -> ExecutionMetrics:
     if isinstance(evidence, DirectModelEvidence):
         result = evidence.provider_result
         return ExecutionMetrics(
@@ -152,15 +156,7 @@ def _metrics(evidence: LaneEvidence) -> ExecutionMetrics:
         duration_ms=evidence.duration_ms,
         input_tokens=usage.input_tokens if usage else None,
         output_tokens=usage.output_tokens if usage else None,
-        tool_calls=sum(
-            event
-            in {
-                TraceEventType.COMMAND_EXECUTION,
-                TraceEventType.FILE_CHANGE,
-                TraceEventType.MCP_TOOL_CALL,
-            }
-            for event in evidence.trace_event_types
-        ),
+        tool_calls=manifest_tool_calls(evidence.model_dump(mode="json"), manifest_path),
         steps=evidence.trace_event_count,
     )
 
@@ -198,20 +194,6 @@ def _observed_usage(metrics: ExecutionMetrics | None) -> ObservedResourceUsage:
         provider_requests=_observed(None, "requests"),
         monetary_cost=_observed(None, "USD"),
     )
-
-
-def attempt_execution_id(claimed: RunSnapshot) -> str:
-    """Keep logical queue identity stable while isolating each physical attempt artifact."""
-
-    if claimed.attempt < 1:
-        raise ValueError("claimed run must have a positive attempt number")
-    suffix = f"-a{claimed.attempt}"
-    candidate = f"{claimed.run_id}{suffix}"
-    if len(candidate) <= 100:
-        return candidate
-    digest = hashlib.sha256(candidate.encode()).hexdigest()[:16]
-    prefix_length = 100 - len(suffix) - len(digest) - 1
-    return f"{claimed.run_id[:prefix_length]}-{digest}{suffix}"
 
 
 class ExperimentRunExecutor:
@@ -264,16 +246,24 @@ class ExperimentRunExecutor:
                 slot_ids=slot_ids,
             )
 
-    async def _transition(self, run_id: str, status: RunStatus) -> RunSnapshot:
+    async def _transition(self, claimed: RunSnapshot, status: RunStatus) -> RunSnapshot:
         async with self.session_factory() as session, session.begin():
-            return await transition_run(session, run_id, self.owner, status, now=self.clock())
+            return await transition_run(
+                session,
+                claimed.run_id,
+                self.owner,
+                status,
+                attempt=claimed.attempt,
+                now=self.clock(),
+            )
 
-    async def _heartbeat(self, run_id: str) -> RunSnapshot:
+    async def _heartbeat(self, claimed: RunSnapshot) -> RunSnapshot:
         async with self.session_factory() as session, session.begin():
             return await heartbeat_run(
                 session,
-                run_id,
+                claimed.run_id,
                 self.owner,
+                attempt=claimed.attempt,
                 now=self.clock(),
                 ttl=self.lease_ttl,
             )
@@ -284,7 +274,7 @@ class ExperimentRunExecutor:
 
     async def _reconcile_terminal(
         self,
-        run_id: str,
+        claimed: RunSnapshot,
         *,
         metrics: ExecutionMetrics | None,
         evidence_digest: str | None,
@@ -292,9 +282,16 @@ class ExperimentRunExecutor:
         if self.authoritative_claim_gate is None:
             return None
         async with self.session_factory() as session, session.begin():
-            attempt = await current_attempt_record(session, run_id, lock=True)
+            run = await session.get(ExperimentRunRecord, claimed.run_id, with_for_update=True)
+            attempt = await current_attempt_record(session, claimed.run_id, lock=True)
             if attempt is None:
                 raise RuntimeError("authoritative execution lost its physical attempt")
+            if (
+                run is None
+                or run.attempt != claimed.attempt
+                or attempt.attempt_number != claimed.attempt
+            ):
+                raise ExperimentConflict("stale claim cannot reconcile another physical attempt")
             reservation = await durable_reservation_for_attempt(session, attempt.attempt_id)
             if reservation is None:
                 raise RuntimeError("authoritative execution terminated without a reservation")
@@ -318,7 +315,7 @@ class ExperimentRunExecutor:
 
     async def _maintain_heartbeat(
         self,
-        run_id: str,
+        claimed: RunSnapshot,
         stop: asyncio.Event,
         lost: asyncio.Event,
         cancelled: asyncio.Event,
@@ -330,7 +327,7 @@ class ExperimentRunExecutor:
             except TimeoutError:
                 pass
             try:
-                snapshot = await self._heartbeat(run_id)
+                snapshot = await self._heartbeat(claimed)
             except Exception:
                 lost.set()
                 return
@@ -345,13 +342,13 @@ class ExperimentRunExecutor:
         if claimed.status is not RunStatus.CLAIMED or claimed.lease_owner != self.owner:
             raise ValueError("executor requires a run claimed by its own worker identity")
         binding = self.bindings.get(claimed.cell_id)
-        preparing = await self._transition(claimed.run_id, RunStatus.PREPARING)
+        preparing = await self._transition(claimed, RunStatus.PREPARING)
         if preparing.status is RunStatus.CANCELLED:
-            await self._reconcile_terminal(claimed.run_id, metrics=None, evidence_digest=None)
+            await self._reconcile_terminal(claimed, metrics=None, evidence_digest=None)
             return preparing
-        running = await self._transition(claimed.run_id, RunStatus.RUNNING)
+        running = await self._transition(claimed, RunStatus.RUNNING)
         if running.status is RunStatus.CANCELLED:
-            await self._reconcile_terminal(claimed.run_id, metrics=None, evidence_digest=None)
+            await self._reconcile_terminal(claimed, metrics=None, evidence_digest=None)
             return running
         result: LaneRunResult | None = None
         error: Exception | None = None
@@ -360,7 +357,7 @@ class ExperimentRunExecutor:
         heartbeat_cancelled = asyncio.Event()
         heartbeat_task = asyncio.create_task(
             self._maintain_heartbeat(
-                claimed.run_id,
+                claimed,
                 heartbeat_stop,
                 heartbeat_lost,
                 heartbeat_cancelled,
@@ -384,22 +381,22 @@ class ExperimentRunExecutor:
                 RunStatus.CANCELLED,
             }:
                 await self._reconcile_terminal(
-                    claimed.run_id,
+                    claimed,
                     metrics=None if result is None else _metrics(result.evidence),
                     evidence_digest=None,
                 )
             return interrupted
 
-        verifying = await self._transition(claimed.run_id, RunStatus.VERIFYING)
+        verifying = await self._transition(claimed, RunStatus.VERIFYING)
         if verifying.status is RunStatus.CANCELLED:
-            await self._reconcile_terminal(claimed.run_id, metrics=None, evidence_digest=None)
+            await self._reconcile_terminal(claimed, metrics=None, evidence_digest=None)
             return verifying
-        scoring = await self._transition(claimed.run_id, RunStatus.SCORING)
+        scoring = await self._transition(claimed, RunStatus.SCORING)
         if scoring.status is RunStatus.CANCELLED:
-            await self._reconcile_terminal(claimed.run_id, metrics=None, evidence_digest=None)
+            await self._reconcile_terminal(claimed, metrics=None, evidence_digest=None)
             return scoring
         if result is None:
-            return await self._finish_infra(claimed.run_id, error)
+            return await self._finish_infra(claimed, error)
 
         evidence = result.evidence
         manifest = result.artifact_directory / "manifest.json"
@@ -429,9 +426,9 @@ class ExperimentRunExecutor:
             authoritative_manifest = None
             digest = None
             failure_detail = f"persisted manifest validation failed: {type(exc).__name__}"
-        metrics = _metrics(evidence)
+        metrics = _metrics(evidence, manifest if digest is not None else None)
         reconciliation = await self._reconcile_terminal(
-            claimed.run_id,
+            claimed,
             metrics=metrics,
             evidence_digest=digest,
         )
@@ -445,6 +442,7 @@ class ExperimentRunExecutor:
                 session,
                 claimed.run_id,
                 self.owner,
+                attempt=claimed.attempt,
                 now=self.clock(),
                 normalized_outcome=outcome,
                 source_outcome=source_outcome,
@@ -458,14 +456,15 @@ class ExperimentRunExecutor:
                 steps=metrics.steps,
             )
 
-    async def _finish_infra(self, run_id: str, error: Exception | None) -> RunSnapshot:
+    async def _finish_infra(self, claimed: RunSnapshot, error: Exception | None) -> RunSnapshot:
         detail = type(error).__name__ if error is not None else "unknown worker failure"
-        await self._reconcile_terminal(run_id, metrics=None, evidence_digest=None)
+        await self._reconcile_terminal(claimed, metrics=None, evidence_digest=None)
         async with self.session_factory() as session, session.begin():
             return await finish_run(
                 session,
-                run_id,
+                claimed.run_id,
                 self.owner,
+                attempt=claimed.attempt,
                 now=self.clock(),
                 normalized_outcome=StatisticalOutcome.INFRA_FAILURE,
                 source_outcome="worker_infrastructure_error",
@@ -518,13 +517,6 @@ class ExperimentRunExecutor:
         return tuple(completed)
 
     async def _refresh_experiment_status(self, experiment_id: str) -> None:
-        terminal = (
-            RunStatus.COMPLETED.value,
-            RunStatus.FAILED_INFRA.value,
-            RunStatus.FAILED_SUBJECT.value,
-            RunStatus.CANCELLED.value,
-            RunStatus.BUDGET_EXHAUSTED.value,
-        )
         async with self.session_factory() as session, session.begin():
             experiment = await session.get(ExperimentRecord, experiment_id, with_for_update=True)
             if experiment is None:
@@ -533,7 +525,7 @@ class ExperimentRunExecutor:
                 await session.execute(
                     select(
                         func.count(),
-                        func.count().filter(ExperimentRunRecord.status.in_(terminal)),
+                        func.count().filter(ExperimentRunRecord.status.in_(TERMINAL_STATUSES)),
                         func.min(ExperimentRunRecord.started_at),
                         func.max(ExperimentRunRecord.finished_at),
                     ).where(ExperimentRunRecord.experiment_id == experiment_id)

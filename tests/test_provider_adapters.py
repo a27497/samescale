@@ -80,6 +80,66 @@ async def client_for(handler: Callable[[httpx.Request], httpx.Response]) -> http
     return httpx.AsyncClient(transport=httpx.MockTransport(handler))
 
 
+@pytest.mark.parametrize("provider", ["deepseek-official", "openai", "test-provider"])
+async def test_responses_structured_output_provider_contract(provider: str) -> None:
+    schema = ProviderJSONSchema(
+        value={
+            "type": "object",
+            "properties": {"answer": {"type": "string"}},
+            "required": ["answer"],
+            "additionalProperties": False,
+        }
+    )
+    invocation = provider_request(Protocol.RESPONSES)
+    invocation = invocation.model_copy(
+        update={
+            "profile": invocation.profile.model_copy(update={"provider": provider}),
+            "output_json_schema": schema,
+        }
+    )
+    calls = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        expected: dict[str, object] = {
+            "type": "json_schema",
+            "name": "structured_output",
+            "schema": schema.value,
+        }
+        if provider != "deepseek-official":
+            expected["strict"] = True
+        assert json.loads(request.content) == {
+            "model": "requested-model",
+            "instructions": "Return strict JSON only.",
+            "input": "Solve the visible task.",
+            "store": False,
+            "tools": [],
+            "max_output_tokens": 4000,
+            "temperature": 0.25,
+            "reasoning": {"effort": "medium"},
+            "text": {"format": expected},
+        }
+        return httpx.Response(
+            200,
+            json={
+                "status": "completed",
+                "output": [
+                    {
+                        "type": "message",
+                        "content": [{"type": "output_text", "text": '{"answer":"ok"}'}],
+                    }
+                ],
+            },
+        )
+
+    async with await client_for(handler) as client:
+        await OpenAIResponsesAdapter(
+            client=client, environment={"TEST_PROVIDER_API_KEY": FAKE_KEY}
+        ).invoke(invocation)
+    assert calls == 1
+
+
 @pytest.mark.asyncio
 async def test_openai_responses_adapter_contract_and_private_reasoning_exclusion() -> None:
     def handler(request: httpx.Request) -> httpx.Response:

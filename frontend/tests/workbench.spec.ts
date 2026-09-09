@@ -147,10 +147,10 @@ beforeEach(() => {
 })
 
 describe('Workbench contracts', () => {
-  it('registers every major route and no Analyst route', () => {
+  it('registers every major route including bounded Analyst sessions', () => {
     const paths = router.getRoutes().map((item) => item.path)
     expect(paths).toEqual(expect.arrayContaining(['/', '/experiments', '/experiments/:id', '/run-control', '/runs/:runId', '/regression', '/diagnosis', '/judgelab', '/judgelab/:calibrationId', '/core-readiness']))
-    expect(paths.some((path) => path.includes('analyst'))).toBe(false)
+    expect(paths).toContain('/analyst')
   })
 
   it('renders grouped product navigation and route metadata in the responsive shell', async () => {
@@ -164,12 +164,21 @@ describe('Workbench contracts', () => {
         },
       },
     })
-    expect(wrapper.text()).toContain('Workspace')
+    expect(wrapper.text()).toContain('SameScale')
+    expect(wrapper.text()).toContain('调查工作区')
+    expect(document.title).toBe('Run Control · SameScale')
+    expect(wrapper.get('.advanced-nav').attributes('open')).toBeDefined()
+    expect(wrapper.findAll('.nav-link')[0]!.attributes('href')).toBe('/analyst')
     expect(wrapper.text()).toContain('Registry')
-    expect(wrapper.text()).toContain('Evidence')
+    expect(wrapper.text()).toContain('评测证据 · Advanced')
     expect(wrapper.find('.topbar h1').text()).toBe('Run Control')
     await wrapper.get('.mobile-menu-button').trigger('click')
     expect(wrapper.get('.workbench-shell').classes()).toContain('nav-open')
+    await router.push('/analyst/sessions'); await flushPromises()
+    expect(document.title).toBe('已保存调查 · SameScale')
+    expect(wrapper.get('.advanced-nav').attributes('open')).toBeUndefined()
+    expect(wrapper.findAll('.nav-current').map(link => link.attributes('href'))).toEqual(['/analyst/sessions'])
+    expect(wrapper.get('.workbench-shell').classes()).not.toContain('nav-open')
     wrapper.unmount()
   })
 
@@ -378,11 +387,99 @@ describe('Workbench contracts', () => {
     vi.useFakeTimers()
     const store = useExperimentStore()
     store.startPolling('matrix-keyless', 50)
-    await vi.runAllTicks()
-    await Promise.resolve()
+    await flushPromises()
     expect(api.getStatus).toHaveBeenCalled()
     expect(store.pollingHandle).toBeNull()
     vi.useRealTimers()
+  })
+
+  it('refreshes every authoritative projection on durable terminal before stopping', async () => {
+    vi.useFakeTimers()
+    const store = useExperimentStore()
+    await store.fetchExperiment('matrix-keyless')
+    const finalDetail = { ...store.selected!, status: 'completed', completed_capability_count: 20,
+      report_digest: 'sha256:final', comparison_intent: 'MODEL_COMPARISON' }
+    api.getExperiment.mockResolvedValue(finalDetail)
+    api.getMatrix.mockResolvedValue({ ...matrix, report_digest: 'sha256:final' })
+    api.getRuns.mockResolvedValue({ items: [{ ...run, status: 'cancelled' }] })
+    store.startPolling('matrix-keyless', 50)
+    try {
+      await flushPromises()
+      expect(store.selected?.completed_capability_count).toBe(20)
+      expect(store.selected?.report_digest).toBe('sha256:final')
+      expect(store.matrix?.report_digest).toBe('sha256:final')
+      expect(store.runs[0]?.status).toBe('cancelled')
+      expect(store.modelComparison?.analysis_digest).toBe('sha256:analysis')
+      expect(store.pollingHandle).toBeNull()
+      await vi.advanceTimersByTimeAsync(200)
+      expect(api.getStatus).toHaveBeenCalledTimes(1)
+    } finally {
+      store.stopPolling()
+      vi.useRealTimers()
+    }
+  })
+
+  it('keeps polling when terminal projections fail and retries the authoritative bundle', async () => {
+    vi.useFakeTimers()
+    const store = useExperimentStore()
+    api.getMatrix.mockRejectedValueOnce(new Error('temporary failure'))
+    store.startPolling('matrix-keyless', 50)
+    try {
+      await flushPromises()
+      expect(store.error).toContain('could not be verified')
+      expect(store.pollingHandle).not.toBeNull()
+      await vi.advanceTimersByTimeAsync(50)
+      expect(store.matrix?.report_digest).toBe('sha256:report')
+      expect(store.error).toBeNull()
+      expect(store.pollingHandle).toBeNull()
+    } finally {
+      store.stopPolling()
+      vi.useRealTimers()
+    }
+  })
+
+  it('serializes terminal refreshes and ignores responses after polling is stopped', async () => {
+    vi.useFakeTimers()
+    const store = useExperimentStore()
+    let resolveMatrix!: (value: typeof matrix) => void
+    api.getMatrix.mockImplementationOnce(() => new Promise((resolve) => { resolveMatrix = resolve }))
+    store.startPolling('matrix-keyless', 50)
+    try {
+      await flushPromises()
+      await vi.advanceTimersByTimeAsync(200)
+      expect(api.getStatus).toHaveBeenCalledTimes(1)
+      expect(api.getMatrix).toHaveBeenCalledTimes(1)
+      expect(store.pollingHandle).not.toBeNull()
+      store.stopPolling()
+      resolveMatrix(matrix)
+      await flushPromises()
+      expect(store.selected).toBeNull()
+      expect(store.matrix).toBeNull()
+      expect(store.loading).toBe(false)
+      expect(store.pollingHandle).toBeNull()
+    } finally {
+      store.stopPolling()
+      vi.useRealTimers()
+    }
+  })
+
+  it('recovers a status request error without an unhandled rejection', async () => {
+    vi.useFakeTimers()
+    const store = useExperimentStore()
+    api.getStatus.mockRejectedValueOnce(new Error('offline'))
+    store.startPolling('matrix-keyless', 50)
+    try {
+      await flushPromises()
+      expect(store.error).toContain('status could not be loaded')
+      expect(store.pollingHandle).not.toBeNull()
+      await vi.advanceTimersByTimeAsync(50)
+      expect(store.selected?.status).toBe('completed')
+      expect(store.error).toBeNull()
+      expect(store.pollingHandle).toBeNull()
+    } finally {
+      store.stopPolling()
+      vi.useRealTimers()
+    }
   })
 
   it('refetches authoritative evidence after reconstructed-page loads', async () => {

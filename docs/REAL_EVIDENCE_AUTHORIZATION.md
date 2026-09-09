@@ -1,5 +1,10 @@
 # Real Evidence Authorization
 
+> Historical v1–v3 campaign record. Statements below about active plans and standing authorization
+> describe those original campaigns; they do not authorize new execution. Use
+> [Project Status](PROJECT_STATUS.md) for the active scope and [Release Evidence](RELEASE_EVIDENCE.md)
+> for versioned release contracts.
+
 K-FAST-3 landing state: Attempt 13 is immutable v2 history, its Calls 5-8 sweep is separately
 `DIAGNOSTIC_ONLY`, and v3 is the active bounded validation contract. V2 remains historical and is
 not mutated into an Attempt 14.

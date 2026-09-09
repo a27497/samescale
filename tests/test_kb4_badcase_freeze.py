@@ -27,6 +27,60 @@ def plan() -> BadCasePlan:
     return badcases.verify_frozen_badcases(ROOT)
 
 
+@pytest.mark.parametrize(
+    ("reference", "historical_digest"),
+    (
+        (
+            "src/harnesslab/diagnosis/service.py",
+            "sha256:84b6fb001654e38cccc690da53711e96030376967fb3e02c0965e01245d6b524",
+        ),
+        (
+            "docs/ANALYST.md",
+            "sha256:d793cfbd1f0a2aad650161058fe874ddded30a7399475b26626327b1413eac39",
+        ),
+    ),
+)
+def test_current_repairs_preserve_frozen_badcase_provenance(
+    monkeypatch: pytest.MonkeyPatch, reference: str, historical_digest: str
+) -> None:
+    real_hash = sha256_file
+    monkeypatch.setattr(
+        badcases,
+        "sha256_file",
+        lambda path: "sha256:" + "0" * 64 if path == ROOT / reference else real_hash(path),
+    )
+    source = badcases.accepted_source(ROOT)
+    assert source["provenance"]["sources"][reference]["sha256"] == historical_digest
+    assert badcases.verify_frozen_badcases(ROOT).canonical_json() == (
+        BadCasePlan.model_validate_json((ROOT / badcases.CANONICAL).read_text()).canonical_json()
+    )
+
+
+@pytest.mark.parametrize("reference", ("src/harnesslab/diagnosis/service.py", "docs/ANALYST.md"))
+def test_frozen_source_binding_cannot_be_rebound(
+    monkeypatch: pytest.MonkeyPatch, reference: str
+) -> None:
+    source = badcases.read_object(ROOT / badcases.SOURCE)
+    source["provenance"]["sources"][reference]["sha256"] = "sha256:" + "0" * 64
+    monkeypatch.setattr(badcases, "read_object", lambda _: source)
+    with pytest.raises(ValueError, match=r"historical K-B4\.2 input identity drift"):
+        badcases.accepted_source(ROOT)
+
+
+def test_current_unsuperseded_source_drift_is_still_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    reference = "src/harnesslab/diagnosis/models.py"
+    real_hash = sha256_file
+    monkeypatch.setattr(
+        badcases,
+        "sha256_file",
+        lambda path: "sha256:" + "0" * 64 if path == ROOT / reference else real_hash(path),
+    )
+    with pytest.raises(ValueError, match=f"K-B4.2 repository source drift: {reference}"):
+        badcases.accepted_source(ROOT)
+
+
 def test_exact_three_frozen_badcases_and_accepted_execution_identities(plan: BadCasePlan) -> None:
     expected = (
         ("badcase-1", "harness-codex-gpt56-high", "core-java-settings-merge", 0),

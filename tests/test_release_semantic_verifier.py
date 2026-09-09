@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import shutil
+import subprocess
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from pydantic import ValidationError
@@ -37,7 +40,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _verify(fixture: dict[str, Any]) -> Any:
-    return verify_semantic_final_release(**fixture)
+    # The synthetic pre-release fixture must not inherit the checkout's release tag.
+    # Exercise the real no-existing-tag check in an isolated, uncommitted repository.
+    with TemporaryDirectory() as directory:
+        root = Path(directory)
+        subprocess.run(("git", "init", "--quiet"), cwd=root, check=True)
+        return verify_semantic_final_release(**{**fixture, "repository_root": root})
 
 
 def test_phase_g_lifecycle_accepts_completed_capability_pass() -> None:
@@ -210,6 +218,20 @@ def test_final_release_accepts_production_valid_capability_failure() -> None:
     assert failed.status is RunStatus.FAILED_SUBJECT
     assert failed.normalized_outcome is StatisticalOutcome.CAPABILITY_FAIL
     assert _verify(fixture).semantic_verified
+
+
+def test_final_release_rejects_an_existing_tag() -> None:
+    fixture = semantic_fixture()
+    command = ("git", "tag", "--list", "v1.0.0-core")
+    with (
+        patch(
+            "harnesslab.release.final_verifier.subprocess.run",
+            return_value=subprocess.CompletedProcess(command, 0, stdout="v1.0.0-core\n"),
+        ) as tag_query,
+        pytest.raises(CoreReleaseError, match="already exists before semantic authorization"),
+    ):
+        verify_semantic_final_release(**fixture)
+    tag_query.assert_called_once_with(command, cwd=ROOT, check=True, capture_output=True, text=True)
 
 
 def test_final_release_rejects_inconsistent_run_lifecycle() -> None:

@@ -17,7 +17,12 @@ from harnesslab.contracts.common import EvaluationLane
 from harnesslab.db.models.experiment import ExperimentRunRecord
 from harnesslab.experiment.methodology import ProviderAvailability
 from harnesslab.experiment.plan import ExperimentRunSlot, MethodologyV2ExperimentPlan
-from harnesslab.experiment.queue import ACTIVE_STATUSES, TERMINAL_STATUSES, RunSnapshot
+from harnesslab.experiment.queue import (
+    ACTIVE_STATUSES,
+    TERMINAL_STATUSES,
+    RunSnapshot,
+    reconcile_expired_cancellations,
+)
 
 
 class DispatchProfile(BaseModel):
@@ -197,7 +202,8 @@ class BlockAwareDispatcher:
 
     async def _resume_state(self) -> tuple[set[str], set[str]]:
         now = datetime.now(UTC)
-        async with self.executor.session_factory() as session:
+        async with self.executor.session_factory() as session, session.begin():
+            await reconcile_expired_cancellations(session, self.plan.experiment_id, now)
             rows = (
                 await session.execute(
                     select(

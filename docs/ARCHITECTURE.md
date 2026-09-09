@@ -61,10 +61,11 @@ network, no Docker socket, no added capabilities, a read-only root filesystem, n
 resource limits, bounded output, and finally-style cleanup. Local artifacts remain filesystem
 bundles rather than database blobs.
 
-Phase C also persists only a minimal execution lease: ownership, heartbeat, expiry, recovery
-attempt, cancellation request, and status. It is not the planned experiment queue or worker
-scheduler. Docker subprocess work on Windows runs on an isolated Proactor thread so the existing
-psycopg/Uvicorn selector-loop boundary remains unchanged.
+The Phase C `execution_lease` table and ORM remain for historical migration compatibility.
+Its unused standalone lease service was removed during Phase L technical closeout; current worker
+ownership, attempt fencing, and cancellation belong to `experiment/queue.py`. Gate C now exercises
+that production queue rather than a second lease implementation. Docker subprocess work on Windows
+runs on an isolated Proactor thread so the psycopg/Uvicorn selector-loop boundary remains unchanged.
 
 ## Phase D M-Lane direct model
 
@@ -260,7 +261,7 @@ routes for model, Harness, or Judge execution, cancellation, deletion, scoring, 
 mutation. The Core readiness view is derived from structured persisted evidence and remains
 `NOT_READY` while real Matrix evidence or release artifacts are unverified.
 
-## Phase J read-only Attribution Analyst
+## Attribution Analyst and bounded investigations
 
 Phase J adds the repository's one confined use of LangGraph 1.2.11. A local `StateGraph` has
 explicit decide, validated-tool, and deterministic-finalize nodes, no checkpoint service, and hard
@@ -291,30 +292,49 @@ contradictory prose. Unknown references, wrong namespaces, absent paths, and une
 closed. Unsupported interpretation remains `HYPOTHESIS` and names evidence needed to verify or
 falsify it.
 
-`FakeAnalystBackend` is the only operational Phase J backend. No implicit credential/provider path
-or Workbench Analyst route exists. Trusted host code alone atomically persists a validated report;
-source experiment and Judge evidence remains unchanged.
+The legacy Phase J one-shot CLI remains Fake-only and atomically writes validated reports.
+Workbench `/analyst` adds persistent investigations using the same graph and six tools. Fake is
+still the deterministic default. `RealAnalystBackend` resolves a Registry provider/model profile
+and invokes the existing ProviderAdapter once per decision with `output_json_schema`; errors never
+fall back to Fake. The host validates decisions, executes evidence tools, and validates citations,
+exact factual assertions, and the scope of proposed regression plans.
 
-## Planned Core boundaries
+One `analyst_session` table stores the frozen goal/scope/profile, graph state, completed calls,
+limits, usage, report, proposal, and review-only approval. A connection-owned PostgreSQL advisory
+lock serializes mutation while short journal transactions commit reservations and results. Evidence
+queries use separate read-only transactions. Each resume advances at most one new model decision;
+completed calls are cached, interrupted calls consume limits, and no scheduler or generic checkpoint
+platform is added. Approval binds session, scope, and proposal digest and cannot launch experiments.
+See [Analyst](ANALYST.md) for recovery semantics and the remaining real-smoke boundary.
 
-The following are **PLANNED**, not implemented:
+## Architecture rationale
 
-- Additional harness adapters at explicit external-system boundaries
-- Remote/cloud artifact storage and worker execution
-- Remote/cloud Judge artifact storage and distributed Judge workers
-- Provider-backed Analyst execution, RAG, and multi-agent attribution
+The Core uses Python because its evaluation ecosystem, typed schemas, subprocess orchestration,
+and analysis tooling fit one implementation runtime. Evaluating Java and TypeScript tasks does
+not require duplicating the Core in those languages; subject toolchains remain behind task and
+adapter boundaries.
 
-## Deliberate exclusions
+PostgreSQL already stores experiment state and supplies transactional queue claims, leases,
+heartbeats, and recovery. Keeping those operations with their durable records avoids a separate
+queue/database consistency boundary. Redis/Celery would add infrastructure and operational
+ownership without addressing a demonstrated gap in this execution model.
 
-Core remains Python because the evaluation ecosystem, schemas, subprocess orchestration, and
-analysis tooling are Python-centered; adding Java would create a second runtime without solving an
-adapter boundary. Redis and Celery are unnecessary while PostgreSQL can later provide durable
-state and queue semantics transactionally. Kafka/RocketMQ and Kubernetes solve scale and
-operations problems not established by current evidence. RAG and multi-agent frameworks do not
-solve HarnessLab's core reproducibility and adapter problem.
+Kafka/RocketMQ address distributed event-streaming and messaging needs, while Kubernetes adds
+cluster scheduling and deployment operations. The current Core requirements do not establish a
+need for those additional systems; local Docker execution and the PostgreSQL-backed worker model
+provide the existing isolation and coordination boundaries.
 
-These exclusions are decisions against premature complexity, not claims that those technologies
-are universally unsuitable.
+The Analyst retrieves bounded evidence from PostgreSQL and immutable artifacts. General-purpose
+RAG, memory, or multi-agent frameworks would broaden its retrieval, orchestration, and trust
+boundaries without solving the Core's reproducibility or adapter problem. Controlled RAG/MCP
+evaluation is a separate research scope. These choices reflect the present workload and evidence,
+not a claim that the excluded technologies are universally unsuitable.
+
+## Future scope
+
+Long-term expansion and architectural exclusions are maintained in
+[Project Blueprint](PROJECT_BLUEPRINT.md); live progress is in
+[Current Milestone](../CURRENT_MILESTONE.md), with prior evidence in [Project Status](PROJECT_STATUS.md).
 
 ## Phase K Core release boundary
 

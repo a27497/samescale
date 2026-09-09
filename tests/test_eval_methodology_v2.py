@@ -608,3 +608,84 @@ def test_legacy_v3_matrix_and_portfolio_remain_readable_and_unchanged() -> None:
         "complete": False,
         "resumable": True,
     }
+
+
+@pytest.mark.integration
+async def test_block_dispatch_resume_reconciles_expired_cancellations_before_selection(
+    database_url: str,
+) -> None:
+    from harnesslab.experiment.dispatch import BlockAwareDispatcher, DispatchProfile
+    from harnesslab.experiment.executor import ExperimentRunExecutor
+    from harnesslab.experiment.queue import request_run_cancellation
+
+    experiment_id = f"closeout-cancel-{uuid4().hex[:12]}"
+    base = basic_spec(repeat_count=1)
+    spec = base.model_copy(
+        update={
+            "experiment_id": experiment_id,
+            "cells": tuple(
+                cell.model_copy(update={"provider_route": "fixture|local"}) for cell in base.cells
+            ),
+        }
+    )
+    plan = build_methodology_v2_plan(
+        spec,
+        ROOT,
+        methodology=load_evaluation_methodology(METHODOLOGY_PATH),
+        evaluation_mode=EvaluationMode.QUICK,
+        funnel_stage=FunnelStage.BREADTH,
+        schedule_seed=73,
+        budget_contract=budget_contract(),
+    )
+    engine = create_engine(Settings.without_dotenv(database_url=database_url))
+    factory = create_session_factory(engine)
+    started = datetime.now(UTC) - timedelta(minutes=2)
+    try:
+        async with factory() as session, session.begin():
+            await enqueue_plan(session, plan)
+            for slot in plan.run_slots:
+                claim = await claim_next_run(
+                    session,
+                    experiment_id,
+                    "abandoned",
+                    now=started,
+                    ttl=timedelta(seconds=30),
+                    slot_ids=(slot.slot_id,),
+                )
+                assert claim is not None
+                await request_run_cancellation(
+                    session, claim.run_id, now=started + timedelta(seconds=1)
+                )
+        executor = ExperimentRunExecutor(
+            repository_root=ROOT, session_factory=factory, bindings={}, owner="resume"
+        )
+        dispatcher = BlockAwareDispatcher(
+            executor=executor,
+            plan=plan,
+            profile=DispatchProfile(
+                profile_id="local-test",
+                global_concurrency=1,
+                max_harness_concurrency=1,
+                max_direct_concurrency=1,
+                provider_concurrency={"fixture": 1},
+            ),
+        )
+        result = await dispatcher.run(max_runs=1)
+        assert result.completed == () and result.events == ()
+        async with factory() as session:
+            rows = (
+                await session.scalars(
+                    select(ExperimentRunRecord).where(
+                        ExperimentRunRecord.experiment_id == experiment_id
+                    )
+                )
+            ).all()
+            assert len(rows) == len(plan.run_slots)
+            assert all(row.status == "cancelled" and row.attempt == 1 for row in rows)
+        assert await dispatcher.run(max_runs=1) == result
+    finally:
+        async with factory() as session, session.begin():
+            await session.execute(
+                delete(ExperimentRecord).where(ExperimentRecord.id == experiment_id)
+            )
+        await engine.dispose()

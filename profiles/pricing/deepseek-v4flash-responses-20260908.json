@@ -1,0 +1,8 @@
+{
+  "route_identity": "deepseek-official|responses|https://api.deepseek.com/responses",
+  "availability": "KNOWN",
+  "input_usd_per_million_tokens": "0.44",
+  "output_usd_per_million_tokens": "1.32",
+  "request_usd": "0",
+  "evidence_reference": "docs/evidence/DEEPSEEK_OFFICIAL_20260908.md"
+}

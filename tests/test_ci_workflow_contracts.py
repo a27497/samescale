@@ -43,8 +43,8 @@ def _check_names(checks: tuple[Any, ...]) -> tuple[str, ...]:
     return tuple(check.name for check in checks)
 
 
-def test_gate_d_and_h_critical_test_names_resolve_in_selected_suites() -> None:
-    for gate in ("D", "H"):
+def test_gate_c_d_and_h_critical_test_names_resolve_in_selected_suites() -> None:
+    for gate in ("C", "D", "H"):
         verifier = _load_verifier(f"verify_gate_{gate.lower()}")
         defined = {
             node.name
@@ -295,3 +295,33 @@ def test_registered_full_release_workflow_bootstraps_same_ref_tokyo_workflows() 
         "if": "${{ inputs.execution_target == 'tokyo-full' }}",
         "uses": "./.github/workflows/self-hosted-full-ci.yml",
     }
+
+
+def test_fast_ci_checks_frontend_and_dto_without_full_release_gates() -> None:
+    for path in (FAST_WORKFLOW, SELF_HOSTED_FAST_WORKFLOW):
+        job = _workflow(path)["jobs"]["gates"]
+        steps = job["steps"]
+        frontend = next(
+            (step for step in steps if step.get("name") == "Check frontend contracts"), None
+        )
+        assert frontend is not None, "Fast CI leaves frontend/DTO changes unchecked"
+        assert frontend["working-directory"] == "frontend"
+        assert "if" not in frontend  # Includes frontend, backend DTO, and shared contract changes.
+        assert frontend["run"].splitlines() == [
+            "npm ci --no-audit --no-fund",
+            "npm run type-check",
+            "npm run test -- tests/workbench.spec.ts tests/registry.spec.ts "
+            "tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts",
+        ]
+        assert "continue-on-error" not in frontend
+        assert any("actions/setup-node@" in step.get("uses", "") for step in steps)
+        commands = "\n".join(step.get("run", "") for step in steps)
+        assert "verify_gate_" not in commands
+        assert "tests/test_experiment_queue.py" in commands
+        assert "tests/test_experiment_tool_metrics.py" in commands
+        assert "tests/test_analyst_sessions.py" in commands
+        assert "tests/test_analyst_showcase.py" in commands
+        assert (
+            "tests/test_workbench_api.py::"
+            "test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel"
+        ) in commands

@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
 from harnesslab import __version__
+from harnesslab.analyst.api import router as analyst_router
 from harnesslab.api.routes.health import router as health_router
 from harnesslab.api.routes.preflight import router as preflight_router
 from harnesslab.api.routes.registry import experiment_router, registry_router
@@ -19,11 +20,14 @@ from harnesslab.custom_eval.api import router as custom_eval_router
 
 def create_app(*, workbench_dist: Path | None = None) -> FastAPI:
     application = FastAPI(
-        title="HarnessLab AI Control API",
+        title="SameScale Control API",
         version=__version__,
-        description="HarnessLab evidence Workbench and keyless Registry Lite control API",
+        description=(
+            "SameScale evidence workbench and keyless Registry Lite API (HarnessLab-compatible)"
+        ),
     )
     application.include_router(health_router, prefix="/api")
+    application.include_router(analyst_router, prefix="/api")
     application.include_router(workbench_router, prefix="/api")
     application.include_router(registry_router, prefix="/api")
     application.include_router(experiment_router, prefix="/api")

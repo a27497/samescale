@@ -1,3 +1,4 @@
+from harnesslab.db.models.analyst import AnalystSessionRecord
 from harnesslab.db.models.execution_lease import ExecutionLease
 from harnesslab.db.models.experiment import (
     BudgetReservationRecord,
@@ -18,6 +19,7 @@ from harnesslab.db.models.registry import RegistryExperimentSnapshotRecord
 from harnesslab.db.models.schema_metadata import SchemaMetadata
 
 __all__ = [
+    "AnalystSessionRecord",
     "BudgetReservationRecord",
     "BudgetScopeLedgerRecord",
     "ExecutionLease",

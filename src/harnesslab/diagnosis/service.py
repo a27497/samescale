@@ -40,6 +40,7 @@ from harnesslab.evidence.reader import (
     load_verified_manifest,
 )
 from harnesslab.experiment.plan import AnyExperimentPlan, load_experiment_plan_payload
+from harnesslab.experiment.tool_metrics import manifest_tool_calls
 from harnesslab.tasks.package import TaskPackage, TaskPackageError
 
 CLUSTER_DIMENSIONS = (
@@ -583,13 +584,8 @@ async def diagnose_experiment(
                 if event.exit_code is not None and event.exit_code != 0
             )
         )
-        command_count = sum(event.type == "COMMAND_EXECUTION" for event in trace_events)
-        tool_count = (
-            run.tool_calls
-            if run.tool_calls is not None
-            else command_count
-            if trace_digest
-            else None
+        tool_count = manifest_tool_calls(
+            raw, Path(run.artifact_manifest_path) if run.artifact_manifest_path else None
         )
         tool_evidence = ToolCallEvidence(
             status="REPORTED" if tool_count is not None else "NOT_REPORTED",
