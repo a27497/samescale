@@ -2,11 +2,11 @@
 
 ## Why Model × Harness × Judge?
 
-HarnessLab separates Model, Harness, and Judge so their effects are not collapsed into one score. Deterministic L0 verification establishes task correctness; Harness evidence describes the execution system; calibrated L1 Judge evidence can add a rubric assessment but cannot override L0.
+HarnessLab separates Model, Harness, and Judge so their effects are not collapsed into one score. Deterministic L0 verification establishes task correctness; Harness evidence describes the execution system; calibrated L2 Judge evidence can add a rubric assessment but cannot override L0.
 
 ## Why not compare Direct Model and Harness naively?
 
-Different model revisions, routes, budgets, prompts, workspaces, verifiers, or network policy can explain a difference. Comparability makes those controls machine-checkable. The K-A direct `/responses` versus Codex pair is a useful example: provider-route mismatch currently blocks an uplift claim.
+Different model revisions, routes, budgets, prompts, workspaces, verifiers, or network policy can explain a difference. Comparability makes those controls machine-checkable. The K-A direct `/responses` versus Codex pair is a useful example: provider-route mismatch illustrates why an uplift claim needs explicit comparability eligibility.
 
 ## Why is infrastructure failure not model failure?
 
@@ -40,10 +40,8 @@ Claims marked as facts carry structured assertions checked against a catalog of 
 
 The problem is bounded evidence retrieval from authoritative PostgreSQL and immutable artifacts, not broad document search. More agents or retrieval infrastructure would expand the trust boundary without providing missing release evidence.
 
-## What will the three real BadCases demonstrate?
+## Which results and limitations can I claim?
 
-After Phase K-B, they should show a verifier-caught plausible wrong solution; a carefully controlled cross-lane difference or the inability to attribute one; and an infrastructure, missing-evidence, or Judge-disagreement case. Until then every slot is explicitly pending.
-
-## What is not yet proved?
-
-No real ranking, Harness uplift, latency/cost ordering, Judge quality, regression, or BadCase is claimed in K-A. Exact Model-only selections, explicit call authorization, trusted results, exact-head CI evidence, and the release tag remain blocked.
+Use [Project Status](PROJECT_STATUS.md) for current evidence and [Release Evidence](RELEASE_EVIDENCE.md)
+for the selected claim contract. Explain each frozen BadCase from its cited verifier/trace facts;
+keep unknown root causes unknown. Documentation alone does not demonstrate human ownership.

@@ -1,5 +1,9 @@
 # HarnessLab Blueprint Reality Audit — 2026-08-30
 
+> Historical audit at the head named below. Its phase restrictions and statuses apply to that
+> baseline, not the current task. See [Project Status](PROJECT_STATUS.md) and the maintained
+> [Project Blueprint](PROJECT_BLUEPRINT.md). The original audit body and JSON remain unchanged.
+
 ## Outcome
 
 This audit applies the authoritative final phase map in

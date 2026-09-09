@@ -35,7 +35,7 @@ class Check:
 
 
 BACKEND_CRITICAL = {
-    "test_workbench_routes_are_read_only_and_have_no_execution_or_analyst_surface",
+    "test_workbench_read_routes_and_bounded_analyst_control_surface",
     "test_experiment_list_detail_status_and_pagination_use_persisted_database",
     "test_complete_matrix_snapshot_and_report_identity_are_browsable",
     "test_multi_task_matrix_uses_task_scoped_verified_observations",
@@ -52,7 +52,7 @@ BACKEND_CRITICAL = {
     "test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel",
 }
 FRONTEND_CRITICAL = {
-    "Workbench contracts > registers every major route and no Analyst route",
+    "Workbench contracts > registers every major route including bounded Analyst sessions",
     "Workbench contracts > renders reported zero differently from NOT_REPORTED",
     "Workbench contracts > keeps NOT_REPORTED visually distinct from NOT_COMPARABLE",
     "Workbench contracts > renders Matrix values, tiers, missing metrics, "
@@ -283,7 +283,7 @@ def verify_scope_and_safety() -> bool:
     ):
         print("FAIL: production frontend contains forbidden private/path material")
         return False
-    print("SCOPE=Phase I Workbench unchanged; no Analyst route/provider trigger/tag/auth/SaaS PASS")
+    print("SCOPE=evidence reads preserved; bounded Analyst sessions; no experiment/tag action PASS")
     print("API_SAFETY=no credential, absolute path, private CoT, or arbitrary artifact path PASS")
     return True
 

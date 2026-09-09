@@ -60,7 +60,8 @@ The primary attempt and all prior attempts remain frozen in the ledger.
 
 Legacy persistence values remain readable: `claimed` maps to `PREPARING`, `scoring` maps to
 `VERIFYING`, and `failed_subject` maps to `FAILED_CAPABILITY`. Phase M writes the legacy
-`failed_subject` value for compatibility. No schema migration is required for this slice.
+`failed_subject` value for compatibility. Migration `20260904_0006` supplies the
+authoritative attempt, resource, control and durable budget tables; it remains unchanged.
 
 ## Control-manifest rule
 
@@ -68,3 +69,16 @@ Preflight and budget manifests are strict JSON and reject unknown fields. They c
 identities, public price evidence, and numeric ceilings only. Credential values must remain in the
 execution environment. A blocked report is an authorization stop, not a prompt to change model,
 provider, route, task, or methodology until a preferred outcome appears.
+
+## Mainline integration on 2026-09-08
+
+The authoritative baseline is main@3335668. Lifecycle vocabulary in
+`experiment/lifecycle.py` is used by `experiment/authoritative.py`, queue, and Diagnosis
+projections. Preserve the M.3 admission/exposure, M.4 funnel, M.5 unified preflight
+and durable budgets, M.6 append-only attempts/control/reconciliation, and M.7
+versioned failure projections. `BUDGET_EXHAUSTED` remains a terminal run status.
+The old L closeout conclusion that lifecycle was unreachable is obsolete on main.
+Legacy queue F1 ownership checks now also require the immutable claim attempt;
+legacy F3 expired-cancellation maintenance excludes authoritative attempts.
+Analyst persistence uses the additive 20260908_0007 revision following 20260904_0006;
+it does not replace the Phase M lifecycle or ledger.

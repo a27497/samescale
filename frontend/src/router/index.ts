@@ -70,6 +70,7 @@ const router = createRouter({
       component: () => import('@/views/RegressionView.vue'),
       meta: { title: 'Regression', section: 'Evidence' },
     },
+    { path: '/analyst', name: 'analyst', component: () => import('@/views/AnalystView.vue'), meta: { title: 'Analyst', section: 'Evidence' } },
     {
       path: '/diagnosis',
       name: 'diagnosis',

@@ -218,7 +218,7 @@ def test_three_badcase_slots_are_frozen_real_failures() -> None:
     assert plan == verify_frozen_badcases(ROOT)
 
 
-def test_tag_guard_refuses_incomplete_release_and_tag_is_absent() -> None:
+def test_tag_guard_refuses_incomplete_candidate_and_existing_tag_is_bound() -> None:
     manifest = load_release_evidence(RELEASE / "release-evidence.json")
     assert not tag_creation_authorized(manifest)
     tags = subprocess.run(
@@ -228,7 +228,15 @@ def test_tag_guard_refuses_incomplete_release_and_tag_is_absent() -> None:
         capture_output=True,
         text=True,
     ).stdout.strip()
-    assert not tags
+    if tags:
+        tagged_commit = subprocess.run(
+            ("git", "rev-parse", "v1.0.0-core^{}"),
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        assert tagged_commit == "e3cab6f180f2bbcd6c8f134aa3d710c503fe6e87"
 
 
 def test_release_docs_and_fresh_setup_contract_exist() -> None:

@@ -18,6 +18,8 @@ from scripts.analyze_kb4_timeout_sensitivity import (
 )
 from scripts.audit_gpt_relay_attribution_sources import GPT_CELLS
 
+from harnesslab.release.badcases import POST_FREEZE_SOURCE_UPDATES
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -33,7 +35,12 @@ def test_frozen_artifact_reconciles_and_reproduces_without_external_evidence(
     validate(artifact)
     assert markdown(artifact) == (ROOT / (OUTPUT + ".md")).read_text()
     for reference, digest in artifact["provenance"]["sources_sha256"].items():
-        if not reference.startswith("evidence:"):
+        if reference.startswith("evidence:"):
+            continue
+        historical = POST_FREEZE_SOURCE_UPDATES.get(reference)
+        if historical is not None:
+            assert digest == historical
+        else:
             assert "sha256:" + hashlib.sha256((ROOT / reference).read_bytes()).hexdigest() == digest
     assert artifact["campaign_reconciliation"]["effective"]["capability_results"] == 599
     assert artifact["external_execution"] == {"provider": 0, "harness": 0, "judge": 0, "matrix": 0}

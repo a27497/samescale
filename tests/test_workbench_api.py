@@ -440,7 +440,7 @@ async def client(phase_i_evidence: PhaseIEvidence) -> AsyncIterator[AsyncClient]
 
 
 @pytest.mark.integration
-async def test_workbench_routes_are_read_only_and_have_no_execution_or_analyst_surface(
+async def test_workbench_read_routes_and_bounded_analyst_control_surface(
     phase_i_evidence: PhaseIEvidence,
 ) -> None:
     schema = phase_i_evidence.app.openapi()
@@ -449,6 +449,16 @@ async def test_workbench_routes_are_read_only_and_have_no_execution_or_analyst_s
         for path, methods in schema["paths"].items()
         if path.startswith("/api/workbench")
     }
+    analyst_paths = {path: methods for path, methods in paths.items() if "/analyst/" in path}
+    assert analyst_paths == {
+        "/api/workbench/analyst/sessions": {"get", "post"},
+        "/api/workbench/analyst/sessions/{session_id}": {"get"},
+        "/api/workbench/analyst/sessions/{session_id}/preflight": {"get"},
+        "/api/workbench/analyst/sessions/{session_id}/resume": {"post"},
+        "/api/workbench/analyst/sessions/{session_id}/proposal": {"put"},
+        "/api/workbench/analyst/sessions/{session_id}/approval": {"post"},
+    }
+    paths = {path: methods for path, methods in paths.items() if path not in analyst_paths}
     assert len(paths) == 16
     assert paths["/api/workbench/regression/compare"] == {"post"}
     assert paths["/api/workbench/experiments/{experiment_id}/diagnosis/badcases"] == {"post"}
@@ -472,7 +482,7 @@ async def test_workbench_routes_are_read_only_and_have_no_execution_or_analyst_s
     assert "execute" not in serialized
     assert "provider" not in serialized
     assert "calibrate" not in serialized
-    assert "analyst" not in serialized
+    assert "analyst" not in serialized  # Existing evidence read routes stay unchanged.
 
 
 @pytest.mark.integration

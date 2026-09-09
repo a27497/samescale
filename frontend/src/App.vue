@@ -29,6 +29,7 @@ const navigation = [
     label: 'Evidence',
     items: [
       { to: '/regression', label: 'Regression', mark: 'RG' },
+      { to: '/analyst', label: 'Analyst', mark: 'AN' },
       { to: '/diagnosis', label: 'Diagnosis', mark: 'DX' },
       { to: '/judgelab', label: 'JudgeLab', mark: 'JL' },
       { to: '/core-readiness', label: 'Core Readiness', mark: 'CR' },
@@ -70,7 +71,7 @@ watch(
         </div>
       </nav>
       <div class="sidebar-foot">
-        <div><span class="readonly-dot" />KEYLESS CONTROL PLANE</div>
+        <div><span class="readonly-dot" />KEYLESS BY DEFAULT</div>
         <small>Secrets stay server-side</small>
       </div>
     </aside>
@@ -93,7 +94,7 @@ watch(
         </div>
         <div class="topbar-status">
           <span class="status-pill neutral">SERVER AUTHORITY</span>
-          <span class="status-pill info"><span class="readonly-dot" /> KEYLESS</span>
+          <span class="status-pill info"><span class="readonly-dot" /> KEYLESS DEFAULT</span>
         </div>
       </header>
       <div class="page-container">

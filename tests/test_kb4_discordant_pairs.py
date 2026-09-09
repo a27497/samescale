@@ -19,7 +19,11 @@ from scripts.analyze_kb4_discordant_pairs import (
 from scripts.analyze_kb4_timeout_sensitivity import OUTPUT as TIMEOUT_OUTPUT
 from scripts.analyze_kb4_timeout_sensitivity import PAIR_DEFINITIONS
 
-from harnesslab.release.badcases import SUPERSEDED_KB42_INPUTS, verify_frozen_badcases
+from harnesslab.release.badcases import (
+    POST_FREEZE_SOURCE_UPDATES,
+    SUPERSEDED_KB42_INPUTS,
+    verify_frozen_badcases,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -42,15 +46,16 @@ def test_artifact_schema_and_markdown_are_reproducible(artifact: dict[str, Any])
 def test_source_hashes_and_accepted_inputs_are_unchanged(artifact: dict[str, Any]) -> None:
     from scripts.analyze_formal_matrix_final import _sha256_file
 
+    historical_inputs = SUPERSEDED_KB42_INPUTS | POST_FREEZE_SOURCE_UPDATES
     for reference, entry in artifact["provenance"]["sources"].items():
-        if reference in SUPERSEDED_KB42_INPUTS:
-            assert entry["sha256"] == SUPERSEDED_KB42_INPUTS[reference]
+        if reference in historical_inputs:
+            assert entry["sha256"] == historical_inputs[reference]
             continue
         if not reference.startswith("evidence:"):
             assert _sha256_file(ROOT / reference) == entry["sha256"]
     for reference, digest in FROZEN_INPUTS.items():
-        if reference in SUPERSEDED_KB42_INPUTS:
-            assert digest == SUPERSEDED_KB42_INPUTS[reference]
+        if reference in historical_inputs:
+            assert digest == historical_inputs[reference]
         else:
             assert _sha256_file(ROOT / reference) == digest
     # Historical K-B4.2 facts stay immutable; the authorized successor is independently bound.

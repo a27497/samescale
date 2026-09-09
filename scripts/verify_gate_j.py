@@ -162,7 +162,6 @@ def verify_scope_and_safety() -> bool:
         print("FAIL: Phase J does not use the required explicit StateGraph")
         return False
     forbidden_runtime = (
-        "ProviderAdapter",
         "DirectModelRunner",
         "ExperimentRunExecutor",
         "enqueue_plan",
@@ -185,17 +184,36 @@ def verify_scope_and_safety() -> bool:
     if found:
         print(f"FAIL: forbidden Analyst runtime expansion detected: {found}")
         return False
-    routes = (ROOT / "src/harnesslab/api/routes/workbench.py").read_text(encoding="utf-8")
-    if "analyst" in routes.lower():
-        print("FAIL: Phase J added a Workbench Analyst route")
+    decision_backend = (analyst_root / "real_backend.py").read_text(encoding="utf-8")
+    host_source = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in analyst_root.glob("*.py")
+        if path.name != "real_backend.py"
+    )
+    if "ProviderAdapter" in host_source or "adapter_for_profile" not in decision_backend:
+        print("FAIL: Analyst provider access must remain in its explicit existing-adapter backend")
         return False
-    migrations = tuple((ROOT / "alembic/versions").glob("*phase_j*"))
-    if migrations:
-        print("FAIL: Phase J unexpectedly added database migrations")
+    migrations = tuple((ROOT / "alembic/versions").glob("*analyst*"))
+    if tuple(path.name for path in migrations) != ("20260908_0007_analyst_session.py",):
+        print("FAIL: expected only the bounded Analyst session migration")
+        return False
+    from alembic.config import Config
+    from alembic.script import ScriptDirectory
+
+    config = Config(str(ROOT / "alembic.ini"))
+    config.set_main_option("script_location", str(ROOT / "alembic"))
+    lineage = ScriptDirectory.from_config(config)
+    analyst_revision = lineage.get_revision("20260908_0007")
+    if (
+        lineage.get_heads() != ["20260908_0007"]
+        or analyst_revision is None
+        or analyst_revision.down_revision != "20260904_0006"
+    ):
+        print("FAIL: Analyst migration must extend the single authoritative Phase M head")
         return False
     print(
-        "SCOPE=isolated Analyst package; no Workbench route, RAG, Multi-Agent, "
-        "queue, or provider surface PASS"
+        "SCOPE=six evidence tools; explicit backend; review-only session API; "
+        "no execution tools PASS"
     )
     print("REAL_ANALYST_PROVIDER=NOT_RUN")
     print("REAL_SUBJECT_PROVIDER=NOT_RUN_DURING_ANALYSIS")

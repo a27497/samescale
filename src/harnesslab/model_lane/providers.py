@@ -341,6 +341,7 @@ class _HTTPProviderAdapter:
             raise ProviderInvocationError(
                 ProviderFailureCategory.MALFORMED_RESPONSE,
                 "provider returned non-JSON content",
+                status_code=response.status_code,
                 request_id=_response_request_id(response),
                 latency_ms=latency_ms,
             ) from exc
@@ -349,6 +350,7 @@ class _HTTPProviderAdapter:
             normalized_body = _object(body, "response body")
             return self._parse(normalized_body, request, latency_ms, response)
         except ProviderInvocationError as exc:
+            exc.status_code = response.status_code
             exc.request_id = exc.request_id or _safe_bounded_text(safe_body.get("id"), limit=300)
             exc.request_id = exc.request_id or _response_request_id(response)
             exc.response_status = exc.response_status or _body_response_status(safe_body)
@@ -358,6 +360,7 @@ class _HTTPProviderAdapter:
             raise ProviderInvocationError(
                 ProviderFailureCategory.MALFORMED_RESPONSE,
                 "provider response failed normalized validation",
+                status_code=response.status_code,
                 request_id=(
                     _safe_bounded_text(safe_body.get("id"), limit=300)
                     or _response_request_id(response)
@@ -434,6 +437,17 @@ class OpenAIResponsesAdapter(_HTTPProviderAdapter):
             payload["temperature"] = profile.reasoning.temperature
         if profile.reasoning.effort is not None:
             payload["reasoning"] = {"effort": profile.reasoning.effort}
+        if request.output_json_schema is not None:
+            output_format: dict[str, object] = {
+                "type": "json_schema",
+                "name": "structured_output",
+                "schema": request.output_json_schema.value,
+            }
+            # DeepSeek official accepts type/name/schema, without nested strict.
+            # Keep the established Responses contract for every other provider.
+            if profile.provider != "deepseek-official":
+                output_format["strict"] = True
+            payload["text"] = {"format": output_format}
         return payload
 
     def _parse(

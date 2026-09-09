@@ -73,27 +73,33 @@ def load_verified_manifest(run: EvidenceRecord, roots: tuple[Path, ...]) -> Veri
         raise
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise EvidenceReadError("run artifact cannot be verified") from exc
-    if not isinstance(raw, dict) or raw.get("run_id") != _expected_manifest_run_id(run):
+    try:
+        expected_run_id = _expected_manifest_run_id(run)
+    except ValueError as exc:
+        raise EvidenceReadError("run attempt identity is invalid") from exc
+    if not isinstance(raw, dict) or raw.get("run_id") != expected_run_id:
         raise EvidenceReadError("run artifact identity mismatch")
     return VerifiedManifest(raw=raw, path=path)
 
 
 def load_normalized_trace(
-    run: EvidenceRecord, roots: tuple[Path, ...]
+    run: EvidenceRecord | VerifiedManifest, roots: tuple[Path, ...] = ()
 ) -> tuple[NormalizedTrace, str, str | None]:
-    manifest = load_verified_manifest(run, roots)
+    """Read one digest-bound trace from a run or an already-verified manifest."""
+    manifest = run if isinstance(run, VerifiedManifest) else load_verified_manifest(run, roots)
     digest = manifest.raw.get("normalized_trace_digest")
     coverage = manifest.raw.get("trace_coverage")
     if not isinstance(digest, str):
         raise EvidenceReadError("normalized trace is not reported")
-    root = manifest.path.parent
-    trace_path = (root / "trace" / "normalized.json").resolve()
-    if root not in trace_path.parents:
-        raise EvidenceReadError("normalized trace escapes its run artifact")
     try:
-        if not trace_path.is_file() or sha256_file(trace_path) != digest:
+        root = manifest.path.parent.resolve()
+        trace_path = (root / "trace" / "normalized.json").resolve()
+        if root not in trace_path.parents:
+            raise EvidenceReadError("normalized trace escapes its run artifact")
+        payload = trace_path.read_bytes()
+        if "sha256:" + hashlib.sha256(payload).hexdigest() != digest:
             raise EvidenceReadError("normalized trace digest does not match")
-        trace = NormalizedTrace.model_validate_json(trace_path.read_text(encoding="utf-8"))
+        trace = NormalizedTrace.model_validate_json(payload)
     except EvidenceReadError:
         raise
     except (OSError, UnicodeDecodeError, ValidationError) as exc:

@@ -1,5 +1,9 @@
 # HarnessLab Final Blueprint Phase Map — 2026-08-25
 
+> Frozen Technical Lead source (2026-08-25). The text below is preserved for historical
+> references. Maintain future planning in [Project Blueprint](PROJECT_BLUEPRINT.md) and
+> current progress in [Project Status](PROJECT_STATUS.md).
+
 This document is the authoritative final phase map supplied by the Technical Lead. It governs
 phase naming and completion claims. Engineering primitives do not complete an evidence-bound phase
 unless the phase's required real evidence also exists.

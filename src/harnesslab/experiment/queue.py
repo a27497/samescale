@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Collection
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -38,7 +39,10 @@ from harnesslab.experiment.authoritative import (
 )
 from harnesslab.experiment.lifecycle import TERMINAL_STATES, LifecycleState
 from harnesslab.experiment.methodology import ProviderAvailability
-from harnesslab.experiment.outcomes import StatisticalOutcome, terminal_status_for_outcome
+from harnesslab.experiment.outcomes import (
+    StatisticalOutcome,
+    terminal_status_for_outcome,
+)
 from harnesslab.experiment.plan import (
     AnyExperimentPlan,
     ExperimentRunSlot,
@@ -142,6 +146,20 @@ class AuthoritativeClaimGate:
             slot_ids=slot_ids,
         )
         return claimed
+
+
+def attempt_execution_id(claimed: RunSnapshot | ExperimentRunRecord) -> str:
+    """Keep logical queue identity stable while isolating each physical attempt artifact."""
+
+    if claimed.attempt < 1:
+        raise ValueError("claimed run must have a positive attempt number")
+    suffix = f"-a{claimed.attempt}"
+    candidate = f"{claimed.run_id}{suffix}"
+    if len(candidate) <= 100:
+        return candidate
+    digest = hashlib.sha256(candidate.encode()).hexdigest()[:16]
+    prefix_length = 100 - len(suffix) - len(digest) - 1
+    return f"{claimed.run_id[:prefix_length]}-{digest}{suffix}"
 
 
 def _snapshot(run: ExperimentRunRecord) -> RunSnapshot:
@@ -251,6 +269,40 @@ async def enqueue_plan(session: AsyncSession, plan: AnyExperimentPlan) -> Enqueu
     return EnqueueResult(plan.experiment_id, plan.digest, len(plan.run_slots), True)
 
 
+def _cancel_run(run: ExperimentRunRecord, now: datetime) -> None:
+    run.status = RunStatus.CANCELLED.value
+    run.normalized_outcome = StatisticalOutcome.CANCELLED.value
+    run.source_outcome = "cancellation_requested"
+    run.finished_at = now
+    run.lease_owner = None
+    run.lease_expires_at = None
+    run.heartbeat_at = now
+
+
+async def reconcile_expired_cancellations(
+    session: AsyncSession, experiment_id: str, now: datetime
+) -> None:
+    # Queue maintenance does not grant a worker ownership or create another attempt.
+    runs = await session.scalars(
+        select(ExperimentRunRecord)
+        .where(
+            ExperimentRunRecord.experiment_id == experiment_id,
+            ExperimentRunRecord.cancellation_requested.is_(True),
+            ~exists().where(ExperimentRunAttemptRecord.run_id == ExperimentRunRecord.run_id),
+            ExperimentRunRecord.status.in_(ACTIVE_STATUSES),
+            or_(
+                ExperimentRunRecord.lease_expires_at.is_(None),
+                ExperimentRunRecord.lease_expires_at <= now,
+            ),
+        )
+        .with_for_update(skip_locked=True)
+        .execution_options(populate_existing=True)
+    )
+    for run in runs:
+        _cancel_run(run, now)
+    await session.flush()
+
+
 async def claim_next_run(
     session: AsyncSession,
     experiment_id: str,
@@ -264,6 +316,7 @@ async def claim_next_run(
         raise ValueError("lease owner must be a non-empty bounded identity")
     if ttl <= timedelta(0):
         raise ValueError("lease ttl must be positive")
+    await reconcile_expired_cancellations(session, experiment_id, now)
     reclaimable = and_(
         ExperimentRunRecord.status.in_(ACTIVE_STATUSES),
         ExperimentRunRecord.lease_expires_at <= now,
@@ -303,6 +356,7 @@ async def claim_next_run(
         .order_by(ExperimentRunRecord.slot_order)
         .limit(1)
         .with_for_update(skip_locked=True)
+        .execution_options(populate_existing=True)
     )
     if run is None:
         return None
@@ -491,16 +545,23 @@ async def claim_authoritative_run(
 
 async def _locked_run(session: AsyncSession, run_id: str) -> ExperimentRunRecord:
     run = await session.scalar(
-        select(ExperimentRunRecord).where(ExperimentRunRecord.run_id == run_id).with_for_update()
+        select(ExperimentRunRecord)
+        .where(ExperimentRunRecord.run_id == run_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
     )
     if run is None:
         raise ExperimentConflict("experiment run does not exist")
     return run
 
 
-def _require_active_owner(run: ExperimentRunRecord, owner: str, now: datetime) -> None:
+def _require_active_owner(
+    run: ExperimentRunRecord, owner: str, attempt: int, now: datetime
+) -> None:
     if run.lease_owner != owner:
         raise ExperimentConflict("only the active lease owner may mutate this run")
+    if run.attempt != attempt:
+        raise ExperimentConflict("only the active attempt may mutate this run")
     if run.lease_expires_at is None or run.lease_expires_at <= now:
         raise ExperimentConflict("expired experiment lease cannot be used")
 
@@ -510,13 +571,14 @@ async def heartbeat_run(
     run_id: str,
     owner: str,
     *,
+    attempt: int,
     now: datetime,
     ttl: timedelta,
 ) -> RunSnapshot:
     if ttl <= timedelta(0):
         raise ValueError("lease ttl must be positive")
     run = await _locked_run(session, run_id)
-    _require_active_owner(run, owner, now)
+    _require_active_owner(run, owner, attempt, now)
     if run.status not in ACTIVE_STATUSES:
         raise ExperimentConflict("terminal or queued run cannot heartbeat")
     authoritative = await current_attempt_record(session, run_id, lock=True)
@@ -544,18 +606,21 @@ async def heartbeat_run(
 
 
 async def release_run(
-    session: AsyncSession, run_id: str, owner: str, *, now: datetime
+    session: AsyncSession, run_id: str, owner: str, *, attempt: int, now: datetime
 ) -> RunSnapshot:
     run = await _locked_run(session, run_id)
-    _require_active_owner(run, owner, now)
+    _require_active_owner(run, owner, attempt, now)
     if await current_attempt_record(session, run_id, lock=True) is not None:
         raise ExperimentConflict("authoritative attempts cannot be released and silently reused")
     if run.status not in ACTIVE_STATUSES:
         raise ExperimentConflict("terminal or queued run cannot be released")
-    run.status = RunStatus.QUEUED.value
-    run.lease_owner = None
-    run.lease_expires_at = None
-    run.heartbeat_at = now
+    if run.cancellation_requested:
+        _cancel_run(run, now)
+    else:
+        run.status = RunStatus.QUEUED.value
+        run.lease_owner = None
+        run.lease_expires_at = None
+        run.heartbeat_at = now
     await session.flush()
     return _snapshot(run)
 
@@ -566,7 +631,11 @@ async def request_run_cancellation(
     run = await _locked_run(session, run_id)
     authoritative = await current_attempt_record(session, run_id, lock=True)
     run.cancellation_requested = True
-    if run.status == RunStatus.QUEUED.value:
+    if run.status == RunStatus.QUEUED.value or (
+        authoritative is None
+        and run.status in ACTIVE_STATUSES
+        and (run.lease_expires_at is None or run.lease_expires_at <= now)
+    ):
         if authoritative is not None:
             await append_attempt_transition(
                 session,
@@ -575,10 +644,7 @@ async def request_run_cancellation(
                 occurred_at=now,
                 reason_code="OPERATOR_CANCELLED",
             )
-        run.status = RunStatus.CANCELLED.value
-        run.normalized_outcome = StatisticalOutcome.CANCELLED.value
-        run.source_outcome = "cancellation_requested"
-        run.finished_at = now
+        _cancel_run(run, now)
     await session.flush()
     return _snapshot(run)
 
@@ -635,10 +701,11 @@ async def transition_run(
     owner: str,
     status: RunStatus,
     *,
+    attempt: int,
     now: datetime,
 ) -> RunSnapshot:
     run = await _locked_run(session, run_id)
-    _require_active_owner(run, owner, now)
+    _require_active_owner(run, owner, attempt, now)
     authoritative = await current_attempt_record(session, run_id, lock=True)
     if run.cancellation_requested:
         if authoritative is not None:
@@ -681,6 +748,7 @@ async def finish_run(
     run_id: str,
     owner: str,
     *,
+    attempt: int,
     now: datetime,
     normalized_outcome: StatisticalOutcome,
     source_outcome: str,
@@ -694,7 +762,7 @@ async def finish_run(
     steps: int | None = None,
 ) -> RunSnapshot:
     run = await _locked_run(session, run_id)
-    _require_active_owner(run, owner, now)
+    _require_active_owner(run, owner, attempt, now)
     if run.status != RunStatus.SCORING.value:
         raise ExperimentConflict("a run may finish only after scoring")
     if run.cancellation_requested:

@@ -1,100 +1,41 @@
 # HarnessLab AI
 
-HarnessLab AI is a reproducible **Model × Harness × Judge** evaluation and attribution
-platform. The repository currently contains **Phase A — Foundation & Contracts** and
-**Phase B — Task Contract + Deterministic Verifier**, **Phase C — Native Docker Sandbox**, and
-**Phase D — M-Lane Direct Model**, **Phase E — Codex H-Lane**, and
-**Phase F — Multi-Harness + Comparability**, and
-**Phase G — Experiment Matrix + Repeated Runs + P-Lane + Statistics**, and
-**Phase H — JudgeLab + Judge Calibration**, and
-**Phase I — Read-only Workbench UI + Regression Compare**, and
-**Phase J — Read-only Attribution Analyst**.
+HarnessLab AI is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
+reproducible Model × Harness × Judge execution and verifier-backed evidence.
 
-## Implemented now
+## Project entrypoints
 
-- An exact Python 3.12.14 runtime and uv lockfile
-- A Typer CLI with `--help`, `--version`, `doctor`, and `serve`
-- A FastAPI control API with a database-aware `GET /api/health` and typed read-only Workbench API
-- A keyless Unified Registry Lite control plane with separate Provider, Model/Profile, Harness,
-  and fail-closed Capability registries; safe Settings references; Methodology-v2 preflight; and
-  PostgreSQL-backed immutable planning snapshots that create no experiment runs
-- Secret-safe settings loaded with Pydantic Settings
-- PostgreSQL 18 development service, SQLAlchemy 2 async access, psycopg 3, and Alembic
-- Pydantic v2 contracts for Task, Model, Harness, Experiment, and Run
-- Versioned, strict-YAML task packages with deterministic task and workspace digests
-- Fresh subject workspaces that exclude hidden verifiers and oracle overlays
-- Fail-closed deterministic verification with baseline-fail/oracle-pass polarity validation,
-  bounded partial scores, protected-file checks, and immutable evidence manifests
-- Python, Java 21, and TypeScript/Node 24 controlled micro-task fixtures
-- A separately qualified Tier-B repo-engineering corpus with frozen multi-file snapshots for
-  Python/SQLite, Java API/service/persistence, and TypeScript config/dependency work
-- Tier-aware schema-v2 planning that requires the digest-bound Tier-B qualification artifact and
-  cannot pool Tier-A and Tier-B outcomes in one plan
-- `harnesslab task validate` and an authoritative Gate B runner
-- A Docker CLI sandbox with a fresh non-root Linux container per subject/verifier run
-- Inspect-verified capability, privilege, network, rootfs, PID, CPU, memory, and mount controls
-- Bounded/redacted logs, immutable image identity, safe workspace snapshots, and hashed artifacts
-- Timeout/cancellation cleanup and fresh-run workspace isolation
-- A minimal PostgreSQL execution lease with heartbeat and expiry recovery
-- `harnesslab sandbox doctor` and an authoritative Gate C runner
-- A normalized direct-provider boundary using async httpx for OpenAI Responses, Anthropic
-  Messages, and generic OpenAI-compatible Chat Completions
-- Credential-reference-only model profiles, one-attempt provider failure attribution, and safe
-  public-output metadata without raw HTTP responses or private reasoning/thinking blocks
-- Deterministic `direct-patch-v1` prompts, strict write/delete patches, protected-path and
-  traversal defenses, and exact-secret artifact withholding
-- An M-Lane runner that applies model patches in a fresh Phase B workspace and evaluates the
-  result through the Phase C isolated hidden verifier
-- `harnesslab model run`, model-profile validation, and an authoritative no-key Gate D runner
-- A pinned non-root Codex 0.149.0 runtime, deterministic `codex-harness-v1` prompt, and minimal
-  `HarnessAdapter` boundary for `codex exec --json`
-- Sanitized native JSONL and Normalized Trace v1 without private reasoning content, plus
-  filesystem-authoritative workspace changes and immutable H-Lane evidence
-- Fake Codex end-to-end runs for the Python, Java, and TypeScript tasks through the isolated
-  hidden verifier, and an authoritative no-key Gate E runner
-- Pinned, non-root Claude Code 2.1.241 and DeepSeek Harness 0.1.1-rc.2 subject images with the
-  same Python 3.12, Java/Javac 21, and Node 24 task toolchains as the verifier
-- One shared Phase F runner for Claude Code bare stream-JSON and the public DeepSeek
-  `dsh --profile headless` contract, including safe evidence and explicit trace coverage
-- A deterministic Comparability Engine with three claim intents, field-level reasons, and
-  `COMPARABLE`, `PARTIALLY_COMPARABLE`, or `NOT_COMPARABLE` outcomes
-- An authoritative, keyless, non-recursive Gate F with critical-test and sensitivity enforcement
-- Strict ExperimentSpec validation and timestamp-free deterministic ExperimentPlan expansion
-- PostgreSQL experiment/cell/pair/ablation/run storage with idempotent enqueue, transactional
-  `FOR UPDATE SKIP LOCKED` claiming, heartbeat, expiry reclaim, attempts, and cancellation
-- A bounded worker that dispatches through existing M/H runners and persists manifest identity
-- Formal n=5, informal n>=3, and smoke n=1 tiers with infrastructure failures outside the
-  capability denominator
-- Wilson 95%, per-task macro pass@k, p50/p95, deterministic bootstrap, exact paired binary tests,
-  and paired continuous statistics using NumPy, pandas, and SciPy
-- Comparability-gated P-Lane and controlled ablation reporting in deterministic JSON/Markdown
-- `harnesslab experiment plan/run`, `harnesslab run inspect`, `harnesslab report compare`, and an
-  authoritative non-recursive, keyless Gate G
-- Strict JudgeDefinition and public-case/hidden-gold suite contracts for LABEL, SCORE, and
-  PAIRWISE evaluation
-- Public-only Judge prompts over the existing one-attempt ProviderAdapter layer, with strict JSON
-  outputs, immutable JudgeEvidence, pairwise order swaps, bias probes, and repeated calibration
-- Label/score/pairwise metrics, suite-scoped qualification, PostgreSQL slots, verified disk
-  artifact reload, deterministic reports, and a keyless Good-vs-Biased E2E
-- `harnesslab judge suite validate/plan/calibrate/report` and an authoritative non-recursive,
-  keyless Gate H
-- A Vue 3/Vite/TypeScript analytical Workbench with Pinia, Vue Router, Element Plus, ECharts,
-  Axios, Vitest, and a pinned npm dependency graph
-- Read-only experiment, task-scoped multi-task Matrix, run/trace, JudgeLab, treatment-aware
-  deterministic Regression compare, polling, and Core readiness views over PostgreSQL plus
-  trusted-root-confined, digest-verified immutable evidence
-- Explicit `NOT_REPORTED` versus zero and `NOT_COMPARABLE` versus missing evidence semantics,
-  with no browser-triggered model, Harness, or Judge execution
-- An authoritative non-recursive, fully keyless Gate I using real persisted Phase G/H fixtures
-- A LangGraph 1.2.11 `StateGraph` confined to a read-only Attribution Analyst package, with an
-  explicit 8-decision/12-tool-call bound and no generic Agent, RAG, or multi-agent runtime
-- Exactly six experiment-scoped evidence tools: `query_runs`, `compare_cells`, `inspect_trace`,
-  `inspect_failure`, `get_task_contract`, and `get_ablation`
-- Exact-value structured fact assertions bound to deterministic evidence citations, enforced
-  `VERIFIED_FACT` versus `HYPOTHESIS`, canonical JSON/Markdown reports, and a production-path
-  keyless Gate J read-only proof
-- pytest integration/unit coverage, Ruff, mypy, and one authoritative Gate A runner
-- GitHub Actions using PostgreSQL 18 without model-provider credentials
+- [Project Blueprint](docs/PROJECT_BLUEPRINT.md): product direction, architecture choices, phase
+  requirements, and acceptance scope.
+- [Project Status](docs/PROJECT_STATUS.md): workspace baseline, active task, evidence position, and NEXT.
+- `AGENTS.md` in source checkouts: development-agent guidance and permission boundaries.
+- [Architecture](docs/ARCHITECTURE.md): implemented execution and evidence contracts.
+- [Productization](docs/PRODUCTIZATION.md): bundled local product operation.
+- [Release Evidence](docs/RELEASE_EVIDENCE.md): versioned candidate and final-release procedure.
+- [First Application](docs/FIRST_APPLICATION.md): bounded demo script, capability draft, and human
+  ownership checkpoints.
+
+Current phase and capability completion claims are maintained in Project Status. Domain documents
+explain component behavior; dated audits and campaign records retain their original scope.
+
+## Implemented Capabilities
+
+- **Reproducible task evaluation:** versioned Python, Java, and TypeScript task packages,
+  baseline/oracle qualification, fresh workspaces, and isolated hidden verification in Docker.
+- **Model and Harness execution:** direct-provider adapters and Codex/Claude/DeepSeek Harness
+  integrations, with normalized traces, filesystem-derived changes, and immutable run evidence.
+  Adapter implementation and qualification for a real campaign are separate claims.
+- **Durable experiments and comparison:** deterministic Matrix plans, PostgreSQL leases and
+  heartbeats, cancellation/recovery, repeated-run statistics, and comparability-gated pairs/ablations.
+- **Judge calibration and diagnosis:** suite-scoped JudgeLab evaluation, bias/consistency checks,
+  failure clustering, factual BadCase reports, and a bounded read-only attribution Analyst.
+- **Local workbench and planning:** bundled CLI/API/Vue application, evidence and trace inspection,
+  regression comparison, registry/settings views, and validated experiment planning snapshots.
+- **Evidence and release controls:** digest-verified artifacts, credential-reference configuration,
+  keyless CI gates, and an independent final-release verifier binding evidence to an exact Git/CI head.
+
+These are implemented system capabilities, not blanket phase-completion or model-performance
+claims. [Release Evidence](docs/RELEASE_EVIDENCE.md) records the accepted campaign scope and limitations.
 
 ## Core boundary
 
@@ -106,16 +47,26 @@ JudgeLab is an L2 annotation and comparison layer. Evidence authority is
 Phase I evidence pages remain read-only. Unified Registry Lite adds backend-validated planning
 pages for models, providers, Harnesses, capabilities, settings, and new experiment snapshots.
 The browser still cannot mutate outcomes, cancel runs, change task/gold data, read secrets or
-private runtime URLs, or trigger provider/Harness/Judge execution. Phase J does not add an Analyst
-browser route. See [Unified Registry Lite](docs/UNIFIED_REGISTRY_LITE.md).
+private runtime URLs, or trigger subject/Harness/Judge execution. The Analyst page adds saved
+investigations and review-only approvals. Explicitly enabled real Analyst decisions use a Registry
+profile; creation, reads, and approvals make no provider calls. See
+[Unified Registry Lite](docs/UNIFIED_REGISTRY_LITE.md) and [Analyst](docs/ANALYST.md).
 
 ## Analyst boundary
 
 Phase J is a read-only attribution layer over approved Phase G/H/I evidence. It uses LangGraph
 only for a bounded local decision/tool/finalize graph. Trace and task text are untrusted evidence,
-not instructions. The Analyst cannot execute subjects, enqueue or cancel work, invoke a provider,
-Harness, Judge, shell, browser, SQL, filesystem, or code tool, and cannot alter authoritative
-evaluation evidence. Trusted host code writes only a validated Analyst report after completion.
+not instructions. Its six evidence tools cannot execute subjects, enqueue or cancel work, or invoke
+Harness, Judge, shell, browser, arbitrary SQL, filesystem, or code tools. Fake is the deterministic
+default. The explicit real decision backend reuses ProviderAdapter and strict JSON output; the
+host validates tool scope, citations, facts, and proposals. PostgreSQL stores only the Analyst
+session and review state; authoritative experiment evidence remains unchanged.
+
+A bounded live Real Agent smoke completed on 2026-09-09 using persisted `core-real-matrix-v6`
+evidence. The accepted report is host-validated, the model proposal is review-only, and approval
+keeps `execution_authorized=false`. This verifies the Analyst vertical slice; it does not authorize
+a new Matrix/regression campaign or strengthen the accepted V6 causal claims. See
+[Real Agent smoke evidence](docs/evidence/REAL_AGENT_SMOKE_20260909.md).
 
 ## Local setup
 
@@ -180,154 +131,35 @@ round trip fails and never returns a DSN or credential.
 
 ## Verification
 
-With PostgreSQL running and `DATABASE_URL` configured, the authoritative local/CI gate is:
+Choose checks for the changed contract and risk; the command catalog below is not a mandatory
+sequence for every task. Documentation-only edits need link/consistency checks and any affected
+existing documentation contracts. Behavior changes need the relevant focused tests. Expand to
+phase gates or full regression for cross-cutting risk or the selected acceptance/release scope.
 
-```powershell
-uv run --locked python scripts/verify_gate_a.py
-```
+The repository supplies keyless `scripts/verify_gate_a.py` through `scripts/verify_gate_k.py`.
+Run a selected gate with `uv run --locked python scripts/verify_gate_<letter>.py` after checking
+its prerequisites. These scripts may run substantial tests, Docker builds, or database fixtures.
 
-This runner executes locked sync, CLI checks, pytest (including an empty-database migration),
-Ruff, mypy, Alembic, and Git whitespace validation. It rejects zero collected tests, skipped
-critical tests, imports outside the working tree, or an absent database configuration. Exit `2`
-means **NOT_VERIFIED**, not success.
+| Gate | Contract |
+| --- | --- |
+| A | Foundation, runtime, static checks, and regression suite |
+| B–C | Task packages, deterministic verification, and Docker isolation |
+| D–F | Direct-model and pinned Harness adapters, traces, and Comparability |
+| G–H | Durable experiments, statistics, and Judge calibration |
+| I–J | Workbench projections and bounded read-only attribution |
+| K | Corpus, immutable history, evidence/claim bindings, and release hard stop |
 
-The authoritative Phase B gate is:
+Keyless/fake checks do not acquire or replace real campaign evidence. Missing prerequisites,
+zero collected tests, or skipped critical checks do not prove acceptance. Final release requires
+its own exact-head verification; see [Release Evidence](docs/RELEASE_EVIDENCE.md).
 
-```powershell
-uv run --locked python scripts/verify_gate_b.py
-```
-
-It runs the Phase B test corpus, validates all three language fixtures through the public CLI,
-checks their baseline/oracle polarity and critical tests, then runs Ruff, formatting, mypy, and
-Git whitespace validation. Individual task packages can be inspected without exposing hidden
-assets:
-
-```powershell
-uv run harnesslab task validate tasks/micro-python-clamp/1.0.0
-```
-
-The Phase C gate runs real hardened subject and verifier containers, verifies cleanup and
-fresh-workspace behavior, checks artifact/redaction integrity, exercises lease expiry recovery,
-and invokes the Phase A and Phase B gates as regressions:
-
-```powershell
-uv run --locked python scripts/verify_gate_c.py
-```
-
-The Phase D gate invokes Gate C as its A/B/C regression, then checks all provider protocols,
-deterministic prompt and patch safety, credential withholding, and the fake-provider M-Lane E2E:
-
-```powershell
-uv run --locked python scripts/verify_gate_d.py
-```
-
-Those standalone commands retain their complete prerequisite regressions. The full-release GitHub
-Actions workflow runs A-K in isolated parallel jobs and uses the guarded `--leaf-only` option for
-C and D only after declaring independent A/B/C jobs in the same workflow. Leaf mode is restricted
-to GitHub Actions and is not an authoritative standalone gate.
-
-Real provider calls are optional and were not used as Gate D evidence. See the safe example
-profiles under `profiles/`; they contain environment-variable names, never credential values.
-
-The Phase E gate independently checks the pinned runtime, profile and prompt fingerprints,
-sanitization/trace mapping, failure taxonomy, workspace authority, and all three H-Lane fixtures:
-
-```powershell
-uv run --locked python scripts/verify_gate_e.py
-```
-
-Real Codex execution is opt-in and is not Gate E evidence. The default result is
-`REAL_CODEX_SMOKE=NOT_RUN`; HarnessLab does not consume ambient Codex login state or credentials.
-
-The non-recursive Phase F gate independently verifies Phase F and its current-tree contracts:
-
-```powershell
-uv run --locked python scripts/verify_gate_f.py
-```
-
-Real Claude and DeepSeek calls are optional and are not Gate F evidence. DeepSeek E1 is honestly
-`FINAL_OUTPUT_ONLY`; E2 is `DEFERRED_NOT_VERIFIED` because no sufficiently documented public
-persistent-session extractor seam was established.
-
-The non-recursive Phase G gate verifies planning, PostgreSQL queue concurrency, keyless runner
-execution, immutable manifest reload, repeated-run policy, P-Lane, ablation, statistics, reports,
-and CLI contracts:
-
-```powershell
-uv run --locked python scripts/verify_gate_g.py
-```
-
-`REAL_MATRIX_EVIDENCE=NOT_RUN` remains separate from deterministic Gate G. A real Matrix Evidence
-run is still required before the final Core hard stop and is never synthesized from ambient login.
-
-The non-recursive Phase H gate verifies Judge contracts, leakage, strict outputs, evidence
-hierarchy, order swaps, bias probes, repeats, persistence, artifact integrity, and qualification:
-
-```powershell
-uv run --locked python scripts/verify_gate_h.py
-```
-
-Gate H is keyless. `REAL_JUDGE_SMOKE=NOT_RUN` unless explicitly enabled with a
-credential-reference-only ModelProfile.
-
-The non-recursive Phase I gate generates actual deterministic Phase G and Phase H persisted
-evidence, reads it through the Workbench API, verifies trace/artifact safety and Regression
-semantics, and runs the pinned frontend type-check, Vitest suite, and production build:
-
-```powershell
-uv run --locked python scripts/verify_gate_i.py
-```
-
-All `REAL_*` evidence remains `NOT_RUN`; Gate I never uses provider or ambient Harness credentials.
-
-The non-recursive Phase J gate verifies the bounded graph, exact tool surface, persisted evidence
-reads, structured fact-to-evidence binding, contradictory run/numeric rejection, citations,
-fact/hypothesis boundary, controlled ablation, injection resistance, deterministic reports, and
-source immutability:
-
-```powershell
-uv run --locked python scripts/verify_gate_j.py
-```
-
-Gate J uses only `FakeAnalystBackend`; real external calls are not performed during analysis.
-
-See [Architecture](docs/ARCHITECTURE.md), [Evaluation Methodology](docs/EVAL_METHODOLOGY.md), and
-[Task Format](docs/TASK_FORMAT.md), [Sandbox Security](docs/SANDBOX_SECURITY.md), and
-[M-Lane Direct Model](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md),
-[Harness Comparability](docs/HARNESS_COMPARABILITY.md),
-[Experiment Statistics](docs/EXPERIMENT_STATISTICS.md), and [Resume Scope](docs/RESUME_SCOPE.md).
-[JudgeLab](docs/JUDGELAB.md) documents the Phase H authority and calibration boundary, and
-[Workbench](docs/WORKBENCH.md) documents the Phase I read API and Vue evidence surface.
-[Attribution Analyst](docs/ANALYST.md) documents Phase J structured facts and read-only graph
-boundary.
-
-## Phase K-B0 real-provider preparation
-
-The prospective Core corpus contains 18 validated tasks: six each in Python, Java, and TypeScript.
-It has one intentional three-language clamp control and 15 semantically independent scenarios, for
-16 scenario families across multiple categories and difficulty bands. The canonical inventory is
-`release/core-corpus.json`; reconstruction checks task semantics, metadata, hidden verifiers,
-baseline failure, and oracle success.
-
-Gate K keyless mode verifies the corpus, eight selected provider profiles and truthful provenance,
-release Matrix/smoke ceilings, Pair and ablation controls, provider-scoped Harness egress,
-Judge-suite binding, evidence schema, documentation, resume map, BadCase placeholders, fresh setup,
-secret boundary, and tag guard:
-
-```bash
-uv run --locked python scripts/verify_gate_k.py
-```
-
-During K-B0 a pass intentionally reports `CORE_RELEASE_READY=FALSE`,
-`REAL_EVIDENCE_AUTHORIZATION_REQUIRED=TRUE`, and every `REAL_*` state `NOT_RUN`. It performs no
-provider, Harness, or Judge call and does not create `v1.0.0-core`. The selected GPT profile is
-`gpt-5.6-sol` via an operator-trusted OpenAI-compatible relay whose upstream first-party provenance
-is not independently verified. See [Real Evidence Authorization](docs/REAL_EVIDENCE_AUTHORIZATION.md)
-for the exact eight-call K-B1 smoke plan, which still requires separate authorization. The keyless
-`harnesslab release smoke preflight` command validates the same frozen bindings consumed by the
-future `harnesslab release smoke execute --allow-real-smoke` command. Gate K injects a fake invoker
-into that production executor to prove its fail-closed, abort-on-first-failure behavior; ordinary CI
-never invokes the real execute command.
+Domain references: [Evaluation Methodology](docs/EVAL_METHODOLOGY.md),
+[Task Format](docs/TASK_FORMAT.md), [Sandbox Security](docs/SANDBOX_SECURITY.md),
+[M-Lane](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md),
+[Comparability](docs/HARNESS_COMPARABILITY.md), [Statistics](docs/EXPERIMENT_STATISTICS.md),
+[JudgeLab](docs/JUDGELAB.md), [Workbench](docs/WORKBENCH.md), and [Analyst](docs/ANALYST.md).
+Historical smoke plans are documented in [Real Evidence Authorization](docs/REAL_EVIDENCE_AUTHORIZATION.md);
+reading them does not authorize a new campaign.
 
 ## Fresh clone operator path
 
@@ -351,7 +183,6 @@ isolated A-K and qualification jobs succeed, `--actions-reproduction` verifies t
 `GITHUB_SHA`, pinned runtimes, and an unmodified tracked checkout. That mode is CI-only and does not
 invoke any gate recursively.
 
-Run `scripts/verify_gate_a.py` through `scripts/verify_gate_k.py` in order for the full keyless gate
-chain; Gates H-J also require `DATABASE_URL` pointing at PostgreSQL. Future real execution uses only
-credential references from the authorization document; never commit `.env` or secret values. Final
-release mode is documented in [Release Evidence](docs/RELEASE_EVIDENCE.md) and remains fail-closed.
+For a task requiring the full keyless chain, run Gates A–K using their prerequisites; database-backed
+gates need an appropriate test PostgreSQL instance. Ordinary edits use the verification scope above.
+Real execution needs current authorization and credential references; never commit `.env` or secret values.

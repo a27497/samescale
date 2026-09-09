@@ -42,6 +42,7 @@ from harnesslab.experiment.statistics import (
     summarize_cell,
     summarize_pair,
 )
+from harnesslab.experiment.tool_metrics import manifest_tool_calls
 from harnesslab.sandbox.artifacts import sha256_file
 
 
@@ -201,22 +202,18 @@ def _number(value: object) -> float | None:
     return None
 
 
-def _manifest_metrics(raw: dict[str, Any]) -> dict[str, float | None]:
+def _manifest_metrics(
+    raw: dict[str, Any], manifest_path: Path | None = None
+) -> dict[str, float | None]:
     provider_result = raw.get("provider_result")
     usage: object = raw.get("usage")
     duration: object = raw.get("duration_ms")
     steps: object = raw.get("trace_event_count")
-    tool_calls: object = None
+    tool_calls = manifest_tool_calls(raw, manifest_path)
     if isinstance(provider_result, dict):
         usage = provider_result.get("usage")
         duration = provider_result.get("latency_ms")
         steps = 1
-        tool_calls = 0
-    event_types = raw.get("trace_event_types")
-    if isinstance(event_types, list):
-        tool_calls = sum(
-            event in {"COMMAND_EXECUTION", "FILE_CHANGE", "MCP_TOOL_CALL"} for event in event_types
-        )
     input_tokens: object = None
     output_tokens: object = None
     if isinstance(usage, dict):
@@ -320,7 +317,8 @@ async def load_verified_experiment_evidence(
                 raise ExperimentReportError(
                     f"run {run.run_id} source outcome disagrees with immutable evidence"
                 )
-            metrics = _manifest_metrics(raw)
+            assert run.artifact_manifest_path is not None
+            metrics = _manifest_metrics(raw, Path(run.artifact_manifest_path))
         elif normalized in {
             StatisticalOutcome.CAPABILITY_PASS,
             StatisticalOutcome.CAPABILITY_FAIL,

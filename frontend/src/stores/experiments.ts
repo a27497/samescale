@@ -23,6 +23,8 @@ interface ExperimentState {
   search: string
   statusFilter: string
   selectedMetric: MatrixMetricKey
+  pollingGeneration: number
+  refreshingGeneration: number | null
   pollingHandle: ReturnType<typeof setInterval> | null
 }
 
@@ -40,6 +42,8 @@ export const useExperimentStore = defineStore('experiments', {
     statusFilter: '',
     selectedMetric: 'success_rate',
     pollingHandle: null,
+    pollingGeneration: 0,
+    refreshingGeneration: null,
   }),
   actions: {
     async fetchList() {
@@ -57,7 +61,8 @@ export const useExperimentStore = defineStore('experiments', {
         this.loading = false
       }
     },
-    async fetchExperiment(id: string) {
+    async fetchExperiment(id: string, generation?: number): Promise<boolean> {
+      const isCurrent = () => generation === undefined || generation === this.pollingGeneration
       this.loading = true
       this.error = null
       try {
@@ -69,29 +74,53 @@ export const useExperimentStore = defineStore('experiments', {
             ? workbenchApi.getModelComparisonAnalysis(id)
             : Promise.resolve(null),
         ])
+        if (!isCurrent()) return false
         this.selected = selected
         this.matrix = matrix
         this.modelComparison = modelComparison
         this.runs = runs.items
+        return true
       } catch {
+        if (!isCurrent()) return false
         this.modelComparison = null
         this.error = 'Persisted experiment evidence could not be verified.'
+        return false
       } finally {
-        this.loading = false
+        if (isCurrent()) this.loading = false
       }
     },
-    async refreshStatus(id: string) {
-      this.durableStatus = await workbenchApi.getStatus(id)
-      if (this.durableStatus.terminal) this.stopPolling()
+    async refreshStatus(id: string, generation?: number) {
+      generation ??= this.pollingGeneration
+      if (generation !== this.pollingGeneration || this.refreshingGeneration === generation) return
+      this.refreshingGeneration = generation
+      try {
+        const status = await workbenchApi.getStatus(id)
+        if (generation !== this.pollingGeneration) return
+        this.durableStatus = status
+        if (status.terminal) {
+          const refreshed = await this.fetchExperiment(id, generation)
+          if (refreshed && generation === this.pollingGeneration) this.stopPolling()
+        } else {
+          this.error = null
+        }
+      } catch {
+        if (generation === this.pollingGeneration) this.error = 'Experiment status could not be loaded.'
+      } finally {
+        if (this.refreshingGeneration === generation) this.refreshingGeneration = null
+      }
     },
     startPolling(id: string, intervalMs = 3_000) {
       this.stopPolling()
-      void this.refreshStatus(id)
-      this.pollingHandle = setInterval(() => void this.refreshStatus(id), intervalMs)
+      this.durableStatus = null
+      const generation = this.pollingGeneration
+      this.pollingHandle = setInterval(() => void this.refreshStatus(id, generation), intervalMs)
+      void this.refreshStatus(id, generation)
     },
     stopPolling() {
+      if (this.refreshingGeneration === this.pollingGeneration) this.loading = false
       if (this.pollingHandle !== null) clearInterval(this.pollingHandle)
       this.pollingHandle = null
+      this.pollingGeneration += 1
     },
   },
 })

@@ -1,11 +1,13 @@
 # Core Release Evidence
 
-K-B4 is formally complete at `3e9fcfeca9cb635d8c40c9206fc278928df9f044`.
-Its exact-head Full Release CI run `33739101949` passed the qualification jobs, Gates A–K,
-and fresh-setup with zero real external calls. K-C.1 now reconciles the stable release contract;
-this is not a final release, tag authorization, or a merge to main.
+This is a versioned release-contract reference. [Project Status](PROJECT_STATUS.md) owns current
+phase/release status; instructions here apply only to an explicitly authorized release task.
+Historical sections describe their named campaign and do not authorize execution.
 
-The current schema-2 candidate selects `core-real-evidence-v6` from
+The accepted K-B4 completion record is at `3e9fcfeca9cb635d8c40c9206fc278928df9f044`, with recorded
+exact-head Full Release CI run `33739101949`. That historical CI is not evidence for a newer head.
+
+The schema-2 V6 candidate selects `core-real-evidence-v6` from
 `release/core-real-evidence-plan-v6.json`. It binds the actual persisted `core-real-matrix-v6`
 ExperimentPlan (`sha256:c18afc7b003a379f3456b23649e6d161da55e4fb5a34b4702dffbff35fb3604a`)
 and `release/core-corpus-v4.json` (task version 1.0.2). V2–V5 plans remain immutable historical
@@ -33,9 +35,22 @@ BadCases and their exact digests are unchanged; all root causes are null. The op
 `analyst_report` binding identifies the accepted K-B4 final attribution JSON, with zero
 controlled-attribution claims. Historical statements within that frozen report are not rewritten.
 
-## Current REAL_* evidence mapping
+The separate 2026-09-09 live Attribution Analyst smoke is product/Agent evidence, not a replacement
+for any `REAL_*` release class. It does not rewrite the accepted V6 Matrix/Judge/BadCase bindings or
+add a controlled-attribution claim. Its report/proposal/approval evidence is recorded under
+`docs/evidence/REAL_AGENT_SMOKE_20260909.md`.
 
-| Class | Current state | Authoritative scope |
+## Accepted V6 evidence contract
+
+The selected evidence classes are recorded in `release/release-evidence.json`; their live summary
+and release-binding limitations are in [Project Status](PROJECT_STATUS.md).
+
+### Accepted V6 exact REAL_* evidence mapping
+
+This mapping is part of the accepted V6 release contract. `VERIFIED` applies to each class's
+bound evidence scope; it does not independently establish final-head release readiness.
+
+| Class | Accepted V6 state | Authoritative scope |
 | --- | --- | --- |
 | REAL_PROVIDER_SMOKE | VERIFIED | Accepted V6 direct GPT, Bailian Qwen, DeepSeek Pro and Flash runs; native manifests and real capability results |
 | REAL_CODEX_SMOKE | VERIFIED | Accepted V6 Codex medium/high runs and their immutable Harness evidence; unexposed observed model stays unexposed |
@@ -81,7 +96,7 @@ bindings. Historical regression tests now read the historical snapshot explicitl
 
 The Phase K hard stop is implemented by strict models in `src/harnesslab/release`, canonical JSON artifacts in `release/`, and `scripts/verify_gate_k.py`. Documentation does not make evidence true; identities, digests, authoritative source references, state, and independent validation do.
 
-## Core real-evidence v3 convergence contract
+## Historical v3 convergence contract
 
 `core-real-evidence-plan-v3.json` (`core-real-evidence-v3` / `core-real-matrix-v3`) and
 `core-real-smoke-plan-v3.json` (`core-real-smoke-v3`) supersede v2 for final real validation without
@@ -104,7 +119,7 @@ aborted after Call 5 and is not represented as complete. `technical-readiness-v3
 non-release subject-plane and Judge-plane reachability result without changing any strict
 `REAL_*` state or `CORE_RELEASE_READY`.
 
-## Core real-evidence v2 artifacts
+## Historical v2 artifacts
 
 - `core-corpus.json` binds the 18 package, task, semantic-family, benchmark-role, workspace, verifier, lane, toolchain, baseline, and oracle identities. Exactly one clamp control spans all three languages; the other 15 families are independent.
 - `core-real-evidence-plan.json` is `core-real-evidence-v2` / `core-real-matrix-v2`. It binds eight configured-not-smoked profiles, seven cells, truthful provider provenance, the unchanged Pair and ablation, frozen Judge profile/suite, exact call/token ceilings, four runtime configuration references, and authorization blockers.
@@ -162,13 +177,13 @@ uv run --locked python scripts/verify_gate_k.py
 
 It validates the task corpus from source, v1 history, OpenCode Go routes/transport/provenance, exact smoke bindings and mutation rejection, smoke and Matrix ceilings, Pair/ablation structure, immutable proxy identity, effective Docker egress topology, docs, resume references, the frozen BadCase contract, secret boundaries, CI ordering, fresh-clone contract, and tag guard. Passing means the hard stop works. Expected R4 output includes `OUTPUT_BUDGET_TRUNCATION_SEMANTICS=PASS`, `OPENCODE_GO_ROUTE_CONTRACT=PASS`, `OPENCODE_GO_CREDENTIAL_TRANSPORT=PASS`, `OPENCODE_GO_PROVENANCE=PASS`, `V1_HISTORY_PRESERVED=PASS`, `V2_SMOKE_PLAN=8_CALLS_14256_TOKENS`, `CORE_RELEASE_READY=FALSE`, and `REAL_CALLS_THIS_REPAIR=0`.
 
-## Later final release mode: detached exact-head binding
+## Final release procedure: detached exact-head binding
 
 K-C.1 leaves `release_commit` and `remote_ci` NOT_VERIFIED, with no identity or digest.
 `core_release_ready=false` and Tag Guard denies authorization. The accepted K-B4 CI run is
 historical evidence, never substituted for CI on a newer commit.
 
-The later authorized finalization flow avoids a commit/CI cycle:
+For an explicitly authorized release task, the finalization flow avoids a commit/CI cycle:
 
 1. Commit the reconciled stable candidate, which contains no final SHA or CI run ID.
 2. Run Full Release CI on that exact final commit. Any subsequent committed change requires

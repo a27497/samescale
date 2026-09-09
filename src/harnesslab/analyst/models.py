@@ -188,6 +188,18 @@ class ClaimClass(StrEnum):
     HYPOTHESIS = "HYPOTHESIS"
 
 
+class FinalizationRejectionCode(StrEnum):
+    DUPLICATE_EVIDENCE = "DUPLICATE_EVIDENCE"
+    MISSING_EVIDENCE = "MISSING_EVIDENCE"
+    ASSERTION_TOOL_MISMATCH = "ASSERTION_TOOL_MISMATCH"
+    ASSERTION_PATH_INVALID = "ASSERTION_PATH_INVALID"
+    ASSERTION_OPERATOR_UNSUPPORTED = "ASSERTION_OPERATOR_UNSUPPORTED"
+    ASSERTION_VALUE_MISMATCH = "ASSERTION_VALUE_MISMATCH"
+    INVALID_ABLATION_REFERENCE = "INVALID_ABLATION_REFERENCE"
+    INVALID_PROPOSAL_SCOPE = "INVALID_PROPOSAL_SCOPE"
+    UNKNOWN = "UNKNOWN"
+
+
 class FactOperator(StrEnum):
     EQ = "EQ"
 
@@ -342,16 +354,46 @@ class ToolDecision(StrictModel):
     calls: tuple[ToolCall, ...] = Field(min_length=1, max_length=6)
 
 
+class ProposedRegressionPlan(StrictModel):
+    objective: str = Field(min_length=1, max_length=2_000)
+    task_ids: tuple[Identifier, ...] = Field(min_length=1, max_length=100)
+    cell_ids: tuple[Identifier, ...] = Field(min_length=1, max_length=100)
+    evidence_refs: tuple[str, ...] = Field(min_length=1, max_length=100)
+    acceptance_criteria: tuple[str, ...] = Field(min_length=1, max_length=10)
+    repeat_count: int = Field(default=1, ge=1, le=5)
+
+    @field_validator("objective")
+    @classmethod
+    def objective_is_public(cls, value: str) -> str:
+        return safe_public_text(value, limit=2_000)
+
+    @field_validator("acceptance_criteria")
+    @classmethod
+    def criteria_are_public(cls, values: tuple[str, ...]) -> tuple[str, ...]:
+        if any(not value.strip() or len(value) > 2_000 for value in values):
+            raise ValueError("acceptance criteria must be nonblank bounded text")
+        return tuple(safe_public_text(value, limit=2_000) for value in values)
+
+
+class AbstainDecision(StrictModel):
+    kind: Literal["abstain"] = "abstain"
+    reason: str = Field(min_length=1, max_length=2_000)
+
+
 class FinalDecision(StrictModel):
     kind: Literal["final"] = "final"
     draft: AttributionDraft
+    proposed_plan: ProposedRegressionPlan | None = None
 
 
-BackendDecision = Annotated[ToolDecision | FinalDecision, Field(discriminator="kind")]
+BackendDecision = Annotated[
+    ToolDecision | FinalDecision | AbstainDecision, Field(discriminator="kind")
+]
 
 
 class ExecutionStatus(StrEnum):
     COMPLETED = "COMPLETED"
+    ABSTAINED = "ABSTAINED"
     LIMIT_REACHED = "LIMIT_REACHED"
 
 
@@ -359,8 +401,10 @@ class ExecutionMetadata(StrictModel):
     status: ExecutionStatus
     decision_iterations: int = Field(ge=0, le=MAX_DECISION_ITERATIONS)
     tool_calls: int = Field(ge=0, le=MAX_TOOL_CALLS)
-    max_decision_iterations: Literal[8] = 8
-    max_tool_calls: Literal[12] = 12
+    max_decision_iterations: int = Field(
+        default=MAX_DECISION_ITERATIONS, ge=1, le=MAX_DECISION_ITERATIONS
+    )
+    max_tool_calls: int = Field(default=MAX_TOOL_CALLS, ge=1, le=MAX_TOOL_CALLS)
 
 
 class AttributionReport(StrictModel):
@@ -448,9 +492,36 @@ class AttributionReport(StrictModel):
         lines.extend(
             [
                 "",
-                f"Bounded execution: {self.execution.decision_iterations}/8 decisions, "
-                f"{self.execution.tool_calls}/12 tool calls; {self.execution.status.value}.",
+                f"Bounded execution: {self.execution.decision_iterations}/"
+                f"{self.execution.max_decision_iterations} decisions, "
+                f"{self.execution.tool_calls}/{self.execution.max_tool_calls} tool calls; "
+                f"{self.execution.status.value}.",
                 "",
             ]
         )
         return "\n".join(lines)
+
+
+class CompletedToolCall(StrictModel):
+    key: Sha256Digest
+    call: ToolCall
+    status: Literal["RUNNING", "COMPLETED", "FAILED", "TIMEOUT", "INTERRUPTED"]
+    evidence_refs: tuple[str, ...] = ()
+
+
+class InvestigationState(StrictModel):
+    request: AnalysisRequest
+    scope: AnalysisScope
+    evidence: tuple[EvidenceEntry, ...] = ()
+    decision_iterations: int = Field(default=0, ge=0, le=MAX_DECISION_ITERATIONS)
+    tool_calls: int = Field(default=0, ge=0, le=MAX_TOOL_CALLS)
+    max_decision_iterations: int = Field(default=8, ge=1, le=8)
+    max_tool_calls: int = Field(default=12, ge=1, le=12)
+    pending: BackendDecision | None = None
+    completed_calls: tuple[CompletedToolCall, ...] = ()
+    inflight: Literal["decision", "tool"] | None = None
+    error: str | None = None
+    limit_reason: str | None = None
+    report: AttributionReport | None = None
+    proposed_plan: ProposedRegressionPlan | None = None
+    finalization_rejections: tuple[FinalizationRejectionCode, ...] = ()

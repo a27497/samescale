@@ -663,13 +663,14 @@ class QualificationExecutor:
                 slot_ids=slot_ids,
             )
 
-    async def _transition(self, run_id: str, status: RunStatus) -> RunSnapshot:
+    async def _transition(self, claimed: RunSnapshot, status: RunStatus) -> RunSnapshot:
         async with self.session_factory() as session, session.begin():
             return await transition_run(
                 session,
-                run_id,
+                claimed.run_id,
                 self.owner,
                 status,
+                attempt=claimed.attempt,
                 now=datetime.now(UTC),
             )
 
@@ -679,7 +680,7 @@ class QualificationExecutor:
 
     async def _heartbeat(
         self,
-        run_id: str,
+        claimed: RunSnapshot,
         stop: asyncio.Event,
         lease_lost: asyncio.Event,
         cancelled: asyncio.Event,
@@ -697,8 +698,9 @@ class QualificationExecutor:
                 async with self.session_factory() as session, session.begin():
                     snapshot = await heartbeat_run(
                         session,
-                        run_id,
+                        claimed.run_id,
                         self.owner,
+                        attempt=claimed.attempt,
                         now=datetime.now(UTC),
                         ttl=self.lease_ttl,
                     )
@@ -751,15 +753,15 @@ class QualificationExecutor:
         heartbeat_task: asyncio.Task[None] | None = None
         started = time.monotonic()
         try:
-            preparing = await self._transition(claimed.run_id, RunStatus.PREPARING)
+            preparing = await self._transition(claimed, RunStatus.PREPARING)
             if preparing.status is RunStatus.CANCELLED:
                 return preparing
-            running = await self._transition(claimed.run_id, RunStatus.RUNNING)
+            running = await self._transition(claimed, RunStatus.RUNNING)
             if running.status is RunStatus.CANCELLED:
                 return running
             heartbeat_task = asyncio.create_task(
                 self._heartbeat(
-                    claimed.run_id,
+                    claimed,
                     heartbeat_stop,
                     lease_lost,
                     cancelled,
@@ -770,10 +772,10 @@ class QualificationExecutor:
             await heartbeat_task
             if lease_lost.is_set() or cancelled.is_set():
                 return await self._inspect(claimed.run_id)
-            verifying = await self._transition(claimed.run_id, RunStatus.VERIFYING)
+            verifying = await self._transition(claimed, RunStatus.VERIFYING)
             if verifying.status is RunStatus.CANCELLED:
                 return verifying
-            scoring = await self._transition(claimed.run_id, RunStatus.SCORING)
+            scoring = await self._transition(claimed, RunStatus.SCORING)
             if scoring.status is RunStatus.CANCELLED:
                 return scoring
             async with self.session_factory() as session, session.begin():
@@ -781,6 +783,7 @@ class QualificationExecutor:
                     session,
                     claimed.run_id,
                     self.owner,
+                    attempt=claimed.attempt,
                     now=datetime.now(UTC),
                     normalized_outcome=StatisticalOutcome.CAPABILITY_PASS,
                     source_outcome="keyless_local_throughput_qualification",

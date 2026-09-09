@@ -54,6 +54,7 @@ def test_migration_from_empty_database(database_url: str, monkeypatch: pytest.Mo
                 "to_regclass('public.judge_calibration'), "
                 "to_regclass('public.judge_evaluation'), "
                 "to_regclass('public.registry_experiment_snapshot'), "
+                "to_regclass('public.analyst_session'), "
                 "(SELECT version_num FROM alembic_version)"
             ).fetchone()
         assert row == (
@@ -66,8 +67,34 @@ def test_migration_from_empty_database(database_url: str, monkeypatch: pytest.Mo
             "judge_calibration",
             "judge_evaluation",
             "registry_experiment_snapshot",
+            "analyst_session",
             expected_revision,
         )
+        # Round-trip only this session migration; older experiment evidence survives.
+        with psycopg.connect(temporary_psycopg_url) as connection:
+            connection.execute(
+                "INSERT INTO experiment (id,schema_version,name,plan_digest,plan_json,status) "
+                "VALUES (%s,1,'preserved',%s,'{}','completed')",
+                ("analyst-migration-control", "sha256:" + "1" * 64),
+            )
+            connection.execute(
+                "INSERT INTO analyst_session (id,experiment_id,state_json) "
+                "VALUES ('migration-session','analyst-migration-control','{}')"
+            )
+        command.downgrade(config, "20260904_0006")
+        with psycopg.connect(temporary_psycopg_url) as connection:
+            assert connection.execute(
+                "SELECT to_regclass('public.analyst_session')"
+            ).fetchone() == (None,)
+            assert connection.execute(
+                "SELECT status,plan_digest FROM experiment WHERE id='analyst-migration-control'"
+            ).fetchone() == ("completed", "sha256:" + "1" * 64)
+        command.upgrade(config, "head")
+        with psycopg.connect(temporary_psycopg_url) as connection:
+            assert connection.execute("SELECT count(*) FROM analyst_session").fetchone() == (0,)
+            assert connection.execute(
+                "SELECT count(*) FROM experiment WHERE id='analyst-migration-control'"
+            ).fetchone() == (1,)
     finally:
         get_settings.cache_clear()
         os.environ["DATABASE_URL"] = database_url

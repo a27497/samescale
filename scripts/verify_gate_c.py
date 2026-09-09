@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 JUNIT = ROOT / "gate-c-results.xml"
 PHASE_C_TESTS = (
     "tests/test_sandbox.py",
-    "tests/test_execution_lease.py",
+    "tests/test_experiment_queue.py",
 )
 CRITICAL_TESTS = {
     "test_artifact_digest_function_is_sensitive",
@@ -41,7 +41,7 @@ CRITICAL_TESTS = {
     "test_docker_preflight_rejects_remote_host_before_connection",
     "test_effective_docker_endpoint_precedence_rejects_remote_overrides",
     "test_effective_inspect_profile_and_isolated_verifier_e2e",
-    "test_execution_lease_heartbeat_and_expiry_recovery",
+    "test_postgresql_durable_queue_skip_locked_lease_and_idempotency",
     "test_explicit_local_context_is_pinned_over_remote_host",
     "test_explicit_cancellation_kills_and_removes_container",
     "test_fake_secret_is_redacted_and_artifacts_are_consistent",

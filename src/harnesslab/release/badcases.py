@@ -28,10 +28,22 @@ SOURCE_DIGESTS = {
     "release/kb4-gpt-codex-timeout-sensitivity.md": "sha256:4d2895b925f7af6fe0522f1923e6a1f9c302e7d7645483ee0f5c84cf8cf0d229",
 }
 # K-B4.2 describes these files at its accepted commit. Their historical hashes remain
-# immutable; only these two live documents are deliberately superseded by this freeze.
+# immutable; only these two live documents were superseded by the original freeze.
 SUPERSEDED_KB42_INPUTS = {
     CANONICAL: "sha256:f6da6f36ca1ce2cce002765398000ab51d42eaa8da8a22ed45cf201e5dd4f817",
     "docs/BADCASES.md": "sha256:965d01a29510f8dcceed95a526f98183bba4afffc72fa17afd11ef4c321daa80",
+}
+# Phase L.2 repaired current Diagnosis metrics and the Real Agent batch updated
+# Analyst docs after the freeze. These blobs remain bound at ACCEPTED_COMMIT;
+# they do not describe today's implementation.
+# Keep this separate from the original receipt's superseded inputs. SOURCE_DIGESTS
+# pins the entire provenance document first, including in distributions without Git.
+POST_FREEZE_SOURCE_UPDATES = {
+    "src/harnesslab/diagnosis/service.py": "sha256:84b6fb001654e38cccc690da53711e96030376967fb3e02c0965e01245d6b524",
+    "docs/ANALYST.md": "sha256:d793cfbd1f0a2aad650161058fe874ddded30a7399475b26626327b1413eac39",
+    "src/harnesslab/experiment/report.py": "sha256:08dc01e91774aef45844a5f0b4bda438ec28c985b5f630c54c7f1ff8e94e677c",
+    "src/harnesslab/model_lane/providers.py": "sha256:2e48de8c5ffac889b01a2de53818982d85d0f37be29e93ff796f8afbc804dc3d",
+    "src/harnesslab/registry/seeds.py": "sha256:54155fad2988c0ba86777156b19ef2842e4b4ad09cfa16bcd9aa63b1535ef330",
 }
 
 
@@ -53,12 +65,13 @@ def accepted_source(root: Path) -> dict[str, Any]:
     for reference, digest in SOURCE_DIGESTS.items():
         require(sha256_file(root / reference) == digest, f"frozen source drift: {reference}")
     source = read_object(root / SOURCE)
+    historical_inputs = SUPERSEDED_KB42_INPUTS | POST_FREEZE_SOURCE_UPDATES
     for reference, binding in source["provenance"]["sources"].items():
         if reference.startswith("evidence:"):
             continue  # Original external files are checked separately by the freeze CLI.
-        if reference in SUPERSEDED_KB42_INPUTS:
+        if reference in historical_inputs:
             require(
-                binding["sha256"] == SUPERSEDED_KB42_INPUTS[reference],
+                binding["sha256"] == historical_inputs[reference],
                 "historical K-B4.2 input identity drift",
             )
         else:

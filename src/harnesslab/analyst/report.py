@@ -7,6 +7,8 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from harnesslab.analyst.models import (
+    MAX_DECISION_ITERATIONS,
+    MAX_TOOL_CALLS,
     AnalysisRequest,
     AnalysisScope,
     AttributionDraft,
@@ -17,6 +19,7 @@ from harnesslab.analyst.models import (
     ExecutionStatus,
     FactAssertion,
     FactOperator,
+    FinalizationRejectionCode,
     VerifiedFact,
     canonical_fact_statement,
     canonical_json_value,
@@ -28,17 +31,35 @@ from harnesslab.analyst.models import (
 class AttributionValidationError(ValueError):
     """A draft contains fabricated citations or unsupported structured facts."""
 
+    def __init__(
+        self, message: str, reason: FinalizationRejectionCode = FinalizationRejectionCode.UNKNOWN
+    ) -> None:
+        super().__init__(message)
+        self.reason = reason
+
 
 def _validate_assertion(assertion: FactAssertion, entry: EvidenceEntry) -> None:
     try:
         actual = resolve_fact_assertion(assertion, entry)
     except ValueError as exc:
-        raise AttributionValidationError(str(exc)) from exc
+        message = str(exc)
+        reason = (
+            FinalizationRejectionCode.ASSERTION_TOOL_MISMATCH
+            if "tool namespace" in message
+            else FinalizationRejectionCode.ASSERTION_PATH_INVALID
+            if "field path" in message
+            else FinalizationRejectionCode.UNKNOWN
+        )
+        raise AttributionValidationError(message, reason) from exc
     if assertion.operator is not FactOperator.EQ:
-        raise AttributionValidationError("unsupported fact assertion operator")
+        raise AttributionValidationError(
+            "unsupported fact assertion operator",
+            FinalizationRejectionCode.ASSERTION_OPERATOR_UNSUPPORTED,
+        )
     if canonical_json_value(actual) != canonical_json_value(assertion.expected_value):
         raise AttributionValidationError(
-            "fact assertion expected value contradicts the cited evidence"
+            "fact assertion expected value contradicts the cited evidence",
+            FinalizationRejectionCode.ASSERTION_VALUE_MISMATCH,
         )
 
 
@@ -51,10 +72,15 @@ def validate_and_build_report(
     status: ExecutionStatus,
     decision_iterations: int,
     tool_calls: int,
+    max_decision_iterations: int = MAX_DECISION_ITERATIONS,
+    max_tool_calls: int = MAX_TOOL_CALLS,
 ) -> AttributionReport:
     ids = tuple(entry.ref.id for entry in catalog)
     if len(ids) != len(set(ids)):
-        raise AttributionValidationError("evidence catalog contains duplicate identities")
+        raise AttributionValidationError(
+            "evidence catalog contains duplicate identities",
+            FinalizationRejectionCode.DUPLICATE_EVIDENCE,
+        )
     by_id = {entry.ref.id: entry for entry in catalog}
     known = set(by_id)
     verified: list[VerifiedFact] = []
@@ -63,7 +89,10 @@ def validate_and_build_report(
         if claim.classification is ClaimClass.VERIFIED_FACT:
             missing = {assertion.evidence_ref for assertion in claim.assertions} - known
             if missing:
-                raise AttributionValidationError("claim cites evidence absent from the catalog")
+                raise AttributionValidationError(
+                    "claim cites evidence absent from the catalog",
+                    FinalizationRejectionCode.MISSING_EVIDENCE,
+                )
             for assertion in claim.assertions:
                 _validate_assertion(assertion, by_id[assertion.evidence_ref])
             verified.append(
@@ -76,11 +105,15 @@ def validate_and_build_report(
         else:
             missing = set(claim.evidence_refs) - known
             if missing:
-                raise AttributionValidationError("claim cites evidence absent from the catalog")
+                raise AttributionValidationError(
+                    "claim cites evidence absent from the catalog",
+                    FinalizationRejectionCode.MISSING_EVIDENCE,
+                )
             hypotheses.append(claim)
     if any(ref not in known or not ref.startswith("ablation:") for ref in draft.ablation_refs):
         raise AttributionValidationError(
-            "ablation reference is missing or not an ablation identity"
+            "ablation reference is missing or not an ablation identity",
+            FinalizationRejectionCode.INVALID_ABLATION_REFERENCE,
         )
     return AttributionReport(
         analysis_id=request.analysis_id,
@@ -91,6 +124,8 @@ def validate_and_build_report(
             status=status,
             decision_iterations=decision_iterations,
             tool_calls=tool_calls,
+            max_decision_iterations=max_decision_iterations,
+            max_tool_calls=max_tool_calls,
         ),
         summary=draft.summary,
         evidence_catalog=catalog,
