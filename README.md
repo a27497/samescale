@@ -243,3 +243,32 @@ invoke any gate recursively.
 For a task requiring the full keyless chain, run Gates A–K using their prerequisites; database-backed
 gates need an appropriate test PostgreSQL instance. Ordinary edits use the verification scope above.
 Real execution needs current authorization and credential references; never commit `.env` or secret values.
+
+## S2.5 本地资源配置
+
+在 Registry 导航中打开“连接与配置”（`/connections`），可查看并配置本地凭据、连接、模型用途/参数与受限 Harness 预设。内置目录只读；保存配置不会执行评测，也不会切换当前 Analyst/Judge。
+
+此入口默认关闭。先按上方开发说明配置本地数据库；在启动 API 的同一个 Bash 会话中设置独立管理令牌（至少 32 字符，不使用模型 API Key）：
+
+```bash
+read -r -s -p 'Local operator token: ' HARNESSLAB_LOCAL_CONFIGURATION_TOKEN
+export HARNESSLAB_LOCAL_CONFIGURATION_TOKEN
+```
+
+直接运行 API 的开发者须先对自己的工作区数据库执行 `uv run --locked alembic upgrade head`，
+并为凭据目录设置绝对路径。例如在启动 API 的同一个 Bash 会话中：
+
+```bash
+export HARNESSLAB_CREDENTIAL_STORE="$HOME/.local/share/samescale/credentials"
+install -d -m 0700 "$HARNESSLAB_CREDENTIAL_STORE"
+```
+
+目录必须属于 API 进程用户、权限为 0700，文件权限为 0600；路径不得含符号链接，也不得与源码或
+工作区产物目录重叠。未配置目录时，原有环境变量引用和本地模型编辑仍可使用，新增密钥/连接保存会失败。
+这是受操作系统权限保护的本地文件存储，**不宣称磁盘加密或云端密钥托管**。备份和恢复时需配套保留
+数据库与凭据卷/目录及原权限；只恢复数据库不会恢复密钥。不要把凭据目录加入可下载产物根。
+
+
+在同一会话运行 `uv run --locked harnesslab serve`；在现有前端开发服务或已构建的工作区打开 `/connections`。用本机 `localhost` 或 `127.0.0.1` 地址访问，输入管理令牌解锁；令牌只留在页面内存，锁定或离开后清除。
+
+每次保存产生新版本，旧计划不改写；凭据轮换或配置停用后需重新绑定。API Key 和连接地址不回显；“校验配置（不联网）”只校验本地引用，连接健康仍为 `NOT_VERIFIED`。

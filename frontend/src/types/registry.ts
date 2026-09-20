@@ -27,6 +27,9 @@ export interface ProviderDefinition {
 }
 
 export interface ProviderModelProfile {
+  purpose?: 'SUBJECT' | 'ANALYST' | 'JUDGE'
+  temperature?: number | null
+  max_output_tokens_limit?: number | null
   profile_id: string
   model_id: string
   provider_id: string
@@ -58,6 +61,7 @@ export interface ModelDefinition {
 }
 
 export interface HarnessProfile {
+  enabled?: boolean
   profile_id: string
   profile_reference: string
   supported_provider_profile_ids: string[]
