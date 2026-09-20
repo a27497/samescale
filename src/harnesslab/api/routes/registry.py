@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from harnesslab.api.local_configuration import configured_credentials, workspace_catalog
 from harnesslab.api.workbench_dependencies import workbench_session
 from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.db.models.registry import RegistryExperimentSnapshotRecord
@@ -32,23 +33,19 @@ from harnesslab.registry.service import (
     all_capabilities,
     build_experiment_snapshot,
     preflight_experiment,
-    registry_catalog,
     registry_settings,
 )
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 Session = Annotated[AsyncSession, Depends(workbench_session)]
+Catalog = Annotated[RegistryCatalog, Depends(workspace_catalog)]
+Credentials = Annotated[frozenset[str], Depends(configured_credentials)]
 registry_router = APIRouter(prefix="/registry", tags=["registry-lite"])
 experiment_router = APIRouter(prefix="/experiments", tags=["registry-lite-experiments"])
 
 
-def _catalog() -> RegistryCatalog:
-    return registry_catalog(REPOSITORY_ROOT, os.environ)
-
-
 @registry_router.get("/providers", response_model=ProviderRegistryResponse)
-async def providers() -> ProviderRegistryResponse:
-    catalog = _catalog()
+async def providers(catalog: Catalog) -> ProviderRegistryResponse:
     return ProviderRegistryResponse(
         registry_id=catalog.registry_id,
         registry_digest=catalog.digest,
@@ -57,8 +54,7 @@ async def providers() -> ProviderRegistryResponse:
 
 
 @registry_router.get("/models", response_model=ModelRegistryResponse)
-async def models() -> ModelRegistryResponse:
-    catalog = _catalog()
+async def models(catalog: Catalog) -> ModelRegistryResponse:
     return ModelRegistryResponse(
         registry_id=catalog.registry_id,
         registry_digest=catalog.digest,
@@ -68,8 +64,7 @@ async def models() -> ModelRegistryResponse:
 
 
 @registry_router.get("/harnesses", response_model=HarnessRegistryResponse)
-async def harnesses() -> HarnessRegistryResponse:
-    catalog = _catalog()
+async def harnesses(catalog: Catalog) -> HarnessRegistryResponse:
     return HarnessRegistryResponse(
         registry_id=catalog.registry_id,
         registry_digest=catalog.digest,
@@ -78,8 +73,7 @@ async def harnesses() -> HarnessRegistryResponse:
 
 
 @registry_router.get("/capabilities", response_model=CapabilityRegistryResponse)
-async def capabilities() -> CapabilityRegistryResponse:
-    catalog = _catalog()
+async def capabilities(catalog: Catalog) -> CapabilityRegistryResponse:
     return CapabilityRegistryResponse(
         registry_id=catalog.registry_id,
         registry_digest=catalog.digest,
@@ -88,14 +82,12 @@ async def capabilities() -> CapabilityRegistryResponse:
 
 
 @registry_router.get("/settings", response_model=RegistrySettings)
-async def settings() -> RegistrySettings:
-    catalog = _catalog()
-    return registry_settings(catalog, os.environ)
+async def settings(catalog: Catalog, credentials: Credentials) -> RegistrySettings:
+    return registry_settings(catalog, os.environ, configured_credentials=credentials)
 
 
 @registry_router.get("/tasks", response_model=TaskRegistryResponse)
-async def tasks() -> TaskRegistryResponse:
-    catalog = _catalog()
+async def tasks(catalog: Catalog) -> TaskRegistryResponse:
     return TaskRegistryResponse(
         registry_id=catalog.registry_id,
         registry_digest=catalog.digest,
@@ -123,14 +115,26 @@ async def methodologies() -> MethodologyRegistryResponse:
 
 
 @experiment_router.post("/preflight", response_model=ExperimentPreflight)
-async def preflight(request: ExperimentBuilderRequest) -> ExperimentPreflight:
-    return preflight_experiment(request, REPOSITORY_ROOT, os.environ)
+async def preflight(
+    request: ExperimentBuilderRequest, catalog: Catalog, credentials: Credentials
+) -> ExperimentPreflight:
+    return preflight_experiment(
+        request, REPOSITORY_ROOT, os.environ, catalog=catalog, configured_credentials=credentials
+    )
 
 
 @experiment_router.post("/snapshot", response_model=ExperimentSnapshot)
-async def snapshot(request: ExperimentBuilderRequest, session: Session) -> ExperimentSnapshot:
+async def snapshot(
+    request: ExperimentBuilderRequest, session: Session, catalog: Catalog, credentials: Credentials
+) -> ExperimentSnapshot:
     try:
-        frozen = build_experiment_snapshot(request, REPOSITORY_ROOT, os.environ)
+        frozen = build_experiment_snapshot(
+            request,
+            REPOSITORY_ROOT,
+            os.environ,
+            catalog=catalog,
+            configured_credentials=credentials,
+        )
     except (RegistryError, ExperimentSpecError, ValueError) as exc:
         raise WorkbenchAPIError(
             422,

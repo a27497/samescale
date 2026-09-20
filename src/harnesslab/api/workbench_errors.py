@@ -1,8 +1,24 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
+
+async def database_unavailable_handler(_request: Request, exc: Exception) -> JSONResponse:
+    logging.getLogger(__name__).warning("Workspace database failure: %s", type(exc).__name__)
+    return JSONResponse(
+        status_code=503,
+        content={
+            "error": {
+                "code": "WORKSPACE_DATABASE_UNAVAILABLE",
+                "message": "Workspace data is unavailable. Run `samescale doctor` and check "
+                "PostgreSQL and migrations, then retry; offline examples remain available.",
+            }
+        },
+    )
 
 
 class WorkbenchAPIError(RuntimeError):

@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 
 from harnesslab.analyst.api_models import (
     AnalystSessionList,
@@ -16,17 +16,19 @@ from harnesslab.analyst.evidence import AnalystEvidenceError
 from harnesslab.analyst.models import ProposedRegressionPlan, StrictModel
 from harnesslab.analyst.sessions import AnalystSessions, ApprovalRequest, CreateInvestigation
 from harnesslab.analyst.showcase import InvestigationExample, historical_example, offline_demo
+from harnesslab.api.local_configuration import configuration_enabled
+from harnesslab.api.workbench_dependencies import workspace_settings
 from harnesslab.api.workbench_errors import WorkbenchAPIError
-from harnesslab.core.config import get_settings
 from harnesslab.db.session import create_engine
 from harnesslab.evidence.reader import EvidenceReadError
+from harnesslab.registry.vault import CredentialVault
 
 router = APIRouter(prefix="/workbench/analyst", tags=["analyst"])
 ROOT = Path(__file__).resolve().parents[3]
 
 
-async def analyst_service() -> AsyncIterator[AnalystSessions]:
-    settings = get_settings()
+async def analyst_service(request: Request) -> AsyncIterator[AnalystSessions]:
+    settings = workspace_settings()
     engine = create_engine(settings)
     try:
         yield AnalystSessions(
@@ -35,6 +37,8 @@ async def analyst_service() -> AsyncIterator[AnalystSessions]:
             artifact_roots=settings.workbench_artifact_roots,
             environment=os.environ,
             real_enabled=os.environ.get("HARNESSLAB_ANALYST_REAL_ENABLED") == "1",
+            local_models_enabled=configuration_enabled(request),
+            vault=CredentialVault.from_environment(),
         )
     except (ValueError, AnalystEvidenceError, EvidenceReadError) as exc:
         raise WorkbenchAPIError(

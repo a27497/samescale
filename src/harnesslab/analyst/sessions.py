@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from harnesslab.analyst.backend import AnalystBackend, FakeAnalystBackend
 from harnesslab.analyst.evidence import AnalystEvidenceRepository
 from harnesslab.analyst.graph import AttributionGraph, validate_proposal
+from harnesslab.analyst.model_bindings import local_analyst_profile
 from harnesslab.analyst.models import (
     AnalysisRequest,
     FinalizationRejectionCode,
@@ -33,11 +34,19 @@ from harnesslab.analyst.real_backend import (
     spend_reasons,
 )
 from harnesslab.analyst.tools import AnalystToolRegistry
+from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.budget.models import AnalystSpendLimits
 from harnesslab.comparability.models import canonical_digest
 from harnesslab.contracts.common import Sha256Digest
 from harnesslab.db.models.analyst import AnalystSessionRecord
+from harnesslab.db.session import create_session_factory
+from harnesslab.registry.model_bindings import (
+    ModelRoleBinding,
+    RoleBoundProvider,
+    resolve_model_role_environment,
+)
 from harnesslab.registry.service import registry_catalog
+from harnesslab.registry.vault import CredentialVault
 
 
 class AnalystSessionError(ValueError):
@@ -78,10 +87,46 @@ class AnalystSession(StrictModel):
     session_id: str
     backend: Literal["fake", "real"]
     profile: AnalystProfile | None = None
+    model_binding: ModelRoleBinding | None = None
     state: InvestigationState
     usage: tuple[DecisionUsage, ...] = ()
     approval: PlanApproval | None = None
     spend_limits: AnalystSpendLimits | None = None
+
+    @model_validator(mode="after")
+    def binding_matches_session(self) -> AnalystSession:
+        binding = self.model_binding
+        if binding is not None:
+            if (
+                self.backend != "real"
+                or binding.purpose != "ANALYST"
+                or self.profile is None
+                or self.spend_limits is None
+                or self.profile.runtime != binding.runtime
+                or self.profile.profile_digest != binding.provider_profile_identity
+                or self.profile.profile_id
+                != f"local-{binding.configuration_id}-v{binding.configuration_revision}"
+                or self.spend_limits.output_tokens_per_request
+                != binding.runtime.reasoning.max_output_tokens
+                or self.spend_limits.timeout_seconds != binding.runtime.request_timeout_seconds
+            ):
+                raise ValueError("local Analyst binding does not match the frozen session")
+        elif self.profile is not None and self.profile.profile_id.startswith("local-"):
+            raise ValueError("local Analyst session requires its frozen binding")
+        return self
+
+    def public_binding(self) -> dict[str, Any] | None:
+        binding = self.model_binding
+        if binding is None:
+            return None
+        return {
+            "purpose": binding.purpose,
+            "configuration_id": binding.configuration_id,
+            "configuration_revision": binding.configuration_revision,
+            "connection_id": binding.connection_id,
+            "connection_revision": binding.connection_revision,
+            "binding_digest": binding.digest,
+        }
 
     @property
     def scope_digest(self) -> str:
@@ -138,6 +183,7 @@ class AnalystSession(StrictModel):
             "scope_digest": self.scope_digest,
             "profile_id": self.profile.profile_id if self.profile else None,
             "profile_digest": self.profile.profile_digest if self.profile else None,
+            "model_binding": self.public_binding(),
             "provider": runtime.provider if runtime else None,
             "model": runtime.requested_model if runtime else None,
             "route": runtime.provider_route_identity if runtime else None,
@@ -199,12 +245,16 @@ class AnalystSessions:
         artifact_roots: tuple[Path, ...],
         environment: Mapping[str, str],
         real_enabled: bool = False,
+        local_models_enabled: bool = False,
+        vault: CredentialVault | None = None,
     ) -> None:
         self.engine = engine
         self.root = repository_root
         self.artifact_roots = artifact_roots
         self.environment = environment
         self.real_enabled = real_enabled
+        self.local_models_enabled = local_models_enabled
+        self.vault = vault or CredentialVault(None)
 
     def repository(self, session: AsyncSession, experiment_id: str) -> AnalystEvidenceRepository:
         return AnalystEvidenceRepository(
@@ -218,7 +268,21 @@ class AnalystSessions:
         async with AsyncSession(self.engine) as reader:
             scope = await self.repository(reader, request.experiment_id).scope()
         profile = None
-        if request.provider_profile_id is not None:
+        binding = None
+        if request.provider_profile_id and request.provider_profile_id.startswith("local-"):
+            if not self.local_models_enabled:
+                raise AnalystSessionError("local Analyst model selection is not enabled")
+            assert request.spend_limits is not None
+            async with AsyncSession(self.engine) as reader:
+                profile, binding = await local_analyst_profile(
+                    reader,
+                    root=self.root,
+                    environment=self.environment,
+                    vault=self.vault,
+                    profile_id=request.provider_profile_id,
+                    budget=request.spend_limits,
+                )
+        elif request.provider_profile_id is not None:
             profile = resolve_analyst_profile(
                 registry_catalog(self.root, self.environment),
                 request.provider_profile_id,
@@ -228,6 +292,7 @@ class AnalystSessions:
             session_id="analyst-" + uuid4().hex,
             backend=request.backend,
             profile=profile,
+            model_binding=binding,
             spend_limits=request.spend_limits,
             state=InvestigationState(
                 request=AnalysisRequest(
@@ -301,19 +366,55 @@ class AnalystSessions:
                 )
                 await connection.commit()
 
-    def _backend(self, value: AnalystSession) -> AnalystBackend:
+    async def _backend(self, value: AnalystSession) -> AnalystBackend:
         if value.backend == "fake":
             return FakeAnalystBackend()
         assert value.profile is not None
-        current = resolve_analyst_profile(
-            registry_catalog(self.root, self.environment), value.profile.profile_id, self.root
-        )
+        adapter = None
+        if value.model_binding is not None:
+            if not self.local_models_enabled or value.spend_limits is None:
+                raise AnalystSessionError("local Analyst model selection is not enabled")
+            async with AsyncSession(self.engine) as reader:
+                current, binding = await local_analyst_profile(
+                    reader,
+                    root=self.root,
+                    environment=self.environment,
+                    vault=self.vault,
+                    profile_id=value.profile.profile_id,
+                    budget=value.spend_limits,
+                )
+                if binding != value.model_binding:
+                    raise AnalystSessionError(
+                        "local Analyst binding changed; create a new investigation"
+                    )
+                await resolve_model_role_environment(
+                    reader,
+                    registry_catalog(self.root, self.environment),
+                    binding,
+                    purpose="ANALYST",
+                    environment=self.environment,
+                    vault=self.vault,
+                )
+            adapter = RoleBoundProvider(
+                session_factory=create_session_factory(self.engine),
+                repository_root=self.root,
+                binding=value.model_binding,
+                purpose="ANALYST",
+                environment=self.environment,
+                vault=self.vault,
+                execution_enabled=self.real_enabled,
+            )
+        else:
+            current = resolve_analyst_profile(
+                registry_catalog(self.root, self.environment), value.profile.profile_id, self.root
+            )
         if current.digest != value.profile.digest:
             raise AnalystSessionError(
                 "Analyst registry profile changed; create a new investigation"
             )
         return RealAnalystBackend(
             value.profile,
+            adapter=adapter,
             environment=self.environment,
             completed_calls=value.state.completed_calls,
             decision_limit=value.state.max_decision_iterations,
@@ -334,15 +435,29 @@ class AnalystSessions:
             reasons.append("REAL_SESSION_REQUIRED")
         else:
             runtime = profile.runtime
+            environment = self.environment
+            if value.model_binding is not None:
+                try:
+                    async with AsyncSession(self.engine) as reader:
+                        environment = await resolve_model_role_environment(
+                            reader,
+                            registry_catalog(self.root, self.environment),
+                            value.model_binding,
+                            purpose="ANALYST",
+                            environment=self.environment,
+                            vault=self.vault,
+                        )
+                except (ValueError, OSError, WorkbenchAPIError):
+                    environment = {}
+                    reasons.append("MODEL_BINDING_STALE_OR_UNAVAILABLE")
             credential_status = (
                 "SET"
-                if self.environment.get(runtime.credential_reference or "", "").strip()
+                if environment.get(runtime.credential_reference or "", "").strip()
                 else "MISSING"
             )
             base_url_status = (
                 "SET"
-                if runtime.base_url
-                or self.environment.get(runtime.base_url_reference or "", "").strip()
+                if runtime.base_url or environment.get(runtime.base_url_reference or "", "").strip()
                 else "MISSING"
             )
             if credential_status == "MISSING":
@@ -351,12 +466,12 @@ class AnalystSessions:
                 reasons.append("BASE_URL_REFERENCE_MISSING")
             else:
                 try:
-                    runtime.resolve_base_url(self.environment)
+                    runtime.resolve_base_url(environment)
                 except ValueError:
                     reasons.append("BASE_URL_REFERENCE_INVALID")
             try:
-                self._backend(value)  # Registry drift/enablement only; never invokes a provider.
-            except (ValueError, OSError):
+                await self._backend(value)  # Local validation only; never invokes a provider.
+            except (ValueError, OSError, WorkbenchAPIError):
                 reasons.append("PROFILE_DRIFT_OR_UNAVAILABLE")
             if value.spend_limits is None:
                 reasons.append("SPEND_LIMITS_MISSING")
@@ -406,6 +521,7 @@ class AnalystSessions:
             "profile_id": profile.profile_id if profile else None,
             "profile_digest": profile.profile_digest if profile else None,
             "frozen_profile_digest": profile.digest if profile else None,
+            "model_binding": value.public_binding(),
             "provider": profile.runtime.provider if profile else None,
             "model": profile.runtime.requested_model if profile else None,
             "route": profile.runtime.provider_route_identity if profile else None,
@@ -459,7 +575,7 @@ class AnalystSessions:
                     != value.state.scope
                 ):
                     raise AnalystSessionError("persisted investigation scope changed")
-            backend = self._backend(value)
+            backend = await self._backend(value)
             state = value.state
             if state.inflight:
                 state = state.model_copy(
