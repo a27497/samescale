@@ -190,5 +190,13 @@ export interface ExperimentSnapshot {
   methodology_id: string
   methodology_digest: string
   comparison_type: ComparisonType
+  provider_selections: {
+    cell_id: string
+    provider_profile_id: string
+    provider_profile_identity: string
+    harness_profile_id: string
+    effective_runtime_profile_identity?: string | null
+    resource_envelope_identity?: string | null
+  }[]
   preflight: ExperimentPreflight
 }

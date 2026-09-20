@@ -124,9 +124,14 @@ describe('Unified Registry Lite Workbench', () => {
   it('keeps repeat count backend-derived and previews blocked interleaving', async () => {
     const wrapper = mount(ExperimentBuilderView)
     await flushPromises()
+    await wrapper.get('[aria-label="Left provider profile"]').setValue(providerProfile.profile_id)
+    await wrapper.get('[aria-label="Right provider profile"]').setValue(providerProfile.profile_id)
+    await wrapper.get('[aria-label="Left Harness profile"]').setValue(directProfile.profile_id)
+    await wrapper.get('[aria-label="Right Harness profile"]').setValue(codexProfile.profile_id)
+    await wrapper.get('.task-picker input').setValue(true)
     await wrapper.get('[aria-label="Evaluation mode"]').setValue('INFORMAL')
     expect((wrapper.get('[aria-label="Repeat policy"]').element as HTMLInputElement).value).toContain('n=3')
-    await wrapper.get('button').trigger('click')
+    await wrapper.get('.toolbar .primary-button').trigger('click')
     await flushPromises()
     const request = api.preflight.mock.calls[0][0]
     expect(request.evaluation_mode).toBe('INFORMAL')

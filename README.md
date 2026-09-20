@@ -272,3 +272,19 @@ install -d -m 0700 "$HARNESSLAB_CREDENTIAL_STORE"
 在同一会话运行 `uv run --locked harnesslab serve`；在现有前端开发服务或已构建的工作区打开 `/connections`。用本机 `localhost` 或 `127.0.0.1` 地址访问，输入管理令牌解锁；令牌只留在页面内存，锁定或离开后清除。
 
 每次保存产生新版本，旧计划不改写；凭据轮换或配置停用后需重新绑定。API Key 和连接地址不回显；“校验配置（不联网）”只校验本地引用，连接健康仍为 `NOT_VERIFIED`。
+
+
+### S2.5 planning selections
+
+Open `/experiments/new` and explicitly select each SUBJECT model profile, compatible Harness
+revision and task. No model, Harness or task is selected automatically. Reloading never substitutes
+another revision for an unavailable choice. The page shows the selected profile identities,
+Harness runtime version, reasoning control, request timeout and configured output ceiling.
+
+The plan's output budget must respect both selected model ceilings. Direct selections use the
+existing one-request, one-turn, zero-tool-call contract and per-request/per-run output scopes.
+Unknown health and unavailable cost bounds remain explicit. Editing inputs invalidates earlier
+preflight results; the backend revalidates the exact selections when freezing a snapshot.
+The saved result shows backend-frozen profile, runtime and resource-envelope identities.
+This freezes a planning snapshot only: it creates no execution or experiment-run records and
+neither invokes a model nor changes Analyst/Judge role selections.
