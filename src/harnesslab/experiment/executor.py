@@ -7,14 +7,11 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Protocol
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from harnesslab.comparability.manifest import load_manifest_facts
-from harnesslab.comparability.models import canonical_digest
-from harnesslab.contracts.model import ModelProfile
 from harnesslab.contracts.run import RunStatus
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
 from harnesslab.evaluation_suites.models import ImmutableArtifactReference
@@ -31,6 +28,35 @@ from harnesslab.experiment.authoritative import (
 from harnesslab.experiment.evidence import (
     ManifestControlMismatch,
     validate_manifest_against_slot,
+)
+from harnesslab.experiment.execution import (
+    CodexHarnessBinding as CodexHarnessBinding,
+)
+from harnesslab.experiment.execution import (
+    DirectModelBinding as DirectModelBinding,
+)
+from harnesslab.experiment.execution import (
+    ExecutionControlMismatch,
+    ExecutionDispatcher,
+    ExecutionRequest,
+)
+from harnesslab.experiment.execution import (
+    ExperimentLaneBinding as ExperimentLaneBinding,
+)
+from harnesslab.experiment.execution import (
+    LaneEvidence as LaneEvidence,
+)
+from harnesslab.experiment.execution import (
+    LaneProfile as LaneProfile,
+)
+from harnesslab.experiment.execution import (
+    LaneRunResult as LaneRunResult,
+)
+from harnesslab.experiment.execution import (
+    MultiHarnessBinding as MultiHarnessBinding,
+)
+from harnesslab.experiment.execution import (
+    resolved_comparison_profile_identity as resolved_comparison_profile_identity,
 )
 from harnesslab.experiment.outcomes import (
     StatisticalOutcome,
@@ -52,84 +78,10 @@ from harnesslab.experiment.queue import (
     attempt_execution_id as attempt_execution_id,
 )
 from harnesslab.experiment.tool_metrics import manifest_tool_calls
-from harnesslab.harness_lane.adapter import CodexBackend
-from harnesslab.harness_lane.models import (
-    CodexHarnessProfile,
-    HarnessLaneEvidence,
-    HarnessLaneRunResult,
-)
-from harnesslab.harness_lane.runner import CodexHarnessRunner
 from harnesslab.model_lane.models import (
     DirectModelEvidence,
-    DirectModelRunResult,
-    ProviderAdapter,
 )
-from harnesslab.model_lane.profiles import model_profile_control_identity
-from harnesslab.model_lane.runner import DirectModelRunner
-from harnesslab.multi_harness.adapter import MultiHarnessAdapter, MultiHarnessBackend
-from harnesslab.multi_harness.models import (
-    MultiHarnessEvidence,
-    MultiHarnessProfile,
-    MultiHarnessRunResult,
-)
-from harnesslab.multi_harness.runner import MultiHarnessRunner
 from harnesslab.sandbox.artifacts import sha256_file
-
-type LaneRunResult = DirectModelRunResult | HarnessLaneRunResult | MultiHarnessRunResult
-type LaneEvidence = DirectModelEvidence | HarnessLaneEvidence | MultiHarnessEvidence
-type LaneProfile = ModelProfile | CodexHarnessProfile | MultiHarnessProfile
-
-
-def resolved_comparison_profile_identity(profile: LaneProfile) -> str:
-    """Match extraction; reasoning effort remains an explicit intent-specific field."""
-
-    if isinstance(profile, ModelProfile):
-        return model_profile_control_identity(profile)
-    controls = profile.model_dump(mode="json")
-    controls.pop("requested_model", None)
-    controls.pop("reasoning_effort", None)
-    return canonical_digest(controls)
-
-
-class ExperimentLaneBinding(Protocol):
-    async def run(self, task_path: Path, run_id: str) -> LaneRunResult: ...
-
-
-@dataclass(frozen=True)
-class DirectModelBinding:
-    runner: DirectModelRunner
-    profile: ModelProfile
-    provider: ProviderAdapter
-
-    async def run(self, task_path: Path, run_id: str) -> DirectModelRunResult:
-        return await self.runner.run(task_path, self.profile, adapter=self.provider, run_id=run_id)
-
-
-@dataclass(frozen=True)
-class CodexHarnessBinding:
-    runner: CodexHarnessRunner
-    profile: CodexHarnessProfile
-    backend: CodexBackend
-
-    async def run(self, task_path: Path, run_id: str) -> HarnessLaneRunResult:
-        return await self.runner.run(task_path, self.profile, backend=self.backend, run_id=run_id)
-
-
-@dataclass(frozen=True)
-class MultiHarnessBinding:
-    runner: MultiHarnessRunner
-    profile: MultiHarnessProfile
-    adapter: MultiHarnessAdapter
-    backend: MultiHarnessBackend
-
-    async def run(self, task_path: Path, run_id: str) -> MultiHarnessRunResult:
-        return await self.runner.run(
-            task_path,
-            self.profile,
-            adapter=self.adapter,
-            backend=self.backend,
-            run_id=run_id,
-        )
 
 
 @dataclass(frozen=True)
@@ -214,6 +166,7 @@ class ExperimentRunExecutor:
         self.repository_root = repository_root.resolve()
         self.session_factory = session_factory
         self.bindings = dict(bindings)
+        self.dispatcher = ExecutionDispatcher(self.repository_root, self.bindings)
         self.owner = owner
         self.lease_ttl = lease_ttl
         self.heartbeat_cadence = heartbeat_cadence or lease_ttl / 3
@@ -341,7 +294,6 @@ class ExperimentRunExecutor:
     async def execute(self, claimed: RunSnapshot) -> RunSnapshot:
         if claimed.status is not RunStatus.CLAIMED or claimed.lease_owner != self.owner:
             raise ValueError("executor requires a run claimed by its own worker identity")
-        binding = self.bindings.get(claimed.cell_id)
         preparing = await self._transition(claimed, RunStatus.PREPARING)
         if preparing.status is RunStatus.CANCELLED:
             await self._reconcile_terminal(claimed, metrics=None, evidence_digest=None)
@@ -364,10 +316,9 @@ class ExperimentRunExecutor:
             )
         )
         try:
-            if binding is None:
-                raise RuntimeError(f"no runner binding for cell {claimed.cell_id}")
-            task_path = (self.repository_root / claimed.slot.task.package_path).resolve()
-            result = await binding.run(task_path, attempt_execution_id(claimed))
+            result = await self.dispatcher.execute(
+                ExecutionRequest(execution_id=attempt_execution_id(claimed), slot=claimed.slot)
+            )
         except Exception as exc:  # durable worker boundary normalizes unexpected infrastructure
             error = exc
         finally:
@@ -467,7 +418,11 @@ class ExperimentRunExecutor:
                 attempt=claimed.attempt,
                 now=self.clock(),
                 normalized_outcome=StatisticalOutcome.INFRA_FAILURE,
-                source_outcome="worker_infrastructure_error",
+                source_outcome=(
+                    "control_identity_mismatch"
+                    if isinstance(error, ExecutionControlMismatch)
+                    else "worker_infrastructure_error"
+                ),
                 artifact_manifest_path=None,
                 evidence_digest=None,
                 failure_detail=detail,

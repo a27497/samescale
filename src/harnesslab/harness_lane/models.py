@@ -198,6 +198,7 @@ class SanitizedNativeEvent(BaseModel):
     usage: CodexTokenUsage | None = None
     reasoning_present: bool = False
     error_code: str | None = Field(default=None, max_length=200)
+    request_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9._:-]{1,300}$")
     attempt: int | None = Field(default=None, ge=1)
     max_retries: int | None = Field(default=None, ge=0)
     retry_delay_ms: float | None = Field(default=None, ge=0, allow_inf_nan=False)
@@ -229,6 +230,7 @@ class NormalizedTraceEvent(BaseModel):
     file_changes: tuple[NativeFileChange, ...] = ()
     usage: CodexTokenUsage | None = None
     error_code: str | None = None
+    request_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9._:-]{1,300}$")
     attempt: int | None = Field(default=None, ge=1)
     max_retries: int | None = Field(default=None, ge=0)
     retry_delay_ms: float | None = Field(default=None, ge=0, allow_inf_nan=False)

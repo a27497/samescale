@@ -237,7 +237,7 @@ def _codex_profile() -> CodexHarnessProfile:
     )
 
 
-def _codex_plan(tmp_path: Path) -> CodexExecutionPlan:
+def _codex_plan(tmp_path: Path, *, image: ImageIdentity | None = None) -> CodexExecutionPlan:
     prompt = render_codex_harness_prompt(
         task_instruction="Fix the visible task.",
         task_digest="sha256:" + "1" * 64,
@@ -245,8 +245,11 @@ def _codex_plan(tmp_path: Path) -> CodexExecutionPlan:
         context_digest=None,
         network_policy=NetworkPolicy.DENY,
     )
+    profile = _codex_profile()
+    if image is not None:
+        profile = profile.model_copy(update={"codex_image": image})
     return CodexHarnessAdapter().prepare(
-        _codex_profile(), prompt, workspace=tmp_path, context=None, task_id="task"
+        profile, prompt, workspace=tmp_path, context=None, task_id="task"
     )
 
 
@@ -492,7 +495,7 @@ async def test_pinned_codex_split_sandbox_executes_with_outer_filesystem_and_sec
 async def test_pinned_codex_uses_generated_isolated_relay_profile_without_websockets(
     tmp_path: Path,
 ) -> None:
-    await CodexRuntime().ensure_image()
+    image = await CodexRuntime().ensure_image()
     proxy_image = await EgressProxyRuntime().ensure_image()
     preflight, docker_cli_environment = await _docker_runtime_preflight()
     suffix = uuid4().hex[:12]
@@ -557,7 +560,7 @@ async def main():
 
 asyncio.run(main())
 """
-    plan = _codex_plan(tmp_path)
+    plan = _codex_plan(tmp_path, image=image)
     backend = DockerCodexBackend(
         explicitly_enabled=True,
         credentials={BASE_URL_REFERENCE: R7_RUNTIME_URL, API_KEY_REFERENCE: R7_FAKE_KEY},

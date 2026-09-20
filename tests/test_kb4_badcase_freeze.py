@@ -31,6 +31,10 @@ def plan() -> BadCasePlan:
     ("reference", "historical_digest"),
     (
         (
+            "src/harnesslab/harness_lane/models.py",
+            "sha256:dd97691e94bb3571323777f045a8d03d112a0a6ca4504f2b4e05ccbfebd06e7e",
+        ),
+        (
             "src/harnesslab/diagnosis/service.py",
             "sha256:84b6fb001654e38cccc690da53711e96030376967fb3e02c0965e01245d6b524",
         ),
@@ -56,7 +60,14 @@ def test_current_repairs_preserve_frozen_badcase_provenance(
     )
 
 
-@pytest.mark.parametrize("reference", ("src/harnesslab/diagnosis/service.py", "docs/ANALYST.md"))
+@pytest.mark.parametrize(
+    "reference",
+    (
+        "src/harnesslab/diagnosis/service.py",
+        "docs/ANALYST.md",
+        "src/harnesslab/harness_lane/models.py",
+    ),
+)
 def test_frozen_source_binding_cannot_be_rebound(
     monkeypatch: pytest.MonkeyPatch, reference: str
 ) -> None:

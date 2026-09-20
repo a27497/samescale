@@ -36,7 +36,7 @@ from harnesslab.tasks.package import TaskPackage
 from tests.phase_g_helpers import PYTHON_TASK_PATH, ROOT
 
 PATCH = (
-    '{"version":1,"operations":[{"op":"write","path":"calculator.py",'
+    '{"schema_version":1,"operations":[{"op":"write","path":"calculator.py",'
     '"content":"def clamp(value: int, lower: int, upper: int) -> int:\\n'
     '    return max(lower, min(value, upper))\\n"}]}'
 )
@@ -247,6 +247,10 @@ async def test_keyless_experiment_e2e_uses_queue_runners_manifests_and_report(
         assert all(run.artifact_manifest_path for run in persisted_runs)
         assert all(Path(run.artifact_manifest_path or "").is_file() for run in persisted_runs)
         assert all(run.evidence_digest for run in persisted_runs)
+        assert all(
+            run.normalized_outcome == StatisticalOutcome.CAPABILITY_PASS.value
+            for run in persisted_runs
+        )
         # The real executor must persist the verified invocation count, not unknown
         # merely because the metric reader lost its artifact path during integration.
         assert all(
@@ -396,8 +400,9 @@ async def test_harness_infra_profile_and_cancel_manifests_reopen_consistently(
 
 
 @pytest.mark.integration
+@pytest.mark.parametrize("legacy_binding", [False, True])
 async def test_executor_rejects_successful_binding_that_disagrees_with_slot(
-    database_url: str, tmp_path: Path
+    database_url: str, tmp_path: Path, legacy_binding: bool
 ) -> None:
     planned_profile = ModelProfile(
         requested_model="planned-model",
@@ -440,20 +445,25 @@ async def test_executor_rejects_successful_binding_that_disagrees_with_slot(
             )
         async with factory() as session, session.begin():
             await enqueue_plan(session, plan)
+        provider = FakeDirectProvider(PATCH, observed_model="wrong-model")
+        configured = DirectModelBinding(
+            DirectModelRunner(
+                artifact_root=artifacts,
+                runtime_root=tmp_path / "mismatch-runtime",
+                allow_custom_endpoint=True,
+            ),
+            actual_profile,
+            provider,
+        )
+
+        class LegacyBinding:
+            async def run(self, task_path: Path, run_id: str):  # type: ignore[no-untyped-def]
+                return await configured.run(task_path, run_id)
+
         executor = ExperimentRunExecutor(
             repository_root=ROOT,
             session_factory=factory,
-            bindings={
-                "direct": DirectModelBinding(
-                    DirectModelRunner(
-                        artifact_root=artifacts,
-                        runtime_root=tmp_path / "mismatch-runtime",
-                        allow_custom_endpoint=True,
-                    ),
-                    actual_profile,
-                    FakeDirectProvider(PATCH, observed_model="wrong-model"),
-                )
-            },
+            bindings={"direct": LegacyBinding() if legacy_binding else configured},
             owner="mismatch-worker",
         )
         completed = await executor.run_until_idle(experiment_id)
@@ -464,7 +474,8 @@ async def test_executor_rejects_successful_binding_that_disagrees_with_slot(
         assert failed.source_outcome == "control_identity_mismatch"
         assert failed.artifact_manifest_path is None
         assert failed.evidence_digest is None
-        assert tuple(artifacts.rglob("manifest.json"))
+        assert bool(tuple(artifacts.rglob("manifest.json"))) is legacy_binding
+        assert bool(provider.requests) is legacy_binding
         async with factory() as session:
             report = await build_experiment_report(session, experiment_id, bootstrap_resamples=99)
         assert report.cells[0].infra_failures == 1

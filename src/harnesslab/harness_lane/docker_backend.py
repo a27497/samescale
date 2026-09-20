@@ -20,7 +20,6 @@ from harnesslab.harness_lane.models import (
     CodexProcessCapture,
     CodexStreamDiagnosticCategory,
 )
-from harnesslab.harness_lane.profile import CODEX_IMAGE
 from harnesslab.sandbox.docker_cli import _DockerCLI, docker_environment
 from harnesslab.sandbox.preflight import _docker_runtime_preflight
 from harnesslab.sandbox.subprocess_loop import run_on_subprocess_loop
@@ -168,7 +167,12 @@ class DockerCodexBackend:
             for name, value in sorted(self.egress_boundary.subject_proxy_environment().items()):
                 arguments.extend(("--env", f"{name}={value}"))
         arguments.extend(
-            ("--entrypoint", "/usr/local/bin/harnesslab-codex-runtime", CODEX_IMAGE, *plan.argv[1:])
+            (
+                "--entrypoint",
+                "/usr/local/bin/harnesslab-codex-runtime",
+                plan.image_reference,
+                *plan.argv[1:],
+            )
         )
         return tuple(arguments)
 
@@ -194,7 +198,7 @@ class DockerCodexBackend:
             if source not in self.credentials:
                 raise self._failure(CodexBackendFailurePhase.CONTAINER_CREATE, started=started)
             value = self.credentials[source]
-            if target == "HARNESSLAB_GPT56_RELAY_BASE_URL":
+            if target in {"HARNESSLAB_GPT56_RELAY_BASE_URL", "HARNESSLAB_CODEX_RELAY_BASE_URL"}:
                 try:
                     value = validate_provider_base_url(value)
                 except ValueError as exc:

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+import re
 from enum import StrEnum
 from typing import Any
 
@@ -65,6 +67,61 @@ def _safe_text(value: object, *, limit: int, secrets: tuple[str, ...]) -> str | 
 
 def _nonnegative(value: object) -> int | None:
     return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+
+
+def _bounded_integer(value: object, *, minimum: int, maximum: int) -> int | None:
+    if isinstance(value, int) and not isinstance(value, bool) and minimum <= value <= maximum:
+        return value
+    return None
+
+
+def _bounded_number(value: object, *, minimum: float, maximum: float) -> float | None:
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        result = float(value)
+        if math.isfinite(result) and minimum <= result <= maximum:
+            return result
+    return None
+
+
+def _first_value(sources: tuple[dict[str, Any], ...], keys: tuple[str, ...]) -> object:
+    for source in sources:
+        for key in keys:
+            if key in source:
+                return source[key]
+    return None
+
+
+def _diagnostic_fields(raw: dict[str, Any], secrets: tuple[str, ...]) -> dict[str, object]:
+    error = raw.get("error")
+    sources = (error, raw) if isinstance(error, dict) else (raw,)
+    request_id = _safe_text(
+        _first_value(sources, ("request_id", "requestId", "x_request_id")),
+        limit=300,
+        secrets=secrets,
+    )
+    if request_id is not None and re.fullmatch(r"[A-Za-z0-9._:-]{1,300}", request_id) is None:
+        request_id = None
+    return {
+        "request_id": request_id,
+        "attempt": _bounded_integer(
+            _first_value(sources, ("attempt", "retry_attempt")), minimum=1, maximum=1_000_000
+        ),
+        "max_retries": _bounded_integer(
+            _first_value(sources, ("max_retries", "maxRetries")),
+            minimum=0,
+            maximum=1_000_000,
+        ),
+        "retry_delay_ms": _bounded_number(
+            _first_value(sources, ("retry_delay_ms", "retryDelayMs")),
+            minimum=0,
+            maximum=86_400_000,
+        ),
+        "error_status": _bounded_integer(
+            _first_value(sources, ("error_status", "http_status", "status_code", "statusCode")),
+            minimum=100,
+            maximum=599,
+        ),
+    }
 
 
 def _usage(value: object) -> CodexTokenUsage | None:
@@ -133,6 +190,7 @@ def _sanitize_event(
             text=text,
             usage=_usage(raw.get("usage")),
             error_code=error_code,
+            **_diagnostic_fields(raw, secrets),
         )
     if event_type not in {"item.started", "item.updated", "item.completed"}:
         return SanitizedNativeEvent(
@@ -141,6 +199,7 @@ def _sanitize_event(
             status=_safe_text(raw.get("status"), limit=200, secrets=secrets),
             thread_id=thread_id,
             observed_model=observed_model,
+            **_diagnostic_fields(raw, secrets),
         )
     item = raw.get("item")
     if not isinstance(item, dict):
@@ -182,6 +241,7 @@ def _sanitize_event(
             **common,
             text=_safe_text(item.get("message"), limit=MAX_PUBLIC_TEXT, secrets=secrets),
             error_code=_safe_text(item.get("code"), limit=200, secrets=secrets),
+            **_diagnostic_fields(item, secrets),
         )
     return SanitizedNativeEvent(**common)
 
@@ -197,6 +257,8 @@ def _trace_type(event: SanitizedNativeEvent) -> TraceEventType:
         return TraceEventType.TURN_FAILED
     if event.event_type == "error":
         return TraceEventType.ERROR
+    if "retry" in event.event_type.casefold() and event.attempt is not None:
+        return TraceEventType.API_RETRY
     item_types = {
         "agent_message": TraceEventType.AGENT_MESSAGE,
         "reasoning": TraceEventType.REASONING_PRESENT,
@@ -219,6 +281,7 @@ def _normalized_trace(events: tuple[SanitizedNativeEvent, ...]) -> NormalizedTra
                 native_event_type=event.event_type,
                 item_type=event.item_type,
                 item_id=event.item_id,
+                thread_id=event.thread_id,
                 status=event.status,
                 text=event.text,
                 command=event.command,
@@ -226,6 +289,12 @@ def _normalized_trace(events: tuple[SanitizedNativeEvent, ...]) -> NormalizedTra
                 exit_code=event.exit_code,
                 file_changes=event.file_changes,
                 usage=event.usage,
+                error_code=event.error_code,
+                request_id=event.request_id,
+                attempt=event.attempt,
+                max_retries=event.max_retries,
+                retry_delay_ms=event.retry_delay_ms,
+                error_status=event.error_status,
             )
             for event in events
         )

@@ -11,6 +11,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 BASE_URL_REFERENCE = "HARNESSLAB_GPT56_RELAY_BASE_URL"
+CURRENT_BASE_URL_REFERENCE = "HARNESSLAB_CODEX_RELAY_BASE_URL"
 RUNTIME_PROFILE = "harnesslab-runtime"
 PERMISSION_PROFILE = "harnesslab-outer-sandbox"
 CODEX_HOME = Path("/tmp/codex-home")
@@ -52,20 +53,22 @@ def _validated_base_url(value: str) -> str:
     return f"https://{hostname}{parsed.path.rstrip('/')}"
 
 
-def _materialize_runtime_profile(base_url: str) -> None:
+def _materialize_runtime_profile(base_url: str, *, current: bool = False) -> None:
     if os.environ.get("CODEX_HOME") != str(CODEX_HOME):
         raise RuntimeError("Codex runtime home is not isolated")
     CODEX_HOME.mkdir(mode=0o700, parents=True, exist_ok=True)
     profile_path = CODEX_HOME / f"{RUNTIME_PROFILE}.config.toml"
+    provider_id = "harnesslab_responses_relay" if current else "harnesslab_gpt56_relay"
+    credential = "HARNESSLAB_CODEX_RELAY_API_KEY" if current else "HARNESSLAB_GPT56_RELAY_API_KEY"
     config = "\n".join(
         (
-            'model_provider = "harnesslab_gpt56_relay"',
+            f'model_provider = "{provider_id}"',
             f'default_permissions = "{PERMISSION_PROFILE}"',
             "",
-            "[model_providers.harnesslab_gpt56_relay]",
+            f"[model_providers.{provider_id}]",
             'name = "HarnessLab trusted GPT relay"',
             f"base_url = {json.dumps(base_url)}",
-            'env_key = "HARNESSLAB_GPT56_RELAY_API_KEY"',
+            f'env_key = "{credential}"',
             'wire_api = "responses"',
             "supports_websockets = false",
             "",
@@ -83,13 +86,19 @@ def _materialize_runtime_profile(base_url: str) -> None:
 
 def main() -> None:
     runtime_value = os.environ.get(BASE_URL_REFERENCE)
+    current_value = os.environ.get(CURRENT_BASE_URL_REFERENCE)
+    if runtime_value is not None and current_value is not None:
+        raise RuntimeError("Codex runtime provider selection is ambiguous")
+    current = current_value is not None
+    runtime_value = current_value if current else runtime_value
     profile_selected = "--profile" in sys.argv[1:] and RUNTIME_PROFILE in sys.argv[1:]
     if profile_selected != (runtime_value is not None):
         raise RuntimeError("Codex runtime provider configuration is incomplete")
     if runtime_value is not None:
-        _materialize_runtime_profile(_validated_base_url(runtime_value))
+        _materialize_runtime_profile(_validated_base_url(runtime_value), current=current)
     child_environment = dict(os.environ)
     child_environment.pop(BASE_URL_REFERENCE, None)
+    child_environment.pop(CURRENT_BASE_URL_REFERENCE, None)
     os.execvpe("codex", ("codex", *sys.argv[1:]), child_environment)
 
 

@@ -16,6 +16,7 @@ from harnesslab.comparability.manifest import ComparabilityInputError, load_mani
 from harnesslab.comparability.models import ComparabilityIntent
 from harnesslab.custom_eval.cli import custom_eval_app
 from harnesslab.egress import EgressNetworkIsolationUnavailable
+from harnesslab.episodes.cli import episode_app
 from harnesslab.experiment.cli import experiment_app, report_app, run_app
 from harnesslab.harness_lane.profile import canonical_codex_profile
 from harnesslab.harness_lane.runtime import CodexRuntime
@@ -120,6 +121,7 @@ app.add_typer(model_app, name="model")
 app.add_typer(harness_app, name="harness")
 app.add_typer(compare_app, name="compare")
 app.add_typer(custom_eval_app, name="custom-eval")
+app.add_typer(episode_app, name="episode")
 app.add_typer(experiment_app, name="experiment")
 app.add_typer(run_app, name="run")
 app.add_typer(report_app, name="report")

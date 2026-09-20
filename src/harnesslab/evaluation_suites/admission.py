@@ -301,6 +301,11 @@ class AdmissionCandidate(BaseModel):
             and self.task_qualification.task != self.characteristics.task
         ):
             raise ValueError("candidate qualification does not bind its exact task")
+        if (
+            self.task_qualification is not None
+            and self.task_qualification.quality_identity != self.characteristics.quality_identity
+        ):
+            raise ValueError("candidate qualification does not bind its exact quality identity")
         if self.candidate_identity != canonical_digest(self.payload()):
             raise ValueError("candidate identity does not match its payload")
         return self
@@ -498,6 +503,15 @@ def build_admission_candidate(
             raise AdmissionGovernanceError("candidate qualification is not qualified")
         if qualification.quality.task != characteristics.task:
             raise AdmissionGovernanceError("candidate qualification does not match the task")
+        quality = qualification.quality
+        if characteristics.quality_identity != quality.quality_identity:
+            raise AdmissionGovernanceError("candidate qualification quality identity mismatch")
+        if (
+            characteristics.family != quality.family
+            or characteristics.benchmark_tier != quality.benchmark_tier
+            or characteristics.source_kind != quality.provenance.source_kind
+        ):
+            raise AdmissionGovernanceError("candidate qualification source category mismatch")
         if qualification.qualification_id is None:
             raise AdmissionGovernanceError("qualified candidate is missing qualification id")
         qualification_reference = TaskQualificationReference(
