@@ -4,6 +4,7 @@ import hashlib
 import os
 import shutil
 import tempfile
+from collections.abc import Callable
 from contextlib import suppress
 from pathlib import Path
 from uuid import uuid4
@@ -134,6 +135,8 @@ class CodexHarnessRunner:
         | None = None,
         run_id: str | None = None,
         prompt_addendum: str | None = None,
+        execution_guard: Callable[[TaskPackage, CodexHarnessProfile, CodexHarnessPrompt, str], None]
+        | None = None,
     ) -> HarnessLaneRunResult:
         if transport is not None and backend is not None:
             raise CodexHarnessRunError("select one subject transport")
@@ -179,6 +182,8 @@ class CodexHarnessRunner:
                 network_policy=profile.tool_network_policy,
                 prompt_addendum=prompt_addendum,
             )
+            if execution_guard is not None:
+                execution_guard(package, profile, prompt, effective_run_id)
             try:
                 observation = await transport.execute(
                     SubjectRequest(
