@@ -1,0 +1,77 @@
+{
+  "kind": "POST_TIMEOUT_OFFLINE_AUDIT_EVIDENCE_SNAPSHOT",
+  "source_audit_reference": "/home/dev/artifacts/samescale-a-offline-20260921-lsgkkz5y",
+  "source_audit_manifest_sha256": "1d15789a2ec9d18974f756db23b13d83ab173d15de4774490541934901864ad2",
+  "copied_files": {
+    "identity.json": {
+      "source_relative_path": "identity.json",
+      "sha256": "064cf235351907a184196da99d790bea11a145748e0ff12296ec011d7e977a53"
+    },
+    "result.json": {
+      "source_relative_path": "result.json",
+      "sha256": "ca2bc7398a3d2d437d1aebb0638d29c3e01d07b165e1715b05466ef293cf2589"
+    },
+    "preservation.json": {
+      "source_relative_path": "preservation.json",
+      "sha256": "b847c0f0273cbea6dd86bbab626ae9b225a83fa59f5cd695b8b8530fc2da07b9"
+    },
+    "verifier-infrastructure-first.stderr": {
+      "source_relative_path": "verifier-infrastructure-first.stderr",
+      "sha256": "2c8bb30606f26f7468a4db0304588ba4f6ded3e3986b8af133a949cbcf7ba3e0"
+    },
+    "public-evidence/public.stdout": {
+      "source_relative_path": "public-evidence/public.stdout",
+      "sha256": "a718e33e6579e85cea7ec3f4b58b5ae52ca711b4199aeec32f54e8f3a9d40e42"
+    },
+    "verifier-evidence/report.json": {
+      "source_relative_path": "verifier-evidence/report.json",
+      "sha256": "e072ac74d42805d6da09b659690cd57d23666cd554ea0bbce11b78dc0dc1ee74"
+    },
+    "verifier-evidence/business-vitest.json": {
+      "source_relative_path": "verifier-evidence/business-vitest.json",
+      "sha256": "380fb563548adb55b86f6dc4a17e89c67d39f989a339dde95f4c49dbb0c57f0a"
+    },
+    "verifier-evidence/public-vitest.json": {
+      "source_relative_path": "verifier-evidence/public-vitest.json",
+      "sha256": "3b82ebf5bbf1cbce3653b6305ad89bfb718cf07a6d03b7c7e2a0ea1c1c69f9f1"
+    },
+    "verifier-evidence/stages.json": {
+      "source_relative_path": "verifier-evidence/stages.json",
+      "sha256": "1b3ae50a0c31a3ccdd438edb6c8ab5b5b0cdb002e3bb37de34e838d0b54cbb50"
+    },
+    "verifier-evidence/build.stdout": {
+      "source_relative_path": "verifier-evidence/build.stdout",
+      "sha256": "f82e6d6168d9c5b6b33ab89827d4d837da59cdec7748e15aa30466020539df72"
+    },
+    "supplemental-evidence/supplemental-vitest.json": {
+      "source_relative_path": "supplemental-evidence/supplemental-vitest.json",
+      "sha256": "d2176a492a81291a89aa245fc35dd46d5b56f8c2c5dcbe8c8a9ebee91762adb5"
+    },
+    "supplemental-evidence/execution.json": {
+      "source_relative_path": "supplemental-evidence/execution.json",
+      "sha256": "0cb6940683776e10977559ffe35075a1ca284bb38bb2748265e4202d5f72236a"
+    },
+    "source-audit-README.md": {
+      "source_relative_path": "README.md",
+      "sha256": "cc08d21b8c80fec1029b85fc380d734d8d4783fc5df67e0de85349cb0c505685"
+    },
+    "source-audit-sha256.json": {
+      "source_relative_path": "sha256.json",
+      "sha256": "1d15789a2ec9d18974f756db23b13d83ab173d15de4774490541934901864ad2"
+    },
+    "supplemental-contract.test.ts.txt": {
+      "source_relative_path": "supplemental-contract.test.ts",
+      "sha256": "c82472d9a4da857ed8b00b23d3af3a8119c644728d431b0a7ab99bc77cd00733"
+    },
+    "run-supplement.py.txt": {
+      "source_relative_path": "run-supplement.py",
+      "sha256": "4d5c346b3de7abcc4c65c84501156d0dd6f581fdf8c9b4d49e1b77682fd3b33e"
+    }
+  },
+  "original_episode_reference": "../l1-a-candidate-real-20260921/episode.json",
+  "original_episode_sha256": "1e50178a31900c3a21a7e0f563ee14b9a685e1f0076a866553429520145cadc7",
+  "original_request_reference": "../l1-a-candidate-closeout-20260921/execution-request.json",
+  "original_request_sha256": "d4342aa041135c27d39a9a9aff11a2b869a4dc72ddae215dd801995120a921d2",
+  "source_assets_policy": "Original full workspace and frozen verifier remain external and read-only; selected reports are exact byte copies. No Candidate patch or new Episode.",
+  "omitted_redundant_logs": "Build warning stderr and type-check banner remain in the source audit; stage exit codes and public output are retained here. Their hashes remain in source-audit-sha256.json."
+}

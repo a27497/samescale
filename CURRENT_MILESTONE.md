@@ -22,11 +22,23 @@ snapshot checks are recorded in the supplement. Push and CI are limited to the c
 branch `codex/l-real-agent-main-integration`; verify CI against the pushed HEAD separately.
 No merge to main or deployment is authorized.
 
-**Next smallest L1 task (not started):** read-only offline review of this attempt's existing trace
-and five-file output to identify the last completed work and remaining verification gap, without
-modifying the frozen task/Setup or launching another Subject, verifier or Judge. It must retain
-NOT_VERIFIED and cannot infer upstream root cause. Any subsequent execution needs separate scope
-and fresh authorization. Stop after this evidence commit, push and exact-HEAD CI check.
+**Post-timeout offline diagnosis recorded (2026-09-21):** [stable audit evidence](docs/evidence/l1-a-candidate-offline-audit-20260921/README.md)
+and [L1 diagnosis supplement](docs/SAMESCALE_L1_A_CANDIDATE_DIAGNOSIS.md) retain the separate audit.
+Public checks **25/25**, type-check/build passed. The unchanged frozen verifier reports **71/75**
+checks (business **68/72**), acceptance FAILED; A3 duplicate variant/extension handling fails on both
+pages. Independent supplemental acceptance **12/22** reproduces A4 private-use defects including
+`en-x-demo`; A7 fails overall due to the shared language defects. The audit proves reproducible
+saved-workspace defects, not an original Episode grade or an engineering-completion percentage.
+Initial audit directory permission failures are recorded separately from Candidate functional failures.
+Original evidence and five saved files remain unchanged; the real attempt remains **NOT_VERIFIED**,
+verifier NOT_RUN. Authorization/execution IDs remain consumed. No timeout root cause is established.
+A Current's historical 75/75 and this later offline 71/75 are not a completed comparable pair;
+comparison remains INCONCLUSIVE and L1 INCOMPLETE.
+
+**Stopping point:** record this diagnosis in a separate local evidence commit only; no push, PR,
+merge, deployment, Candidate repair, or new execution. The next recommended bounded task is the
+existing GitHub KB4 CI failure investigation/compatibility repair, under a separate user request;
+it is not started here and cannot change frozen evidence merely to make checks pass.
 
 <details>
 <summary>Historical S1.5 handoff — retained from the prior commit, not current state or authorization</summary>

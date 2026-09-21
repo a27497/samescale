@@ -1,0 +1,458 @@
+{
+  "schema_version": 1,
+  "passed": false,
+  "score": 0.9466666666666667,
+  "checks": [
+    {
+      "name": "detail A1/A7 selects stream index rather than array position or translation target",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics en",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics eng",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics zh",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics zho",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics chi",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics en-US",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics zh-Hant",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics fr",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics de-DE",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A2/A4/A7 language semantics sr-Latn-RS",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language missing preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language null preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language empty preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language space preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language und preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language unknown preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language auto preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language invalid preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language bad segments preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language dangling extension preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language repeated region preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language bad region preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A3/A7 unknown language duplicate variant preserves playable content",
+      "passed": false,
+      "score": 0.0,
+      "detail": "RangeError: Invalid language tag: sl-rozaj-rozaj\n    at Intl.getCanonicalLocales (<anonymous>)\n    at language (/tmp/ll-verify-mikhzxbb/workspace/frontend/.qualification/contract.test.ts:60:35)\n    at /tmp/ll-verify-mikhzxbb/workspace/frontend/.qualification/contract.test.ts:87:66\n    at file:///opt/ll-deps/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "detail A3/A7 unknown language duplicate extension preserves playable content",
+      "passed": false,
+      "score": 0.0,
+      "detail": "RangeError: Invalid language tag: en-u-ca-gregory-u-nu-latn\n    at Intl.getCanonicalLocales (<anonymous>)\n    at language (/tmp/ll-verify-mikhzxbb/workspace/frontend/.qualification/contract.test.ts:60:35)\n    at /tmp/ll-verify-mikhzxbb/workspace/frontend/.qualification/contract.test.ts:87:66\n    at file:///opt/ll-deps/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "detail A5/A7 no fabricated track: NOT_FOUND",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A5/A7 no fabricated track: UNSUPPORTED",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A5/A7 no fabricated track: null selection",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A5/A7 no fabricated track: absent selected stream",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A5/A6/A7 clears old track during refresh and waits for matching download",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A5/A6/A7 probe failure removes stale track with feedback",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A5/A6/A7 download failure removes stale track with feedback",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A6/A7 late old probe cannot overwrite a new resource",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A6/A7 late old download cannot overwrite a new resource",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A6/A7 late failed old download cannot clear new subtitles",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "detail A6/A7 unmount invalidates pending completion",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A1/A7 selects stream index rather than array position or translation target",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics en",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics eng",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics zh",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics zho",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics chi",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics en-US",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics zh-Hant",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics fr",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics de-DE",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A2/A4/A7 language semantics sr-Latn-RS",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language missing preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language null preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language empty preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language space preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language und preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language unknown preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language auto preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language invalid preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language bad segments preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language dangling extension preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language repeated region preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language bad region preserves playable content",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A3/A7 unknown language duplicate variant preserves playable content",
+      "passed": false,
+      "score": 0.0,
+      "detail": "RangeError: Invalid language tag: sl-rozaj-rozaj\n    at Intl.getCanonicalLocales (<anonymous>)\n    at language (/tmp/ll-verify-mikhzxbb/workspace/frontend/.qualification/contract.test.ts:60:35)\n    at /tmp/ll-verify-mikhzxbb/workspace/frontend/.qualification/contract.test.ts:87:66\n    at file:///opt/ll-deps/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "upload A3/A7 unknown language duplicate extension preserves playable content",
+      "passed": false,
+      "score": 0.0,
+      "detail": "RangeError: Invalid language tag: en-u-ca-gregory-u-nu-latn\n    at Intl.getCanonicalLocales (<anonymous>)\n    at language (/tmp/ll-verify-mikhzxbb/workspace/frontend/.qualification/contract.test.ts:60:35)\n    at /tmp/ll-verify-mikhzxbb/workspace/frontend/.qualification/contract.test.ts:87:66\n    at file:///opt/ll-deps/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "upload A5/A7 no fabricated track: NOT_FOUND",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A5/A7 no fabricated track: UNSUPPORTED",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A5/A7 no fabricated track: null selection",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A5/A7 no fabricated track: absent selected stream",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A5/A6/A7 clears old track during refresh and waits for matching download",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A5/A6/A7 probe failure removes stale track with feedback",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A5/A6/A7 download failure removes stale track with feedback",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A6/A7 late old probe cannot overwrite a new resource",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A6/A7 late old download cannot overwrite a new resource",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A6/A7 late failed old download cannot clear new subtitles",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "upload A6/A7 unmount invalidates pending completion",
+      "passed": true,
+      "score": 1.0,
+      "detail": ""
+    },
+    {
+      "name": "public-unit",
+      "passed": true,
+      "score": 1.0,
+      "detail": "exit 0"
+    },
+    {
+      "name": "type-check",
+      "passed": true,
+      "score": 1.0,
+      "detail": "exit 0"
+    },
+    {
+      "name": "build",
+      "passed": true,
+      "score": 1.0,
+      "detail": "exit 0"
+    }
+  ],
+  "summary": "Offline business contract and public checks; no model execution."
+}

@@ -1,0 +1,53 @@
+[
+  {
+    "stage": "business",
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--config",
+      ".qualification/vitest.config.mts",
+      "--reporter=json",
+      "--outputFile",
+      "/tmp/ll-verify-mikhzxbb/vitest.json"
+    ],
+    "exit_code": 1,
+    "duration_seconds": 3.1929766540001765
+  },
+  {
+    "stage": "public-unit",
+    "command": [
+      "npm",
+      "run",
+      "test:unit",
+      "--",
+      "--maxWorkers=1",
+      "--fileParallelism=false",
+      "--reporter=json",
+      "--outputFile",
+      "/tmp/ll-verify-mikhzxbb/public.json"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 7.598922204999781
+  },
+  {
+    "stage": "type-check",
+    "command": [
+      "npm",
+      "run",
+      "type-check"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 5.033444903000145
+  },
+  {
+    "stage": "build",
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 6.646826667999903
+  }
+]

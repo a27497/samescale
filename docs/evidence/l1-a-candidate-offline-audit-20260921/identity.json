@@ -1,0 +1,9 @@
+{
+  "task": "/home/dev/artifacts/samescale-l1-development-receiver/20260920-preparation-03/custom-store/snapshots/0b481688e47274a2d6631ff6cf47fe301a05ce1c070ec6039596dba697976335/package/lecturelens-embedded-subtitle-language-metadata/1.0.1",
+  "original_bundle": "/home/dev/artifacts/samescale-l1-a-candidate-real-a4869bcecb1148debd84bed5f7259d20",
+  "original_execution_id": "a4869bcecb1148debd84bed5f7259d20",
+  "reconstructed_file_count": 99,
+  "reconstruction_exact": true,
+  "provider_calls": 0,
+  "scope": "INDEPENDENT_OFFLINE_AUDIT_NOT_ORIGINAL_EPISODE"
+}
