@@ -31,7 +31,11 @@ GOLDEN = {
     ),
     "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef",
 }
-SUITES = ("tests/test_s2_offline_replay.py", "tests/test_s3_ci_regression.py")
+SUITES = (
+    "tests/test_s2_offline_replay.py",
+    "tests/test_s3_ci_regression.py",
+    "tests/test_recruiter_demo.py",
+)
 REQUIRED_TESTS = (
     "test_real_runs_are_reconstructed_without_execution",
     "test_integrity_drift_fails_closed",
@@ -41,6 +45,8 @@ REQUIRED_TESTS = (
     "test_parser_mutation_fails_closed",
     "test_schema_and_taxonomy_drift_fail_closed",
     "test_workflow_uses_offline_entry_without_execution_credentials",
+    "test_export_uses_no_network_or_process",
+    "test_shared_files_contain_only_public_projection",
 )
 
 

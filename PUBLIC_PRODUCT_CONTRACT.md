@@ -1,5 +1,15 @@
 # SameScale Product — Public Product Contract
 
+## Recruiter Demo — Phase S4 冻结范围（2026-09-21）
+
+`docs/recruiter/demo/index.html` 是从 S1–S3 已保存证据导出的只读分享页，不是实时运行界面。
+展示同一真实任务的 Codex verified pass 与 Claude Code timeout/NOT_VERIFIED、描述性 Trace Diff、
+有边界的 diagnosis、Offline Replay 和已保存的 GitHub CI 验收记录。仅公开字段，不包含凭据、
+内部 endpoint、原始 trace/command、源码或隐藏 verifier 资产；导出失败不发布替代结果。
+打开页面无外部请求、模型调用、命令执行或 verifier 重跑。S1 仅 2/16 cells，仍 partial/blocked；
+不支持能力排名、完整配置比较、普遍效率或 Harness 因果结论。CLI/provider/model/template 差异明确列出。
+本地 HTML 与求职资料属于分享准备，不代表私有仓库已公开、网站已部署或招聘者理解度已实测。
+
 SameScale helps an AI Coding developer inspect an engineering failure, follow verified evidence,
 separate facts from hypotheses, and review a regression proposal. The initial product continues
 the existing HarnessLab P0 Analyst application; S1 updates its external brand and investigation

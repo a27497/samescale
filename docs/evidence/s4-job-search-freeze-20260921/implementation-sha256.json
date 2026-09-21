@@ -1,0 +1,9 @@
+{
+  "scripts/export_recruiter_demo.py": "sha256:485e0744b26e4d3e5edd6ec6fc22ab022495ceb607f85e08bc2f9c57027d2afd",
+  "scripts/verify_s3_regression.py": "sha256:60b4770f2748506d07316b39d8bc418de0ac4f408310b7efb5ccc28a26d93ff3",
+  "tests/test_recruiter_demo.py": "sha256:ed2ecde1696019a1a3aa84726b1d32a37251823611e728d617108b531d86a39f",
+  "docs/recruiter/template.html": "sha256:49da6309e72751ca23059d30bc47a3bbc7b79f1f54655c0bcd56bb5829bcba6f",
+  "docs/recruiter/demo/index.html": "sha256:a8556e1a3b90d166c235655a861c823f5cf16d3c9f2b9fa1204f3986518c419a",
+  "docs/recruiter/demo/public-evidence.json": "sha256:84e3e9731a118a2c5bf8aa1d9ea6a1d7d76dc4bee5aeac37e5ae186957a8b008",
+  "docs/recruiter/demo/SHA256SUMS": "sha256:c83fda5fc6d49f151a4bf4e306a965c876dad124a0a266ffe63ccae7a3aee8d4"
+}

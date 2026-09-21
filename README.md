@@ -1,5 +1,23 @@
 # SameScale
 
+## Recruiter Demo · 求职冻结版
+
+**3–5 分钟：真实 coding task → configurations → result → Trace Diff → diagnosis → Offline Replay → CI。**
+下载并用浏览器打开 [Recruiter Demo](docs/recruiter/demo/index.html)。单个 HTML 即可分享，
+无需账号、模型密钥、服务或网络；GitHub 文件预览不会运行 HTML。只分享 `docs/recruiter/demo/`，
+不分享原始 bundle 或私有工作区。未部署网站。
+
+### Engineering Highlights
+
+- 同一真实 SSE 恢复任务：Codex recorded **20/20 verified_pass**；Claude Code timeout / **NOT_VERIFIED**，verifier **NOT_RUN**。
+- 摘要绑定的 evidence chain：native/normalized trace、workspace diff、independent verifier 与 failure taxonomy 相互核对。
+- 复用 Offline Replay 与 GitHub CI 入口，检测 evidence、parser/schema、文件归属和失败分类回归；无 Provider/model/Claude/Judge 调用。
+- Recruiter Demo 仅导出公开字段，保留未知与结论限制；S1 **partial/blocked**，不是能力排名或完整 benchmark。
+
+[演示脚本与复验命令](docs/RECRUITER_DEMO.md) · [面试材料与简历事实](docs/JOB_SEARCH_FREEZE.md) ·
+[S4 final report](docs/evidence/s4-job-search-freeze-20260921/README.md)。求职版冻结范围以
+[CURRENT_MILESTONE](CURRENT_MILESTONE.md) 为准；下方保留现有产品说明与其他历史案例。
+
 SameScale is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
 reproducible Model × Harness × Judge execution and verifier-backed evidence.
 

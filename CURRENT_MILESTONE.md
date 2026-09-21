@@ -1,5 +1,15 @@
 # SameScale Product — Current Milestone
 
+## Phase S4 — Recruiter Demo + Job-search Freeze：验收收口中 — 2026-09-21
+
+[Recruiter Demo](docs/recruiter/demo/index.html)、[3–5 分钟讲解稿](docs/RECRUITER_DEMO.md) 与
+[面试/简历事实](docs/JOB_SEARCH_FREEZE.md) 已生成；[S4 report](docs/evidence/s4-job-search-freeze-20260921/README.md)。
+8 项导出/安全投影测试 PASS，桌面与手机 file:// 离线浏览器验收 PASS，HTTP 请求 0。
+独立 staged tree 的统一离线入口 **73 tests PASS**，全树 Ruff/format/mypy PASS；
+GitHub 当前 S4 SHA 尚待验收。
+Provider/model/Claude/Judge 新调用 0；S1 保持 partial/blocked，S2/S3 complete。
+完成本次 S4 验收即求职冻结并 STOP，不规划 S5、不继续新功能、不 merge main、不 deploy。
+
 ## Phase S3 — CI Regression Integration：COMPLETE — 2026-09-21
 
 [Final report](docs/evidence/s3-ci-regression-20260921/README.md) 与

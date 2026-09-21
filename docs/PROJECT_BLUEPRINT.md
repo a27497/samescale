@@ -1,5 +1,15 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：Phase S4 — Recruiter Demo + Job-search Freeze（2026-09-21）
+
+复用 S1–S3 真实历史 evidence、既有 Offline Replay/CI 和单文件离线 HTML 模式，交付
+3–5 分钟的 task → configurations → result → Trace Diff → diagnosis → replay → CI 路径。
+导出显式筛选的公开字段；提供 README Engineering Highlights、演示脚本、面试材料与简历事实。
+验收要求来源完整性、公开投影边界、必要测试与桌面/手机本地 Demo 验收；需要时仅 scoped
+commit/push 当前 feature branch 并核验实际 SHA 的 CI。不得新增 Provider/model/Claude/Judge 调用。
+保留 dirty work 与历史 evidence；S1 partial/blocked，S2/S3/S4 complete 后进入求职冻结并 STOP。
+不规划 S5，不继续新功能，不 merge main、不 deploy。以下为历史阶段上下文，不自动启动。
+
 ## 当前授权：Phase S3 — CI Regression Integration（2026-09-21）
 
 将 S2 Offline Replay + Trace Diff 接入普通 GitHub push/pull_request CI，本地与 CI 使用同一
