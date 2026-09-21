@@ -1,0 +1,87 @@
+{
+  "kind": "INDEPENDENT_OFFLINE_SAVED_WORKSPACE_AUDIT",
+  "original_attempt_status": "NOT_VERIFIED",
+  "original_authorization_and_execution": "CONSUMED_NO_RETRY_NO_RESUME",
+  "request_identity": "sha256:e6f94974c63b8ecfaca982c9c230d3a0a859089b56e1310e0baa9519b962b61e",
+  "task_identity": {
+    "exposure_state": "UNKNOWN",
+    "holdout_eligible": false,
+    "intended_use": "DEVELOPMENT",
+    "oracle_digest": "sha256:1e5bbec58d8f5539e70d7643971f0e685765ad60a687dc63c534ce4bd2db4ff6",
+    "task_digest": "sha256:86e44d00176c61c704e12d0c03fc3bfd4c9d349edc97a93ba6e073b6404ad031",
+    "task_id": "lecturelens-embedded-subtitle-language-metadata",
+    "task_version": "1.0.1",
+    "verifier_digest": "sha256:9d010944ef0e1a74783fbcee11495edb7c5935002d48c7f4aaa33c8d3f853ce8",
+    "workspace_digest": "sha256:1870160e291f022b67ae2334f5dc265348b3e6f54131d1045dad01d91b68bb15"
+  },
+  "workspace_output_digest": "sha256:977e9f9d23f82354f22ce0ccf0f3c592cd60af52e4bca9dc7580d9f9e37f83e4",
+  "image_id": "sha256:88c5544438f5942f7b3d17263816ac01f1479fb8d0ae7e9dd640fbe8ef51f11b",
+  "network": "none",
+  "provider_calls": 0,
+  "model_calls": 0,
+  "judge_calls": 0,
+  "original_files_unchanged": 240,
+  "reconstructed_files_byte_identical": 99,
+  "candidate_code_modified": false,
+  "public_checks": {
+    "passed": true,
+    "test_files": 9,
+    "tests_passed": 25,
+    "tests_failed": 0,
+    "command": "python3 tools/frontend_check.py",
+    "exit_code": 0
+  },
+  "type_check": "PASS",
+  "build": "PASS",
+  "frozen_verifier": {
+    "passed": false,
+    "passed_checks": 71,
+    "total_checks": 75,
+    "business_passed": 68,
+    "business_failed": 4,
+    "skipped": 0,
+    "score": 0.9466666666666667,
+    "note": "check ratio is not percent engineering completion"
+  },
+  "supplemental": {
+    "passed": false,
+    "tests_passed": 12,
+    "tests_failed": 10,
+    "total": 22,
+    "skipped": 0,
+    "scope": "Separate test suite; original verifier unchanged"
+  },
+  "candidate_failures": [
+    "A3: duplicate variants sl-rozaj-rozaj retained, both pages",
+    "A3: duplicate singleton extensions en-u-ca-gregory-u-nu-latn retained, both pages",
+    "A4: en-x-demo, de-DE-x-goethe, en-US-x-a, x-demo, en-US-u-ca-gregory-x-demo all become und, both pages"
+  ],
+  "infrastructure_failures": [
+    {
+      "stage": "first verifier audit",
+      "cause": "Audit evidence bind mount not writable for container UID",
+      "resolution": "Adjusted permissions of new temporary audit output directories only; reran unchanged verifier"
+    },
+    {
+      "stage": "first supplemental launch",
+      "cause": "New audit parent directory mode 0700 denied container access",
+      "resolution": "Made new audit parent traversable; Candidate code unchanged"
+    }
+  ],
+  "requirements": {
+    "A1": "PASS_TESTED_SCOPE",
+    "A2": "PASS_CORE_ALIASES_REGIONS_SCRIPTS; broader valid tags fail A4",
+    "A3": "FAIL",
+    "A4": "FAIL_SUPPLEMENTAL",
+    "A5": "PASS_TESTED_SCOPE",
+    "A6": "PASS_TESTED_SCOPE",
+    "A7": "PARTIAL: both surfaces consistent and lifecycle works, same language edge defects on both"
+  },
+  "classification": "工程上接近完成",
+  "uncovered": [
+    "Real browser/media playback not exercised (Vue mounted components in happy-dom with API mocks)",
+    "Not exhaustive BCP47 domain or all possible asynchronous schedules",
+    "Original timeout root cause, token usage and missing request telemetry remain unknown"
+  ],
+  "episode_updated": false
+}

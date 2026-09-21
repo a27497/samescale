@@ -1,0 +1,113 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
+import { reactive, nextTick } from 'vue';
+import Detail from '../src/views/TaskDetailView.vue';
+import Upload from '../src/views/UploadView.vue';
+import Player from '../src/components/VideoPlaybackCard.vue';
+
+const h = vi.hoisted(() => ({
+  probe: vi.fn(), download: vi.fn(), route: null as any, upload: null as any,
+  events: null as any, result: null as any, push: vi.fn(),
+}));
+vi.mock('vue-router', () => ({ useRoute: () => h.route, useRouter: () => ({ push: h.push }) }));
+vi.mock('../src/api/embeddedSubtitles', () => ({
+  probeTaskEmbeddedSubtitles: (...a: any[]) => h.probe(...a),
+  probeUploadEmbeddedSubtitles: (...a: any[]) => h.probe(...a),
+  downloadTaskEmbeddedSubtitle: (...a: any[]) => h.download(...a),
+  downloadUploadEmbeddedSubtitle: (...a: any[]) => h.download(...a),
+  toReadableEmbeddedSubtitleError: () => '字幕加载失败',
+}));
+vi.mock('../src/api/media', () => ({
+  requestTaskPlaybackToken: async () => ({ playbackUrl: '/course.mp4' }),
+  requestUploadPlaybackToken: async () => ({ playbackUrl: '/upload.mp4' }),
+  toReadablePlaybackError: () => '播放失败',
+}));
+vi.mock('../src/api/runtimeConfiguration', () => ({ fetchPublicRuntimeConfiguration: async () => ({ demoMode: false }) }));
+vi.mock('../src/api/task', () => ({ fetchTaskDetail: async () => ({ taskId: 'course-1', targetLanguage: 'zh-CN' }), cancelTask: vi.fn(), retryTask: vi.fn(), createAnalysisTask: vi.fn(), toReadableTaskError: vi.fn() }));
+vi.mock('../src/stores/taskEvents', () => ({ useTaskEventsStore: () => h.events }));
+vi.mock('../src/stores/taskResult', () => ({ useTaskResultStore: () => h.result }));
+vi.mock('../src/stores/upload', () => ({ useUploadStore: () => h.upload }));
+
+const stubs: any = Object.fromEntries(['CourseWorkspaceHeader', 'CourseWorkspaceNav', 'CourseOverviewPanel', 'CourseContentPanel', 'CourseStudyPanel', 'CourseQaPanel', 'CourseFilesPanel', 'CourseTechnicalPanel', 'UploadFilePicker', 'UploadProgress', 'PageHeading', 'TermHelp', 'el-alert', 'el-skeleton', 'el-empty', 'el-progress', 'el-tag', 'el-select', 'el-option'].map(k => [k, true]));
+stubs.SectionPanel = { template: '<section><slot /></section>' };
+stubs['el-button'] = { template: '<button><slot /></button>' };
+const vtt = 'WEBVTT\n\n00:00:00.000 --> 00:00:03.000\noriginal words\n';
+let wrapper: any;
+let blobId = 0;
+function deferred<T = any>() {
+  let resolve!: (v: T) => void, reject!: (e: any) => void;
+  const promise = new Promise<T>((a,b) => { resolve=a; reject=b; });
+  return { promise, resolve, reject };
+}
+function response(language: any = 'eng') {
+  return { status: 'FOUND', selectedStreamIndex: 17, tracks: [
+    { streamIndex: 2, language: 'zh', supported: true },
+    { streamIndex: 17, language, supported: true },
+  ] };
+}
+async function settled() { await flushPromises(); await nextTick(); }
+async function start(surface: string) {
+  wrapper = mount(surface === 'detail' ? Detail : Upload, { global: { stubs } });
+  if (surface === 'upload') { h.upload.phase = 'success'; h.upload.completed = { uploadId: 'upload-1' }; }
+  await settled();
+}
+async function switchResource(surface: string) {
+  if (surface === 'detail') h.route.params.taskId = 'course-2';
+  else { h.upload.uploadId = 'upload-2'; h.upload.completed = { uploadId: 'upload-2' }; }
+  await settled();
+}
+async function refresh() { wrapper.findComponent(Player).vm.$emit('refresh'); await settled(); }
+function language() { return Intl.getCanonicalLocales(wrapper.get('track').attributes('srclang'))[0]!.toLowerCase(); }
+beforeEach(() => {
+  h.probe.mockReset().mockResolvedValue(response()); h.download.mockReset().mockResolvedValue(vtt);
+  h.route = reactive({ params: { taskId: 'course-1' }, fullPath: '/tasks/course-1' });
+  h.upload = reactive({ phase: 'ready', selected: null, completed: null, uploadId: 'upload-1', errorMessage: '', isBusy: false });
+  h.events = reactive({ task: null, connectionStatus: 'idle', errorMessage: '', lastHeartbeatAt: '', connect: vi.fn(), disconnect: vi.fn(), reconnect: vi.fn() });
+  h.result = reactive({ result: null, loading: false, errorMessage: '', load: vi.fn(), clear: vi.fn() });
+  vi.spyOn(URL, 'createObjectURL').mockImplementation(() => `blob:qualification-${++blobId}`);
+  vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+});
+afterEach(() => { wrapper?.unmount(); wrapper = null; vi.restoreAllMocks(); });
+
+
+for (const surface of ['detail', 'upload']) describe(`supplemental ${surface}`, () => {
+  for (const tag of ['en-x-demo', 'de-DE-x-goethe', 'en-US-x-a', 'x-demo', 'en-u-ca-gregory', 'en-US-u-ca-gregory-x-demo', 'zh-Hant-TW']) {
+    it(`A4/A7 guaranteed valid BCP47 ${tag}`, async () => {
+      h.probe.mockResolvedValue(response(tag)); await start(surface);
+      expect(wrapper.findComponent(Player).props('subtitleText')).toBe(vtt);
+      expect(wrapper.get('track').attributes('srclang').toLowerCase()).toBe(tag.toLowerCase());
+    });
+  }
+  it('A5/A6/A7 loaded resource switch clears old text and visible language until new download', async () => {
+    await start(surface); const old=wrapper.get('track').attributes('src');
+    const p=deferred(), d=deferred(); h.probe.mockReturnValueOnce(p.promise); h.download.mockReturnValueOnce(d.promise);
+    await switchResource(surface);
+    expect(wrapper.find('track').exists()).toBe(false);
+    expect(wrapper.findComponent(Player).props('subtitleText')).toBe('');
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith(old);
+    p.resolve(response('fr')); await settled(); expect(wrapper.find('track').exists()).toBe(false);
+    expect(wrapper.findComponent(Player).props('subtitleText')).toBe('');
+    d.resolve(vtt+'new'); await settled(); expect(language()).toBe('fr');
+    expect(wrapper.findComponent(Player).props('subtitleText')).toBe(vtt+'new');
+  });
+  it('A6/A7 late failed old probe cannot clear new subtitles', async () => {
+    const old=deferred(); h.probe.mockReturnValueOnce(old.promise); await start(surface);
+    h.probe.mockResolvedValue(response('fr')); await switchResource(surface);
+    old.reject(new Error('old probe error')); await settled(); expect(language()).toBe('fr');
+    expect(wrapper.findComponent(Player).props('subtitleStatus')).toBe('loaded');
+  });
+  it('A5/A6/A7 refresh clears old text and visible language before probe completes', async () => {
+    await start(surface); const p=deferred(); h.probe.mockReturnValueOnce(p.promise); await refresh();
+    expect(wrapper.find('track').exists()).toBe(false);
+    expect(wrapper.findComponent(Player).props('subtitleText')).toBe('');
+    p.reject(new Error('refresh failure')); await settled();
+    expect(wrapper.find('track').exists()).toBe(false);
+    expect(wrapper.findComponent(Player).props('subtitleText')).toBe('');
+  });
+  it('A6/A7 newer refresh wins over late successful older refresh', async () => {
+    await start(surface); const old=deferred(); h.download.mockReturnValueOnce(old.promise); await refresh();
+    h.probe.mockResolvedValue(response('fr')); h.download.mockResolvedValue(vtt+'new'); await refresh();
+    old.resolve(vtt+'old'); await settled(); expect(language()).toBe('fr');
+    expect(wrapper.findComponent(Player).props('subtitleText')).toBe(vtt+'new');
+  });
+});

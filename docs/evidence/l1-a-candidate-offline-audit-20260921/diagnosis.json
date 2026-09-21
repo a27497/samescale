@@ -1,0 +1,50 @@
+{
+  "kind": "DERIVED_CONTEXT_NOT_NEW_COMPARISON",
+  "comparison_decision": "INCONCLUSIVE",
+  "current_source_reference": "/home/dev/projects/harnesslab-ai-integration/docs/evidence/l1-development-real-20260920-03/a-current-episode.json",
+  "current_source_sha256": "583cb7e75fc04efeb9b903064616be814458313c1cb6888a1b72d1ee321395de",
+  "current_recorded_observation": {
+    "run_id": "ab-a-current-1-real",
+    "task_id": "lecturelens-embedded-subtitle-language-metadata",
+    "task_version": "1.0.1",
+    "task_digest": "sha256:86e44d00176c61c704e12d0c03fc3bfd4c9d349edc97a93ba6e073b6404ad031",
+    "setup_identity": "sha256:601265580750f70728139d663febfa9701cfbdf27dbe51196b16069dc1c62d2f",
+    "source_manifest_digest": "sha256:4d99bd47be0fe116a843f8456ce66cd8018ff2ea34b07e7c52f5bcb594524d6f",
+    "acceptance": "RECORDED_PASS",
+    "verifier_check_count": 75,
+    "duration_ms": 257392,
+    "output_tokens": 7875,
+    "comparison_eligible": false
+  },
+  "candidate_original_observation": {
+    "run_id": "a4869bcecb1148debd84bed5f7259d20",
+    "task_id": "lecturelens-embedded-subtitle-language-metadata",
+    "task_version": "1.0.1",
+    "task_digest": "sha256:86e44d00176c61c704e12d0c03fc3bfd4c9d349edc97a93ba6e073b6404ad031",
+    "setup_identity": "sha256:8ab2ef3242f59cddc8812a446d460576b57894dcb0b7f0ae88cb42e10ce2b698",
+    "source_manifest_digest": "sha256:72ef5ef46c5b5d3e1d35dc63131f05611b809e4cf8412a93b74b02799961ef9f",
+    "acceptance": "NOT_VERIFIED",
+    "verifier_check_count": 0,
+    "duration_ms": 601037,
+    "output_tokens": null,
+    "comparison_eligible": false
+  },
+  "audit_acceptance": "FAILED_SAVED_WORKSPACE_ONLY",
+  "requirements": {
+    "A1": "PASS_TESTED_SCOPE",
+    "A2": "PASS_CORE_ALIAS_REGION_SCRIPT_CASES",
+    "A3": "FAIL",
+    "A4": "FAIL_SUPPLEMENTAL_PRIVATE_USE",
+    "A5": "PASS_TESTED_SCOPE",
+    "A6": "PASS_TESTED_SCOPE",
+    "A7": "FAIL_OVERALL_SHARED_LANGUAGE_DEFECTS; consistency and lifecycle subcases pass"
+  },
+  "claims_not_supported": [
+    "Original Candidate Episode formal score of 71/75",
+    "Current tested against this audit supplemental suite",
+    "Prompt/model quality, efficiency or stability ranking",
+    "Timeout attributed to model, relay or Provider root cause",
+    "Completed controlled pair or L1 completion"
+  ],
+  "scope_note": "Current context is a selected historical observation with source digest, not newly executed evidence or the full historical bundle."
+}

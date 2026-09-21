@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "mode": "file:// + offline browser",
+  "checks": [
+    {
+      "viewport": "desktop",
+      "width": 1360,
+      "height": 900,
+      "anchors": 7,
+      "details": 3,
+      "refresh": "PASS",
+      "keyboard_skip_link": "PASS",
+      "horizontal_overflow": false,
+      "http_requests": 0,
+      "page_errors": 0
+    },
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "anchors": 7,
+      "details": 3,
+      "refresh": "PASS",
+      "keyboard_skip_link": "PASS",
+      "horizontal_overflow": false,
+      "http_requests": 0,
+      "page_errors": 0
+    }
+  ]
+}

@@ -12,6 +12,7 @@ from scripts.analyze_kb4_timeout_sensitivity import PAIR_DEFINITIONS
 from harnesslab.analyst.models import FactAssertion, canonical_fact_statement
 from harnesslab.analyst.report import AttributionValidationError
 from harnesslab.release.badcases import CANONICAL, encoded, read_object
+from harnesslab.sandbox.artifacts import sha256_file
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -33,6 +34,38 @@ def test_report_reproduces_from_frozen_sources_without_executing_a_backend(
     assert final.markdown(report) == (ROOT / (final.OUTPUT + ".md")).read_text()
     assert set(report["external_execution"].values()) == {0}
     assert report["new_experimental_evidence"] is False
+
+
+@pytest.mark.parametrize(
+    "reference",
+    (
+        "src/harnesslab/harness_lane/adapter.py",
+        "src/harnesslab/harness_lane/docker_backend.py",
+        "src/harnesslab/harness_lane/trace.py",
+    ),
+)
+def test_superseded_harness_sources_preserve_report_and_reject_rebinding(
+    monkeypatch: pytest.MonkeyPatch, reference: str
+) -> None:
+    real_hash = sha256_file
+    monkeypatch.setattr(
+        final,
+        "sha256_file",
+        lambda path: "sha256:" + "0" * 64 if path == ROOT / reference else real_hash(path),
+    )
+    # Evolving live runtime code cannot change the digest-bound historical report.
+    assert encoded(final.build(ROOT)) == (ROOT / (final.OUTPUT + ".json")).read_text()
+
+    timeout = read_object(ROOT / final.TIMEOUT)
+    timeout["provenance"]["sources_sha256"][reference] = "sha256:" + "0" * 64
+    monkeypatch.setattr(
+        final,
+        "read_object",
+        lambda path: timeout if path == ROOT / final.TIMEOUT else read_object(path),
+    )
+    # Exercise the inner binding guard even after the outer file-byte pin passes.
+    with pytest.raises(ValueError, match="historical frozen V6 source identity drift"):
+        final.build(ROOT)
 
 
 def test_statistics_are_preserved_separately_from_comparability(report: dict[str, Any]) -> None:

@@ -1,0 +1,320 @@
+{
+  "models": {
+    "models": [
+      {
+        "model_id": "gpt-5.6-sol",
+        "display_name": "GPT-5.6 Sol",
+        "model_family": "GPT-5.6",
+        "capabilities": [
+          "coding",
+          "reasoning"
+        ],
+        "context_window_tokens": null,
+        "context_metadata_status": "NOT_AVAILABLE",
+        "reasoning_controls": {
+          "effort": true,
+          "temperature": false,
+          "thinking_toggle": false
+        },
+        "supported_protocols": [
+          "responses"
+        ]
+      },
+      {
+        "model_id": "glm-5.2",
+        "display_name": "GLM-5.2",
+        "model_family": "GLM",
+        "capabilities": [
+          "judge-candidate"
+        ],
+        "context_window_tokens": null,
+        "context_metadata_status": "NOT_AVAILABLE",
+        "reasoning_controls": {
+          "effort": false,
+          "temperature": false,
+          "thinking_toggle": false
+        },
+        "supported_protocols": [
+          "chat_completions"
+        ]
+      }
+    ],
+    "provider_profiles": [
+      {
+        "profile_id": "gpt56-relay-gpt56-responses",
+        "model_id": "gpt-5.6-sol",
+        "provider_id": "gpt56-relay",
+        "requested_model": "gpt-5.6-sol",
+        "protocol": "responses",
+        "route": "/responses",
+        "provider_route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+        "credential_ref": "HARNESSLAB_GPT56_RELAY_API_KEY",
+        "reasoning_effort": "medium",
+        "max_output_tokens": 2000,
+        "request_timeout_seconds": 180,
+        "observed_model_capability": "RUN_EVIDENCE_ONLY",
+        "automation_allowed": true,
+        "enabled": true,
+        "pricing_snapshot_reference": null,
+        "runtime_endpoint_fingerprint": null,
+        "profile_identity": "sha256:85c1f3bd8f6cb6dd72a3f8246b66f72c04733c17572b151e1219c40f3b48fbfa"
+      },
+      {
+        "profile_id": "opencode-go-glm52-chat",
+        "model_id": "glm-5.2",
+        "provider_id": "opencode-go",
+        "requested_model": "glm-5.2",
+        "protocol": "chat_completions",
+        "route": "/v1/chat/completions",
+        "provider_route_identity": "opencode-go|chat_completions|https://opencode.ai/zen/go/v1/chat/completions",
+        "credential_ref": "HARNESSLAB_OPENCODE_GO_API_KEY",
+        "reasoning_effort": null,
+        "max_output_tokens": 256,
+        "request_timeout_seconds": 90,
+        "observed_model_capability": "RUN_EVIDENCE_ONLY",
+        "automation_allowed": true,
+        "enabled": true,
+        "pricing_snapshot_reference": "release/opencode-go-route-snapshot.json",
+        "runtime_endpoint_fingerprint": null,
+        "profile_identity": "sha256:19a5427869e4c275c0e103e6a36f18d31e4e9147cab5eee051e0d6a4efb41981"
+      }
+    ]
+  },
+  "providers": {
+    "items": [
+      {
+        "provider_id": "gpt56-relay",
+        "display_name": "GPT-5.6 operator relay",
+        "provider_family": "OpenAI-compatible relay",
+        "region": "operator-managed",
+        "protocols": [
+          "responses"
+        ],
+        "endpoint_class": "PRIVATE_RELAY",
+        "base_url_reference": "HARNESSLAB_GPT56_RELAY_BASE_URL",
+        "protocol_base_url_references": {},
+        "credential_ref": "HARNESSLAB_GPT56_RELAY_API_KEY",
+        "billing_mode": "RELAY_ACCOUNT",
+        "automation_allowed": true,
+        "enabled": true,
+        "health_status": "UNKNOWN",
+        "capabilities": [
+          "responses",
+          "reasoning-effort"
+        ],
+        "pricing_snapshot_reference": null,
+        "runtime_endpoint_fingerprint": null,
+        "runtime_endpoint_fingerprints": {},
+        "configuration_reason_codes": [
+          "RUNTIME_ENDPOINT_REFERENCE_MISSING"
+        ]
+      },
+      {
+        "provider_id": "opencode-go",
+        "display_name": "OpenCode Go",
+        "provider_family": "Third-party inference platform",
+        "region": "global",
+        "protocols": [
+          "messages",
+          "chat_completions"
+        ],
+        "endpoint_class": "PUBLIC_SHARED",
+        "base_url_reference": null,
+        "protocol_base_url_references": {},
+        "credential_ref": "HARNESSLAB_OPENCODE_GO_API_KEY",
+        "billing_mode": "CONTRACT",
+        "automation_allowed": true,
+        "enabled": true,
+        "health_status": "UNKNOWN",
+        "capabilities": [
+          "messages",
+          "chat-completions"
+        ],
+        "pricing_snapshot_reference": "release/opencode-go-route-snapshot.json",
+        "runtime_endpoint_fingerprint": null,
+        "runtime_endpoint_fingerprints": {},
+        "configuration_reason_codes": []
+      }
+    ]
+  },
+  "harnesses": {
+    "items": [
+      {
+        "harness_id": "direct-model",
+        "display_name": "Direct model adapter",
+        "version": "evidence-schema-1",
+        "image_reference": "harnesslab-sandbox:task-runtime",
+        "image_digest": null,
+        "cli_runtime_identity": "harnesslab.model_lane.runner.DirectModelRunner",
+        "profiles": [
+          {
+            "profile_id": "direct-gpt56-relay-gpt56-responses",
+            "profile_reference": "builtin:registry.direct.gpt56-relay-gpt56-responses",
+            "supported_provider_profile_ids": [
+              "gpt56-relay-gpt56-responses"
+            ],
+            "reasoning_effort": "medium",
+            "harness_config_identity": "sha256:963d89e35fb7930fcdec842a6509150414b79847508a533e368d89cce21f6a10"
+          }
+        ],
+        "supported_protocols": [
+          "responses",
+          "messages",
+          "chat_completions"
+        ],
+        "tool_surface": [],
+        "trace_coverage": "FINAL_OUTPUT_ONLY",
+        "observed_model_exposure": "RUN_EVIDENCE_ONLY",
+        "network_capability": "PROVIDER_ALLOWLIST",
+        "mcp_capability": false,
+        "workspace_mutation": true,
+        "native_tools": false,
+        "runtime_health": "UNKNOWN",
+        "runner_contract": "direct-model-v1"
+      },
+      {
+        "harness_id": "codex",
+        "display_name": "Codex",
+        "version": "0.149.0",
+        "image_reference": "harnesslab-phase-e-codex:0.149.0",
+        "image_digest": null,
+        "cli_runtime_identity": "codex-cli-0.149.0",
+        "profiles": [
+          {
+            "profile_id": "codex-gpt56-medium",
+            "profile_reference": "builtin:registry.codex-gpt56",
+            "supported_provider_profile_ids": [
+              "gpt56-relay-gpt56-responses"
+            ],
+            "reasoning_effort": "medium",
+            "harness_config_identity": "sha256:fb5be749febba4845a5d405aa20344505054921b69d41db7f69817494e926110"
+          }
+        ],
+        "supported_protocols": [
+          "responses"
+        ],
+        "tool_surface": [
+          "shell",
+          "workspace"
+        ],
+        "trace_coverage": "FULL_STREAM",
+        "observed_model_exposure": "RUN_EVIDENCE_ONLY",
+        "network_capability": "PROVIDER_ALLOWLIST",
+        "mcp_capability": true,
+        "workspace_mutation": true,
+        "native_tools": true,
+        "runtime_health": "UNKNOWN",
+        "runner_contract": "codex-harness-v1"
+      }
+    ]
+  },
+  "capabilities": {
+    "items": [
+      {
+        "provider_profile_id": "gpt56-relay-gpt56-responses",
+        "harness_profile_id": "direct-gpt56-relay-gpt56-responses",
+        "status": "PARTIALLY_SUPPORTED",
+        "reason_codes": [
+          "TRACE_COVERAGE_LIMITED"
+        ],
+        "protocol_compatible": true,
+        "model_provider_compatible": true,
+        "observed_model": "RUN_EVIDENCE_ONLY",
+        "trace_coverage": "FINAL_OUTPUT_ONLY",
+        "native_tools": false,
+        "workspace_mutation": true,
+        "network_requirement": "PROVIDER_ALLOWLIST",
+        "reasoning_control_supported": true,
+        "harness_uplift_eligible": false,
+        "judge_eligible": false
+      },
+      {
+        "provider_profile_id": "gpt56-relay-gpt56-responses",
+        "harness_profile_id": "codex-gpt56-medium",
+        "status": "SUPPORTED",
+        "reason_codes": [],
+        "protocol_compatible": true,
+        "model_provider_compatible": true,
+        "observed_model": "RUN_EVIDENCE_ONLY",
+        "trace_coverage": "FULL_STREAM",
+        "native_tools": true,
+        "workspace_mutation": true,
+        "network_requirement": "PROVIDER_ALLOWLIST",
+        "reasoning_control_supported": true,
+        "harness_uplift_eligible": true,
+        "judge_eligible": false
+      },
+      {
+        "provider_profile_id": "opencode-go-glm52-chat",
+        "harness_profile_id": "direct-gpt56-relay-gpt56-responses",
+        "status": "UNSUPPORTED",
+        "reason_codes": [
+          "PROVIDER_MODEL_PROFILE_UNSUPPORTED_BY_HARNESS"
+        ],
+        "protocol_compatible": true,
+        "model_provider_compatible": false,
+        "observed_model": "RUN_EVIDENCE_ONLY",
+        "trace_coverage": "FINAL_OUTPUT_ONLY",
+        "native_tools": false,
+        "workspace_mutation": true,
+        "network_requirement": "PROVIDER_ALLOWLIST",
+        "reasoning_control_supported": false,
+        "harness_uplift_eligible": false,
+        "judge_eligible": false
+      },
+      {
+        "provider_profile_id": "opencode-go-glm52-chat",
+        "harness_profile_id": "codex-gpt56-medium",
+        "status": "UNSUPPORTED",
+        "reason_codes": [
+          "PROTOCOL_UNSUPPORTED_BY_HARNESS",
+          "PROVIDER_MODEL_PROFILE_UNSUPPORTED_BY_HARNESS"
+        ],
+        "protocol_compatible": false,
+        "model_provider_compatible": false,
+        "observed_model": "RUN_EVIDENCE_ONLY",
+        "trace_coverage": "FULL_STREAM",
+        "native_tools": true,
+        "workspace_mutation": true,
+        "network_requirement": "PROVIDER_ALLOWLIST",
+        "reasoning_control_supported": true,
+        "harness_uplift_eligible": false,
+        "judge_eligible": false
+      }
+    ]
+  },
+  "settings": {
+    "defaults": {
+      "default_provider_profile_id": "gpt56-relay-gpt56-responses",
+      "default_evaluation_mode": "QUICK",
+      "default_schedule_seed": 20260828,
+      "default_concurrency": 1,
+      "default_cost_budget": null
+    },
+    "credentials": [
+      {
+        "credential_ref": "DEEPSEEK_API_KEY",
+        "status": "MISSING"
+      },
+      {
+        "credential_ref": "HARNESSLAB_ALIBABA_BAILIAN_API_KEY",
+        "status": "MISSING"
+      },
+      {
+        "credential_ref": "HARNESSLAB_GPT56_RELAY_API_KEY",
+        "status": "MISSING"
+      },
+      {
+        "credential_ref": "HARNESSLAB_OPENCODE_GO_API_KEY",
+        "status": "MISSING"
+      }
+    ],
+    "provider_enabled": {
+      "gpt56-relay": true,
+      "opencode-go": true,
+      "deepseek-official": true,
+      "alibaba-bailian": true
+    },
+    "secret_editing_supported": false
+  }
+}

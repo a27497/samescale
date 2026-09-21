@@ -1,0 +1,17 @@
+{
+  "claims": {
+    "authorization_id": {
+      "consumed": true,
+      "id": "3ce7b6074a1e4a5396ade94519c44824",
+      "receipt_identity": "sha256:b7c5ddc60fa44c749c878063327fd6d9e646dd64031f262b77fab1211b2c57c3"
+    },
+    "execution_id": {
+      "consumed": true,
+      "id": "a4869bcecb1148debd84bed5f7259d20",
+      "receipt_identity": "sha256:b7c5ddc60fa44c749c878063327fd6d9e646dd64031f262b77fab1211b2c57c3"
+    }
+  },
+  "kind": "READ_ONLY_PERSISTENT_CLAIM_CHECK",
+  "resume_authorized": false,
+  "retry_authorized": false
+}

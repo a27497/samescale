@@ -666,6 +666,54 @@ def test_sanitized_jsonl_maps_trace_order_unknown_and_private_reasoning() -> Non
     assert collection.failure_category is None
 
 
+def test_codex_structured_transport_diagnostics_are_preserved() -> None:
+    lines = (
+        json.dumps({"type": "thread.started", "thread_id": "thread-safe"}),
+        json.dumps(
+            {
+                "type": "request.retry",
+                "attempt": 2,
+                "max_retries": 4,
+                "retry_delay_ms": 750.5,
+                "http_status": 503,
+                "request_id": "req_retry_123",
+            }
+        ),
+        json.dumps(
+            {
+                "type": "turn.failed",
+                "error": {
+                    "message": "stream disconnected before completion",
+                    "code": "transport_error",
+                    "status_code": 502,
+                    "request_id": "req_terminal_456",
+                },
+            }
+        ),
+    )
+
+    collection = collect_codex_jsonl(CodexProcessCapture(lines, 1, 12))
+    retry = collection.sanitized_events[1]
+    terminal = collection.sanitized_events[2]
+    normalized_retry = collection.trace.events[1]
+    normalized_terminal = collection.trace.events[2]
+
+    assert retry.request_id == "req_retry_123"
+    assert retry.attempt == 2
+    assert retry.max_retries == 4
+    assert retry.retry_delay_ms == 750.5
+    assert retry.error_status == 503
+    assert normalized_retry.type is TraceEventType.API_RETRY
+    assert normalized_retry.request_id == "req_retry_123"
+    assert normalized_retry.error_status == 503
+    assert terminal.request_id == "req_terminal_456"
+    assert terminal.error_code == "transport_error"
+    assert terminal.error_status == 502
+    assert normalized_terminal.request_id == "req_terminal_456"
+    assert normalized_terminal.error_status == 502
+    assert collection.failure_category is HarnessFailureCategory.MODEL_TURN_FAILED
+
+
 @pytest.mark.parametrize(
     ("scenario", "expected"),
     [

@@ -1,0 +1,14 @@
+import pathlib,shutil,tempfile,subprocess,sys,json
+with tempfile.TemporaryDirectory(prefix="ll-supplement-") as td:
+ front=pathlib.Path(td)/"frontend";shutil.copytree("/workspace/frontend",front)
+ mods=front/"node_modules";mods.mkdir()
+ for p in pathlib.Path("/opt/ll-deps/node_modules").iterdir():
+  if p.name not in (".vite",".vite-temp"):(mods/p.name).symlink_to(p,target_is_directory=p.is_dir())
+ hidden=front/".qualification";hidden.mkdir()
+ shutil.copyfile("/audit/supplemental-contract.test.ts",hidden/"contract.test.ts")
+ shutil.copyfile("/audit/verifier/vitest.config.mts",hidden/"vitest.config.mts")
+ cmd=["node","node_modules/vitest/vitest.mjs","run","--config",".qualification/vitest.config.mts","--reporter=json","--outputFile","/evidence/supplemental-vitest.json"]
+ run=subprocess.run(cmd,cwd=front,timeout=180,capture_output=True)
+ pathlib.Path("/evidence/stdout").write_bytes(run.stdout);pathlib.Path("/evidence/stderr").write_bytes(run.stderr)
+ pathlib.Path("/evidence/execution.json").write_text(json.dumps({"exit_code":run.returncode,"command":cmd,"candidate_code_modified":False,"kind":"SUPPLEMENTAL_NOT_FROZEN_VERIFIER"},indent=2))
+ sys.exit(run.returncode)

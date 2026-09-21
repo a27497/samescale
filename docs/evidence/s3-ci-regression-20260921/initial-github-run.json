@@ -1,0 +1,92 @@
+{
+  "conclusion": "failure",
+  "databaseId": 35642692424,
+  "headSha": "abc2c54f32b0a2588ba0c0de162a150fc9308403",
+  "jobs": [
+    {
+      "completedAt": "2026-09-21T19:07:33Z",
+      "conclusion": "failure",
+      "databaseId": 106475606695,
+      "name": "offline-regression",
+      "startedAt": "2026-09-21T19:06:26Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-21T19:06:30Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-21T19:06:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:06:31Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-09-21T19:06:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:06:37Z",
+          "conclusion": "success",
+          "name": "Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9",
+          "number": 3,
+          "startedAt": "2026-09-21T19:06:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:06:40Z",
+          "conclusion": "success",
+          "name": "Provision locked dependencies (outside offline regression)",
+          "number": 4,
+          "startedAt": "2026-09-21T19:06:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:07:29Z",
+          "conclusion": "success",
+          "name": "Offline replay and trace regression",
+          "number": 5,
+          "startedAt": "2026-09-21T19:06:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:07:30Z",
+          "conclusion": "failure",
+          "name": "Retain regression evidence",
+          "number": 6,
+          "startedAt": "2026-09-21T19:07:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:07:30Z",
+          "conclusion": "skipped",
+          "name": "Post Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9",
+          "number": 11,
+          "startedAt": "2026-09-21T19:07:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:07:30Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 12,
+          "startedAt": "2026-09-21T19:07:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:07:30Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-09-21T19:07:30Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a27497/samescale/actions/runs/35642692424/job/106475606695"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/a27497/samescale/actions/runs/35642692424"
+}

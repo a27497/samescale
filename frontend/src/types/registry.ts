@@ -27,6 +27,9 @@ export interface ProviderDefinition {
 }
 
 export interface ProviderModelProfile {
+  purpose?: 'SUBJECT' | 'ANALYST' | 'JUDGE'
+  temperature?: number | null
+  max_output_tokens_limit?: number | null
   profile_id: string
   model_id: string
   provider_id: string
@@ -58,6 +61,7 @@ export interface ModelDefinition {
 }
 
 export interface HarnessProfile {
+  enabled?: boolean
   profile_id: string
   profile_reference: string
   supported_provider_profile_ids: string[]
@@ -186,5 +190,13 @@ export interface ExperimentSnapshot {
   methodology_id: string
   methodology_digest: string
   comparison_type: ComparisonType
+  provider_selections: {
+    cell_id: string
+    provider_profile_id: string
+    provider_profile_identity: string
+    harness_profile_id: string
+    effective_runtime_profile_identity?: string | null
+    resource_envelope_identity?: string | null
+  }[]
   preflight: ExperimentPreflight
 }

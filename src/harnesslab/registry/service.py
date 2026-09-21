@@ -104,6 +104,8 @@ def _direct_runtime_source(
             base_url_reference=reference,
             credential_reference=profile.credential_reference,
             reasoning_effort=profile.reasoning_effort,
+            temperature=profile.temperature,
+            max_output_tokens_limit=profile.max_output_tokens_limit,
             request_timeout_seconds=profile.request_timeout_seconds,
         )
     if expected_reference is not None:
@@ -116,6 +118,8 @@ def _direct_runtime_source(
         base_url=base,
         credential_reference=profile.credential_reference,
         reasoning_effort=profile.reasoning_effort,
+        temperature=profile.temperature,
+        max_output_tokens_limit=profile.max_output_tokens_limit,
         request_timeout_seconds=profile.request_timeout_seconds,
     )
 
@@ -244,7 +248,12 @@ def registry_catalog(
     return build_registry_catalog(repository_root, environment, task_corpus_path=task_corpus_path)
 
 
-def registry_settings(catalog: RegistryCatalog, environment: Mapping[str, str]) -> RegistrySettings:
+def registry_settings(
+    catalog: RegistryCatalog,
+    environment: Mapping[str, str],
+    *,
+    configured_credentials: frozenset[str] | None = None,
+) -> RegistrySettings:
     references = tuple(sorted({item.credential_reference for item in catalog.providers}))
     return RegistrySettings(
         defaults=catalog.defaults,
@@ -253,7 +262,11 @@ def registry_settings(catalog: RegistryCatalog, environment: Mapping[str, str]) 
                 credential_reference=reference,
                 status=(
                     CredentialStatus.SET
-                    if environment.get(reference, "").strip()
+                    if (
+                        reference in configured_credentials
+                        if configured_credentials is not None
+                        else bool(environment.get(reference, "").strip())
+                    )
                     else CredentialStatus.MISSING
                 ),
             )
@@ -295,6 +308,10 @@ def assess_capability(
         reason_codes.append("PROTOCOL_UNSUPPORTED_BY_HARNESS")
     if not model_provider_compatible:
         reason_codes.append("PROVIDER_MODEL_PROFILE_UNSUPPORTED_BY_HARNESS")
+    if not resolved.profile.enabled:
+        reason_codes.append("HARNESS_CONFIGURATION_DISABLED")
+    if profile.purpose != "SUBJECT":
+        reason_codes.append("MODEL_PURPOSE_NOT_SUBJECT")
     if not provider.enabled or not profile.enabled:
         reason_codes.append("PROVIDER_OR_PROFILE_DISABLED")
     if not provider.automation_allowed or not profile.automation_allowed:
@@ -303,6 +320,8 @@ def assess_capability(
     compatible = (
         protocol_compatible
         and model_provider_compatible
+        and resolved.profile.enabled
+        and profile.purpose == "SUBJECT"
         and provider.enabled
         and profile.enabled
         and provider.automation_allowed
@@ -339,7 +358,8 @@ def assess_capability(
         workspace_mutation=resolved.harness.workspace_mutation,
         network_requirement=resolved.harness.network_capability,
         reasoning_control_supported=(
-            resolved.profile.reasoning_effort is None
+            resolved.harness.harness_id == "direct-model"
+            or resolved.profile.reasoning_effort is None
             or profile.reasoning_effort == resolved.profile.reasoning_effort
             or resolved.harness.harness_id == "codex"
         ),
@@ -455,7 +475,9 @@ def _resolve_cells(
                 harness_version=resolved_harness.harness.version,
                 harness_config_identity=resolved_harness.profile.harness_config_identity,
                 reasoning_effort=(
-                    resolved_harness.profile.reasoning_effort
+                    provider_profile.reasoning_effort
+                    if direct_runtime is not None
+                    else resolved_harness.profile.reasoning_effort
                     if resolved_harness.profile.reasoning_effort is not None
                     else provider_profile.reasoning_effort
                 ),
@@ -646,8 +668,12 @@ def preflight_experiment(
     *,
     task_corpus_path: Path | None = None,
     tier_b_qualification_path: Path | None = None,
+    catalog: RegistryCatalog | None = None,
+    configured_credentials: frozenset[str] | None = None,
 ) -> ExperimentPreflight:
-    catalog = registry_catalog(repository_root, environment, task_corpus_path=task_corpus_path)
+    catalog = catalog or registry_catalog(
+        repository_root, environment, task_corpus_path=task_corpus_path
+    )
     checks: list[PreflightCheck] = []
     methodology = load_evaluation_methodology(repository_root / METHODOLOGY_PATH)
     if (
@@ -724,7 +750,12 @@ def preflight_experiment(
         if profile is None:
             continue
         provider = providers[profile.provider_id]
-        if not environment.get(profile.credential_reference, "").strip():
+        present = (
+            profile.credential_reference in configured_credentials
+            if configured_credentials is not None
+            else bool(environment.get(profile.credential_reference, "").strip())
+        )
+        if not present:
             checks.append(
                 _check(
                     f"credential:{profile.profile_id}",
@@ -909,8 +940,12 @@ def build_experiment_snapshot(
     *,
     task_corpus_path: Path | None = None,
     tier_b_qualification_path: Path | None = None,
+    catalog: RegistryCatalog | None = None,
+    configured_credentials: frozenset[str] | None = None,
 ) -> ExperimentSnapshot:
-    catalog = registry_catalog(repository_root, environment, task_corpus_path=task_corpus_path)
+    catalog = catalog or registry_catalog(
+        repository_root, environment, task_corpus_path=task_corpus_path
+    )
     candidate = _build_candidate(
         request,
         catalog,
@@ -923,6 +958,8 @@ def build_experiment_snapshot(
         environment,
         task_corpus_path=task_corpus_path,
         tier_b_qualification_path=tier_b_qualification_path,
+        catalog=catalog,
+        configured_credentials=configured_credentials,
     )
     snapshot_id = "snapshot-" + candidate.plan.experiment_id.removeprefix("registry-")
     snapshot = freeze_experiment_snapshot(

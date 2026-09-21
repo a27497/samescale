@@ -1,0 +1,15 @@
+{
+  "README.md": "daa1a72d7ca26e66af353108bd7c16a4b96c5c615c747288fde8ae5e48946520",
+  "authorization.pending.json": "625ee7fdfb1a02957882d65ab05a793c112e6fc6ddbcb5d7a02c3e468348d155",
+  "candidate-addendum.txt": "518bb1ace0202e4d778d09ed38dad37988372189b0d3d44e651493da783760dd",
+  "codex.sanitized.jsonl": "1282836c52abf9ba395ddd9fc960126acdf20382b4664c3b4fdff01839225735",
+  "consumption-check.json": "5649ebd40e864413c7222b6c4d4403a0959ff20967081391920c7ce0fc47bfa8",
+  "execution-request.json": "d4342aa041135c27d39a9a9aff11a2b869a4dc72ddae215dd801995120a921d2",
+  "plan.json": "86470f5aeb0b7b59451599145040abe5fc48104f1483a75e55ded1d819417e5e",
+  "saved-files/frontend/src/components/VideoPlaybackCard.vue": "b342f3549d83ff1f2efe99c71e0590b4a6964849b04621e357244b9df00238e6",
+  "saved-files/frontend/src/components/task-detail/CourseVideoAside.vue": "1c2921a9707518ca11e9a2cac0a02b0735a65992543d08dafcc1c83260f4abb4",
+  "saved-files/frontend/src/utils/subtitleLanguage.ts": "83af5a73ca85a9b509a31248df48ea07bf524cbedd98f02a02cf41e77db7afdb",
+  "saved-files/frontend/src/views/TaskDetailView.vue": "9840fcf4a3190c61d8439729cb6f916928153af514a71a4e925ad397ca57cbca",
+  "saved-files/frontend/src/views/UploadView.vue": "e597ceacfc2447afad35f9635f8b52307267bb67fe89ed40a6cb3d17a909b5aa",
+  "validation.json": "709ee0dcf409c632f7af1b37f113362257f518c30ec0103a1d0474fb780fe992"
+}

@@ -1,0 +1,9 @@
+{
+  "started_at": "2026-09-21T04:56:27.408343+00:00",
+  "execution_id": "a4869bcecb1148debd84bed5f7259d20",
+  "slot": "A/candidate/1",
+  "top_level_attempts": 1,
+  "retry": 0,
+  "resume": false,
+  "judge": false
+}

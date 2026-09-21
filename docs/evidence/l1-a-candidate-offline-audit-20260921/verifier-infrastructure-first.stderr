@@ -1,0 +1,28 @@
+Traceback (most recent call last):
+  File "/verifier/verify.py", line 39, in <module>
+    (evidence/(label+'.stdout')).write_bytes(run.stdout);(evidence/(label+'.stderr')).write_bytes(run.stderr)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pathlib.py", line 1036, in write_bytes
+    with self.open(mode='wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/evidence/business.stdout'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/verifier/verify.py", line 63, in <module>
+    write('stages.json',stages);write('infrastructure-error.json',{'error':str(e),'type':type(e).__name__})
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/verifier/verify.py", line 9, in write
+    def write(n,obj):(evidence/n).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pathlib.py", line 1047, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/evidence/stages.json'

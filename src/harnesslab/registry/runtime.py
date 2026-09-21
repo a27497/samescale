@@ -38,6 +38,12 @@ class DirectRuntimeProfileSource(BaseModel):
         exclude_if=lambda value: value is None,
     )
     credential_reference: str = Field(pattern=r"^[A-Z][A-Z0-9_]*$")
+    temperature: float | None = Field(
+        default=None, ge=0, le=2, exclude_if=lambda value: value is None
+    )
+    max_output_tokens_limit: int | None = Field(
+        default=None, gt=0, exclude_if=lambda value: value is None
+    )
     reasoning_effort: str | None = Field(default=None, max_length=50)
     request_timeout_seconds: int = Field(gt=0, le=600)
 
@@ -137,6 +143,11 @@ def resolve_direct_runtime_profile(
     """Canonical planner/loader/preflight/runtime resolution for Direct M-Lane."""
 
     max_output_tokens = _require_direct_budget(budget)
+    if (
+        source.max_output_tokens_limit is not None
+        and max_output_tokens > source.max_output_tokens_limit
+    ):
+        raise DirectRuntimeContractError("Plan output budget exceeds the model configuration limit")
     profile = ModelProfile(
         requested_model=source.requested_model,
         provider=source.provider,
@@ -146,6 +157,7 @@ def resolve_direct_runtime_profile(
         protocol=source.protocol,
         reasoning=ReasoningProfile(
             effort=source.reasoning_effort,
+            temperature=source.temperature,
             max_output_tokens=max_output_tokens,
         ),
         request_timeout_seconds=source.request_timeout_seconds,

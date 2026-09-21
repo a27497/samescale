@@ -1,5 +1,23 @@
 # SameScale
 
+## Recruiter Demo · 求职冻结版
+
+**3–5 分钟：真实 coding task → configurations → result → Trace Diff → diagnosis → Offline Replay → CI。**
+下载并用浏览器打开 [Recruiter Demo](docs/recruiter/demo/index.html)。单个 HTML 即可分享，
+无需账号、模型密钥、服务或网络；GitHub 文件预览不会运行 HTML。只分享 `docs/recruiter/demo/`，
+不分享原始 bundle 或私有工作区。未部署网站。
+
+### Engineering Highlights
+
+- 同一真实 SSE 恢复任务：Codex recorded **20/20 verified_pass**；Claude Code timeout / **NOT_VERIFIED**，verifier **NOT_RUN**。
+- 摘要绑定的 evidence chain：native/normalized trace、workspace diff、independent verifier 与 failure taxonomy 相互核对。
+- 复用 Offline Replay 与 GitHub CI 入口，检测 evidence、parser/schema、文件归属和失败分类回归；无 Provider/model/Claude/Judge 调用。
+- Recruiter Demo 仅导出公开字段，保留未知与结论限制；S1 **partial/blocked**，不是能力排名或完整 benchmark。
+
+[演示脚本与复验命令](docs/RECRUITER_DEMO.md) · [面试材料与简历事实](docs/JOB_SEARCH_FREEZE.md) ·
+[S4 final report](docs/evidence/s4-job-search-freeze-20260921/README.md)。求职版冻结范围以
+[CURRENT_MILESTONE](CURRENT_MILESTONE.md) 为准；下方保留现有产品说明与其他历史案例。
+
 SameScale is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
 reproducible Model × Harness × Judge execution and verifier-backed evidence.
 
@@ -243,3 +261,48 @@ invoke any gate recursively.
 For a task requiring the full keyless chain, run Gates A–K using their prerequisites; database-backed
 gates need an appropriate test PostgreSQL instance. Ordinary edits use the verification scope above.
 Real execution needs current authorization and credential references; never commit `.env` or secret values.
+
+## S2.5 本地资源配置
+
+在 Registry 导航中打开“连接与配置”（`/connections`），可查看并配置本地凭据、连接、模型用途/参数与受限 Harness 预设。内置目录只读；保存配置不会执行评测，也不会切换当前 Analyst/Judge。
+
+此入口默认关闭。先按上方开发说明配置本地数据库；在启动 API 的同一个 Bash 会话中设置独立管理令牌（至少 32 字符，不使用模型 API Key）：
+
+```bash
+read -r -s -p 'Local operator token: ' HARNESSLAB_LOCAL_CONFIGURATION_TOKEN
+export HARNESSLAB_LOCAL_CONFIGURATION_TOKEN
+```
+
+直接运行 API 的开发者须先对自己的工作区数据库执行 `uv run --locked alembic upgrade head`，
+并为凭据目录设置绝对路径。例如在启动 API 的同一个 Bash 会话中：
+
+```bash
+export HARNESSLAB_CREDENTIAL_STORE="$HOME/.local/share/samescale/credentials"
+install -d -m 0700 "$HARNESSLAB_CREDENTIAL_STORE"
+```
+
+目录必须属于 API 进程用户、权限为 0700，文件权限为 0600；路径不得含符号链接，也不得与源码或
+工作区产物目录重叠。未配置目录时，原有环境变量引用和本地模型编辑仍可使用，新增密钥/连接保存会失败。
+这是受操作系统权限保护的本地文件存储，**不宣称磁盘加密或云端密钥托管**。备份和恢复时需配套保留
+数据库与凭据卷/目录及原权限；只恢复数据库不会恢复密钥。不要把凭据目录加入可下载产物根。
+
+
+在同一会话运行 `uv run --locked harnesslab serve`；在现有前端开发服务或已构建的工作区打开 `/connections`。用本机 `localhost` 或 `127.0.0.1` 地址访问，输入管理令牌解锁；令牌只留在页面内存，锁定或离开后清除。
+
+每次保存产生新版本，旧计划不改写；凭据轮换或配置停用后需重新绑定。API Key 和连接地址不回显；“校验配置（不联网）”只校验本地引用，连接健康仍为 `NOT_VERIFIED`。
+
+
+### S2.5 planning selections
+
+Open `/experiments/new` and explicitly select each SUBJECT model profile, compatible Harness
+revision and task. No model, Harness or task is selected automatically. Reloading never substitutes
+another revision for an unavailable choice. The page shows the selected profile identities,
+Harness runtime version, reasoning control, request timeout and configured output ceiling.
+
+The plan's output budget must respect both selected model ceilings. Direct selections use the
+existing one-request, one-turn, zero-tool-call contract and per-request/per-run output scopes.
+Unknown health and unavailable cost bounds remain explicit. Editing inputs invalidates earlier
+preflight results; the backend revalidates the exact selections when freezing a snapshot.
+The saved result shows backend-frozen profile, runtime and resource-envelope identities.
+This freezes a planning snapshot only: it creates no execution or experiment-run records and
+neither invokes a model nor changes Analyst/Judge role selections.

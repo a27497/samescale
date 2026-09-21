@@ -1,5 +1,109 @@
 # SameScale Product — Current Milestone
 
+## 求职冻结 — Phase S4 COMPLETE / STOP — 2026-09-21
+
+**S1：PARTIAL REAL BENCHMARK / BLOCKED；S2 / S3 / S4：COMPLETE。**
+[Recruiter Demo](docs/recruiter/demo/index.html) · [3–5 分钟演示稿](docs/RECRUITER_DEMO.md) ·
+[面试材料与简历事实](docs/JOB_SEARCH_FREEZE.md) ·
+[S4 final report](docs/evidence/s4-job-search-freeze-20260921/README.md) ·
+[冻结清单](docs/evidence/s4-job-search-freeze-20260921/freeze-manifest.json)。
+
+- 复用 S2/S3 reader、bundle/输出摘要与 CI receipt，单文件 HTML 展示 task → configurations → result → Trace Diff → diagnosis → Offline Replay → CI。
+- 分享包仅 `docs/recruiter/demo/`；无原始命令、内部 endpoint、凭据引用、源码或私密推理。
+  桌面 1360px / 手机 390px 视口本地浏览器验收 PASS，HTTP 请求与 page errors 均 0。
+- 独立 staged tree 的统一离线 gate **73 tests PASS**（65 S2/S3 + 8 S4）；Ruff/format/mypy PASS。
+  实现 SHA `5bdc03f8addce7532fdfc053c383cb66895e3b3b` 的
+  [Offline CI](https://github.com/a27497/samescale/actions/runs/35645815474) 与
+  [Fast CI](https://github.com/a27497/samescale/actions/runs/35645815456) 均 PASS；GitHub receipt 与本地一致。
+- 新 Provider/model/Claude/Judge 调用 **0**；没有新 subject、命令或 verifier 执行。
+  历史 evidence、原始失败及无关 dirty work 保留；仅追加 S4 文档区块和既有 CI 的 S4 tests。
+- S1 仍仅 2/16 cells：Codex recorded 20/20 verified_pass，Claude timeout/NOT_VERIFIED、verifier NOT_RUN，14 NOT_RUN；无能力排名、完整 benchmark 或 Harness 因果结论。
+- 3–5 分钟是讲解预算，未做招聘者理解度实测；简历材料是项目事实，不证明未经确认的个人贡献或面试准备度。
+
+**求职版已冻结，STOP。不规划 S5，不继续开发新功能；无 PR、merge main 或 deploy。**
+以下阶段与 L1 状态仅保留为历史上下文，不自动授权后续工作。
+
+## Phase S3 — CI Regression Integration：COMPLETE — 2026-09-21
+
+[Final report](docs/evidence/s3-ci-regression-20260921/README.md) 与
+[final status](docs/evidence/s3-ci-regression-20260921/final-status.json) 已产出。
+统一入口 `bash scripts/ci_s3.sh NEW_OUTPUT_DIRECTORY`：隔离网络、清空环境、临时 HOME，
+不执行 subject/命令/verifier；Provider/model/Claude/Judge 调用 **0**。
+
+- 独立 staged tree **65 tests PASS**，两次 replay 的 5 个输出逐字节匹配 S2 冻结摘要。
+  evidence/digest、replay、trace/schema/parser、changed-files attribution、failure taxonomy
+  回归均有 fail-closed 覆盖；Ruff/format/mypy PASS。
+- 实现 SHA `b2d729bc8d1c9eb793511b54a7b235a72e67cb9b` 已推送当前 feature branch；
+  [Offline CI](https://github.com/a27497/samescale/actions/runs/35643033783) 与
+  [Fast CI](https://github.com/a27497/samescale/actions/runs/35643033753) 均 **PASS**。
+  SHA-bound GitHub receipt 与本地结果完全一致，65 项 JUnit 回读通过。
+- 初次 CI 的 artifact 配额失败保留；后续改用 Actions 日志/summary，无删除历史 artifact。
+  2085 个起始文件原内容保全；仅追加 S3 文档块，其他 dirty work 未纳入 scoped commits。
+
+**S3 COMPLETE 后停止，不进入 S4；无 PR、merge main、deploy 或真实 benchmark workflow。**
+S1 保持 PARTIAL REAL BENCHMARK / BLOCKED；不支持能力排名、完整配置比较或 Harness 因果结论。
+下方为保留的历史状态，不自动启动其他阶段。
+
+## KB4 CI compatibility repair — 2026-09-21
+
+Repair base is `d46d02c249c862ccbf76cebaa90e353b4041d067`; only the two repair files and
+related Milestone hunks are included in this compatibility commit.
+Both failures from Fast CI 35563979439 were reproduced in the working tree and exported HEAD.
+Commit `23ece300` legitimately evolved `harness_lane/adapter.py`, `docker_backend.py` and `trace.py`;
+the historical-source compatibility map omitted these three paths. Each original digest matches
+the Git blob at accepted commit `b3c36154871225d8af1cf4247258b129f8698f1c`.
+The repair adds only those historical bindings to the existing map, plus three regression cases
+checking unchanged report reproduction and rejection of historical-binding tampering.
+All 185 tracked release/evidence files retain HEAD bytes; frozen results and conclusions are unchanged.
+The two failed tests and directly related KB4 regressions pass: **74 tests** in an exported HEAD
+with only the two repair files overlaid. Focused Ruff check/format and mypy pass.
+No Provider/model/Judge/real L1 execution. Remote CI has not been rerun; local results do not claim
+remote success. The user authorized this scoped commit and non-force push of the current feature
+branch, followed by exact-HEAD CI inspection. Stop after reporting CI; do not expand the repair,
+merge, deploy or launch real execution. Unrelated dirty work is preserved.
+
+## L1 A Candidate evidence closeout — 2026-09-21
+
+**L1 remains INCOMPLETE; comparison INCONCLUSIVE.** The only authorized `A/candidate/1`
+attempt on `lecturelens-embedded-subtitle-language-metadata@1.0.1` is **NOT_VERIFIED / STOPPED**.
+Subject timeout was **600 seconds**; recorded duration **601.037 seconds**. Verifier did not run;
+five modified files were saved; token usage is **UNKNOWN**. Request ID and HTTP status were not
+recorded. The 6000-token output declaration had no session hard cap. Model, relay and Provider
+root cause remain **NOT_ESTABLISHED**.
+
+[Original attempt evidence](docs/evidence/l1-a-candidate-real-20260921/README.md) and
+[portable closeout supplement](docs/evidence/l1-a-candidate-closeout-20260921/README.md) retain
+separate identities and the original NOT_VERIFIED Episode. Authorization
+`3ce7b6074a1e4a5396ade94519c44824` and execution `a4869bcecb1148debd84bed5f7259d20` are
+**consumed**; no retry, resume, Judge or new real attempt is authorized. Three prior rounds are
+preserved; no Episode is overwritten or spliced. Subject/proxy and execution-network cleanup passed.
+
+This closeout commits only this attempt's stable evidence, explanatory material and this L1
+status hunk. Other accumulated work remains unstaged. Evidence/diagnostic quick checks: **21 passed**;
+snapshot checks are recorded in the supplement. Push and CI are limited to the current feature
+branch `codex/l-real-agent-main-integration`; verify CI against the pushed HEAD separately.
+No merge to main or deployment is authorized.
+
+**Post-timeout offline diagnosis recorded (2026-09-21):** [stable audit evidence](docs/evidence/l1-a-candidate-offline-audit-20260921/README.md)
+and [L1 diagnosis supplement](docs/SAMESCALE_L1_A_CANDIDATE_DIAGNOSIS.md) retain the separate audit.
+Public checks **25/25**, type-check/build passed. The unchanged frozen verifier reports **71/75**
+checks (business **68/72**), acceptance FAILED; A3 duplicate variant/extension handling fails on both
+pages. Independent supplemental acceptance **12/22** reproduces A4 private-use defects including
+`en-x-demo`; A7 fails overall due to the shared language defects. The audit proves reproducible
+saved-workspace defects, not an original Episode grade or an engineering-completion percentage.
+Initial audit directory permission failures are recorded separately from Candidate functional failures.
+Original evidence and five saved files remain unchanged; the real attempt remains **NOT_VERIFIED**,
+verifier NOT_RUN. Authorization/execution IDs remain consumed. No timeout root cause is established.
+A Current's historical 75/75 and this later offline 71/75 are not a completed comparable pair;
+comparison remains INCONCLUSIVE and L1 INCOMPLETE.
+
+**L1 stopping point:** diagnosis recorded in evidence commit `d46d02c`; no Candidate repair or
+new execution. The separately authorized KB4 commit/push and CI check are described above.
+No PR, merge, deployment, or frozen-evidence rewrite is authorized.
+
+<details>
+<summary>Historical S1.5 handoff — retained from the prior commit, not current state or authorization</summary>
+
 Updated: 2026-09-09. Milestone: **S1.5 — mainline integration and SameScale canonical identity**.
 State: **ACCEPTED — main integration and canonical identity verified; S2 NOT_STARTED**.
 S1 implementation, local tests and Browser QA remain accepted at
@@ -175,3 +279,5 @@ New live Real execution, full A–K/release acceptance, clean-clone reproduction
 non-Chromium testing are **NOT_RUN** in S1. Original real-session restoration and human ownership
 remain **NOT_VERIFIED**; historical runtime/security debts remain separate scopes. This product
 refactor makes no new causal, model-ranking, reasoning-effort, or automatic-repair claim.
+
+</details>

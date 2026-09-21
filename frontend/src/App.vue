@@ -25,6 +25,7 @@ const navigation = [
   {
     label: 'Registry',
     items: [
+      { to: '/connections', label: '连接与配置', mark: 'CO' },
       { to: '/models', label: 'Models', mark: 'MO' },
       { to: '/providers', label: 'Providers', mark: 'PR' },
       { to: '/harnesses', label: 'Harnesses', mark: 'HA' },

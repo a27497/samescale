@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "kind": "PUBLIC_RECRUITER_DEMO",
+  "recorded_date": "2026-09-21",
+  "s1": {
+    "status": "PARTIAL REAL BENCHMARK / BLOCKED",
+    "attempted": 2,
+    "planned": 16
+  },
+  "cards": [
+    {
+      "label": "Official Codex",
+      "requested_model": "gpt-6-astra",
+      "result": "verified_pass",
+      "verifier": "verified_pass",
+      "checks": 20,
+      "passed_checks": 20,
+      "subject_seconds": 193.0,
+      "tool_count": 13,
+      "changed_files": [
+        {
+          "file": "taskEvents.recovery.test.ts",
+          "status": "added"
+        },
+        {
+          "file": "taskEvents.ts",
+          "status": "modified"
+        }
+      ],
+      "failure_taxonomy": null,
+      "tools": [
+        {
+          "start": 4,
+          "end": 5,
+          "tool": "command_execution",
+          "status": "completed"
+        },
+        {
+          "start": 6,
+          "end": 7,
+          "tool": "command_execution",
+          "status": "completed"
+        },
+        {
+          "start": 8,
+          "end": 9,
+          "tool": "command_execution",
+          "status": "completed"
+        },
+        {
+          "start": 10,
+          "end": 11,
+          "tool": "command_execution",
+          "status": "failed"
+        },
+        {
+          "start": 12,
+          "end": 13,
+          "tool": "command_execution",
+          "status": "failed"
+        },
+        {
+          "start": 14,
+          "end": 15,
+          "tool": "command_execution",
+          "status": "completed"
+        },
+        {
+          "start": 16,
+          "end": 17,
+          "tool": "command_execution",
+          "status": "failed"
+        },
+        {
+          "start": 18,
+          "end": 19,
+          "tool": "command_execution",
+          "status": "completed"
+        },
+        {
+          "start": 21,
+          "end": 22,
+          "tool": "file_change",
+          "status": "completed"
+        },
+        {
+          "start": 23,
+          "end": 24,
+          "tool": "command_execution",
+          "status": "completed"
+        },
+        {
+          "start": 25,
+          "end": 26,
+          "tool": "file_change",
+          "status": "completed"
+        },
+        {
+          "start": 27,
+          "end": 30,
+          "tool": "command_execution",
+          "status": "completed"
+        },
+        {
+          "start": 28,
+          "end": 29,
+          "tool": "command_execution",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "label": "Claude Code",
+      "requested_model": "qwen3.8-max",
+      "result": "NOT_VERIFIED",
+      "verifier": "NOT_RUN",
+      "checks": null,
+      "passed_checks": null,
+      "subject_seconds": 601.055,
+      "tool_count": 10,
+      "changed_files": [],
+      "failure_taxonomy": "execution_budget_exhausted",
+      "tools": [
+        {
+          "start": 6,
+          "end": 7,
+          "tool": "Bash",
+          "status": "completed"
+        },
+        {
+          "start": 8,
+          "end": 9,
+          "tool": "Read",
+          "status": "completed"
+        },
+        {
+          "start": 20,
+          "end": 21,
+          "tool": "Bash",
+          "status": "completed"
+        },
+        {
+          "start": 22,
+          "end": 23,
+          "tool": "Read",
+          "status": "completed"
+        },
+        {
+          "start": 44,
+          "end": 45,
+          "tool": "Read",
+          "status": "completed"
+        },
+        {
+          "start": 46,
+          "end": 47,
+          "tool": "Read",
+          "status": "completed"
+        },
+        {
+          "start": 66,
+          "end": 67,
+          "tool": "Bash",
+          "status": "completed"
+        },
+        {
+          "start": 68,
+          "end": 69,
+          "tool": "Bash",
+          "status": "completed"
+        },
+        {
+          "start": 89,
+          "end": 90,
+          "tool": "Read",
+          "status": "completed"
+        },
+        {
+          "start": 91,
+          "end": 92,
+          "tool": "Read",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "replay": {
+    "status": "PASS",
+    "archive_sha256": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+    "outputs": {
+      "claude.json": "sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d",
+      "codex.json": "sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe",
+      "diagnosis.md": "sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1",
+      "offline-boundary.json": "sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097",
+      "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef"
+    }
+  },
+  "ci": {
+    "status": "RECORDED_PASS",
+    "sha": "b2d729bc8d1c9eb793511b54a7b235a72e67cb9b",
+    "tests": 65
+  },
+  "new_model_calls": 0,
+  "sources": {
+    "README.md": "sha256:9f5b586f9fa0ab521ea0c42fec237818caf59b7ab89a154ed1644c8b20cef70b",
+    "final-status.json": "sha256:236aebfa45427db32c719207d255e9bb810077788a56145065c741333817a5a1",
+    "github-offline-run.json": "sha256:5c94ef405721295f452766e08f7724863b87cf13d7863d696cf16e3f85ef5820",
+    "github-fast-run.json": "sha256:bae08efbd4ccd079ce11edb1734810998798821dbbb6e696a76dba49a7fed064",
+    "github-receipt.json": "sha256:3cf02fdfcdcbbb8a75353f878bffbc8dd03f282f17b8e27ab61331204f08795b"
+  }
+}

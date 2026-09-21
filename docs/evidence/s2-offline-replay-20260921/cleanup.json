@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "pytest_temporary_copies_removed": [
+    {
+      "root": "/tmp/pytest-of-dev/pytest-41",
+      "owned_entries_removed": 42,
+      "parent_removed": false
+    },
+    {
+      "root": "/tmp/pytest-of-dev/pytest-42",
+      "owned_entries_removed": 42,
+      "parent_removed": false
+    },
+    {
+      "root": "/tmp/pytest-of-dev/pytest-43",
+      "owned_entries_removed": 42,
+      "parent_removed": false
+    }
+  ],
+  "integrity_drill_temporary_copies_removed": true,
+  "original_evidence_deleted": false,
+  "immutable_s2_bundles_and_outputs_retained": true,
+  "subject_or_provider_containers_started": 0,
+  "external_calls": 0
+}

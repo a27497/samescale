@@ -12,10 +12,12 @@ from harnesslab.harness_lane.models import (
 )
 from harnesslab.harness_lane.profile import (
     CODEX_CLI_VERSION,
+    CODEX_IMAGE,
     CODEX_PERMISSION_FILESYSTEM_OVERRIDE,
     CODEX_PERMISSION_NETWORK_OVERRIDE,
     CODEX_PERMISSION_PROFILE,
     SHELL_TOOL_ENVIRONMENT_POLICY,
+    SUPPORTED_CODEX_IMAGES,
 )
 from harnesslab.harness_lane.prompt import CodexHarnessPrompt
 from harnesslab.harness_lane.trace import collect_codex_jsonl
@@ -34,6 +36,7 @@ class CodexExecutionPlan:
     timeout_seconds: float
     task_id: str
     environment_references: tuple[tuple[str, str], ...] = ()
+    image_reference: str = CODEX_IMAGE
 
 
 class CodexBackend(Protocol):
@@ -71,11 +74,37 @@ class CodexHarnessAdapter:
     """One Codex adapter. It never decides whether the coding task is correct."""
 
     def preflight(self, profile: CodexHarnessProfile) -> None:
-        if profile.codex_cli_version != CODEX_CLI_VERSION:
+        if profile.codex_cli_version not in SUPPORTED_CODEX_IMAGES:
             raise HarnessAdapterError(
-                f"Codex CLI must be pinned to {CODEX_CLI_VERSION}; "
+                f"Codex CLI must be pinned to a supported version; "
                 f"found {profile.codex_cli_version}"
             )
+        if profile.codex_cli_version != CODEX_CLI_VERSION and (
+            profile.codex_image.reference != SUPPORTED_CODEX_IMAGES[profile.codex_cli_version]
+        ):
+            raise HarnessAdapterError("Codex image reference and CLI version disagree")
+        if profile.model_provider_id == "harnesslab_responses_relay" and (
+            profile.codex_cli_version == CODEX_CLI_VERSION
+        ):
+            raise HarnessAdapterError("Current relay requires the current Codex runtime")
+        if profile.model_provider_id is not None:
+            provider_refs = {
+                "harnesslab_gpt56_relay": (
+                    "HARNESSLAB_GPT56_RELAY_BASE_URL",
+                    "HARNESSLAB_GPT56_RELAY_API_KEY",
+                ),
+                "harnesslab_responses_relay": (
+                    "HARNESSLAB_CODEX_RELAY_BASE_URL",
+                    "HARNESSLAB_CODEX_RELAY_API_KEY",
+                ),
+            }
+            if (
+                provider_refs.get(profile.model_provider_id)
+                != (profile.provider_base_url_reference, profile.provider_credential_reference)
+                or profile.provider_wire_api != "responses"
+                or profile.provider_supports_websockets
+            ):
+                raise HarnessAdapterError("Codex provider does not match the runtime contract")
         if profile.codex_image.image_id == "sha256:" + "0" * 64:
             raise HarnessAdapterError("Codex image identity must come from an inspected image")
         if profile.shell_tool_environment_policy != SHELL_TOOL_ENVIRONMENT_POLICY:
@@ -92,6 +121,7 @@ class CodexHarnessAdapter:
         context: Path | None,
         task_id: str,
     ) -> CodexExecutionPlan:
+        self.preflight(profile)
         if not workspace.is_dir() or workspace.is_symlink():
             raise HarnessAdapterError("subject workspace is unavailable or unsafe")
         if context is not None and (not context.is_dir() or context.is_symlink()):
@@ -109,7 +139,11 @@ class CodexHarnessAdapter:
             )
             environment_references = (
                 (
-                    "HARNESSLAB_GPT56_RELAY_BASE_URL",
+                    (
+                        "HARNESSLAB_CODEX_RELAY_BASE_URL"
+                        if profile.model_provider_id == "harnesslab_responses_relay"
+                        else "HARNESSLAB_GPT56_RELAY_BASE_URL"
+                    ),
                     profile.provider_base_url_reference,
                 ),
             )
@@ -169,6 +203,7 @@ class CodexHarnessAdapter:
             timeout_seconds=profile.execution_timeout_seconds,
             task_id=task_id,
             environment_references=environment_references,
+            image_reference=profile.codex_image.image_id,
         )
 
     async def execute(self, plan: CodexExecutionPlan, backend: CodexBackend) -> CodexProcessCapture:

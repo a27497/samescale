@@ -1,0 +1,205 @@
+{
+  "kind": "S1_PARTIAL_REAL_BENCHMARK_FINAL_STATUS",
+  "date": "2026-09-21",
+  "status": "BLOCKED",
+  "delivery_classification": "PARTIAL REAL BENCHMARK",
+  "closeout_status": "CLOSED_BY_USER",
+  "comparison_type": "AI_CODING_CONFIGURATION_COMPARISON",
+  "campaign_identity": "sha256:3b7887f08a320967b0efc9ad6a9a1c801498c0999c75384a267609ccd7e2dda4",
+  "planned_tasks": 8,
+  "planned_cells": 16,
+  "attempted_cells": 2,
+  "verified_pass": 1,
+  "timeout_not_verified": 1,
+  "not_run": 14,
+  "totals": {
+    "codex": {
+      "attempted": 1,
+      "verified_pass": 1,
+      "verified_fail": 0,
+      "infra_unverified": 0,
+      "not_run": 7
+    },
+    "claude": {
+      "attempted": 1,
+      "verified_pass": 0,
+      "verified_fail": 0,
+      "infra_unverified": 1,
+      "not_run": 7
+    }
+  },
+  "tasks": [
+    {
+      "task": {
+        "task_id": "lecturelens-analysis-progress-stream-reconnect",
+        "task_version": "1.0.0",
+        "task_digest": "sha256:1cc953b6302ffd16d71dfdec294461256c82da58781a9f988867ea1d20532b39",
+        "workspace_digest": "sha256:04e7fdf0ea00dc87b63777ed2fb851e33aa2f6cc2e109424ee52622fde6d53d0",
+        "verifier_digest": "sha256:bcfc107dafda32731693975ddc8ee21c96c952decb5e660ec3cc3ee71f4154d9"
+      },
+      "configs": {
+        "codex": {
+          "status": "verified_pass",
+          "verification": "verified_pass"
+        },
+        "claude": {
+          "status": "harness_error",
+          "verification": "NOT_VERIFIED"
+        }
+      }
+    },
+    {
+      "task": {
+        "task_id": "lecturelens-api-timestamp-utc",
+        "task_version": "1.0.0",
+        "task_digest": "sha256:b65988191aea48a1a727e0f5a0a08b344a1335b17cb0e0815b56d17fc56e88d3",
+        "workspace_digest": "sha256:76d252dda687b1131a9ce9a424068e857c87abf1d8cce175e40a15a155f0fe69",
+        "verifier_digest": "sha256:2c59dc78c98eac443ea75c9be4147fe2362f6ca5f11edb1b17986eaa1b4d1c32"
+      },
+      "configs": {
+        "codex": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        },
+        "claude": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        }
+      }
+    },
+    {
+      "task": {
+        "task_id": "lecturelens-chapter-coverage-contract",
+        "task_version": "1.0.0",
+        "task_digest": "sha256:ca6846227f3522193c457275bdca806afb61b554dec3a5c386b1897d0ac7aef8",
+        "workspace_digest": "sha256:c974b11516d44f65ff633b56dbfc8945bbbebb9649c19eb9ca25a287a5a463fb",
+        "verifier_digest": "sha256:f79b4b6f85d2e3728fb9da03db0a64246d0795ca35aeb471dd3ffbe8ffd9deab"
+      },
+      "configs": {
+        "codex": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        },
+        "claude": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        }
+      }
+    },
+    {
+      "task": {
+        "task_id": "lecturelens-embedded-subtitle-language-metadata",
+        "task_version": "1.0.1",
+        "task_digest": "sha256:86e44d00176c61c704e12d0c03fc3bfd4c9d349edc97a93ba6e073b6404ad031",
+        "workspace_digest": "sha256:1870160e291f022b67ae2334f5dc265348b3e6f54131d1045dad01d91b68bb15",
+        "verifier_digest": "sha256:9d010944ef0e1a74783fbcee11495edb7c5935002d48c7f4aaa33c8d3f853ce8"
+      },
+      "configs": {
+        "codex": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        },
+        "claude": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        }
+      }
+    },
+    {
+      "task": {
+        "task_id": "lecturelens-learning-sensitive-terminology",
+        "task_version": "1.0.0",
+        "task_digest": "sha256:e88aa6a396d065228e887fcbf8d28a973c6ea5f60dc295a06a7fd1e2fc52ae04",
+        "workspace_digest": "sha256:f4088ca65252a0f95fdc97c45dcaa7f15c98bb250809a1bc5a00faafb14447bd",
+        "verifier_digest": "sha256:940b987d73509d5c3af5446a857f3c1cb8d835d1f43036c5e67a43c30d984b85"
+      },
+      "configs": {
+        "codex": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        },
+        "claude": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        }
+      }
+    },
+    {
+      "task": {
+        "task_id": "lecturelens-ocr-readable-noise",
+        "task_version": "1.0.0",
+        "task_digest": "sha256:ec041874546ed32dbba35a8fa294799e19565c32d3073f069680a02e9746df86",
+        "workspace_digest": "sha256:837358086d759b07933e74866c5ea4069b930e272f048d478377f98771c085ac",
+        "verifier_digest": "sha256:91f3d9ccfc6d1081901a8cd383c8c58b996c580df57688a37431d9b599f3a425"
+      },
+      "configs": {
+        "codex": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        },
+        "claude": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        }
+      }
+    },
+    {
+      "task": {
+        "task_id": "lecturelens-qa-natural-query",
+        "task_version": "1.0.1",
+        "task_digest": "sha256:8a7aea74d7a7b4c794ca41295b0105ae4599559faabdb9526fb8a98eba0f1523",
+        "workspace_digest": "sha256:783dca57ba4bb9ba3ff029568809e719b3e17051fea160fa3e03aa63b421f9d4",
+        "verifier_digest": "sha256:770572c73c6d0206acdf56f60a21f5497934bfdbe23a9ad89fd3cfde4835c174"
+      },
+      "configs": {
+        "codex": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        },
+        "claude": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        }
+      }
+    },
+    {
+      "task": {
+        "task_id": "lecturelens-tool-schema",
+        "task_version": "1.0.1",
+        "task_digest": "sha256:5a83a9de1190063c9fc59a5515c20f9ebfa0c9a7bd0ce0d1eae2538174aa7576",
+        "workspace_digest": "sha256:bb865cd9b3133ee6779bbe9ede0192d4ee312f59d46a00537209c7c5d4500913",
+        "verifier_digest": "sha256:534bf20e8f6b586f7fe11aeec374493b944d4e8f9a28f491fc28c439b881ca12"
+      },
+      "configs": {
+        "codex": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        },
+        "claude": {
+          "status": "NOT_RUN",
+          "verification": "NOT_RUN"
+        }
+      }
+    }
+  ],
+  "task_success_authority": "independent verifier",
+  "declared_output_budget": 6000,
+  "output_budget_changes_task_success": false,
+  "subject_timeout_seconds": 600,
+  "timeout_extension_applied": false,
+  "full_restart_performed": false,
+  "execution_authorized": false,
+  "future_dispatch_authorized": false,
+  "new_provider_model_calls_during_recovery_and_closeout": 0,
+  "smokes_counted_in_benchmark": false,
+  "ability_ranking_allowed": false,
+  "complete_configuration_conclusions_allowed": false,
+  "harness_causal_claims_allowed": false,
+  "unverified_is_business_failure": false,
+  "s2_handoff": "NEXT_PHASE_NOT_STARTED",
+  "s2_started": false,
+  "source_summary": {
+    "path": "../s1-completion-final-20260921/benchmark-summary.json",
+    "sha256": "sha256:f6e8ac7f4c43e81e97294a8f0865e615504875f2f330845b40106919fd6dce22"
+  }
+}

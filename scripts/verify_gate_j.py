@@ -204,12 +204,14 @@ def verify_scope_and_safety() -> bool:
     config.set_main_option("script_location", str(ROOT / "alembic"))
     lineage = ScriptDirectory.from_config(config)
     analyst_revision = lineage.get_revision("20260908_0007")
+    heads = lineage.get_heads()
     if (
-        lineage.get_heads() != ["20260908_0007"]
+        len(heads) != 1
         or analyst_revision is None
         or analyst_revision.down_revision != "20260904_0006"
+        or "20260908_0007" not in {revision.revision for revision in lineage.walk_revisions()}
     ):
-        print("FAIL: Analyst migration must extend the single authoritative Phase M head")
+        print("FAIL: single migration lineage must retain Analyst after the Phase M head")
         return False
     print(
         "SCOPE=six evidence tools; explicit backend; review-only session API; "

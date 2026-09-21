@@ -150,6 +150,15 @@ class ModelDefinition(RegistryModel):
 
 
 class ProviderModelProfile(RegistryModel):
+    purpose: Literal["SUBJECT", "ANALYST", "JUDGE"] = Field(
+        default="SUBJECT", exclude_if=lambda value: value == "SUBJECT"
+    )
+    temperature: float | None = Field(
+        default=None, ge=0, le=2, exclude_if=lambda value: value is None
+    )
+    max_output_tokens_limit: int | None = Field(
+        default=None, gt=0, exclude_if=lambda value: value is None
+    )
     profile_id: Identifier
     model_id: Identifier
     provider_id: Identifier
@@ -198,6 +207,7 @@ class ProviderModelProfile(RegistryModel):
 
 
 class HarnessProfileDefinition(RegistryModel):
+    enabled: bool = Field(default=True, exclude_if=lambda value: value is True)
     profile_id: Identifier
     profile_reference: str = Field(pattern=r"^builtin:[a-z0-9._-]+$")
     supported_provider_profile_ids: tuple[Identifier, ...]
@@ -538,6 +548,7 @@ class ExperimentSnapshot(RegistryModel):
                 selection.resource_envelope_identity == resolved.resource_envelope_identity,
                 selection.harness_config_identity == direct_harness_control_identity(),
                 cell.requested_model == resolved.profile.requested_model,
+                cell.reasoning_effort == resolved.profile.reasoning.effort,
                 cell.provider_route == resolved.profile.provider_route_identity,
                 cell.profile_identity == resolved.profile_control_identity,
                 cell.effective_runtime_profile_identity == resolved.effective_profile_identity,

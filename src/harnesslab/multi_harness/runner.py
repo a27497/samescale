@@ -14,17 +14,22 @@ from harnesslab.harness_lane.models import (
     HarnessLaneOutcome,
 )
 from harnesslab.harness_lane.runner import changed_path_evidence, workspace_inventory
+from harnesslab.harness_lane.transport import (
+    MultiHarnessCLITransport,
+    SubjectObservation,
+    SubjectRequest,
+    SubjectTransport,
+    SubjectWorkspace,
+)
 from harnesslab.model_lane.patch import copy_workspace_snapshot
 from harnesslab.multi_harness.adapter import MultiHarnessAdapter, MultiHarnessBackend
-from harnesslab.multi_harness.diagnostics import safe_process_diagnostics
 from harnesslab.multi_harness.models import (
-    HarnessProcessCapture,
     MultiHarnessCollection,
     MultiHarnessEvidence,
     MultiHarnessProfile,
     MultiHarnessRunResult,
 )
-from harnesslab.multi_harness.prompt import render_harness_prompt
+from harnesslab.multi_harness.prompt import MultiHarnessPrompt, render_harness_prompt
 from harnesslab.sandbox.artifacts import (
     ArtifactError,
     assert_tree_has_no_run_secrets,
@@ -66,10 +71,18 @@ class MultiHarnessRunner:
         task_path: Path,
         profile: MultiHarnessProfile,
         *,
-        adapter: MultiHarnessAdapter,
-        backend: MultiHarnessBackend,
+        adapter: MultiHarnessAdapter | None = None,
+        backend: MultiHarnessBackend | None = None,
+        transport: SubjectTransport[MultiHarnessProfile, MultiHarnessPrompt, MultiHarnessCollection]
+        | None = None,
         run_id: str | None = None,
     ) -> MultiHarnessRunResult:
+        if transport is not None and (adapter is not None or backend is not None):
+            raise MultiHarnessRunError("select one subject transport")
+        if transport is None:
+            if adapter is None or backend is None:
+                raise MultiHarnessRunError("a subject transport or CLI adapter/backend is required")
+            transport = MultiHarnessCLITransport(adapter, backend)
         package = TaskPackage.load(task_path)
         if EvaluationLane.HARNESS not in package.definition.lane_support:
             raise MultiHarnessRunError("task package does not declare H-Lane support")
@@ -87,7 +100,7 @@ class MultiHarnessRunner:
             )
         run_root = Path(tempfile.mkdtemp(prefix=f"{effective_run_id}-", dir=self.runtime_root))
         materialized = None
-        secrets = backend.artifact_secret_values
+        secrets = transport.artifact_secret_values
         try:
             materialized = package.materialize(run_root)
             make_tree_writable(materialized.workspace)
@@ -107,16 +120,17 @@ class MultiHarnessRunner:
             if prompt.template_version != profile.prompt_template_version:
                 raise MultiHarnessRunError("prompt template does not match profile")
             try:
-                adapter.preflight(profile)
-                plan = adapter.prepare(
-                    profile,
-                    prompt,
-                    workspace=materialized.workspace,
-                    context=materialized.context,
-                    task_id=package.definition.id,
+                observation = await transport.execute(
+                    SubjectRequest(
+                        effective_run_id, package.definition.id, profile, prompt, effective_run_id
+                    ),
+                    SubjectWorkspace(
+                        effective_run_id, materialized.workspace, materialized.context
+                    ),
                 )
-                capture = await backend.run(plan)
-                collection = adapter.collect(capture, secret_values=secrets)
+                if observation.execution_id != effective_run_id:
+                    raise HarnessAdapterError("subject returned another execution identity")
+                collection = observation.collection
             except HarnessAdapterError as exc:
                 raise MultiHarnessRunError(str(exc)) from exc
             output_digest = digest_tree(materialized.workspace)
@@ -141,7 +155,7 @@ class MultiHarnessRunner:
                     output_digest,
                     changed,
                     context_digest,
-                    capture,
+                    observation,
                     collection,
                     HarnessLaneOutcome.HARNESS_ERROR,
                     f"{profile.harness.value} attempt failed: {failure.value}",
@@ -177,7 +191,7 @@ class MultiHarnessRunner:
                     output_digest,
                     changed,
                     context_digest,
-                    capture,
+                    observation,
                     collection,
                     HarnessLaneOutcome.INFRA_ERROR,
                     f"isolated Hidden Verifier failed: {type(exc).__name__}",
@@ -199,7 +213,7 @@ class MultiHarnessRunner:
                 output_digest,
                 changed,
                 context_digest,
-                capture,
+                observation,
                 collection,
                 outcome,
                 "isolated Hidden Verifier passed"
@@ -235,7 +249,7 @@ class MultiHarnessRunner:
         output_digest: str,
         changed_paths: tuple[ChangedPathEvidence, ...],
         context_digest: str | None,
-        capture: HarnessProcessCapture,
+        observation: SubjectObservation[MultiHarnessCollection],
         collection: MultiHarnessCollection,
         outcome: HarnessLaneOutcome,
         summary: str,
@@ -248,7 +262,9 @@ class MultiHarnessRunner:
         verifier_score: float | None = None,
         verifier_lifecycle: VerifierLifecycleDiagnostics | None = None,
     ) -> MultiHarnessEvidence:
-        diagnostics = safe_process_diagnostics(capture, secret_values=secret_values)
+        diagnostics = observation.diagnostics
+        if diagnostics is None:
+            raise MultiHarnessRunError("subject diagnostics are unavailable")
         return MultiHarnessEvidence(
             run_id=run_id,
             task_id=package.definition.id,
@@ -281,10 +297,10 @@ class MultiHarnessRunner:
             stderr_digest=diagnostics.stderr_digest,
             stdout_line_count=diagnostics.stdout_line_count,
             startup_failure_category=diagnostics.startup_failure_category,
-            process_exit_code=capture.exit_code,
-            duration_ms=capture.duration_ms,
-            timed_out=capture.timed_out,
-            cancelled=capture.cancelled,
+            process_exit_code=observation.exit_code,
+            duration_ms=observation.duration_ms,
+            timed_out=observation.timed_out,
+            cancelled=observation.cancelled,
             retry_count=collection.retry_count,
             usage=collection.usage,
             harness_failure=harness_failure,

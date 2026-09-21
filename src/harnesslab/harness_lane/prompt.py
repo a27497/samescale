@@ -23,7 +23,12 @@ def render_codex_harness_prompt(
     workspace_input_digest: str,
     context_digest: str | None,
     network_policy: NetworkPolicy,
+    prompt_addendum: str | None = None,
 ) -> CodexHarnessPrompt:
+    if prompt_addendum is not None and (
+        not prompt_addendum.strip() or len(prompt_addendum) > 4000 or "\x00" in prompt_addendum
+    ):
+        raise ValueError("prompt addendum must contain 1-4000 characters without NUL")
     context_line = (
         "Subject-visible context is mounted read-only at /context."
         if context_digest is not None
@@ -45,9 +50,13 @@ def render_codex_harness_prompt(
             "No verifier or oracle details are available to you.",
         )
     )
+    template_version = PROMPT_TEMPLATE_VERSION
+    if prompt_addendum is not None:
+        text += "\n\nAdditional coding instructions:\n" + prompt_addendum
+        template_version = "codex-harness-addendum-v1"
     canonical = json.dumps(
         {
-            "template_version": PROMPT_TEMPLATE_VERSION,
+            "template_version": template_version,
             "text": text,
             "task_digest": task_digest,
             "workspace_input_digest": workspace_input_digest,
@@ -58,4 +67,4 @@ def render_codex_harness_prompt(
         ensure_ascii=False,
     )
     prompt_hash = "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
-    return CodexHarnessPrompt(PROMPT_TEMPLATE_VERSION, text, prompt_hash)
+    return CodexHarnessPrompt(template_version, text, prompt_hash)

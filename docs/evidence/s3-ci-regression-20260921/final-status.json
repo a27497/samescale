@@ -1,0 +1,36 @@
+{
+  "phase": "S3",
+  "status": "COMPLETE",
+  "accepted_implementation_sha": "b2d729bc8d1c9eb793511b54a7b235a72e67cb9b",
+  "branch": "codex/l-real-agent-main-integration",
+  "entry": "bash scripts/ci_s3.sh NEW_OUTPUT_DIRECTORY",
+  "local_regression": "PASS",
+  "tests_passed": 65,
+  "github_offline_run": {
+    "id": 35643033783,
+    "url": "https://github.com/a27497/samescale/actions/runs/35643033783",
+    "head_sha": "b2d729bc8d1c9eb793511b54a7b235a72e67cb9b",
+    "conclusion": "success"
+  },
+  "github_fast_run": {
+    "id": 35643033753,
+    "url": "https://github.com/a27497/samescale/actions/runs/35643033753",
+    "head_sha": "b2d729bc8d1c9eb793511b54a7b235a72e67cb9b",
+    "conclusion": "success"
+  },
+  "github_receipt_equals_local": true,
+  "provider_calls": 0,
+  "model_calls": 0,
+  "claude_calls": 0,
+  "judge_calls": 0,
+  "subject_executed": false,
+  "verifier_executed": false,
+  "original_files_preserved": 2085,
+  "historical_artifacts_deleted": 0,
+  "s1_status": "PARTIAL REAL BENCHMARK / BLOCKED",
+  "ability_ranking_supported": false,
+  "s4_started": false,
+  "pr_created": false,
+  "merged_main": false,
+  "deployed": false
+}

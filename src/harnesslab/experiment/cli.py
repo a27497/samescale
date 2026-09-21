@@ -14,6 +14,7 @@ from harnesslab.contracts.common import Protocol
 from harnesslab.contracts.model import ModelProfile, ReasoningProfile
 from harnesslab.core.config import Settings
 from harnesslab.db.session import create_engine, create_session_factory
+from harnesslab.experiment.execution import execution_capabilities
 from harnesslab.experiment.executor import (
     CodexHarnessBinding,
     DirectModelBinding,
@@ -54,7 +55,7 @@ run_app = typer.Typer(no_args_is_help=True, help="Inspect durable experiment run
 report_app = typer.Typer(no_args_is_help=True, help="Build deterministic experiment reports.")
 
 FAKE_PATCH = (
-    '{"version":1,"operations":[{"op":"write","path":"calculator.py",'
+    '{"schema_version":1,"operations":[{"op":"write","path":"calculator.py",'
     '"content":"def clamp(value: int, lower: int, upper: int) -> int:\\n'
     '    return max(lower, min(value, upper))\\n"}]}'
 )
@@ -87,6 +88,25 @@ def _load_plan(path: Path) -> AnyExperimentPlan:
             raise ExperimentSpecError(f"invalid experiment plan: {exc}") from exc
     spec = load_experiment_spec(path)
     return build_experiment_plan(spec, _repository_root())
+
+
+@experiment_app.command("execution-capabilities")
+def show_execution_capabilities() -> None:
+    """Show declared entry-point capabilities without checking health or starting a run."""
+    typer.echo(
+        json.dumps(
+            {
+                "execution_authorized": False,
+                "runtime_health": "NOT_VERIFIED",
+                "bindings": {
+                    name: capability.model_dump(mode="json")
+                    for name, capability in execution_capabilities().items()
+                },
+            },
+            sort_keys=True,
+            indent=2,
+        )
+    )
 
 
 @experiment_app.command("plan")

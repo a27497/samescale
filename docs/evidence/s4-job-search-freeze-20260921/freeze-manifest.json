@@ -1,0 +1,24 @@
+{
+  "kind": "JOB_SEARCH_FREEZE",
+  "accepted_implementation_sha": "5bdc03f8addce7532fdfc053c383cb66895e3b3b",
+  "delivery_files": {
+    "scripts/export_recruiter_demo.py": "sha256:485e0744b26e4d3e5edd6ec6fc22ab022495ceb607f85e08bc2f9c57027d2afd",
+    "scripts/verify_s3_regression.py": "sha256:60b4770f2748506d07316b39d8bc418de0ac4f408310b7efb5ccc28a26d93ff3",
+    "tests/test_recruiter_demo.py": "sha256:ed2ecde1696019a1a3aa84726b1d32a37251823611e728d617108b531d86a39f",
+    "docs/recruiter/template.html": "sha256:49da6309e72751ca23059d30bc47a3bbc7b79f1f54655c0bcd56bb5829bcba6f",
+    "docs/recruiter/demo/index.html": "sha256:a8556e1a3b90d166c235655a861c823f5cf16d3c9f2b9fa1204f3986518c419a",
+    "docs/recruiter/demo/public-evidence.json": "sha256:84e3e9731a118a2c5bf8aa1d9ea6a1d7d76dc4bee5aeac37e5ae186957a8b008",
+    "docs/recruiter/demo/SHA256SUMS": "sha256:c83fda5fc6d49f151a4bf4e306a965c876dad124a0a266ffe63ccae7a3aee8d4",
+    "docs/RECRUITER_DEMO.md": "sha256:b2e48b0c259c29dfba81912faaa66baa39ba0f72f83ee6fe073e9985d6c51847",
+    "docs/JOB_SEARCH_FREEZE.md": "sha256:8f8b4be8a9361756c70d55ec3ca2b8ed95cb0f4a4eab7b7630e283380cacdc0c"
+  },
+  "immutable_source_pins": {
+    "docs/evidence/s2-offline-replay-20260921/README.md": "sha256:9f5b586f9fa0ab521ea0c42fec237818caf59b7ab89a154ed1644c8b20cef70b",
+    "docs/evidence/s1-partial-closeout-20260921/final-status.json": "sha256:236aebfa45427db32c719207d255e9bb810077788a56145065c741333817a5a1",
+    "docs/evidence/s3-ci-regression-20260921/github-offline-run.json": "sha256:5c94ef405721295f452766e08f7724863b87cf13d7863d696cf16e3f85ef5820",
+    "docs/evidence/s3-ci-regression-20260921/github-fast-run.json": "sha256:bae08efbd4ccd079ce11edb1734810998798821dbbb6e696a76dba49a7fed064",
+    "docs/evidence/s3-ci-regression-20260921/github-receipt.json": "sha256:3cf02fdfcdcbbb8a75353f878bffbc8dd03f282f17b8e27ab61331204f08795b"
+  },
+  "representative_archive_sha256": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+  "scope": "Read-only demo + job materials; no runtime expansion or new real attempts"
+}

@@ -1,0 +1,15 @@
+{
+  "exit_code": 1,
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "--config",
+    ".qualification/vitest.config.mts",
+    "--reporter=json",
+    "--outputFile",
+    "/evidence/supplemental-vitest.json"
+  ],
+  "candidate_code_modified": false,
+  "kind": "SUPPLEMENTAL_NOT_FROZEN_VERIFIER"
+}

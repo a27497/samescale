@@ -1,0 +1,42 @@
++ npm run test:unit -- --maxWorkers=1 --fileParallelism=false
+
+> courselingo-frontend@0.0.0 test:unit
+> vitest run --maxWorkers=1 --fileParallelism=false
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/tmp/ll-public-yn9rf4zq/frontend[39m
+
+ [32m✓[39m src/components/task-detail/CourseVisualEvidencePanel.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 74[2mms[22m[39m
+ [32m✓[39m src/components/task-detail/CourseContentPanel.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 53[2mms[22m[39m
+ [32m✓[39m src/api/result.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/api/aiTimeoutMessages.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/utils/taskStatus.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m src/stores/taskEvents.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/utils/time.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m src/components/VideoPlaybackCard.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 29[2mms[22m[39m
+ [32m✓[39m src/components/task-detail/workspace.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m      Tests [22m [1m[32m25 passed[39m[22m[90m (25)[39m
+[2m   Start at [22m 05:42:37
+[2m   Duration [22m 7.00s[2m (transform 581ms, setup 0ms, import 3.07s, tests 190ms, environment 2.54s)[22m
+
++ npm run type-check
+
+> courselingo-frontend@0.0.0 type-check
+> vue-tsc -b
+
++ npm run build
+
+> courselingo-frontend@0.0.0 build
+> vue-tsc -b && vite build
+
+vite v8.1.0 building client environment for production...
+[2Ktransforming...✓ 1750 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.39 kB │ gzip:   0.26 kB
+dist/assets/index-DTcArQ1L.css    403.01 kB │ gzip:  55.17 kB
+dist/assets/index-CgeAGbV8.js   1,159.12 kB │ gzip: 375.44 kB
+
+✓ built in 1.46s

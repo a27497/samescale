@@ -66,6 +66,18 @@ _TIER_B_CHECKS = _TIER_A_CHECKS | {
     QualificationCheck.FAILURE_BOUNDARIES_VALID,
 }
 
+# Custom qualification describes an executable, isolated task contract. It does not
+# assign an Official tier, attest unseen exposure, or establish repeated-run health.
+CUSTOM_TECHNICAL_CHECKS = frozenset(
+    {
+        QualificationCheck.PACKAGE_VALID,
+        QualificationCheck.BASELINE_FAILS,
+        QualificationCheck.ORACLE_PASSES,
+        QualificationCheck.WORKSPACE_ISOLATION,
+        QualificationCheck.HIDDEN_ASSETS_ISOLATED,
+    }
+)
+
 
 class TaskIdentity(BaseModel):
     """The existing package identity, copied rather than reinterpreted."""
@@ -219,15 +231,21 @@ class TaskQualification(BaseModel):
             if self.qualification_id is not None or self.evidence:
                 raise ValueError("unqualified tasks cannot carry qualification claims")
             return self
-        if self.quality.benchmark_tier is BenchmarkTier.UNASSIGNED:
-            raise ValueError("imported/custom tasks need an assigned governed tier first")
+        if (
+            self.quality.benchmark_tier is BenchmarkTier.UNASSIGNED
+            and self.quality.family is not TaskFamily.CUSTOM
+        ):
+            raise ValueError("imported tasks need an assigned governed tier first")
         if self.qualification_id is None:
             raise ValueError("qualified tasks require a qualification id")
-        required = (
-            _TIER_A_CHECKS
-            if self.quality.benchmark_tier is BenchmarkTier.TIER_A
-            else _TIER_B_CHECKS
-        )
+        if self.quality.family is TaskFamily.CUSTOM:
+            required = CUSTOM_TECHNICAL_CHECKS
+        else:
+            required = (
+                _TIER_A_CHECKS
+                if self.quality.benchmark_tier is BenchmarkTier.TIER_A
+                else _TIER_B_CHECKS
+            )
         actual = {item.check for item in self.evidence}
         missing = sorted(check.value for check in required - actual)
         if missing:

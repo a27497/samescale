@@ -249,9 +249,11 @@ def resolve_analyst_profile(
         raise ValueError("Analyst provider/model profile is disabled or disallows automation")
     source = _direct_runtime_source(provider, profile)
     runtime = ModelProfile(
-        **source.model_dump(exclude={"reasoning_effort"}),
+        **source.model_dump(exclude={"reasoning_effort", "temperature", "max_output_tokens_limit"}),
         reasoning=ReasoningProfile(
-            effort=profile.reasoning_effort, max_output_tokens=profile.max_output_tokens
+            effort=profile.reasoning_effort,
+            temperature=source.temperature,
+            max_output_tokens=profile.max_output_tokens_limit or profile.max_output_tokens,
         ),
     )
     pricing = None

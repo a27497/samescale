@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "starting_files": 3258,
+  "original_content_unchanged": 3257,
+  "scoped_behavior_change": "scripts/verify_s3_regression.py: append recruiter tests and mandatory test families only",
+  "additive_scope_blocks": [
+    "README.md",
+    "PUBLIC_PRODUCT_CONTRACT.md",
+    "docs/PROJECT_BLUEPRINT.md",
+    "CURRENT_MILESTONE.md"
+  ],
+  "historical_evidence_changed": false,
+  "documentation_links_checked": 20
+}

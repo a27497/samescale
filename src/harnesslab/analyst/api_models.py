@@ -28,7 +28,17 @@ class AnalystTotals(StrictModel):
     latency_ms: int | None
 
 
+class AnalystModelBindingView(StrictModel):
+    purpose: Literal["ANALYST"]
+    configuration_id: str
+    configuration_revision: int = Field(ge=1)
+    connection_id: str | None
+    connection_revision: int | None
+    binding_digest: Sha256Digest
+
+
 class AnalystSessionView(StrictModel):
+    model_binding: AnalystModelBindingView | None = None
     spend_limits: AnalystSpendLimits | None
     session_id: str
     backend: Literal["fake", "real"]
@@ -72,6 +82,7 @@ class StructuredDecisionContract(StrictModel):
 
 
 class AnalystSmokePreflight(StrictModel):
+    model_binding: AnalystModelBindingView | None = None
     kind: Literal["REAL_AGENT_SMOKE"]
     session_id: str
     session_digest: Sha256Digest

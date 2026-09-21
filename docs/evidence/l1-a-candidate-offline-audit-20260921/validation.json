@@ -1,0 +1,26 @@
+{
+  "kind": "EVIDENCE_STABILIZATION_CHECKS_NOT_ACCEPTANCE_RERUN",
+  "source_audit_files_checked": 137,
+  "original_evidence_and_task_files_checked": 240,
+  "source_audit_and_original_files_unchanged": true,
+  "workspace_quick_checks": {
+    "result": "21 passed",
+    "command": ".venv/bin/python -m pytest -q tests/test_l1_development_evidence.py tests/test_lecturelens_development_diagnostics.py tests/test_codex_harness.py::test_codex_structured_transport_diagnostics_are_preserved",
+    "scope": "Existing working-tree tests use pre-existing uncommitted helpers; these helpers are not part of this commit. Portable snapshot check is independent."
+  },
+  "provider_calls": 0,
+  "model_calls": 0,
+  "judge_calls": 0,
+  "acceptance_reruns": 0,
+  "original_episode_updated": false,
+  "independent_staged_snapshot": {
+    "result": "PASS",
+    "method": "git write-tree and git archive; standard-library verifier from exported snapshot",
+    "external_artifact_reads": 0,
+    "document_links_checked": 17,
+    "workspace_mapping_files_checked": 99,
+    "original_episode": "NOT_VERIFIED / 0 checks",
+    "whitespace": "git diff --cached --check PASS",
+    "scope": "Only audit snapshot, diagnosis supplement and one Milestone section; pre-existing work preserved"
+  }
+}

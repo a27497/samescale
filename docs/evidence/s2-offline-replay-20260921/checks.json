@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "pytest",
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--offline",
+        "pytest",
+        "-q",
+        "tests/test_s2_offline_replay.py"
+      ],
+      "exit_code": 0,
+      "output": "pytest.txt"
+    },
+    {
+      "check": "ruff",
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--offline",
+        "ruff",
+        "check",
+        "src/harnesslab/analyst/offline_replay.py",
+        "scripts/replay_s2.py",
+        "tests/test_s2_offline_replay.py"
+      ],
+      "exit_code": 0,
+      "output": "ruff.txt"
+    },
+    {
+      "check": "format",
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--offline",
+        "ruff",
+        "format",
+        "--check",
+        "src/harnesslab/analyst/offline_replay.py",
+        "scripts/replay_s2.py",
+        "tests/test_s2_offline_replay.py"
+      ],
+      "exit_code": 0,
+      "output": "format.txt"
+    },
+    {
+      "check": "mypy",
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--offline",
+        "mypy",
+        "--follow-imports=silent",
+        "src/harnesslab/analyst/offline_replay.py",
+        "scripts/replay_s2.py",
+        "tests/test_s2_offline_replay.py"
+      ],
+      "exit_code": 0,
+      "output": "mypy.txt"
+    }
+  ],
+  "new_provider_model_calls": 0
+}

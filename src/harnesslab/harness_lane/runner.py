@@ -4,27 +4,33 @@ import hashlib
 import os
 import shutil
 import tempfile
+from collections.abc import Callable
 from contextlib import suppress
 from pathlib import Path
 from uuid import uuid4
 
 from harnesslab.contracts.common import EvaluationLane
 from harnesslab.harness_lane.adapter import CodexBackend, CodexHarnessAdapter, HarnessAdapterError
-from harnesslab.harness_lane.docker_backend import CodexBackendExecutionError
 from harnesslab.harness_lane.models import (
     ChangedPathEvidence,
     ChangedPathStatus,
     CodexBackendFailureEvidence,
     CodexCollection,
     CodexHarnessProfile,
-    CodexProcessCapture,
     HarnessFailureCategory,
     HarnessLaneEvidence,
     HarnessLaneOutcome,
     HarnessLaneRunResult,
     WorkspaceFileEvidence,
 )
-from harnesslab.harness_lane.prompt import render_codex_harness_prompt
+from harnesslab.harness_lane.prompt import CodexHarnessPrompt, render_codex_harness_prompt
+from harnesslab.harness_lane.transport import (
+    CodexCLITransport,
+    SubjectObservation,
+    SubjectRequest,
+    SubjectTransport,
+    SubjectWorkspace,
+)
 from harnesslab.model_lane.patch import copy_workspace_snapshot
 from harnesslab.sandbox.artifacts import (
     ArtifactError,
@@ -124,10 +130,21 @@ class CodexHarnessRunner:
         task_path: Path,
         profile: CodexHarnessProfile,
         *,
-        backend: CodexBackend,
+        backend: CodexBackend | None = None,
+        transport: SubjectTransport[CodexHarnessProfile, CodexHarnessPrompt, CodexCollection]
+        | None = None,
         run_id: str | None = None,
+        prompt_addendum: str | None = None,
+        execution_guard: Callable[[TaskPackage, CodexHarnessProfile, CodexHarnessPrompt, str], None]
+        | None = None,
     ) -> HarnessLaneRunResult:
-        secret_values = backend.artifact_secret_values
+        if transport is not None and backend is not None:
+            raise CodexHarnessRunError("select one subject transport")
+        if transport is None:
+            if backend is None:
+                raise CodexHarnessRunError("a subject transport or CLI backend is required")
+            transport = CodexCLITransport(self.adapter, backend)
+        secret_values = transport.artifact_secret_values
         package = TaskPackage.load(task_path)
         if EvaluationLane.HARNESS not in package.definition.lane_support:
             raise CodexHarnessRunError("task package does not declare H-Lane support")
@@ -163,29 +180,29 @@ class CodexHarnessRunner:
                 workspace_input_digest=input_digest,
                 context_digest=context_digest,
                 network_policy=profile.tool_network_policy,
+                prompt_addendum=prompt_addendum,
             )
+            if execution_guard is not None:
+                execution_guard(package, profile, prompt, effective_run_id)
             try:
-                self.adapter.preflight(profile)
-                plan = self.adapter.prepare(
-                    profile,
-                    prompt,
-                    workspace=materialized.workspace,
-                    context=materialized.context,
-                    task_id=package.definition.id,
+                observation = await transport.execute(
+                    SubjectRequest(
+                        effective_run_id, package.definition.id, profile, prompt, effective_run_id
+                    ),
+                    SubjectWorkspace(
+                        effective_run_id, materialized.workspace, materialized.context
+                    ),
                 )
-                capture = await self.adapter.execute(plan, backend)
-            except CodexBackendExecutionError as exc:
+                if observation.execution_id != effective_run_id:
+                    raise HarnessAdapterError("subject returned another execution identity")
+            except HarnessAdapterError as exc:
+                raise CodexHarnessRunError(str(exc)) from exc
+            collection = observation.collection
+            if observation.backend_failure is not None:
+                backend_failure = observation.backend_failure
                 output_digest = digest_tree(materialized.workspace)
                 output_inventory = workspace_inventory(materialized.workspace)
                 changed_paths = changed_path_evidence(input_inventory, output_inventory)
-                capture = CodexProcessCapture(
-                    lines=(),
-                    exit_code=exc.evidence.exit_code,
-                    duration_ms=exc.evidence.duration_ms,
-                    timed_out=exc.evidence.timed_out,
-                    cancelled=exc.evidence.cancelled,
-                )
-                collection = self.adapter.collect(capture, secret_values=secret_values)
                 evidence = self._evidence(
                     effective_run_id,
                     package,
@@ -196,17 +213,13 @@ class CodexHarnessRunner:
                     output_digest=output_digest,
                     changed_paths=changed_paths,
                     context_digest=context_digest,
-                    capture=capture,
+                    observation=observation,
                     collection=collection,
                     outcome=HarnessLaneOutcome.INFRA_ERROR,
-                    summary=(f"Codex backend execution failed during {exc.evidence.phase.value}"),
-                    backend_failure=exc.evidence,
+                    summary=f"Codex backend execution failed during {backend_failure.phase.value}",
+                    backend_failure=backend_failure,
                 )
                 return self._persist(evidence, collection, None, secret_values)
-            except HarnessAdapterError as exc:
-                raise CodexHarnessRunError(str(exc)) from exc
-            collection = self.adapter.collect(capture, secret_values=secret_values)
-            self.adapter.normalize(collection)
             output_digest = digest_tree(materialized.workspace)
             output_inventory = workspace_inventory(materialized.workspace)
             changed_paths = changed_path_evidence(input_inventory, output_inventory)
@@ -231,7 +244,7 @@ class CodexHarnessRunner:
                     output_digest=output_digest,
                     changed_paths=changed_paths,
                     context_digest=context_digest,
-                    capture=capture,
+                    observation=observation,
                     collection=collection,
                     outcome=HarnessLaneOutcome.HARNESS_ERROR,
                     summary=f"Codex Harness attempt failed: {failure.value}",
@@ -264,7 +277,7 @@ class CodexHarnessRunner:
                     output_digest=output_digest,
                     changed_paths=changed_paths,
                     context_digest=context_digest,
-                    capture=capture,
+                    observation=observation,
                     collection=collection,
                     outcome=HarnessLaneOutcome.INFRA_ERROR,
                     summary=f"isolated Hidden Verifier failed: {type(exc).__name__}",
@@ -285,7 +298,7 @@ class CodexHarnessRunner:
                 output_digest=output_digest,
                 changed_paths=changed_paths,
                 context_digest=context_digest,
-                capture=capture,
+                observation=observation,
                 collection=collection,
                 outcome=outcome,
                 summary=(
@@ -323,7 +336,7 @@ class CodexHarnessRunner:
         output_digest: str,
         changed_paths: tuple[ChangedPathEvidence, ...],
         context_digest: str | None,
-        capture: CodexProcessCapture,
+        observation: SubjectObservation[CodexCollection],
         collection: CodexCollection,
         outcome: HarnessLaneOutcome,
         summary: str,
@@ -361,10 +374,10 @@ class CodexHarnessRunner:
             trace_event_types=tuple(event.type for event in collection.trace.events),
             thread_id=collection.thread_id,
             terminal_native_event=collection.terminal_event,
-            process_exit_code=capture.exit_code,
-            duration_ms=capture.duration_ms,
-            timed_out=capture.timed_out,
-            cancelled=capture.cancelled,
+            process_exit_code=observation.exit_code,
+            duration_ms=observation.duration_ms,
+            timed_out=observation.timed_out,
+            cancelled=observation.cancelled,
             usage=collection.usage,
             harness_failure=harness_failure,
             backend_failure=backend_failure,

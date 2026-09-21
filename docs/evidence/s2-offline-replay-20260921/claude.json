@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "replay_status": "PASS",
+  "bundle_digest": "sha256:e01f1d48cf37ecf11faab24e160abb7f5f5b11fdc794efbbafb9d43f27f4a1b2",
+  "run_id": "9f0c915c881c417786fc6bff73b175d3",
+  "campaign_identity": "sha256:3b7887f08a320967b0efc9ad6a9a1c801498c0999c75384a267609ccd7e2dda4",
+  "task": {
+    "task_id": "lecturelens-analysis-progress-stream-reconnect",
+    "task_version": "1.0.0",
+    "task_digest": "sha256:1cc953b6302ffd16d71dfdec294461256c82da58781a9f988867ea1d20532b39",
+    "workspace_input_digest": "sha256:04e7fdf0ea00dc87b63777ed2fb851e33aa2f6cc2e109424ee52622fde6d53d0",
+    "verifier_definition_digest": "sha256:bcfc107dafda32731693975ddc8ee21c96c952decb5e660ec3cc3ee71f4154d9"
+  },
+  "configuration": {
+    "harness": "claude-code",
+    "requested_model": "qwen3.8-max",
+    "provider_route": "alibaba-bailian|messages|env:HARNESSLAB_ALIBABA_BAILIAN_ANTHROPIC_BASE_URL/v1/messages",
+    "plan_harness_config_identity": "sha256:269af5faf78de53318874ad0946742029576d0feee899e7f9781c8828dcede89",
+    "prompt_hash": "sha256:6a5aa6fc9811b9ba077e7dae1085fbe2a109fb60c5a81598f09ab3a198f6a559",
+    "observed_model_status": "exposed"
+  },
+  "outcome": "harness_error",
+  "task_verification": "NOT_VERIFIED",
+  "verification": {
+    "state": "NOT_RUN",
+    "checks": null,
+    "passed_checks": null,
+    "task_success": null
+  },
+  "trace": {
+    "event_count": 6857,
+    "type_counts": {
+      "COMMAND_EXECUTION": 20,
+      "REASONING_PRESENT": 8,
+      "THREAD_STARTED": 1,
+      "UNKNOWN": 6828
+    },
+    "tools": [
+      {
+        "start_ordinal": 6,
+        "source_pointer": "/events/5",
+        "end_ordinal": 7,
+        "tool": "Bash",
+        "command": "ls /workspace && cat /workspace/TASK_CONTRACT.json 2>/dev/null | head -100",
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [],
+        "command_path_mentions": [
+          "TASK_CONTRACT.json"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 8,
+        "source_pointer": "/events/7",
+        "end_ordinal": 9,
+        "tool": "Read",
+        "command": null,
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [
+          {
+            "kind": "read",
+            "path": "/workspace/frontend/src/stores/taskEvents.ts"
+          }
+        ],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 20,
+        "source_pointer": "/events/19",
+        "end_ordinal": 21,
+        "tool": "Bash",
+        "command": "find /workspace/frontend/src -type f | sort && echo --- && ls /workspace/tools",
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 22,
+        "source_pointer": "/events/21",
+        "end_ordinal": 23,
+        "tool": "Read",
+        "command": null,
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [
+          {
+            "kind": "read",
+            "path": "/workspace/frontend/src/api/taskEvents.ts"
+          }
+        ],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 44,
+        "source_pointer": "/events/43",
+        "end_ordinal": 45,
+        "tool": "Read",
+        "command": null,
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [
+          {
+            "kind": "read",
+            "path": "/workspace/frontend/src/stores/taskEvents.test.ts"
+          }
+        ],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 46,
+        "source_pointer": "/events/45",
+        "end_ordinal": 47,
+        "tool": "Read",
+        "command": null,
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [
+          {
+            "kind": "read",
+            "path": "/workspace/frontend/src/types/task.ts"
+          }
+        ],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 66,
+        "source_pointer": "/events/65",
+        "end_ordinal": 67,
+        "tool": "Bash",
+        "command": "grep -rn \"useTaskEventsStore\\|taskEvents\" /workspace/frontend/src --include=\"*.vue\" --include=\"*.ts\" -l | grep -v test && echo --- && cat /workspace/frontend/package.json",
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [],
+        "command_path_mentions": [
+          "frontend/package.json"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 68,
+        "source_pointer": "/events/67",
+        "end_ordinal": 69,
+        "tool": "Bash",
+        "command": "grep -n \"taskEvents\\|useTaskEventsStore\" /workspace/frontend/src/views/TaskDetailView.vue /workspace/frontend/src/App.vue 2>/dev/null | head -40",
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [],
+        "command_path_mentions": [
+          "frontend/src/App.vue",
+          "frontend/src/views/TaskDetailView.vue"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 89,
+        "source_pointer": "/events/88",
+        "end_ordinal": 90,
+        "tool": "Read",
+        "command": null,
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [
+          {
+            "kind": "read",
+            "path": "/workspace/frontend/src/views/TaskDetailView.vue"
+          }
+        ],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 91,
+        "source_pointer": "/events/90",
+        "end_ordinal": 92,
+        "tool": "Read",
+        "command": null,
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [
+          {
+            "kind": "read",
+            "path": "/workspace/tools/frontend_check.py"
+          }
+        ],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "single_pending_in_recorded_order",
+        "validation_command_observed": false
+      }
+    ],
+    "tool_count": 10,
+    "last_tool_ordinal": 92,
+    "thinking_metadata_events": 6828,
+    "trailing_thinking_metadata_events": 6762,
+    "thinking_metadata_is_token_usage": false,
+    "per_event_duration": null,
+    "timestamps_available": false,
+    "coverage_label": "FULL_STREAM",
+    "coverage_label_proves_native_completion": false,
+    "native_digest": "sha256:9434fc2e29ecf0658846597eaf34d3aa86e072c2bf90451a0ffc94eaebafc17c",
+    "normalized_digest": "sha256:9b99f2cc26f3443075ba3c3ba762e0629c68651ab5f310629b87697f9280802f"
+  },
+  "file_access": {
+    "explicit_read_events": [
+      {
+        "ordinal": 8,
+        "kind": "read",
+        "path": "/workspace/frontend/src/stores/taskEvents.ts"
+      },
+      {
+        "ordinal": 22,
+        "kind": "read",
+        "path": "/workspace/frontend/src/api/taskEvents.ts"
+      },
+      {
+        "ordinal": 44,
+        "kind": "read",
+        "path": "/workspace/frontend/src/stores/taskEvents.test.ts"
+      },
+      {
+        "ordinal": 46,
+        "kind": "read",
+        "path": "/workspace/frontend/src/types/task.ts"
+      },
+      {
+        "ordinal": 89,
+        "kind": "read",
+        "path": "/workspace/frontend/src/views/TaskDetailView.vue"
+      },
+      {
+        "ordinal": 91,
+        "kind": "read",
+        "path": "/workspace/tools/frontend_check.py"
+      }
+    ],
+    "explicit_edit_events": [],
+    "command_path_mentions": [
+      "TASK_CONTRACT.json",
+      "frontend/package.json",
+      "frontend/src/App.vue",
+      "frontend/src/views/TaskDetailView.vue"
+    ],
+    "shell_access_coverage": "UNKNOWN; mentions can include commands not reached"
+  },
+  "changed_files": [],
+  "validation": {
+    "subject_commands": [],
+    "independent_verifier": {
+      "state": "NOT_RUN",
+      "checks": null,
+      "passed_checks": null,
+      "task_success": null
+    }
+  },
+  "duration_usage": {
+    "subject_ms": 601055,
+    "end_to_end_ms": 606046,
+    "usage": null,
+    "cost_usd": null,
+    "provider_request_count": null,
+    "budget_compliance": {
+      "declared_output_tokens": 6000,
+      "observed_output_tokens": null,
+      "status": "UNKNOWN",
+      "excess_tokens": null,
+      "session_hard_cap_enforced": false,
+      "stops_campaign_alone": false,
+      "changes_task_success": false
+    }
+  },
+  "completion_failure": {
+    "native_terminal": null,
+    "process_exit_code": 0,
+    "timed_out": true,
+    "failure_taxonomy": "execution_budget_exhausted",
+    "stop_reasons": [
+      "cleanup_failure",
+      "execution_budget_exhausted",
+      "timeout_or_cancelled",
+      "missing_verifier_or_zero_checks",
+      "verifier_process_not_valid"
+    ],
+    "timeout_root_cause": "NOT_ESTABLISHED"
+  },
+  "controls": {
+    "secret_audit": "PASS",
+    "original_cleanup": "FAIL",
+    "post_stop_cleanup": "PASS"
+  },
+  "integrity": {
+    "files_verified": 204,
+    "native_normalized_consistent": true,
+    "workspace_diff_reconstructed": true,
+    "verifier_rerun": false
+  },
+  "external_calls": 0
+}

@@ -28,6 +28,7 @@ const router = createRouter({
       component: () => import('@/views/RunControlView.vue'),
       meta: { title: 'Run Control', section: 'Workspace' },
     },
+    { path: '/connections', name: 'connections', component: () => import('@/views/ConnectionsView.vue'), meta: { title: '连接总览', section: 'Registry' } },
     { path: '/models', name: 'models', component: () => import('@/views/ModelsView.vue'), meta: { title: 'Model Registry', section: 'Registry' } },
     {
       path: '/providers',

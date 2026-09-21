@@ -39,6 +39,15 @@ SUPERSEDED_KB42_INPUTS = {
 # Keep this separate from the original receipt's superseded inputs. SOURCE_DIGESTS
 # pins the entire provenance document first, including in distributions without Git.
 POST_FREEZE_SOURCE_UPDATES = {
+    # L1 commit 23ece300 added runtime/image selection and transport diagnostics.
+    # KB4's timeout provenance still binds these blobs at ACCEPTED_COMMIT; its
+    # enclosing evidence bytes remain pinned by SOURCE_DIGESTS above.
+    "src/harnesslab/harness_lane/adapter.py": "sha256:1a0ad40f4e90c7aced3671e2615f664a269daf1b1571751859aba4b6cd0f3054",
+    "src/harnesslab/harness_lane/docker_backend.py": "sha256:ad2e959b253f242aa935344842adc37ea15af3b4339b6ebd4b4f977e2dbc2fb0",
+    "src/harnesslab/harness_lane/trace.py": "sha256:0850207261ace509cb5e4ee06bd11bf08867a655b13236389332dc584dedf3a0",
+    # L1 adds optional retry/status diagnostics; K-B4.2 still describes the model
+    # at ACCEPTED_COMMIT, whose original blob matches this provenance digest.
+    "src/harnesslab/harness_lane/models.py": "sha256:dd97691e94bb3571323777f045a8d03d112a0a6ca4504f2b4e05ccbfebd06e7e",
     "src/harnesslab/diagnosis/service.py": "sha256:84b6fb001654e38cccc690da53711e96030376967fb3e02c0965e01245d6b524",
     "docs/ANALYST.md": "sha256:d793cfbd1f0a2aad650161058fe874ddded30a7399475b26626327b1413eac39",
     "src/harnesslab/experiment/report.py": "sha256:08dc01e91774aef45844a5f0b4bda438ec28c985b5f630c54c7f1ff8e94e677c",
