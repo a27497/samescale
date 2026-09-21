@@ -1,5 +1,16 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：Phase S3 — CI Regression Integration（2026-09-21）
+
+将 S2 Offline Replay + Trace Diff 接入普通 GitHub push/pull_request CI，本地与 CI 使用同一
+入口和合同。冻结 representative evidence 与已观察到的输出；对 evidence/digest drift、
+replay inconsistency、trace/schema/parser、changed-files attribution 和 failure taxonomy
+回归 fail closed。回归无网络、无凭据，不执行 Provider/model/Claude/Judge/真实 benchmark。
+验收要求本地回归 PASS、实际 pushed SHA 的 GitHub CI PASS、S3 final report 与 CURRENT_MILESTONE。
+仅授权当前 feature branch 所需 scoped commit/push；保留 dirty work 与历史 evidence。
+不做 S1 能力排名/完整比较，不 PR、merge main、deploy；完成 S3 后停止，不进入 S4。
+下方阶段授权和旧产品阶段命名仅为历史上下文，不扩大本次 CI 集成范围。
+
 Planning authority: **HL-BLUEPRINT-2026-09-05**, the user-supplied authoritative blueprint and
 first-application delivery contract, amended by the **2026-09-09 SameScale macro-route freeze**
 below. The user's latest explicit decisions govern scope.

@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "original_files_verified": {
+    "codex": 315,
+    "claude": 109
+  },
+  "source_export_index_sha256": "sha256:ec89a7ae878c5e19e4905ec8a12a8ba21bf8b7ba92ef66e7e50f88115ada6a7f",
+  "source_export_files_verified": {
+    "campaign-00/external-artifacts.json": "sha256:f9a9dc12ba34a2c81c5da2d032eed02a41189ea2d816e0431a523598dedc0f7b",
+    "campaign-01/external-artifacts.json": "sha256:aeeda4de3bbb18f2b32fa7a2b325083b200ea1b2f8e817367d5a4d0c7938c000",
+    "campaign-00/receipt.json": "sha256:d719527f3b0dce2bb1763bc99f7d367922b73a004197e8e5b40d27bf8e0181f8",
+    "campaign-00/result.json": "sha256:c22f27994c161ef32a8469aeb15b3f17db581f53960299f3ca23908a6ebf935f",
+    "campaign-00/cleanup.json": "sha256:d52cd650510225f4fd475d4d39a58c2aa635dbc4f18b5e71f3dc747a9d740f58",
+    "campaign-00/secret-audit.json": "sha256:57c9fd6500ce02a922001037523345213d93cbc32f8549829bd220841ab791c9",
+    "campaign-01/receipt.json": "sha256:a2e964b621f0a438660a137e6c4c9821b7a8b7f44dc9f39059316cd52014fc7f",
+    "campaign-01/result.json": "sha256:271af627c667724f23342a0ae7b24227bff922b289337bbb2a9ea36f36f8a4ab",
+    "campaign-01/cleanup.json": "sha256:6717f3b0c30bfdc0faa510ba9f180d2684ae6ff5d3128c83024b0f4d759e0752",
+    "campaign-01/secret-audit.json": "sha256:57c9fd6500ce02a922001037523345213d93cbc32f8549829bd220841ab791c9",
+    "post-stop-cleanup.json": "sha256:cc89adcf4996535e44d1a8263ac1654ea471c8c451252238f308b3f14c86a645"
+  },
+  "inputs_sha256": "sha256:d77d964fe60158da4e22ee7e60df0cfb54178a99c957298d861d977f925d0395",
+  "external_calls": 0
+}

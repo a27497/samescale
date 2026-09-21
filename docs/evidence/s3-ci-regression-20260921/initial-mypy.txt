@@ -1,0 +1,2 @@
+tests/test_s3_ci_regression.py:71: error: Module "harnesslab.analyst.offline_replay" does not explicitly export attribute "_trace_event"  [attr-defined]
+Found 1 error in 1 file (checked 368 source files)

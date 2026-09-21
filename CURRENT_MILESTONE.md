@@ -1,5 +1,15 @@
 # SameScale Product — Current Milestone
 
+## Phase S3 — CI Regression Integration：IN PROGRESS — 2026-09-21
+
+[Contract and evidence](docs/evidence/s3-ci-regression-20260921/README.md)。
+统一入口 `bash scripts/ci_s3.sh NEW_OUTPUT_DIRECTORY` 已在无外部网络 namespace 内通过
+独立 staged tree 的 65 tests、两次冻结输出一致性检查与全树 Ruff/format/mypy。
+实际 pushed SHA 的 GitHub CI 尚待验证，不标记 COMPLETE。
+只提交 S3 必需实现、S2 冻结输入/基线和当前 S3 文档块；其余 dirty work 与历史 evidence 保留。
+用户已授权当前 feature branch 的 scoped commit/push；禁止 PR、merge main、deploy、真实模型
+benchmark。S1 保持 PARTIAL REAL BENCHMARK / BLOCKED；完成 S3 后停止，不进入 S4。
+
 ## KB4 CI compatibility repair — 2026-09-21
 
 Repair base is `d46d02c249c862ccbf76cebaa90e353b4041d067`; only the two repair files and

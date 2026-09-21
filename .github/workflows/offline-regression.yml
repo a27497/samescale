@@ -1,0 +1,42 @@
+name: SameScale Offline Regression
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: samescale-offline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  offline-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.12.5
+          enable-cache: true
+      - name: Provision locked dependencies (outside offline regression)
+        run: uv sync --locked
+      - name: Offline replay and trace regression
+        run: bash scripts/ci_s3.sh "$RUNNER_TEMP/s3-regression"
+      - name: Retain regression evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: s3-regression-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/s3-regression/result.json
+            ${{ runner.temp }}/s3-regression/*.txt
+            ${{ runner.temp }}/s3-regression/pytest.xml
+            ${{ runner.temp }}/s3-regression/replay-a/
+            ${{ runner.temp }}/s3-regression/replay-b/
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,391 @@
+{
+  "schema_version": 1,
+  "replay_status": "PASS",
+  "bundle_digest": "sha256:fe0b66d329f95be9f879cb744ea5de2d11468e179c7f87c9a455ae014fca8dea",
+  "run_id": "7462d2841b6f44648c43ee384baf8e6f",
+  "campaign_identity": "sha256:3b7887f08a320967b0efc9ad6a9a1c801498c0999c75384a267609ccd7e2dda4",
+  "task": {
+    "task_id": "lecturelens-analysis-progress-stream-reconnect",
+    "task_version": "1.0.0",
+    "task_digest": "sha256:1cc953b6302ffd16d71dfdec294461256c82da58781a9f988867ea1d20532b39",
+    "workspace_input_digest": "sha256:04e7fdf0ea00dc87b63777ed2fb851e33aa2f6cc2e109424ee52622fde6d53d0",
+    "verifier_definition_digest": "sha256:bcfc107dafda32731693975ddc8ee21c96c952decb5e660ec3cc3ee71f4154d9"
+  },
+  "configuration": {
+    "harness": "codex",
+    "requested_model": "gpt-6-astra",
+    "provider_route": "official-chatgpt|codex-cli|https://chatgpt.com/backend-api/codex/responses",
+    "plan_harness_config_identity": "sha256:aaac17df8d30fab0ab40fd981e970956ed453d9ade66405d0d2bb824f882a812",
+    "prompt_hash": "sha256:d4233983321a0af25c8879f417900a43b6d083004ffab6344c685f8bd90fa655",
+    "observed_model_status": "not_exposed"
+  },
+  "outcome": "verified_pass",
+  "task_verification": "verified_pass",
+  "verification": {
+    "state": "verified_pass",
+    "task_success": true,
+    "checks": 20,
+    "passed_checks": 20,
+    "report_digest": "sha256:f895a51ce7b8d17d48b366686ef3fae9924c49d9bfe6472dcc72a1a236947813"
+  },
+  "trace": {
+    "event_count": 33,
+    "type_counts": {
+      "AGENT_MESSAGE": 4,
+      "COMMAND_EXECUTION": 22,
+      "FILE_CHANGE": 4,
+      "THREAD_STARTED": 1,
+      "TURN_COMPLETED": 1,
+      "TURN_STARTED": 1
+    },
+    "tools": [
+      {
+        "start_ordinal": 4,
+        "source_pointer": "/events/3",
+        "end_ordinal": 5,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c \"pwd && rg --files -g 'AGENTS.md' -g 'TASK_CONTRACT.json' -g 'taskEvents*' -g '*task*test.ts' -g 'package.json'\"",
+        "status": "completed",
+        "exit_code": 0,
+        "file_events": [],
+        "command_path_mentions": [
+          "TASK_CONTRACT.json"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 6,
+        "source_pointer": "/events/5",
+        "end_ordinal": 7,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c 'cat TASK_CONTRACT.json && cat frontend/src/stores/taskEvents.ts'",
+        "status": "completed",
+        "exit_code": 0,
+        "file_events": [],
+        "command_path_mentions": [
+          "TASK_CONTRACT.json",
+          "frontend/src/stores/taskEvents.ts"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 8,
+        "source_pointer": "/events/7",
+        "end_ordinal": 9,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c 'cat frontend/src/stores/taskEvents.test.ts && cat frontend/src/api/taskEvents.ts && cat frontend/package.json'",
+        "status": "completed",
+        "exit_code": 0,
+        "file_events": [],
+        "command_path_mentions": [
+          "frontend/package.json",
+          "frontend/src/api/taskEvents.ts",
+          "frontend/src/stores/taskEvents.test.ts"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 10,
+        "source_pointer": "/events/9",
+        "end_ordinal": 11,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c \"rg --files -g 'AGENTS.md' /workspace /tmp 2>/dev/null && git status --short\"",
+        "status": "failed",
+        "exit_code": 1,
+        "file_events": [],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 12,
+        "source_pointer": "/events/11",
+        "end_ordinal": 13,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c \"git status --short && cat tools/frontend_check.py && rg --files frontend | rg '(vitest|vite.config|tsconfig)'\"",
+        "status": "failed",
+        "exit_code": 128,
+        "file_events": [],
+        "command_path_mentions": [
+          "tools/frontend_check.py"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 14,
+        "source_pointer": "/events/13",
+        "end_ordinal": 15,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c \"rg -n 'taskEvents|isTaskEventAuthError|disconnect\\\\(|reconnect\\\\(' frontend/src && cat frontend/src/types/task.ts && cat frontend/src/stores/auth.ts\"",
+        "status": "completed",
+        "exit_code": 0,
+        "file_events": [],
+        "command_path_mentions": [
+          "frontend/src/stores/auth.ts",
+          "frontend/src/types/task.ts"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 16,
+        "source_pointer": "/events/15",
+        "end_ordinal": 17,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c \"sed -n '60,130p' frontend/src/views/TaskDetailView.vue && cat frontend/src/components/task/TaskProgressCard.vue 2>/dev/null && cat frontend/src/api/authToken.ts\"",
+        "status": "failed",
+        "exit_code": 1,
+        "file_events": [],
+        "command_path_mentions": [
+          "frontend/src/api/authToken.ts",
+          "frontend/src/views/TaskDetailView.vue"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 18,
+        "source_pointer": "/events/17",
+        "end_ordinal": 19,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c 'cat tools/frontend_check.py && cat frontend/vite.config.ts && cat frontend/tsconfig.app.json'",
+        "status": "completed",
+        "exit_code": 0,
+        "file_events": [],
+        "command_path_mentions": [
+          "frontend/tsconfig.app.json",
+          "frontend/vite.config.ts",
+          "tools/frontend_check.py"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 21,
+        "source_pointer": "/events/20",
+        "end_ordinal": 22,
+        "tool": "file_change",
+        "command": null,
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [
+          {
+            "kind": "update",
+            "path": "/workspace/frontend/src/stores/taskEvents.ts"
+          }
+        ],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 23,
+        "source_pointer": "/events/22",
+        "end_ordinal": 24,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c 'cat frontend/src/api/authToken.ts && cat frontend/src/utils/errorMessage.ts && cat frontend/src/api/http.ts'",
+        "status": "completed",
+        "exit_code": 0,
+        "file_events": [],
+        "command_path_mentions": [
+          "frontend/src/api/authToken.ts",
+          "frontend/src/api/http.ts",
+          "frontend/src/utils/errorMessage.ts"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 25,
+        "source_pointer": "/events/24",
+        "end_ordinal": 26,
+        "tool": "file_change",
+        "command": null,
+        "status": "completed",
+        "exit_code": null,
+        "file_events": [
+          {
+            "kind": "add",
+            "path": "/workspace/frontend/src/stores/taskEvents.recovery.test.ts"
+          }
+        ],
+        "command_path_mentions": [],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      },
+      {
+        "start_ordinal": 27,
+        "source_pointer": "/events/26",
+        "end_ordinal": 30,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c 'python tools/frontend_check.py'",
+        "status": "completed",
+        "exit_code": 0,
+        "file_events": [],
+        "command_path_mentions": [
+          "tools/frontend_check.py"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": true
+      },
+      {
+        "start_ordinal": 28,
+        "source_pointer": "/events/27",
+        "end_ordinal": 29,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c 'cat frontend/src/stores/taskEvents.ts'",
+        "status": "completed",
+        "exit_code": 0,
+        "file_events": [],
+        "command_path_mentions": [
+          "frontend/src/stores/taskEvents.ts"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": false
+      }
+    ],
+    "tool_count": 13,
+    "last_tool_ordinal": 30,
+    "thinking_metadata_events": 0,
+    "trailing_thinking_metadata_events": 0,
+    "thinking_metadata_is_token_usage": false,
+    "per_event_duration": null,
+    "timestamps_available": false,
+    "coverage_label": "FULL_STREAM",
+    "coverage_label_proves_native_completion": false,
+    "native_digest": "sha256:6a401a9c0a7f68220e92f8f55963f6d6b6bc62ddbaa30243a841f06eaac2c2c9",
+    "normalized_digest": "sha256:087cfabfeb63a806accd0df1d5bb8225cb69440cde050b62a22ed1ddb679de5d"
+  },
+  "file_access": {
+    "explicit_read_events": [],
+    "explicit_edit_events": [
+      {
+        "ordinal": 21,
+        "kind": "update",
+        "path": "/workspace/frontend/src/stores/taskEvents.ts"
+      },
+      {
+        "ordinal": 25,
+        "kind": "add",
+        "path": "/workspace/frontend/src/stores/taskEvents.recovery.test.ts"
+      }
+    ],
+    "command_path_mentions": [
+      "TASK_CONTRACT.json",
+      "frontend/package.json",
+      "frontend/src/api/authToken.ts",
+      "frontend/src/api/http.ts",
+      "frontend/src/api/taskEvents.ts",
+      "frontend/src/stores/auth.ts",
+      "frontend/src/stores/taskEvents.test.ts",
+      "frontend/src/stores/taskEvents.ts",
+      "frontend/src/types/task.ts",
+      "frontend/src/utils/errorMessage.ts",
+      "frontend/src/views/TaskDetailView.vue",
+      "frontend/tsconfig.app.json",
+      "frontend/vite.config.ts",
+      "tools/frontend_check.py"
+    ],
+    "shell_access_coverage": "UNKNOWN; mentions can include commands not reached"
+  },
+  "changed_files": [
+    {
+      "path": "frontend/src/stores/taskEvents.recovery.test.ts",
+      "status": "added",
+      "before_digest": null,
+      "after_digest": "sha256:6592f88bad2a0c7f4c0b5a7c2d7117b503efc231c2c9614df7ce643ef9bf2bd8"
+    },
+    {
+      "path": "frontend/src/stores/taskEvents.ts",
+      "status": "modified",
+      "before_digest": "sha256:38906c128055c958ebe0ff9dbf5392026f5bbd2ddb4727ace308dfc5d43e402e",
+      "after_digest": "sha256:2621fcbe376ab6eca52d4b229c034bb405f35634c3880c613ef65125945c800a"
+    }
+  ],
+  "validation": {
+    "subject_commands": [
+      {
+        "start_ordinal": 27,
+        "source_pointer": "/events/26",
+        "end_ordinal": 30,
+        "tool": "command_execution",
+        "command": "/usr/bin/bash -c 'python tools/frontend_check.py'",
+        "status": "completed",
+        "exit_code": 0,
+        "file_events": [],
+        "command_path_mentions": [
+          "tools/frontend_check.py"
+        ],
+        "path_mentions_are_access_proof": false,
+        "linkage": "item_id",
+        "validation_command_observed": true
+      }
+    ],
+    "independent_verifier": {
+      "state": "verified_pass",
+      "task_success": true,
+      "checks": 20,
+      "passed_checks": 20,
+      "report_digest": "sha256:f895a51ce7b8d17d48b366686ef3fae9924c49d9bfe6472dcc72a1a236947813"
+    }
+  },
+  "duration_usage": {
+    "subject_ms": 193000,
+    "end_to_end_ms": 220490,
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 25216,
+      "input_tokens": 188342,
+      "output_tokens": 5230,
+      "reasoning_output_tokens": 714
+    },
+    "cost_usd": null,
+    "provider_request_count": null,
+    "budget_compliance": {
+      "declared_output_tokens": 6000,
+      "observed_output_tokens": 5230,
+      "status": "WITHIN_DECLARED_BUDGET",
+      "excess_tokens": 0,
+      "session_hard_cap_enforced": false,
+      "stops_campaign_alone": false,
+      "changes_task_success": false
+    }
+  },
+  "completion_failure": {
+    "native_terminal": "turn.completed",
+    "process_exit_code": 0,
+    "timed_out": false,
+    "failure_taxonomy": null,
+    "stop_reasons": [],
+    "timeout_root_cause": null
+  },
+  "controls": {
+    "secret_audit": "PASS",
+    "original_cleanup": "PASS",
+    "post_stop_cleanup": null
+  },
+  "integrity": {
+    "files_verified": 306,
+    "native_normalized_consistent": true,
+    "workspace_diff_reconstructed": true,
+    "verifier_rerun": false
+  },
+  "external_calls": 0
+}

@@ -1,0 +1,9 @@
+{
+  ".github/workflows/offline-regression.yml": "sha256:4c26257c320abaa4e7d4b45cda0821c4c5faad2ea09a312a324fd0fc6cad20df",
+  "scripts/ci_s3.sh": "sha256:ab745322bb6a1671f4c56ca3df86d99ae228b8ad82f1f0e1bac39117b470c50f",
+  "scripts/replay_s2.py": "sha256:3f9e460d27a063c14a1695d3acfbe0be2d205eb0f83d719454505d2e41651504",
+  "scripts/verify_s3_regression.py": "sha256:3b36a4ac1ab3fdd26e8fce6d4db97b4830b1a6c6e2b22f8d8aa80efa66f1bb30",
+  "src/harnesslab/analyst/offline_replay.py": "sha256:5ec9cf68fc3cf8a905fda383b473ea96db9325660f93c9ef878069b9c43659d9",
+  "tests/test_s2_offline_replay.py": "sha256:50638d75f702657389fae3393da05786f271f58ea549e4d67edab71bd1e6d888",
+  "tests/test_s3_ci_regression.py": "sha256:8c05835d12e5062e7b41f2313248b25c73dc71620ddd301aa35d4c1a5abf33fa"
+}

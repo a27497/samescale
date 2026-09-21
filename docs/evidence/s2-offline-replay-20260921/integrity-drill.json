@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "case": "missing_native",
+      "result": "FAIL_CLOSED",
+      "reason": "bundle inventory mismatch",
+      "success_artifact_released": false
+    },
+    {
+      "case": "tampered_workspace",
+      "result": "FAIL_CLOSED",
+      "reason": "evidence digest mismatch",
+      "success_artifact_released": false
+    },
+    {
+      "case": "contradictory_success_with_new_outer_digest",
+      "result": "FAIL_CLOSED",
+      "reason": "task success contradiction",
+      "success_artifact_released": false
+    }
+  ],
+  "originals_modified": false,
+  "temporary_copies_removed": true,
+  "external_calls": 0
+}

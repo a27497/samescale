@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "external_calls": 0,
+  "provider_calls": 0,
+  "model_calls": 0,
+  "claude_calls": 0,
+  "judge_calls": 0,
+  "guard": "CPython audit hook denies socket and process operations",
+  "subject_executed": false,
+  "verifier_executed": false
+}
