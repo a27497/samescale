@@ -1,5 +1,36 @@
 # SameScale Product — Current Milestone
 
+## L1 A Candidate evidence closeout — 2026-09-21
+
+**L1 remains INCOMPLETE; comparison INCONCLUSIVE.** The only authorized `A/candidate/1`
+attempt on `lecturelens-embedded-subtitle-language-metadata@1.0.1` is **NOT_VERIFIED / STOPPED**.
+Subject timeout was **600 seconds**; recorded duration **601.037 seconds**. Verifier did not run;
+five modified files were saved; token usage is **UNKNOWN**. Request ID and HTTP status were not
+recorded. The 6000-token output declaration had no session hard cap. Model, relay and Provider
+root cause remain **NOT_ESTABLISHED**.
+
+[Original attempt evidence](docs/evidence/l1-a-candidate-real-20260921/README.md) and
+[portable closeout supplement](docs/evidence/l1-a-candidate-closeout-20260921/README.md) retain
+separate identities and the original NOT_VERIFIED Episode. Authorization
+`3ce7b6074a1e4a5396ade94519c44824` and execution `a4869bcecb1148debd84bed5f7259d20` are
+**consumed**; no retry, resume, Judge or new real attempt is authorized. Three prior rounds are
+preserved; no Episode is overwritten or spliced. Subject/proxy and execution-network cleanup passed.
+
+This closeout commits only this attempt's stable evidence, explanatory material and this L1
+status hunk. Other accumulated work remains unstaged. Evidence/diagnostic quick checks: **21 passed**;
+snapshot checks are recorded in the supplement. Push and CI are limited to the current feature
+branch `codex/l-real-agent-main-integration`; verify CI against the pushed HEAD separately.
+No merge to main or deployment is authorized.
+
+**Next smallest L1 task (not started):** read-only offline review of this attempt's existing trace
+and five-file output to identify the last completed work and remaining verification gap, without
+modifying the frozen task/Setup or launching another Subject, verifier or Judge. It must retain
+NOT_VERIFIED and cannot infer upstream root cause. Any subsequent execution needs separate scope
+and fresh authorization. Stop after this evidence commit, push and exact-HEAD CI check.
+
+<details>
+<summary>Historical S1.5 handoff — retained from the prior commit, not current state or authorization</summary>
+
 Updated: 2026-09-09. Milestone: **S1.5 — mainline integration and SameScale canonical identity**.
 State: **ACCEPTED — main integration and canonical identity verified; S2 NOT_STARTED**.
 S1 implementation, local tests and Browser QA remain accepted at
@@ -175,3 +206,5 @@ New live Real execution, full A–K/release acceptance, clean-clone reproduction
 non-Chromium testing are **NOT_RUN** in S1. Original real-session restoration and human ownership
 remain **NOT_VERIFIED**; historical runtime/security debts remain separate scopes. This product
 refactor makes no new causal, model-ranking, reasoning-effort, or automatic-repair claim.
+
+</details>

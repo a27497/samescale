@@ -1,0 +1,31 @@
+{
+  "isolated_snapshot": {
+    "candidate_tree_before_validation_record": "145d74973677313b45aa37f02a8ab22e4ab2e6c7",
+    "external_artifact_reads": 0,
+    "source": "git write-tree then git archive; imports restricted to extracted src"
+  },
+  "kind": "OFFLINE_EVIDENCE_CLOSEOUT_VALIDATION",
+  "preparation_correction": "Offline checker initially used a nonexistent NormalizedTrace.digest property; corrected to SHA-256 of canonical_json and reran successfully. No evidence bytes changed.",
+  "real_execution_authorized": false,
+  "root_cause": "NOT_ESTABLISHED",
+  "snapshot_checks": {
+    "consumption_bindings": "PASS",
+    "diagnostic_unknowns": "PRESERVED",
+    "document_file_links": "PASS",
+    "external_artifact_reads": 0,
+    "identity_bindings": "PASS",
+    "judge_calls": 0,
+    "model_calls": 0,
+    "original_evidence_files": 11,
+    "provider_calls": 0,
+    "saved_files": 5,
+    "status": "PASS",
+    "timeout_contract": "PASS",
+    "verifier_runs": 0
+  },
+  "workspace_quick_tests": {
+    "command": ".venv/bin/python -m pytest -q tests/test_l1_development_evidence.py tests/test_lecturelens_development_diagnostics.py tests/test_codex_harness.py::test_codex_structured_transport_diagnostics_are_preserved",
+    "result": "21 passed",
+    "scope": "Existing workspace tests include uncommitted diagnostic/report helpers; these helpers are not included in this evidence commit."
+  }
+}

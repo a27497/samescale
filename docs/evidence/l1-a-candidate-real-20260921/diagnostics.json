@@ -1,0 +1,28 @@
+{
+  "attempt_id": "a4869bcecb1148debd84bed5f7259d20",
+  "automatic_retry_authorized": false,
+  "cancelled": false,
+  "completed_commands": 20,
+  "error_events": [],
+  "last_completed_command": {
+    "command": "/usr/bin/bash -c 'ls -ld frontend/node_modules; find frontend/node_modules -maxdepth 1 -mindepth 1 | head'",
+    "exit_code": 0,
+    "ordinal": 55
+  },
+  "output_budget": {
+    "declared": 6000,
+    "observed": null,
+    "session_hard_cap_enforced": false,
+    "status": "UNKNOWN"
+  },
+  "process_exit_code": null,
+  "reported_condition": "UNCLASSIFIED_RECORDED_FAILURE",
+  "reported_http_statuses": [],
+  "request_ids": [],
+  "retry_events": [],
+  "root_cause": "NOT_ESTABLISHED",
+  "saved_changed_files": 5,
+  "structured_transport_diagnostics": false,
+  "timed_out": true,
+  "verifier_manifest_present": false
+}

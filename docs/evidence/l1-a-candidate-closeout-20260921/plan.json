@@ -1,0 +1,142 @@
+{
+  "argv_overrides": [
+    "-c",
+    "model_providers.harnesslab_responses_relay.request_max_retries=0",
+    "-c",
+    "model_providers.harnesslab_responses_relay.stream_max_retries=0"
+  ],
+  "automatic_recovery": false,
+  "candidate_freeze_identity": "sha256:2d01a22db1d61b1f0d73b58498ed7fa2ee19e682617787cbcec4a5fbe8c5f9f2",
+  "claims": "Development observations only; no generalization or stability claim",
+  "comparison_decision": "INCONCLUSIVE",
+  "connection_revision": null,
+  "container_resources": {
+    "cpus": "2",
+    "memory": "2g",
+    "pids": "256",
+    "tmpfs": "768m"
+  },
+  "credential_status": "NOT_CHECKED",
+  "execution_authorized": false,
+  "intake_digest": "sha256:c4e333262a91830509dfbebb1c8b97b1bd1ee0b8dcaa054f0c85c727cff0e9fc",
+  "kind": "LECTURELENS_AB_DEVELOPMENT_COMPARISON",
+  "monetary_policy": "USER_UNLIMITED_PREFERENCE_NOT_AUTHORIZATION",
+  "namespace": "CUSTOM",
+  "only_treatment": "prompt_addendum",
+  "plan_identity": "sha256:3957137f54e670d971b8e1b0f8a9e3bb500c6306ccc6fa2b31d05e7ba7168d01",
+  "profile": {
+    "ambient_user_config_isolated": true,
+    "approval_policy": "never",
+    "attempt_count": 1,
+    "built_in_behavior_profile": "codex-cli-0.153.4-built-ins;request_max_retries=0;stream_max_retries=0",
+    "codex_cli_version": "0.153.4",
+    "codex_image": {
+      "image_id": "sha256:88c5544438f5942f7b3d17263816ac01f1479fb8d0ae7e9dd640fbe8ef51f11b",
+      "reference": "sha256:88c5544438f5942f7b3d17263816ac01f1479fb8d0ae7e9dd640fbe8ef51f11b",
+      "repo_digests": []
+    },
+    "codex_inner_filesystem_policy": "unrestricted",
+    "codex_inner_network_enforcement": "seccomp",
+    "codex_inner_network_policy": "deny",
+    "codex_permission_profile": "harnesslab-outer-sandbox",
+    "effective_filesystem_policy": "workspace-write",
+    "ephemeral": true,
+    "execution_timeout_seconds": 600.0,
+    "external_skill_plugin_profile": "none",
+    "filesystem_enforcement": "outer-docker",
+    "harness": "codex",
+    "ignore_rules": true,
+    "ignore_user_config": false,
+    "mcp_profile": "none",
+    "model_provider_id": "harnesslab_responses_relay",
+    "provider_base_url_reference": "HARNESSLAB_CODEX_RELAY_BASE_URL",
+    "provider_config_digest": "sha256:181aefc2e1bc9cc394f94f17362aa33ebdb2488c0568b2f7177701223eb1d7b1",
+    "provider_credential_reference": "HARNESSLAB_CODEX_RELAY_API_KEY",
+    "provider_provenance": "TRUSTED_THIRD_PARTY_RELAY",
+    "provider_route": "custom-relay|responses|env:HARNESSLAB_CODEX_RELAY_BASE_URL/responses",
+    "provider_supports_websockets": false,
+    "provider_wire_api": "responses",
+    "reasoning_effort": "high",
+    "requested_model": "gpt-6-astra",
+    "schema_version": 1,
+    "shell_tool_environment_policy": "inherit=core;ignore_default_excludes=false;exclude=*KEY*,*SECRET*,*TOKEN*,*PASSWORD*;allow_login_shell=false",
+    "subject_toolchain_profile": "python3.12.11+temurin21-jdk+node24-bookworm;lecturelens-frontend-lock-84eed60a;offline-deps-v1",
+    "tool_network_policy": "deny",
+    "web_search_policy": "disabled"
+  },
+  "profile_change_from_t1": "Same CLI/model/permissions; task offline dependency image",
+  "profile_identity": "sha256:8a94f1a41844103f3b024d9160ec8d06d5848247dab203ca54b91b722befa9e2",
+  "ready_to_execute": false,
+  "real_model_runs": 0,
+  "remaining_execution_requirements": [
+    "BIND_CONNECTION_REVISION",
+    "FRESH_FOUR_SLOT_AUTHORIZATION",
+    "ACCEPT_NO_SESSION_TOKEN_HARD_CAP"
+  ],
+  "resource_budget": {
+    "max_output_tokens": 6000,
+    "network_policy": "deny",
+    "timeout_seconds": 600
+  },
+  "run_order": [
+    "A/current/1",
+    "A/candidate/1",
+    "B/candidate/1",
+    "B/current/1"
+  ],
+  "session_output_token_cap_enforced": false,
+  "subject_tmpfs_noexec": false,
+  "tasks": {
+    "A": {
+      "exposure_state": "UNKNOWN",
+      "holdout_eligible": false,
+      "intended_use": "DEVELOPMENT",
+      "oracle_digest": "sha256:1e5bbec58d8f5539e70d7643971f0e685765ad60a687dc63c534ce4bd2db4ff6",
+      "task_digest": "sha256:86e44d00176c61c704e12d0c03fc3bfd4c9d349edc97a93ba6e073b6404ad031",
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "task_version": "1.0.1",
+      "variants": {
+        "candidate": {
+          "profile_identity": "sha256:8a94f1a41844103f3b024d9160ec8d06d5848247dab203ca54b91b722befa9e2",
+          "prompt_identity": "sha256:f112eb875131079859f0cbc78a4d3c7d12e9e4b3d744c0ca268cca1835f923dd",
+          "prompt_text": "You are executing one HarnessLab coding task inside the Codex H-Lane.\n\nTask instruction:\n# 原字幕语言元数据\n\n修复下列用户可观察行为，保留现有功能。完整边界见 TASK_CONTRACT.json。\n\n- A1: 语言来源为当前字幕探测响应 selectedStreamIndex 对应轨道的 language；不能用 tracks 数组位置、课程目标翻译语言、界面语言或浏览器语言替代。\n- A2: 已下载且当前有效的字幕轨道必须带有表示该字幕语言的非空 BCP47 srclang。英语 en/eng 表示英语；中文 zh/zho/chi 表示中文，不凭空推断地区或简繁。已有明确地区/文字的合法标签（如 en-US、zh-Hant）不得丢失其语义。对标签大小写等价形式不作额外限制。\n- A3: 有可用字幕但 language 缺失、null、空白、明确未知（und、unknown、auto）或在公开必验域中明显语法无效时，语言为 und；字幕内容仍可播放，不因为缺少语言信息丢弃字幕。不把未知语言默认成中文或英语，不借助网络/模型猜测。\n- A4: 其他由输入保证有效的 BCP47 标签保持语言语义；不要求增加完整 ISO 639 别名目录、离线完整语言注册表校验或实时语言注册表查询，也不要求浏览器完整语言名称翻译。验收不得把未公开别名表、特殊方言推断或良构但未注册标签分类加入必需条件。\n- A5: 无可选流、选中流在本次 tracks 中不存在、状态为 NOT_FOUND/UNSUPPORTED、尚未成功取得当前字幕内容或加载失败时，不显示一个伪造/旧字幕轨道。缺少语言与缺少可播放字幕分别处理。\n- A6: 切换课程/上传资源、开始刷新或发生失败后，旧字幕内容与语言不得冒充当前已加载字幕；旧请求的晚到结果不覆盖新资源。新请求成功后，内容与语言必须来自同一次有效选择。\n- A7: 上传预览与课程详情采用同一语言与未知值语义；上传页不是可省略的兼容性抽查。保留既有播放、字幕文字、刷新和错误提示能力，不改后端探测选择策略、不重处理媒体。\n\n允许修改：\n- frontend/src/views/TaskDetailView.vue\n- frontend/src/components/task-detail/CourseVideoAside.vue\n- frontend/src/components/VideoPlaybackCard.vue\n- frontend/src/views/UploadView.vue\n\n允许必要新增：frontend/src/utils/subtitleLanguage.ts；可在 frontend/src 下新增 *.test.ts 公开测试。\n其余已有文件均保护；不得改依赖、锁文件、现有测试、构建配置或后端。\n原始完整前端上下文已提供；不需要后端、媒体文件、数据库或模型服务。\n\n离线公开检查（在指定镜像内、工作区根目录执行）：\n```sh\npython tools/frontend_check.py\n```\n此命令在临时副本调用原有 npm run test:unit、npm run type-check、npm run build；测试串行限流。依赖来自固定镜像 /opt/ll-deps，检查后不污染提交目录。\n需要本地预览时，在可丢弃副本将镜像依赖链接到 frontend/node_modules 后运行 npm run dev -- --host 0.0.0.0。本任务不要求连接真实后端。\n\n预算：600 秒；声明 6000 output tokens；工具网络 deny。此 token 值不是会话硬上限的实施证明。\n不得访问 verifier、oracle、资格记录或另一尝试；只提交源代码修改。\n\nWorking directory: /workspace\nNo subject-visible context is provided.\nModify only files inside /workspace.\nSubject tool network policy: deny.\nDo not attempt network access when the policy is deny.\nHarnessLab Hidden Verifier is authoritative; your own success report is not.\nNo verifier or oracle details are available to you.\n\nAdditional coding instructions:\n环境探索时先确认当前工作区是否为 Git 仓库，再使用依赖 Git 的命令；源码快照可能没有 .git。\n文件与规则搜索限定在 /workspace 内，不向父目录或容器根目录扩展。\n区分搜索无匹配与命令执行错误：rg 退出 1 表示无匹配，退出 2 表示错误。\n彼此独立的环境检查分别执行，避免前一项无匹配或失败通过 && 短路后续必要检查。",
+          "setup_identity": "sha256:8ab2ef3242f59cddc8812a446d460576b57894dcb0b7f0ae88cb42e10ce2b698"
+        },
+        "current": {
+          "profile_identity": "sha256:8a94f1a41844103f3b024d9160ec8d06d5848247dab203ca54b91b722befa9e2",
+          "prompt_identity": "sha256:3218bb18141b0958da498cf4dac8860ce0abe7dc56fa511c30639ae100e0baa3",
+          "prompt_text": "You are executing one HarnessLab coding task inside the Codex H-Lane.\n\nTask instruction:\n# 原字幕语言元数据\n\n修复下列用户可观察行为，保留现有功能。完整边界见 TASK_CONTRACT.json。\n\n- A1: 语言来源为当前字幕探测响应 selectedStreamIndex 对应轨道的 language；不能用 tracks 数组位置、课程目标翻译语言、界面语言或浏览器语言替代。\n- A2: 已下载且当前有效的字幕轨道必须带有表示该字幕语言的非空 BCP47 srclang。英语 en/eng 表示英语；中文 zh/zho/chi 表示中文，不凭空推断地区或简繁。已有明确地区/文字的合法标签（如 en-US、zh-Hant）不得丢失其语义。对标签大小写等价形式不作额外限制。\n- A3: 有可用字幕但 language 缺失、null、空白、明确未知（und、unknown、auto）或在公开必验域中明显语法无效时，语言为 und；字幕内容仍可播放，不因为缺少语言信息丢弃字幕。不把未知语言默认成中文或英语，不借助网络/模型猜测。\n- A4: 其他由输入保证有效的 BCP47 标签保持语言语义；不要求增加完整 ISO 639 别名目录、离线完整语言注册表校验或实时语言注册表查询，也不要求浏览器完整语言名称翻译。验收不得把未公开别名表、特殊方言推断或良构但未注册标签分类加入必需条件。\n- A5: 无可选流、选中流在本次 tracks 中不存在、状态为 NOT_FOUND/UNSUPPORTED、尚未成功取得当前字幕内容或加载失败时，不显示一个伪造/旧字幕轨道。缺少语言与缺少可播放字幕分别处理。\n- A6: 切换课程/上传资源、开始刷新或发生失败后，旧字幕内容与语言不得冒充当前已加载字幕；旧请求的晚到结果不覆盖新资源。新请求成功后，内容与语言必须来自同一次有效选择。\n- A7: 上传预览与课程详情采用同一语言与未知值语义；上传页不是可省略的兼容性抽查。保留既有播放、字幕文字、刷新和错误提示能力，不改后端探测选择策略、不重处理媒体。\n\n允许修改：\n- frontend/src/views/TaskDetailView.vue\n- frontend/src/components/task-detail/CourseVideoAside.vue\n- frontend/src/components/VideoPlaybackCard.vue\n- frontend/src/views/UploadView.vue\n\n允许必要新增：frontend/src/utils/subtitleLanguage.ts；可在 frontend/src 下新增 *.test.ts 公开测试。\n其余已有文件均保护；不得改依赖、锁文件、现有测试、构建配置或后端。\n原始完整前端上下文已提供；不需要后端、媒体文件、数据库或模型服务。\n\n离线公开检查（在指定镜像内、工作区根目录执行）：\n```sh\npython tools/frontend_check.py\n```\n此命令在临时副本调用原有 npm run test:unit、npm run type-check、npm run build；测试串行限流。依赖来自固定镜像 /opt/ll-deps，检查后不污染提交目录。\n需要本地预览时，在可丢弃副本将镜像依赖链接到 frontend/node_modules 后运行 npm run dev -- --host 0.0.0.0。本任务不要求连接真实后端。\n\n预算：600 秒；声明 6000 output tokens；工具网络 deny。此 token 值不是会话硬上限的实施证明。\n不得访问 verifier、oracle、资格记录或另一尝试；只提交源代码修改。\n\nWorking directory: /workspace\nNo subject-visible context is provided.\nModify only files inside /workspace.\nSubject tool network policy: deny.\nDo not attempt network access when the policy is deny.\nHarnessLab Hidden Verifier is authoritative; your own success report is not.\nNo verifier or oracle details are available to you.",
+          "setup_identity": "sha256:601265580750f70728139d663febfa9701cfbdf27dbe51196b16069dc1c62d2f"
+        }
+      },
+      "verifier_digest": "sha256:9d010944ef0e1a74783fbcee11495edb7c5935002d48c7f4aaa33c8d3f853ce8",
+      "workspace_digest": "sha256:1870160e291f022b67ae2334f5dc265348b3e6f54131d1045dad01d91b68bb15"
+    },
+    "B": {
+      "exposure_state": "UNKNOWN",
+      "holdout_eligible": false,
+      "intended_use": "DEVELOPMENT",
+      "oracle_digest": "sha256:44e8033383d28815e58844b50ab9fb02d30bbd0ad695b58ee52db4edfa8789f8",
+      "task_digest": "sha256:1cc953b6302ffd16d71dfdec294461256c82da58781a9f988867ea1d20532b39",
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "task_version": "1.0.0",
+      "variants": {
+        "candidate": {
+          "profile_identity": "sha256:8a94f1a41844103f3b024d9160ec8d06d5848247dab203ca54b91b722befa9e2",
+          "prompt_identity": "sha256:4ba01f6b1f0baaa806055c53070f660ae918c8abb9ded2baf7282bf41804a6e0",
+          "prompt_text": "You are executing one HarnessLab coding task inside the Codex H-Lane.\n\nTask instruction:\n# 分析任务浏览器 SSE 中断恢复\n\n修复下列用户可观察行为，保留现有功能。完整边界见 TASK_CONTRACT.json。\n\n- B1: 当前分析任务非终态时，暂时的传输失败或事件流提前结束后，无需手动刷新即可再次尝试订阅，最近一次已知进度保持可见。\n- B2: 恢复尝试之间有正的等待间隔且等待有有限上限；同一当前任务不叠加多个并行恢复活动，不因重复失败形成忙循环。不指定具体退避算法或固定毫秒序列。每次未终止的尝试失败后仍应能继续恢复；该行为不承诺永久网络故障下最终成功。\n- B3: 任务进入 SUCCEEDED/FAILED/CANCELED、认证失效、主动断开、切换任务或页面退出后，旧连接不得再自行重连。后续用户显式选择新任务或重新登录后的新订阅仍可正常开始。\n- B4: 旧请求/旧连接的晚到消息、结束或失败回调，不得覆盖新任务、新连接状态，或使已终止的连接重新恢复；同一任务已知终态不得被旧非终态事件回退。\n- B5: 保持现有授权错误及人工操作反馈；不改变服务端 analysis task 的执行、恢复、结果、数据库状态或权限。此任务不实现 Python Study Session/Run 的 checkpoint。\n\n允许修改：\n- frontend/src/stores/taskEvents.ts\n\n允许必要新增：本题不要求新增生产文件；可在 frontend/src 下新增 *.test.ts 公开测试。\n其余已有文件均保护；不得改依赖、锁文件、现有测试、构建配置或后端。\n原始完整前端上下文已提供；不需要后端、媒体文件、数据库或模型服务。\n\n离线公开检查（在指定镜像内、工作区根目录执行）：\n```sh\npython tools/frontend_check.py\n```\n此命令在临时副本调用原有 npm run test:unit、npm run type-check、npm run build；测试串行限流。依赖来自固定镜像 /opt/ll-deps，检查后不污染提交目录。\n需要本地预览时，在可丢弃副本将镜像依赖链接到 frontend/node_modules 后运行 npm run dev -- --host 0.0.0.0。本任务不要求连接真实后端。\n\n预算：600 秒；声明 6000 output tokens；工具网络 deny。此 token 值不是会话硬上限的实施证明。\n不得访问 verifier、oracle、资格记录或另一尝试；只提交源代码修改。\n\nWorking directory: /workspace\nNo subject-visible context is provided.\nModify only files inside /workspace.\nSubject tool network policy: deny.\nDo not attempt network access when the policy is deny.\nHarnessLab Hidden Verifier is authoritative; your own success report is not.\nNo verifier or oracle details are available to you.\n\nAdditional coding instructions:\n环境探索时先确认当前工作区是否为 Git 仓库，再使用依赖 Git 的命令；源码快照可能没有 .git。\n文件与规则搜索限定在 /workspace 内，不向父目录或容器根目录扩展。\n区分搜索无匹配与命令执行错误：rg 退出 1 表示无匹配，退出 2 表示错误。\n彼此独立的环境检查分别执行，避免前一项无匹配或失败通过 && 短路后续必要检查。",
+          "setup_identity": "sha256:382854d582aded32b14e244b4a7d70de741096faf3eabb6886600c1bc6a2cd46"
+        },
+        "current": {
+          "profile_identity": "sha256:8a94f1a41844103f3b024d9160ec8d06d5848247dab203ca54b91b722befa9e2",
+          "prompt_identity": "sha256:d4233983321a0af25c8879f417900a43b6d083004ffab6344c685f8bd90fa655",
+          "prompt_text": "You are executing one HarnessLab coding task inside the Codex H-Lane.\n\nTask instruction:\n# 分析任务浏览器 SSE 中断恢复\n\n修复下列用户可观察行为，保留现有功能。完整边界见 TASK_CONTRACT.json。\n\n- B1: 当前分析任务非终态时，暂时的传输失败或事件流提前结束后，无需手动刷新即可再次尝试订阅，最近一次已知进度保持可见。\n- B2: 恢复尝试之间有正的等待间隔且等待有有限上限；同一当前任务不叠加多个并行恢复活动，不因重复失败形成忙循环。不指定具体退避算法或固定毫秒序列。每次未终止的尝试失败后仍应能继续恢复；该行为不承诺永久网络故障下最终成功。\n- B3: 任务进入 SUCCEEDED/FAILED/CANCELED、认证失效、主动断开、切换任务或页面退出后，旧连接不得再自行重连。后续用户显式选择新任务或重新登录后的新订阅仍可正常开始。\n- B4: 旧请求/旧连接的晚到消息、结束或失败回调，不得覆盖新任务、新连接状态，或使已终止的连接重新恢复；同一任务已知终态不得被旧非终态事件回退。\n- B5: 保持现有授权错误及人工操作反馈；不改变服务端 analysis task 的执行、恢复、结果、数据库状态或权限。此任务不实现 Python Study Session/Run 的 checkpoint。\n\n允许修改：\n- frontend/src/stores/taskEvents.ts\n\n允许必要新增：本题不要求新增生产文件；可在 frontend/src 下新增 *.test.ts 公开测试。\n其余已有文件均保护；不得改依赖、锁文件、现有测试、构建配置或后端。\n原始完整前端上下文已提供；不需要后端、媒体文件、数据库或模型服务。\n\n离线公开检查（在指定镜像内、工作区根目录执行）：\n```sh\npython tools/frontend_check.py\n```\n此命令在临时副本调用原有 npm run test:unit、npm run type-check、npm run build；测试串行限流。依赖来自固定镜像 /opt/ll-deps，检查后不污染提交目录。\n需要本地预览时，在可丢弃副本将镜像依赖链接到 frontend/node_modules 后运行 npm run dev -- --host 0.0.0.0。本任务不要求连接真实后端。\n\n预算：600 秒；声明 6000 output tokens；工具网络 deny。此 token 值不是会话硬上限的实施证明。\n不得访问 verifier、oracle、资格记录或另一尝试；只提交源代码修改。\n\nWorking directory: /workspace\nNo subject-visible context is provided.\nModify only files inside /workspace.\nSubject tool network policy: deny.\nDo not attempt network access when the policy is deny.\nHarnessLab Hidden Verifier is authoritative; your own success report is not.\nNo verifier or oracle details are available to you.",
+          "setup_identity": "sha256:0876ea2d5054852aff59cc936949857b6023e2484c4c25e97e43b4195edb93b9"
+        }
+      },
+      "verifier_digest": "sha256:bcfc107dafda32731693975ddc8ee21c96c952decb5e660ec3cc3ee71f4154d9",
+      "workspace_digest": "sha256:04e7fdf0ea00dc87b63777ed2fb851e33aa2f6cc2e109424ee52622fde6d53d0"
+    }
+  },
+  "verifier_tmpfs_noexec": true
+}
