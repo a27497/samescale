@@ -27,16 +27,27 @@ jobs:
         run: uv sync --locked
       - name: Offline replay and trace regression
         run: bash scripts/ci_s3.sh "$RUNNER_TEMP/s3-regression"
-      - name: Retain regression evidence
+      - name: Record regression evidence in Actions log and summary
         if: ${{ always() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: s3-regression-${{ github.sha }}
-          path: |
-            ${{ runner.temp }}/s3-regression/result.json
-            ${{ runner.temp }}/s3-regression/*.txt
-            ${{ runner.temp }}/s3-regression/pytest.xml
-            ${{ runner.temp }}/s3-regression/replay-a/
-            ${{ runner.temp }}/s3-regression/replay-b/
-          if-no-files-found: error
-          retention-days: 30
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          output = Path(os.environ["RUNNER_TEMP"]) / "s3-regression"
+          result = json.loads((output / "result.json").read_text())
+          receipt = {"head_sha": os.environ["GITHUB_SHA"], "regression": result}
+          print("S3_GITHUB_RECEIPT=" + json.dumps(receipt, sort_keys=True))
+          for name in ("pytest.txt", "pytest.xml", "replay-a.txt", "replay-b.txt"):
+              path = output / name
+              if path.exists():
+                  print(f"S3_EVIDENCE_BEGIN={name}")
+                  print(path.read_text())
+                  print(f"S3_EVIDENCE_END={name}")
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as summary:
+              summary.write("## Offline regression\n\n```json\n")
+              summary.write(json.dumps(receipt, indent=2) + "\n```\n")
+          if result["status"] != "PASS":
+              raise SystemExit(2)
+          PY

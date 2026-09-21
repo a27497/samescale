@@ -1,0 +1,9 @@
+{
+  "run_id": 35642692424,
+  "regression_step": "PASS",
+  "workflow": "FAIL",
+  "failed_step": "Retain regression evidence",
+  "reason": "Artifact storage quota has been hit. Unable to upload any new artifacts.",
+  "resolution": "Use SHA-bound Actions logs and job summary; preserve existing artifacts.",
+  "historical_artifacts_deleted": 0
+}

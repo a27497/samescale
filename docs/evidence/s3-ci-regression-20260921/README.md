@@ -13,7 +13,7 @@ bash scripts/ci_s3.sh /tmp/s3-regression-new
 ```
 
 Linux, a provisioned locked `.venv`, and passwordless `sudo`, `unshare`, `setpriv` are required.
-Dependency provisioning and GitHub checkout/artifact transport use the network outside the test
+Dependency provisioning and GitHub checkout/log transport use the network outside the test
 boundary. Regression runs in a fresh network namespace with only down loopback, no routes,
 a clean environment and temporary HOME, as the original non-root user with no-new-privileges.
 Missing isolation fails closed; there is no online fallback. The S2 replay subprocess additionally
@@ -26,7 +26,9 @@ checks the five committed S2 golden outputs, extracts only the validated archive
 CLI replays, and requires both complete output inventories to match every frozen byte digest.
 It then runs the S2 and S3 adversarial suites, requiring nonzero collection, critical test families,
 no failures/errors/skips, and a successful test process. PASS is written only after every gate.
-The workflow fails on a nonzero exit and uploads results/JUnit/replay outputs with the pushed SHA.
+The workflow fails on a nonzero exit and records a SHA-bound result, JUnit and replay receipts in its Actions log and job summary.
+The complete JSON/Markdown replay outputs are already pinned in the repository; CI records their
+verified digests. No artifact quota or artifact deletion is required.
 Frozen anchors must be reviewed explicitly for intentional contract changes; never regenerate them
 to repair a failing CI run.
 
@@ -61,3 +63,13 @@ the test now imports its parser from the defining module. Final regression inclu
 scope documents. All unrelated dirty work and historical evidence retained.
 
 S3 only. No S4, PR, main merge or deployment.
+
+The first GitHub attempt [35642692424](https://github.com/a27497/samescale/actions/runs/35642692424)
+ran the offline gate successfully ([65-test receipt](initial-github-regression-result.json)), but
+artifact storage quota rejected the upload, so the whole workflow correctly remained FAILED.
+[Failure record](artifact-quota-failure.json) and [job metadata](initial-github-run.json) are retained.
+The successor records the same evidence in Actions logs/summary, with no historical artifact deletion.
+
+Quota-independent successor: [65 local tests PASS](successor-local-pytest.txt),
+[result](successor-local-result.json), [final implementation pins](implementation-final-sha256.json),
+[summary step check](summary-step-check.json). GitHub successor acceptance pending.

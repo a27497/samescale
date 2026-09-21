@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Actual workflow summary step executed against local regression output",
+    "SHA-bound result decoded with tests_passed=65",
+    "JUnit emitted between named evidence markers",
+    "Job summary includes verified SHA"
+  ],
+  "provider_calls": 0,
+  "model_calls": 0
+}

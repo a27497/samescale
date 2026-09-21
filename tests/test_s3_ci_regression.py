@@ -141,6 +141,12 @@ def test_workflow_uses_offline_entry_without_execution_credentials() -> None:
     assert "if" not in step and "continue-on-error" not in step
     assert "secrets." not in path.read_text()
     assert not any("env" in s for s in job["steps"])
+    record = job["steps"][-1]
+    assert record["if"] == "${{ always() }}"
+    assert "S3_GITHUB_RECEIPT=" in record["run"]
+    assert 'os.environ["GITHUB_SHA"]' in record["run"]
+    assert 'result["status"] != "PASS"' in record["run"]
+    assert "continue-on-error" not in record
     launcher = (ROOT / "scripts/ci_s3.sh").read_text()
     assert "sudo -n unshare --net -- setpriv" in launcher
     assert "env -i HOME=" in launcher and "--no-new-privs" in launcher
