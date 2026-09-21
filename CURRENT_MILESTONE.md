@@ -1,14 +1,25 @@
 # SameScale Product — Current Milestone
 
-## Phase S3 — CI Regression Integration：IN PROGRESS — 2026-09-21
+## Phase S3 — CI Regression Integration：COMPLETE — 2026-09-21
 
-[Contract and evidence](docs/evidence/s3-ci-regression-20260921/README.md)。
-统一入口 `bash scripts/ci_s3.sh NEW_OUTPUT_DIRECTORY` 已在无外部网络 namespace 内通过
-独立 staged tree 的 65 tests、两次冻结输出一致性检查与全树 Ruff/format/mypy。
-实际 pushed SHA 的 GitHub CI 尚待验证，不标记 COMPLETE。
-只提交 S3 必需实现、S2 冻结输入/基线和当前 S3 文档块；其余 dirty work 与历史 evidence 保留。
-用户已授权当前 feature branch 的 scoped commit/push；禁止 PR、merge main、deploy、真实模型
-benchmark。S1 保持 PARTIAL REAL BENCHMARK / BLOCKED；完成 S3 后停止，不进入 S4。
+[Final report](docs/evidence/s3-ci-regression-20260921/README.md) 与
+[final status](docs/evidence/s3-ci-regression-20260921/final-status.json) 已产出。
+统一入口 `bash scripts/ci_s3.sh NEW_OUTPUT_DIRECTORY`：隔离网络、清空环境、临时 HOME，
+不执行 subject/命令/verifier；Provider/model/Claude/Judge 调用 **0**。
+
+- 独立 staged tree **65 tests PASS**，两次 replay 的 5 个输出逐字节匹配 S2 冻结摘要。
+  evidence/digest、replay、trace/schema/parser、changed-files attribution、failure taxonomy
+  回归均有 fail-closed 覆盖；Ruff/format/mypy PASS。
+- 实现 SHA `b2d729bc8d1c9eb793511b54a7b235a72e67cb9b` 已推送当前 feature branch；
+  [Offline CI](https://github.com/a27497/samescale/actions/runs/35643033783) 与
+  [Fast CI](https://github.com/a27497/samescale/actions/runs/35643033753) 均 **PASS**。
+  SHA-bound GitHub receipt 与本地结果完全一致，65 项 JUnit 回读通过。
+- 初次 CI 的 artifact 配额失败保留；后续改用 Actions 日志/summary，无删除历史 artifact。
+  2085 个起始文件原内容保全；仅追加 S3 文档块，其他 dirty work 未纳入 scoped commits。
+
+**S3 COMPLETE 后停止，不进入 S4；无 PR、merge main、deploy 或真实 benchmark workflow。**
+S1 保持 PARTIAL REAL BENCHMARK / BLOCKED；不支持能力排名、完整配置比较或 Harness 因果结论。
+下方为保留的历史状态，不自动启动其他阶段。
 
 ## KB4 CI compatibility repair — 2026-09-21
 

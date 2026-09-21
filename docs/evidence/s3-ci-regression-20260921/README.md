@@ -1,6 +1,20 @@
-# Phase S3 — CI Regression Integration
+# Phase S3 — CI Regression Integration：COMPLETE
 
-2026-09-21. Local exact staged-tree acceptance PASS; GitHub SHA acceptance pending.
+2026-09-21. **S3 COMPLETE.** [Final status](final-status.json).
+
+Implementation acceptance SHA: `b2d729bc8d1c9eb793511b54a7b235a72e67cb9b`, verified on
+`origin/codex/l-real-agent-main-integration`. Local **65 tests PASS**; GitHub
+[Offline Regression 35643033783](https://github.com/a27497/samescale/actions/runs/35643033783)
+and [Fast CI 35643033753](https://github.com/a27497/samescale/actions/runs/35643033753) **PASS**
+on that exact SHA. [SHA-bound GitHub receipt](github-receipt.json) equals the local receipt in full;
+[GitHub JUnit](github-pytest.xml) contains 65 passing cases. Full CI
+[metadata](github-fast-run.json) and [core summary](github-fast-summary.txt) are retained separately.
+The final report closeout changes only documentation/evidence; implementation pins remain unchanged.
+
+Provider/model/Claude/Judge calls **0**. Both independent replays reproduce all five frozen output
+files exactly. No new subject, captured shell command or verifier execution. All 2085 starting files
+retain their original content; only the two live scope documents received additive S3 blocks.
+S1 remains **PARTIAL REAL BENCHMARK / BLOCKED**. **Stop at S3; S4 not started.**
 
 ## Contract
 
@@ -72,4 +86,4 @@ The successor records the same evidence in Actions logs/summary, with no histori
 
 Quota-independent successor: [65 local tests PASS](successor-local-pytest.txt),
 [result](successor-local-result.json), [final implementation pins](implementation-final-sha256.json),
-[summary step check](summary-step-check.json). GitHub successor acceptance pending.
+[summary step check](summary-step-check.json). GitHub successor acceptance PASS; see the SHA-bound evidence above.
