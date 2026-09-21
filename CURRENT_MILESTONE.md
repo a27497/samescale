@@ -1,5 +1,23 @@
 # SameScale Product — Current Milestone
 
+## KB4 CI compatibility repair — 2026-09-21
+
+Repair base is `d46d02c249c862ccbf76cebaa90e353b4041d067`; only the two repair files and
+related Milestone hunks are included in this compatibility commit.
+Both failures from Fast CI 35563979439 were reproduced in the working tree and exported HEAD.
+Commit `23ece300` legitimately evolved `harness_lane/adapter.py`, `docker_backend.py` and `trace.py`;
+the historical-source compatibility map omitted these three paths. Each original digest matches
+the Git blob at accepted commit `b3c36154871225d8af1cf4247258b129f8698f1c`.
+The repair adds only those historical bindings to the existing map, plus three regression cases
+checking unchanged report reproduction and rejection of historical-binding tampering.
+All 185 tracked release/evidence files retain HEAD bytes; frozen results and conclusions are unchanged.
+The two failed tests and directly related KB4 regressions pass: **74 tests** in an exported HEAD
+with only the two repair files overlaid. Focused Ruff check/format and mypy pass.
+No Provider/model/Judge/real L1 execution. Remote CI has not been rerun; local results do not claim
+remote success. The user authorized this scoped commit and non-force push of the current feature
+branch, followed by exact-HEAD CI inspection. Stop after reporting CI; do not expand the repair,
+merge, deploy or launch real execution. Unrelated dirty work is preserved.
+
 ## L1 A Candidate evidence closeout — 2026-09-21
 
 **L1 remains INCOMPLETE; comparison INCONCLUSIVE.** The only authorized `A/candidate/1`
@@ -35,10 +53,9 @@ verifier NOT_RUN. Authorization/execution IDs remain consumed. No timeout root c
 A Current's historical 75/75 and this later offline 71/75 are not a completed comparable pair;
 comparison remains INCONCLUSIVE and L1 INCOMPLETE.
 
-**Stopping point:** record this diagnosis in a separate local evidence commit only; no push, PR,
-merge, deployment, Candidate repair, or new execution. The next recommended bounded task is the
-existing GitHub KB4 CI failure investigation/compatibility repair, under a separate user request;
-it is not started here and cannot change frozen evidence merely to make checks pass.
+**L1 stopping point:** diagnosis recorded in evidence commit `d46d02c`; no Candidate repair or
+new execution. The separately authorized KB4 commit/push and CI check are described above.
+No PR, merge, deployment, or frozen-evidence rewrite is authorized.
 
 <details>
 <summary>Historical S1.5 handoff — retained from the prior commit, not current state or authorization</summary>
