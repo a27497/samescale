@@ -1,14 +1,27 @@
 # SameScale Product — Current Milestone
 
-## Phase S4 — Recruiter Demo + Job-search Freeze：验收收口中 — 2026-09-21
+## 求职冻结 — Phase S4 COMPLETE / STOP — 2026-09-21
 
-[Recruiter Demo](docs/recruiter/demo/index.html)、[3–5 分钟讲解稿](docs/RECRUITER_DEMO.md) 与
-[面试/简历事实](docs/JOB_SEARCH_FREEZE.md) 已生成；[S4 report](docs/evidence/s4-job-search-freeze-20260921/README.md)。
-8 项导出/安全投影测试 PASS，桌面与手机 file:// 离线浏览器验收 PASS，HTTP 请求 0。
-独立 staged tree 的统一离线入口 **73 tests PASS**，全树 Ruff/format/mypy PASS；
-GitHub 当前 S4 SHA 尚待验收。
-Provider/model/Claude/Judge 新调用 0；S1 保持 partial/blocked，S2/S3 complete。
-完成本次 S4 验收即求职冻结并 STOP，不规划 S5、不继续新功能、不 merge main、不 deploy。
+**S1：PARTIAL REAL BENCHMARK / BLOCKED；S2 / S3 / S4：COMPLETE。**
+[Recruiter Demo](docs/recruiter/demo/index.html) · [3–5 分钟演示稿](docs/RECRUITER_DEMO.md) ·
+[面试材料与简历事实](docs/JOB_SEARCH_FREEZE.md) ·
+[S4 final report](docs/evidence/s4-job-search-freeze-20260921/README.md) ·
+[冻结清单](docs/evidence/s4-job-search-freeze-20260921/freeze-manifest.json)。
+
+- 复用 S2/S3 reader、bundle/输出摘要与 CI receipt，单文件 HTML 展示 task → configurations → result → Trace Diff → diagnosis → Offline Replay → CI。
+- 分享包仅 `docs/recruiter/demo/`；无原始命令、内部 endpoint、凭据引用、源码或私密推理。
+  桌面 1360px / 手机 390px 视口本地浏览器验收 PASS，HTTP 请求与 page errors 均 0。
+- 独立 staged tree 的统一离线 gate **73 tests PASS**（65 S2/S3 + 8 S4）；Ruff/format/mypy PASS。
+  实现 SHA `5bdc03f8addce7532fdfc053c383cb66895e3b3b` 的
+  [Offline CI](https://github.com/a27497/samescale/actions/runs/35645815474) 与
+  [Fast CI](https://github.com/a27497/samescale/actions/runs/35645815456) 均 PASS；GitHub receipt 与本地一致。
+- 新 Provider/model/Claude/Judge 调用 **0**；没有新 subject、命令或 verifier 执行。
+  历史 evidence、原始失败及无关 dirty work 保留；仅追加 S4 文档区块和既有 CI 的 S4 tests。
+- S1 仍仅 2/16 cells：Codex recorded 20/20 verified_pass，Claude timeout/NOT_VERIFIED、verifier NOT_RUN，14 NOT_RUN；无能力排名、完整 benchmark 或 Harness 因果结论。
+- 3–5 分钟是讲解预算，未做招聘者理解度实测；简历材料是项目事实，不证明未经确认的个人贡献或面试准备度。
+
+**求职版已冻结，STOP。不规划 S5，不继续开发新功能；无 PR、merge main 或 deploy。**
+以下阶段与 L1 状态仅保留为历史上下文，不自动授权后续工作。
 
 ## Phase S3 — CI Regression Integration：COMPLETE — 2026-09-21
 

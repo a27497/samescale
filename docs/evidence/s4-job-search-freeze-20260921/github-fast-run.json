@@ -1,0 +1,148 @@
+{
+  "conclusion": "success",
+  "databaseId": 35645815456,
+  "headSha": "5bdc03f8addce7532fdfc053c383cb66895e3b3b",
+  "jobs": [
+    {
+      "completedAt": "2026-09-21T19:42:34Z",
+      "conclusion": "success",
+      "databaseId": 106485884774,
+      "name": "gates",
+      "startedAt": "2026-09-21T19:36:00Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-21T19:36:03Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-21T19:36:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:36:17Z",
+          "conclusion": "success",
+          "name": "Initialize containers",
+          "number": 2,
+          "startedAt": "2026-09-21T19:36:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:36:19Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 3,
+          "startedAt": "2026-09-21T19:36:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:36:25Z",
+          "conclusion": "success",
+          "name": "Install pinned uv",
+          "number": 4,
+          "startedAt": "2026-09-21T19:36:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:36:26Z",
+          "conclusion": "success",
+          "name": "Install pinned Python",
+          "number": 5,
+          "startedAt": "2026-09-21T19:36:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:36:27Z",
+          "conclusion": "success",
+          "name": "Install Node 24",
+          "number": 6,
+          "startedAt": "2026-09-21T19:36:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:36:29Z",
+          "conclusion": "success",
+          "name": "Sync locked dependencies",
+          "number": 7,
+          "startedAt": "2026-09-21T19:36:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:36:31Z",
+          "conclusion": "success",
+          "name": "Upgrade test database",
+          "number": 8,
+          "startedAt": "2026-09-21T19:36:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:36:58Z",
+          "conclusion": "success",
+          "name": "Lint, format, type, and whitespace checks",
+          "number": 9,
+          "startedAt": "2026-09-21T19:36:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:37:26Z",
+          "conclusion": "success",
+          "name": "Check frontend contracts",
+          "number": 10,
+          "startedAt": "2026-09-21T19:36:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:42:29Z",
+          "conclusion": "success",
+          "name": "Run bounded deterministic core regressions",
+          "number": 11,
+          "startedAt": "2026-09-21T19:37:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:42:29Z",
+          "conclusion": "success",
+          "name": "Post Install Node 24",
+          "number": 19,
+          "startedAt": "2026-09-21T19:42:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:42:29Z",
+          "conclusion": "success",
+          "name": "Post Install pinned uv",
+          "number": 20,
+          "startedAt": "2026-09-21T19:42:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:42:30Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 21,
+          "startedAt": "2026-09-21T19:42:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:42:30Z",
+          "conclusion": "success",
+          "name": "Stop containers",
+          "number": 22,
+          "startedAt": "2026-09-21T19:42:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-21T19:42:30Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 23,
+          "startedAt": "2026-09-21T19:42:30Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/a27497/samescale/actions/runs/35645815456/job/106485884774"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/a27497/samescale/actions/runs/35645815456"
+}
