@@ -1,0 +1,61 @@
+   Building harnesslab-ai @ file:///home/dev/projects/samescale-phase0-candidate-20260922
+      Built harnesslab-ai @ file:///home/dev/projects/samescale-phase0-candidate-20260922
+Uninstalled 1 package in 143ms
+Installed 1 package in 122ms
+........................................................................ [ 13%]
+...............................F........................................ [ 27%]
+........................................................................ [ 41%]
+........................................................................ [ 55%]
+........................................................................ [ 69%]
+........................................................................ [ 83%]
+........................................................................ [ 97%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+_________________ test_demo_diagnostics_do_not_require_docker __________________
+
+obj = <module 'harnesslab.productization.cli' from '/home/dev/projects/samescale-phase0-candidate-20260922/src/harnesslab/productization/cli.py'>
+name = 'check_demo', ann = 'harnesslab.productization.cli'
+
+    def annotated_getattr(obj: object, name: str, ann: str) -> object:
+        try:
+>           obj = getattr(obj, name)
+                  ^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'harnesslab.productization.cli' has no attribute 'check_demo'
+
+.venv/lib/python3.12/site-packages/_pytest/monkeypatch.py:95: AttributeError
+
+The above exception was the direct cause of the following exception:
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x76e5eedf1250>
+
+    def test_demo_diagnostics_do_not_require_docker(monkeypatch: pytest.MonkeyPatch) -> None:
+        calls: list[tuple[int, bool]] = []
+    
+        def check(port: int, *, inspect_assets: bool = False) -> None:
+            calls.append((port, inspect_assets))
+    
+        monkeypatch.setattr("harnesslab.cli.check_demo", check)
+>       monkeypatch.setattr("harnesslab.productization.cli.check_demo", check)
+
+tests/test_product_demo.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.12/site-packages/_pytest/monkeypatch.py:109: in derive_importpath
+    annotated_getattr(target, attr, ann=module)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+obj = <module 'harnesslab.productization.cli' from '/home/dev/projects/samescale-phase0-candidate-20260922/src/harnesslab/productization/cli.py'>
+name = 'check_demo', ann = 'harnesslab.productization.cli'
+
+    def annotated_getattr(obj: object, name: str, ann: str) -> object:
+        try:
+            obj = getattr(obj, name)
+        except AttributeError as e:
+>           raise AttributeError(
+                f"{type(obj).__name__!r} object at {ann} has no attribute {name!r}"
+            ) from e
+E           AttributeError: 'module' object at harnesslab.productization.cli has no attribute 'check_demo'
+
+.venv/lib/python3.12/site-packages/_pytest/monkeypatch.py:97: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_product_demo.py::test_demo_diagnostics_do_not_require_docker
+1 failed, 517 passed in 349.15s (0:05:49)

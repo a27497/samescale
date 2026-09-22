@@ -1,5 +1,16 @@
 # SameScale Product — Current Milestone
 
+## Phase 0 — isolated development baseline — 2026-09-22
+
+Base `ef135bbdd49639afc28e2701d811329f3418281d` (fetched origin/main); candidate branch `codex/phase0-baseline-20260922`. [Acceptance and scope](docs/evidence/phase0-candidate-20260922/README.md) / [local receipt](docs/evidence/phase0-candidate-20260922/local-acceptance.json).
+
+- Explicit allowlist: final Product QA / Planning and Harness eligibility; required verified frontend, read-only API and Demo dependencies; passive Hook → independent verifier → VERIFIED_FAIL → frozen CUSTOM case → deterministic Offline Replay. Historical S1/L1 untracked campaigns/tests/fixtures, installer/wheel packaging and duplicate evidence are excluded.
+- **Local PASS:** frontend **17 spec / 167 tests / 0 failures / 0 unhandled errors**; Hook/Verifier/Episode **68** plus boundary **13** = **81 PASS**; unified offline **122 PASS**; mirrored bounded CI backend **518 PASS**. Ruff, format (721 files), strict mypy (382 files), build/vue-tsc PASS. No tests skipped or weakened.
+- Five candidate typing errors fixed without behavior changes. Ruff excludes only immutable `docs/evidence/**`; other maintained Python stays checked. Three fixture digests, Hook bundle/case, copied evidence and old S2/S3/S4 bytes unchanged; S2's five output digests match in both replay runs.
+- Original dirty worktree stays untouched (4,009 files and Git state checked). Candidate missing Demo dependencies were added individually after import/CLI audit; initial failures remain recorded. No unrelated source repair or history rewriting.
+- GitHub acceptance requires **both automatic workflows on the final candidate HEAD**, not historical CI: [candidate Actions](https://github.com/a27497/samescale/actions?query=branch%3Acodex%2Fphase0-baseline-20260922). Local source-digest readback binds the accepted code to the final commit; no extra evidence-only commit is needed to claim its own SHA.
+- This is a development baseline, not a new campaign or capability comparison. The seeded verification-only session establishes workspace contract failure, not a Codex capability/instruction-compliance failure. No Agent/model/Claude/Judge, Campaign, merge main or deployment; **Phase 1 is not started**.
+
 ## 求职冻结 — Phase S4 COMPLETE / STOP — 2026-09-21
 
 **S1：PARTIAL REAL BENCHMARK / BLOCKED；S2 / S3 / S4：COMPLETE。**

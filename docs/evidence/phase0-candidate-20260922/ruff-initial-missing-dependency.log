@@ -1,0 +1,98 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_local_model_configuration.py:1:1
+   |
+ 1 | / from __future__ import annotations
+ 2 | |
+ 3 | | import asyncio
+ 4 | | from collections.abc import AsyncIterator
+ 5 | | from contextlib import asynccontextmanager
+ 6 | | from pathlib import Path
+ 7 | |
+ 8 | | import pytest
+ 9 | | from httpx import ASGITransport, AsyncClient
+10 | | from sqlalchemy import func, select
+11 | | from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+12 | |
+13 | | from harnesslab.api.app import create_app
+14 | | from harnesslab.api.local_configuration import local_catalog_session
+15 | | from harnesslab.api.workbench_dependencies import workbench_session
+16 | | from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
+17 | | from harnesslab.db.models.registry import LocalModelConfigurationRecord
+18 | | from harnesslab.productization.demo import create_demo_app
+19 | | from harnesslab.registry.local_models import (
+20 | |     LocalModelConfiguration,
+21 | |     configurations,
+22 | |     effective_catalog,
+23 | | )
+24 | | from harnesslab.registry.models import CompatibilityStatus, freeze_provider_model_profile
+25 | | from harnesslab.registry.service import assess_capability, registry_catalog
+26 | | from tests.phase_g_helpers import ROOT
+27 | | from tests.test_registry_lite import (
+28 | |     alibaba_environment,
+29 | |     builder_request,
+30 | |     isolated_registry_database,
+31 | |     relay_environment,
+32 | | )
+   | |_^
+33 |
+34 |   TOKEN = "local-operator-test-placeholder-1234567890"
+   |
+help: Organize imports
+   |
+8  | import pytest
+9  + from harnesslab.productization.demo import create_demo_app
+10 | from httpx import ASGITransport, AsyncClient
+--------------------------------------------------------------------------------
+18 | from harnesslab.db.models.registry import LocalModelConfigurationRecord
+   - from harnesslab.productization.demo import create_demo_app
+19 | from harnesslab.registry.local_models import (
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_local_model_harness.py:1:1
+   |
+ 1 | / from __future__ import annotations
+ 2 | |
+ 3 | | import asyncio
+ 4 | | from pathlib import Path
+ 5 | | from typing import Any
+ 6 | |
+ 7 | | import pytest
+ 8 | | from httpx import ASGITransport, AsyncClient
+ 9 | | from sqlalchemy import func, select
+10 | |
+11 | | from harnesslab.api.app import create_app
+12 | | from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
+13 | | from harnesslab.db.models.registry import RegistryExperimentSnapshotRecord
+14 | | from harnesslab.productization.demo import create_demo_app
+15 | | from harnesslab.registry.models import ExperimentSnapshot
+16 | | from harnesslab.registry.runtime import (
+17 | |     DirectRuntimeContractError,
+18 | |     DirectRuntimeProfileSource,
+19 | |     resolve_direct_runtime_profile,
+20 | | )
+21 | | from harnesslab.registry.service import resolve_frozen_direct_runtime
+22 | | from tests.test_local_model_configuration import BODY, HEADERS, PATH, TOKEN, local_client
+23 | | from tests.test_registry_lite import (
+24 | |     budget,
+25 | |     builder_request,
+26 | |     isolated_registry_database,
+27 | |     relay_environment,
+28 | | )
+   | |_^
+29 |
+30 |   HARNESS_PATH = "/api/local-configuration/harnesses/my-runtime"
+   |
+help: Organize imports
+   |
+7  | import pytest
+8  + from harnesslab.productization.demo import create_demo_app
+9  | from httpx import ASGITransport, AsyncClient
+--------------------------------------------------------------------------------
+14 | from harnesslab.db.models.registry import RegistryExperimentSnapshotRecord
+   - from harnesslab.productization.demo import create_demo_app
+15 | from harnesslab.registry.models import ExperimentSnapshot
+   |
+
+Found 2 errors.
+[*] 2 fixable with the `--fix` option.

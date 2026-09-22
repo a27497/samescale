@@ -1,5 +1,9 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## Phase 0 — authorized isolated baseline assembly — 2026-09-22
+
+Build a separate candidate from latest origin/main with an explicit file allowlist for verified Product QA / Planning and passive Hook → independent verifier → regression replay. Preserve the original dirty worktree and all frozen evidence; exclude historical S1/L1 campaigns and unrelated distribution work. Fix only the five candidate typing errors, run full static/frontend/build and focused/offline gates, then make scoped commits and push the candidate branch. Verify exact-HEAD CI; stop on unknown provenance or new real product failure. Do not enter Phase 1 or execute subjects/campaigns. Current outcomes belong to CURRENT_MILESTONE.
+
 ## 当前授权：Phase S4 — Recruiter Demo + Job-search Freeze（2026-09-21）
 
 复用 S1–S3 真实历史 evidence、既有 Offline Replay/CI 和单文件离线 HTML 模式，交付

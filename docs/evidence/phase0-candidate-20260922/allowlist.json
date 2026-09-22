@@ -1,0 +1,1008 @@
+{
+  "base": "ef135bbdd49639afc28e2701d811329f3418281d",
+  "source_worktree": "/home/dev/projects/harnesslab-ai-integration",
+  "records": [
+    {
+      "path": "frontend/index.html",
+      "group": "product-qa",
+      "source_sha256": "sha256:9f9018349f1664be340b0656628d5f1eeb9409abc90ef5b3fcece462dadfee29",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/App.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:1cfeee148aea714a391d4167845f7852b71507e74a0b41313a9b864d974ff6dc",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/api/analyst.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:f7b136369df64da67f98991c38ab06e81d98eb37afd49e1b9138ebc064760f12",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/api/client.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:c33bb655d4f1cf5672f0a9821d6b757bb249adcc2219942adce11b8b5e9a63e1",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/assets/samescale-mark.svg",
+      "group": "product-qa",
+      "source_sha256": "sha256:84c2a786ffe55b0bf8bbb8179de3f26c25863389ca15e6310b69eeef7d70d4af",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/BrandMark.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:35f8d70e6506e6883fa23447d0785d2bf32cb87a0c3314fc6e9f8b6af6867904",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/ComparisonCase.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:ca854ec1fb60d23b49fccffbf1a81af7e1703ef82b2c0b19f95a9a07ad847c68",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/ConnectionStates.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:eeae4a751b9400159c68874c465a29fbd968979198d4692bcdbad453e84770df",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/EvidenceChart.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:542b4c1e515c19fd6f78daad5c9b97df13b4851a33b4002ba2ec154182d1188e",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/InvestigationReport.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:7a87bced4a8b9ded2af29c4fb3cc4e953c34ecbdc900fbe280e236d321833982",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/LocalConnections.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:a988c8e169572edf77851df2d2075ff788b32972b004b2635aa5eadda39d6189",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/LocalHarnessConfigurations.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:25be5094f02c58e2cb3a4fbcb156942f85c18b4c5f937785588f901aaa2e670a",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/LocalModelConfigurations.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:8da1e263db8433f70f7e05e4b2da26f078503925f7fc5cfa512878c73bfbb1b9",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/MatrixHeatmap.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:05d862768c88e4a8d9791e68040d232c0f9dabc898aa7038089fcc0dfc7fb686",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/ProductStatus.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:4dcffea8f1ea18639e9225728d8440bae4e9603d474834d13c3d29d16e184f0e",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/ResourceManager.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:39f7f30229ac0a61b3b3154bedc13b1282b9fc536beaa9c3b9915a1f9a91d404",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/SavedPlans.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:8603fcdbcbb389dd0405a7b35fe788c735fa007967e4947151d327a1d93d3d3c",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/StatusBadge.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:f48225c49c6386c4063a514ac239d6eb70348cbfc4763654f20687ece748e590",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/components/TraceTimeline.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:26f69bb414447521907437f4b8482a9aa738716776d6771fae65c158174e7795",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/composables/en.json",
+      "group": "product-qa",
+      "source_sha256": "sha256:1b0f81b64ec48385f019f94a8fab161ec0f741c9482945aadf061e83445389cf",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/composables/labels.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:14d2d89870617157bd405f0d82eb42c94a037124553a75871a72f3855877ef98",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/composables/preferences.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:c4d83f98351a3f815999759665fbfcb59f235e27905ec05dd2ad40321337cc95",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/composables/productContext.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:39ff2f43a94058459a2866e99ae863a402d76d5f43febcae4af0847c3f9f53fc",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/composables/registryPresentation.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:ebc83a5c697693796e53c544e0185a391d3d30f68059987d7695efef4595811f",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/composables/sidebarResize.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:46738be7b79328901af5d2947f906f68e26b2653545637b8e01691b3d4619300",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/main.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:537f5040392d6c3dde6fe9cb1863df6fe689a9e28b4cb5e70a170638d5c224fc",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/router/index.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:f146b2d5fea4f71a333e79896819a434af1eadd74160d58adc018b40667b3818",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/router/recovery.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:85b0da9d45082b7fef72c04e5a35ca8587f7cdbf49ad3cd51aedc1f6393bd454",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/stores/experiments.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:72783335239bb3a867d12f81e5065a90e04184e23b36ae03b35dc485a983a222",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/styles.css",
+      "group": "product-qa",
+      "source_sha256": "sha256:4043ecae4fb46b7e5fa326f0f6e3a41c92bbebaf6bef8dcd143f72542bb1392e",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/types/analyst.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:6698f7c84cdc332d854d8beeca82a01d231d4feb253a6a2fe5f911a8b29b0b7f",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/types/comparison.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:14e6033f3787715a38fcaa54cf99447666cf1d0715afea1058f486c139dffec4",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/types/registry.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:8693d06ddc31db9c353276a458784ab45d4f863fc90448562f33b551f7b41cc7",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/AnalystHomeView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:6bacafebb756923f49f62b50aef5e796f04ee460e37b6dd0008c3867cbe9e6ca",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/AnalystView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:aa88368b3c29d8a7bb464deedf6f083f6823acdf4badfba9fa6aeee095a6241a",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/CapabilitiesView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:743f3a690fcbf02362fd3a68ca3b1b3555b6854b7fd472bf35fc794ab0620b59",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/ConnectionsView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:0d6bc9f2bb89b57f1b4b06cda83abce826b0e29f4b4d27e37c40319442c0c775",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/CoreReadinessView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:1e5eb1698a29567724e0cab43a722c3f1ca0916e8639457292d566709a0ee12e",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/DiagnosisView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:25e3f250b9457994c6deef4db42d3959501e79a5d4a29e434760e4472701f051",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/ExamplesView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:bcd51e8c55b1fc459611c9e3d0b4d6eeeaa92990ec116294c15f00e019d4cb28",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/ExperimentBuilderView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:227b5fafc6b0a2d7fc0d5d7a9c0b809d07b31cd90f38be47fce66438de1f5cf1",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/ExperimentDetailView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:a4ac226e0d56378bd9823fbd3e1c26e546fac446f13a684a80ac645af26e9a87",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/ExperimentsView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:de03959413faff727a753aee5ce86691e32ede87d9f14eb75dd87029b7c7e04c",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/HarnessesView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:03dfee367e6b4c27969e4eb33bc3afdeae041517d19af1360023bea274ec102e",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/JudgeDetailView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:faec08589b1066feb1aa189a65e692eacc59b8b195bcc709b6576aeea8d2ae44",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/JudgeLabView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:336621aa3c4a8d9a74266e1142f5eef48189a87d92d1af9baa30da4b3a5f355c",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/ModelsView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:33ec4c8088e28a36a6daa30414b3ea36c3355c31733e9120ce945541ab51d824",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/NotFoundView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:6a61b4001ac87013f454c62834e838f02c99ab73b1d4a59816701cac210bfd35",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/OverviewView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:768f92501e6598a90f57cf0ddef498d7ef27e235b420a2987616087c0ebf040d",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/ProvidersView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:b10b1fa49afaf3005ac7bed03fd84b63cf531d317f2c57fba5ed34b7bde8a7d6",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/RegressionView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:e43475365a71c40383584b0d9296d0b6c7b0730221beeb1ebbf2fdc348f8ba53",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/RunControlView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:3380c8994ce432455b3cf903018e01946eb3b55967516f5770d33c7f6cc80400",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/RunDetailView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:58a29420b96d3b04b3a257b31b1ef7e7d7d670642eb99e36cbb5a1f2bc804e03",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/SettingsView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:04404c8aafc7a7f832c9e16d9bc5640df0ec53c3d25849e30905d6c77621f8b9",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/src/views/TasksView.vue",
+      "group": "product-qa",
+      "source_sha256": "sha256:0352d3acd8926ec5de71b9e3f6d56aa297cf9b0284a2f8650ab2ce591f948cc8",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/analyst-home.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:acda2f6cea8fe0b8d26b53e912d823f6a1d537394f27e7509d3e97d864708951",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/analyst.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:511de0a51958b2b61b77215f69f37212acb87055e6f2c7f892a99d1f0be84086",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/comparison-case.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:12e5fe540c7f4948e072eacd1e78b756fa8660b09d8f6bfa30c67bee87340beb",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/connections.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:b3913c43b27a0fad29590372ccfbd70799ec48d530ac121d331bdf0f60e56799",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/diagnosis.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:212400746f59c393b15c1f3a8620267901ab2d447a455ab4509cc014c0d636d6",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/examples.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:21d0f44a66359902b64a1b0e61823f0a800abfec36677b876a7f35f2779208ca",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/fixtures/comparison.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:b464387cd1749c8db4481b7111d5334df0e431cd0ae557ca6c2fa1eac6e1ab54",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/local-configuration-entry.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:a4eb10ec16abefbff9aac014b230caedb393f8a191039ff8cb9b69325f7b339d",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/local-connections.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:f262ccca4acd7f58dd6df7525f981b65846386563dc1cec2f52e51f78649d123",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/local-harness-configurations.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:bd7a8047d13ed7ae5d31eae5fb2611a87912a45a2cd0aed98d032b6f950644bd",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/local-model-configurations.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:4b859eb6ed312ce94ce71d9956ad81df6aa57910a716c8a72d889cef5621171d",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/navigation-recovery.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:74f1185fac701ced3be71f5066db2f09861bf35e3a5ecf8741a10c5317c6f2a5",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/planning-local-configuration.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:0d9c213aedf91032004d2ead530d5a2ae1a921f6adabc36b300b6328b0639349",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/product-status.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:596243fd27b4dadc79d5b5439de81f619bf47e93302e8fc835f62697fe0c50e5",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/registry.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:ae8b6b24d177e001fa6e08f5625e015a5f072857b6abcdf6e5d2a55808e4aba3",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/saved-plans.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:db5b98d08b049e1a20bb032d5bfc57d1d531e1520a9ea1cee3ad61c71d0024f0",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/setup.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:e980d978779bb3043248204399c28ef0aac7a2d703d09323d3dc7e2e45e94a98",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/tasks.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:bebabc5eb6a50f4a6f2eb0d287be5ce8158527182bbabca5b0c97c32a8c2ac7c",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "frontend/tests/workbench.spec.ts",
+      "group": "product-qa",
+      "source_sha256": "sha256:83d0b3a0ed81e1b2c7fff66cf53f1970b1e297556c65da549f9233fef5db0230",
+      "reason": "QA frontend dependency closure; exact source from 167-pass worktree, retained tests and runtime imports"
+    },
+    {
+      "path": "src/harnesslab/api/app.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:8651119d462b6f06b9bfd59c8819939b6ac2a77d435815453fe974691df3f597",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "src/harnesslab/api/routes/product.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:28cf91a96879d7f23c83ee89aec6c234ad9dae9c0f6cd7ab62aa953f092448d8",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "src/harnesslab/api/routes/health.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:653c02f731606ddd6540b431bfac5123366662a75647e6d3f3eb0bc687fc75ca",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "src/harnesslab/api/routes/registry.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:2fc24f12ebc2704af16cbf826719ae373f58cd6738822a5c21197a4214cb355a",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "src/harnesslab/registry/models.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:2fe46be7f70edcf8c6cd40d21e3627dd5d51d11decb03b9eab403ba618a5806e",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "src/harnesslab/api/static.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:49284b219e7a2b2fffaf0d2e7c89c08b9d19493d24bc0ca3f1e0dee265676e35",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "src/harnesslab/analyst/api.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:266f256c1c4479876186dcd2d233c3dc28c146ab1255ce8bf11cf019bbb03a7d",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "src/harnesslab/analyst/comparison_showcase.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:e4c5a258d332cb661c251fa3532caf8e8a6bf5ec7eb918bd6b2dc84e32cd37ac",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "tests/test_registry_lite.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:3348695075f117e4c53df1de6d7351ffee97d3f27a426065c2639c312be8139e",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "tests/test_api_health.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:d41a46932cc3061e9ea7eec64aa4e1d0609c736e1a68686632668a93aec5ebe4",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "tests/test_bundled_workbench.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:256984c5d51871d251a4c0fc50d0daef9d64d608c93e678b9db56f025cb82ebe",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "tests/test_comparison_showcase.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:c2cfcb905fb627330cb68212c3064497db61ce7c0c06e7d86010975ae490e3cf",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "tests/test_local_connections.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:99f2a1cd4823a031e29dbb20c43438ef7bf3e3ace51ea666948dda7e1f9e23eb",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "tests/test_local_model_configuration.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:a1adfac7628401a4f996c6386732c920c4bb0494b5afe2602d5c87086266de2b",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "tests/test_local_model_harness.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:94bd7e0660754d18f6e74bc453c3f5437a2fa91052eb489be0afbc7faf4277f8",
+      "reason": "Saved-plan API / product mode / comparison and navigation dependencies with existing tests"
+    },
+    {
+      "path": "src/harnesslab/episodes/hooks.py",
+      "group": "hook-replay",
+      "source_sha256": "sha256:79ed246ad25b527d3a7e4876fa96e6812d85654468a6cb1fa57076c258fcb555",
+      "reason": "Passive hook import, independent verification attachment, freeze and offline regression"
+    },
+    {
+      "path": "src/harnesslab/episodes/verified_hooks.py",
+      "group": "hook-replay",
+      "source_sha256": "sha256:9b49255904215a231d9ab57a38f3c62b9cc8a105897a29d624879520a596af83",
+      "reason": "Passive hook import, independent verification attachment, freeze and offline regression"
+    },
+    {
+      "path": "src/harnesslab/episodes/cli.py",
+      "group": "hook-replay",
+      "source_sha256": "sha256:f151aaec1993a50365f2f7cff3608a294decadfe5d24cc7ab92d316eb6cc599b",
+      "reason": "Passive hook import, independent verification attachment, freeze and offline regression"
+    },
+    {
+      "path": "src/harnesslab/episodes/service.py",
+      "group": "hook-replay",
+      "source_sha256": "sha256:cb553db3271dc382a4347bc28a9c39ac170dbf9da711c89a54a948d705c2037e",
+      "reason": "Passive hook import, independent verification attachment, freeze and offline regression"
+    },
+    {
+      "path": "scripts/receive_agent_hook.py",
+      "group": "hook-replay",
+      "source_sha256": "sha256:75490292617579eb91446aeb18f7125e594c322426dbd2156301f82eee14faaa",
+      "reason": "Passive hook import, independent verification attachment, freeze and offline regression"
+    },
+    {
+      "path": "scripts/replay_hook.py",
+      "group": "hook-replay",
+      "source_sha256": "sha256:cfaab38087b89fce49e31bb22fdf0e1c6d996b2b98033a76f3b65e5f364d856b",
+      "reason": "Passive hook import, independent verification attachment, freeze and offline regression"
+    },
+    {
+      "path": "scripts/verify_s3_regression.py",
+      "group": "hook-replay",
+      "source_sha256": "sha256:d43d04be843f00a44b9f2de32269f98e6dfd2caba146edc0d2a925c7fa1d8a31",
+      "reason": "Passive hook import, independent verification attachment, freeze and offline regression"
+    },
+    {
+      "path": "tests/test_native_hooks.py",
+      "group": "hook-replay",
+      "source_sha256": "sha256:867a88a6eb31732cc54d7efa87946d777fd404e71a592fb718fdc0202bdbff0a",
+      "reason": "Passive hook import, independent verification attachment, freeze and offline regression"
+    },
+    {
+      "path": "tests/test_verified_hook_replay.py",
+      "group": "hook-replay",
+      "source_sha256": "sha256:3e5a977d76bbb4e79a9d89cf34e1ce027cb7db65766256877da2a50bb3472616",
+      "reason": "Passive hook import, independent verification attachment, freeze and offline regression"
+    },
+    {
+      "path": "tests/test_immutable_evidence_lint.py",
+      "group": "lint-boundary",
+      "source_sha256": "sha256:535d10da9efeb49f18e42e0d8da7d9dda4dc84c19e26b1b3f95462348c324fc1",
+      "reason": "Evidence integrity, discovery and executable dependency regression"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/.lock",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/3662ca3369b11d6a1834da63cd19fba1ecdf04de33b66761e5c7f6354f15c8d7.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:19f93b9fd85b3be7f93b4cf9ca1083070c6e37e7f90091721d348dba71d252f8",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/68c1da277fb1fcf9d41854cbb771795e75472fd2d9baef64dd3abe3fcab01e22.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:532e78688cf730fbe077fbcd58138f7e18b75558f23c26826815b459024b3ced",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/78cee96d37705c87b8ee2064e4e66d4d853176cea52f356fc2a07bca0f275ea1.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:3fe57d2ddf96da90d3c89b3b81e6cd0f165c54b93cd08162a6f12c15aec7c61a",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/83440d9857c0424bbf6bc7eef2987fb0662ae38683af5ba189eba7c264f2f29a.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:4120dbd3268cc0cbc23341933d9bfacc8578f54e8d33cd4f734fcda5508b26dd",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/997e6a67e28e10cca42aae388b70ce85147eacf3cbb13888936bd3af5ae3b096.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:8c1564ebc0c3f0bb83b4aa374dc909537238a25d1f36d2b5959a736776ca6f7b",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/a5e770d14cda3a2a147b281877c227bc2ac843c5f89bc4a48521974055f88f9c.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:2c8dbf44f9037b75e9e64e4f188bcfbfd01936bc4eb358ddf07c2250cc9ba9a4",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/c6700fc94877cf5b83bb76dd71cc337107a7f01361bced6b7bfe7c5815422330.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:9e9aeb6a3d21c599cefc97d1e4b223ad9270f14af88df4bc2c59cebc1f91e4db",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/f07616ae1610cacd8bee0a673d3ee2c234784f0a534f440846d0c87842e2d9f5.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:a4842a86418ae2cfb885791192b281293568bae7415ad6396b1add4ad785dcc2",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/f9e0e442de0bfa45f3b5908aaefbe293a64a32b59ced6e682c6607e3b450dab3.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:573f082bde8751d396eece4f6827a7179ff346ff31d25ad6eb2b8296085732c2",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/codex-hooks/fd86f07104dfb3c5dea4727774a27857589fa21efd08c54e4eaf4869463c851f.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:394dcd5d59f7c3e2839d356ef8c747c8177f0f40febad539ed06bb57583a0825",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/binding.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:2665b2fdc0ab56c37b39378d275b6db10e9fb5bfb6470dd2f3e9394e282db4da",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/bundle.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:7eabbf0805c2e9fb3ec89ecc338850c31dffe2aea513928391f7e3195c5e2971",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/episode.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:9dc86b7ec995ba54b227e866343c57ae6a5a697f896b3c44b222bb074af3ba4e",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/final-workspace/calculator.py",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:b08bd9e339436526fdee360729d4065cdda47d6834f7c67b7f8dc769b8015592",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/final-workspace/verify_fixture.py",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:8b439065f296f2a810cd66fbb7300750cab34dd6d225758ba89289bd989a0dc3",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/hooks/.lock",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/hooks/28d604661f2691e6978f46c6920c924c50266e4970d364ee330ae705950ee98e.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:b74e0304d531f9dabaf74e3e5da1e41b54617e7d8b44807e18399f850e25ef65",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/hooks/50225e8587f779a1f83bd70239699db4a5590204118f9db2d8307fabe5dbdbf0.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:92a60edfc570e87b4914fe9aa00e2c7c8b1db9fcf4e68c75a1442a5d05ce1658",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/hooks/66b50d2e54393390f507327b1696780a7438acca35b1939c73bf4c92bc44b54e.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:b3f63d87527243063a5557f0be2ee80fb1f06b7c46f9ac671e099341ef76c1c1",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/hooks/b56d3ee2a1eae110a2960ea86dbf8d8477696be9c09dc93f382242915de2535c.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:f393ff5398486ff132e4ac4dd3be5dfbf58720e8f365437733c2b64548bfd89b",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/hooks/cbd5b4ec433a40056500249cb19bc90834ed943740b76e9f1abc657399d9533f.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:ed792031dbd387d100e00e8aa5c9250dcd0afb01b6b54bc1a731ebb2428999ef",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/hooks/f2d5efdda1d871bc78339c4de29b3bad543ed75dffd2479fdb25bc2473921abb.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:a9629631e6a2274e4dac9da4b4d10ddc54079e62e09c965f724e0d1defe2a085",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/normalized.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:a8cce8cfa339a1510ef01cf3e7ecf3e8eca06c8e6b07d38dbc10a4025b5c6ca8",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/prior-capture-index.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:8dd5b6c1de1421c880e5cc2311e9fd534d6693fc47b2361441b89b18a10941bd",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/prior-workspace-receipt.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:4631eb20e9b18c7ab2ec65f3f63a33dac68a4f771161ee7100d9e17a7cf2dcef",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/task-package/hook-inclusive-sum/1.0.0/instruction.md",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:e3d07919b64bc2f5e2edbc5630cd77f28bfba675bf6860eff6a09c543273d6f5",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/task-package/hook-inclusive-sum/1.0.0/oracle/calculator.py",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:c7eaf80b51ee238545733f3fccce7361a997e176ec1013cb11c35a056137c4bc",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/task-package/hook-inclusive-sum/1.0.0/task.yaml",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:a0dff7deea67857aab8e72d037fb869cf3f5d7f8cc9cc4f9fe19da18fdc39ecd",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/task-package/hook-inclusive-sum/1.0.0/verifier/verify.py",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:983d7bb38393b3a49d9b880c5c617fc9109d63b22027855577beb3fda28f47e2",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/task-package/hook-inclusive-sum/1.0.0/workspace/calculator.py",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:b08bd9e339436526fdee360729d4065cdda47d6834f7c67b7f8dc769b8015592",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/task-package/hook-inclusive-sum/1.0.0/workspace/verify_fixture.py",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:8b439065f296f2a810cd66fbb7300750cab34dd6d225758ba89289bd989a0dc3",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/task.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:eb75614313ce955b989f852b927809d2e85f25581871a8fc271cb4d2530a0aac",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/verifier-lifecycle.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:8d08f0d15d6951ebbb94a71aa6ebb35063427eb80a8217d71331fc5b9ae6abd2",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/verifier-run/manifest.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:6ef4278785ae66e972512e27e5804e0b23302722dd0485e54a03fe6d166f1548",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/verifier-run/stderr.txt",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/verifier-run/stdout.txt",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:5278d27a578bf768e8a26aa33e5c87eb50b8ba1a96bc88ccd0247853c9400249",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/verifier-run/workspace/calculator.py",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:b08bd9e339436526fdee360729d4065cdda47d6834f7c67b7f8dc769b8015592",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/verifier-run/workspace/verify_fixture.py",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:8b439065f296f2a810cd66fbb7300750cab34dd6d225758ba89289bd989a0dc3",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification/verifier-source/verify.py",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:983d7bb38393b3a49d9b880c5c617fc9109d63b22027855577beb3fda28f47e2",
+      "reason": "Pinned original hook input or complete pinned verifier bundle; immutable bytes"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/normalized.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:f9038010d74d5451477d8ede6cfcdf01e94e09fee18de6497ba0a9d2d8729bbc",
+      "reason": "Frozen trace/case and original deterministic replay receipts"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/regression-case.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:72cee58acd891a69cc6835375dedcb90087c53c6469ac5601c1f78e9a27fc21a",
+      "reason": "Frozen trace/case and original deterministic replay receipts"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/regression-anchor.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:f200cc5b6e039af76fe333ede3c3e742eebeaf0ca6755a6dcc07ce6465ecd45e",
+      "reason": "Frozen trace/case and original deterministic replay receipts"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification-anchor.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:980f33514d519d5e41f3b119961e6017d9889c509c61ad47bccf13011ebeb3a7",
+      "reason": "Frozen trace/case and original deterministic replay receipts"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/verification-summary.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:c01326f64279069c5a992e83572b4627e259b201e0cc89d24c890e81d9762a57",
+      "reason": "Frozen trace/case and original deterministic replay receipts"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/replay-a.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:cba5b77f7e2f168d076222a5a9f37a617029c72a8f9253ad1091b842f3803c26",
+      "reason": "Frozen trace/case and original deterministic replay receipts"
+    },
+    {
+      "path": "docs/evidence/real-hook-trace-20260922/verifier-closeout/replay-b.json",
+      "group": "hook-evidence",
+      "source_sha256": "sha256:cba5b77f7e2f168d076222a5a9f37a617029c72a8f9253ad1091b842f3803c26",
+      "reason": "Frozen trace/case and original deterministic replay receipts"
+    },
+    {
+      "path": "docs/evidence/harness-eligibility-fix-20260922/phase.patch",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:d68859c0f0ba112fa3c9b8032800fe8c84ac78c33554d901fcae766110e9f778",
+      "reason": "Final QA verification provenance, copied unchanged"
+    },
+    {
+      "path": "docs/evidence/harness-eligibility-fix-20260922/coverage.json",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:a0b5892d1f49b93de90c7f5f89075cb9a04a8f5f62388e6a2098050004c3e2c0",
+      "reason": "Final QA verification provenance, copied unchanged"
+    },
+    {
+      "path": "docs/evidence/harness-eligibility-fix-20260922/browser-result.json",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:e6e5d2f9b5d375818c219815daae71fc11e59a506c37942105b4a66da0d85dda",
+      "reason": "Final QA verification provenance, copied unchanged"
+    },
+    {
+      "path": "docs/evidence/harness-eligibility-fix-20260922/tests/frontend-full.log",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:69b88420bbac51caef0303292acb1080b0ad7b1e4495bf89409070a4e3a276fc",
+      "reason": "Final QA verification provenance, copied unchanged"
+    },
+    {
+      "path": "docs/evidence/harness-eligibility-fix-20260922/tests/build.log",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:e7e03b5acc0ca8fead3dd2c10587c5721b3a5855ffbb8c9af2d9d021527b379c",
+      "reason": "Final QA verification provenance, copied unchanged"
+    },
+    {
+      "path": "docs/evidence/harness-eligibility-fix-20260922/tests/planning.log",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:f038a9ea032ff0838803c47d74dec375a9d5753a208644f4c1be0ecd18221349",
+      "reason": "Final QA verification provenance, copied unchanged"
+    },
+    {
+      "path": "docs/evidence/harness-eligibility-fix-20260922/tests/entry.log",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:4202c0ffdae052d42dfe2c6fe4734a7ed8829721e596e4d9f10bd5ebf505e3ba",
+      "reason": "Final QA verification provenance, copied unchanged"
+    },
+    {
+      "path": "docs/evidence/harness-eligibility-fix-20260922/tests/backend.log",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:8d8a21d527b93a4b14e65ec921b302e84214cf99c6939a96875bc91904446a37",
+      "reason": "Final QA verification provenance, copied unchanged"
+    },
+    {
+      "path": "docs/evidence/harness-eligibility-fix-20260922/offline/result.json",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:0089cfbf487fce7c185243bf8ce16b570fa448a5cf1247d30e61eb5fa0bff8f3",
+      "reason": "Final QA verification provenance, copied unchanged"
+    },
+    {
+      "path": "docs/evidence/human-uat-repair-20260922/browser-final-check.json",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:c754c0bd027bfc5858318afa135acca62f1407ebba57ea8162922a417ef1c80c",
+      "reason": "QA repair scope validation; historical result only"
+    },
+    {
+      "path": "docs/evidence/human-uat-repair-20260922/tests/backend-regression.log",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:39c00e1f9412817c6216ff50e4da93ef9b133ad7add24ee1e31242b99bca6f49",
+      "reason": "QA repair scope validation; historical result only"
+    },
+    {
+      "path": "docs/evidence/human-uat-repair-20260922/tests/mypy.log",
+      "group": "qa-evidence",
+      "source_sha256": "sha256:f9b031e5c45aa702cd4fef028d465551cb20a2c4698e0913c7b00766b20ac4d8",
+      "reason": "QA repair scope validation; historical result only"
+    },
+    {
+      "path": "src/harnesslab/productization/demo.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:cb9a648dafb6c77dd264e8ba45f984ed31922e2dd54f20f856981f54270e407d",
+      "reason": "Minimal QA U05/demo isolation dependency discovered via create_demo_app imports; no installer or wheel build hook"
+    },
+    {
+      "path": "src/harnesslab/productization/assets.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:1fa31d421832f6a5b54ea224b5b82326e9c66805ecadd78e9868eb4ed6413268",
+      "reason": "Minimal QA U05/demo isolation dependency discovered via create_demo_app imports; no installer or wheel build hook"
+    },
+    {
+      "path": "src/harnesslab/cli.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:6da9850605df432c4fce5d24d6083fafcd4c4ac2bb104742e33ae8b682ca41af",
+      "reason": "Minimal QA U05/demo isolation dependency discovered via create_demo_app imports; no installer or wheel build hook"
+    },
+    {
+      "path": "tests/test_product_demo.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:13ad58d09d6e159618c5496a71deca370150fc9b8953c57a0fe223f397036467",
+      "reason": "Minimal QA U05/demo isolation dependency discovered via create_demo_app imports; no installer or wheel build hook"
+    },
+    {
+      "path": "src/harnesslab/productization/cli.py",
+      "group": "product-qa",
+      "source_sha256": "sha256:e0d5251cb731ed823299a6f063305cc13d32697660edd2b3c06678075e2b4e71",
+      "reason": "Missing status --demo dependency: initial mirrored CI 517 pass / one monkeypatch AttributeError; exact original QA wiring, no lifecycle changes"
+    }
+  ],
+  "excluded": [
+    "Historical S1/L1 campaign scripts, tests, fixtures and Docker variants",
+    "Installer and wheel/distribution packaging changes; minimal Demo runtime needed by QA is included",
+    "Unrelated shared runtime/preflight changes",
+    "Historical evidence outside selected final QA receipts and pinned Hook closure",
+    "Duplicate Hook verifier package/run copies outside pinned verification bundle",
+    "Original dirty milestone/blueprint history; candidate starts from main docs"
+  ],
+  "candidate_authored_paths": {
+    ".github/workflows/ci.yml": "Scoped CI full frontend/build/QA/Hook coverage",
+    ".github/workflows/self-hosted-ci.yml": "Scoped CI full frontend/build/QA/Hook coverage",
+    "CURRENT_MILESTONE.md": "Phase 0 contract/milestone or scoped lint/CLI settings",
+    "PUBLIC_PRODUCT_CONTRACT.md": "Phase 0 contract/milestone or scoped lint/CLI settings",
+    "README.md": "Phase 0 contract/milestone or scoped lint/CLI settings",
+    "docs/EPISODE_IMPORT.md": "Phase 0 contract/milestone or scoped lint/CLI settings",
+    "docs/PROJECT_BLUEPRINT.md": "Phase 0 contract/milestone or scoped lint/CLI settings",
+    "pyproject.toml": "Phase 0 contract/milestone or scoped lint/CLI settings",
+    "tests/test_ci_workflow_contracts.py": "Scoped CI full frontend/build/QA/Hook coverage",
+    "docs/evidence/phase0-candidate-20260922/": "New provenance, allowlist, preservation and acceptance records"
+  },
+  "type_only_transformations": {
+    "tests/test_immutable_evidence_lint.py": "Rename AST alias loop variables; fix four mypy inference errors",
+    "tests/test_verified_hook_replay.py": "Typed cast for JSON object fixture helper; fix one no-any-return"
+  }
+}

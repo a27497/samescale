@@ -81,3 +81,9 @@ Future product changes must update this contract only after checking source, foc
 the evidence required by the claim. Historical contracts and immutable reports retain their own
 scope. Plans belong to [Project Blueprint](docs/PROJECT_BLUEPRINT.md), and current verification
 belongs to [Current Milestone](CURRENT_MILESTONE.md).
+
+## Phase 0 supported scope
+
+Saved planning snapshots have a paginated read-only list and identity/digest-validated detail; historical saved preflight does not establish current health or execution permission. Failed save, catalog changes and configuration edits invalidate current preflight. Missing/disabled/incompatible Harness identities remain visible and block planning until explicit valid selection and new preflight. Inactive methodology remains unknown; token budgets respect both selected configuration limits. Workspace Judge data and frozen Judge evidence are labeled separately.
+
+Native Hook collection is passive, allowlisted and redacted before persistence. Missing command exit status remains unknown. A pinned independent verifier attachment can establish final workspace contract failure and freeze a CUSTOM regression case. The included real session used a seeded verification-only fixture; no model root cause, causal comparison or instruction-compliance failure is claimed. Replay only verifies stored inputs/results and performs no subject/verifier execution. Evidence Python is read-only data, not maintained production source.

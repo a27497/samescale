@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "allowlisted_copied_files": 163,
+  "unallowlisted_changes": [],
+  "only_copied_source_transformations": {
+    "tests/test_verified_hook_replay.py": {
+      "source_sha256": "sha256:3e5a977d76bbb4e79a9d89cf34e1ce027cb7db65766256877da2a50bb3472616",
+      "candidate_sha256": "sha256:aa48c94b8cb6c109a00c571e278670c3a87584fcb467f07521c06f1373c4507b"
+    },
+    "tests/test_immutable_evidence_lint.py": {
+      "source_sha256": "sha256:535d10da9efeb49f18e42e0d8da7d9dda4dc84c19e26b1b3f95462348c324fc1",
+      "candidate_sha256": "sha256:ce4ba875b2e3f64fd89ef75848780d28c67b0455a5bdc606602673d6f8be8a76"
+    }
+  },
+  "old_frozen_evidence_modified": false,
+  "new_runtime_features_authored": false
+}

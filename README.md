@@ -306,3 +306,11 @@ preflight results; the backend revalidates the exact selections when freezing a 
 The saved result shows backend-frozen profile, runtime and resource-envelope identities.
 This freezes a planning snapshot only: it creates no execution or experiment-run records and
 neither invokes a model nor changes Analyst/Judge role selections.
+
+## Phase 0 baseline acceptance
+
+The isolated [Phase 0 candidate](docs/evidence/phase0-candidate-20260922/README.md) preserves the verified planning fixes and passive native Hook regression path. Saved plans can be reopened read-only; invalid or incompatible Harness selections preserve identity and block preflight/save until an explicit valid selection and new preflight.
+
+Native Hook observations do not establish task success. A separately recorded deterministic verifier binds the final workspace to a bounded CUSTOM failure case; Offline Replay checks recorded evidence without executing a subject, model, captured command or verifier. The seeded verification-only fixture is not evidence of model capability failure.
+
+Run `npm run test --prefix frontend`, `npm run build --prefix frontend`, `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy src tests scripts`, and `bash scripts/ci_s3.sh /tmp/NEW-phase0-offline`. Evidence under `docs/evidence/**` is immutable input excluded from Ruff discovery; maintained source remains linted. See CURRENT_MILESTONE for actual acceptance status.

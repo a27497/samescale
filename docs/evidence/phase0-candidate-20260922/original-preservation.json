@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "files_checked": 4009,
+  "old_evidence_files": 2709,
+  "missing": [],
+  "changed": [],
+  "git_status_unchanged": true,
+  "head_unchanged": true
+}

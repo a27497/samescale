@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "base": "ef135bbdd49639afc28e2701d811329f3418281d",
+  "ruff": "PASS",
+  "format": "PASS_721_FILES",
+  "mypy": "PASS_382_FILES",
+  "candidate_mypy_errors_fixed": 5,
+  "historical_s1_files_changed": 0,
+  "frontend": {
+    "specs": 17,
+    "passed": 167,
+    "failed": 0,
+    "unhandled_errors": 0
+  },
+  "hook_verifier_episode": 68,
+  "boundary_regression": 13,
+  "focused_total": 81,
+  "offline": 122,
+  "fast_ci_backend": 518,
+  "build_vue_tsc": "PASS",
+  "frozen_s2_outputs": "MATCHED_5_GOLDEN_DIGESTS_TWICE",
+  "new_agent_model_claude_judge_calls": 0,
+  "remote_ci": "REQUIRED_ON_FINAL_HEAD"
+}

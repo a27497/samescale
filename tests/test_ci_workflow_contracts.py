@@ -310,8 +310,8 @@ def test_fast_ci_checks_frontend_and_dto_without_full_release_gates() -> None:
         assert frontend["run"].splitlines() == [
             "npm ci --no-audit --no-fund",
             "npm run type-check",
-            "npm run test -- tests/workbench.spec.ts tests/registry.spec.ts "
-            "tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts",
+            "npm run test",
+            "npm run build",
         ]
         assert "continue-on-error" not in frontend
         assert any("actions/setup-node@" in step.get("uses", "") for step in steps)

@@ -59,7 +59,8 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           npm run type-check
-          npm run test -- tests/workbench.spec.ts tests/registry.spec.ts tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts
+          npm run test
+          npm run build
       - name: Run bounded deterministic core regressions
         run: >-
           uv run --locked pytest -q
@@ -67,6 +68,17 @@ jobs:
           tests/test_analyst_contracts.py
           tests/test_analyst_showcase.py
           tests/test_api_health.py
+          tests/test_bundled_workbench.py
+          tests/test_product_demo.py
+          tests/test_comparison_showcase.py
+          tests/test_registry_lite.py
+          tests/test_local_connections.py
+          tests/test_local_model_configuration.py
+          tests/test_local_model_harness.py
+          tests/test_episodes.py
+          tests/test_native_hooks.py
+          tests/test_verified_hook_replay.py
+          tests/test_immutable_evidence_lint.py
           tests/test_contracts.py
           tests/test_workbench_api.py::test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel
           tests/test_experiment_executor_safety.py

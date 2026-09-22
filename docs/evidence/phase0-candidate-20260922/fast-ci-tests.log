@@ -1,0 +1,15 @@
+........................................................................ [ 13%]
+........................................................................ [ 27%]
+........................................................................ [ 41%]
+........................................................................ [ 55%]
+........................................................................ [ 69%]
+........................................................................ [ 83%]
+........................................................................ [ 97%]
+..............                                                           [100%]
+============================= slowest 5 durations ==============================
+121.89s setup    tests/test_kc_release_reconciliation.py::test_kc_rejects_fabricated_stronger_ablation[comparable-count]
+32.22s setup    tests/test_workbench_api.py::test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel
+17.87s call     tests/test_tier_b_repo_engineering.py::test_methodology_plan_requires_and_binds_tier_b_qualification
+16.05s call     tests/test_registry_lite.py::test_registry_api_does_not_seed_or_mutate_real_matrix_on_fresh_database
+13.44s call     tests/test_registry_lite.py::test_provider_switch_and_runtime_endpoint_change_snapshot_identity
+518 passed in 343.97s (0:05:43)

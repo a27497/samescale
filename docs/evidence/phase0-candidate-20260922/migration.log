@@ -1,0 +1,12 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 20260822_0001, Create the Phase A schema metadata table.
+INFO  [alembic.runtime.migration] Running upgrade 20260822_0001 -> 20260822_0002, Add the minimal Phase C execution lease.
+INFO  [alembic.runtime.migration] Running upgrade 20260822_0002 -> 20260823_0003, Add Phase G experiment matrix and durable run queue.
+INFO  [alembic.runtime.migration] Running upgrade 20260823_0003 -> 20260823_0004, Add Phase H Judge calibration persistence.
+INFO  [alembic.runtime.migration] Running upgrade 20260823_0004 -> 20260828_0005, Add the immutable Unified Registry Lite snapshot ledger.
+INFO  [alembic.runtime.migration] Running upgrade 20260828_0005 -> 20260904_0006, Add authoritative Phase-M attempt, resource, control, and budget ledgers.
+INFO  [alembic.runtime.migration] Running upgrade 20260904_0006 -> 20260908_0007, Persist bounded Analyst investigations, usage and review-only approvals.
+INFO  [alembic.runtime.migration] Running upgrade 20260908_0007 -> 20260915_0008, Append-only local model configurations, without credentials or execution rows.
+INFO  [alembic.runtime.migration] Running upgrade 20260915_0008 -> 20260915_0009, Local connection revisions and credential metadata; secret values stay outside PostgreSQL.
+INFO  [alembic.runtime.migration] Running upgrade 20260915_0009 -> 20260915_0010, Append-only local Harness preset selections.

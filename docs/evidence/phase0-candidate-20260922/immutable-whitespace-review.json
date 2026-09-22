@@ -1,0 +1,24 @@
+{
+  "staged_diagnostic_exit": 2,
+  "immutable_artifact_diagnostics": [
+    "docs/evidence/harness-eligibility-fix-20260922/phase.patch:24: trailing whitespace.",
+    "docs/evidence/harness-eligibility-fix-20260922/tests/entry.log:13: new blank line at EOF.",
+    "docs/evidence/harness-eligibility-fix-20260922/tests/frontend-full.log:13: new blank line at EOF.",
+    "docs/evidence/harness-eligibility-fix-20260922/tests/planning.log:13: new blank line at EOF."
+  ],
+  "maintained_source_whitespace": "PASS",
+  "action": "Preserve exact immutable log/patch bytes; no Git/Ruff rules changed. This diagnostic is not a product failure.",
+  "candidate_acceptance_log_diagnostics": [
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.log:33: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.log:36: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.log:40: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.log:41: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.log:44: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.xml:18: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.xml:21: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.xml:25: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.xml:26: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/fast-ci-tests-initial-missing-dependency.xml:29: trailing whitespace.",
+    "docs/evidence/phase0-candidate-20260922/frontend-full.log:13: new blank line at EOF."
+  ]
+}

@@ -86,6 +86,9 @@ markers = [
 target-version = "py312"
 line-length = 100
 src = ["src", "tests", "scripts"]
+# Historical evidence is read-only input, never maintained execution source.
+# Preserve its bytes/digests; tests enforce the dependency and lint boundaries.
+extend-exclude = ["docs/evidence/**"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
