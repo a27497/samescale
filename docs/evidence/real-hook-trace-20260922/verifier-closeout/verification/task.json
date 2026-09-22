@@ -1,0 +1,32 @@
+{
+  "id": "hook-inclusive-sum",
+  "version": "1.0.0",
+  "domain": "software-engineering",
+  "lane_support": [
+    "H"
+  ],
+  "instruction": "CUSTOM fixture contract: inclusive_sum(start, end) sums integer endpoints inclusively. A descending empty interval returns zero. This post-session verification is not a model ability benchmark.\n",
+  "workspace": {
+    "uri": "workspace",
+    "digest": "sha256:f9a90c468e6309cff585031cb0cc184be2c5883c7c2dc7268e362b25162da6e8"
+  },
+  "context_bundle": null,
+  "verifier": {
+    "kind": "python",
+    "version": "1",
+    "entrypoint": "verifier/verify.py",
+    "digest": "sha256:72970c43b91e9d602d7718b4de140406f25604029e63c924ceef966777ab3e59"
+  },
+  "oracle": {
+    "uri": "oracle",
+    "digest": "sha256:50ae2d56dd0372e4daf01a6383ada08945bc49fccddbc954007ddf05d9290f12"
+  },
+  "budget": {
+    "timeout_seconds": 15,
+    "max_output_tokens": 1000,
+    "network_policy": "deny"
+  },
+  "expected_tools": [],
+  "metadata": {},
+  "content_digest": "sha256:e6018ec867483e2ab51871535e541511dbbed9973ad9a38a8d2f91c0ebe5a9de"
+}

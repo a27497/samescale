@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "stages": [
+    {
+      "stage": "VERIFIER_WORKSPACE_PREPARE",
+      "status": "COMPLETED",
+      "duration_ms": 2,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": null,
+      "timeout": false
+    },
+    {
+      "stage": "VERIFIER_SANDBOX_CREATE",
+      "status": "COMPLETED",
+      "duration_ms": 659,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": null,
+      "timeout": false
+    },
+    {
+      "stage": "VERIFIER_WORKSPACE_ATTACH",
+      "status": "COMPLETED",
+      "duration_ms": 35,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": null,
+      "timeout": false
+    },
+    {
+      "stage": "VERIFIER_SANDBOX_START",
+      "status": "COMPLETED",
+      "duration_ms": 447,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": null,
+      "timeout": false
+    },
+    {
+      "stage": "VERIFIER_PROCESS_START",
+      "status": "COMPLETED",
+      "duration_ms": 447,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": null,
+      "timeout": false
+    },
+    {
+      "stage": "VERIFIER_PROCESS_WAIT",
+      "status": "COMPLETED",
+      "duration_ms": 465,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": 0,
+      "timeout": false
+    },
+    {
+      "stage": "VERIFIER_SANDBOX_CLEANUP",
+      "status": "COMPLETED",
+      "duration_ms": 89,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": null,
+      "timeout": false
+    },
+    {
+      "stage": "VERIFIER_ARTIFACT_PERSIST",
+      "status": "COMPLETED",
+      "duration_ms": 1,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": null,
+      "timeout": false
+    },
+    {
+      "stage": "VERIFIER_RESULT_COLLECT",
+      "status": "COMPLETED",
+      "duration_ms": 0,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": 0,
+      "timeout": false
+    },
+    {
+      "stage": "VERIFIER_STAGING_CLEANUP",
+      "status": "COMPLETED",
+      "duration_ms": 0,
+      "exception_class": null,
+      "reason_code": null,
+      "container_exit_code": null,
+      "timeout": false
+    }
+  ],
+  "failure_subtype": null
+}

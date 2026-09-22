@@ -1,0 +1,12 @@
+{
+  "runtime": "isolated tmpfs",
+  "raw_prompt_matches": [],
+  "credential_value_matches": [],
+  "session_transcripts": [],
+  "shell_snapshots": [],
+  "status": "PASS",
+  "fixture_unchanged": true,
+  "raw_hook_payload_saved": false,
+  "auth_reference_only": true,
+  "temporary_config_removed": true
+}

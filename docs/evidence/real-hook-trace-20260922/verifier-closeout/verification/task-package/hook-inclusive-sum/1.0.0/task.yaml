@@ -1,0 +1,8 @@
+schema_version: 1
+id: hook-inclusive-sum
+version: 1.0.0
+domain: software-engineering
+lane_support: [H]
+verifier: {kind: python, version: "1", entrypoint: verifier/verify.py, timeout_seconds: 15}
+oracle: {path: oracle}
+budget: {timeout_seconds: 15, max_output_tokens: 1000, network_policy: deny}

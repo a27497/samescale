@@ -1,0 +1,1 @@
+{"call":"sha256:c21941416272eb70d6a7460f42ffe1e15bfcd216c1a299db1a266f33f981acea","event":"PreToolUse","exit_code":null,"failure":false,"schema_version":1,"session":"sha256:54053f9e9f9c948b8f270f6daaaff54c83ea298c20032d697b72ff5a7a2b3d17","source":"codex","tool":"Bash"}

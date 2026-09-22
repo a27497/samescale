@@ -35,6 +35,8 @@ SUITES = (
     "tests/test_s2_offline_replay.py",
     "tests/test_s3_ci_regression.py",
     "tests/test_recruiter_demo.py",
+    "tests/test_native_hooks.py",
+    "tests/test_verified_hook_replay.py",
 )
 REQUIRED_TESTS = (
     "test_real_runs_are_reconstructed_without_execution",
@@ -47,6 +49,13 @@ REQUIRED_TESTS = (
     "test_workflow_uses_offline_entry_without_execution_credentials",
     "test_export_uses_no_network_or_process",
     "test_shared_files_contain_only_public_projection",
+    "test_duplicate_out_of_order_and_restart_import",
+    "test_redaction_precedes_any_persistence",
+    "test_frozen_case_deterministic_and_offline",
+    "test_real_hook_capture_retains_unknown_status_and_blocks_freeze",
+    "test_real_workspace_failure_is_independently_verified_without_hook_exit_codes",
+    "test_verified_case_cli_freeze_and_two_offline_replays",
+    "test_passing_workspace_never_becomes_bad_case",
 )
 
 

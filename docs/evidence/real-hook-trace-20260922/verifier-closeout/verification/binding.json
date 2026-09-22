@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "episode_identity": "sha256:225968d9320b831780d3e6aad132e5801fed1d59900346cf6b05bf905412f598",
+  "source_kind": "unverified",
+  "binding_authority": "OPERATOR_RECORDED_NOT_ATTESTED",
+  "prior_capture_manifest_digest": "sha256:8dd5b6c1de1421c880e5cc2311e9fd534d6693fc47b2361441b89b18a10941bd",
+  "source_files": {
+    "calculator.py": "sha256:b08bd9e339436526fdee360729d4065cdda47d6834f7c67b7f8dc769b8015592",
+    "verify_fixture.py": "sha256:8b439065f296f2a810cd66fbb7300750cab34dd6d225758ba89289bd989a0dc3"
+  },
+  "excluded_generated_cache": [
+    "__pycache__/calculator.cpython-312.pyc"
+  ],
+  "contract": "inclusive integer endpoints; empty descending interval returns zero",
+  "session_purpose": "verification-only seeded fixture; not a repair instruction or ability benchmark",
+  "agent_reexecuted": false
+}
