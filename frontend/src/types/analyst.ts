@@ -24,6 +24,14 @@ export interface RegressionProposal {
 }
 
 export interface AnalystSession {
+  model_binding?: {
+    purpose: 'ANALYST'
+    configuration_id: string
+    configuration_revision: number
+    connection_id: string | null
+    connection_revision: number | null
+    binding_digest: string
+  } | null
   spend_limits: AnalystSpendLimits | null
   session_id: string
   backend: 'fake' | 'real'

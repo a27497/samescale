@@ -60,3 +60,14 @@ describe('local connections', () => {
     expect(wrapper.get('[role=alert]').text()).toContain('Could not load'); expect(wrapper.text()).not.toContain('private-load-secret')
   })
 })
+
+ it('uses browser Unicode-sets patterns that accept legal IDs and reject malformed IDs', async () => {
+   const wrapper = editor(); await flushPromises()
+   const fields = wrapper.findAll('input[pattern]')
+   expect(fields.length).toBeGreaterThan(0)
+   for (const field of fields) {
+     const pattern = new RegExp(`^(?:${field.attributes('pattern')})$`, 'v')
+     expect(pattern.test('uat-valid-123')).toBe(true)
+     for (const invalid of ['Invalid', '-bad', 'bad space', 'bad/key', 'a'.repeat(Number(field.attributes('maxlength')) + 1)]) expect(pattern.test(invalid)).toBe(false)
+   }
+ })

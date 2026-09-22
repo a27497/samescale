@@ -35,6 +35,7 @@ from harnesslab.productization.cli import (
     status_command,
     up_command,
 )
+from harnesslab.productization.demo import check_demo, demo_command
 from harnesslab.release.diagnostic import (
     ComponentDiagnosticError,
     execute_real_component_diagnostics,
@@ -112,6 +113,7 @@ release_v6_canary_app = typer.Typer(
     no_args_is_help=True,
     help="Preflight, authorize, or execute only the bounded V6 Alibaba canary.",
 )
+app.command("demo")(demo_command)
 app.command("up")(up_command)
 app.command("down")(down_command)
 app.command("status")(status_command)
@@ -744,6 +746,12 @@ def main(
 
 @app.command()
 def doctor(
+    demo: Annotated[
+        bool, typer.Option("--demo", help="Check the standalone demo without Docker.")
+    ] = False,
+    port: Annotated[
+        int, typer.Option("--port", min=1, max=65535, help="Standalone demo port.")
+    ] = 8000,
     compose_file: Annotated[
         Path | None, typer.Option("--compose-file", help="Product Compose file.")
     ] = None,
@@ -753,6 +761,9 @@ def doctor(
 ) -> None:
     """Check Docker, product configuration, and runtime readiness keylessly."""
 
+    if demo:
+        check_demo(port, inspect_assets=True)
+        return
     doctor_command(compose_file=compose_file, project_name=project_name)
 
 

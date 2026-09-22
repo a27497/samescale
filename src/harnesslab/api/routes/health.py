@@ -16,10 +16,9 @@ DatabaseCheck = Callable[[], Awaitable[None]]
 
 
 def database_check_dependency() -> DatabaseCheck:
-    settings = get_settings()
-
     async def perform_check() -> None:
-        await check_database(settings)
+        # Configuration failures have the same unavailable contract as connection failures.
+        await check_database(get_settings())
 
     return perform_check
 

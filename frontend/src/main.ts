@@ -6,7 +6,10 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import App from './App.vue'
+import { loadPreferences } from './composables/preferences'
 import router from './router'
+
+loadPreferences()
 
 createApp(App)
   .use(createPinia())

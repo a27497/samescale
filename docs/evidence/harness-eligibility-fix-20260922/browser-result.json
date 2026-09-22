@@ -1,0 +1,538 @@
+{
+  "status": "PASS",
+  "scope": "Controlled catalog/preflight fixtures only; no backend execution or persistence",
+  "browser": "153.0.8010.12",
+  "observations": [
+    {
+      "width": 1440,
+      "state": "disabled",
+      "invalidPreflightRequests": 0,
+      "recoveryRequests": 1,
+      "oldPreflightInvalidated": true
+    },
+    {
+      "width": 1440,
+      "state": "incompatible",
+      "invalidPreflightRequests": 0,
+      "recoveryRequests": 1,
+      "oldPreflightInvalidated": true
+    },
+    {
+      "width": 390,
+      "state": "disabled",
+      "invalidPreflightRequests": 0,
+      "recoveryRequests": 1,
+      "oldPreflightInvalidated": true
+    },
+    {
+      "width": 390,
+      "state": "incompatible",
+      "invalidPreflightRequests": 0,
+      "recoveryRequests": 1,
+      "oldPreflightInvalidated": true
+    }
+  ],
+  "events": [],
+  "requests": [
+    {
+      "path": "/api/product",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/models",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/harnesses",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/tasks",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/methodologies",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/settings",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/providers",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/capabilities",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/experiments/preflight",
+      "method": "POST",
+      "body": {
+        "name": "工程能力评测",
+        "methodology_id": "fixture-method",
+        "methodology_digest": "sha256:fixture-method",
+        "evaluation_mode": "QUICK",
+        "comparison_type": "END_TO_END_SYSTEM_COMPARISON",
+        "task_ids": [
+          "fixture-task"
+        ],
+        "cells": [
+          {
+            "cell_id": "left",
+            "provider_model_profile_id": "local-subject-v3",
+            "harness_profile_id": "valid-runtime"
+          },
+          {
+            "cell_id": "right",
+            "provider_model_profile_id": "local-subject-v3",
+            "harness_profile_id": "codex-gpt56-medium"
+          }
+        ],
+        "budget": {
+          "max_wall_time": {
+            "status": "ENFORCED",
+            "value": 90,
+            "unit": "seconds",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_output_tokens": {
+            "status": "ENFORCED",
+            "value": 800,
+            "unit": "tokens",
+            "scopes": [
+              "PER_PROVIDER_REQUEST",
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_model_turns": {
+            "status": "ENFORCED",
+            "value": 1,
+            "unit": "turns",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_tool_calls": {
+            "status": "ENFORCED",
+            "value": 0,
+            "unit": "calls",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_provider_requests": {
+            "status": "ENFORCED",
+            "value": 1,
+            "unit": "requests",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_cost": {
+            "status": "NOT_AVAILABLE",
+            "value": null,
+            "unit": "USD",
+            "scopes": [
+              "NOT_AVAILABLE"
+            ]
+          }
+        },
+        "schedule_seed": 9,
+        "max_parallel_runs": 1,
+        "billing_modes": {}
+      }
+    },
+    {
+      "path": "/api/product",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/models",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/harnesses",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/tasks",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/methodologies",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/settings",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/providers",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/capabilities",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/experiments/preflight",
+      "method": "POST",
+      "body": {
+        "name": "工程能力评测",
+        "methodology_id": "fixture-method",
+        "methodology_digest": "sha256:fixture-method",
+        "evaluation_mode": "QUICK",
+        "comparison_type": "END_TO_END_SYSTEM_COMPARISON",
+        "task_ids": [
+          "fixture-task"
+        ],
+        "cells": [
+          {
+            "cell_id": "left",
+            "provider_model_profile_id": "local-subject-v3",
+            "harness_profile_id": "valid-runtime"
+          },
+          {
+            "cell_id": "right",
+            "provider_model_profile_id": "local-subject-v3",
+            "harness_profile_id": "codex-gpt56-medium"
+          }
+        ],
+        "budget": {
+          "max_wall_time": {
+            "status": "ENFORCED",
+            "value": 90,
+            "unit": "seconds",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_output_tokens": {
+            "status": "ENFORCED",
+            "value": 800,
+            "unit": "tokens",
+            "scopes": [
+              "PER_PROVIDER_REQUEST",
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_model_turns": {
+            "status": "ENFORCED",
+            "value": 1,
+            "unit": "turns",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_tool_calls": {
+            "status": "ENFORCED",
+            "value": 0,
+            "unit": "calls",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_provider_requests": {
+            "status": "ENFORCED",
+            "value": 1,
+            "unit": "requests",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_cost": {
+            "status": "NOT_AVAILABLE",
+            "value": null,
+            "unit": "USD",
+            "scopes": [
+              "NOT_AVAILABLE"
+            ]
+          }
+        },
+        "schedule_seed": 9,
+        "max_parallel_runs": 1,
+        "billing_modes": {}
+      }
+    },
+    {
+      "path": "/api/product",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/models",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/harnesses",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/tasks",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/methodologies",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/settings",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/providers",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/capabilities",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/experiments/preflight",
+      "method": "POST",
+      "body": {
+        "name": "工程能力评测",
+        "methodology_id": "fixture-method",
+        "methodology_digest": "sha256:fixture-method",
+        "evaluation_mode": "QUICK",
+        "comparison_type": "END_TO_END_SYSTEM_COMPARISON",
+        "task_ids": [
+          "fixture-task"
+        ],
+        "cells": [
+          {
+            "cell_id": "left",
+            "provider_model_profile_id": "local-subject-v3",
+            "harness_profile_id": "valid-runtime"
+          },
+          {
+            "cell_id": "right",
+            "provider_model_profile_id": "local-subject-v3",
+            "harness_profile_id": "codex-gpt56-medium"
+          }
+        ],
+        "budget": {
+          "max_wall_time": {
+            "status": "ENFORCED",
+            "value": 90,
+            "unit": "seconds",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_output_tokens": {
+            "status": "ENFORCED",
+            "value": 800,
+            "unit": "tokens",
+            "scopes": [
+              "PER_PROVIDER_REQUEST",
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_model_turns": {
+            "status": "ENFORCED",
+            "value": 1,
+            "unit": "turns",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_tool_calls": {
+            "status": "ENFORCED",
+            "value": 0,
+            "unit": "calls",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_provider_requests": {
+            "status": "ENFORCED",
+            "value": 1,
+            "unit": "requests",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_cost": {
+            "status": "NOT_AVAILABLE",
+            "value": null,
+            "unit": "USD",
+            "scopes": [
+              "NOT_AVAILABLE"
+            ]
+          }
+        },
+        "schedule_seed": 9,
+        "max_parallel_runs": 1,
+        "billing_modes": {}
+      }
+    },
+    {
+      "path": "/api/product",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/models",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/harnesses",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/tasks",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/methodologies",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/settings",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/providers",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/registry/capabilities",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/experiments/preflight",
+      "method": "POST",
+      "body": {
+        "name": "工程能力评测",
+        "methodology_id": "fixture-method",
+        "methodology_digest": "sha256:fixture-method",
+        "evaluation_mode": "QUICK",
+        "comparison_type": "END_TO_END_SYSTEM_COMPARISON",
+        "task_ids": [
+          "fixture-task"
+        ],
+        "cells": [
+          {
+            "cell_id": "left",
+            "provider_model_profile_id": "local-subject-v3",
+            "harness_profile_id": "valid-runtime"
+          },
+          {
+            "cell_id": "right",
+            "provider_model_profile_id": "local-subject-v3",
+            "harness_profile_id": "codex-gpt56-medium"
+          }
+        ],
+        "budget": {
+          "max_wall_time": {
+            "status": "ENFORCED",
+            "value": 90,
+            "unit": "seconds",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_output_tokens": {
+            "status": "ENFORCED",
+            "value": 800,
+            "unit": "tokens",
+            "scopes": [
+              "PER_PROVIDER_REQUEST",
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_model_turns": {
+            "status": "ENFORCED",
+            "value": 1,
+            "unit": "turns",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_tool_calls": {
+            "status": "ENFORCED",
+            "value": 0,
+            "unit": "calls",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_provider_requests": {
+            "status": "ENFORCED",
+            "value": 1,
+            "unit": "requests",
+            "scopes": [
+              "PER_LOGICAL_RUN"
+            ]
+          },
+          "max_cost": {
+            "status": "NOT_AVAILABLE",
+            "value": null,
+            "unit": "USD",
+            "scopes": [
+              "NOT_AVAILABLE"
+            ]
+          }
+        },
+        "schedule_seed": 9,
+        "max_parallel_runs": 1,
+        "billing_modes": {}
+      }
+    }
+  ]
+}

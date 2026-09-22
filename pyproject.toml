@@ -29,6 +29,7 @@ dependencies = [
 
 [project.scripts]
 harnesslab = "harnesslab.cli:app"
+samescale = "harnesslab.cli:app"
 
 [dependency-groups]
 dev = [

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { statusLabel } from '@/composables/labels'
 
 const props = defineProps<{ value: string }>()
 
@@ -13,5 +14,5 @@ const tone = computed(() => {
 </script>
 
 <template>
-  <span class="status-pill" :class="tone">{{ value }}</span>
+  <span class="status-pill" :class="tone" :title="value" :data-status="value">{{ statusLabel(value) }}</span>
 </template>

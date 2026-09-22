@@ -48,6 +48,25 @@ async def test_api_routes_remain_authoritative_with_bundle(tmp_path: Path) -> No
     assert "bundled-workbench" not in missing_asset.text
 
 
+@pytest.mark.parametrize("path", ["/", "/index.html", "/regression", "/judgelab/example"])
+async def test_spa_shell_revalidates_on_navigation_and_conditional_requests(
+    tmp_path: Path, path: str
+) -> None:
+    application = create_app(workbench_dist=_bundle(tmp_path / "dist"))
+    async with AsyncClient(
+        transport=ASGITransport(app=application), base_url="http://test"
+    ) as client:
+        response = await client.get(path)
+        cached = await client.get(path, headers={"If-None-Match": response.headers["etag"]})
+        head = await client.head(path)
+
+    assert response.status_code == 200
+    assert cached.status_code == 304
+    assert head.status_code == 200
+    for result in (response, cached, head):
+        assert result.headers["cache-control"] == "no-cache"
+
+
 async def test_integrated_preflight_and_custom_eval_routes_precede_bundle(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime
 from enum import StrEnum
 from typing import Literal
 
@@ -605,3 +606,17 @@ def freeze_experiment_snapshot(**values: object) -> ExperimentSnapshot:
     return ExperimentSnapshot.model_validate(
         {**persisted, "snapshot_digest": canonical_digest(identity)}
     )
+
+
+class ExperimentSnapshotSummary(RegistryModel):
+    snapshot_id: Identifier
+    snapshot_digest: Sha256Digest
+    name: str
+    created_at: datetime
+
+
+class ExperimentSnapshotList(RegistryModel):
+    items: tuple[ExperimentSnapshotSummary, ...]
+    total: int
+    limit: int
+    offset: int

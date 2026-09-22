@@ -8,6 +8,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import TraceTimeline from '@/components/TraceTimeline.vue'
 import { escapeTooltipText } from '@/charts/safeTooltip'
 import App from '@/App.vue'
+import ProductStatus from '@/components/ProductStatus.vue'
 import router from '@/router'
 import { useExperimentStore } from '@/stores/experiments'
 import CoreReadinessView from '@/views/CoreReadinessView.vue'
@@ -153,7 +154,7 @@ describe('Workbench contracts', () => {
     expect(paths).toContain('/analyst')
   })
 
-  it('renders grouped product navigation and route metadata in the responsive shell', async () => {
+  it('renders compact product navigation and route metadata in the responsive shell', async () => {
     await router.push('/run-control')
     const wrapper = mount(App, {
       global: {
@@ -165,21 +166,40 @@ describe('Workbench contracts', () => {
       },
     })
     expect(wrapper.text()).toContain('SameScale')
-    expect(wrapper.text()).toContain('调查工作区')
-    expect(document.title).toBe('Run Control · SameScale')
-    expect(wrapper.get('.advanced-nav').attributes('open')).toBeDefined()
+    await flushPromises()
+    wrapper.getComponent(ProductStatus).vm.$emit('mode', 'workspace'); await flushPromises()
+    expect(wrapper.text()).toContain('评测与比较')
+    expect(document.title).toBe('运行记录 · SameScale')
+    expect(wrapper.find('.advanced-nav').exists()).toBe(false)
+    expect(wrapper.findAll('.sidebar nav a').map(link => link.attributes('href'))).toEqual(['/analyst', '/experiments', '/tasks', '/connections'])
+    expect(wrapper.findAll('.secondary-navigation a').map(link => link.attributes('href'))).toEqual(expect.arrayContaining(['/overview', '/run-control', '/analyst/sessions', '/regression', '/diagnosis', '/judgelab', '/core-readiness']))
     expect(wrapper.findAll('.nav-link')[0]!.attributes('href')).toBe('/analyst')
-    expect(wrapper.text()).toContain('Registry')
-    expect(wrapper.text()).toContain('评测证据 · Advanced')
-    expect(wrapper.find('.topbar h1').text()).toBe('Run Control')
+    expect(wrapper.text()).toContain('连接与配置')
+    expect(wrapper.find('.topbar h1').text()).toBe('运行记录')
     await wrapper.get('.mobile-menu-button').trigger('click')
     expect(wrapper.get('.workbench-shell').classes()).toContain('nav-open')
     await router.push('/analyst/sessions'); await flushPromises()
     expect(document.title).toBe('已保存调查 · SameScale')
-    expect(wrapper.get('.advanced-nav').attributes('open')).toBeUndefined()
-    expect(wrapper.findAll('.nav-current').map(link => link.attributes('href'))).toEqual(['/analyst/sessions'])
+    expect(wrapper.findAll('.nav-current').map(link => link.attributes('href'))).toEqual(['/experiments'])
     expect(wrapper.get('.workbench-shell').classes()).not.toContain('nav-open')
     wrapper.unmount()
+  })
+
+  it('keeps workspace navigation hidden until mode is known and keeps demo navigation read-only', async () => {
+    await router.push('/analyst')
+    const wrapper = mount(App, { global: { plugins: [router], stubs: { RouterView: true } } })
+    const paths = () => wrapper.findAll('.sidebar nav a').map(link => link.attributes('href'))
+    await flushPromises()
+    expect(paths()).toEqual(['/analyst'])
+    wrapper.getComponent(ProductStatus).vm.$emit('mode', 'demo'); await flushPromises()
+    expect(paths()).toEqual(['/analyst', '/tasks'])
+    await flushPromises()
+    wrapper.getComponent(ProductStatus).vm.$emit('mode', 'workspace'); await flushPromises()
+    expect(paths()).toContain('/experiments')
+    await router.push('/experiments/new'); await flushPromises()
+    expect(wrapper.findAll('.sidebar nav [aria-current="page"]').map(link => link.attributes('href'))).toEqual(['/analyst'])
+    await router.push('/harnesses'); await flushPromises()
+    expect(wrapper.findAll('.sidebar nav [aria-current="page"]').map(link => link.attributes('href'))).toEqual(['/connections'])
   })
 
   it('renders an evidence-first overview with direct registry and run-control entry points', async () => {
@@ -189,9 +209,9 @@ describe('Workbench contracts', () => {
     })
     const wrapper = mount(OverviewView, { global: { plugins: [router] } })
     await flushPromises()
-    expect(wrapper.text()).toContain('Controlled evaluation, from registry to trace')
+    expect(wrapper.text()).toContain('规划实验，核对运行证据')
     expect(wrapper.text()).toContain('Keyless Matrix')
-    expect(wrapper.text()).toContain('Run Control')
+    expect(wrapper.text()).toContain('运行记录')
     expect(wrapper.find('a[href="/run-control"]').exists()).toBe(true)
   })
 
@@ -199,7 +219,7 @@ describe('Workbench contracts', () => {
     const zero = mount(EvidenceValue, { props: { evidence: reported(0) } })
     const missing = mount(EvidenceValue, { props: { evidence: notReported } })
     expect(zero.text()).toContain('0.00')
-    expect(missing.text()).toContain('NOT_REPORTED')
+    expect(missing.get('[data-status="NOT_REPORTED"]').text()).toBe('未报告')
   })
 
   it('keeps NOT_REPORTED visually distinct from NOT_COMPARABLE', () => {
@@ -227,15 +247,15 @@ describe('Workbench contracts', () => {
     await router.push('/experiments/matrix-keyless')
     const wrapper = mount(ExperimentDetailView, { global: { plugins: [createPinia(), router] } })
     await flushPromises()
-    await wrapper.findAll('.tab-button')[3].trigger('click')
+    await wrapper.findAll('.tab-button')[3].trigger('click'); await flushPromises()
     const text = wrapper.text()
     expect(text).toContain('exploratory/descriptive only')
-    expect(text).toContain('Matched capability pairs')
-    expect(text).toContain('Per-model capability rates (B − A)')
-    expect(text).toContain('Matched capability-pair rates (B − A)')
+    expect(text).toContain('配对能力结果')
+    expect(text).toContain('各模型能力通过率差（B − A）')
+    expect(text).toContain('配对能力通过率差（B − A）')
     expect(text).toContain('BUDGET_EXHAUSTION')
     expect(text).toContain('NOT_AVAILABLE')
-    expect(text).toContain('Lease claims')
+    expect(text).toContain('租约领取')
     expect(text.toLowerCase()).not.toContain('statistically significant')
     expect(text.toLowerCase()).not.toContain('universally better')
     expect(text.toLowerCase()).not.toContain('causal uplift')
@@ -249,24 +269,24 @@ describe('Workbench contracts', () => {
 
   it('withholds content for REASONING_PRESENT', () => {
     const wrapper = mount(TraceTimeline, { props: { trace } })
-    expect(wrapper.text()).toContain('private content is withheld')
+    expect(wrapper.text()).toContain('不展示私有内容')
     expect(wrapper.text()).not.toContain('NATIVE_REASONING_CONTENT_MUST_STAY_HIDDEN')
-    expect(wrapper.text()).toContain('FULL_STREAM')
+    expect(wrapper.find('[data-status="FULL_STREAM"]').exists()).toBe(true)
   })
 
   it('renders experiment list evidence', async () => {
     const wrapper = mount(ExperimentsView, { global: { plugins: [createPinia(), router] } })
     await flushPromises()
     expect(wrapper.text()).toContain('Keyless Matrix')
-    expect(wrapper.text()).toContain('completed')
+    expect(wrapper.find('[data-status="completed"]').exists()).toBe(true)
   })
 
   it('renders run status, trace coverage, and cost missingness', async () => {
     await router.push('/runs/run-safe')
     const wrapper = mount(RunDetailView, { global: { plugins: [router] } })
     await flushPromises()
-    expect(wrapper.text()).toContain('capability_pass')
-    expect(wrapper.text()).toContain('FULL_STREAM')
+    expect(wrapper.find('[data-status="capability_pass"]').exists()).toBe(true)
+    expect(wrapper.find('[data-status="FULL_STREAM"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('NOT_REPORTED')
     expect(wrapper.text()).not.toContain('NATIVE_REASONING_CONTENT_MUST_STAY_HIDDEN')
   })
@@ -284,14 +304,14 @@ describe('Workbench contracts', () => {
     const wrapper = mount(RunControlView, { global: { plugins: [router] } })
     await flushPromises()
     const text = wrapper.text()
-    expect(text).toContain('Capability results stay final')
-    expect(text).toContain('RECOVERY REVIEW')
-    expect(text).toContain('Preserve exact treatment')
-    expect(text).toContain('Diagnosis & trace')
+    expect(text).toContain('保留原始能力结果')
+    expect(text).toContain('待审阅恢复')
+    expect(text).toContain('保留原实验条件')
+    expect(text).toContain('查看证据与轨迹')
     const cancelledRow = wrapper.findAll('tbody tr').find((row) => row.text().includes('run-cancelled'))
-    expect(cancelledRow?.text()).toContain('OBSERVE')
-    expect(cancelledRow?.text()).toContain('Observe backend lifecycle state')
-    expect(cancelledRow?.text()).not.toContain('Recorded evidence; no semantic retry')
+    expect(cancelledRow?.text()).toContain('查看状态')
+    expect(cancelledRow?.text()).toContain('查看服务端运行状态')
+    expect(cancelledRow?.text()).not.toContain('结果已记录，不通过重试改写能力证据')
     expect(wrapper.findAll('button').some((button) => button.text().toLowerCase().includes('retry')))
       .toBe(false)
     expect(api.getStatus).toHaveBeenCalledWith('matrix-keyless')
@@ -302,7 +322,7 @@ describe('Workbench contracts', () => {
     await router.push('/run-control?experiment=matrix-keyless')
     const wrapper = mount(RunControlView, { global: { plugins: [router] } })
     await flushPromises()
-    expect((wrapper.get('[aria-label="Run Control experiment"]').element as HTMLSelectElement).value)
+    expect((wrapper.get('[aria-label="选择运行记录所属实验"]').element as HTMLSelectElement).value)
       .toBe('matrix-keyless')
     expect(router.currentRoute.value.query.experiment).toBe('matrix-keyless')
   })
@@ -312,9 +332,9 @@ describe('Workbench contracts', () => {
     await router.push('/run-control?experiment=outside-first-page')
     const wrapper = mount(RunControlView, { global: { plugins: [router] } })
     await flushPromises()
-    expect((wrapper.get('[aria-label="Run Control experiment"]').element as HTMLSelectElement).value)
+    expect((wrapper.get('[aria-label="选择运行记录所属实验"]').element as HTMLSelectElement).value)
       .toBe('outside-first-page')
-    expect(wrapper.text()).toContain('outside-first-page · direct link')
+    expect(wrapper.text()).toContain('outside-first-page · 直接访问')
     expect(api.getStatus).toHaveBeenCalledWith('outside-first-page')
     expect(api.getRuns).toHaveBeenCalledWith('outside-first-page', { limit: 100 })
   })
@@ -335,7 +355,7 @@ describe('Workbench contracts', () => {
     await router.push('/judgelab/judge-keyless')
     const wrapper = mount(JudgeDetailView, { global: { plugins: [router] } })
     await flushPromises()
-    expect(wrapper.text()).toContain('QUALIFIED_FOR_SUITE')
+    expect(wrapper.find('[data-status="QUALIFIED_FOR_SUITE"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('core-calibration@1.0.0')
   })
 
@@ -362,15 +382,15 @@ describe('Workbench contracts', () => {
       comparisons: [{ baseline_cell_id: 'direct', candidate_cell_id: 'codex', baseline_value: reported(1), candidate_value: reported(.5), delta: reported(-.5), direction: 'DECREASED', baseline_tier: 'INFORMAL', candidate_tier: 'INFORMAL', comparability: 'NOT_COMPARABLE', reason_codes: ['HARD_CONTROL_MISMATCH'], paired_observations: 3, baseline_infra_count: 0, candidate_infra_count: 1 }],
     })
     const wrapper = mount(RegressionView)
-    await wrapper.get('[aria-label="Baseline experiment ID"]').setValue('a')
-    await wrapper.get('[aria-label="Candidate experiment ID"]').setValue('b')
-    await wrapper.get('[aria-label="Comparison intent"]').setValue('MODEL_COMPARISON')
+    await wrapper.get('[aria-label="基线实验 ID"]').setValue('a')
+    await wrapper.get('[aria-label="候选实验 ID"]').setValue('b')
+    await wrapper.get('[aria-label="对比目的"]').setValue('MODEL_COMPARISON')
     await wrapper.get('button').trigger('click')
     await flushPromises()
-    expect(wrapper.text()).toContain('NOT_COMPARABLE')
+    expect(wrapper.find('[data-status="NOT_COMPARABLE"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('no causal attribution')
     expect(wrapper.text()).toContain('HARD_CONTROL_MISMATCH')
-    expect(wrapper.text()).toContain('Raw direction')
+    expect(wrapper.text()).toContain('原始方向')
     expect(api.compare).toHaveBeenCalledWith('a', 'b', 'MODEL_COMPARISON')
   })
 
@@ -378,8 +398,8 @@ describe('Workbench contracts', () => {
     api.readiness.mockResolvedValue({ status: 'NOT_READY', task_corpus_size: 1, evaluated_at: '2026-08-23T00:00:00Z', blockers: ['REAL_JUDGE_EVIDENCE'], checks: [{ key: 'REAL_JUDGE_EVIDENCE', label: 'Real Judge evidence', status: 'NOT_VERIFIED', evidence: 'REAL_JUDGE_SMOKE=NOT_RUN' }] })
     const wrapper = mount(CoreReadinessView)
     await flushPromises()
-    expect(wrapper.text()).toContain('NOT_READY')
-    expect(wrapper.text()).toContain('NOT_VERIFIED')
+    expect(wrapper.find('[data-status="NOT_READY"]').exists()).toBe(true)
+    expect(wrapper.find('[data-status="NOT_VERIFIED"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('REAL_JUDGE_SMOKE=NOT_RUN')
   })
 
@@ -426,7 +446,7 @@ describe('Workbench contracts', () => {
     store.startPolling('matrix-keyless', 50)
     try {
       await flushPromises()
-      expect(store.error).toContain('could not be verified')
+      expect(store.error).toContain('无法读取或校验')
       expect(store.pollingHandle).not.toBeNull()
       await vi.advanceTimersByTimeAsync(50)
       expect(store.matrix?.report_digest).toBe('sha256:report')
@@ -470,7 +490,7 @@ describe('Workbench contracts', () => {
     store.startPolling('matrix-keyless', 50)
     try {
       await flushPromises()
-      expect(store.error).toContain('status could not be loaded')
+      expect(store.error).toContain('无法读取运行状态')
       expect(store.pollingHandle).not.toBeNull()
       await vi.advanceTimersByTimeAsync(50)
       expect(store.selected?.status).toBe('completed')
@@ -492,4 +512,57 @@ describe('Workbench contracts', () => {
     expect(api.getExperiment).toHaveBeenCalledTimes(2)
     expect(reconstructed.selected?.experiment_id).toBe('matrix-keyless')
   })
+})
+
+it('clears earlier run data and ignores a response from a previous experiment selection', async () => {
+  let finishOld!: (value: unknown) => void
+  api.listExperiments.mockResolvedValueOnce({ items: [experiment, { ...experiment, experiment_id: 'newer' }] })
+  api.getStatus.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve }))
+  await router.push('/run-control?experiment=matrix-keyless')
+  const wrapper = mount(RunControlView, { global: { plugins: [router] } }); await flushPromises()
+  await router.push('/run-control?experiment=newer'); await flushPromises()
+  finishOld({ experiment_id: 'matrix-keyless', terminal: true, status: 'old-sentinel' }); await flushPromises()
+  expect(wrapper.text()).not.toContain('old-sentinel')
+  expect(api.getStatus).toHaveBeenCalledWith('newer')
+})
+
+it('does not present an unavailable experiment list as zero recent experiments', async () => {
+  api.listExperiments.mockRejectedValueOnce(new Error('offline'))
+  const wrapper = mount(OverviewView); await flushPromises()
+  expect(wrapper.text()).toContain('不将缺失数据记为零')
+  expect(wrapper.get('.overview-metrics .metric-card .value').text()).toBe('—')
+  expect(wrapper.text()).not.toContain('尚无已保存实验')
+})
+
+it('ignores an initial experiment read after leaving that detail route', async () => {
+  const store = useExperimentStore()
+  let finish!: (value: unknown) => void
+  api.getExperiment.mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+  const pending = store.fetchExperiment('old-experiment', store.pollingGeneration)
+  store.stopPolling()
+  finish({ ...experiment, experiment_id: 'old-experiment' })
+  await pending
+  expect(store.selected).toBeNull()
+  expect(store.matrix).toBeNull()
+})
+
+it('separates workspace calibrations from frozen Judge evidence without overriding readiness', async () => {
+  api.listCalibrations.mockResolvedValue({ items: [], total: 0, limit: 25, offset: 0 })
+  const current = mount(JudgeLabView, { global: { plugins: [router] } }); await flushPromises()
+  expect(current.text()).toContain('当前工作区校准记录')
+  expect(current.text()).toContain('尚无评审校准记录')
+  expect(current.find('[data-status="REAL_JUDGE_SMOKE=NOT_RUN"]').exists()).toBe(false)
+  api.readiness.mockResolvedValue({ status: 'NOT_READY', blockers: ['JUDGE_CALIBRATION'], checks: [
+    { key: 'JUDGE_EVIDENCE', label: 'Core real Judge evidence', status: 'READY', evidence: 'Judge suite is frozen; REAL_JUDGE_SMOKE=VERIFIED' },
+    { key: 'JUDGE_CALIBRATION', label: 'Judge calibration evidence', status: 'NOT_REPORTED', evidence: '0 integrity-validated completed calibrations of 0 completed records' },
+  ] })
+  const history = mount(CoreReadinessView); await flushPromises()
+  expect(history.text()).toContain('冻结历史 Judge 证据'); expect(history.text()).toContain('当前工作区校准证据')
+  expect(history.text()).toContain('REAL_JUDGE_SMOKE=VERIFIED')
+  expect(history.find('[data-status="NOT_READY"]').exists()).toBe(true)
+  expect(history.find('[data-status="NOT_REPORTED"]').exists()).toBe(true)
+  api.listCalibrations.mockRejectedValueOnce(new Error('unavailable'))
+  const failed = mount(JudgeLabView, { global: { plugins: [router] } }); await flushPromises()
+  expect(failed.text()).toContain('暂时无法读取评审校准证据')
+  expect(failed.text()).not.toContain('尚无评审校准记录')
 })

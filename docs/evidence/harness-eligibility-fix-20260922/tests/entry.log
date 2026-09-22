@@ -1,0 +1,13 @@
+
+> harnesslab-workbench@0.1.0 test
+> vitest run tests/local-configuration-entry.spec.ts
+
+
+ RUN  v4.1.11 /home/dev/projects/harnesslab-ai-integration/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  08:50:13
+   Duration  2.23s (transform 786ms, setup 103ms, import 920ms, tests 309ms, environment 744ms)
+

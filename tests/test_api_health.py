@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -46,3 +47,28 @@ async def test_health_reports_unavailable_database_without_secret_leak() -> None
     assert response.status_code == 503
     assert response.json() == {"status": "unhealthy", "database": "unavailable"}
     assert "must-not-leak" not in response.text
+
+
+@pytest.mark.parametrize("configured", [None, "invalid-secret-sentinel"])
+async def test_missing_or_invalid_configuration_is_actionable(
+    configured: str | None, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    if configured is not None:
+        monkeypatch.setenv("DATABASE_URL", configured)
+    async with AsyncClient(
+        transport=ASGITransport(app=create_app()), base_url="http://test"
+    ) as client:
+        health = await client.get("/api/health")
+        assert health.status_code == 503
+        assert health.json() == {"status": "unhealthy", "database": "unavailable"}
+        for path in (
+            "/api/workbench/experiments",
+            "/api/workbench/analyst/sessions?experiment_id=test",
+        ):
+            response = await client.get(path)
+            assert response.status_code == 503
+            assert response.json()["error"]["code"] == "WORKSPACE_NOT_CONFIGURED"
+            assert "samescale up" in response.text
+            assert "invalid-secret-sentinel" not in response.text

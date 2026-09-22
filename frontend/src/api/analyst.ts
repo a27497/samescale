@@ -1,8 +1,10 @@
+import type { ComparisonExample } from '@/types/comparison'
 import { apiClient } from '@/api/client'
 import type { InvestigationExample, AnalystSession, AnalystSpendLimits, AnalystPreflight, RegressionProposal } from '@/types/analyst'
 
 const path = (id: string) => `/analyst/sessions/${encodeURIComponent(id)}`
 export const analystApi = {
+  comparison: async () => (await apiClient.get<ComparisonExample>('/analyst/examples/comparison')).data,
   offline: async () => (await apiClient.post<InvestigationExample>('/analyst/examples/offline')).data,
   historical: async () => (await apiClient.get<InvestigationExample>('/analyst/examples/historical')).data,
   list: async (experimentId: string) => (await apiClient.get<{ items: AnalystSession[] }>('/analyst/sessions', { params: { experiment_id: experimentId } })).data,

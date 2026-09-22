@@ -1,8 +1,11 @@
+<script setup lang="ts">
+import { t } from '@/composables/i18n'
+</script>
 <template>
   <section class="centered-state">
-    <span class="eyebrow">ROUTE NOT FOUND</span>
-    <h2>This workbench page does not exist.</h2>
-    <p>The URL may be stale. No data or experiment state was changed.</p>
-    <RouterLink class="primary-button" to="/">Return to overview</RouterLink>
+    <span class="eyebrow">{{ t('页面不存在') }}</span>
+    <h2>{{ t('没有找到此页面') }}</h2>
+    <p>{{ t('链接可能已失效。可以返回首页查看评测入口。') }}</p>
+    <RouterLink class="primary-button" to="/">{{ t('返回首页') }}</RouterLink>
   </section>
 </template>

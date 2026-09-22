@@ -2,11 +2,13 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import router from '@/router'
+import { preferences } from '@/composables/preferences'
 import CapabilitiesView from '@/views/CapabilitiesView.vue'
 import ExperimentBuilderView from '@/views/ExperimentBuilderView.vue'
 import HarnessesView from '@/views/HarnessesView.vue'
 import ModelsView from '@/views/ModelsView.vue'
 import ProvidersView from '@/views/ProvidersView.vue'
+import ConnectionsView from '@/views/ConnectionsView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 
 const api = vi.hoisted(() => ({
@@ -76,17 +78,20 @@ describe('Unified Registry Lite Workbench', () => {
   })
 
   it('shows credential presence without browser secret editing', async () => {
-    const wrapper = mount(SettingsView)
+    await router.push('/connections')
+    const wrapper = mount(ConnectionsView, { global: { plugins: [router] } })
     await flushPromises()
     expect(wrapper.text()).toContain('HARNESSLAB_ALIBABA_BAILIAN_API_KEY')
-    expect(wrapper.text()).toContain('MISSING')
-    expect(wrapper.text()).toContain('Secret editing is intentionally unavailable')
+    expect(wrapper.find('[data-status="MISSING"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('当前网页不编辑 API Key 或服务端配置。')
   })
 
   it('renders fail-closed capability reason codes', async () => {
     const wrapper = mount(CapabilitiesView)
     await flushPromises()
-    expect(wrapper.text()).toContain('UNSUPPORTED')
+    expect(wrapper.find('[data-status="UNSUPPORTED"]').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('PROVIDER_MODEL_PROFILE_UNSUPPORTED_BY_HARNESS')
+    await wrapper.get('.compatibility-toggle').trigger('click')
     expect(wrapper.text()).toContain('PROVIDER_MODEL_PROFILE_UNSUPPORTED_BY_HARNESS')
     expect(wrapper.text()).toContain('NOT_SUPPORTED')
   })
@@ -113,6 +118,8 @@ describe('Unified Registry Lite Workbench', () => {
   it('exposes Harness image, tools, network, observed-model surface, and supported profiles', async () => {
     const wrapper = mount(HarnessesView)
     await flushPromises()
+    expect(wrapper.text()).not.toContain('codex-image')
+    await wrapper.findAll('.resource-list button').find(item => item.text().includes('Codex'))!.trigger('click')
     const text = wrapper.text()
     expect(text).toContain('codex-image')
     expect(text).toContain('shell')
@@ -122,22 +129,211 @@ describe('Unified Registry Lite Workbench', () => {
   })
 
   it('keeps repeat count backend-derived and previews blocked interleaving', async () => {
-    const wrapper = mount(ExperimentBuilderView)
+    const wrapper = mount(ExperimentBuilderView, { global: { plugins: [router] } })
     await flushPromises()
-    await wrapper.get('[aria-label="Left provider profile"]').setValue(providerProfile.profile_id)
-    await wrapper.get('[aria-label="Right provider profile"]').setValue(providerProfile.profile_id)
-    await wrapper.get('[aria-label="Left Harness profile"]').setValue(directProfile.profile_id)
-    await wrapper.get('[aria-label="Right Harness profile"]').setValue(codexProfile.profile_id)
-    await wrapper.get('.task-picker input').setValue(true)
-    await wrapper.get('[aria-label="Evaluation mode"]').setValue('INFORMAL')
-    expect((wrapper.get('[aria-label="Repeat policy"]').element as HTMLInputElement).value).toContain('n=3')
-    await wrapper.get('.toolbar .primary-button').trigger('click')
+    await wrapper.get('[aria-label="评测模式"]').setValue('INFORMAL')
+    expect((wrapper.get('[aria-label="重复策略"]').element as HTMLInputElement).value).toContain('n=3')
+    await wrapper.get('button').trigger('click')
     await flushPromises()
     const request = api.preflight.mock.calls[0][0]
     expect(request.evaluation_mode).toBe('INFORMAL')
     expect(request).not.toHaveProperty('repeat_count')
+    expect(request.budget.max_output_tokens.scopes).toEqual(['PER_PROVIDER_REQUEST', 'PER_LOGICAL_RUN'])
+    expect(request.budget.max_model_turns).toMatchObject({ status: 'ENFORCED', value: 1 })
+    expect(request.budget.max_tool_calls).toMatchObject({ status: 'ENFORCED', value: 0 })
+    expect(request.budget.max_provider_requests).toMatchObject({ status: 'ENFORCED', value: 1 })
     expect(wrapper.text()).toContain('right → left')
     expect(wrapper.text()).toContain('PRICING_NOT_AVAILABLE')
-    expect(wrapper.text()).toContain('NO EXECUTION')
+    expect(wrapper.text()).toContain('不执行实验')
   })
+})
+
+it('invalidates a preflight and frozen snapshot when the form changes', async () => {
+  const wrapper = mount(ExperimentBuilderView, { global: { plugins: [router] } }); await flushPromises()
+  const preflightButton = () => wrapper.findAll('button').find(item => item.text() === '运行无密钥预检')!
+  const snapshotButton = () => wrapper.findAll('button').find(item => item.text() === '保存计划')!
+  await preflightButton().trigger('click'); await flushPromises()
+  expect(snapshotButton().attributes('disabled')).toBeUndefined()
+  await wrapper.get('[aria-label="实验名称"]').setValue('Changed plan')
+  expect(snapshotButton().attributes('disabled')).toBeDefined()
+  expect(wrapper.text()).not.toContain('PRICING_NOT_AVAILABLE')
+  expect(api.snapshot).not.toHaveBeenCalled()
+})
+
+it('discards a preflight that finishes after a budget edit', async () => {
+  let finish!: (value: unknown) => void
+  api.preflight.mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+  const wrapper = mount(ExperimentBuilderView, { global: { plugins: [router] } }); await flushPromises()
+  await wrapper.findAll('button').find(item => item.text() === '运行无密钥预检')!.trigger('click')
+  await wrapper.get('[aria-label="输出 Token 上限"]').setValue(999)
+  finish({ status: 'READY', checks: [], schedule_preview: [], candidate_plan_digest: 'stale-plan' })
+  await flushPromises()
+  expect(wrapper.text()).not.toContain('stale-plan')
+  expect(wrapper.findAll('button').find(item => item.text() === '保存计划')!.attributes('disabled')).toBeDefined()
+})
+
+it('keeps browser preferences independent of server configuration reads', async () => {
+  localStorage.clear()
+  const wrapper = mount(SettingsView); await flushPromises()
+  expect(api.settings).not.toHaveBeenCalled()
+  await wrapper.get('#text-size').setValue('large')
+  expect(document.documentElement.dataset.textSize).toBe('large')
+  expect(JSON.parse(localStorage.getItem('samescale.ui.preferences.v1')!).textSize).toBe('large')
+  await wrapper.findAll('button').find(item => item.text() === '恢复默认显示')!.trigger('click')
+  expect(document.documentElement.dataset.textSize).toBe('standard')
+  expect(api.preflight).not.toHaveBeenCalled()
+})
+
+
+it('paginates compatibility and resets the page and disclosure after filtering', async () => {
+  const item = (await api.capabilities()).items[0]
+  api.capabilities.mockResolvedValueOnce({ items: Array.from({ length: 23 }, (_, index) => ({ ...item, provider_profile_id: `profile-${index}` })) })
+  const wrapper = mount(CapabilitiesView); await flushPromises()
+  expect(wrapper.findAll('.compatibility-toggle')).toHaveLength(10)
+  await wrapper.findAll('button').find(item => item.text() === '下一页')!.trigger('click')
+  expect(wrapper.findAll('.compatibility-toggle')[0]!.text()).toContain('profile-10')
+  await wrapper.get('.compatibility-toggle').trigger('click')
+  await wrapper.get('[aria-label="搜索兼容性"]').setValue('profile-22')
+  expect(wrapper.findAll('.compatibility-toggle')).toHaveLength(1)
+  expect(wrapper.get('.compatibility-toggle').attributes('aria-expanded')).toBe('false')
+  expect(wrapper.get('.pagination').text()).toContain('1–1 / 1')
+})
+
+it('searches resources without leaving an unrelated detail visible', async () => {
+  const wrapper = mount(HarnessesView); await flushPromises()
+  await wrapper.get('[aria-label="搜索资源"]').setValue('codex')
+  expect(wrapper.findAll('.resource-list button')).toHaveLength(1)
+  expect(wrapper.get('.resource-detail').text()).toContain('codex-image')
+  await wrapper.get('[aria-label="搜索资源"]').setValue('not-a-resource')
+  expect(wrapper.get('.resource-detail').text()).not.toContain('codex-image')
+})
+
+it('persists interface language, updates mounted UI and preserves raw registry identities', async () => {
+  localStorage.clear()
+  const wrapper = mount(SettingsView); await flushPromises()
+  await wrapper.get('#interface-language').setValue('en')
+  expect(wrapper.text()).toContain('Interface language')
+  expect(api.settings).not.toHaveBeenCalled()
+  expect(document.documentElement.lang).toBe('en')
+  expect(JSON.parse(localStorage.getItem('samescale.ui.preferences.v1')!).language).toBe('en')
+  const other = mount(SettingsView); await flushPromises()
+  expect(other.text()).toContain('Interface language')
+  await other.get('#interface-language').setValue('zh-CN')
+  expect(wrapper.text()).toContain('界面语言')
+  localStorage.clear()
+})
+
+
+it('restores a valid comparison URL and invalidates preflight when the URL choice changes', async () => {
+  await router.push('/experiments/new?comparison=MODEL_COMPARISON')
+  const wrapper = mount(ExperimentBuilderView, { global: { plugins: [router] } }); await flushPromises()
+  const comparison = () => (wrapper.get('[aria-label="对比类型"]').element as HTMLSelectElement).value
+  expect(comparison()).toBe('MODEL_COMPARISON')
+  await wrapper.findAll('button').find(item => item.text() === '运行无密钥预检')!.trigger('click'); await flushPromises()
+  expect(api.preflight.mock.calls.at(-1)?.[0].comparison_type).toBe('MODEL_COMPARISON')
+  await router.push('/experiments/new?comparison=HARNESS_UPLIFT'); await flushPromises()
+  expect(comparison()).toBe('HARNESS_UPLIFT')
+  expect(wrapper.findAll('button').find(item => item.text() === '保存计划')!.attributes('disabled')).toBeDefined()
+  await router.push('/experiments/new?comparison=invalid'); await flushPromises()
+  expect(comparison()).toBe('HARNESS_UPLIFT')
+  expect(api.snapshot).not.toHaveBeenCalled()
+})
+
+
+it('shows server compatibility and its reasons beside each planning selection', async () => {
+  const unsupported = (await api.capabilities()).items[0]
+  api.capabilities.mockResolvedValue({ items: [
+    { ...unsupported, harness_profile_id: directProfile.profile_id, status: 'PARTIALLY_SUPPORTED', reason_codes: ['TRACE_COVERAGE_LIMITED'] },
+    { ...unsupported, harness_profile_id: codexProfile.profile_id },
+  ] })
+  const wrapper = mount(ExperimentBuilderView, { global: { plugins: [router] } }); await flushPromises()
+  expect(wrapper.findAll('.planning-connection')[0]!.text()).toContain('轨迹覆盖有限')
+  expect(wrapper.findAll('.planning-connection')[1]!.text()).toContain('此执行方式未声明支持该模型服务配置')
+  expect(wrapper.findAll('.planning-connection')[1]!.find('[data-status="UNSUPPORTED"]').exists()).toBe(true)
+  await wrapper.get('[aria-label="右侧执行方式"]').setValue(directProfile.profile_id)
+  expect(wrapper.findAll('.planning-connection')[1]!.find('[data-status="PARTIALLY_SUPPORTED"]').exists()).toBe(true)
+  expect(api.preflight).not.toHaveBeenCalled()
+  expect(api.snapshot).not.toHaveBeenCalled()
+})
+
+it('keeps missing compatibility unknown and allows explicit authoritative preflight', async () => {
+  api.capabilities.mockRejectedValue(new Error('offline'))
+  const wrapper = mount(ExperimentBuilderView, { global: { plugins: [router] } }); await flushPromises()
+  expect(wrapper.get('[role="status"]').text()).toContain('以服务端预检为准')
+  expect(wrapper.findAll('.planning-connection > [data-status="NOT_VERIFIED"]')).toHaveLength(2)
+  expect(api.preflight).not.toHaveBeenCalled()
+  await wrapper.findAll('button').find(b => b.text() === '运行无密钥预检')!.trigger('click'); await flushPromises()
+  expect(api.preflight).toHaveBeenCalledTimes(1)
+  expect(api.snapshot).not.toHaveBeenCalled()
+})
+
+it('announces pending preflight and removes the unsubmitted prompt until success or failure', async () => {
+  const wrapper = mount(ExperimentBuilderView, { global: { plugins: [router] } }); await flushPromises()
+  let finish!: (value: unknown) => void
+  api.preflight.mockReturnValueOnce(new Promise(resolve => { finish = resolve }))
+  await wrapper.findAll('button').find(b => b.text() === '运行无密钥预检')!.trigger('click')
+  expect(wrapper.get('[role="status"]').text()).toContain('正在运行无密钥预检')
+  expect(wrapper.text()).not.toContain('先运行预检')
+  expect(wrapper.findAll('button').find(b => b.text() === '正在预检…')!.attributes('disabled')).toBeDefined()
+  finish({ status: 'BLOCKED', checks: [], estimated_logical_slots: 2, cost_estimate: { status: 'NOT_AVAILABLE' }, schedule_preview: [] }); await flushPromises()
+  expect(wrapper.text()).not.toContain('正在运行无密钥预检')
+  expect(wrapper.findAll('button').find(b => b.text() === '保存计划')!.attributes('disabled')).toBeDefined()
+  api.preflight.mockRejectedValueOnce(new Error('private failure'))
+  await wrapper.findAll('button').find(b => b.text() === '运行无密钥预检')!.trigger('click'); await flushPromises()
+  expect(wrapper.text()).toContain('预检失败'); expect(wrapper.text()).not.toContain('正在运行无密钥预检')
+})
+
+it('links a saved snapshot to a reloadable read-only entry', async () => {
+  api.snapshot.mockResolvedValue({ snapshot_id: 'snapshot-test', snapshot_digest: 'sha256:saved' })
+  const wrapper = mount(ExperimentBuilderView, { global: { plugins: [router] } }); await flushPromises()
+  await wrapper.findAll('button').find(b => b.text() === '运行无密钥预检')!.trigger('click'); await flushPromises()
+  await wrapper.findAll('button').find(b => b.text() === '保存计划')!.trigger('click'); await flushPromises()
+  expect(wrapper.get('.snapshot-confirmation a').attributes('href')).toBe('/experiments?snapshot=snapshot-test#saved-plans')
+})
+
+it('translates the product footer after switching language and reconstructing settings', async () => {
+  localStorage.clear()
+  const wrapper = mount(SettingsView); await flushPromises()
+  await wrapper.get('#interface-language').setValue('en')
+  expect(wrapper.get('.settings-about').text()).toContain('Conclusions are limited to the available evidence.')
+  wrapper.unmount()
+  const again = mount(SettingsView); await flushPromises()
+  expect(again.get('.settings-about').text()).not.toMatch(/[\u4e00-\u9fff]/)
+})
+
+
+it('invalidates failed snapshot preflight and requires a successful new preflight before saving again', async () => {
+  preferences.language = 'zh-CN'
+  await router.push('/experiments/new')
+  const wrapper = mount(ExperimentBuilderView, { global: { plugins: [router] } }); await flushPromises()
+  const preflightButton = () => wrapper.findAll('button').find(b => b.text() === '运行无密钥预检')!
+  const saveButton = () => wrapper.findAll('button').find(b => b.text() === '保存计划')!
+  await preflightButton().trigger('click'); await flushPromises()
+  expect(saveButton().attributes('disabled')).toBeUndefined()
+  expect(wrapper.text()).toContain('sha256:plan')
+  api.snapshot.mockRejectedValueOnce(new Error('private-save-failure'))
+  await saveButton().trigger('click'); await flushPromises()
+  expect(wrapper.text()).toContain('快照未保存，请重新预检后重试。')
+  expect(wrapper.text()).not.toContain('private-save-failure')
+  expect(wrapper.text()).not.toContain('sha256:plan')
+  expect(wrapper.find('.snapshot-confirmation').exists()).toBe(false)
+  expect(saveButton().attributes('disabled')).toBeDefined()
+  await saveButton().trigger('click'); expect(api.snapshot).toHaveBeenCalledTimes(1)
+  api.preflight.mockRejectedValueOnce(new Error('preflight-unavailable'))
+  await preflightButton().trigger('click'); await flushPromises()
+  expect(saveButton().attributes('disabled')).toBeDefined()
+  api.preflight.mockResolvedValueOnce({ status: 'BLOCKED', checks: [], schedule_preview: [], cost_estimate: { status: 'NOT_AVAILABLE' } })
+  await preflightButton().trigger('click'); await flushPromises()
+  expect(saveButton().attributes('disabled')).toBeDefined()
+  let complete!: (value: unknown) => void
+  const ready = await api.preflight.mock.results[0]!.value
+  api.preflight.mockReturnValueOnce(new Promise(resolve => { complete = resolve }))
+  await preflightButton().trigger('click')
+  expect(saveButton().attributes('disabled')).toBeDefined()
+  complete({ ...ready, candidate_plan_digest: 'sha256:renewed-plan' }); await flushPromises()
+  expect(saveButton().attributes('disabled')).toBeUndefined()
+  api.snapshot.mockResolvedValueOnce({ snapshot_id: 'snapshot-recovered', snapshot_digest: 'sha256:recovered' })
+  await saveButton().trigger('click'); await flushPromises()
+  expect(api.snapshot).toHaveBeenCalledTimes(2)
+  expect(wrapper.get('.snapshot-confirmation').text()).toContain('snapshot-recovered')
 })

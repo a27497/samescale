@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import App from '@/App.vue'
 import applicationRouter from '@/router'
@@ -7,12 +7,19 @@ import ConnectionsView from '@/views/ConnectionsView.vue'
 import { preferences } from '@/composables/preferences'
 import fixture from './fixtures/registry-connections.json'
 
-const registry = vi.hoisted(() => ({ models: vi.fn(), providers: vi.fn(), harnesses: vi.fn(), settings: vi.fn() }))
+const registry = vi.hoisted(() => ({ models: vi.fn(), providers: vi.fn(), harnesses: vi.fn(), capabilities: vi.fn(), settings: vi.fn() }))
 const local = vi.hoisted(() => ({ status: vi.fn(), list: vi.fn(), options: vi.fn(), credentials: vi.fn(), connections: vi.fn(), harnesses: vi.fn(), save: vi.fn() }))
 vi.mock('@/api/client', () => ({ registryApi: registry }))
 vi.mock('@/api/localConfiguration', () => ({ localConfigurationApi: local }))
+afterEach(() => vi.unstubAllGlobals())
 beforeEach(() => {
   vi.resetAllMocks(); localStorage.clear(); sessionStorage.clear(); preferences.language = 'zh-CN'
+  vi.stubGlobal('fetch', vi.fn(async (url: string) => {
+    if (url === '/api/product') return { ok: true, json: async () => ({ mode: 'workspace' }) }
+    if (url === '/api/health') return { ok: true, json: async () => ({ status: 'ok', database: 'ok' }) }
+    throw new Error(`Unexpected test request: ${url}`)
+  }))
+  registry.capabilities.mockResolvedValue(structuredClone(fixture.capabilities))
   registry.models.mockResolvedValue(structuredClone(fixture.models))
   registry.providers.mockResolvedValue(structuredClone(fixture.providers))
   registry.harnesses.mockResolvedValue(structuredClone(fixture.harnesses))
@@ -58,7 +65,7 @@ describe('local configuration application entry', () => {
     const { wrapper } = await open()
     expect(wrapper.get('.connections-page > [role=alert]').text()).toContain('模型配置')
     expect(wrapper.text()).not.toContain('private-endpoint-sentinel')
-    await wrapper.get('.connections-page .page-heading button').trigger('click'); await flushPromises()
+    await wrapper.get('.connections-page .connections-toolbar button').trigger('click'); await flushPromises()
     expect(wrapper.find('.connections-page > [role=alert]').exists()).toBe(false)
     expect(registry.models).toHaveBeenCalledTimes(2)
   })

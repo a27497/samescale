@@ -81,7 +81,7 @@ onMounted(load); onBeforeUnmount(() => { generation++; key.value = ''; connectio
         <h5>{{ t('凭据') }}</h5><button class="secondary-button" :disabled="busy" @click="clearKey">{{ t('新增凭据') }}</button>
         <ul><li v-for="item in credentials" :key="item.credential_id"><button :disabled="busy" @click="editKey(item)">{{ item.name }} · v{{ item.revision }} · {{ t(item.enabled ? (item.present ? '已配置' : '不可用') : '已停用') }}</button><code>{{ item.reference }}</code></li></ul>
         <form @submit.prevent="saveKey"><fieldset :disabled="busy"><legend>{{ t('保存或轮换凭据') }}</legend>
-          <label>{{ t('凭据 ID') }}<input v-model="key.id" :disabled="key.revision > 0" maxlength="32" pattern="[a-z][a-z0-9-]{0,31}" required></label>
+          <label>{{ t('凭据 ID') }}<input v-model="key.id" :disabled="key.revision > 0" maxlength="32" pattern="[a-z][a-z0-9\-]{0,31}" required></label>
           <label>{{ t('凭据名称') }}<input v-model="key.name" maxlength="100" required></label>
           <label>{{ t('新的 API Key') }}<input v-model="key.value" type="password" autocomplete="off" maxlength="8192" :required="key.revision === 0"></label>
           <label class="check-row"><input v-model="key.enabled" type="checkbox">{{ t('启用凭据') }}</label>
@@ -92,7 +92,7 @@ onMounted(load); onBeforeUnmount(() => { generation++; key.value = ''; connectio
         <h5>{{ t('服务连接') }}</h5><button class="secondary-button" :disabled="busy" @click="clearConnection">{{ t('新增连接') }}</button>
         <ul><li v-for="item in connections" :key="item.connection_id"><button :disabled="busy" @click="editConnection(item)">{{ item.name }} · v{{ item.revision }} · {{ t(item.enabled ? (item.ready_for_planning ? '本地引用可用' : '需要检查引用') : '已停用') }}</button><span>{{ t('连接健康：未验证') }}</span><button class="secondary-button" :disabled="busy" @click="check(item)">{{ t('校验配置（不联网）') }}</button></li></ul>
         <form @submit.prevent="saveConnection"><fieldset :disabled="busy"><legend>{{ t('保存服务连接') }}</legend>
-          <label>{{ t('连接 ID') }}<input v-model="connection.id" :disabled="connection.revision > 0" maxlength="32" pattern="[a-z][a-z0-9-]{0,31}" required></label>
+          <label>{{ t('连接 ID') }}<input v-model="connection.id" :disabled="connection.revision > 0" maxlength="32" pattern="[a-z][a-z0-9\-]{0,31}" required></label>
           <label>{{ t('连接名称') }}<input v-model="connection.name" maxlength="100" required></label>
           <label>{{ t('服务商模板') }}<select v-model="connection.provider" :aria-label="t('服务商模板')" @change="connection.protocol = protocols[0] ?? ''"><option v-for="p in providers" :key="p.provider_id" :value="p.provider_id">{{ p.display_name }}</option></select></label>
           <label>{{ t('协议') }}<select v-model="connection.protocol" :aria-label="t('协议')"><option v-for="protocol in protocols" :key="protocol" :value="protocol">{{ protocol }}</option></select></label>

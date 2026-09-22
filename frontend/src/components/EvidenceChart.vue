@@ -1,42 +1,23 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-
-import { init, type ECharts } from '@/charts/echarts'
+import { t } from '@/composables/i18n'
 import EvidenceValue from '@/components/EvidenceValue.vue'
 import type { EvidenceValue as EvidenceValueType } from '@/types/workbench'
 
-const props = defineProps<{
+defineProps<{
   title: string
   items: Array<{ label: string; evidence: EvidenceValueType }>
 }>()
-const target = ref<HTMLDivElement | null>(null)
-let chart: ECharts | null = null
-
-function render() {
-  if (!target.value) return
-  chart ??= init(target.value)
-  chart.setOption({
-    animation: false,
-    grid: { left: 92, right: 20, top: 18, bottom: 30 },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'value' },
-    yAxis: { type: 'category', data: props.items.map((item) => item.label) },
-    series: [{ type: 'bar', data: props.items.map((item) => item.evidence.value), itemStyle: { color: '#268f86' } }],
-  })
-}
-
-watch(() => props.items, () => nextTick(render), { deep: true })
-onMounted(render)
-onBeforeUnmount(() => chart?.dispose())
 </script>
 
 <template>
-  <div>
-    <div ref="target" class="chart" role="img" :aria-label="title" />
-    <div class="chart-summary">
-      <span v-for="item in items" :key="item.label" style="margin-right: 16px">
-        {{ item.label }}: <EvidenceValue :evidence="item.evidence" />
-      </span>
-    </div>
-  </div>
+  <dl class="usage-evidence" :aria-label="title">
+    <div v-for="item in items" :key="item.label"><dt>{{ t(item.label) }}</dt><dd><EvidenceValue :evidence="item.evidence" /></dd></div>
+  </dl>
 </template>
+
+<style scoped>
+.usage-evidence { margin: 0; }
+.usage-evidence > div { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.usage-evidence dt { color: var(--muted); font: var(--type-caption); }
+.usage-evidence dd { margin: 0; font: var(--type-code); }
+</style>

@@ -22,6 +22,7 @@ import type {
   ExperimentBuilderRequest,
   ExperimentPreflight,
   ExperimentSnapshot,
+  ExperimentSnapshotSummary,
   HarnessDefinition,
   MethodologyRegistryItem,
   ModelDefinition,
@@ -134,7 +135,11 @@ export const registryApi = {
       )
     ).data,
   preflight: async (request: ExperimentBuilderRequest) =>
-    (await registryApiClient.post<ExperimentPreflight>('/experiments/preflight', request)).data,
+    (await registryApiClient.post<ExperimentPreflight>('/experiments/preflight', request, { timeout: 120_000 })).data,
+  snapshots: async (offset = 0) =>
+    (await registryApiClient.get<{ items: ExperimentSnapshotSummary[]; total: number; limit: number; offset: number }>('/experiments/snapshots', { params: { offset, limit: 25 } })).data,
+  getSnapshot: async (id: string) =>
+    (await registryApiClient.get<ExperimentSnapshot>(`/experiments/snapshots/${encodeURIComponent(id)}`)).data,
   snapshot: async (request: ExperimentBuilderRequest) =>
-    (await registryApiClient.post<ExperimentSnapshot>('/experiments/snapshot', request)).data,
+    (await registryApiClient.post<ExperimentSnapshot>('/experiments/snapshot', request, { timeout: 120_000 })).data,
 }

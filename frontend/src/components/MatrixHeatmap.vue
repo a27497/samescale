@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from '@/composables/i18n'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { init, type ECharts } from '@/charts/echarts'
@@ -8,6 +9,7 @@ import type { MatrixMetricKey, MatrixResponse } from '@/types/workbench'
 const props = defineProps<{ matrix: MatrixResponse; metric: MatrixMetricKey }>()
 const chartElement = ref<HTMLDivElement | null>(null)
 let chart: ECharts | null = null
+let resizeObserver: ResizeObserver | null = null
 
 const textualSummary = computed(() =>
   props.matrix.points.map((point) => {
@@ -26,6 +28,7 @@ function renderChart() {
   const max = numericValues.length ? Math.max(...numericValues) : 1
   chart.setOption({
     animation: false,
+    textStyle: { fontFamily: getComputedStyle(document.documentElement).fontFamily, fontSize: 13 },
     grid: { left: 150, right: 28, top: 34, bottom: 64 },
     tooltip: {
       formatter: (raw: unknown) => {
@@ -50,7 +53,7 @@ function renderChart() {
       orient: 'horizontal',
       left: 'center',
       bottom: 2,
-      inRange: { color: ['#edf4f3', '#84c9c1', '#126f68'] },
+      inRange: { color: ['#f0f2f5', '#b1bfce', '#536b86'] },
     },
     series: [
       {
@@ -76,14 +79,17 @@ function renderChart() {
 }
 
 watch(() => [props.matrix, props.metric], () => nextTick(renderChart), { deep: true })
-onMounted(renderChart)
-onBeforeUnmount(() => chart?.dispose())
+onMounted(() => {
+  renderChart()
+  if (typeof ResizeObserver !== 'undefined' && chartElement.value) { resizeObserver = new ResizeObserver(() => chart?.resize()); resizeObserver.observe(chartElement.value) }
+})
+onBeforeUnmount(() => { resizeObserver?.disconnect(); chart?.dispose() })
 </script>
 
 <template>
   <div>
-    <div ref="chartElement" class="chart" role="img" :aria-label="`Matrix heatmap for ${metric}`" />
-    <ul class="chart-summary" aria-label="Matrix textual summary">
+    <div ref="chartElement" class="chart" role="img" :aria-label="`矩阵热图：${metric}`" />
+    <ul class="chart-summary" :aria-label="t('矩阵文字摘要')">
       <li v-for="item in textualSummary" :key="item">{{ item }}</li>
     </ul>
   </div>

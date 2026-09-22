@@ -1,0 +1,187 @@
+--- before/frontend/src/views/ExperimentBuilderView.vue
++++ after/frontend/src/views/ExperimentBuilderView.vue
+@@ -29,6 +29,7 @@
+ const connectionError = ref(false)
+ // Retain identity for display only; availability always comes from the current catalog.
+ const selectedProfileIdentities = reactive<Record<string, string>>({})
++const selectedHarnessIdentities = reactive<Record<string, string>>({})
+ let modelSelectionInitialized = false
+ const profileFor = (id: string) => profiles.value.find(p => p.profile_id === id)
+ const providerFor = (id: string) => providers.value.find(p => p.provider_id === profileFor(id)?.provider_id)
+@@ -47,6 +48,15 @@
+ const includesDirect = computed(() => harnesses.value.some(item => item.harness_id === 'direct-model'
+   && item.profiles.some(profile => [form.leftHarness, form.rightHarness].includes(profile.profile_id))))
+ const harnessProfiles = computed(() => harnesses.value.flatMap((item) => item.profiles))
++const harnessProfileFor = (id: string) => harnessProfiles.value.find(item => item.profile_id === id)
++function harnessIssue(profileId: string, harnessId: string): string | null {
++  const harness = harnessProfileFor(harnessId)
++  if (!harness) return '执行方式已不可用，请显式选择有效配置。'
++  // The Registry wire contract omits enabled when it is true.
++  if (harness.enabled === false) return '执行方式已停用'
++  if (!harness.supported_provider_profile_ids.includes(profileId)) return '执行方式与所选模型版本不兼容'
++  return null
++}
+ 
+ const route = useRoute()
+ watch(() => route.query.comparison, value => {
+@@ -58,6 +68,10 @@
+   for (const id of [form.leftProfile, form.rightProfile]) {
+     const identity = profileFor(id)?.profile_identity
+     if (identity) selectedProfileIdentities[id] = identity
++  }
++  for (const id of [form.leftHarness, form.rightHarness]) {
++    const identity = harnessProfileFor(id)?.harness_config_identity
++    if (identity) selectedHarnessIdentities[id] = identity
+   }
+   loading.value = true; error.value = ''; preflight.value = null; snapshot.value = null
+   profiles.value = []; harnesses.value = []; methodology.value = null; tasks.value = []; settings.value = null
+@@ -81,8 +95,7 @@
+       if (!profileFor(form.rightProfile)) form.rightProfile = defaultProfile
+       modelSelectionInitialized = true
+     }
+-    if (!harnessProfiles.value.some(item => item.profile_id === form.leftHarness)) form.leftHarness = harnessProfiles.value[0]?.profile_id ?? ''
+-    if (!harnessProfiles.value.some(item => item.profile_id === form.rightHarness)) form.rightHarness = harnessProfiles.value[1]?.profile_id ?? form.leftHarness
++    // Keep the intended Harness identities, including on the first load. Never substitute an executor.
+     selectedTasks.value = taskData.items.slice(0, 1).map((item) => item.task_id)
+   } catch { error.value = '无法读取实验规划配置，请检查本地 API 后重试。' } finally { loading.value = false }
+ }
+@@ -95,7 +108,7 @@
+   return limits.length ? Math.min(...limits) : null
+ })
+ const outputBudgetExceeded = computed(() => outputTokenLimit.value !== null && form.outputTokens > outputTokenLimit.value)
+-const formValid = computed(() => Boolean(methodology.value && form.name.trim() && form.name.length <= 200 && selectedTasks.value.length && selectedTasks.value.length <= 18 && profileFor(form.leftProfile) && profileFor(form.rightProfile) && form.leftHarness && form.rightHarness)
++const formValid = computed(() => Boolean(methodology.value && form.name.trim() && form.name.length <= 200 && selectedTasks.value.length && selectedTasks.value.length <= 18 && profileFor(form.leftProfile) && profileFor(form.rightProfile) && !harnessIssue(form.leftProfile, form.leftHarness) && !harnessIssue(form.rightProfile, form.rightHarness))
+   && Number.isInteger(form.concurrency) && form.concurrency >= 1 && form.concurrency <= 64
+   && Number.isInteger(form.scheduleSeed) && Number.isInteger(form.wallTime) && form.wallTime > 0
+   && Number.isInteger(form.outputTokens) && form.outputTokens > 0 && !outputBudgetExceeded.value)
+@@ -160,12 +173,13 @@
+           <label>{{ t('输出 Token 上限') }}<input v-model.number="form.outputTokens" type="number" min="1" :aria-invalid="outputBudgetExceeded" :aria-describedby="outputBudgetExceeded ? 'output-budget-error' : undefined" :aria-label="t('输出 Token 上限')"></label>
+         </div>
+         <p v-if="outputBudgetExceeded" id="output-budget-error" class="error-state" role="alert">{{ t('输出预算超出所选配置上限：') }} {{ outputTokenLimit }} tokens</p>
+-        <div class="builder-section"><h3>{{ t('实验单元') }}</h3><div class="cell-grid"><div><strong>{{ t('左侧实验条件') }}</strong><label>{{ t('模型服务配置') }}<select v-model="form.leftProfile" :aria-label="t('左侧模型服务配置')"><option v-if="form.leftProfile && !profileFor(form.leftProfile)" :value="form.leftProfile" disabled>{{ t('已不可用') }}: {{ form.leftProfile }}</option><option v-for="item in profiles" :key="item.profile_id" :value="item.profile_id">{{ item.profile_id }}</option></select></label><label>{{ t('执行方式') }}<select v-model="form.leftHarness" :aria-label="t('左侧执行方式')"><optgroup v-for="group in runtimeProfileGroups(harnesses)" :key="group.label" :label="t(group.label)"><option v-for="item in group.profiles" :key="item.profile_id" :value="item.profile_id">{{ item.profile_id }}</option></optgroup></select></label></div><div><strong>{{ t('右侧实验条件') }}</strong><label>{{ t('模型服务配置') }}<select v-model="form.rightProfile" :aria-label="t('右侧模型服务配置')"><option v-if="form.rightProfile && !profileFor(form.rightProfile)" :value="form.rightProfile" disabled>{{ t('已不可用') }}: {{ form.rightProfile }}</option><option v-for="item in profiles" :key="item.profile_id" :value="item.profile_id">{{ item.profile_id }}</option></select></label><label>{{ t('执行方式') }}<select v-model="form.rightHarness" :aria-label="t('右侧执行方式')"><optgroup v-for="group in runtimeProfileGroups(harnesses)" :key="group.label" :label="t(group.label)"><option v-for="item in group.profiles" :key="item.profile_id" :value="item.profile_id">{{ item.profile_id }}</option></optgroup></select></label></div></div></div>
++        <div class="builder-section"><h3>{{ t('实验单元') }}</h3><div class="cell-grid"><div><strong>{{ t('左侧实验条件') }}</strong><label>{{ t('模型服务配置') }}<select v-model="form.leftProfile" :aria-label="t('左侧模型服务配置')"><option v-if="form.leftProfile && !profileFor(form.leftProfile)" :value="form.leftProfile" disabled>{{ t('已不可用') }}: {{ form.leftProfile }}</option><option v-for="item in profiles" :key="item.profile_id" :value="item.profile_id">{{ item.profile_id }}</option></select></label><label>{{ t('执行方式') }}<select v-model="form.leftHarness" :aria-label="t('左侧执行方式')"><option v-if="!harnessProfileFor(form.leftHarness)" :value="form.leftHarness" disabled>{{ t('已不可用') }}: {{ form.leftHarness }}</option><optgroup v-for="group in runtimeProfileGroups(harnesses)" :key="group.label" :label="t(group.label)"><option v-for="item in group.profiles" :key="item.profile_id" :value="item.profile_id">{{ item.profile_id }}{{ harnessIssue(form.leftProfile, item.profile_id) ? ' · ' + t(harnessIssue(form.leftProfile, item.profile_id)) : '' }}</option></optgroup></select></label></div><div><strong>{{ t('右侧实验条件') }}</strong><label>{{ t('模型服务配置') }}<select v-model="form.rightProfile" :aria-label="t('右侧模型服务配置')"><option v-if="form.rightProfile && !profileFor(form.rightProfile)" :value="form.rightProfile" disabled>{{ t('已不可用') }}: {{ form.rightProfile }}</option><option v-for="item in profiles" :key="item.profile_id" :value="item.profile_id">{{ item.profile_id }}</option></select></label><label>{{ t('执行方式') }}<select v-model="form.rightHarness" :aria-label="t('右侧执行方式')"><option v-if="!harnessProfileFor(form.rightHarness)" :value="form.rightHarness" disabled>{{ t('已不可用') }}: {{ form.rightHarness }}</option><optgroup v-for="group in runtimeProfileGroups(harnesses)" :key="group.label" :label="t(group.label)"><option v-for="item in group.profiles" :key="item.profile_id" :value="item.profile_id">{{ item.profile_id }}{{ harnessIssue(form.rightProfile, item.profile_id) ? ' · ' + t(harnessIssue(form.rightProfile, item.profile_id)) : '' }}</option></optgroup></select></label></div></div></div>
+         <p v-if="connectionError" class="notice" role="status">{{ t('连接或兼容性信息未完整读取；以服务端预检为准。') }}</p>
+         <div class="cell-grid planning-connections">
+           <section v-for="cell in [{ name: '左侧实验条件', profile: form.leftProfile, harness: form.leftHarness }, { name: '右侧实验条件', profile: form.rightProfile, harness: form.rightHarness }]" :key="cell.name" class="planning-connection">
+             <h4>{{ t(cell.name) }} · {{ t('组合兼容') }}</h4>
+             <p v-if="cell.profile && !profileFor(cell.profile)" role="alert">{{ t('已选模型版本不可用，请显式选择有效版本后重新预检。') }} <code>{{ cell.profile }}</code><code>{{ selectedProfileIdentities[cell.profile] ?? 'NOT_REPORTED' }}</code></p>
++            <p v-if="harnessIssue(cell.profile, cell.harness)" class="harness-eligibility" role="alert">{{ t(harnessIssue(cell.profile, cell.harness)) }}<code>{{ cell.harness }}</code><code>{{ harnessProfileFor(cell.harness)?.harness_config_identity ?? selectedHarnessIdentities[cell.harness] ?? 'NOT_REPORTED' }}</code></p>
+             <StatusBadge :value="capabilityFor(cell.profile, cell.harness)?.status ?? 'NOT_VERIFIED'" />
+             <ul v-if="capabilityFor(cell.profile, cell.harness)?.reason_codes.length"><li v-for="code in capabilityFor(cell.profile, cell.harness)?.reason_codes" :key="code">{{ t(registryReason(code)) }} <code>{{ code }}</code></li></ul>
+             <p v-else-if="!capabilityFor(cell.profile, cell.harness)">{{ t('缺少此组合的兼容性结果。') }}</p>
+--- before/frontend/src/composables/en.json
++++ after/frontend/src/composables/en.json
+@@ -493,6 +493,9 @@
+   "已保存调查列表": "Saved investigation list",
+   "不可用": "Unavailable",
+   "已不可用": "Unavailable",
++  "执行方式已不可用，请显式选择有效配置。": "Harness unavailable. Explicitly select a valid configuration.",
++  "执行方式已停用": "Harness disabled",
++  "执行方式与所选模型版本不兼容": "Harness incompatible with the selected model revision",
+   "已选模型版本不可用，请显式选择有效版本后重新预检。": "The selected model revision is unavailable. Explicitly select a valid revision and run preflight again.",
+   "搜索调查": "Search investigations",
+   "搜索问题或会话 ID": "Search questions or session IDs",
+--- before/frontend/tests/planning-local-configuration.spec.ts
++++ after/frontend/tests/planning-local-configuration.spec.ts
+@@ -48,11 +48,12 @@
+   it('uses initial server defaults without running preflight and excludes non-SUBJECT and unknown local roles', async () => {
+     const w = await open()
+     expect((w.get('[aria-label="左侧模型服务配置"]').element as HTMLSelectElement).value).toBe(model.profile_id)
+-    expect((w.get('[aria-label="左侧执行方式"]').element as HTMLSelectElement).value).toBe(runtime.profiles[0]!.profile_id)
++    expect((w.get('[aria-label="左侧执行方式"]').element as HTMLSelectElement).value).toBe('direct-gpt56-relay-gpt56-responses')
++    expect(preflightButton(w).attributes('disabled')).toBeDefined()
+     expect((w.get('.task-picker input').element as HTMLInputElement).checked).toBe(true)
+     expect(w.get('[aria-label="左侧模型服务配置"]').text()).not.toMatch(/local-(ANALYST|JUDGE|UNKNOWN)/)
+     expect(w.find('[aria-label="右侧模型服务配置"]').text()).not.toMatch(/local-(ANALYST|JUDGE|UNKNOWN)/)
+-    await w.get('[aria-label="输出 Token 上限"]').setValue(800)
++    await select(w)
+     expect(preflightButton(w).attributes('disabled')).toBeUndefined()
+     expect(freezeButton(w).attributes('disabled')).toBeDefined()
+     expect(api.preflight).not.toHaveBeenCalled()
+@@ -265,7 +266,86 @@
+     api.harnesses.mockResolvedValue({ items: [{ ...runtime, profiles: [{ ...runtime.profiles[0]!, enabled: state !== 'disabled', supported_provider_profile_ids: state === 'incompatible' ? ['other-model-revision'] : [model.profile_id] }] }] })
+     const w = await open(); await select(w)
+     expect(preflightButton(w).attributes('disabled')).toBeDefined()
++    expect(freezeButton(w).attributes('disabled')).toBeDefined()
++    await preflightButton(w).trigger('click'); await freezeButton(w).trigger('click')
++    expect(api.preflight).not.toHaveBeenCalled(); expect(api.snapshot).not.toHaveBeenCalled()
++  })
++  it.each(['左侧', '右侧'])('blocks one invalid %s Harness and recovers only after explicit selection and new preflight', async side => {
++    const valid = runtime.profiles[0]!
++    const disabled = { ...valid, profile_id: 'disabled-runtime', enabled: false }
++    api.harnesses.mockResolvedValue({ items: [{ ...runtime, profiles: [valid, disabled] }] })
++    const w = await open(); await select(w)
++    await preflightButton(w).trigger('click'); await flushPromises()
++    expect(freezeButton(w).attributes('disabled')).toBeUndefined()
++    await w.get(`[aria-label="${side}执行方式"]`).setValue(disabled.profile_id)
++    expect((w.get(`[aria-label="${side}执行方式"]`).element as HTMLSelectElement).value).toBe(disabled.profile_id)
++    expect(w.text()).toContain('执行方式已停用')
++    expect(preflightButton(w).attributes('disabled')).toBeDefined()
++    expect(freezeButton(w).attributes('disabled')).toBeDefined()
++    expect(w.text()).not.toContain('sha256:plan')
++    await preflightButton(w).trigger('click'); await freezeButton(w).trigger('click')
++    expect(api.preflight).toHaveBeenCalledTimes(1); expect(api.snapshot).not.toHaveBeenCalled()
++    await w.get(`[aria-label="${side}执行方式"]`).setValue(valid.profile_id)
++    expect(preflightButton(w).attributes('disabled')).toBeUndefined()
++    expect(freezeButton(w).attributes('disabled')).toBeDefined()
++    await preflightButton(w).trigger('click'); await flushPromises()
++    expect(api.preflight).toHaveBeenCalledTimes(2)
++    expect(freezeButton(w).attributes('disabled')).toBeUndefined()
++  })
++  it.each(['左侧', '右侧'])('preserves %s Harness identity when a model change makes it incompatible and rejects a late response', async side => {
++    const nextModel = { ...model, profile_id: 'other-model-revision' }
++    const nextRuntime = { ...runtime.profiles[0]!, profile_id: 'other-runtime', supported_provider_profile_ids: [nextModel.profile_id] }
++    api.models.mockResolvedValue({ models: fixture.models.models, provider_profiles: [model, nextModel] })
++    api.harnesses.mockResolvedValue({ items: [{ ...runtime, profiles: [...runtime.profiles, nextRuntime] }] })
++    const w = await open(); await select(w)
++    let done!: (value: unknown) => void
++    api.preflight.mockReturnValueOnce(new Promise(resolve => { done = resolve }))
++    await preflightButton(w).trigger('click')
++    await w.get(`[aria-label="${side}模型服务配置"]`).setValue(nextModel.profile_id)
++    done(ready); await flushPromises()
++    expect((w.get(`[aria-label="${side}执行方式"]`).element as HTMLSelectElement).value).toBe(runtime.profiles[0]!.profile_id)
++    expect(w.text()).toContain('执行方式与所选模型版本不兼容')
++    expect(w.text()).not.toContain('sha256:plan')
++    expect(preflightButton(w).attributes('disabled')).toBeDefined()
++    expect(freezeButton(w).attributes('disabled')).toBeDefined()
++    await preflightButton(w).trigger('click'); expect(api.preflight).toHaveBeenCalledTimes(1)
++    await w.get(`[aria-label="${side}执行方式"]`).setValue(nextRuntime.profile_id)
++    expect(preflightButton(w).attributes('disabled')).toBeUndefined()
++    expect(freezeButton(w).attributes('disabled')).toBeDefined()
++    await preflightButton(w).trigger('click'); await flushPromises()
++    expect(freezeButton(w).attributes('disabled')).toBeUndefined()
++  })
++  it.each(['disabled', 'removed', 'incompatible'])('keeps the selected Harness on catalog reload when it becomes %s', async state => {
++    const valid = runtime.profiles[0]!
++    const w = await open(); await select(w)
++    api.preflight.mockRejectedValueOnce(new Error('catalog changed'))
++    await preflightButton(w).trigger('click'); await flushPromises()
++    const replacement = { ...valid, profile_id: 'replacement-runtime' }
++    const changed = { ...valid, enabled: state !== 'disabled', supported_provider_profile_ids: state === 'incompatible' ? [] : valid.supported_provider_profile_ids }
++    api.harnesses.mockResolvedValue({ items: [{ ...runtime, profiles: state === 'removed' ? [replacement] : [changed, replacement] }] })
++    await w.get('.retry-button').trigger('click'); await flushPromises()
++    for (const side of ['左侧', '右侧']) {
++      expect((w.get(`[aria-label="${side}执行方式"]`).element as HTMLSelectElement).value).toBe(valid.profile_id)
++    }
++    expect(w.text()).toContain(valid.harness_config_identity)
++    expect(w.text()).toContain(state === 'removed' ? '已不可用' : state === 'disabled' ? '执行方式已停用' : '执行方式与所选模型版本不兼容')
++    expect(preflightButton(w).attributes('disabled')).toBeDefined()
++    expect(freezeButton(w).attributes('disabled')).toBeDefined()
++    await preflightButton(w).trigger('click'); expect(api.preflight).toHaveBeenCalledTimes(1)
++    for (const side of ['左侧', '右侧']) await w.get(`[aria-label="${side}执行方式"]`).setValue(replacement.profile_id)
++    expect(preflightButton(w).attributes('disabled')).toBeUndefined()
++    expect(freezeButton(w).attributes('disabled')).toBeDefined()
++  })
++  it.each(['disabled', 'incompatible', 'missing'])('does not replace an invalid initial Harness (%s) with another executor', async state => {
++    const preferred = { ...runtime.profiles[0]!, profile_id: 'direct-gpt56-relay-gpt56-responses', enabled: state !== 'disabled', supported_provider_profile_ids: state === 'incompatible' ? [] : [model.profile_id] }
++    api.harnesses.mockResolvedValue({ items: [{ ...runtime, profiles: state === 'missing' ? runtime.profiles : [preferred, ...runtime.profiles] }] })
++    const w = await open()
++    expect((w.get('[aria-label="左侧执行方式"]').element as HTMLSelectElement).value).toBe(preferred.profile_id)
++    expect(preflightButton(w).attributes('disabled')).toBeDefined()
+     expect(api.preflight).not.toHaveBeenCalled()
++    expect(w.get('[aria-label="左侧执行方式"]').text()).toContain(runtime.profiles[0]!.profile_id)
++    await select(w)
++    expect(preflightButton(w).attributes('disabled')).toBeUndefined()
+   })
+   it('does not persist a BLOCKED preflight or reuse preflight after a rejected snapshot', async () => {
+     const w = await open(); await select(w)

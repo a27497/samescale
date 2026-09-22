@@ -1,92 +1,93 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
-import { analystApi } from '@/api/analyst'
-import InvestigationReport from '@/components/InvestigationReport.vue'
-import type { InvestigationExample } from '@/types/analyst'
-const example = ref<InvestigationExample | null>(null)
-const busy = ref(false)
-const error = ref('')
-const result = ref<HTMLElement | null>(null)
-const requestedKind = ref<'offline' | 'historical'>('offline')
-async function open(kind: 'offline' | 'historical') {
-  requestedKind.value = kind
-  busy.value = true; error.value = ''; example.value = null
-  try { example.value = kind === 'offline' ? await analystApi.offline() : await analystApi.historical() }
-  catch { error.value = '案例加载失败。请确认本地 API 已启动；历史证据缺失或摘要不匹配时不会显示替代结果。可以重试或选择其他入口。' }
-  finally { busy.value = false }
-  if (example.value) {
-    await nextTick()
-    result.value?.focus()
-    result.value?.scrollIntoView?.({ block: 'start' })
-  }
+import { inject, onBeforeUnmount, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { t } from '@/composables/i18n'
+import { preferences } from '@/composables/preferences'
+import { productModeKey } from '@/composables/productContext'
+import { workbenchApi } from '@/api/client'
+import StatusBadge from '@/components/StatusBadge.vue'
+import BrandMark from '@/components/BrandMark.vue'
+import type { ExperimentSummary } from '@/types/workbench'
+
+const router = useRouter()
+const productMode = inject(productModeKey, ref('unknown'))
+const comparison = ref(window.history.state?.evaluationComparison === 'HARNESS_UPLIFT' ? 'HARNESS_UPLIFT' : 'MODEL_COMPARISON')
+const recent = ref<ExperimentSummary[]>([])
+const error = ref(false)
+const loading = ref(false)
+let generation = 0
+onBeforeUnmount(() => { generation++ })
+async function loadRecent() {
+  const current = ++generation
+  recent.value = []; error.value = false; loading.value = false
+  if (productMode.value !== 'workspace') return
+  loading.value = true
+  try {
+    const result = await workbenchApi.listExperiments({ limit: 3 })
+    if (current === generation) recent.value = result.items.slice(0, 3)
+  } catch { if (current === generation) error.value = true }
+  finally { if (current === generation) loading.value = false }
+}
+watch(productMode, loadRecent, { immediate: true })
+function next() {
+  if (productMode.value !== 'workspace') return
+  window.history.replaceState({ ...window.history.state, evaluationComparison: comparison.value }, '')
+  void router.push({ path: '/experiments/new', query: { comparison: comparison.value } })
+}
+function dateLabel(value: string) {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(preferences.language, { month: 'short', day: 'numeric' })
 }
 </script>
 
 <template>
-  <section class="analyst-home">
-    <div class="investigation-hero">
-      <span class="eyebrow">SAMESCALE / INVESTIGATE</span>
-      <h2>从一次失败，<br />找到有证据的下一步。</h2>
-      <p>查询运行记录，核对失败证据，区分事实与假设。<br />把工程问题变成一份可审阅的调查报告。</p>
-      <ol class="journey" aria-label="调查路径"><li>提出问题</li><li>核对证据</li><li>审阅下一步</li></ol>
-    </div>
-    <div class="entry-cards">
-      <article class="primary-entry"><span class="status-pill info">FAKE · OFFLINE</span><h3>从一个失败案例开始</h3>
-        <p>去重任务为什么没有通过？用固定合成案例运行现有调查图和事实校验。无需 Provider Key、数据库或 Docker。</p>
-        <p class="muted">固定脚本，不调用模型；结果不保存为数据库会话。</p>
-        <button class="start-demo" :disabled="busy" @click="open('offline')">运行离线演示</button></article>
-      <article><span class="status-pill neutral">HISTORICAL REAL · READ ONLY</span><h3>查看历史真实调查</h3>
-        <p>回看 2026-09-09 的真实模型调查：为什么现有证据不足以证明某个 Harness 更强？</p>
-        <p class="muted">读取冻结文件；不是当前会话，原数据库会话尚未恢复。</p>
-        <button :disabled="busy" @click="open('historical')">查看历史真实记录</button></article>
-      <article><span class="status-pill neutral">CURRENT SESSIONS</span><h3>调查已有工程证据</h3>
-        <p>选择当前数据库中的实验，新建或恢复有界调查，保存并审阅回归方案。</p>
-        <p class="muted">Fake 可无密钥演练持久化；Real 需配置、预算与逐步确认，无静默回退。</p>
-        <RouterLink to="/analyst/sessions?backend=real" class="entry-link">进入 Real 调查</RouterLink>
-        <RouterLink to="/analyst/sessions" class="entry-link">Fake 与已保存会话</RouterLink></article>
-    </div>
-    <p v-if="busy" role="status" class="loading-state">{{ requestedKind === 'offline' ? '正在运行合成案例并校验事实…' : '正在核对冻结历史证据…' }}</p>
-    <div v-if="error" role="alert" class="error-state"><p>{{ error }}</p><button @click="open(requestedKind)">重试加载</button></div>
-    <article v-if="example" :key="example.kind" ref="result" tabindex="-1" class="example" aria-label="调查案例">
-      <h2 class="result-heading">{{ example.kind === 'offline_fake' ? '离线案例调查报告' : '历史真实调查报告' }}</h2>
-      <p class="provenance" role="status">{{ example.provenance }}</p>
-      <p v-if="example.kind === 'historical_real'">历史实际用量：{{ example.metadata.decisions }}/{{ example.metadata.decision_limit }} 决策 · {{ example.metadata.tools }}/{{ example.metadata.tool_limit }} 工具。{{ example.metadata.limit_correction }} {{ example.metadata.trace_limit }}</p>
-      <p v-else>本次运行：{{ example.metadata.decisions }} 决策 · {{ example.metadata.tools }} 工具 · Provider 请求 {{ example.metadata.provider_requests }}。刷新后可重新运行。</p>
-      <p v-if="example.kind === 'historical_real'" class="reading-guide">阅读提示：当前证据不足以证明某个 Harness 在该任务上更强，也无法确立提高推理强度的因果收益。下方保留原始报告及其可定位引用。</p>
-      <InvestigationReport :report="example.report" :evidence="example.report.evidence_catalog">
-        <template #next><p v-if="example.proposal">历史待审阅方案：{{ example.proposal.objective }}</p>
-          <ul><li v-for="step in example.next_steps" :key="step">{{ step }}</li></ul>
-          <p>此处只展示建议，不修改历史审批，不自动修复或执行实验。</p></template>
-      </InvestigationReport>
-      <details><summary>来源、用量与调查过程</summary><pre>{{ JSON.stringify(example.metadata, null, 2) }}</pre></details>
-    </article>
+  <section class="evaluation-home">
+    <BrandMark class="home-brand-mark" />
+    <h1>{{ t(productMode === 'workspace' ? '规划一次评测' : productMode === 'demo' ? '查看评测案例' : '首页') }}</h1>
+    <form v-if="productMode === 'workspace'" class="evaluation-choice" @submit.prevent="next">
+      <fieldset>
+        <legend class="sr-only">{{ t('比较对象') }}</legend>
+        <label :class="{ selected: comparison === 'MODEL_COMPARISON' }"><input v-model="comparison" type="radio" name="comparison" value="MODEL_COMPARISON">{{ t('比较模型') }}</label>
+        <label :class="{ selected: comparison === 'HARNESS_UPLIFT' }"><input v-model="comparison" type="radio" name="comparison" value="HARNESS_UPLIFT">{{ t('直接调用 vs Agent') }}</label>
+      </fieldset>
+      <button type="submit" class="primary-button evaluation-start">{{ t('创建计划') }}<span aria-hidden="true">→</span></button>
+    </form>
+    <RouterLink v-if="productMode === 'demo'" class="primary-button home-comparison-link" to="/examples?example=comparison">{{ t('查看比较案例') }}<span aria-hidden="true">→</span></RouterLink>
+    <RouterLink class="home-example-link" to="/examples">{{ t(productMode === 'demo' ? '其他示例' : '查看示例') }}<span aria-hidden="true">↗</span></RouterLink>
+    <section v-if="recent.length" class="recent-records" :aria-label="t('最近记录')">
+      <header><h2>{{ t('最近记录') }}</h2><RouterLink to="/experiments">{{ t('全部记录') }}</RouterLink></header>
+      <ul><li v-for="item in recent" :key="item.experiment_id">
+        <RouterLink :to="`/experiments/${encodeURIComponent(item.experiment_id)}`" :title="item.name">{{ item.name }}</RouterLink>
+        <StatusBadge :value="item.status" />
+        <time :datetime="item.created_at" :title="item.created_at">{{ dateLabel(item.created_at) }}</time>
+      </li></ul>
+    </section>
+    <p v-else-if="error" role="alert" class="recent-error">{{ t('最近记录加载失败。') }} <button @click="loadRecent">{{ t('重试') }}</button></p>
+    <span v-else-if="loading" role="status" class="sr-only">{{ t('正在读取最近记录…') }}</span>
   </section>
 </template>
 
 <style scoped>
-.analyst-home { font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
-h2 { max-width: 760px; font-size: clamp(23px, 3vw, 34px); line-height: 1.3; }
-.investigation-hero { padding: 30px 0 24px; }
-.investigation-hero h2 { font-size: clamp(30px, 3.5vw, 46px); letter-spacing: -.04em; margin: 18px 0; }
-.investigation-hero p { color: var(--muted); font-size: 15px; }
-.journey { display: flex; flex-wrap: wrap; gap: 12px 30px; padding: 0; list-style: none; counter-reset: journey; color: var(--accent); margin: 26px 0 0; }
-.journey li { counter-increment: journey; }
-.journey li::before { content: '0' counter(journey); margin-right: 8px; font: 12px ui-monospace, monospace; }
-.primary-entry { border-top: 3px solid var(--accent) !important; }
-button.start-demo { background: var(--accent); color: white; border-color: var(--accent); }
-.entry-cards article > button:first-of-type, .entry-cards article > a:first-of-type { margin-top: auto; }
-.result-heading { font-size: 24px; margin-top: 30px; }
-.example { scroll-margin-top: 110px; }
-.example:focus { outline: none; }
-.entry-cards { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 18px; }
-.entry-cards article { display: flex; flex-direction: column; align-items: flex-start; border: 1px solid var(--line); border-radius: 8px; padding: 22px; background: var(--panel); }
-h3 { font-size: 18px; margin: 16px 0 0; }
-.muted { color: var(--muted); font-size: 12px; }
-button, .entry-link { padding: 11px 14px; margin-top: 10px; color: var(--accent); border: 1px solid var(--line); background: var(--panel); border-radius: 4px; cursor: pointer; font: inherit; }
-button:disabled { opacity: .55; }
-.example { margin-top: 28px; border-top: 1px solid var(--line); }
-.provenance { font-weight: 600; padding: 16px; border: 1px solid var(--accent); }
-pre { max-height: 380px; overflow: auto; white-space: pre-wrap; font-size: 12px; }
-summary { cursor: pointer; }
-@media (max-width: 1050px) { .entry-cards { grid-template-columns: 1fr; } }
+.evaluation-home { width: 100%; max-width: 640px; margin: 0 auto; padding-top: clamp(40px, 21vh, 240px); padding-bottom: 40px; }
+.home-brand-mark { width: 64px; height: 64px; margin: 0 auto 24px; }
+h1 { font: 500 30px/1.4 var(--font-ui); text-align: center; margin: 0 0 32px; }
+.evaluation-choice { display: flex; align-items: center; gap: 20px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 3px 12px #10182005; }
+fieldset { display: flex; flex: 1; gap: 4px; border: 0; margin: 0; padding: 0; min-width: 0; }
+label { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 14px; border-radius: 9px; cursor: pointer; color: var(--muted); }
+label.selected { background: var(--hover); color: var(--ink); }
+input { margin: 0; accent-color: var(--ink); }
+.evaluation-start { gap: 18px; min-height: 44px; flex-shrink: 0; border-radius: 9px; }
+.home-comparison-link { display: flex; align-items: center; justify-content: center; gap: 18px; width: fit-content; max-width: 100%; min-height: 44px; margin: 0 auto; padding: 12px 20px; border-radius: 9px; text-decoration: none; }
+.home-example-link { display: flex; align-items: center; gap: 6px; width: fit-content; margin: 20px auto 0; color: var(--muted); text-decoration: none; font: var(--type-caption); padding: 8px; }
+a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.recent-records { margin-top: 56px; }
+.recent-records header { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font: var(--type-caption); }
+h2 { margin: 0; font: inherit; }header a { text-decoration: none; }
+ul { list-style: none; margin: 12px 0 0; padding: 0; }
+li { display: flex; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+li > a { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration: none; }
+time { font: var(--type-caption); color: var(--muted); white-space: nowrap; }
+.recent-error { margin-top: 40px; color: var(--muted); font: var(--type-caption); text-align: center; }.recent-error button { border: 0; background: transparent; color: var(--link); cursor: pointer; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 600px) { .evaluation-home { padding-top: 9vh; }.home-brand-mark { width: 56px; height: 56px; margin-bottom: 20px; }h1 { font-size: 26px; }.evaluation-choice { flex-direction: column; align-items: stretch; gap: 12px; }fieldset { justify-content: center; }label { flex: 1; padding: 12px 6px; }.recent-records { margin-top: 36px; }li { gap: 8px; } }
 </style>

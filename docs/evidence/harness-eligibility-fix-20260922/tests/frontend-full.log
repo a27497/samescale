@@ -1,0 +1,13 @@
+
+> harnesslab-workbench@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 /home/dev/projects/harnesslab-ai-integration/frontend
+
+
+ Test Files  17 passed (17)
+      Tests  167 passed (167)
+   Start at  08:50:27
+   Duration  8.30s (transform 7.98s, setup 1.85s, import 14.24s, tests 11.34s, environment 21.59s)
+

@@ -5,6 +5,7 @@ from typing import Annotated, NoReturn
 
 import typer
 
+from harnesslab.productization.demo import check_demo
 from harnesslab.productization.lifecycle import CheckState, LifecycleError, ProductLifecycle
 
 
@@ -73,6 +74,12 @@ def down_command(
 
 
 def status_command(
+    demo: Annotated[
+        bool, typer.Option("--demo", help="Check standalone demo availability.")
+    ] = False,
+    port: Annotated[
+        int, typer.Option("--port", min=1, max=65535, help="Standalone demo port.")
+    ] = 8000,
     compose_file: Annotated[
         Path | None, typer.Option("--compose-file", help="Product Compose file.")
     ] = None,
@@ -82,6 +89,9 @@ def status_command(
 ) -> None:
     """Show health and state for every product service."""
 
+    if demo:
+        check_demo(port)
+        return
     lifecycle = _lifecycle(compose_file, project_name)
     try:
         _preflight, services = lifecycle.status()

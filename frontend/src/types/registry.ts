@@ -184,9 +184,17 @@ export interface ExperimentPreflight {
   candidate_plan_digest: string | null
 }
 
+export interface ExperimentSnapshotSummary {
+  snapshot_id: string
+  snapshot_digest: string
+  name: string
+  created_at: string
+}
+
 export interface ExperimentSnapshot {
   snapshot_id: string
   snapshot_digest: string
+  plan: { name: string; evaluation_mode: EvaluationMode; [key: string]: unknown }
   methodology_id: string
   methodology_digest: string
   comparison_type: ComparisonType

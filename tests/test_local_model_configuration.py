@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -14,6 +15,7 @@ from harnesslab.api.local_configuration import local_catalog_session
 from harnesslab.api.workbench_dependencies import workbench_session
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
 from harnesslab.db.models.registry import LocalModelConfigurationRecord
+from harnesslab.productization.demo import create_demo_app
 from harnesslab.registry.local_models import (
     LocalModelConfiguration,
     configurations,
@@ -136,6 +138,24 @@ async def test_write_schema_does_not_accept_secrets_commands_or_unbounded_values
         response = await client.put(PATH, json={**BODY, **extra}, headers=HEADERS)
         assert response.status_code == 422
         assert "secret-sentinel" not in response.text
+
+
+async def test_demo_never_registers_local_configuration_or_loads_database(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("HARNESSLAB_LOCAL_CONFIGURATION_TOKEN", TOKEN)
+    app = create_demo_app(tmp_path)
+    assert not any(
+        getattr(route, "path", "").startswith("/api/local-configuration") for route in app.routes
+    )
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://localhost") as client:
+        response = await client.put(PATH, json=BODY, headers=HEADERS)
+        assert response.status_code == 503
+        catalog = await client.get("/api/registry/models")
+        assert catalog.status_code == 200
+        assert not any(
+            p["profile_id"].startswith("local-") for p in catalog.json()["provider_profiles"]
+        )
 
 
 @pytest.mark.integration

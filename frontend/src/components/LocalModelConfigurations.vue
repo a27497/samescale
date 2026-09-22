@@ -94,7 +94,7 @@ onMounted(checkStatus); onBeforeUnmount(lock)
         <form class="local-form model-editor" @submit.prevent="save">
           <fieldset :disabled="busy">
             <legend>{{ t(form.revision ? '编辑配置' : '新增配置') }}</legend>
-            <label>{{ t('配置 ID') }}<input v-model="form.id" :aria-label="t('配置 ID')" :disabled="form.revision > 0" pattern="[a-z][a-z0-9-]{0,39}" maxlength="40" required><small>{{ t('小写字母开头，可含数字和连字符。') }}</small></label>
+            <label>{{ t('配置 ID') }}<input v-model="form.id" :aria-label="t('配置 ID')" :disabled="form.revision > 0" pattern="[a-z][a-z0-9\-]{0,39}" maxlength="40" required><small>{{ t('小写字母开头，可含数字和连字符。') }}</small></label>
             <label>{{ t('配置名称') }}<input v-model="form.name" maxlength="100" required></label>
             <label>{{ t('内置模型模板') }}<select v-model="form.template" @change="templateChanged" :aria-label="t('内置模型模板')" required><option disabled value="">{{ t('选择模板') }}</option><option v-for="p in templates" :key="p.profile_id" :value="p.profile_id">{{ p.profile_id }}</option></select></label>
             <label>{{ t('服务连接') }}<select v-model="form.connection" :aria-label="t('服务连接')"><option value="">{{ t('沿用模板连接') }}</option><option v-if="form.connection && !matchingConnections.some(c => c.connection_id === form.connection)" :value="form.connection" disabled>{{ t('连接已失效，请重新选择') }}</option><option v-for="c in matchingConnections" :key="c.connection_id" :value="c.connection_id">{{ c.name }} · v{{ c.revision }} · {{ t(c.ready_for_planning ? '本地引用可用' : '需要检查引用') }}</option></select><small>{{ t('保存将绑定所选连接的当前版本。轮换或停用后需重新绑定，旧计划保持原样。') }}</small></label>

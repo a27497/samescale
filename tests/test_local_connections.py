@@ -389,3 +389,26 @@ async def test_missing_vault_fails_closed_and_rollback_discards_new_secret(
         async with local_client(factory) as client:
             result = await client.put(PREFIX + "/credentials/test-key", json=KEY_BODY)
             assert result.status_code == 503 and KEY not in result.text
+
+
+async def test_demo_excludes_connection_and_credential_routes_with_vault_configured(
+    configured: CredentialVault,
+    tmp_path: Path,
+) -> None:
+    from harnesslab.productization.demo import create_demo_app
+
+    configured.put(KEY)
+    (tmp_path / "demo").mkdir()
+    app = create_demo_app(tmp_path / "demo")
+    assert not any(getattr(route, "path", "").startswith(PREFIX) for route in app.routes)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://localhost", headers=HEADERS
+    ) as client:
+        for route in ["/credentials", "/connections", "/models"]:
+            result = await client.get(PREFIX + route)
+            assert result.status_code == 503 and KEY not in result.text
+        result = await client.get("/api/registry/providers")
+        assert result.status_code == 200
+        assert not any(
+            p["provider_id"].startswith("local-connection-") for p in result.json()["items"]
+        )

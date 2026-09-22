@@ -1,78 +1,87 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, expect, it, vi } from 'vitest'
+import { ref } from 'vue'
 import AnalystHomeView from '@/views/AnalystHomeView.vue'
-import InvestigationReport from '@/components/InvestigationReport.vue'
+import { productModeKey, type ProductMode } from '@/composables/productContext'
 import router from '@/router'
-const api = vi.hoisted(() => ({ offline: vi.fn(), historical: vi.fn() }))
-vi.mock('@/api/analyst', () => ({ analystApi: api }))
-const report = {
-  summary: 'Output order differs',
-  verified_facts: [{ statement: 'Observed mismatch', evidence_refs: ['run:demo'] }],
-  hypotheses: [{ statement: 'Possibly sorted', additional_evidence_needed: 'Inspect patch', evidence_refs: ['run:demo'] }],
-  limitations: ['Synthetic inputs only'],
-  evidence_catalog: [{ ref: { id: 'run:demo' }, digest_bindings: ['digest'], data_by_tool: { inspect_failure: { observed: ['a', 'b'] } } }],
+
+const api = vi.hoisted(() => ({ listExperiments: vi.fn() }))
+const navigate = vi.hoisted(() => vi.fn())
+vi.mock('@/api/client', () => ({ workbenchApi: api }))
+vi.mock('vue-router', async original => ({ ...await original<typeof import('vue-router')>(), useRouter: () => ({ push: navigate }) }))
+function home(mode = ref<ProductMode>('workspace')) {
+  return mount(AnalystHomeView, { global: { provide: { [productModeKey as symbol]: mode }, plugins: [router] } })
 }
-function mountHome() { return mount(AnalystHomeView, { global: { stubs: { RouterLink: { template: '<a><slot /></a>' } } } }) }
-function button(wrapper: ReturnType<typeof mount>, name: string) { return wrapper.findAll('button').find(button => button.text() === name)! }
 beforeEach(() => {
   vi.resetAllMocks()
-  api.offline.mockResolvedValue({ kind: 'offline_fake', provenance: 'Fake / synthetic', report, metadata: { decisions: 2, tools: 2, provider_requests: 0 }, next_steps: ['Add regression'], proposal: null })
-  api.historical.mockResolvedValue({ kind: 'historical_real', provenance: 'Historical real / read only', report, metadata: { decision_limit: 4 }, next_steps: ['Review historical plan'], proposal: null })
+  window.history.replaceState(null, '')
+  api.listExperiments.mockResolvedValue({ items: [] })
 })
-describe('Agent product entry', () => {
-  it('lands at Analyst and preserves advanced routes without starting anything', async () => {
-    expect(router.getRoutes().find(route => route.path === '/')?.redirect).toBe('/analyst')
-    for (const path of ['/overview', '/experiments', '/judgelab', '/analyst/sessions']) expect(router.getRoutes().some(route => route.path === path)).toBe(true)
-    const wrapper = mountHome(); await flushPromises()
-    expect(wrapper.text()).toContain('无需 Provider Key')
-    expect(api.offline).not.toHaveBeenCalled()
-    expect(api.historical).not.toHaveBeenCalled()
-  })
-  it('keeps Fake, frozen real and current sessions visibly distinct', async () => {
-    const wrapper = mountHome()
-    await button(wrapper, '运行离线演示').trigger('click'); await flushPromises()
-    expect(wrapper.get('[aria-label="调查案例"]').text()).toContain('Fake / synthetic')
-    expect(api.historical).not.toHaveBeenCalled()
-    await button(wrapper, '查看历史真实记录').trigger('click'); await flushPromises()
-    expect(wrapper.get('[aria-label="调查案例"]').text()).toContain('Historical real / read only')
-    expect(wrapper.get('[aria-label="调查案例"]').text()).not.toContain('Fake / synthetic')
-    expect(wrapper.findAll('button').some(button => /Resume|Approve/.test(button.text()))).toBe(false)
-  })
-  it('removes stale results on failure and allows an explicit retry without fallback', async () => {
-    const wrapper = mountHome()
-    await button(wrapper, '运行离线演示').trigger('click'); await flushPromises()
-    api.historical.mockRejectedValueOnce(new Error('Invalid digest'))
-    await button(wrapper, '查看历史真实记录').trigger('click'); await flushPromises()
-    expect(wrapper.find('[aria-label="调查案例"]').exists()).toBe(false)
-    expect(wrapper.get('[role="alert"]').text()).toContain('不会显示替代结果')
-    expect(api.offline).toHaveBeenCalledTimes(1)
-    await button(wrapper, '查看历史真实记录').trigger('click'); await flushPromises()
-    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
-    expect(wrapper.get('[aria-label="调查案例"]').text()).toContain('Historical real')
-  })
-  it('opens and focuses the cited evidence and labels missing sources', async () => {
-    const wrapper = mount(InvestigationReport, { props: { report, evidence: report.evidence_catalog }, attachTo: document.body })
-    await wrapper.get('button.citation').trigger('click'); await flushPromises()
-    const entry = wrapper.get('[data-evidence-index="0"]')
-    expect(document.activeElement).toBe(entry.element)
-    expect(entry.get('details').attributes('open')).toBeDefined()
-    expect(entry.text()).toContain('inspect_failure')
-    await wrapper.get('button.return-citation').trigger('click')
-    expect(document.activeElement).toBe(wrapper.get('button.citation').element)
-    await wrapper.get('.report-nav button').trigger('click')
-    expect(document.activeElement).toBe(wrapper.get('[data-report-section="0"]').element)
-    expect(wrapper.findAll('h3').map(item => item.text())).toEqual(['1 · 结论', '2 · 证据', '3 · 限制与待验证假设', '4 · 下一步'])
-    await wrapper.setProps({ evidence: [] })
-    expect(wrapper.text().match(/来源不可用：run:demo/g)).toHaveLength(2)
-    expect(wrapper.find('.return-citation').exists()).toBe(false)
-    expect(wrapper.find('button.citation').exists()).toBe(false)
-    wrapper.unmount()
-  })
-})
-
-it('focuses the loaded result after keyboard activation', async () => {
-  const wrapper = mount(AnalystHomeView, { attachTo: document.body, global: { stubs: { RouterLink: true } } })
-  await button(wrapper, '运行离线演示').trigger('click'); await flushPromises()
-  expect(document.activeElement).toBe(wrapper.get('[aria-label="调查案例"]').element)
+it('starts only planning and passes the selected comparison without creating a record', async () => {
+  const wrapper = home(); await flushPromises()
+  expect(wrapper.get('h1').text()).toBe('规划一次评测')
+  expect(wrapper.get('button[type="submit"]').text()).toContain('创建计划')
+  expect(wrapper.find('.home-comparison-link').exists()).toBe(false)
+  expect(wrapper.find('textarea').exists()).toBe(false)
+  expect(wrapper.find('.recent-records').exists()).toBe(false)
+  expect(wrapper.get('.home-example-link').attributes('href')).toBe('/examples')
+  expect(navigate).not.toHaveBeenCalled()
+  await wrapper.get('form').trigger('submit')
+  expect(navigate).toHaveBeenLastCalledWith({ path: '/experiments/new', query: { comparison: 'MODEL_COMPARISON' } })
+  await wrapper.get('input[value="HARNESS_UPLIFT"]').setValue()
+  await wrapper.get('form').trigger('submit')
+  expect(navigate).toHaveBeenLastCalledWith({ path: '/experiments/new', query: { comparison: 'HARNESS_UPLIFT' } })
   wrapper.unmount()
+  const returned = home()
+  expect((returned.get('input[value="HARNESS_UPLIFT"]').element as HTMLInputElement).checked).toBe(true)
+  returned.unmount()
+})
+it('shows at most three server records with their actual identity and status', async () => {
+  api.listExperiments.mockResolvedValue({ items: Array.from({ length: 4 }, (_, i) => ({ experiment_id: `saved-${i}`, name: `Saved ${i}`, status: 'completed', created_at: '2026-09-11T01:02:00Z' })) })
+  const wrapper = home(); await flushPromises()
+  expect(api.listExperiments).toHaveBeenCalledExactlyOnceWith({ limit: 3 })
+  expect(wrapper.findAll('li')).toHaveLength(3)
+  expect(wrapper.get('li a').attributes('href')).toBe('/experiments/saved-0')
+  expect(wrapper.get('time').attributes('datetime')).toBe('2026-09-11T01:02:00Z')
+  expect(wrapper.get('[data-status]').attributes('data-status')).toBe('completed')
+  wrapper.unmount()
+})
+it('distinguishes failed reads from empty records and retries explicitly', async () => {
+  api.listExperiments.mockRejectedValueOnce(new Error('unavailable'))
+  const wrapper = home(); await flushPromises()
+  expect(wrapper.get('[role="alert"]').text()).toContain('最近记录加载失败')
+  expect(wrapper.find('.recent-records').exists()).toBe(false)
+  await wrapper.get('[role="alert"] button').trigger('click'); await flushPromises()
+  expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+  expect(wrapper.find('.recent-records').exists()).toBe(false)
+  expect(api.listExperiments).toHaveBeenCalledTimes(2)
+  wrapper.unmount()
+})
+it('does not fetch workspace records in demo or unknown mode and discards stale responses', async () => {
+  const mode = ref<ProductMode>('unknown')
+  const wrapper = home(mode); await flushPromises()
+  expect(wrapper.get('h1').text()).toBe('首页')
+  expect(wrapper.find('.home-comparison-link').exists()).toBe(false)
+  mode.value = 'demo'; await flushPromises()
+  expect(wrapper.get('h1').text()).toBe('查看评测案例')
+  expect(wrapper.get('.home-comparison-link').attributes('href')).toBe('/examples?example=comparison')
+  expect(wrapper.get('.home-example-link').text()).toContain('其他示例')
+  expect(api.listExperiments).not.toHaveBeenCalled()
+  expect(wrapper.find('form').exists()).toBe(false)
+  let resolve!: (value: unknown) => void
+  api.listExperiments.mockImplementationOnce(() => new Promise(done => { resolve = done }))
+  mode.value = 'workspace'; await flushPromises()
+  expect(wrapper.find('form').exists()).toBe(true)
+  mode.value = 'demo'; await flushPromises()
+  resolve({ items: [{ experiment_id: 'stale', name: 'Stale record' }] }); await flushPromises()
+  expect(wrapper.text()).not.toContain('Stale record')
+  expect(wrapper.find('form').exists()).toBe(false)
+  wrapper.unmount()
+})
+it('keeps legacy example URLs compatible', async () => {
+  await router.push('/analyst?example=historical')
+  expect(router.currentRoute.value.fullPath).toBe('/examples?example=historical')
+  await router.push('/analyst?example=offline')
+  expect(router.currentRoute.value.fullPath).toBe('/examples?example=offline')
+  expect(router.getRoutes().find(route => route.path === '/')?.redirect).toBe('/analyst')
 })

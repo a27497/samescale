@@ -1,0 +1,57 @@
+[
+  {
+    "case": "enabled and compatible",
+    "status": "PASS",
+    "evidence": "Complete planning existing happy paths and registry suite; enabled omission uses server wire default"
+  },
+  {
+    "case": "disabled otherwise compatible",
+    "status": "PASS",
+    "evidence": "Original disabled assertion retained; preflight/save blocked and no request"
+  },
+  {
+    "case": "enabled incompatible",
+    "status": "PASS",
+    "evidence": "Original incompatible assertion retained; preflight/save blocked and no request"
+  },
+  {
+    "case": "one side invalid",
+    "status": "PASS",
+    "evidence": "Both left/right parameterized; other side valid"
+  },
+  {
+    "case": "model change invalidates Harness",
+    "status": "PASS",
+    "evidence": "Both sides; ID retained, late preflight ignored; explicit matching Harness then fresh preflight"
+  },
+  {
+    "case": "catalog disables/removes/makes Harness incompatible",
+    "status": "PASS",
+    "evidence": "Three states; original IDs/digest retained, no replacement, disabled until explicit valid selection"
+  },
+  {
+    "case": "explicit recovery",
+    "status": "PASS",
+    "evidence": "Invalid to valid selection enables preflight but not save"
+  },
+  {
+    "case": "fresh successful preflight",
+    "status": "PASS",
+    "evidence": "Enables save after explicit eligible selection"
+  },
+  {
+    "case": "late response cannot restore invalid selection",
+    "status": "PASS",
+    "evidence": "Existing generation protections and new model/Harness pair tests"
+  },
+  {
+    "case": "initial invalid default does not substitute executor",
+    "status": "PASS",
+    "evidence": "disabled/incompatible/missing intended initial IDs stay visible and blocked; catalog alternatives retained"
+  },
+  {
+    "case": "browser desktop and mobile invalid requests",
+    "status": "PASS",
+    "evidence": "Controlled fixture Chromium1440/390: disabled/incompatible 0 requests under click/Enter; valid recovery 1 each"
+  }
+]

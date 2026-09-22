@@ -18,7 +18,7 @@ const report = {
   plan_digest: `sha256:${'1'.repeat(64)}`,
   report_digest: `sha256:${'2'.repeat(64)}`,
   cluster_dimensions: ['model', 'harness', 'task', 'language', 'task_family', 'failure_class', 'trace_pattern', 'tool_pattern', 'workspace_diff_pattern'],
-  correlation_warning: 'Trace correlation is not causality; only controlled ablation can strengthen attribution.',
+  correlation_warning: '轨迹相关性不等于因果；归因需要受控消融证据。',
   classification_limitations: ['Free-form output is never guessed into a taxonomy.'],
   failure_run_count: 1,
   real_run_count: 1,
@@ -78,15 +78,15 @@ describe('Diagnosis Workbench', () => {
     await flushPromises()
 
     const text = wrapper.text()
-    expect(text).toContain('Experiment → Cell')
+    expect(text).toContain('实验 → 单元')
     expect(text).toContain('codex-low')
     expect(text).toContain('targeted-bug-fix')
     expect(text).toContain('Test Failure')
-    expect(text).toContain('Trace')
-    expect(text).toContain('Workspace diff')
-    expect(text).toContain('Tool calls')
-    expect(text).toContain('Verifier')
-    expect(text).toContain('VERIFIED_FACT')
+    expect(text).toContain('轨迹')
+    expect(text).toContain('工作区差异')
+    expect(text).toContain('工具调用')
+    expect(text).toContain('校验器')
+    expect(text).toContain('已验证事实')
     expect(text).toContain('HYPOTHESIS')
     expect(text).toContain('Trace correlation is not causality')
     expect(api.getDiagnosis).toHaveBeenCalledWith('diagnosis-fixture')
@@ -99,7 +99,7 @@ describe('Diagnosis Workbench', () => {
     await flushPromises()
 
     expect(api.exportBadCases).toHaveBeenCalledWith('diagnosis-fixture')
-    expect(wrapper.text()).toContain('Exported 1 real BadCases and 0 synthetic cases')
+    expect(wrapper.text()).toContain('已导出 1 个真实失败案例与 0 个合成案例')
     expect(wrapper.text()).toContain('never counted as real BadCases')
   })
 })

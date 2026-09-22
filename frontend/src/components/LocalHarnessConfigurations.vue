@@ -51,7 +51,7 @@ onMounted(load); onBeforeUnmount(() => generation++)
     <p v-if="error" role="alert" class="error-state">{{ t(error) }}</p><p v-if="message" role="status">{{ t(message) }}</p>
     <ul><li v-for="item in items" :key="item.configuration_id"><button :disabled="busy" @click="edit(item)">{{ item.name }} · v{{ item.revision }} · {{ t(item.enabled ? '已启用' : '已停用') }}</button><code>{{ item.profile.profile_id }}</code></li></ul>
     <form @submit.prevent="save"><fieldset :disabled="busy"><legend>{{ t(form.revision ? '编辑运行配置' : '新增运行配置') }}</legend>
-      <label>{{ t('运行配置 ID') }}<input v-model="form.id" :disabled="form.revision > 0" pattern="[a-z][a-z0-9-]{0,39}" maxlength="40" required></label>
+      <label>{{ t('运行配置 ID') }}<input v-model="form.id" :disabled="form.revision > 0" pattern="[a-z][a-z0-9\-]{0,39}" maxlength="40" required></label>
       <label>{{ t('运行配置名称') }}<input v-model="form.name" maxlength="100" required></label>
       <label>{{ t('运行预设') }}<select v-model="form.template" :aria-label="t('运行预设')" @change="form.bindings = []"><option v-for="p in options.harness_templates" :key="p.profile_id" :value="p.profile_id">{{ p.profile_id }} · {{ p.version }}</option></select></label>
       <p v-if="preset">{{ t('预设工具') }}：{{ preset.tool_surface.join(', ') || t('无工具') }} · {{ t('推理强度') }}：{{ preset.reasoning_effort ?? t('沿用模型') }}</p>

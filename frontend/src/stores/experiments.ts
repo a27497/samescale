@@ -20,6 +20,7 @@ interface ExperimentState {
   durableStatus: ExperimentStatus | null
   loading: boolean
   error: string | null
+  listGeneration: number
   search: string
   statusFilter: string
   selectedMetric: MatrixMetricKey
@@ -38,6 +39,7 @@ export const useExperimentStore = defineStore('experiments', {
     durableStatus: null,
     loading: false,
     error: null,
+    listGeneration: 0,
     search: '',
     statusFilter: '',
     selectedMetric: 'success_rate',
@@ -47,6 +49,7 @@ export const useExperimentStore = defineStore('experiments', {
   }),
   actions: {
     async fetchList() {
+      const generation = ++this.listGeneration
       this.loading = true
       this.error = null
       try {
@@ -54,15 +57,20 @@ export const useExperimentStore = defineStore('experiments', {
           search: this.search || undefined,
           status: this.statusFilter || undefined,
         })
+        if (generation !== this.listGeneration) return
         this.items = response.items
       } catch {
-        this.error = 'Experiment evidence could not be loaded.'
+        if (generation !== this.listGeneration) return
+        this.items = []
+        this.error = '无法读取实验列表。请确认本地数据库与 API 已启动，再刷新。'
       } finally {
-        this.loading = false
+        if (generation === this.listGeneration) this.loading = false
       }
     },
     async fetchExperiment(id: string, generation?: number): Promise<boolean> {
       const isCurrent = () => generation === undefined || generation === this.pollingGeneration
+      if (!isCurrent()) return false
+      if (this.selected?.experiment_id !== id) { this.selected = null; this.matrix = null; this.runs = []; this.modelComparison = null; this.durableStatus = null }
       this.loading = true
       this.error = null
       try {
@@ -83,7 +91,8 @@ export const useExperimentStore = defineStore('experiments', {
       } catch {
         if (!isCurrent()) return false
         this.modelComparison = null
-        this.error = 'Persisted experiment evidence could not be verified.'
+        this.selected = null; this.matrix = null; this.runs = []; this.durableStatus = null
+        this.error = '无法读取或校验实验证据，请重试。'
         return false
       } finally {
         if (isCurrent()) this.loading = false
@@ -104,7 +113,7 @@ export const useExperimentStore = defineStore('experiments', {
           this.error = null
         }
       } catch {
-        if (generation === this.pollingGeneration) this.error = 'Experiment status could not be loaded.'
+        if (generation === this.pollingGeneration) this.error = '无法读取运行状态，请重新加载。'
       } finally {
         if (this.refreshingGeneration === generation) this.refreshingGeneration = null
       }

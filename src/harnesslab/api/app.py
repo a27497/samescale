@@ -9,6 +9,7 @@ from harnesslab.analyst.api import router as analyst_router
 from harnesslab.api.routes.health import router as health_router
 from harnesslab.api.routes.local_configuration import router as local_configuration_router
 from harnesslab.api.routes.preflight import router as preflight_router
+from harnesslab.api.routes.product import product_router
 from harnesslab.api.routes.registry import experiment_router, registry_router
 from harnesslab.api.routes.workbench import router as workbench_router
 from harnesslab.api.static import WorkbenchStaticFiles, resolve_workbench_dist
@@ -32,6 +33,7 @@ def create_app(*, workbench_dist: Path | None = None) -> FastAPI:
     application.state.local_configuration_allowed = True
     application.include_router(local_configuration_router, prefix="/api")
     application.include_router(health_router, prefix="/api")
+    application.include_router(product_router("workspace"), prefix="/api")
     application.include_router(analyst_router, prefix="/api")
     application.include_router(workbench_router, prefix="/api")
     application.include_router(registry_router, prefix="/api")

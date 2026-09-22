@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -10,6 +11,7 @@ from sqlalchemy import func, select
 from harnesslab.api.app import create_app
 from harnesslab.db.models.experiment import ExperimentRecord, ExperimentRunRecord
 from harnesslab.db.models.registry import RegistryExperimentSnapshotRecord
+from harnesslab.productization.demo import create_demo_app
 from harnesslab.registry.models import ExperimentSnapshot
 from harnesslab.registry.runtime import (
     DirectRuntimeContractError,
@@ -242,7 +244,9 @@ async def test_invalid_controls_and_harness_bindings_fail_closed(
         (HARNESS_PATH, "PUT"),
     ],
 )
-async def test_harness_operator_boundaries(path: str, method: str, configured: None) -> None:
+async def test_harness_operator_and_demo_boundaries(
+    path: str, method: str, configured: None, tmp_path: Path
+) -> None:
     async with AsyncClient(
         transport=ASGITransport(app=create_app()), base_url="http://localhost"
     ) as client:
@@ -252,3 +256,11 @@ async def test_harness_operator_boundaries(path: str, method: str, configured: N
             method, path, json=HARNESS, headers={**HEADERS, "Origin": "null"}
         )
         assert result.status_code == 403
+    demo = create_demo_app(tmp_path)
+    assert not any(
+        getattr(r, "path", "").startswith("/api/local-configuration") for r in demo.routes
+    )
+    async with AsyncClient(
+        transport=ASGITransport(app=demo), base_url="http://localhost", headers=HEADERS
+    ) as client:
+        assert (await client.request(method, path, json=HARNESS)).status_code == 503
