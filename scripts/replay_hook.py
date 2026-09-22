@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from harnesslab.episodes.hooks import encode, replay_hook_case
-from scripts.replay_s2 import offline_guard
+from harnesslab.evidence.offline_boundary import offline_guard
 
 
 def main() -> int:

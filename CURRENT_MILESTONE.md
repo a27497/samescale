@@ -2,6 +2,28 @@
 
 ## Phase 0 — isolated development baseline — 2026-09-22
 
+### Replay CLI / neutral offline boundary repair — local PASS, exact-HEAD CI pending
+
+- Shared `ReplayError` and unchanged `offline_guard` now live in
+  `harnesslab.evidence.offline_boundary`. S2 replay, Hook replay and Demo export use the same
+  guard; `analyst.offline_replay` explicitly re-exports the same `ReplayError` for compatibility.
+  Analyst retains no process/network execution surface. Gate J and its assertion are unchanged.
+- Original Fast CI's two import failures were reproduced with `PYTHONPATH` unset. Their direct
+  script regressions now remove `PYTHONPATH` explicitly and execute from the repository root.
+  A separately exported candidate with a fresh locked venv also passed both CLI scenarios.
+- Local acceptance: Hook/Verifier/Episode **68 PASS**, unchanged Gate J scope and guard rejection
+  checks **2 PASS**; unified offline **122 PASS**; bounded Fast CI backend **518 PASS**;
+  full Ruff / format (**722 files**) / strict mypy (**383 files**) PASS; frontend **17 specs /
+  167 PASS / 0 FAIL / 0 unhandled**, build/vue-tsc PASS. No skipped or weakened checks.
+- Both S2 replays match all five frozen output digests. Guard and exception AST match their
+  originals. Frozen evidence, historical result summaries, failure attribution and replay output
+  semantics are unchanged; CI PYTHONPATH and scope checks are unchanged.
+- Prior stopped attempt: putting the guard in Analyst caused the scope check to flag its denial
+  string; backend stopped at **134 PASS / 1 FAIL** without commit/push. The explicitly authorized
+  neutral-module relocation resolves that blocker; no unrelated failure occurred this round.
+- Await both automatic workflows on the pushed repair HEAD before marking Phase 0 COMPLETE.
+  No Agent/model/Claude/Judge/Campaign, main merge or deployment; **Phase 1 not started**.
+
 Base `ef135bbdd49639afc28e2701d811329f3418281d` (fetched origin/main); candidate branch `codex/phase0-baseline-20260922`. [Acceptance and scope](docs/evidence/phase0-candidate-20260922/README.md) / [local receipt](docs/evidence/phase0-candidate-20260922/local-acceptance.json).
 
 - Explicit allowlist: final Product QA / Planning and Harness eligibility; required verified frontend, read-only API and Demo dependencies; passive Hook → independent verifier → VERIFIED_FAIL → frozen CUSTOM case → deterministic Offline Replay. Historical S1/L1 untracked campaigns/tests/fixtures, installer/wheel packaging and duplicate evidence are excluded.

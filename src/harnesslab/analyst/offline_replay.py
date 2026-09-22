@@ -10,16 +10,13 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 from harnesslab.comparability.models import canonical_digest
+from harnesslab.evidence.offline_boundary import ReplayError as ReplayError
 from harnesslab.harness_lane.models import NormalizedTrace, SanitizedNativeEvent
 from harnesslab.harness_lane.trace import _normalized_trace
 from harnesslab.multi_harness.trace import _trace_event
 from harnesslab.tasks.package import sha256_bytes
 
 Json = dict[str, Any]
-
-
-class ReplayError(ValueError):
-    """Missing, changed, unsupported or contradictory evidence: no result is released."""
 
 
 def require(condition: bool, reason: str) -> None:

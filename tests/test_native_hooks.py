@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -191,6 +192,9 @@ def test_frozen_case_deterministic_and_offline(tmp_path: Path) -> None:
                 "--output",
                 str(tmp_path / name),
             ],
+            cwd=Path(__file__).resolve().parents[1],
+            # Direct script execution must work without repository PYTHONPATH injection.
+            env={key: value for key, value in os.environ.items() if key != "PYTHONPATH"},
             capture_output=True,
             text=True,
         )

@@ -328,6 +328,13 @@ for action in [lambda: socket.socket(), lambda: subprocess.run([sys.executable, 
         pass
     else:
         raise AssertionError('offline boundary bypassed')
+for event in ['os.exec', 'os.spawn', 'os.posix_spawn', 'os.system', 'pty.spawn']:
+    try:
+        sys.audit(event)
+    except module['ReplayError']:
+        pass
+    else:
+        raise AssertionError(f'offline boundary bypassed: {event}')
 print('blocked both before execution')
 """
     result = subprocess.run(

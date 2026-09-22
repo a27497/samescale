@@ -6,7 +6,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 from harnesslab.analyst.offline_replay import (
     ReplayError,
@@ -18,16 +17,7 @@ from harnesslab.analyst.offline_replay import (
     require,
     safe_path,
 )
-
-
-def offline_guard(event: str, args: tuple[Any, ...]) -> None:
-    if event.startswith(
-        ("socket.", "subprocess.", "os.exec", "os.spawn", "os.posix_spawn")
-    ) or event in {
-        "os.system",
-        "pty.spawn",
-    }:
-        raise ReplayError("offline boundary: network/process operation rejected")
+from harnesslab.evidence.offline_boundary import offline_guard
 
 
 def main() -> int:

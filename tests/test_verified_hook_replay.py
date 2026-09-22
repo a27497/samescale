@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -109,6 +110,9 @@ def test_verified_case_cli_freeze_and_two_offline_replays(tmp_path: Path) -> Non
                 "--output",
                 str(output),
             ],
+            cwd=ROOT,
+            # Direct script execution must work without repository PYTHONPATH injection.
+            env={key: value for key, value in os.environ.items() if key != "PYTHONPATH"},
             capture_output=True,
         )
         assert run.returncode == 0, run.stderr

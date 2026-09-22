@@ -21,8 +21,8 @@ from harnesslab.analyst.offline_replay import (
     replay_bundle,
     require,
 )
+from harnesslab.evidence.offline_boundary import offline_guard
 from harnesslab.tasks.package import sha256_bytes
-from scripts.replay_s2 import offline_guard
 from scripts.verify_s3_regression import ARCHIVE_DIGEST, GOLDEN, INPUTS_DIGEST, extract_archive
 
 ROOT = Path(__file__).resolve().parents[1]
