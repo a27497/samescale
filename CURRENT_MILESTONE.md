@@ -2,7 +2,7 @@
 
 ## Phase 0 — isolated development baseline — 2026-09-22
 
-### Offline CI evidence-recording repair — 2026-09-23
+### Phase 0 COMPLETE — Offline CI evidence-recording repair — 2026-09-23
 
 - The replay/regression step on `b9e8b60` passed, while the following Actions log step remained
   running until cancellation. It printed the complete pytest/JUnit payload (about 1 MB locally).
@@ -15,9 +15,16 @@
   Focused workflow/recording contracts: 37 PASS. Mirrored Fast CI backend: 518 PASS on a new,
   migrated disposable PostgreSQL 18 instance. The prior 15-minute timeout remains a bound,
   not evidence of successful remote recording.
-- Clean candidate and exact-head CI are pending at this checkpoint.
-  Phase 0 remains INCOMPLETE until both workflows pass on the same committed HEAD. D1 has not
-  started. The older STOP records below describe earlier attempts, not the current authorization.
+- Clean detached candidate at `69e814fb0e5a682a94f098d91a4e920aba3bfbd4` passed locked
+  dependency installation, full Ruff/format/mypy, 167 frontend tests/build, 37 focused contracts,
+  123 isolated offline regression tests and the bounded record step. The original development
+  worktree remains untouched.
+- Pushed `69e814fb0e5a682a94f098d91a4e920aba3bfbd4`; remote SHA matches. Exact-head
+  [Fast CI 35818146603](https://github.com/a27497/samescale/actions/runs/35818146603)
+  **PASS** and [Offline CI 35818146785](https://github.com/a27497/samescale/actions/runs/35818146785)
+  **PASS**. The recording step completed in about one second, with JUnit count and file digests in
+  the Actions receipt. Phase 0 is complete; D1 pre-run provenance and protocol freeze is next.
+  The older STOP records below describe earlier attempts, not the current authorization.
 
 ### Offline CI timeout closeout — STOP / INCOMPLETE — 2026-09-22
 
