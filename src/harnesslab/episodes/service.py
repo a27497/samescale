@@ -7,7 +7,10 @@ import os
 import stat
 from collections import Counter
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
+
+if TYPE_CHECKING:
+    from harnesslab.episodes.hooks import HookEpisode
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -265,8 +268,17 @@ def import_codex_episode(source: Path, store: Path, *, source_kind: SourceKind) 
     return episode
 
 
-def inspect_episode(path: Path) -> Episode:
-    episode = Episode.model_validate(_json(path))
+def inspect_episode(path: Path) -> Episode | HookEpisode:
+    from harnesslab.episodes.hooks import HookEpisode
+
+    raw = _json(path)
+    if not isinstance(raw, dict):
+        raise EpisodeImportError("Stored Episode must be an object")
+    episode = (
+        HookEpisode.model_validate(raw)
+        if raw.get("source_format") == "native-hook-v1"
+        else Episode.model_validate(raw)
+    )
     if path.name != episode.identity.removeprefix("sha256:") + ".json":
         raise EpisodeImportError("Stored Episode identity mismatch")
     return episode
