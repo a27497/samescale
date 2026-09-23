@@ -1,0 +1,43 @@
+# D1 Configuration Decision — frozen protocol
+
+The user selected the historical S1 **Official Codex** configuration as current and the
+historical S1 **Claude Code** configuration as candidate. The two real DEVELOPMENT tasks are
+LectureLens B (`lecturelens-analysis-progress-stream-reconnect@1.0.0`) and A
+(`lecturelens-embedded-subtitle-language-metadata@1.0.1`). The original source commits,
+starting workspace, task packages, independent verifier, oracle, prompt and configuration
+identities are inherited byte for byte from the qualified S1 completion freeze. S1 runs are
+historical references and do not count as D1 trials.
+
+[`campaign.json`](campaign.json) binds the exact 20 trial identities, task and configuration
+revisions, invocation controls, image and source digests, fixed ordering, failure taxonomy and
+decision vocabulary. [`phase-authorization.json`](phase-authorization.json) binds one execution
+identity per trial. [`operator.py`](operator.py) checks those identities before each dispatch and
+records immutable per-trial output outside the repository. A temporary copy of the freeze and
+operator passed keyless verification before the official files were written. The final freeze
+passed the same verification; source/credential value exposure scan passed without persisting
+credential values.
+
+The fixed run contract is **2 configurations × 2 tasks × 5 trials = 20**. Each trial starts
+from the same task package workspace and has one attempt, zero operator retries, no resume,
+fallback or Judge, one subject at a time, a 600-second subject timeout, and a 300-second
+independent verifier timeout. The 6000 output-token value is a declaration, not a cumulative
+session hard cap. Monetary cost and a session token hard cap are `NOT_AVAILABLE`; observed
+usage/cost must not be inferred from the declaration. A verified task failure remains in the
+series; an infrastructure, protocol, authentication, control, evidence or cleanup failure
+stops the series with the remaining trials marked `NOT_RUN`.
+
+The comparison is limited to these tasks, versions, environment, budget and configurations.
+Model, Provider, Harness, prompt and tool differences prevent a Harness-causal conclusion.
+Only independent verifier outcomes count as verified success. The frozen vocabulary is
+`KEEP CURRENT`, `SWITCH SUPPORTED BY CURRENT EVIDENCE`, `INSUFFICIENT EVIDENCE`, or
+`INVALID COMPARISON`; no global ranking is authorized.
+
+Historical S1 operator modules and 67 source files remain in the original, separate
+integration worktree and are hash-bound in this freeze. The D1 operator must run from that
+checkout with `PYTHONPATH=src:.`; it refuses source drift. Full per-trial bundles remain under
+`/home/dev/artifacts/samescale-d1-20260923/`. This is a local campaign dependency; the frozen
+protocol is inspectable here, while the historical operator tree is not redistributed by this
+candidate branch.
+
+Status at freeze: **20 planned; 0 D1 runs executed.** Later receipts must be added without
+editing the frozen files or counting historical S1 runs as D1 trials.

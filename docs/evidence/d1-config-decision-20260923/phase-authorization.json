@@ -1,0 +1,116 @@
+{
+  "kind": "D1_PHASE_AUTHORIZATION",
+  "campaign_identity": "sha256:db53f913e451a931157aa710817459def3e1cc78b5f6acd946c40741e438a25e",
+  "source": "User request: D1 2 configs x 2 real tasks x 5 trials; subsequent explicit selection of historical S1 Official Codex and Claude Code on LectureLens B and A",
+  "execution_authorized": true,
+  "subject_sessions": 20,
+  "attempt_each": 1,
+  "operator_retry": 0,
+  "resume": false,
+  "fallback": false,
+  "judge": false,
+  "unknown_cost_and_session_token_hard_caps_acknowledged": true,
+  "cells": [
+    {
+      "cell_identity": "sha256:c74d5e0bfe16732aca402e5e848f2a7fccba28f8a27ca9a40cc8803fc493c5e8",
+      "execution_id": "179bfbe2c3184551bda28be825173a1d",
+      "authorization_id": "d64488d8ba8d4237a8a57f595dc43931"
+    },
+    {
+      "cell_identity": "sha256:2539a37713dad9f4ccfec8fe71e3fe678432c18238693ed38fa679e3bff2e963",
+      "execution_id": "838c6689ba2d4b6fa41db6e19b568c15",
+      "authorization_id": "8fbfcdf324294f49b002c00c5a91eb51"
+    },
+    {
+      "cell_identity": "sha256:ba61d063b25c277130abdcd340ac5f32f2039217a0b249111f973325bbd96379",
+      "execution_id": "b1b6b009ecce4080a4f720ef56f0a87f",
+      "authorization_id": "e66d88dd710f4ee5b9a7f84bcea3a484"
+    },
+    {
+      "cell_identity": "sha256:511e18b8accbcaabd8745e8f85e5ae3c2e637fd22d813fade85c88cce38bfb7a",
+      "execution_id": "cc53cf9a07c743418d2a0d7a78213d66",
+      "authorization_id": "1353b0fe8c154da8919c55b74e9ef6ea"
+    },
+    {
+      "cell_identity": "sha256:ca37d961abddbde96a7bde134b11966f9e57c0e88cb1aeabe57268b1b81940f2",
+      "execution_id": "1bd075b11dbc47a7bf0f2d86010ba388",
+      "authorization_id": "52b0ef4e44de4f27a42c96982be0335e"
+    },
+    {
+      "cell_identity": "sha256:2a099c857f89c6f5cdb0d67326c69866b4c5ccc0a2cec99eda60b770f0401f07",
+      "execution_id": "3a82179074ed4763888601407885c109",
+      "authorization_id": "ac27aecedafe488da33b6e80056eec5d"
+    },
+    {
+      "cell_identity": "sha256:d66dadaf21ba45425660ce59febfe069cad84548f8359c584c61d0084f4d7e12",
+      "execution_id": "406e90be0f0d41a89ed52635fc925c1d",
+      "authorization_id": "5a39a5db98b24b029df87f9897a0b23c"
+    },
+    {
+      "cell_identity": "sha256:36992a44cf3a58dcbedec2aed313fc51f18a13f853ffd6bbb8f0f99d9e7380ca",
+      "execution_id": "e86b55e5666d4673af41008d839de3db",
+      "authorization_id": "6f11e6a636c94b96960e0a8da94d0ade"
+    },
+    {
+      "cell_identity": "sha256:dfd2bb2947cb934b185d9ee68fba5b0323056c15be6856707088ebceda7398aa",
+      "execution_id": "ed20b33ffd5f4fcd9442853150acfc7c",
+      "authorization_id": "4de0aeb2406542589a715cc9feb40943"
+    },
+    {
+      "cell_identity": "sha256:7fc602580759ecbc39ed1ed2335d6858d4243b920be9995cb8e5b2cf8fe2343f",
+      "execution_id": "3b80bbb50e134ba4aabe5a7d352fefee",
+      "authorization_id": "2b13cfff72bd4e7fb533f9b28446ce53"
+    },
+    {
+      "cell_identity": "sha256:51514dfbe738074f8767b285d6487fcd03e45a85b02bedebc351cd07e86d6b4c",
+      "execution_id": "adb73d40e6814e9ea7b6f6806720cbdf",
+      "authorization_id": "bdea77ede718478f832235f914a64c41"
+    },
+    {
+      "cell_identity": "sha256:2714e1fb6e802a2286625d640d0020ef51399442581dbfdc2ab70c591ef533db",
+      "execution_id": "8462ac34e9d54ac0888b64c97209657e",
+      "authorization_id": "38317831680d4851a9e1655efdec2745"
+    },
+    {
+      "cell_identity": "sha256:cae483e4e971026b146e435001fcfe0aeff59fa868dc4792bfd5c132f8f907c5",
+      "execution_id": "1ccea234a5824984bbb8142868edfd7f",
+      "authorization_id": "68258ad143644b2d8e15f420660538a0"
+    },
+    {
+      "cell_identity": "sha256:ca041f2152ad3f663bdbfaccefc6e9095cc34b9f212dd2b26251c41595a8fbb7",
+      "execution_id": "a1f45fd231e743728c3c00f31d48a9a1",
+      "authorization_id": "097f22db68dc408396e2a200048e9c85"
+    },
+    {
+      "cell_identity": "sha256:2e7fee6317d319417d0b54afba9e6910f330feb82f1f90a7a51ac9944622122d",
+      "execution_id": "e2de4dda46f64f26aa672dcc93b7b3a2",
+      "authorization_id": "890b5c26a9f94945a968b58f8aab608f"
+    },
+    {
+      "cell_identity": "sha256:1b6675659abaadf541d1c7ac226b9a358763f07f13a892e2530bd28b16a5dfab",
+      "execution_id": "0d55205c2f514c1f8b0351e5dc2c7e61",
+      "authorization_id": "4b1c38a871714bdb979d969cf2027cf6"
+    },
+    {
+      "cell_identity": "sha256:031544a6fc9735bbc38688c20994a60a8baec98e6e9d6d5669210910045bf83d",
+      "execution_id": "c43b07708dde4b63bd14d0c3c7d3f7c3",
+      "authorization_id": "fbc563917bcb4d7e91c37c503c684fcd"
+    },
+    {
+      "cell_identity": "sha256:5e58093919b731a1e84e2cf3651e1f59972a17c71b6ae320c4758f6266580e4f",
+      "execution_id": "c1a7268680264069ab47a0b42f68dbf7",
+      "authorization_id": "0615801f35264081b8dcce4bafdee1f4"
+    },
+    {
+      "cell_identity": "sha256:18cdeb3eba84072b43e76d1a7c4540333651025f717efdbf3a51e6f014d20135",
+      "execution_id": "814df17fcdb44963b79b8e2d0424eb68",
+      "authorization_id": "530acf88d9734511a27ac012ed6a6b4a"
+    },
+    {
+      "cell_identity": "sha256:6bc6c85827c6f8fd47d1eb103dc69916fb51bdbe8333a5dfc86ced2b0c8bda81",
+      "execution_id": "d58e5c4e7ad54b96a7c1d077117e29d7",
+      "authorization_id": "732766a5062e430fa3f41c386218783c"
+    }
+  ],
+  "identity": "sha256:0f79e24d0e2d2791ba49314f5f1f0b8b2cb750322a102d665a24990e0c5f5bfe"
+}
