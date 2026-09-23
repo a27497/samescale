@@ -1,308 +1,88 @@
 # SameScale
 
-## Recruiter Demo · 求职冻结版
+**AI Coding Agent 运行验证与诊断工作台**
 
-**3–5 分钟：真实 coding task → configurations → result → Trace Diff → diagnosis → Offline Replay → CI。**
-下载并用浏览器打开 [Recruiter Demo](docs/recruiter/demo/index.html)。单个 HTML 即可分享，
-无需账号、模型密钥、服务或网络；GitHub 文件预览不会运行 HTML。只分享 `docs/recruiter/demo/`，
-不分享原始 bundle 或私有工作区。未部署网站。
+*AI Coding Agent Evaluation & Diagnosis Workbench*
 
-### Engineering Highlights
+把 Coding Agent 的一次运行，转化为可检查、可诊断、可复核的工程证据。
+SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回答：实际发生了什么、哪些结果已验证、失败停在哪一层，以及保存的证据能否离线复核。它不把局部运行结果写成模型排行榜。
 
-- 同一真实 SSE 恢复任务：Codex recorded **20/20 verified_pass**；Claude Code timeout / **NOT_VERIFIED**，verifier **NOT_RUN**。
-- 摘要绑定的 evidence chain：native/normalized trace、workspace diff、independent verifier 与 failure taxonomy 相互核对。
-- 复用 Offline Replay 与 GitHub CI 入口，检测 evidence、parser/schema、文件归属和失败分类回归；无 Provider/model/Claude/Judge 调用。
-- Recruiter Demo 仅导出公开字段，保留未知与结论限制；S1 **partial/blocked**，不是能力排名或完整 benchmark。
+**[打开只读 Recruiter Demo](https://getsamescale.com/demo/)** · [下载离线 HTML](docs/recruiter/demo/index.html) · [4 分钟讲解稿](docs/RECRUITER_DEMO.md)
 
-[演示脚本与复验命令](docs/RECRUITER_DEMO.md) · [面试材料与简历事实](docs/JOB_SEARCH_FREEZE.md) ·
-[S4 final report](docs/evidence/s4-job-search-freeze-20260921/README.md)。求职版冻结范围以
-[CURRENT_MILESTONE](CURRENT_MILESTONE.md) 为准；下方保留现有产品说明与其他历史案例。
+## Why SameScale
 
-SameScale is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
-reproducible Model × Harness × Judge execution and verifier-backed evidence.
+Agent 说“done”只是一次输出，不等于任务契约通过。工程复盘还需要检查最终 workspace、工具轨迹和独立 verifier，区分任务失败、环境中断与尚未证实的模型或运行时原因。保留原始状态与未知项，才能在不再次调用模型的情况下复核结论。
 
-SameScale Product continues the existing P0 Analyst application in the canonical private repository
-[a27497/samescale](https://github.com/a27497/samescale), renamed in place from `a27497/harnesslab-ai`.
-Git history, package/CLI names, configuration, and historical evidence retain HarnessLab compatibility.
-S1 presents SameScale in the application shell and makes investigation entry, cited reports, and saved sessions the primary
-experience. The runtime and existing evaluation routes remain compatible.
+## How it works
 
-Clone the canonical repository with an account that has access:
-
-```bash
-git clone git@github.com:a27497/samescale.git
-cd samescale
+```mermaid
+flowchart TD
+    A["Coding Agent / Direct run"] --> B["CLI adapter or native Hook"]
+    B --> C["Normalized Trace / Episode"]
+    C --> D["Workspace & evidence"]
+    D --> E["Independent verifier"]
+    E --> F["Evidence-bounded diagnosis"]
+    F -. "when frozen" .-> G["Offline replay / regression gates"]
 ```
 
-The supported executable is still `harnesslab`; the additive `samescale` CLI and `demo` launcher
-belong to S2 and are not implemented yet. Existing checkout directories can keep their names.
+这是系统中已有的证据处理阶段，不是每条历史运行都走完的时间线。不同来源的证据保持各自身份；缺失的原生字段保持 unknown。Native Hook 的受控验收记录见下方 Case B，其实现与原件尚未进入远端 `main`。
 
-## Codex development entry (source checkout)
+## Engineering highlights
 
-Read root `AGENTS.md`, `CURRENT_MILESTONE.md` (live scope/results), and
-`PUBLIC_PRODUCT_CONTRACT.md` (supported behavior/claims). Plans remain in Project Blueprint;
-Project Status preserves the earlier P0 and real-smoke evidence.
+- **Trace / Episode evidence binding.** 将运行事件、文件变化和验收来源绑定到可检查的记录。事件中的路径提及不能代替真实 workspace diff，缺失的退出码也不能从 stdout 猜测。
+- **Independent verification.** 用任务契约检查最终 workspace，将 Agent 自报、进程退出和任务验收分开。原 Episode 未运行 verifier 时，后续审计不能回填原结果。
+- **Failure diagnosis.** 按可观察证据描述 timeout、workspace contract failure 和未知状态；把失败位置与模型、Provider 或 Harness 的根因归属分开。
+- **Deterministic offline replay.** 从冻结、摘要绑定的记录重建分析，并拒绝缺失、漂移或矛盾的输入；不重跑 Agent、模型、trace 中的命令或原 verifier。
+- **CI / regression gates.** 用无模型调用的离线检查约束 evidence reader、文件归属和失败分类。CI 能验证保存记录的处理契约，不自动证明某个案例已进入同一条 CI 链路。
+- **Configuration and evidence boundaries.** 固定任务、配置与预算身份；只在可比条件和足够证据下讨论差异。`L0` 确定性验证、`L1` 人工 gold、`L2` Judge 保持不同权威层级。
 
-The repo-local Skill is `.agents/skills/samescale-product/SKILL.md`. From this checkout, invoke
-`$samescale-product` with a bounded task. Its location follows the
-[official Codex skill discovery convention](https://learn.chatgpt.com/docs/build-skills);
-root guidance follows [AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
-These are source-development files, not a new runtime dependency or a prerequisite for running
-the installed application. No personal Codex configuration or plugin installation is required.
+## Evidence stories
 
-## 先体验工程问题调查（无 Provider Key）
+以下是**两条独立的证据链**，其数字和产物不合并。
 
-打开首页即进入 **SameScale / 工程问题调查**。第一次使用不需要了解 Phase、Matrix 或 Judge。
+### Case A — Timeout → offline workspace audit
 
-```bash
-uv sync --locked
-npm ci --prefix frontend
-npm run build --prefix frontend
-HARNESSLAB_ANALYST_REAL_ENABLED=0 uv run --locked harnesslab serve
-```
+一次真实 A Candidate 运行到时限后保存了 5 个修改文件。原 Episode 保持 `NOT_VERIFIED`，verifier 为 `NOT_RUN`、0 checks。随后对**保存的 workspace** 做独立离线审计，冻结 verifier 报告 **71/75**，并发现受测语言标签契约失败。
 
-打开 <http://127.0.0.1:8000/>，选择：
+**The offline audit is not the original Episode verifier.** 此案例不主张 replay 或 CI 连续性，也不把 71/75 写成原运行的正式成绩。[原运行](docs/evidence/l1-a-candidate-real-20260921/README.md) · [离线审计](docs/evidence/l1-a-candidate-offline-audit-20260921/README.md)
 
-- **运行离线演示**：固定去重失败案例，使用合成工具数据运行现有 LangGraph 与事实校验。
-  无模型请求，无需 PostgreSQL、Docker 或凭据。结果不保存，刷新后可以重新运行。
-- **查看历史真实记录**：只读加载并校验仓库内冻结报告，点击引用定位具体工具证据。
-  这是过去的真实调查；原数据库会话尚未恢复，不提供恢复或审批按钮。
-- **进入 Real 调查 / Fake 与已保存会话**：使用当前数据库的已有实验。
-  需要下方完整环境设置；Fake 可演练持久化与方案审阅，Real 还需要可用 Registry profile、
-  服务端显式启用、预算和逐步调用确认。创建与预检不调用模型；失败不会自动回退 Fake。
+### Case B — Native Hook → verified workspace Bad Case → offline replay
 
-报告按 **结论 → 证据 → 限制 → 下一步** 展示。审批仅保存审阅记录，不执行回归或自动修复。
-离线模式仍需本地 Python API 与构建后的前端；首次安装依赖需要网络。
-报告章节导航可跳转到结论、证据、限制和下一步；引用展开工具数据与摘要后，可返回引用处。
-已保存调查先显示会话范围与结果，新建表单和回归审阅可按需展开。
-旧 Overview 位于 `/overview`；Experiments、Matrix、JudgeLab 等保留在可展开的「评测工具」内。
+另一条受控 fixture 记录复用了真实 Codex session 的 native Hook 收据。Hook 未原生提供可靠的 command exit code，因此 Trace 保持 `UNKNOWN`。独立 verifier 检查最终 workspace：**1 PASS / 3 FAIL**；受限于 workspace contract 的 Bad Case 随后冻结，两次 Offline Replay 输出逐字节一致。
 
-## Project entrypoints
+**Model root cause: `NOT_ESTABLISHED`. Harness root cause: `NOT_ESTABLISHED`.** Fixture 中的缺陷是预先人工播种的，不构成 Codex 能力或指令遵循失败证明。来源为 `docs/evidence/real-hook-trace-20260922/verifier-closeout/`；该 closeout 目前只在开发工作树中，**尚未提交到远端 `main`**，因此这里不提供虚假的 GitHub 原件链接，也不主张远端 CI 已运行。
 
-- [Project Blueprint](docs/PROJECT_BLUEPRINT.md): product direction, architecture choices, phase
-  requirements, and acceptance scope.
-- [Project Status](docs/PROJECT_STATUS.md): preserved P0/real-smoke evidence and historical handoff;
-  links to the current SameScale milestone in source checkouts.
-- `AGENTS.md` in source checkouts: development-agent guidance and permission boundaries.
-- [Architecture](docs/ARCHITECTURE.md): implemented execution and evidence contracts.
-- [Productization](docs/PRODUCTIZATION.md): bundled local product operation.
-- [Release Evidence](docs/RELEASE_EVIDENCE.md): versioned candidate and final-release procedure.
-- [First Application](docs/FIRST_APPLICATION.md): bounded demo script, capability draft, and human
-  ownership checkpoints.
+## Recruiter Demo
 
-Current milestone results are maintained in root CURRENT_MILESTONE.md. Domain documents
-explain component behavior; dated audits and campaign records retain their original scope.
+[在线打开只读 Demo](https://getsamescale.com/demo/)：约 3–5 分钟查看 Task → Configurations → Result → Trace Diff → Diagnosis → Offline Replay → 已保存的 CI / regression evidence。它展示的是**另一组 S4 冻结记录**，不是 Case A 或 Case B 的后续步骤；页面不启动 Agent、模型、replay 或验收。
 
-## Implemented Capabilities
+无需账号或 Provider key。也可以在有仓库访问权限时打开 [仓库中的单文件 HTML](docs/recruiter/demo/index.html)，点击 GitHub 的 **Raw** 下载后在浏览器本地打开；GitHub 文件预览本身不会运行 HTML。[讲解与复验路径](docs/RECRUITER_DEMO.md) · [分享边界](docs/evidence/s4-job-search-freeze-20260921/README.md)
 
-- **Reproducible task evaluation:** versioned Python, Java, and TypeScript task packages,
-  baseline/oracle qualification, fresh workspaces, and isolated hidden verification in Docker.
-- **Model and Harness execution:** direct-provider adapters and Codex/Claude/DeepSeek Harness
-  integrations, with normalized traces, filesystem-derived changes, and immutable run evidence.
-  Adapter implementation and qualification for a real campaign are separate claims.
-- **Durable experiments and comparison:** deterministic Matrix plans, PostgreSQL leases and
-  heartbeats, cancellation/recovery, repeated-run statistics, and comparability-gated pairs/ablations.
-- **Judge calibration and diagnosis:** suite-scoped JudgeLab evaluation, bias/consistency checks,
-  failure clustering, factual BadCase reports, and a bounded read-only attribution Analyst.
-- **Local workbench and planning:** bundled CLI/API/Vue application, evidence and trace inspection,
-  regression comparison, registry/settings views, and validated experiment planning snapshots.
-- **Evidence and release controls:** digest-verified artifacts, credential-reference configuration,
-  keyless CI gates, and an independent final-release verifier binding evidence to an exact Git/CI head.
+## Tech stack
 
-These are implemented system capabilities, not blanket phase-completion or model-performance
-claims. [Release Evidence](docs/RELEASE_EVIDENCE.md) records the accepted campaign scope and limitations.
+Python · FastAPI · PostgreSQL · SQLAlchemy / Alembic · LangGraph · Vue 3 · TypeScript · Docker · GitHub Actions。现有 `src/harnesslab`、`harnesslab` CLI 与 `HARNESSLAB_*` 配置名保留兼容身份。
 
-## Core boundary
+## Evidence boundaries
 
-JudgeLab is an L2 annotation and comparison layer. Evidence authority is
-`L0 deterministic > L1 repository-curated human gold > L2 LLM Judge`.
+- Unknown stays unknown；`NOT_RUN` 和 `NOT_VERIFIED` 不是通过。
+- Agent self-report 和进程 exit code 不能替代独立任务验收。
+- 后来的离线审计不会改写原 Episode verifier。
+- 不同 run 的 Evidence 不拼成同一条因果故事。
+- Workspace 失败本身不能建立模型或 Harness 根因。
+- 局部证据不生成模型排名；摘要校验也不单独认证来源真实性。
 
-## Workbench boundary
+## For technical review
 
-Phase I evidence pages remain read-only. Unified Registry Lite adds backend-validated planning
-pages for models, providers, Harnesses, capabilities, settings, and new experiment snapshots.
-The browser still cannot mutate outcomes, cancel runs, change task/gold data, read secrets or
-private runtime URLs, or trigger subject/Harness/Judge execution. The Analyst page adds saved
-investigations and review-only approvals. Explicitly enabled real Analyst decisions use a Registry
-profile; creation, reads, and approvals make no provider calls. See
-[Unified Registry Lite](docs/UNIFIED_REGISTRY_LITE.md) and [Analyst](docs/ANALYST.md).
+值得追问的工程点：如何把原生事件与 Episode 绑定而不猜缺失字段？如何把原运行的 `NOT_RUN` 与后来审计分开？Offline Replay 证明了什么、不能证明什么？CI 如何在不调用模型的条件下发现证据读取回归？
 
-## Analyst boundary
-
-Phase J is a read-only attribution layer over approved Phase G/H/I evidence. It uses LangGraph
-only for a bounded local decision/tool/finalize graph. Trace and task text are untrusted evidence,
-not instructions. Its six evidence tools cannot execute subjects, enqueue or cancel work, or invoke
-Harness, Judge, shell, browser, arbitrary SQL, filesystem, or code tools. Fake is the deterministic
-default. The explicit real decision backend reuses ProviderAdapter and strict JSON output; the
-host validates tool scope, citations, facts, and proposals. PostgreSQL stores only the Analyst
-session and review state; authoritative experiment evidence remains unchanged.
-
-A bounded live Real Agent smoke completed on 2026-09-09 using persisted `core-real-matrix-v6`
-evidence. The accepted report is host-validated, the model proposal is review-only, and approval
-keeps `execution_authorized=false`. This verifies the Analyst vertical slice; it does not authorize
-a new Matrix/regression campaign or strengthen the accepted V6 causal claims. See
-[Real Agent smoke evidence](docs/evidence/REAL_AGENT_SMOKE_20260909.md).
-
-## Local setup
-
-Gate A prerequisites are Docker and [uv](https://docs.astral.sh/uv/). Gate B additionally requires
-Java 21 (`java` and `javac`) and Node.js `>=24.18.1 <25` on `PATH`. Gate C requires a reachable local
-Docker Engine, or Docker Desktop using Linux containers; remote TCP/SSH contexts are unsupported.
-Gate D uses deterministic fake/MockTransport providers and requires no model API key. Gate E
-builds the pinned Codex image and uses deterministic Fake Codex runs. Gate F builds pinned Claude
-and DeepSeek images and uses deterministic fake harness runs; none requires a key.
-Gate G adds real PostgreSQL queue concurrency and actual keyless runner execution without
-consuming provider or ambient harness credentials.
-Gate H adds a 15-case keyless suite and 126 persisted Judge slots without real model calls.
-Gate I adds a keyless persisted two-task Matrix, Judge calibration fixture, treatment-aware
-manifest Regression proofs, trusted artifact-root escape tests, typed Workbench API tests, and
-frontend type/test/build checks. The frontend accepts compatible Node releases in
-`>=24.18.1 <25`.
-Gate J adds a keyless production queue/executor/manifest/report fixture, controlled ablation,
-host-validated structured fact binding, safe normalized-trace reads, no-ablation hypothesis proof,
-and source snapshots.
-
-Tier-B corpus qualification is also fully keyless. It repeats baseline/oracle and known-defect
-verification, checks workspace isolation and failure attribution, and never invokes a provider or
-Judge. See [Tier-B repo engineering](docs/TIER_B_REPO_ENGINEERING.md).
-The operator-blocked six-slot preregistration is documented in
-[Tier-B keyless smoke experiment](docs/TIER_B_SMOKE_EXPERIMENT.md).
-
-```powershell
-Copy-Item .env.example .env
-uv sync --locked
-docker compose up -d
-uv run alembic upgrade head
-uv run harnesslab doctor
-uv run harnesslab sandbox doctor
-uv run harnesslab model profile validate profiles/openai-responses.example.yaml
-uv run harnesslab harness codex doctor
-uv run harnesslab harness claude doctor
-uv run harnesslab harness deepseek doctor
-uv run harnesslab experiment --help
-uv run harnesslab judge suite validate judge_suites/core-calibration/1.0.0
-uv run harnesslab judge plan judge_suites/core-calibration/1.0.0/calibration.yaml
-uv run harnesslab analyst --help
-```
-
-Start the frontend development server in a second shell:
-
-```powershell
-Set-Location frontend
-npm ci
-npm run dev
-```
-
-Start the API and query its health endpoint:
-
-```powershell
-uv run harnesslab serve
-Invoke-RestMethod http://127.0.0.1:8000/api/health
-```
-
-`doctor` returns exit `0` when all required checks pass, `1` for a failed configured check, and
-`2` when required configuration is not available. Health returns HTTP 503 when the database
-round trip fails and never returns a DSN or credential.
-
-## Verification
-
-Choose checks for the changed contract and risk; the command catalog below is not a mandatory
-sequence for every task. Documentation-only edits need link/consistency checks and any affected
-existing documentation contracts. Behavior changes need the relevant focused tests. Expand to
-phase gates or full regression for cross-cutting risk or the selected acceptance/release scope.
-
-The repository supplies keyless `scripts/verify_gate_a.py` through `scripts/verify_gate_k.py`.
-Run a selected gate with `uv run --locked python scripts/verify_gate_<letter>.py` after checking
-its prerequisites. These scripts may run substantial tests, Docker builds, or database fixtures.
-
-| Gate | Contract |
+| 入口 | 内容 |
 | --- | --- |
-| A | Foundation, runtime, static checks, and regression suite |
-| B–C | Task packages, deterministic verification, and Docker isolation |
-| D–F | Direct-model and pinned Harness adapters, traces, and Comparability |
-| G–H | Durable experiments, statistics, and Judge calibration |
-| I–J | Workbench projections and bounded read-only attribution |
-| K | Corpus, immutable history, evidence/claim bindings, and release hard stop |
+| [Architecture](docs/ARCHITECTURE.md) | 运行、隔离、证据与 Analyst 边界 |
+| [Evaluation methodology](docs/EVAL_METHODOLOGY.md) | 验证权威与可比性 |
+| [Recruiter Demo guide](docs/RECRUITER_DEMO.md) | 讲解脚本、离线打开方式与限制 |
+| [Evidence records](docs/evidence/) | 按原始运行和审计来源分别保存的记录 |
+| [Current milestone](CURRENT_MILESTONE.md) | 已验收状态、未提交工作与阻碍 |
+| [Public product contract](PUBLIC_PRODUCT_CONTRACT.md) | 对外能力与声明边界 |
+| [Developer setup](docs/PRODUCTIZATION.md) | 本地产品运行与分发细节 |
 
-Keyless/fake checks do not acquire or replace real campaign evidence. Missing prerequisites,
-zero collected tests, or skipped critical checks do not prove acceptance. Final release requires
-its own exact-head verification; see [Release Evidence](docs/RELEASE_EVIDENCE.md).
-
-Domain references: [Evaluation Methodology](docs/EVAL_METHODOLOGY.md),
-[Task Format](docs/TASK_FORMAT.md), [Sandbox Security](docs/SANDBOX_SECURITY.md),
-[M-Lane](docs/MODEL_LANE.md), [Codex H-Lane](docs/CODEX_HARNESS.md),
-[Comparability](docs/HARNESS_COMPARABILITY.md), [Statistics](docs/EXPERIMENT_STATISTICS.md),
-[JudgeLab](docs/JUDGELAB.md), [Workbench](docs/WORKBENCH.md), and [Analyst](docs/ANALYST.md).
-Historical smoke plans are documented in [Real Evidence Authorization](docs/REAL_EVIDENCE_AUTHORIZATION.md);
-reading them does not authorize a new campaign.
-
-## Fresh clone operator path
-
-Assumptions are Python 3.12.14, uv 0.12.5, Docker, PostgreSQL 18, Java 21, and Node 24
-(`>=24.18.1 <25`). From a fresh clone:
-
-```bash
-uv sync --locked
-docker compose up -d postgres
-uv run --locked alembic upgrade head
-uv run --locked harnesslab task validate tasks/micro-python-clamp/1.0.0
-npm --prefix frontend ci
-npm --prefix frontend run build
-uv run --locked python scripts/verify_fresh_setup.py --check-runtime
-```
-
-That command is a non-mutating setup preflight contract, not proof that a clean checkout was fully
-reproduced. The default push/pull-request workflow is bounded development CI. The manually
-dispatched full-release workflow supplies the authoritative clean-checkout reproduction: after its
-isolated A-K and qualification jobs succeed, `--actions-reproduction` verifies the exact
-`GITHUB_SHA`, pinned runtimes, and an unmodified tracked checkout. That mode is CI-only and does not
-invoke any gate recursively.
-
-For a task requiring the full keyless chain, run Gates A–K using their prerequisites; database-backed
-gates need an appropriate test PostgreSQL instance. Ordinary edits use the verification scope above.
-Real execution needs current authorization and credential references; never commit `.env` or secret values.
-
-## S2.5 本地资源配置
-
-在 Registry 导航中打开“连接与配置”（`/connections`），可查看并配置本地凭据、连接、模型用途/参数与受限 Harness 预设。内置目录只读；保存配置不会执行评测，也不会切换当前 Analyst/Judge。
-
-此入口默认关闭。先按上方开发说明配置本地数据库；在启动 API 的同一个 Bash 会话中设置独立管理令牌（至少 32 字符，不使用模型 API Key）：
-
-```bash
-read -r -s -p 'Local operator token: ' HARNESSLAB_LOCAL_CONFIGURATION_TOKEN
-export HARNESSLAB_LOCAL_CONFIGURATION_TOKEN
-```
-
-直接运行 API 的开发者须先对自己的工作区数据库执行 `uv run --locked alembic upgrade head`，
-并为凭据目录设置绝对路径。例如在启动 API 的同一个 Bash 会话中：
-
-```bash
-export HARNESSLAB_CREDENTIAL_STORE="$HOME/.local/share/samescale/credentials"
-install -d -m 0700 "$HARNESSLAB_CREDENTIAL_STORE"
-```
-
-目录必须属于 API 进程用户、权限为 0700，文件权限为 0600；路径不得含符号链接，也不得与源码或
-工作区产物目录重叠。未配置目录时，原有环境变量引用和本地模型编辑仍可使用，新增密钥/连接保存会失败。
-这是受操作系统权限保护的本地文件存储，**不宣称磁盘加密或云端密钥托管**。备份和恢复时需配套保留
-数据库与凭据卷/目录及原权限；只恢复数据库不会恢复密钥。不要把凭据目录加入可下载产物根。
-
-
-在同一会话运行 `uv run --locked harnesslab serve`；在现有前端开发服务或已构建的工作区打开 `/connections`。用本机 `localhost` 或 `127.0.0.1` 地址访问，输入管理令牌解锁；令牌只留在页面内存，锁定或离开后清除。
-
-每次保存产生新版本，旧计划不改写；凭据轮换或配置停用后需重新绑定。API Key 和连接地址不回显；“校验配置（不联网）”只校验本地引用，连接健康仍为 `NOT_VERIFIED`。
-
-
-### S2.5 planning selections
-
-Open `/experiments/new` and explicitly select each SUBJECT model profile, compatible Harness
-revision and task. No model, Harness or task is selected automatically. Reloading never substitutes
-another revision for an unavailable choice. The page shows the selected profile identities,
-Harness runtime version, reasoning control, request timeout and configured output ceiling.
-
-The plan's output budget must respect both selected model ceilings. Direct selections use the
-existing one-request, one-turn, zero-tool-call contract and per-request/per-run output scopes.
-Unknown health and unavailable cost bounds remain explicit. Editing inputs invalidates earlier
-preflight results; the backend revalidates the exact selections when freezing a snapshot.
-The saved result shows backend-frozen profile, runtime and resource-envelope identities.
-This freezes a planning snapshot only: it creates no execution or experiment-run records and
-neither invokes a model nor changes Analyst/Judge role selections.
+本仓库沿用 HarnessLab 的实现与历史；README 是入口，具体运行步骤、历史验收和开发记录保留在对应文档中。
