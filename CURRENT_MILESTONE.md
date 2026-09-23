@@ -42,7 +42,7 @@ commit `6792663ffa18420d16e757317d9e343fe9505b9a` was pushed. Exact-head
   Two D2 offline replays and CI regression are required at final exact HEAD; no Agent/model,
   original command or verifier is executed by replay.
 
-## Final Job Search Freeze — exact-head CI pending — 2026-09-23
+## Job Search Freeze — COMPLETE when final exact-head CI passes — 2026-09-23
 
 The Recruiter Demo and job-search materials now connect D1's bounded decision and D2's natural
 failure with separate original/audit evidence layers. Final local gates **PASS**: full Ruff,
@@ -54,10 +54,19 @@ offline HTML open checks and share-package SHA checks passed. The prior backend 
 evidence-code-loading contract failure (517 PASS / 1 FAIL) was fixed by switching D2 replay to
 data reads; the complete fresh-database rerun passed. D1's `report_d1.py --check` passed.
 
-**Job Search Freeze is CI-gated.** Push this candidate, verify Fast CI and Offline CI PASS on
-its exact HEAD, then mark the frozen state. No new Agent trial, frozen source evidence rewrite,
-PR, merge, deployment or additional product scope is part of this closeout. Historical milestone
-entries below retain their original scope and dates; this top section is live state.
+Implementation commit `e33c2459a52719f5f3f92b863da7146e862e55a0` was pushed; remote branch
+matched it. Exact-head [Fast CI 35823539221](https://github.com/a27497/samescale/actions/runs/35823539221)
+**PASS** (518 backend tests; static/frontend/build gates passed) and
+[Offline CI 35823539245](https://github.com/a27497/samescale/actions/runs/35823539245)
+**PASS** (126 tests; D2 replay ×2; both output digests
+`sha256:667f2a00d9bbccbffd02665ce40d2e4158dd0cc03b687b04baf11035928c4e57`).
+The remote SHA-bound receipt reports zero subject, verifier, Provider, model and Judge execution.
+
+**Freeze rule:** this documentation-only status commit makes Job Search Freeze **COMPLETE** only
+after Fast CI and Offline CI both report `PASS` for that final commit's exact HEAD. Until then,
+its status is `CI_PENDING`. No new Agent trial, frozen source evidence rewrite, PR, merge,
+deployment or additional product scope is part of this closeout. Historical milestone entries
+below retain their original scope and dates; this top section is live state.
 
 ## Phase 0 — isolated development baseline — 2026-09-22
 
