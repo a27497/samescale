@@ -1,6 +1,6 @@
 # SameScale Product — Current Milestone
 
-## D1 Configuration Decision — BLOCKED / INSUFFICIENT EVIDENCE — 2026-09-23
+## D1 Configuration Decision — COMPLETE / INSUFFICIENT EVIDENCE — 2026-09-23
 
 The user selected historical S1 Official Codex as current, Claude Code as candidate, and real
 LectureLens B/A tasks. [Frozen D1 protocol and observed result](docs/evidence/d1-config-decision-20260923/README.md)
@@ -19,13 +19,45 @@ commit `6792663ffa18420d16e757317d9e343fe9505b9a` was pushed. Exact-head
   Model, Harness and Tool failure `NOT_ESTABLISHED`; workspace contract `NOT_VERIFIED`. Original
   cleanup `FAIL` from five empty scratch directories is retained. Separate post-stop cleanup
   removed only those empty directories, 0 files; original receipt/bundle readback passed.
-- D1 Acceptance **NOT MET**. Decision within these two tasks/configurations/versions/environment/
-  budget: **`INSUFFICIENT EVIDENCE`**. Consistency, five-trial median and comparable steps per
-  verified success `NOT_VERIFIED`; observed cost per verified success `NOT_AVAILABLE`.
-- **D2 NOT_STARTED; Job Search Freeze NOT_REACHED.** The order in the current request stops at
-  this genuine frozen-protocol blocker. No changed timeout, retry, new Bad Case or additional
-  Agent run is made to fill missing cells. Existing natural failures remain historical evidence,
-  not a completed D2 chain.
+- [Read-only D1 acceptance audit](docs/evidence/d1-config-decision-20260923/ACCEPTANCE_AUDIT.md)
+  **PASS / COMPLETE**: all 20 planned slots have states; the one verified success has original
+  independent verifier evidence; unknowns remain unknown. Decision within these two tasks,
+  configurations, versions, environment and budget: **`INSUFFICIENT EVIDENCE`**. The 20-run
+  campaign was **not** fully executed. Consistency, five-trial median and comparable steps per
+  verified success remain `NOT_VERIFIED`; observed cost per verified success `NOT_AVAILABLE`.
+  The original result's `BLOCKED_BEFORE_D1_ACCEPTANCE` label remains an unchanged stopping record.
+
+## D2 Natural Failure Diagnosis — COMPLETE — 2026-09-23
+
+- Reused the historical real `A/candidate/1` LectureLens subtitle-language attempt, not the
+  seeded Hook fixture and not a new Agent run. Original timeout **600 s / 601.037 s observed**;
+  **5 saved files**, original Episode **NOT_VERIFIED**, original verifier **NOT_RUN**.
+- The [independent offline audit](docs/evidence/l1-a-candidate-offline-audit-20260921/README.md)
+  matched those files to the 99-file output workspace and recorded **71/75** checks, with
+  A3 duplicate variant/extension failures; supplemental checks found A4 private-use defects.
+  This is saved-workspace evidence only, not a retroactive Episode grade.
+- [D2 freeze and chain](docs/evidence/d2-natural-failure-20260923/README.md) pin the original
+  evidence and scoped diagnosis. Workspace Contract defects **VERIFIED**; Model capability and
+  Harness root cause **NOT_ESTABLISHED**. Original timeout remains an original run fact.
+  Two D2 offline replays and CI regression are required at final exact HEAD; no Agent/model,
+  original command or verifier is executed by replay.
+
+## Final Job Search Freeze — exact-head CI pending — 2026-09-23
+
+The Recruiter Demo and job-search materials now connect D1's bounded decision and D2's natural
+failure with separate original/audit evidence layers. Final local gates **PASS**: full Ruff,
+format (727 files), strict mypy (388 files), frontend type-check/17 specs/167 tests/build,
+Fast CI's full bounded backend suite **518 PASS** on a newly migrated disposable PostgreSQL 18,
+and the network-isolated Offline CI entry **126 PASS** with D2 read-only replay ×2 and identical
+frozen output. The Actions receipt recorded both D2 replay digests locally. Desktop and mobile
+offline HTML open checks and share-package SHA checks passed. The prior backend run's
+evidence-code-loading contract failure (517 PASS / 1 FAIL) was fixed by switching D2 replay to
+data reads; the complete fresh-database rerun passed. D1's `report_d1.py --check` passed.
+
+**Job Search Freeze is CI-gated.** Push this candidate, verify Fast CI and Offline CI PASS on
+its exact HEAD, then mark the frozen state. No new Agent trial, frozen source evidence rewrite,
+PR, merge, deployment or additional product scope is part of this closeout. Historical milestone
+entries below retain their original scope and dates; this top section is live state.
 
 ## Phase 0 — isolated development baseline — 2026-09-22
 

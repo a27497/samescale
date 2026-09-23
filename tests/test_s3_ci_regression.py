@@ -11,6 +11,7 @@ import pytest
 import yaml
 from scripts.record_s3_ci import record
 from scripts.verify_s3_regression import (
+    D2_GOLDEN,
     EVIDENCE,
     GOLDEN,
     ROOT,
@@ -177,3 +178,22 @@ def test_actions_receipt_is_bounded_and_checks_junit(tmp_path: Path, capsys: Any
     (tmp_path / "pytest.xml").write_text("<testsuites/>")
     assert record(tmp_path, "a" * 40, summary) == 2
     assert "S3_RECORDING_FAILED=" in capsys.readouterr().err
+
+
+def test_actions_receipt_requires_both_d2_replays(tmp_path: Path, capsys: Any) -> None:
+    source = ROOT / "docs/evidence/phase0-candidate-20260922/offline"
+    for name in ("result.json", "pytest.txt", "pytest.xml", "replay-a.txt", "replay-b.txt"):
+        shutil.copyfile(source / name, tmp_path / name)
+    result = json.loads((tmp_path / "result.json").read_text())
+    result["d2_case"] = "A/candidate/1"
+    result["d2_identical_output"] = D2_GOLDEN
+    (tmp_path / "result.json").write_text(json.dumps(result))
+    summary = tmp_path / "summary.md"
+    assert record(tmp_path, "a" * 40, summary) == 2
+    assert "regression evidence file missing" in capsys.readouterr().err
+
+    observed = (ROOT / "docs/evidence/d2-natural-failure-20260923/freeze.json").read_bytes()
+    for name in ("d2-replay-a.txt", "d2-replay-b.txt"):
+        (tmp_path / name).write_bytes(observed)
+    assert record(tmp_path, "a" * 40, summary) == 2
+    assert "D2 replay evidence drift" in capsys.readouterr().err

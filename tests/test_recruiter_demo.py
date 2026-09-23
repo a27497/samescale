@@ -30,6 +30,18 @@ def test_verified_projection_keeps_partial_and_unknown(public: dict[str, Any]) -
     assert public["s1"]["attempted"] == 2 and public["s1"]["planned"] == 16
     assert [len(card["tools"]) for card in public["cards"]] == [13, 10]
     assert public["ci"]["tests"] == 65 and public["new_model_calls"] == 0
+    assert public["d1"]["status"] == "COMPLETE"
+    assert public["d1"]["decision"] == "INSUFFICIENT EVIDENCE"
+    assert (public["d1"]["attempted"], public["d1"]["planned"], public["d1"]["not_run"]) == (
+        2,
+        20,
+        18,
+    )
+    assert public["d1"]["consistency"] == public["d1"]["median_latency"] == "NOT_VERIFIED"
+    assert public["d2"]["case"] == "A/candidate/1"
+    assert public["d2"]["original_episode"] == "NOT_VERIFIED"
+    assert public["d2"]["independent_verifier_passed"] == 71
+    assert public["d2"]["model_root_cause"] == "NOT_ESTABLISHED"
 
 
 def test_export_uses_no_network_or_process(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -70,6 +82,7 @@ def test_shared_files_contain_only_public_projection(public: dict[str, Any]) -> 
         assert forbidden not in shared
     assert "default-src 'none'" in page
     assert "NOT_ESTABLISHED" in page and "14 NOT_RUN" in page
+    assert "18 个 slot 明确为 NOT_RUN" in page and "A/candidate/1" in page
     for section in ("task", "configurations", "result", "trace", "diagnosis", "replay", "ci"):
         assert f'id="{section}"' in page and f'href="#{section}"' in page
 

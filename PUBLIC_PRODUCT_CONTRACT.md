@@ -2,7 +2,11 @@
 
 ## Recruiter Demo — Phase S4 冻结范围（2026-09-21）
 
-`docs/recruiter/demo/index.html` 是从 S1–S3 已保存证据导出的只读分享页，不是实时运行界面。
+`docs/recruiter/demo/index.html` 是从 S1–S3、D1 与 D2 已保存证据导出的只读分享页，
+不是实时运行界面。D1 完成的是 20 个计划 slot 的状态记账与限定范围的
+`INSUFFICIENT EVIDENCE` 决策：2 attempted、18 `NOT_RUN`，并未完成 20 次运行。
+D2 只展示真实 A/candidate/1 原 Episode `NOT_VERIFIED` 与后续独立离线保存工作区
+71/75 审计之间的关联；A3/A4 保存工作区缺陷可确认，Model/Harness 根因未建立。
 展示同一真实任务的 Codex verified pass 与 Claude Code timeout/NOT_VERIFIED、描述性 Trace Diff、
 有边界的 diagnosis、Offline Replay 和已保存的 GitHub CI 验收记录。仅公开字段，不包含凭据、
 内部 endpoint、原始 trace/command、源码或隐藏 verifier 资产；导出失败不发布替代结果。

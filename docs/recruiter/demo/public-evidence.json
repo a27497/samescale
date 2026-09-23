@@ -1,11 +1,37 @@
 {
   "schema_version": 1,
   "kind": "PUBLIC_RECRUITER_DEMO",
-  "recorded_date": "2026-09-21",
+  "recorded_date": "2026-09-23",
   "s1": {
     "status": "PARTIAL REAL BENCHMARK / BLOCKED",
     "attempted": 2,
     "planned": 16
+  },
+  "d1": {
+    "status": "COMPLETE",
+    "decision": "INSUFFICIENT EVIDENCE",
+    "attempted": 2,
+    "planned": 20,
+    "not_run": 18,
+    "consistency": "NOT_VERIFIED",
+    "median_latency": "NOT_VERIFIED",
+    "observed_cost": "NOT_AVAILABLE"
+  },
+  "d2": {
+    "schema_version": 1,
+    "case": "A/candidate/1",
+    "original_episode": "NOT_VERIFIED",
+    "original_timeout_seconds": 600,
+    "original_duration_ms": 601037,
+    "original_verifier": "NOT_RUN",
+    "saved_changed_files": 5,
+    "reconstructed_files": 99,
+    "independent_verifier_passed": 71,
+    "independent_verifier_total": 75,
+    "independent_verifier_result": "FAILED_SAVED_WORKSPACE_ONLY",
+    "workspace_contract": "DEFECTS_VERIFIED_A3_A4",
+    "model_root_cause": "NOT_ESTABLISHED",
+    "harness_root_cause": "NOT_ESTABLISHED"
   },
   "cards": [
     {
@@ -202,6 +228,9 @@
   },
   "new_model_calls": 0,
   "sources": {
+    "ACCEPTANCE_AUDIT.md": "sha256:f94e191ea1cc3d4ebe681c6a835da44be6d838f95391085a4f6f0bb206411437",
+    "result.json": "sha256:d67c20ad15e935ac4a787ed8d2ca1a8299f7f8b389fdf134971cbc9d9d7701d8",
+    "freeze.json": "sha256:a2a34894344177fb36407d5b5e93f5351089f67423779cfa485f7cf26bec9f0b",
     "README.md": "sha256:9f5b586f9fa0ab521ea0c42fec237818caf59b7ab89a154ed1644c8b20cef70b",
     "final-status.json": "sha256:236aebfa45427db32c719207d255e9bb810077788a56145065c741333817a5a1",
     "github-offline-run.json": "sha256:5c94ef405721295f452766e08f7724863b87cf13d7863d696cf16e3f85ef5820",

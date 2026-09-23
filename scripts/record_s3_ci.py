@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 EVIDENCE_FILES = ("pytest.txt", "pytest.xml", "replay-a.txt", "replay-b.txt")
+D2_EVIDENCE_FILES = ("d2-replay-a.txt", "d2-replay-b.txt")
 
 
 def record(output: Path, head_sha: str, summary_path: Path) -> int:
@@ -18,9 +19,18 @@ def record(output: Path, head_sha: str, summary_path: Path) -> int:
         result = json.loads(result_path.read_text())
         if not isinstance(result, dict):
             raise ValueError("regression result is not an object")
-        files = {name: output / name for name in EVIDENCE_FILES}
+        names = EVIDENCE_FILES + (D2_EVIDENCE_FILES if result.get("d2_case") else ())
+        files = {name: output / name for name in names}
         if any(not path.is_file() for path in files.values()):
             raise ValueError("regression evidence file missing")
+        if result.get("d2_case"):
+            expected = result.get("d2_identical_output")
+            if not isinstance(expected, str) or not expected.startswith("sha256:"):
+                raise ValueError("D2 replay digest missing")
+            for name in D2_EVIDENCE_FILES:
+                observed = "sha256:" + hashlib.sha256(files[name].read_bytes()).hexdigest()
+                if observed != expected:
+                    raise ValueError("D2 replay evidence drift")
         cases = ET.parse(files["pytest.xml"]).getroot().findall(".//testcase")
         if not cases or any(list(case) for case in cases):
             raise ValueError("JUnit contains zero, failed, errored, or skipped tests")

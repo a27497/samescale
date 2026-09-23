@@ -13,13 +13,17 @@
 - 摘要绑定的 evidence chain：native/normalized trace、workspace diff、independent verifier 与 failure taxonomy 相互核对。
 - 复用 Offline Replay 与 GitHub CI 入口，检测 evidence、parser/schema、文件归属和失败分类回归；无 Provider/model/Claude/Judge 调用。
 - Recruiter Demo 仅导出公开字段，保留未知与结论限制；S1 **partial/blocked**，不是能力排名或完整 benchmark。
+- D1 在 20 个计划 slot 中尝试 2 次、18 次 `NOT_RUN`，决策收口为 **COMPLETE / INSUFFICIENT EVIDENCE**；Consistency、Median Latency 仍 `NOT_VERIFIED`。
+- D2 复用真实 `A/candidate/1` 超时失败：保存工作区经后续独立离线 verifier 得到 71/75，定位 A3/A4 缺陷；原 Episode 仍 `NOT_VERIFIED`，Model/Harness 根因 `NOT_ESTABLISHED`。只读 Replay ×2 进入 Offline CI。
 
 [演示脚本与复验命令](docs/RECRUITER_DEMO.md) · [面试材料与简历事实](docs/JOB_SEARCH_FREEZE.md) ·
-[S4 final report](docs/evidence/s4-job-search-freeze-20260921/README.md)。求职版冻结范围以
+[D1 验收审计](docs/evidence/d1-config-decision-20260923/ACCEPTANCE_AUDIT.md) ·
+[D2 自然失败闭环](docs/evidence/d2-natural-failure-20260923/README.md) ·
+[S4 historical final report](docs/evidence/s4-job-search-freeze-20260921/README.md)。求职版冻结范围以
 [CURRENT_MILESTONE](CURRENT_MILESTONE.md) 为准；下方保留现有产品说明与其他历史案例。
 
-SameScale is an **evidence-diagnosis and regression Agent workbench for AI Coding**, built on
-reproducible Model × Harness × Judge execution and verifier-backed evidence.
+SameScale 不告诉用户哪个 Coding Agent 世界第一；它利用用户自己的真实开发证据，诊断失败来源，
+并判断现有证据是否足以支持更换 Model、Harness 或配置。
 
 SameScale Product continues the existing P0 Analyst application in the canonical private repository
 [a27497/samescale](https://github.com/a27497/samescale), renamed in place from `a27497/harnesslab-ai`.

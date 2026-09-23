@@ -54,8 +54,9 @@ and [trial 01](receipts/01.json) receipts are copied here; no source result was 
 | B × Official Codex, trial 1 | `verified_pass` | 20/20 checks | 224.417 s |
 | B × Claude Code, trial 1 | `harness_error / NOT_VERIFIED` | `NOT_RUN` | 601.327 s |
 
-The remaining **18/20 planned trials are `NOT_RUN`**. This does not satisfy D1's 20-run
-acceptance. The bounded decision is **`INSUFFICIENT EVIDENCE`**; it does not support a switch,
+The remaining **18/20 planned trials are `NOT_RUN`**. The [acceptance audit](ACCEPTANCE_AUDIT.md)
+closes the bounded D1 decision as **COMPLETE / `INSUFFICIENT EVIDENCE`** with every planned slot
+accounted for; the 20-run campaign itself was not fully executed. This decision does not support a switch,
 ranking, or causal Model/Harness claim. Consistency, a five-trial median and comparable steps per
 verified success are `NOT_VERIFIED`; observed cost per verified success is `NOT_AVAILABLE`.
 
@@ -71,4 +72,6 @@ The exact freeze commit `6792663ffa18420d16e757317d9e343fe9505b9a` passed
 [Fast CI](https://github.com/a27497/samescale/actions/runs/35819575364) and
 [Offline CI](https://github.com/a27497/samescale/actions/runs/35819575362).
 Those keyless checks verify the product baseline; they do not fill D1's 18 missing trials.
-D2 and the final Job Search Freeze were not started because D1 stopped before acceptance.
+The original result's `BLOCKED_BEFORE_D1_ACCEPTANCE` label remains unchanged as a historical
+stopping record. The later acceptance audit separates that hard-stop fact from decision closeout;
+it did not dispatch more trials or revise any result. D2 uses separate historical natural evidence.

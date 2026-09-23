@@ -32,7 +32,7 @@ code{font:13px/1.65 ui-monospace,monospace;overflow-wrap:anywhere}li code{displa
 <body>
 <a class="skip" href="#task">跳到演示正文</a>
 <header id="top">
-<div class="brand"><strong>SameScale</strong><span>ENGINEERING CASE · 2026-09-21</span></div>
+<div class="brand"><strong>SameScale</strong><span>ENGINEERING CASE · 2026-09-23</span></div>
 <h1>一次真实编程任务，<br>一条可复验的证据链。</h1>
 <p class="lead">从任务与结果，追到工具轨迹、文件变更和验收状态，再把这条证据链锁进离线回归。</p>
 <p class="muted">Recruiter Demo · 3–5 分钟 · 真实历史记录 · 无需登录、服务或模型密钥</p>
@@ -53,6 +53,7 @@ code{font:13px/1.65 ui-monospace,monospace;overflow-wrap:anywhere}li code{displa
 <div class="grid"><div><h3>Official Codex</h3><p>请求模型 <strong>gpt-6-astra · high</strong><br>Codex CLI 0.153.4 · Official ChatGPT</p></div><div><h3>Claude Code</h3><p>请求模型 <strong>qwen3.8-max</strong><br>Claude Code 2.1.241 · Alibaba Bailian Messages</p></div></div>
 <p>Claude Code 是运行时名称，此次请求的模型是 qwen3.8-max。模型、provider、CLI、prompt-template 不同；两侧保留原冻结 600 秒 subject 时限。</p>
 <p class="note"><strong>S1：PARTIAL REAL BENCHMARK / BLOCKED。</strong>16 个计划 cells 只执行了 2 个，其余 14 NOT_RUN。这是两个实测 attempts 的描述，不是能力排名、完整 benchmark 或单变量因果实验。</p>
+<details><summary>D1 配置决策 · 20 个 slot 的完整状态</summary><p>冻结范围为两种配置、LectureLens B/A 两项任务、各 5 次。D1 的试次与上方 S1 历史演示分开记账。D1 只有 2 次尝试：Official Codex 的 B/1 独立 verifier 20/20；Claude Code 的 B/1 到 600 秒边界且未验证。其余 18 个 slot 明确为 NOT_RUN。</p><p><strong>INSUFFICIENT EVIDENCE</strong> 是本次任务、环境、版本、预算与配置内的决策。D1 验收已按状态记账与证据边界收口；20-run campaign 未执行完，Consistency 和 Median Latency 仍 NOT_VERIFIED，Observed Cost 为 NOT_AVAILABLE。</p></details>
 </section>
 <section id="result" aria-labelledby="result-title">
 <p class="eyebrow">03 · Verifier-backed result</p><h2 id="result-title">一次已验证通过，一次超时未验证</h2>
@@ -76,13 +77,15 @@ code{font:13px/1.65 ui-monospace,monospace;overflow-wrap:anywhere}li code{displa
 <p class="eyebrow">05 · Evidence-bounded diagnosis</p><h2 id="diagnosis-title">事实可以复验，根因仍有边界</h2>
 <div class="grid"><div><h3>能确认</h3><p>Codex 保存了修改、自检与独立通过记录。Claude 保存了读取和 shell 交互，随后直到时限仍无完成、文件变更或验收记录。</p><p><code>execution_budget_exhausted</code> 是已记录的 failure taxonomy。</p></div><div><h3>不能确认</h3><p>无法证明 timeout 是模型、provider 或运行时哪一层导致。没有逐事件时间戳；thinking metadata 数量不是 token usage，也不是有效推进的证明。</p><p><code>root cause: NOT_ESTABLISHED</code></p></div></div>
 <p class="muted">原 Claude cleanup FAIL 与随后 post-stop cleanup PASS 分开保留；后续收尾不会改写原 attempt。</p>
+<details><summary>D2 真实失败 · A/candidate/1 字幕语言元数据</summary><p>原真实运行在 600 秒上限后停止，历时 601.037 秒，留下 5 个修改文件；原 Episode 仍是 <strong>NOT_VERIFIED</strong>，当时 verifier NOT_RUN。保存工作区与后续独立离线审计的 99 文件快照字节一致。</p><p>后续独立 verifier 对保存工作区报告 <strong>71/75</strong>，A3 的重复 variant/extension 失败；独立补充验收又发现 A4 private-use 标签被错误降为 und。这是保存工作区缺陷的证据，不是原 Episode 正式成绩。</p><p>Workspace Contract：DEFECTS_VERIFIED_A3_A4；Model/Harness 根因：<strong>NOT_ESTABLISHED</strong>。原 timeout 仍是原运行事实，不能据此归因为模型或 Harness。</p></details>
 </section>
 <section id="replay" aria-labelledby="replay-title">
 <p class="eyebrow">06 · Offline Replay</p><h2 id="replay-title">换一台机器，仍能核对同一组事实</h2>
 <div class="flow">Frozen bundle → SHA-256 / inventory → native ↔ normalized trace → workspace diff → verifier state → Trace Diff</div>
 <p>本文件生成时已复用 S2 reader 对两个完整 bundle 做离线重建，并与冻结输出摘要核对。缺失、篡改或跨记录矛盾直接拒绝导出。</p>
 <p><strong>Replay PASS</strong> 表示保存的事实可一致重建，不表示重新运行模型、命令或 verifier。本页展示生成时的验收快照，点击或刷新不会执行 replay。</p>
-<details><summary>核对来源与摘要</summary><p>以下是导出时已核对的来源摘要。摘要用于完整性核对；同时替换证据和全部信任锚的攻击不由摘要单独认证。完整原件留在操作者仓库。</p><ul><li><strong>README.md</strong><code>sha256:9f5b586f9fa0ab521ea0c42fec237818caf59b7ab89a154ed1644c8b20cef70b</code></li><li><strong>final-status.json</strong><code>sha256:236aebfa45427db32c719207d255e9bb810077788a56145065c741333817a5a1</code></li><li><strong>github-offline-run.json</strong><code>sha256:5c94ef405721295f452766e08f7724863b87cf13d7863d696cf16e3f85ef5820</code></li><li><strong>github-fast-run.json</strong><code>sha256:bae08efbd4ccd079ce11edb1734810998798821dbbb6e696a76dba49a7fed064</code></li><li><strong>github-receipt.json</strong><code>sha256:3cf02fdfcdcbbb8a75353f878bffbc8dd03f282f17b8e27ab61331204f08795b</code></li><li><strong>claude.json</strong><code>sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d</code></li><li><strong>codex.json</strong><code>sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe</code></li><li><strong>diagnosis.md</strong><code>sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1</code></li><li><strong>offline-boundary.json</strong><code>sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097</code></li><li><strong>trace-diff.json</strong><code>sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef</code></li></ul></details>
+<p>D2 的 A/candidate/1 保存工作区证据也经过两次只读离线 Replay，固定输出相同；回放只读取原 Episode、保存文件摘要、独立 verifier 报告和诊断记录。</p>
+<details><summary>核对来源与摘要</summary><p>以下是导出时已核对的来源摘要。摘要用于完整性核对；同时替换证据和全部信任锚的攻击不由摘要单独认证。完整原件留在操作者仓库。</p><ul><li><strong>ACCEPTANCE_AUDIT.md</strong><code>sha256:f94e191ea1cc3d4ebe681c6a835da44be6d838f95391085a4f6f0bb206411437</code></li><li><strong>result.json</strong><code>sha256:d67c20ad15e935ac4a787ed8d2ca1a8299f7f8b389fdf134971cbc9d9d7701d8</code></li><li><strong>freeze.json</strong><code>sha256:a2a34894344177fb36407d5b5e93f5351089f67423779cfa485f7cf26bec9f0b</code></li><li><strong>README.md</strong><code>sha256:9f5b586f9fa0ab521ea0c42fec237818caf59b7ab89a154ed1644c8b20cef70b</code></li><li><strong>final-status.json</strong><code>sha256:236aebfa45427db32c719207d255e9bb810077788a56145065c741333817a5a1</code></li><li><strong>github-offline-run.json</strong><code>sha256:5c94ef405721295f452766e08f7724863b87cf13d7863d696cf16e3f85ef5820</code></li><li><strong>github-fast-run.json</strong><code>sha256:bae08efbd4ccd079ce11edb1734810998798821dbbb6e696a76dba49a7fed064</code></li><li><strong>github-receipt.json</strong><code>sha256:3cf02fdfcdcbbb8a75353f878bffbc8dd03f282f17b8e27ab61331204f08795b</code></li><li><strong>claude.json</strong><code>sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d</code></li><li><strong>codex.json</strong><code>sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe</code></li><li><strong>diagnosis.md</strong><code>sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1</code></li><li><strong>offline-boundary.json</strong><code>sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097</code></li><li><strong>trace-diff.json</strong><code>sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef</code></li></ul></details>
 </section>
 <section id="ci" aria-labelledby="ci-title">
 <p class="eyebrow">07 · CI regression</p><h2 id="ci-title">把已知事实变成后续变更的回归边界</h2>
@@ -90,7 +93,7 @@ code{font:13px/1.65 ui-monospace,monospace;overflow-wrap:anywhere}li code{displa
 <p>已保存的 GitHub Actions 记录：Offline Regression 与 Fast CI 均 PASS。实现验收 SHA：<code>b2d729bc8d1c9eb793511b54a7b235a72e67cb9b</code>。这是 2026-09-21 的已核验记录，不是实时状态。</p>
 <ul><li>evidence / digest drift 与 replay inconsistency</li><li>trace / schema / parser regression</li><li>changed-files attribution 与 failure taxonomy regression</li></ul>
 <p>本地与 GitHub 使用同一入口。回归运行于无外部网络的 namespace，环境清空；普通 CI 不调用 Provider、model、Claude 或 Judge。依赖安装与 GitHub 日志传输在回归隔离边界之外。</p>
-<p class="note"><strong>工程交付：</strong>真实 run evidence → 描述性 Trace Diff → 有边界的诊断 → 离线可复验 → CI 检测回归。S1 partial/blocked；S2/S3/S4 complete，求职展示已冻结。</p>
+<p class="note"><strong>工程交付：</strong>真实 run evidence → 描述性 Trace Diff → 有边界的诊断 → 离线可复验 → CI 检测回归。D1 决策 COMPLETE / INSUFFICIENT EVIDENCE，D2 自然失败闭环完成；S1 历史比较仍 partial/blocked。本页是只读求职展示。</p>
 </section>
 <a class="back" href="#top">回到开头 ↑</a>
 </main>

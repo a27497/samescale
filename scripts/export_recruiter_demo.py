@@ -23,13 +23,24 @@ from harnesslab.analyst.offline_replay import (
 )
 from harnesslab.evidence.offline_boundary import offline_guard
 from harnesslab.tasks.package import sha256_bytes
+from scripts.replay_d2 import replay as replay_d2
 from scripts.verify_s3_regression import ARCHIVE_DIGEST, GOLDEN, INPUTS_DIGEST, extract_archive
 
 ROOT = Path(__file__).resolve().parents[1]
 S2 = "docs/evidence/s2-offline-replay-20260921"
 S3 = "docs/evidence/s3-ci-regression-20260921"
 S1 = "docs/evidence/s1-partial-closeout-20260921/final-status.json"
+D1 = "docs/evidence/d1-config-decision-20260923/result.json"
 SOURCE_PINS: dict[str, str] = {
+    "docs/evidence/d1-config-decision-20260923/ACCEPTANCE_AUDIT.md": (
+        "sha256:f94e191ea1cc3d4ebe681c6a835da44be6d838f95391085a4f6f0bb206411437"
+    ),
+    "docs/evidence/d1-config-decision-20260923/result.json": (
+        "sha256:d67c20ad15e935ac4a787ed8d2ca1a8299f7f8b389fdf134971cbc9d9d7701d8"
+    ),
+    "docs/evidence/d2-natural-failure-20260923/freeze.json": (
+        "sha256:a2a34894344177fb36407d5b5e93f5351089f67423779cfa485f7cf26bec9f0b"
+    ),
     "docs/evidence/s2-offline-replay-20260921/README.md": (
         "sha256:9f5b586f9fa0ab521ea0c42fec237818caf59b7ab89a154ed1644c8b20cef70b"
     ),
@@ -66,6 +77,18 @@ def project(root: Path = ROOT) -> dict[str, Any]:
         and not status["ability_ranking_allowed"],
         "S1 scope drift",
     )
+    d1 = sources[D1]
+    require(
+        d1["planned"] == 20
+        and d1["attempted"] == 2
+        and d1["verified_pass"] == 1
+        and d1["not_verified"] == 1
+        and d1["not_run"] == 18
+        and d1["decision"] == "INSUFFICIENT EVIDENCE"
+        and d1["metrics"]["consistency"] == "NOT_VERIFIED",
+        "D1 decision scope drift",
+    )
+    d2 = replay_d2(root)
     with tempfile.TemporaryDirectory(prefix="s4-replay-") as temporary:
         inputs_root = Path(temporary) / "inputs"
         extract_archive(root / S2 / "representative-bundles.zip", inputs_root)
@@ -131,8 +154,19 @@ def project(root: Path = ROOT) -> dict[str, Any]:
     return {
         "schema_version": 1,
         "kind": "PUBLIC_RECRUITER_DEMO",
-        "recorded_date": "2026-09-21",
+        "recorded_date": "2026-09-23",
         "s1": {"status": "PARTIAL REAL BENCHMARK / BLOCKED", "attempted": 2, "planned": 16},
+        "d1": {
+            "status": "COMPLETE",
+            "decision": d1["decision"],
+            "attempted": d1["attempted"],
+            "planned": d1["planned"],
+            "not_run": d1["not_run"],
+            "consistency": d1["metrics"]["consistency"],
+            "median_latency": "NOT_VERIFIED",
+            "observed_cost": "NOT_AVAILABLE",
+        },
+        "d2": d2,
         "cards": cards,
         "replay": {"status": "PASS", "archive_sha256": ARCHIVE_DIGEST, "outputs": GOLDEN},
         "ci": {"status": "RECORDED_PASS", "sha": receipt["head_sha"], "tests": 65},
@@ -176,6 +210,10 @@ def render(data: dict[str, Any], template: str) -> str:
         tools="".join(tools),
         sources=sources,
         ci_sha=escape(data["ci"]["sha"]),
+        d1_decision=escape(data["d1"]["decision"]),
+        d2_checks=escape(
+            f"{data['d2']['independent_verifier_passed']}/{data['d2']['independent_verifier_total']}"
+        ),
     )
 
 
@@ -205,7 +243,7 @@ def main() -> int:
     sys.addaudithook(offline_guard)
     try:
         export(args.output)
-    except (ReplayError, OSError, KeyError, ValueError, TypeError):
+    except (AssertionError, ReplayError, OSError, KeyError, ValueError, TypeError):
         print("FAIL_CLOSED: invalid evidence or output; no demo published")
         return 2
     print("PASS: public-safe offline demo exported; new Provider/model/Claude/Judge calls=0")

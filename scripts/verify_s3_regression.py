@@ -31,12 +31,14 @@ GOLDEN = {
     ),
     "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef",
 }
+D2_GOLDEN = "sha256:667f2a00d9bbccbffd02665ce40d2e4158dd0cc03b687b04baf11035928c4e57"
 SUITES = (
     "tests/test_s2_offline_replay.py",
     "tests/test_s3_ci_regression.py",
     "tests/test_recruiter_demo.py",
     "tests/test_native_hooks.py",
     "tests/test_verified_hook_replay.py",
+    "tests/test_d2_natural_replay.py",
 )
 REQUIRED_TESTS = (
     "test_real_runs_are_reconstructed_without_execution",
@@ -56,6 +58,8 @@ REQUIRED_TESTS = (
     "test_real_workspace_failure_is_independently_verified_without_hook_exit_codes",
     "test_verified_case_cli_freeze_and_two_offline_replays",
     "test_passing_workspace_never_becomes_bad_case",
+    "test_natural_failure_two_read_only_replays",
+    "test_natural_failure_evidence_tamper_fails_closed",
 )
 
 
@@ -137,6 +141,13 @@ def main() -> int:
                 attempt,
             )
             check_outputs(output / attempt)
+        for attempt in ("d2-replay-a", "d2-replay-b"):
+            run([sys.executable, "scripts/replay_d2.py"], output, attempt)
+            read_pinned(output / f"{attempt}.txt", D2_GOLDEN)
+        require(
+            (output / "d2-replay-a.txt").read_bytes() == (output / "d2-replay-b.txt").read_bytes(),
+            "D2 replay inconsistency",
+        )
         run(
             [
                 sys.executable,
@@ -161,6 +172,9 @@ def main() -> int:
             identical_outputs=GOLDEN,
             replayed_runs=2,
             replay_passes=2,
+            d2_case="A/candidate/1",
+            d2_replay_passes=2,
+            d2_identical_output=D2_GOLDEN,
             external_calls=0,
             provider_calls=0,
             model_calls=0,
