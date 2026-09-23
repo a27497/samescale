@@ -2,7 +2,48 @@
 
 ## Phase 0 — isolated development baseline — 2026-09-22
 
-### Replay CLI / neutral offline boundary repair — local PASS, exact-HEAD CI pending
+### Offline CI evidence-recording repair — 2026-09-23
+
+- The replay/regression step on `b9e8b60` passed, while the following Actions log step remained
+  running until cancellation. It printed the complete pytest/JUnit payload (about 1 MB locally).
+  The current repair records a bounded SHA-bound receipt, JUnit pass count and SHA-256 digests for
+  pytest/JUnit and both replay logs. Missing, malformed, failed or skipped JUnit evidence fails
+  closed; the regression step and its frozen evidence are unchanged.
+- Local static checks PASS: full Ruff, format (723 files), strict mypy (384 files); frontend
+  type check, 17 specs / 167 tests and build PASS. Unified offline regression PASS: 123 tests,
+  two replay passes, five frozen output digests matched, zero external/model/verifier calls.
+  Focused workflow/recording contracts: 37 PASS. Mirrored Fast CI backend: 518 PASS on a new,
+  migrated disposable PostgreSQL 18 instance. The prior 15-minute timeout remains a bound,
+  not evidence of successful remote recording.
+- Clean candidate and exact-head CI are pending at this checkpoint.
+  Phase 0 remains INCOMPLETE until both workflows pass on the same committed HEAD. D1 has not
+  started. The older STOP records below describe earlier attempts, not the current authorization.
+
+### Offline CI timeout closeout — STOP / INCOMPLETE — 2026-09-22
+
+- One-line CI commit `b9e8b606c94bc0df8470d2e45180d203dacc411e` changes only the Offline
+  job timeout from 10 to **15 minutes**; pushed to `codex/phase0-baseline-20260922`.
+  Tests, evidence recording, Replay/Verifier/guard and frozen evidence are unchanged.
+- Local workflow/CI contracts **36 PASS**, unified isolated offline **122 PASS**, full Ruff /
+  format (**722 files**) / strict mypy (**383 files**) PASS. The exact existing recording
+  command completed locally in **0.064 seconds**, writing 1,066,807 log bytes and 1,265 summary
+  bytes; this does not establish remote recording health.
+- Exact-HEAD [Fast CI 35748291808](https://github.com/a27497/samescale/actions/runs/35748291808)
+  **PASS**. [Offline CI 35748291694](https://github.com/a27497/samescale/actions/runs/35748291694)
+  **CANCELLED**; check-run annotation: `The job has exceeded the maximum execution time of 15m0s`.
+- Offline job timestamps (UTC): started **15:34:25**, cancelled **15:54:27**, wall time **20m02s**.
+  Setup **1s**, checkout **2s**, uv setup **6s**, locked dependencies **3s**, replay/regression
+  **1m24s PASS**. Evidence recording started **15:36:02** and has no completion timestamp or
+  successful conclusion; **18m25s elapsed from recording start to job cancellation**, not a
+  measured successful step duration. Post steps did not start.
+- The increased bound did not resolve the recording stall. No claim of normal/non-stuck recording;
+  no higher timeout, CI changes or rerun after this result. **Phase 0 INCOMPLETE; Phase 1 not ready
+  and not started.** No main merge, deployment, Agent/model/Claude/Judge/Campaign execution.
+- This post-CI milestone record remains local/uncommitted; final pushed HEAD is the CI-only commit
+  above. Earlier repair observations below retain their original scope and results.
+
+
+### Replay CLI / neutral offline boundary repair — STOP / INCOMPLETE
 
 - Shared `ReplayError` and unchanged `offline_guard` now live in
   `harnesslab.evidence.offline_boundary`. S2 replay, Hook replay and Demo export use the same
@@ -21,8 +62,18 @@
 - Prior stopped attempt: putting the guard in Analyst caused the scope check to flag its denial
   string; backend stopped at **134 PASS / 1 FAIL** without commit/push. The explicitly authorized
   neutral-module relocation resolves that blocker; no unrelated failure occurred this round.
-- Await both automatic workflows on the pushed repair HEAD before marking Phase 0 COMPLETE.
-  No Agent/model/Claude/Judge/Campaign, main merge or deployment; **Phase 1 not started**.
+- Repair commit `b05b507af0d91c5ff5e88d2e261cc5a34ecc031e` was pushed to
+  `codex/phase0-baseline-20260922`; remote branch SHA matches. Exact-HEAD
+  [Fast CI 35745223513](https://github.com/a27497/samescale/actions/runs/35745223513) **PASS**
+  (518 backend / 167 frontend tests; static/build checks PASS).
+- Exact-HEAD [Offline CI 35745223557](https://github.com/a27497/samescale/actions/runs/35745223557)
+  finished **CANCELLED**. The replay/regression step succeeded, but the Actions log/summary step
+  did not finish. Check-run annotation: `The job has exceeded the maximum execution time of 10m0s`.
+  Full job log was unavailable (`log not found`). No new regression failure was reported; the
+  workflow itself did not PASS. STOP: no CI changes or rerun under this import/boundary scope.
+- **Phase 0 INCOMPLETE; Phase 1 not ready and not started.** This post-CI status is a local
+  milestone update, not another commit; the final pushed and verified HEAD remains the repair SHA.
+  No Agent/model/Claude/Judge/Campaign, main merge or deployment.
 
 Base `ef135bbdd49639afc28e2701d811329f3418281d` (fetched origin/main); candidate branch `codex/phase0-baseline-20260922`. [Acceptance and scope](docs/evidence/phase0-candidate-20260922/README.md) / [local receipt](docs/evidence/phase0-candidate-20260922/local-acceptance.json).
 

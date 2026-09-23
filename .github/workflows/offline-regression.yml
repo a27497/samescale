@@ -29,25 +29,4 @@ jobs:
         run: bash scripts/ci_s3.sh "$RUNNER_TEMP/s3-regression"
       - name: Record regression evidence in Actions log and summary
         if: ${{ always() }}
-        run: |
-          python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          output = Path(os.environ["RUNNER_TEMP"]) / "s3-regression"
-          result = json.loads((output / "result.json").read_text())
-          receipt = {"head_sha": os.environ["GITHUB_SHA"], "regression": result}
-          print("S3_GITHUB_RECEIPT=" + json.dumps(receipt, sort_keys=True))
-          for name in ("pytest.txt", "pytest.xml", "replay-a.txt", "replay-b.txt"):
-              path = output / name
-              if path.exists():
-                  print(f"S3_EVIDENCE_BEGIN={name}")
-                  print(path.read_text())
-                  print(f"S3_EVIDENCE_END={name}")
-          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a") as summary:
-              summary.write("## Offline regression\n\n```json\n")
-              summary.write(json.dumps(receipt, indent=2) + "\n```\n")
-          if result["status"] != "PASS":
-              raise SystemExit(2)
-          PY
+        run: python3 scripts/record_s3_ci.py "$RUNNER_TEMP/s3-regression"

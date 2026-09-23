@@ -9,6 +9,7 @@ from typing import Any
 
 import pytest
 import yaml
+from scripts.record_s3_ci import record
 from scripts.verify_s3_regression import (
     EVIDENCE,
     GOLDEN,
@@ -143,9 +144,7 @@ def test_workflow_uses_offline_entry_without_execution_credentials() -> None:
     assert not any("env" in s for s in job["steps"])
     record = job["steps"][-1]
     assert record["if"] == "${{ always() }}"
-    assert "S3_GITHUB_RECEIPT=" in record["run"]
-    assert 'os.environ["GITHUB_SHA"]' in record["run"]
-    assert 'result["status"] != "PASS"' in record["run"]
+    assert record["run"] == 'python3 scripts/record_s3_ci.py "$RUNNER_TEMP/s3-regression"'
     assert "continue-on-error" not in record
     launcher = (ROOT / "scripts/ci_s3.sh").read_text()
     assert "sudo -n unshare --net -- setpriv" in launcher
@@ -154,3 +153,27 @@ def test_workflow_uses_offline_entry_without_execution_credentials() -> None:
     assert "verify_s3_regression.py" in launcher
     recorded = json.loads((EVIDENCE / "reproducibility.json").read_text())
     assert recorded["identical_outputs"] == GOLDEN
+
+
+def test_actions_receipt_is_bounded_and_checks_junit(tmp_path: Path, capsys: Any) -> None:
+    source = ROOT / "docs/evidence/phase0-candidate-20260922/offline"
+    for name in ("result.json", "pytest.txt", "pytest.xml", "replay-a.txt", "replay-b.txt"):
+        shutil.copyfile(source / name, tmp_path / name)
+    summary = tmp_path / "summary.md"
+    assert record(tmp_path, "a" * 40, summary) == 0
+    output = capsys.readouterr().out
+    assert len(output) < 5000
+    receipt = json.loads(output.removeprefix("S3_GITHUB_RECEIPT="))
+    assert receipt["head_sha"] == "a" * 40
+    assert receipt["junit_cases"] == receipt["regression"]["tests_passed"] == 122
+    assert set(receipt["evidence_sha256"]) == {
+        "pytest.txt",
+        "pytest.xml",
+        "replay-a.txt",
+        "replay-b.txt",
+    }
+    assert "Offline regression" in summary.read_text()
+
+    (tmp_path / "pytest.xml").write_text("<testsuites/>")
+    assert record(tmp_path, "a" * 40, summary) == 2
+    assert "S3_RECORDING_FAILED=" in capsys.readouterr().err
