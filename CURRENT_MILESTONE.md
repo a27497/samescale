@@ -1,5 +1,32 @@
 # SameScale Product — Current Milestone
 
+## D1 Configuration Decision — BLOCKED / INSUFFICIENT EVIDENCE — 2026-09-23
+
+The user selected historical S1 Official Codex as current, Claude Code as candidate, and real
+LectureLens B/A tasks. [Frozen D1 protocol and observed result](docs/evidence/d1-config-decision-20260923/README.md)
+bind exactly **2 configs × 2 tasks × 5 trials = 20**, with task/workspace/config/prompt/verifier,
+600-second subject and 300-second verifier bounds, tools, declared output budget and taxonomy.
+Freeze identity `sha256:db53f913e451a931157aa710817459def3e1cc78b5f6acd946c40741e438a25e`;
+commit `6792663ffa18420d16e757317d9e343fe9505b9a` was pushed. Exact-head
+[Fast CI 35819575364](https://github.com/a27497/samescale/actions/runs/35819575364) and
+[Offline CI 35819575362](https://github.com/a27497/samescale/actions/runs/35819575362) **PASS**.
+
+- **2 attempted / 20 planned**: B × Official Codex trial 1 `verified_pass`, independent verifier
+  **20/20**, subject **224.417 s**; B × Claude trial 1 `harness_error / NOT_VERIFIED`, subject
+  **601.327 s**, verifier **NOT_RUN**, usage/cost `UNKNOWN / NOT_AVAILABLE`. Frozen stop rule
+  prevented further dispatch: **18 NOT_RUN**. Historical S1 runs are not counted.
+- Observed failure mechanism: 600-second evaluation-contract timeout. Root cause `UNKNOWN`;
+  Model, Harness and Tool failure `NOT_ESTABLISHED`; workspace contract `NOT_VERIFIED`. Original
+  cleanup `FAIL` from five empty scratch directories is retained. Separate post-stop cleanup
+  removed only those empty directories, 0 files; original receipt/bundle readback passed.
+- D1 Acceptance **NOT MET**. Decision within these two tasks/configurations/versions/environment/
+  budget: **`INSUFFICIENT EVIDENCE`**. Consistency, five-trial median and comparable steps per
+  verified success `NOT_VERIFIED`; observed cost per verified success `NOT_AVAILABLE`.
+- **D2 NOT_STARTED; Job Search Freeze NOT_REACHED.** The order in the current request stops at
+  this genuine frozen-protocol blocker. No changed timeout, retry, new Bad Case or additional
+  Agent run is made to fill missing cells. Existing natural failures remain historical evidence,
+  not a completed D2 chain.
+
 ## Phase 0 — isolated development baseline — 2026-09-22
 
 ### Phase 0 COMPLETE — Offline CI evidence-recording repair — 2026-09-23

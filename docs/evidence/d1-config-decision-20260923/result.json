@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "campaign_identity": "sha256:db53f913e451a931157aa710817459def3e1cc78b5f6acd946c40741e438a25e",
+  "phase_status": "BLOCKED_BEFORE_D1_ACCEPTANCE",
+  "planned": 20,
+  "attempted": 2,
+  "verified_pass": 1,
+  "verified_fail": 0,
+  "not_verified": 1,
+  "not_run": 18,
+  "rows": [
+    {
+      "index": 0,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "codex",
+      "trial": 1,
+      "state": "verified_pass",
+      "verified_success": true,
+      "subject_duration_ms": 224417,
+      "verifier_checks": 20,
+      "verifier_passed_checks": 20,
+      "usage": {
+        "input_tokens": 265779,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 5731,
+        "reasoning_output_tokens": 809
+      },
+      "cost_usd": "NOT_AVAILABLE",
+      "continue_allowed": true,
+      "stop_reasons": [],
+      "receipt_sha256": "sha256:429f4b968c5b20bb341ac352beb280c7670c76a0f2f208af846de34596d323d1",
+      "bundle_digest": "sha256:c217ff4027ca07a6d5bb7dda30d1085c0f7b2375516998de554bceade676f49d"
+    },
+    {
+      "index": 1,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "claude",
+      "trial": 1,
+      "state": "harness_error",
+      "verified_success": null,
+      "subject_duration_ms": 601327,
+      "verifier_checks": null,
+      "verifier_passed_checks": null,
+      "usage": null,
+      "cost_usd": "NOT_AVAILABLE",
+      "continue_allowed": false,
+      "stop_reasons": [
+        "cleanup_failure",
+        "execution_budget_exhausted",
+        "timeout_or_cancelled",
+        "missing_verifier_or_zero_checks",
+        "verifier_process_not_valid"
+      ],
+      "receipt_sha256": "sha256:992575d101691e18b28acd18a76a23069bd317f1ee2b8d84846bbe326deb3972",
+      "bundle_digest": "sha256:78684861aac6698d9ed696431ff920e1eb08d0afa2e4de36071a1a31b36214eb"
+    },
+    {
+      "index": 2,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "claude",
+      "trial": 1,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 3,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "codex",
+      "trial": 1,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 4,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "claude",
+      "trial": 2,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 5,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "codex",
+      "trial": 2,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 6,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "codex",
+      "trial": 2,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 7,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "claude",
+      "trial": 2,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 8,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "codex",
+      "trial": 3,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 9,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "claude",
+      "trial": 3,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 10,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "claude",
+      "trial": 3,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 11,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "codex",
+      "trial": 3,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 12,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "claude",
+      "trial": 4,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 13,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "codex",
+      "trial": 4,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 14,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "codex",
+      "trial": 4,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 15,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "claude",
+      "trial": 4,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 16,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "codex",
+      "trial": 5,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 17,
+      "task_id": "lecturelens-analysis-progress-stream-reconnect",
+      "config": "claude",
+      "trial": 5,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 18,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "claude",
+      "trial": 5,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    },
+    {
+      "index": 19,
+      "task_id": "lecturelens-embedded-subtitle-language-metadata",
+      "config": "codex",
+      "trial": 5,
+      "state": "NOT_RUN",
+      "verified_success": null,
+      "cost_usd": "NOT_AVAILABLE"
+    }
+  ],
+  "metrics": {
+    "verified_success": "1 VERIFIED_PASS / 20 planned; 1 NOT_VERIFIED; 18 NOT_RUN",
+    "consistency": "NOT_VERIFIED",
+    "median_latency": "NOT_VERIFIED; one completed verified trial observed at 224.417 s",
+    "steps_per_verified_success": "NOT_VERIFIED; no frozen cross-Harness step unit",
+    "observed_cost_per_verified_success": "NOT_AVAILABLE"
+  },
+  "failure_attribution": {
+    "observed_boundary": "EVALUATION_CONTRACT: 600-second subject timeout",
+    "root_cause": "UNKNOWN",
+    "model_capability_failure": "NOT_ESTABLISHED",
+    "harness_failure": "NOT_ESTABLISHED",
+    "tool_failure": "NOT_ESTABLISHED",
+    "workspace_contract_failure": "NOT_VERIFIED",
+    "independent_verifier": "NOT_RUN",
+    "original_cleanup": "FAIL: empty scratch directories remained",
+    "post_stop_cleanup": "PASS: empty scratch directories removed; original evidence unchanged"
+  },
+  "decision": "INSUFFICIENT EVIDENCE",
+  "decision_scope": "these_two_tasks_environment_versions_budgets_and_configs_only",
+  "d2_status": "NOT_STARTED_D1_BLOCKED",
+  "post_stop_cleanup_sha256": "sha256:97cf2a50f9ed550edc051485397087b1800ab6376af5639204849a5bfd5839ce"
+}

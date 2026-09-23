@@ -1,0 +1,43 @@
+{
+  "index": 0,
+  "side": "codex",
+  "task_id": "lecturelens-analysis-progress-stream-reconnect",
+  "cell_identity": "sha256:c74d5e0bfe16732aca402e5e848f2a7fccba28f8a27ca9a40cc8803fc493c5e8",
+  "campaign_identity": "sha256:db53f913e451a931157aa710817459def3e1cc78b5f6acd946c40741e438a25e",
+  "config_identity": "sha256:aaac17df8d30fab0ab40fd981e970956ed453d9ade66405d0d2bb824f882a812",
+  "execution_id": "179bfbe2c3184551bda28be825173a1d",
+  "consumed": true,
+  "backend_dispatches": 1,
+  "outcome": "verified_pass",
+  "task_success": true,
+  "continue_allowed": true,
+  "stop_reasons": [],
+  "subject_duration_ms": 224417,
+  "end_to_end_observed_ms": 258395,
+  "usage": {
+    "input_tokens": 265779,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 5731,
+    "reasoning_output_tokens": 809
+  },
+  "cost_usd": null,
+  "budget_compliance": {
+    "declared_output_tokens": 6000,
+    "observed_output_tokens": 5731,
+    "status": "WITHIN_DECLARED_BUDGET",
+    "excess_tokens": 0,
+    "session_hard_cap_enforced": false,
+    "stops_campaign_alone": false,
+    "changes_task_success": false
+  },
+  "verifier_checks": 20,
+  "verifier_passed_checks": 20,
+  "secret_audit": "PASS",
+  "cleanup_verified": true,
+  "provider_request_count": null,
+  "judge_calls": 0,
+  "artifact_directory": "/home/dev/artifacts/samescale-d1-20260923/campaign-00/runs/179bfbe2c3184551bda28be825173a1d",
+  "artifact_digest": "sha256:c217ff4027ca07a6d5bb7dda30d1085c0f7b2375516998de554bceade676f49d",
+  "identity": "sha256:d0b7b93a2e7bf702c98d41eb3da1e07d0a3419ce52c5348b0ec683a86109ea8a"
+}

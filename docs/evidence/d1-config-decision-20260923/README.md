@@ -41,3 +41,34 @@ candidate branch.
 
 Status at freeze: **20 planned; 0 D1 runs executed.** Later receipts must be added without
 editing the frozen files or counting historical S1 runs as D1 trials.
+
+## Run result and stopping point
+
+The frozen schedule started two trials and stopped at the predeclared hard-failure boundary.
+[Machine-readable result](result.json) is rebuilt by `uv run --locked python scripts/report_d1.py
+--check` from the original external trial bundles. Compact, digest-bound [trial 00](receipts/00.json)
+and [trial 01](receipts/01.json) receipts are copied here; no source result was rewritten.
+
+| Trial | Outcome | Independent verifier | Subject duration |
+| --- | --- | --- | --- |
+| B × Official Codex, trial 1 | `verified_pass` | 20/20 checks | 224.417 s |
+| B × Claude Code, trial 1 | `harness_error / NOT_VERIFIED` | `NOT_RUN` | 601.327 s |
+
+The remaining **18/20 planned trials are `NOT_RUN`**. This does not satisfy D1's 20-run
+acceptance. The bounded decision is **`INSUFFICIENT EVIDENCE`**; it does not support a switch,
+ranking, or causal Model/Harness claim. Consistency, a five-trial median and comparable steps per
+verified success are `NOT_VERIFIED`; observed cost per verified success is `NOT_AVAILABLE`.
+
+The Claude process reached the frozen 600-second subject timeout. It produced no independently
+verified workspace outcome; 0 changed files and unknown usage are retained. The observed boundary
+belongs to the evaluation contract. Why the session did not finish is `UNKNOWN`; Model, Harness
+and Tool failure are `NOT_ESTABLISHED`. The original cleanup receipt remains `FAIL` because five
+empty scratch directories remained. A separate [post-stop cleanup](post-stop-cleanup.json) removed
+only those empty directories, with **0 files deleted**, no remaining campaign container/network,
+and original result/receipt bytes unchanged. No Agent retry, verifier run, or changed protocol.
+
+The exact freeze commit `6792663ffa18420d16e757317d9e343fe9505b9a` passed
+[Fast CI](https://github.com/a27497/samescale/actions/runs/35819575364) and
+[Offline CI](https://github.com/a27497/samescale/actions/runs/35819575362).
+Those keyless checks verify the product baseline; they do not fill D1's 18 missing trials.
+D2 and the final Job Search Freeze were not started because D1 stopped before acceptance.

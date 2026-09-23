@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "original_trial": 1,
+  "original_cleanup_status": "FAIL",
+  "empty_scratch_directories_removed": 5,
+  "files_deleted": 0,
+  "containers_or_networks_remaining": 0,
+  "preserved_sha256": {
+    "receipt.json": "sha256:992575d101691e18b28acd18a76a23069bd317f1ee2b8d84846bbe326deb3972",
+    "cleanup.json": "sha256:b101a809647c9a5db165464be85dd99dde98bc62ea69ded3c64967baa6ddc716",
+    "result.json": "sha256:42a6f15ff727f38f564c26fff34e8db6cc4d20aa7cbc3b8071d33679fb448e5f",
+    "sha256.json": "sha256:53cba84ae3bcda7f16ac328439f19d83f1a6c78c7792912621a9a0c1418a228a"
+  }
+}
