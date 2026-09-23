@@ -13,7 +13,7 @@ SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回
 
 [在线打开只读 Demo](https://getsamescale.com/demo/)：约 3–5 分钟查看 Task → Configurations → Result → Trace Diff → Diagnosis → Offline Replay → 已保存的 CI / regression evidence。它展示的是**另一组 S4 冻结记录**，不是 Case A 的后续步骤；页面不启动 Agent、模型、replay 或验收。
 
-无需账号或 Provider key。也可以在有仓库访问权限时打开 [仓库中的单文件 HTML](docs/recruiter/demo/index.html)，点击 GitHub 的 **Raw** 下载后在浏览器本地打开；GitHub 文件预览本身不会运行 HTML。[讲解与复验路径](docs/RECRUITER_DEMO.md) · [分享边界](docs/evidence/s4-job-search-freeze-20260921/README.md)
+无需账号或 Provider key。也可以打开 [仓库中的单文件 HTML](docs/recruiter/demo/index.html)，点击 GitHub 的 **Raw** 下载后在浏览器本地打开；GitHub 文件预览本身不会运行 HTML。[讲解与复验路径](docs/RECRUITER_DEMO.md) · [分享边界](docs/evidence/s4-job-search-freeze-20260921/README.md)
 
 ## Why SameScale
 
@@ -28,10 +28,10 @@ flowchart TD
     C --> D["Workspace & evidence"]
     D --> E["Independent verifier"]
     E --> F["Evidence-bounded diagnosis"]
-    F -. "when frozen" .-> G["Offline replay / regression gates"]
+    F -.-> G["Offline replay / regression gates"]
 ```
 
-这是系统中已有的证据处理阶段，不是每条历史运行都走完的时间线。不同来源的证据保持各自身份；缺失的原生字段保持 unknown。下方案例只引用远端 `main` 已保存的证据。
+这是系统中已有的证据处理阶段，不是每条历史运行都走完的时间线。不同来源的证据保持各自身份；缺失的原生字段保持 unknown。下方案例只引用仓库中已保存的证据。
 
 ## Engineering highlights
 
