@@ -9,6 +9,12 @@ SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回
 
 **[打开只读 Recruiter Demo](https://getsamescale.com/demo/)** · [下载离线 HTML](docs/recruiter/demo/index.html) · [4 分钟讲解稿](docs/RECRUITER_DEMO.md)
 
+## Recruiter Demo
+
+[在线打开只读 Demo](https://getsamescale.com/demo/)：约 3–5 分钟查看 Task → Configurations → Result → Trace Diff → Diagnosis → Offline Replay → 已保存的 CI / regression evidence。它展示的是**另一组 S4 冻结记录**，不是 Case A 的后续步骤；页面不启动 Agent、模型、replay 或验收。
+
+无需账号或 Provider key。也可以在有仓库访问权限时打开 [仓库中的单文件 HTML](docs/recruiter/demo/index.html)，点击 GitHub 的 **Raw** 下载后在浏览器本地打开；GitHub 文件预览本身不会运行 HTML。[讲解与复验路径](docs/RECRUITER_DEMO.md) · [分享边界](docs/evidence/s4-job-search-freeze-20260921/README.md)
+
 ## Why SameScale
 
 Agent 说“done”只是一次输出，不等于任务契约通过。工程复盘还需要检查最终 workspace、工具轨迹和独立 verifier，区分任务失败、环境中断与尚未证实的模型或运行时原因。保留原始状态与未知项，才能在不再次调用模型的情况下复核结论。
@@ -25,7 +31,7 @@ flowchart TD
     F -. "when frozen" .-> G["Offline replay / regression gates"]
 ```
 
-这是系统中已有的证据处理阶段，不是每条历史运行都走完的时间线。不同来源的证据保持各自身份；缺失的原生字段保持 unknown。Native Hook 的受控验收记录见下方 Case B，其实现与原件尚未进入远端 `main`。
+这是系统中已有的证据处理阶段，不是每条历史运行都走完的时间线。不同来源的证据保持各自身份；缺失的原生字段保持 unknown。下方案例只引用远端 `main` 已保存的证据。
 
 ## Engineering highlights
 
@@ -38,7 +44,7 @@ flowchart TD
 
 ## Evidence stories
 
-以下是**两条独立的证据链**，其数字和产物不合并。
+以下是**两组独立的证据故事**；Case B 内的两次原运行也各自保留身份，其数字和产物不合并。
 
 ### Case A — Timeout → offline workspace audit
 
@@ -46,17 +52,11 @@ flowchart TD
 
 **The offline audit is not the original Episode verifier.** 此案例不主张 replay 或 CI 连续性，也不把 71/75 写成原运行的正式成绩。[原运行](docs/evidence/l1-a-candidate-real-20260921/README.md) · [离线审计](docs/evidence/l1-a-candidate-offline-audit-20260921/README.md)
 
-### Case B — Native Hook → verified workspace Bad Case → offline replay
+### Case B — Frozen S1 runs → S2 Offline Replay → S4 Recruiter Demo
 
-另一条受控 fixture 记录复用了真实 Codex session 的 native Hook 收据。Hook 未原生提供可靠的 command exit code，因此 Trace 保持 `UNKNOWN`。独立 verifier 检查最终 workspace：**1 PASS / 3 FAIL**；受限于 workspace contract 的 Bad Case 随后冻结，两次 Offline Replay 输出逐字节一致。
+另一组 S1 正式记录来自同一任务：Official Codex 的原独立 verifier 已保存 **20/20 verified_pass**；Claude Code 原运行 timeout、`NOT_VERIFIED`，verifier `NOT_RUN`。S2 对这**两条原运行分别**做摘要绑定的离线重建，再生成描述性 Trace Diff；两次独立 CLI 复验的五个输出文件逐字节一致。Replay 未重新运行模型、subject 或 verifier。
 
-**Model root cause: `NOT_ESTABLISHED`. Harness root cause: `NOT_ESTABLISHED`.** Fixture 中的缺陷是预先人工播种的，不构成 Codex 能力或指令遵循失败证明。来源为 `docs/evidence/real-hook-trace-20260922/verifier-closeout/`；该 closeout 目前只在开发工作树中，**尚未提交到远端 `main`**，因此这里不提供虚假的 GitHub 原件链接，也不主张远端 CI 已运行。
-
-## Recruiter Demo
-
-[在线打开只读 Demo](https://getsamescale.com/demo/)：约 3–5 分钟查看 Task → Configurations → Result → Trace Diff → Diagnosis → Offline Replay → 已保存的 CI / regression evidence。它展示的是**另一组 S4 冻结记录**，不是 Case A 或 Case B 的后续步骤；页面不启动 Agent、模型、replay 或验收。
-
-无需账号或 Provider key。也可以在有仓库访问权限时打开 [仓库中的单文件 HTML](docs/recruiter/demo/index.html)，点击 GitHub 的 **Raw** 下载后在浏览器本地打开；GitHub 文件预览本身不会运行 HTML。[讲解与复验路径](docs/RECRUITER_DEMO.md) · [分享边界](docs/evidence/s4-job-search-freeze-20260921/README.md)
+S4 将这组已保存记录投影为只读 Demo，并附已保存的 CI 验收记录。S1 仍为 **2/16 cells、14 `NOT_RUN`、partial/blocked**；两侧 model、provider、CLI 与 prompt template 不同，不支持能力排名或 Harness 根因归属。[S2 Offline Replay 与复验](docs/evidence/s2-offline-replay-20260921/README.md) · [S4 Demo 冻结与 CI receipt](docs/evidence/s4-job-search-freeze-20260921/README.md)
 
 ## Tech stack
 
@@ -71,7 +71,7 @@ Python · FastAPI · PostgreSQL · SQLAlchemy / Alembic · LangGraph · Vue 3 ·
 - Workspace 失败本身不能建立模型或 Harness 根因。
 - 局部证据不生成模型排名；摘要校验也不单独认证来源真实性。
 
-## For technical review
+## Technical review links
 
 值得追问的工程点：如何把原生事件与 Episode 绑定而不猜缺失字段？如何把原运行的 `NOT_RUN` 与后来审计分开？Offline Replay 证明了什么、不能证明什么？CI 如何在不调用模型的条件下发现证据读取回归？
 
