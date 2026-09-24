@@ -622,6 +622,11 @@ async def test_registry_api_does_not_seed_or_mutate_real_matrix_on_fresh_databas
             second = await client.post(
                 "/api/experiments/snapshot", json=request.model_dump(mode="json")
             )
+            saved_list = await client.get("/api/experiments/snapshots?limit=1")
+            saved_detail = await client.get(f"/api/experiments/snapshots/{expected.snapshot_id}")
+            beyond_page = await client.get("/api/experiments/snapshots?limit=1&offset=1")
+            missing = await client.get("/api/experiments/snapshots/not-present")
+            invalid_page = await client.get("/api/experiments/snapshots?limit=0")
             malicious = request.model_dump(mode="json")
             malicious["base_url"] = "https://raw-url-sentinel.invalid"
             rejected = await client.post("/api/experiments/preflight", json=malicious)
@@ -636,6 +641,16 @@ async def test_registry_api_does_not_seed_or_mutate_real_matrix_on_fresh_databas
         assert preflight.status_code == 200
         assert first.status_code == second.status_code == 200
         assert first.json()["snapshot_digest"] == second.json()["snapshot_digest"]
+        assert saved_list.status_code == saved_detail.status_code == 200
+        assert saved_list.json()["total"] == 1
+        assert saved_list.json()["items"][0]["name"] == expected.plan.name
+        assert saved_list.json()["items"][0]["snapshot_digest"] == expected.snapshot_digest
+        assert saved_list.json()["items"][0]["snapshot_id"] == expected.snapshot_id
+        assert saved_detail.json() == first.json()
+        assert beyond_page.json()["items"] == []
+        assert beyond_page.json()["total"] == 1
+        assert missing.status_code == 404
+        assert invalid_page.status_code == 422
         assert rejected.status_code == 422
         assert "raw-url-sentinel" not in rejected.text
         assert rejected_snapshot.status_code == 422
@@ -775,3 +790,52 @@ async def test_registry_snapshot_preserves_explicitly_enqueued_real_matrix_fixtu
         assert rows_after == rows_before
         assert registry_snapshot is not None
         assert no_registry_experiment is None
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("damage", ["payload", "row_digest", "row_preflight"])
+async def test_saved_plan_reads_reject_tampered_snapshot_without_rebuilding_it(
+    database_url: str, monkeypatch: pytest.MonkeyPatch, damage: str
+) -> None:
+    frozen = build_experiment_snapshot(builder_request(), ROOT, relay_environment())
+    async with isolated_registry_database(database_url) as factory:
+        async with factory() as session:
+            damaged = frozen.model_dump(mode="json")
+            if damage == "payload":
+                damaged["plan"]["name"] = "tampered-name"
+            session.add(
+                RegistryExperimentSnapshotRecord(
+                    id=frozen.snapshot_id,
+                    snapshot_digest=(
+                        "sha256:" + "0" * 64 if damage == "row_digest" else frozen.snapshot_digest
+                    ),
+                    methodology_id=frozen.methodology_id,
+                    methodology_digest=frozen.methodology_digest,
+                    preflight_status=(
+                        "tampered" if damage == "row_preflight" else frozen.preflight.status.value
+                    ),
+                    snapshot_json=damaged,
+                )
+            )
+            await session.commit()
+
+        def forbidden(*args: object, **kwargs: object) -> None:
+            raise AssertionError("Read-only saved plan must not rebuild or preflight")
+
+        monkeypatch.setattr("harnesslab.api.routes.registry.build_experiment_snapshot", forbidden)
+        monkeypatch.setattr("harnesslab.api.routes.registry.preflight_experiment", forbidden)
+        async with registry_client(factory) as client:
+            for path in [
+                "/api/experiments/snapshots",
+                f"/api/experiments/snapshots/{frozen.snapshot_id}",
+            ]:
+                result = await client.get(path)
+                assert result.status_code == 409
+                assert result.json()["error"]["code"] == "ARTIFACT_INTEGRITY_ERROR"
+                assert "tampered-name" not in result.text
+        async with factory() as session:
+            record = await session.get(RegistryExperimentSnapshotRecord, frozen.snapshot_id)
+            assert record is not None
+            assert record.snapshot_json == damaged
+            assert await session.scalar(select(func.count()).select_from(ExperimentRecord)) == 0
+            assert await session.scalar(select(func.count()).select_from(ExperimentRunRecord)) == 0

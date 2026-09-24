@@ -4,7 +4,8 @@ import os
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,6 +20,8 @@ from harnesslab.registry.models import (
     ExperimentBuilderRequest,
     ExperimentPreflight,
     ExperimentSnapshot,
+    ExperimentSnapshotList,
+    ExperimentSnapshotSummary,
     HarnessRegistryResponse,
     MethodologyRegistryItem,
     MethodologyRegistryResponse,
@@ -145,7 +148,7 @@ async def snapshot(
     if existing is not None:
         # The ID binds treatment/runtime identities. Volatile provider status may
         # change a new preflight result, but it never mutates the frozen snapshot.
-        return ExperimentSnapshot.model_validate(existing.snapshot_json)
+        return validated_snapshot(existing)
     session.add(
         RegistryExperimentSnapshotRecord(
             id=frozen.snapshot_id,
@@ -166,14 +169,58 @@ async def snapshot(
     return frozen
 
 
+def validated_snapshot(record: RegistryExperimentSnapshotRecord) -> ExperimentSnapshot:
+    """Reject a damaged stored snapshot without rebuilding or changing its identity."""
+    try:
+        frozen = ExperimentSnapshot.model_validate(record.snapshot_json)
+        if (
+            frozen.snapshot_id != record.id
+            or frozen.snapshot_digest != record.snapshot_digest
+            or frozen.methodology_id != record.methodology_id
+            or frozen.methodology_digest != record.methodology_digest
+            or frozen.preflight.status.value != record.preflight_status
+        ):
+            raise ValueError("snapshot record identity mismatch")
+        return frozen
+    except ValueError as exc:
+        raise WorkbenchAPIError(
+            409, "ARTIFACT_INTEGRITY_ERROR", "experiment snapshot is invalid"
+        ) from exc
+
+
+@experiment_router.get("/snapshots", response_model=ExperimentSnapshotList)
+async def list_snapshots(
+    session: Session,
+    limit: Annotated[int, Query(ge=1, le=100)] = 25,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> ExperimentSnapshotList:
+    records = await session.scalars(
+        select(RegistryExperimentSnapshotRecord)
+        .order_by(
+            RegistryExperimentSnapshotRecord.created_at.desc(),
+            RegistryExperimentSnapshotRecord.id.asc(),
+        )
+        .limit(limit)
+        .offset(offset)
+    )
+    items = []
+    for record in records:
+        frozen = validated_snapshot(record)
+        items.append(
+            ExperimentSnapshotSummary(
+                snapshot_id=frozen.snapshot_id,
+                snapshot_digest=frozen.snapshot_digest,
+                name=frozen.plan.name,
+                created_at=record.created_at,
+            )
+        )
+    total = await session.scalar(select(func.count()).select_from(RegistryExperimentSnapshotRecord))
+    return ExperimentSnapshotList(items=tuple(items), total=total or 0, limit=limit, offset=offset)
+
+
 @experiment_router.get("/snapshots/{snapshot_id}", response_model=ExperimentSnapshot)
 async def get_snapshot(snapshot_id: str, session: Session) -> ExperimentSnapshot:
     record = await session.get(RegistryExperimentSnapshotRecord, snapshot_id)
     if record is None:
         raise WorkbenchAPIError(404, "NOT_FOUND", "experiment snapshot does not exist")
-    try:
-        return ExperimentSnapshot.model_validate(record.snapshot_json)
-    except ValueError as exc:
-        raise WorkbenchAPIError(
-            409, "ARTIFACT_INTEGRITY_ERROR", "experiment snapshot is invalid"
-        ) from exc
+    return validated_snapshot(record)
