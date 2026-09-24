@@ -12,6 +12,7 @@ from harnesslab.analyst.api_models import (
     AnalystSessionView,
     AnalystSmokePreflight,
 )
+from harnesslab.analyst.comparison_showcase import ComparisonExample, comparison_example
 from harnesslab.analyst.evidence import AnalystEvidenceError
 from harnesslab.analyst.models import ProposedRegressionPlan, StrictModel
 from harnesslab.analyst.sessions import AnalystSessions, ApprovalRequest, CreateInvestigation
@@ -21,6 +22,7 @@ from harnesslab.api.workbench_dependencies import workspace_settings
 from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.db.session import create_engine
 from harnesslab.evidence.reader import EvidenceReadError
+from harnesslab.productization.assets import distribution_root
 from harnesslab.registry.vault import CredentialVault
 
 router = APIRouter(prefix="/workbench/analyst", tags=["analyst"])
@@ -117,4 +119,16 @@ async def read_historical_example() -> InvestigationExample:
             409,
             "HISTORICAL_EVIDENCE_UNAVAILABLE",
             "Frozen historical evidence is missing or failed digest validation.",
+        ) from exc
+
+
+@router.get("/examples/comparison", response_model=ComparisonExample)
+async def read_comparison_example() -> ComparisonExample:
+    try:
+        return comparison_example(distribution_root())
+    except (OSError, ValueError) as exc:
+        raise WorkbenchAPIError(
+            409,
+            "COMPARISON_EVIDENCE_UNAVAILABLE",
+            "Frozen comparison evidence is unavailable or invalid.",
         ) from exc
