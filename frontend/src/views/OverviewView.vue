@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { computed, onMounted, ref } from 'vue'
 
 import { workbenchApi } from '@/api/client'
@@ -53,8 +54,8 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div v-if="loading" class="loading-state">Loading persisted evidence…</div>
-    <div v-else-if="error" class="error-state">Workbench API evidence is unavailable.</div>
+    <PageState v-if="loading" kind="loading">Loading persisted evidence…</PageState>
+    <PageState v-else-if="error" kind="error" reload>Workbench API evidence is unavailable.</PageState>
     <template v-else>
       <div class="metric-grid overview-metrics">
         <div class="metric-card accent">
@@ -81,8 +82,8 @@ onMounted(async () => {
             <div><span class="panel-kicker">RECENT ACTIVITY</span><h3>Experiment evidence</h3></div>
             <RouterLink class="table-link" to="/experiments">View all</RouterLink>
           </div>
-          <div v-if="!experiments.length" class="empty-state">No persisted experiments.</div>
-          <div v-else class="responsive-table">
+          <PageState v-if="!experiments.length" kind="empty">No persisted experiments.</PageState>
+          <div v-else class="responsive-table" role="region" aria-label="Recent experiments" tabindex="0">
             <table class="data-table">
               <thead><tr><th>Experiment</th><th>Status</th><th>Matrix</th><th>Capability / Infra</th></tr></thead>
               <tbody>

@@ -1,11 +1,36 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const title = computed(() => String(route.meta.title ?? route.name ?? 'Workbench'))
 const section = computed(() => String(route.meta.section ?? 'Workbench'))
 const mobileNavOpen = ref(false)
+const menuButton = ref<HTMLButtonElement | null>(null)
+const navigationPanel = ref<HTMLElement | null>(null)
+async function openNavigation() {
+  mobileNavOpen.value = true
+  await nextTick()
+  navigationPanel.value?.querySelector<HTMLButtonElement>('.nav-close-button')?.focus()
+}
+function closeNavigation() {
+  mobileNavOpen.value = false
+  menuButton.value?.focus()
+}
+function navigationKeydown(event: KeyboardEvent) {
+  if (!mobileNavOpen.value || event.key !== 'Tab' || !window.matchMedia('(max-width: 860px)').matches) return
+  const controls = Array.from(navigationPanel.value?.querySelectorAll<HTMLElement>('a, button, summary') ?? [])
+    .filter(element => {
+      const closedDetails = element.closest('details:not([open])')
+      return (!closedDetails || element === closedDetails.querySelector('summary'))
+        && element.getClientRects().length > 0 && getComputedStyle(element).visibility !== 'hidden'
+    })
+  const target = event.shiftKey ? controls.at(-1) : controls[0]
+  if (document.activeElement === (event.shiftKey ? controls[0] : controls.at(-1))) {
+    event.preventDefault()
+    target?.focus()
+  }
+}
 const advancedOpen = ref(false)
 const isInvestigation = computed(() => route.meta.section === 'Investigation')
 
@@ -47,7 +72,7 @@ const navigation = [
 watch(
   () => route.fullPath,
   () => {
-    mobileNavOpen.value = false
+    if (mobileNavOpen.value) closeNavigation()
     advancedOpen.value = !isInvestigation.value
     document.title = `${title.value} · SameScale`
   },
@@ -57,14 +82,16 @@ watch(
 
 <template>
   <a class="skip-link" href="#main-content">Skip to content</a>
-  <div class="workbench-shell" :class="{ 'nav-open': mobileNavOpen }" @keydown.esc="mobileNavOpen = false">
+  <div class="workbench-shell" :class="{ 'nav-open': mobileNavOpen }" @keydown.esc="mobileNavOpen && closeNavigation()">
     <button
       v-if="mobileNavOpen"
       class="nav-scrim"
       aria-label="Close navigation"
-      @click="mobileNavOpen = false"
+      tabindex="-1"
+      @click="closeNavigation"
     />
-    <aside id="workbench-navigation" class="sidebar" aria-label="Workbench navigation">
+    <aside id="workbench-navigation" ref="navigationPanel" class="sidebar" aria-label="Workbench navigation" @keydown="navigationKeydown">
+      <button class="secondary-button nav-close-button" @click="closeNavigation">关闭导航</button>
       <div class="brand">
         <span class="brand-mark" aria-hidden="true">S=</span>
         <div>
@@ -98,11 +125,12 @@ watch(
       <header class="topbar">
         <div class="topbar-heading">
           <button
+            ref="menuButton"
             class="mobile-menu-button"
             aria-label="Open navigation"
             aria-controls="workbench-navigation"
             :aria-expanded="mobileNavOpen"
-            @click="mobileNavOpen = true"
+            @click="openNavigation"
           >
             <span /><span /><span />
           </button>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -21,8 +22,8 @@ onMounted(async () => {
 <template>
   <section>
     <div class="page-heading"><div><h2>Judge calibration</h2><p class="technical">{{ id }}</p></div><StatusBadge v-if="detail" :value="detail.real_judge_smoke" /></div>
-    <div v-if="loading" class="loading-state">Loading verified Judge report…</div>
-    <div v-else-if="error || !detail" class="error-state">Judge report is unavailable or failed digest verification.</div>
+    <PageState v-if="loading" kind="loading">Loading verified Judge report…</PageState>
+    <PageState v-else-if="error || !detail" kind="error" reload>Judge report is unavailable or failed digest verification.</PageState>
     <template v-else>
       <div class="notice">QUALIFIED_FOR_SUITE applies only to {{ detail.suite_id }}@{{ detail.suite_version }}. It is not universal Judge reliability.</div>
       <div v-for="cell in detail.cells" :key="cell.judge_cell_id" class="panel">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -45,8 +46,8 @@ onBeforeUnmount(() => store.stopPolling())
       <div><h2>{{ store.selected?.name ?? id }}</h2><p class="technical">{{ id }}</p></div>
       <div class="toolbar"><StatusBadge v-if="store.selected" :value="store.selected.status" /><StatusBadge v-if="store.durableStatus" :value="store.durableStatus.terminal ? 'DURABLE TERMINAL' : 'POLLING POSTGRES'" /></div>
     </div>
-    <div v-if="store.loading" class="loading-state">Loading persisted Matrix evidence…</div>
-    <div v-else-if="store.error" class="error-state">{{ store.error }}</div>
+    <PageState v-if="store.loading" kind="loading">Loading persisted Matrix evidence…</PageState>
+    <PageState v-else-if="store.error" kind="error" reload>{{ store.error }}</PageState>
     <template v-else-if="store.selected">
       <div class="tabs" role="tablist">
         <button v-for="name in ['overview', 'matrix', 'runs', 'statistics'] as const" :key="name" class="tab-button" :class="{ active: tab === name }" @click="tab = name">{{ name.toUpperCase() }}</button>
@@ -59,18 +60,18 @@ onBeforeUnmount(() => store.stopPolling())
           <div class="metric-card"><div class="label">Dimensions</div><div class="value">{{ store.selected.task_count }} × {{ store.selected.cell_count }}</div><div class="detail">tasks × cells</div></div>
         </div>
         <div class="section-grid" style="margin-top: 16px">
-          <div class="panel"><div class="panel-title"><h3>Experiment cells</h3></div><table class="data-table"><thead><tr><th>Cell</th><th>Lane</th><th>Model</th><th>Harness</th></tr></thead><tbody><tr v-for="cell in store.selected.cells" :key="cell.cell_id"><td class="technical">{{ cell.cell_id }}</td><td>{{ cell.lane }}</td><td>{{ cell.requested_model }}</td><td>{{ cell.harness }}@{{ cell.harness_version }}</td></tr></tbody></table></div>
+          <div class="panel"><div class="panel-title"><h3>Experiment cells</h3></div><div class="responsive-table" role="region" aria-label="Experiment evidence" tabindex="0"><table class="data-table"><thead><tr><th>Cell</th><th>Lane</th><th>Model</th><th>Harness</th></tr></thead><tbody><tr v-for="cell in store.selected.cells" :key="cell.cell_id"><td class="technical">{{ cell.cell_id }}</td><td>{{ cell.lane }}</td><td>{{ cell.requested_model }}</td><td>{{ cell.harness }}@{{ cell.harness_version }}</td></tr></tbody></table></div></div>
           <div class="panel"><div class="panel-title"><h3>Evidence identity</h3></div><dl class="definition-list"><dt>Plan</dt><dd class="technical">{{ store.selected.plan_digest }}</dd><dt>Report</dt><dd class="technical">{{ store.selected.report_digest ?? 'NOT_REPORTED' }}</dd><dt>Intent / mode</dt><dd>{{ store.selected.comparison_intent }} / {{ store.selected.evaluation_mode }}</dd><dt>Tiers</dt><dd><StatusBadge v-for="tier in store.selected.evidence_tiers" :key="tier" :value="tier" style="margin-right: 4px" /></dd></dl></div>
         </div>
       </template>
       <div v-else-if="tab === 'matrix'" class="panel">
         <div class="panel-title"><h3>Matrix heatmap</h3><select v-model="store.selectedMetric" aria-label="Matrix metric"><option v-for="metric in metrics" :key="metric.key" :value="metric.key">{{ metric.label }}</option></select></div>
         <MatrixHeatmap v-if="store.matrix" :matrix="store.matrix" :metric="store.selectedMetric" />
-        <div v-else class="empty-state">Matrix report is NOT_REPORTED.</div>
+        <PageState v-else kind="empty">Matrix report is NOT_REPORTED.</PageState>
       </div>
       <div v-else-if="tab === 'runs'" class="panel">
         <div class="panel-title"><h3>Runs</h3><span class="muted">Persisted logical run IDs</span></div>
-        <table class="data-table"><thead><tr><th>Run</th><th>Cell / Task</th><th>Lane</th><th>Status</th><th>Outcome</th></tr></thead><tbody><tr v-for="run in store.runs" :key="run.run_id"><td><RouterLink class="table-link technical" :to="`/runs/${run.run_id}`">{{ run.run_id.slice(0, 24) }}…</RouterLink></td><td>{{ run.cell_id }}<br/><span class="muted">{{ run.task_id }} r{{ run.repeat_index }}</span></td><td>{{ run.lane }}</td><td><StatusBadge :value="run.status" /></td><td><StatusBadge :value="run.normalized_outcome ?? 'NOT_REPORTED'" /></td></tr></tbody></table>
+        <div class="responsive-table" role="region" aria-label="Experiment evidence" tabindex="0"><table class="data-table"><thead><tr><th>Run</th><th>Cell / Task</th><th>Lane</th><th>Status</th><th>Outcome</th></tr></thead><tbody><tr v-for="run in store.runs" :key="run.run_id"><td><RouterLink class="table-link technical" :to="`/runs/${run.run_id}`">{{ run.run_id.slice(0, 24) }}…</RouterLink></td><td>{{ run.cell_id }}<br/><span class="muted">{{ run.task_id }} r{{ run.repeat_index }}</span></td><td>{{ run.lane }}</td><td><StatusBadge :value="run.status" /></td><td><StatusBadge :value="run.normalized_outcome ?? 'NOT_REPORTED'" /></td></tr></tbody></table></div>
       </div>
       <template v-else>
         <div v-if="analysis" class="panel">
@@ -114,7 +115,7 @@ onBeforeUnmount(() => store.stopPolling())
 
           <div class="panel" style="margin-top: 16px">
             <div class="panel-title"><h3>Per-model outcomes, identity, usage, and cost</h3></div>
-            <table class="data-table">
+            <div class="responsive-table" role="region" aria-label="Experiment evidence" tabindex="0"><table class="data-table">
               <thead><tr><th>Model</th><th>PASS / FAIL / INFRA</th><th>Pass rate</th><th>Observed identity</th><th>Trace</th><th>Known usage / cost</th></tr></thead>
               <tbody>
                 <tr v-for="model in analysis.models" :key="model.cell_id">
@@ -126,17 +127,17 @@ onBeforeUnmount(() => store.stopPolling())
                   <td>Input {{ model.usage_and_cost.input_tokens.known_total ?? 'NOT_AVAILABLE' }} / output {{ model.usage_and_cost.output_tokens.known_total ?? 'NOT_AVAILABLE' }} tokens<br/><StatusBadge :value="model.usage_and_cost.explicit_cost.status" /> cost {{ model.usage_and_cost.explicit_cost.total ?? 'NOT_AVAILABLE' }}</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <div class="section-grid" style="margin-top: 16px">
             <div class="panel">
               <div class="panel-title"><h3>Failure presentation</h3></div>
-              <table class="data-table"><thead><tr><th>Category</th><th>Slots</th></tr></thead><tbody><tr v-for="(count, category) in analysis.overall.failure_categories" :key="category"><td><StatusBadge :value="String(category)" /></td><td>{{ count }}</td></tr></tbody></table>
+              <div class="responsive-table" role="region" aria-label="Experiment evidence" tabindex="0"><table class="data-table"><thead><tr><th>Category</th><th>Slots</th></tr></thead><tbody><tr v-for="(count, category) in analysis.overall.failure_categories" :key="category"><td><StatusBadge :value="String(category)" /></td><td>{{ count }}</td></tr></tbody></table></div>
             </div>
             <div class="panel">
               <div class="panel-title"><h3>Language / task-family breakdown</h3></div>
-              <table class="data-table"><thead><tr><th>Dimension</th><th>Value</th><th>Pairs</th><th>A / B pass rate</th><th>Infra / missing</th></tr></thead><tbody><tr v-for="row in analysis.breakdowns" :key="`${row.dimension}:${row.value}`"><td>{{ row.dimension }}</td><td>{{ row.value }}</td><td>{{ row.matched_capability_pairs }} / {{ row.planned_pairs }}</td><td>{{ rateText(row.model_a_pass_rate) }} / {{ rateText(row.model_b_pass_rate) }}</td><td>{{ row.infra_pairs }} / {{ row.missing_pairs }}</td></tr></tbody></table>
+              <div class="responsive-table" role="region" aria-label="Experiment evidence" tabindex="0"><table class="data-table"><thead><tr><th>Dimension</th><th>Value</th><th>Pairs</th><th>A / B pass rate</th><th>Infra / missing</th></tr></thead><tbody><tr v-for="row in analysis.breakdowns" :key="`${row.dimension}:${row.value}`"><td>{{ row.dimension }}</td><td>{{ row.value }}</td><td>{{ row.matched_capability_pairs }} / {{ row.planned_pairs }}</td><td>{{ rateText(row.model_a_pass_rate) }} / {{ rateText(row.model_b_pass_rate) }}</td><td>{{ row.infra_pairs }} / {{ row.missing_pairs }}</td></tr></tbody></table></div>
             </div>
           </div>
           <dl class="definition-list" style="margin-top: 16px"><dt>Analysis digest</dt><dd class="technical">{{ store.modelComparison?.analysis_digest }}</dd><dt>Recovery distinction</dt><dd>{{ analysis.recovery_attempts.note }}</dd></dl>

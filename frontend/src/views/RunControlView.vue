@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -102,7 +103,7 @@ onMounted(async () => {
       <span class="status-pill neutral">NO RETRY-ALL</span>
     </div>
 
-    <div v-if="loading" class="loading-state">Loading experiment lifecycle state…</div>
+    <PageState v-if="loading" kind="loading">Loading experiment lifecycle state…</PageState>
     <template v-else>
       <div class="run-control-toolbar panel">
         <label>
@@ -121,7 +122,7 @@ onMounted(async () => {
         <RouterLink v-if="selectedExperimentId" class="table-link" :to="`/experiments/${selectedExperimentId}`">Open experiment evidence →</RouterLink>
       </div>
 
-      <div v-if="error" class="error-state">{{ error }}</div>
+      <PageState v-if="error" kind="error">{{ error }}</PageState>
       <template v-else-if="selectedExperimentId">
         <div class="metric-grid">
           <div class="metric-card accent"><div class="label">Lifecycle</div><div class="value compact-value">{{ status?.status ?? 'NOT_REPORTED' }}</div><div class="detail">{{ status?.terminal ? 'Durable terminal state' : 'May still change' }}</div></div>
@@ -148,8 +149,8 @@ onMounted(async () => {
               <button v-for="value in ['ALL', 'CAPABILITY_TERMINAL', 'INFRASTRUCTURE', 'LIFECYCLE'] as const" :key="value" :class="{ active: filter === value }" @click="filter = value">{{ value.replace('_TERMINAL', '') }}</button>
             </div>
           </div>
-          <div v-if="!visibleRuns.length" class="empty-state">No runs match this lifecycle class.</div>
-          <div v-else class="responsive-table">
+          <PageState v-if="!visibleRuns.length" kind="empty">No runs match this lifecycle class.</PageState>
+          <div v-else class="responsive-table" role="region" aria-label="Run lifecycle" tabindex="0">
             <table class="data-table run-control-table">
               <thead><tr><th>Run identity</th><th>Slot</th><th>Status / outcome</th><th>Control boundary</th><th>Evidence</th></tr></thead>
               <tbody>
@@ -165,7 +166,7 @@ onMounted(async () => {
           </div>
         </div>
       </template>
-      <div v-else class="empty-state">No persisted experiment is available for run control.</div>
+      <PageState v-else kind="empty">No persisted experiment is available for run control.</PageState>
     </template>
   </section>
 </template>

@@ -182,6 +182,33 @@ describe('Workbench contracts', () => {
     wrapper.unmount()
   })
 
+  it('cycles mobile menu focus around visible controls and returns focus on Escape', async () => {
+    await router.push('/analyst')
+    const originalMatchMedia = window.matchMedia
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true })
+    const rectangles = vi.spyOn(HTMLElement.prototype, 'getClientRects').mockReturnValue([{}] as unknown as DOMRectList)
+    const wrapper = mount(App, {
+      attachTo: document.body,
+      global: { plugins: [router], stubs: { RouterView: true, ElTooltip: true } },
+    })
+    try {
+      await wrapper.get('.mobile-menu-button').trigger('click')
+      await flushPromises()
+      expect(document.activeElement).toBe(wrapper.get('.nav-close-button').element)
+      await wrapper.get('.nav-close-button').trigger('keydown', { key: 'Tab', shiftKey: true })
+      expect(document.activeElement).toBe(wrapper.get('.advanced-nav > summary').element)
+      await wrapper.get('.advanced-nav > summary').trigger('keydown', { key: 'Tab' })
+      expect(document.activeElement).toBe(wrapper.get('.nav-close-button').element)
+      await wrapper.get('.nav-close-button').trigger('keydown', { key: 'Escape' })
+      expect(wrapper.get('.workbench-shell').classes()).not.toContain('nav-open')
+      expect(document.activeElement).toBe(wrapper.get('.mobile-menu-button').element)
+    } finally {
+      wrapper.unmount()
+      rectangles.mockRestore()
+      window.matchMedia = originalMatchMedia
+    }
+  })
+
   it('renders an evidence-first overview with direct registry and run-control entry points', async () => {
     api.readiness.mockResolvedValueOnce({
       status: 'NOT_READY', task_corpus_size: 4, blockers: ['REAL_JUDGE_EVIDENCE'], checks: [],

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { onMounted, ref } from 'vue'
 
 import { registryApi } from '@/api/client'
@@ -34,9 +35,9 @@ const enabledControlNames = (model: ModelDefinition) =>
       <span class="status-pill neutral">READ ONLY</span>
     </div>
     <div class="registry-principle"><strong>Identity rule</strong><span>A model definition describes capability; each provider profile below remains a distinct experimental treatment.</span></div>
-    <div v-if="loading" class="loading-state">Loading model registry…</div>
-    <div v-else-if="error" class="error-state">Model registry is unavailable.</div>
-    <div v-else-if="!models.length" class="empty-state">No configured model definitions are reported.</div>
+    <PageState v-if="loading" kind="loading">Loading model registry…</PageState>
+    <PageState v-else-if="error" kind="error" reload>Model registry is unavailable.</PageState>
+    <PageState v-else-if="!models.length" kind="empty">No configured model definitions are reported.</PageState>
     <div v-else class="registry-card-grid">
       <article v-for="model in models" :key="model.model_id" class="panel registry-card model-card">
         <div class="panel-title">
@@ -51,19 +52,21 @@ const enabledControlNames = (model: ModelDefinition) =>
           <dt>Reasoning controls</dt><dd>{{ enabledControlNames(model).join(', ') || 'NONE_REPORTED' }}</dd>
         </dl>
 
-        <div class="subsection-heading"><span>Provider profiles</span><b>{{ modelProfiles(model.model_id).length }}</b></div>
         <div v-if="!modelProfiles(model.model_id).length" class="notice"><span class="technical">CONFIGURED_MODEL_ID_REQUIRED</span></div>
-        <div v-for="profile in modelProfiles(model.model_id)" :key="profile.profile_id" class="provider-profile">
-          <div class="provider-profile-head"><strong class="technical">{{ profile.profile_id }}</strong><StatusBadge :value="profile.enabled ? 'ENABLED' : 'DISABLED'" /></div>
-          <dl class="mini-definition-list">
-            <dt>Provider / protocol</dt><dd>{{ profile.provider_id }} / {{ profile.protocol }}</dd>
-            <dt>Requested model</dt><dd class="technical">{{ profile.requested_model }}</dd>
-            <dt>Route identity</dt><dd class="technical">{{ profile.provider_route_identity }}</dd>
-            <dt>Observed identity</dt><dd>{{ profile.observed_model_capability }}</dd>
-            <dt>Controls</dt><dd>effort={{ profile.reasoning_effort ?? 'NOT_AVAILABLE' }} · max output={{ profile.max_output_tokens }}</dd>
-            <dt>Profile digest</dt><dd class="technical">{{ profile.profile_identity }}</dd>
-          </dl>
-        </div>
+        <details v-else class="profile-details">
+          <summary>Provider profiles · {{ modelProfiles(model.model_id).length }} <small>路由与身份详情</small></summary>
+          <div v-for="profile in modelProfiles(model.model_id)" :key="profile.profile_id" class="provider-profile">
+            <div class="provider-profile-head"><strong class="technical">{{ profile.profile_id }}</strong><StatusBadge :value="profile.enabled ? 'ENABLED' : 'DISABLED'" /></div>
+            <dl class="mini-definition-list">
+              <dt>Provider / protocol</dt><dd>{{ profile.provider_id }} / {{ profile.protocol }}</dd>
+              <dt>Requested model</dt><dd class="technical">{{ profile.requested_model }}</dd>
+              <dt>Route identity</dt><dd class="technical">{{ profile.provider_route_identity }}</dd>
+              <dt>Observed identity</dt><dd>{{ profile.observed_model_capability }}</dd>
+              <dt>Controls</dt><dd>effort={{ profile.reasoning_effort ?? 'NOT_AVAILABLE' }} · max output={{ profile.max_output_tokens }}</dd>
+              <dt>Profile digest</dt><dd class="technical">{{ profile.profile_identity }}</dd>
+            </dl>
+          </div>
+        </details>
       </article>
     </div>
   </section>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { computed, onMounted, ref } from 'vue'
 
 import { registryApi } from '@/api/client'
@@ -23,8 +24,8 @@ onMounted(async () => {
       <span class="status-pill neutral">SERVER MANAGED</span>
     </div>
     <div class="settings-security-banner"><span class="security-mark">•••</span><div><strong>Secret-safe by construction</strong><p>Secret editing is intentionally unavailable. Credential values are never returned or persisted in browser state; only reference names and SET / MISSING presence are shown.</p></div></div>
-    <div v-if="loading" class="loading-state">Loading safe settings…</div>
-    <div v-else-if="error" class="error-state">Settings are unavailable.</div>
+    <PageState v-if="loading" kind="loading">Loading safe settings…</PageState>
+    <PageState v-else-if="error" kind="error" reload>Settings are unavailable.</PageState>
     <template v-else-if="settings">
       <div class="section-grid settings-grid">
         <div class="panel">
@@ -40,7 +41,7 @@ onMounted(async () => {
         </div>
         <div class="panel">
           <div class="panel-title"><div><span class="panel-kicker">ENVIRONMENT</span><h3>Credential presence</h3></div><span>{{ configuredCredentials }} / {{ settings.credentials.length }} set</span></div>
-          <div v-if="!settings.credentials.length" class="empty-state">No credential references are declared.</div>
+          <PageState v-if="!settings.credentials.length" kind="empty">No credential references are declared.</PageState>
           <div v-for="item in settings.credentials" :key="item.credential_ref" class="credential-row"><span><strong class="technical">{{ item.credential_ref }}</strong><small>Value withheld</small></span><StatusBadge :value="item.status" /></div>
           <div class="secret-editing-state"><span>Browser secret editing</span><strong>{{ settings.secret_editing_supported ? 'SUPPORTED' : 'INTENTIONALLY UNAVAILABLE' }}</strong></div>
         </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { computed, onMounted, ref } from 'vue'
 
 import { workbenchApi } from '@/api/client'
@@ -78,9 +79,9 @@ onMounted(async () => {
       <button class="primary-button" :disabled="!report" @click="exportBadCases">Export real BadCases</button>
     </div>
 
-    <div v-if="loading || diagnosisLoading" class="loading-state">Building deterministic clusters…</div>
-    <div v-else-if="error && !report" class="error-state">{{ error }}</div>
-    <div v-else-if="!report" class="empty-state">No experiment evidence is available.</div>
+    <PageState v-if="loading || diagnosisLoading" kind="loading">Building deterministic clusters…</PageState>
+    <PageState v-else-if="error && !report" kind="error">{{ error }}</PageState>
+    <PageState v-else-if="!report" kind="empty">No experiment evidence is available.</PageState>
     <template v-else>
       <div class="metric-grid diagnosis-metrics">
         <div class="metric-card"><span>Failure runs</span><strong class="value">{{ report.failure_run_count }}</strong></div>
@@ -93,7 +94,7 @@ onMounted(async () => {
         Exported {{ exported.real_case_count }} real BadCases and {{ exported.synthetic_qualification_case_count }} synthetic cases.
         {{ exported.limitation }}
       </div>
-      <div v-if="error" class="error-state">{{ error }}</div>
+      <PageState v-if="error" kind="error">{{ error }}</PageState>
 
       <div class="diagnosis-tree">
         <details v-for="cell in report.cells" :key="cell.cell_id" open class="diagnosis-level diagnosis-cell">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 
 import { registryApi } from '@/api/client'
@@ -115,10 +116,10 @@ async function freezeSnapshot() {
   <section>
     <div class="page-heading"><div><h2>Experiment Builder Lite</h2><p>Methodology v2 authoritative planning only — no provider call and no run creation.</p></div><StatusBadge :value="preflight?.status ?? 'NOT_REPORTED'" /></div>
     <button class="secondary-button" :disabled="loading || busy" @click="load">Reload planning configuration</button>
-    <div v-if="loading" class="loading-state">Loading Registry contracts…</div>
+    <PageState v-if="loading" kind="loading">Loading Registry contracts…</PageState>
     <div v-else class="builder-layout">
       <div class="panel builder-form">
-        <div v-if="error" class="error-state">{{ error }}</div>
+        <PageState v-if="error" kind="error">{{ error }}</PageState>
         <div class="form-grid">
           <label>Experiment name<input v-model="form.name" aria-label="Experiment name" maxlength="200"></label>
           <label>Evaluation mode<select v-model="form.mode" aria-label="Evaluation mode"><option value="QUICK">QUICK</option><option value="INFORMAL">INFORMAL</option><option value="FORMAL_EXHAUSTIVE">FORMAL_EXHAUSTIVE</option></select></label>
@@ -166,7 +167,7 @@ async function freezeSnapshot() {
       </div>
       <aside class="panel preview-panel">
         <div class="panel-title"><h3>Planning preview</h3><span class="status-pill neutral">NO EXECUTION</span></div>
-        <div v-if="!preflight" class="empty-state">Run preflight to preview backend-authoritative scheduling.</div>
+        <PageState v-if="!preflight" kind="empty">Run preflight to preview backend-authoritative scheduling.</PageState>
         <template v-else><dl class="definition-list"><dt>Status</dt><dd><StatusBadge :value="preflight.status" /></dd><dt>Logical slots</dt><dd>{{ preflight.estimated_logical_slots }}</dd><dt>Mode / n</dt><dd>{{ preflight.evaluation_mode }} / {{ preflight.repeat_count }}</dd><dt>Max wall bound</dt><dd>{{ preflight.estimated_maximum_wall_time_seconds ?? 'NOT_AVAILABLE' }} seconds</dd><dt>Cost estimate</dt><dd>{{ preflight.cost_estimate.status }}</dd><dt>Plan digest</dt><dd class="technical">{{ preflight.candidate_plan_digest }}</dd></dl><div class="check-list"><div v-for="check in preflight.checks" :key="`${check.key}:${check.reason_code}`" class="check-row"><StatusBadge :value="check.status" /><div><strong class="technical">{{ check.reason_code }}</strong><small>{{ check.detail }}</small></div></div></div><div v-for="block in preflight.schedule_preview.slice(0, 3)" :key="block.block_identity" class="schedule-block"><strong>{{ block.task_id }} / repeat={{ block.repeat_index }}</strong><span class="technical">{{ block.cell_execution_order.join(' → ') }}</span></div></template>
         <div v-if="snapshot" class="snapshot-confirmation"><strong>Immutable snapshot frozen</strong><span class="technical">{{ snapshot.snapshot_id }}</span><span class="technical">{{ snapshot.snapshot_digest }}</span>
           <div v-for="selection in snapshot.provider_selections" :key="selection.cell_id" class="frozen-selection" :data-frozen-cell="selection.cell_id">

@@ -1,5 +1,111 @@
 # SameScale Product — Current Milestone
 
+## Tailscale black-box QA handoff — 2026-09-29
+
+This handoff packages the completed UI usability work and starts a separate keyless QA
+instance. It does not advance a product phase or replace the older manual-test services.
+
+- Production frontend build passed after the QA navigation improvement. It is served by
+  `harnesslab serve` without reload in tmux session `qa` at `100.68.169.36:8068`. FastAPI serves
+  the built SPA and `/api` on the same origin; there is no browser localhost dependency or CORS
+  requirement. The socket is bound only to the Tailscale IPv4 address. An INPUT firewall chain
+  allows this port on `tailscale0` and loopback and drops it on other interfaces. The QA startup
+  environment includes the repository root in `PYTHONPATH` for the existing Core Readiness
+  source import.
+- The app has `HARNESSLAB_ENVIRONMENT=qa` and an isolated `samescale_qa` PostgreSQL database in
+  `samescale-qa-postgres`, published only to host loopback on port 55471. QA configuration is
+  private under `/home/dev/.local/state/samescale-qa/`; no production database or Provider key is
+  configured. Alembic reached `20260915_0010`.
+- `scripts/seed_qa_demo.py` used the existing Fake provider/Fake Codex executor and independent
+  task verifier to persist three synthetic examples: `phase-i-matrix-baseline` (9 terminal
+  runs), `phase-i-matrix-candidate` (9), and `phase-i-matrix-multi-task` (18, including 9
+  `failed_subject` runs). The multi-task diagnosis reports 9 failure runs in 3 cells. The first
+  two examples support a directional regression comparison. These are QA samples, not Real
+  benchmark or model-ranking evidence.
+- Frontend tests **82/82 PASS**, TypeScript and production build **PASS**. Database health returned
+  `ok`; Core Readiness returned HTTP 200 with the expected `NOT_READY` status; `/`, `/overview`,
+  `/diagnosis`, and `/regression` returned HTTP 200. Eight core routes
+  rendered in local headless Chromium; the populated diagnosis and deep-linked regression views
+  were checked separately. The regression API returned three comparisons for the default cell
+  mapping, including two `PARTIALLY_COMPARABLE` and one `NOT_COMPARABLE` result.
+- Tailscale access from a second machine, browser compatibility outside local Chromium, and
+  credential-dependent Real execution remain **NOT_VERIFIED**. No push or merge was performed.
+
+## UI usability closeout — 2026-09-26
+
+User-authorized UI audit and P0/P1 fixes only, on `main` base `179f261`; the frontend changes
+were uncommitted at audit closeout and are included in the QA handoff commit above. The earlier
+manual-access notes below are preserved. No feature phase advances.
+
+- Audited 20 major entries at 1440px desktop and 390px mobile, including real empty/unavailable
+  states. No P0 blocker was found in the checked presentation paths. Fixed P1 small metadata/form
+  text, excessive Profile expansion and Harness whitespace, wide-table overflow, unbounded
+  capability-table height, missing Provider empty/error recovery, and offscreen mobile navigation
+  focus. Investigation entry and Advanced hierarchy remain intact; no visual redesign.
+- Frontend tests: **82 PASS / 10 files**; TypeScript and production build **PASS**. Final 40 route
+  screenshots have no page-level horizontal overflow or page-script errors. Key pages also pass
+  at 320/390/768/1280/1920px, with Profile expansion, filtering, keyboard table scrolling and menu
+  focus/close/return verified. A collapsed-menu focus issue and populated-detail grid overflow
+  found during regression were corrected before the final checks.
+- Historical report reading and citation/return passed at desktop/mobile. Provider loading,
+  empty and error/recovery were explicitly browser-injected. Populated experiment/Matrix/runs/
+  statistics/Trace/Judge/regression views were checked with existing synthetic unit-test fixtures
+  intercepted in the browser, not persisted evidence or new results. Current database lists are
+  empty and local editing is disabled; real persistence/configuration writes were not exercised.
+- View business scripts are unchanged apart from the presentation component import. API clients,
+  types/stores, backend contracts, migrations and frozen evidence are unchanged. No model, Judge,
+  subject, verifier, replay, commit or push. The built frontend is served by the existing instance.
+- Browser checks used local HTTPS Host/SNI routing with the existing self-signed certificate
+  verification bypassed; user-network/TLS trust, physical-device/non-Chromium and full screen-reader
+  acceptance are not claimed. Screenshot audit and regression details are local task artifacts
+  at `/tmp/samescale-usability-20260926/REPORT.md`, outside immutable evidence.
+- Remaining P2 only: language/copy consistency, repeated headings, brand/icon details, and minor
+  color/radius polish. **UI closeout complete; STOP.**
+
+## Manual test access — 2026-09-26
+
+User-authorized startup and source-IP allowlist maintenance only; no new product phase.
+The current SameScale entry is `https://samescale.34.81.153.182.sslip.io/analyst`, using
+a dedicated HTTPS virtual host on the existing gateway and forwarding to the
+existing `samescale-live.service` at `127.0.0.1:8057`, serving this checkout at
+`179f261`. The previous frozen `ef135bb` manual-test instance and its database remain intact.
+The workspace user service is enabled with linger. Earlier HTTP forwarding sockets on ports
+80 and 8000 remain enabled, but user access to port 8000 failed as described below.
+LectureLens retains `https://34.81.153.182/` on port 443. Its original virtual-host block
+and application services are unchanged; the shared gateway gained only the SameScale block
+and was gracefully reloaded, not restarted.
+
+- The user reported `ERR_EMPTY_RESPONSE` on port 8000. During a coordinated refresh,
+  packet capture saw no inbound port-8000 packets and the host INPUT counter did not change.
+  This locates the failure before host ingress; the exact upstream cause is not established.
+- The new HTTPS virtual host allows only `103.127.218.203` and loopback. Its DNS resolves to
+  `34.81.153.182`. It currently reuses the gateway's self-signed IP certificate, so browsers
+  can report both an untrusted issuer and hostname mismatch; this is not trusted-TLS acceptance.
+  Local Host/SNI routing, SameScale HTML, startup assets, health, Registry models, historical
+  and comparison examples returned HTTP 200. User-network access is pending confirmation.
+- LectureLens HTML before/after the gateway reload is byte-identical; its gateway container ID,
+  start time and restart count are unchanged, and backend/agent/model services remain active.
+
+- Added `103.127.218.203/32` to the persistent HTTP firewall and systemd socket allowlists.
+  The dedicated port-8000 socket allows only that IP and loopback. Existing port-80 entries remain;
+  the persistent HTTP firewall now covers ports 80 and 8000.
+- Verified the new port-8000 entry returns the SameScale page title, database health `ok`, and
+  HTTP 200 for Registry models and the comparison example. LectureLens still returns its own
+  page, its backend/agent/model services are active, and its gateway container ID, start time,
+  and restart count are unchanged across this operation.
+- Verified locally through the HTTP forwarding entry with the public Host header: database-backed
+  health, 16 SPA entry routes, referenced startup assets, all seven Registry GET endpoints,
+  experiment/calibration lists, scoped session listing, Core Readiness response, historical and
+  comparison examples, and the offline Fake example returned HTTP 200.
+  These checks establish endpoint availability, not full browser or functional acceptance.
+- Current experiment/calibration lists are empty; local configuration editing reports disabled.
+  No new Provider/model/Judge campaign was launched. Paid execution and credential-dependent
+  workflows were not verified.
+- HTTPS access from the user's network remains NOT_VERIFIED; port-8000 user access FAILED.
+  Cloud firewall inspection was unavailable
+  because gcloud has no active account and this VM exposes no service account. Host allowlist and
+  forwarding checks passed; no claim is made about cloud firewall configuration.
+
 ## 求职冻结 — Phase S4 COMPLETE / STOP — 2026-09-21
 
 **S1：PARTIAL REAL BENCHMARK / BLOCKED；S2 / S3 / S4：COMPLETE。**

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { computed, onMounted, ref } from 'vue'
 
 import { registryApi } from '@/api/client'
@@ -35,8 +36,8 @@ onMounted(async () => {
         <select v-model="filter" aria-label="Capability status filter"><option>ALL</option><option>SUPPORTED</option><option>PARTIALLY_SUPPORTED</option><option>UNSUPPORTED</option></select>
       </div>
     </div>
-    <div v-if="loading" class="loading-state">Deriving capabilities…</div>
-    <div v-else-if="error" class="error-state">Capability registry is unavailable.</div>
+    <PageState v-if="loading" kind="loading">Deriving capabilities…</PageState>
+    <PageState v-else-if="error" kind="error" reload>Capability registry is unavailable.</PageState>
     <template v-else>
       <div class="metric-grid capability-metrics">
         <button :class="['metric-card', { accent: filter === 'ALL' }]" @click="filter = 'ALL'"><span class="label">All assessments</span><strong class="value">{{ items.length }}</strong></button>
@@ -46,8 +47,9 @@ onMounted(async () => {
       </div>
       <div class="panel">
         <div class="panel-title"><div><span class="panel-kicker">COMPATIBILITY MATRIX</span><h3>{{ visible.length }} treatment pair{{ visible.length === 1 ? '' : 's' }}</h3></div><span class="status-pill neutral">BACKEND DERIVED</span></div>
-        <div v-if="!visible.length" class="empty-state">No capability assessment matches the current filters.</div>
-        <div v-else class="responsive-table">
+        <p v-if="visible.length" class="table-scroll-hint">可搜索或筛选结果；表格内上下、左右滚动查看完整字段。</p>
+        <PageState v-if="!visible.length" kind="empty">No capability assessment matches the current filters.</PageState>
+        <div v-else class="responsive-table capability-results" role="region" aria-label="Capability assessments" tabindex="0">
           <table class="data-table capability-table">
             <thead><tr><th>Treatment identity</th><th>Status</th><th>Protocol & model</th><th>Evidence & execution</th><th>Limitations</th></tr></thead>
             <tbody>

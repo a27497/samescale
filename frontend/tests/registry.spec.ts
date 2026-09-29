@@ -75,6 +75,21 @@ describe('Unified Registry Lite Workbench', () => {
     expect(wrapper.text()).not.toContain('sk-sentinel')
   })
 
+  it('distinguishes an empty provider registry from an unavailable registry with recovery', async () => {
+    api.providers.mockResolvedValueOnce({ items: [] })
+    const empty = mount(ProvidersView)
+    await flushPromises()
+    expect(empty.get('[role="status"]').text()).toContain('No provider definitions')
+    expect(empty.find('[role="alert"]').exists()).toBe(false)
+    api.providers.mockRejectedValueOnce(new Error('Unavailable'))
+    const failed = mount(ProvidersView, { global: { plugins: [router] } })
+    await flushPromises()
+    expect(failed.get('[role="alert"]').text()).toContain('Provider registry is unavailable')
+    expect(failed.get('[role="alert"] button').text()).toBe('重新加载页面')
+    expect(failed.get('[role="alert"] a').attributes('href')).toBe('/analyst')
+    expect(failed.find('.registry-card').exists()).toBe(false)
+  })
+
   it('shows credential presence without browser secret editing', async () => {
     const wrapper = mount(SettingsView)
     await flushPromises()

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { onMounted } from 'vue'
 
 import StatusBadge from '@/components/StatusBadge.vue'
@@ -22,10 +23,10 @@ onMounted(() => void store.fetchList())
       </div>
     </div>
     <div class="panel">
-      <div v-if="store.loading" class="loading-state">Loading persisted experiments…</div>
-      <div v-else-if="store.error" class="error-state">{{ store.error }}</div>
-      <div v-else-if="!store.items.length" class="empty-state">No experiments match the current filters.</div>
-      <table v-else class="data-table">
+      <PageState v-if="store.loading" kind="loading">Loading persisted experiments…</PageState>
+      <PageState v-else-if="store.error" kind="error">{{ store.error }}</PageState>
+      <PageState v-else-if="!store.items.length" kind="empty">No experiments match the current filters.</PageState>
+      <div v-else class="responsive-table" role="region" aria-label="Experiments" tabindex="0"><table class="data-table">
         <thead><tr><th>Experiment</th><th>Status</th><th>Plan</th><th>Dimensions</th><th>Runs</th><th>Infra</th></tr></thead>
         <tbody>
           <tr v-for="item in store.items" :key="item.experiment_id">
@@ -37,7 +38,7 @@ onMounted(() => void store.fetchList())
             <td>{{ item.infra_count }}</td>
           </tr>
         </tbody>
-      </table>
+      </table></div>
     </div>
   </section>
 </template>

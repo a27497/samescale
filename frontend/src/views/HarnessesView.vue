@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageState from '@/components/PageState.vue'
 import { onMounted, ref } from 'vue'
 
 import { registryApi } from '@/api/client'
@@ -21,9 +22,9 @@ onMounted(async () => {
       <div><h2>Harness Registry</h2><p>Immutable runtime, image, profile, tool, network, and evidence-surface metadata.</p></div>
       <span class="status-pill neutral">READ ONLY</span>
     </div>
-    <div v-if="loading" class="loading-state">Loading Harness registry…</div>
-    <div v-else-if="error" class="error-state">Harness registry is unavailable.</div>
-    <div v-else-if="!items.length" class="empty-state">No Harness definitions are reported.</div>
+    <PageState v-if="loading" kind="loading">Loading Harness registry…</PageState>
+    <PageState v-else-if="error" kind="error" reload>Harness registry is unavailable.</PageState>
+    <PageState v-else-if="!items.length" kind="empty">No Harness definitions are reported.</PageState>
     <div v-else class="registry-card-grid">
       <article v-for="item in items" :key="item.harness_id" class="panel registry-card harness-card">
         <div class="panel-title">
@@ -44,14 +45,16 @@ onMounted(async () => {
           <dt>Tool surface</dt><dd><span v-for="tool in item.tool_surface" :key="tool" class="metadata-chip">{{ tool }}</span><span v-if="!item.tool_surface.length">NONE</span></dd>
           <dt>Execution surface</dt><dd>native_tools={{ item.native_tools }} · mcp={{ item.mcp_capability }} · workspace_mutation={{ item.workspace_mutation }}</dd>
         </dl>
-        <div class="subsection-heading"><span>Profiles & supported provider-model treatments</span><b>{{ item.profiles.length }}</b></div>
-        <div class="profile-stack">
-          <div v-for="profile in item.profiles" :key="profile.profile_id" class="provider-profile">
-            <div class="provider-profile-head"><strong class="technical">{{ profile.profile_id }}</strong><span class="muted">effort={{ profile.reasoning_effort ?? 'NOT_AVAILABLE' }}</span></div>
-            <div class="supported-models"><span>Supported profiles</span><code v-for="supported in profile.supported_provider_profile_ids" :key="supported">{{ supported }}</code><em v-if="!profile.supported_provider_profile_ids.length">NONE_REPORTED</em></div>
-            <small class="technical">{{ profile.harness_config_identity }}</small>
+        <details class="profile-details">
+          <summary>Profiles & supported provider-model treatments · {{ item.profiles.length }} <small>支持列表</small></summary>
+          <div class="profile-stack">
+            <div v-for="profile in item.profiles" :key="profile.profile_id" class="provider-profile">
+              <div class="provider-profile-head"><strong class="technical">{{ profile.profile_id }}</strong><span class="muted">effort={{ profile.reasoning_effort ?? 'NOT_AVAILABLE' }}</span></div>
+              <div class="supported-models"><span>Supported profiles</span><code v-for="supported in profile.supported_provider_profile_ids" :key="supported">{{ supported }}</code><em v-if="!profile.supported_provider_profile_ids.length">NONE_REPORTED</em></div>
+              <small class="technical">{{ profile.harness_config_identity }}</small>
+            </div>
           </div>
-        </div>
+        </details>
       </article>
     </div>
   </section>
