@@ -42,7 +42,11 @@ def create_app(*, workbench_dist: Path | None = None) -> FastAPI:
         if manifest:
             if request.url.path == "/":
                 return RedirectResponse("/demo", status_code=307)
-            allowed_post = request.url.path == "/api/workbench/regression/compare" or (
+            # Fixed Fake computation only: no persistence, artifacts, Provider or network.
+            allowed_post = request.url.path in {
+                "/api/workbench/regression/compare",
+                "/api/workbench/analyst/examples/offline",
+            } or (
                 request.url.path.startswith("/api/workbench/experiments/")
                 and request.url.path.endswith("/diagnosis/badcases")
             )

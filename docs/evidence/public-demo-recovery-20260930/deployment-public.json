@@ -1,0 +1,21 @@
+{
+  "implementation_commit": "18664549ff18c07c0b4ab2472abf5d2032f57977",
+  "push_remote_sha_verified": true,
+  "startup_storage_gate": "PASS",
+  "service": "active/running",
+  "deployed_loopback_gate": {
+    "passed": 12,
+    "total": 12
+  },
+  "public_internet": "NOT_VERIFIED",
+  "trusted_tls": "NOT_VERIFIED",
+  "public_browser": {
+    "desktop": "ERR_CONNECTION_REFUSED",
+    "mobile": "ERR_CONNECTION_REFUSED"
+  },
+  "PUBLIC_DEMO_READY": false,
+  "paid_provider_calls": 0,
+  "secret_changed": false,
+  "raw_deployment_sha256": "sha256:d9913ba4811bfe91ca3e425eb4b9f7f82f86549929c71b9d33b60fef65e5641e",
+  "raw_browser_sha256": "sha256:1f8e02773b4f3f009e407e3c42e76abcfcd4cd6e7b966b50c7c7e74e50ac5fcd"
+}

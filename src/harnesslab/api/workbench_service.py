@@ -738,7 +738,11 @@ def _judge_report(
         raise WorkbenchAPIError(
             409, "ARTIFACT_INTEGRITY_ERROR", "Judge report cannot be verified"
         ) from exc
-    if report.calibration_id != record.id or report.report_digest != record.report_digest:
+    if (
+        report.calibration_id != record.id
+        or report.plan_digest != record.plan_digest
+        or report.report_digest != record.report_digest
+    ):
         raise WorkbenchAPIError(
             409, "ARTIFACT_INTEGRITY_ERROR", "Judge report identity does not match"
         )
@@ -748,18 +752,17 @@ def _judge_report(
 async def list_judge_calibrations(
     session: AsyncSession, *, limit: int, offset: int, roots: tuple[Path, ...]
 ) -> JudgeCalibrationListResponse:
-    records = tuple(
+    # Registry status covers every record, independently of the requested page.
+    all_records = tuple(
         (
             await session.scalars(
-                select(JudgeCalibrationRecord)
-                .order_by(JudgeCalibrationRecord.created_at.desc())
-                .limit(limit)
-                .offset(offset)
+                select(JudgeCalibrationRecord).order_by(JudgeCalibrationRecord.created_at.desc())
             )
         ).all()
     )
     items: list[JudgeCalibrationSummary] = []
-    for record in records:
+    smoke_states: set[str] = set()
+    for index, record in enumerate(all_records):
         plan = record.plan_json
         report: JudgeCalibrationReport | None = None
         report_evidence_status: str = "NOT_REPORTED"
@@ -768,8 +771,15 @@ async def list_judge_calibrations(
                 report = _judge_report(record, roots)
             except WorkbenchAPIError:
                 report_evidence_status = "INTEGRITY_ERROR"
+                smoke_states.add("NOT_VERIFIED")
             else:
                 report_evidence_status = "REPORTED"
+                if record.status == "completed":
+                    smoke_states.add(report.real_judge_smoke)
+        elif record.status == "completed":
+            smoke_states.add("NOT_VERIFIED")
+        if not offset <= index < offset + limit:
+            continue
         cells = plan.get("judge_cells")
         cell_count = len(cells) if isinstance(cells, list) else 0
         items.append(
@@ -791,8 +801,20 @@ async def list_judge_calibrations(
                 finished_at=record.finished_at,
             )
         )
-    total = int(await session.scalar(select(func.count()).select_from(JudgeCalibrationRecord)) or 0)
-    return JudgeCalibrationListResponse(items=tuple(items), total=total, limit=limit, offset=offset)
+    smoke = (
+        "VERIFIED"
+        if "VERIFIED" in smoke_states
+        else "NOT_VERIFIED"
+        if smoke_states - {"NOT_RUN"}
+        else "NOT_RUN"
+    )
+    return JudgeCalibrationListResponse(
+        items=tuple(items),
+        total=len(all_records),
+        limit=limit,
+        offset=offset,
+        real_judge_smoke=smoke,
+    )
 
 
 async def judge_calibration_detail(
@@ -1115,7 +1137,8 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
                 and release_evidence.judge_report.state is EvidenceState.VERIFIED
                 else "NOT_VERIFIED"
             ),
-            evidence=f"Judge suite is frozen; REAL_JUDGE_SMOKE={judge_release_state}",
+            evidence=f"Frozen release snapshot: REAL_JUDGE_SMOKE={judge_release_state}",
+            evidence_scope="FROZEN_RELEASE_SNAPSHOT",
         ),
         ReadinessCheck(
             key="JUDGE_CALIBRATION",

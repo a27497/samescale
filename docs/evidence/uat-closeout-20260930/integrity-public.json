@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "before_file_count": 451,
+  "after_file_count": 451,
+  "equal": true,
+  "raw_receipt_sha256": "sha256:0cfebdf31adb84a0cdaf30f12d3062bcb278128d1e4dbf3413a47c67517b3d46",
+  "scope": "Full backend suite protected repository evidence, release/recruiter artifacts and external frozen Public Demo bundle."
+}

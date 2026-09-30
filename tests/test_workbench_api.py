@@ -502,6 +502,7 @@ async def test_workbench_read_routes_and_bounded_analyst_control_surface(
     }
     analyst_paths = {path: methods for path, methods in paths.items() if "/analyst/" in path}
     assert analyst_paths == {
+        "/api/workbench/analyst/capabilities": {"get"},
         "/api/workbench/analyst/examples/offline": {"post"},
         "/api/workbench/analyst/examples/historical": {"get"},
         "/api/workbench/analyst/examples/comparison": {"get"},
@@ -1142,3 +1143,69 @@ async def test_frontend_dtos_contain_no_absolute_path_credential_or_private_sent
     assert "credential_reference" not in serialized
     assert "DATABASE_URL" not in serialized
     assert PRIVATE_SENTINEL not in serialized
+
+
+@pytest.mark.integration
+async def test_judge_smoke_scopes_do_not_conflate_registry_and_release(client: AsyncClient) -> None:
+    registry = (await client.get("/api/workbench/judgelab/calibrations")).json()
+    assert registry["evidence_scope"] == "CURRENT_JUDGELAB_REGISTRY"
+    assert registry["real_judge_smoke"] == "NOT_RUN"
+    readiness = (await client.get("/api/workbench/core-readiness")).json()
+    release = next(check for check in readiness["checks"] if check["key"] == "JUDGE_EVIDENCE")
+    assert release["evidence_scope"] == "FROZEN_RELEASE_SNAPSHOT"
+    assert release["evidence"] == "Frozen release snapshot: REAL_JUDGE_SMOKE=VERIFIED"
+    # Current status covers the registry, even beyond the last page.
+    empty_page = (await client.get("/api/workbench/judgelab/calibrations?offset=1000")).json()
+    assert not empty_page["items"]
+    assert empty_page["real_judge_smoke"] == registry["real_judge_smoke"]
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("smoke", ["VERIFIED", "NOT_RUN", "NOT_VERIFIED"])
+async def test_judgelab_status_comes_from_verified_current_report(
+    client: AsyncClient,
+    phase_i_evidence: PhaseIEvidence,
+    smoke: str,
+) -> None:
+    from harnesslab.judgelab.report import JudgeCalibrationReport
+
+    async with phase_i_evidence.factory() as session, session.begin():
+        record = await session.get(JudgeCalibrationRecord, CALIBRATION_ID)
+        assert record is not None and record.report_json_path is not None
+        path = Path(record.report_json_path)
+        original = path.read_bytes()
+        digest = record.report_digest
+        report = JudgeCalibrationReport.model_validate_json(original).model_copy(
+            update={"real_judge_smoke": smoke}
+        )
+        path.write_text(report.canonical_json())
+        record.report_digest = report.report_digest
+    try:
+        listing = (await client.get("/api/workbench/judgelab/calibrations?offset=1000")).json()
+        assert listing["real_judge_smoke"] == smoke
+        async with phase_i_evidence.factory() as session, session.begin():
+            record = await session.get(JudgeCalibrationRecord, CALIBRATION_ID)
+            assert record is not None
+            record.report_digest = "sha256:" + "0" * 64
+        corrupt = (await client.get("/api/workbench/judgelab/calibrations")).json()
+        assert corrupt["real_judge_smoke"] == "NOT_VERIFIED"
+    finally:
+        path.write_bytes(original)
+        async with phase_i_evidence.factory() as session, session.begin():
+            record = await session.get(JudgeCalibrationRecord, CALIBRATION_ID)
+            assert record is not None
+            record.report_digest = digest
+
+
+async def test_empty_judgelab_registry_reports_not_run() -> None:
+    from unittest.mock import AsyncMock, MagicMock
+
+    from harnesslab.api.workbench_service import list_judge_calibrations
+
+    session = AsyncMock()
+    session.scalars.return_value = MagicMock()
+    session.scalars.return_value.all.return_value = []
+    response = await list_judge_calibrations(session, limit=25, offset=0, roots=())
+    assert response.evidence_scope == "CURRENT_JUDGELAB_REGISTRY"
+    assert response.real_judge_smoke == "NOT_RUN"
+    assert response.total == 0

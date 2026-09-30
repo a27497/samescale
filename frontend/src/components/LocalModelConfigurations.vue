@@ -4,7 +4,8 @@ import { localConfigurationApi, type LocalModelConfiguration, type ConnectionMet
 import type { ProviderModelProfile, HarnessDefinition, ProviderDefinition } from '@/types/registry'
 import LocalHarnessConfigurations from '@/components/LocalHarnessConfigurations.vue'
 import LocalConnections from '@/components/LocalConnections.vue'
-import { t } from '@/composables/i18n'
+import { useTranslation } from '@/composables/i18n'
+const t = useTranslation()
 
 const props = defineProps<{ profiles: ProviderModelProfile[], harnesses: HarnessDefinition[], providers: ProviderDefinition[] }>()
 const emit = defineEmits<{ changed: [] }>()

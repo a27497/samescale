@@ -1,0 +1,128 @@
+{
+  "generated_at": "2026-09-30T09:54:02.604250+00:00",
+  "expected_demo_id": "public-demo-20260930-9569db12e23a",
+  "PUBLIC_DEMO_READY": true,
+  "checks": [
+    {
+      "check": "public demo experiment exists",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "run readable",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "artifact exists",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "SHA256 correct",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "verifier verdict readable",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "Diagnosis opens",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "Regression opens",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "provenance explainable",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "no broken reference",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "no HTTP 409/404/500",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "fixture/offline/historical/real distinguished",
+      "pass": true,
+      "state": "PASS"
+    },
+    {
+      "check": "no browsing credential needed",
+      "pass": true,
+      "state": "PASS"
+    }
+  ],
+  "responses": [
+    {
+      "path": "/api/workbench/public-demo",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20260930-9569db12e23a-baseline",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20260930-9569db12e23a-candidate",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20260930-9569db12e23a-baseline/runs?limit=100",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-4aa5c58b6cca90bf5a5b76526b838baa526101050fbf337004b85d6dff9cd35a",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-4aa5c58b6cca90bf5a5b76526b838baa526101050fbf337004b85d6dff9cd35a/public-artifact?download=true",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20260930-9569db12e23a-baseline/diagnosis",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-4aa5c58b6cca90bf5a5b76526b838baa526101050fbf337004b85d6dff9cd35a/trace",
+      "status": 200
+    },
+    {
+      "path": "/demo",
+      "status": 200
+    },
+    {
+      "path": "/experiments/public-demo-20260930-9569db12e23a-baseline?tab=runs",
+      "status": 200
+    },
+    {
+      "path": "/runs/run-4aa5c58b6cca90bf5a5b76526b838baa526101050fbf337004b85d6dff9cd35a",
+      "status": 200
+    },
+    {
+      "path": "/diagnosis?experiment=public-demo-20260930-9569db12e23a-baseline",
+      "status": 200
+    },
+    {
+      "path": "/regression?baseline=public-demo-20260930-9569db12e23a-baseline&candidate=public-demo-20260930-9569db12e23a-candidate",
+      "status": 200
+    }
+  ],
+  "error": null,
+  "evidence_scope": "TAILNET_ONLY",
+  "public_projection_of_sha256": "sha256:46018496b092a74b2cd33f40602c8b31712712a6496b167c08245a7e6b9feca2"
+}

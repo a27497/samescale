@@ -3,6 +3,7 @@ import type { InvestigationExample, AnalystSession, AnalystSpendLimits, AnalystP
 
 const path = (id: string) => `/analyst/sessions/${encodeURIComponent(id)}`
 export const analystApi = {
+  capabilities: async () => (await apiClient.get<{ public_demo_read_only: boolean; persistent_sessions_allowed: boolean }>('/analyst/capabilities')).data,
   offline: async () => (await apiClient.post<InvestigationExample>('/analyst/examples/offline')).data,
   historical: async () => (await apiClient.get<InvestigationExample>('/analyst/examples/historical')).data,
   list: async (experimentId: string) => (await apiClient.get<{ items: AnalystSession[] }>('/analyst/sessions', { params: { experiment_id: experimentId } })).data,

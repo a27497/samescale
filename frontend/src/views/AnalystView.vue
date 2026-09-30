@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import PublicAnalystNotice from '@/components/PublicAnalystNotice.vue'
+import { useAnalystAccess } from '@/composables/analystAccess'
 import InvestigationReport from '@/components/InvestigationReport.vue'
 
 import { analystApi } from '@/api/analyst'
@@ -8,6 +10,7 @@ import type { AnalystSession, AnalystPreflight } from '@/types/analyst'
 import type { ProviderModelProfile } from '@/types/registry'
 import type { ExperimentSummary } from '@/types/workbench'
 
+const { access, loadAccess } = useAnalystAccess()
 const experiments = ref<ExperimentSummary[]>([])
 const profiles = ref<ProviderModelProfile[]>([])
 const experimentId = ref('')
@@ -103,6 +106,8 @@ async function saveProposal() {
   })))
 }
 onMounted(async () => {
+  await loadAccess()
+  if (access.value !== 'private') return
   busy.value = true
   const results = await Promise.allSettled([
     workbenchApi.listExperiments({ limit: 100 }), registryApi.models(),
@@ -126,7 +131,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section class="sessions-workspace">
+  <section v-if="access !== 'private'" class="sessions-workspace">
+    <h2>Analyst sessions</h2>
+    <PublicAnalystNotice v-if="access === 'public'" />
+    <p v-else-if="access === 'loading'" role="status">Checking workspace permissions…</p>
+    <p v-else role="alert">Workspace permissions are unavailable. Reload the page to retry. <RouterLink to="/analyst">Open offline examples →</RouterLink></p>
+  </section>
+  <section v-else class="sessions-workspace">
     <div class="page-heading"><div><span class="eyebrow">SAMESCALE / INVESTIGATIONS</span><h2>继续追踪一个工程问题</h2><p>选择已有证据，继续调查，或审阅下一步回归方案。</p></div></div>
     <p><a href="/analyst">← 开始调查：离线演示 / 历史真实记录</a></p>
     <p v-if="!busy && !experiments.length">当前没有可用实验。离线演示无需导入历史数据库；Real 调查需要先提供可验证的实验记录。</p>

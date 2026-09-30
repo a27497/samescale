@@ -1,0 +1,298 @@
+{
+  "device_sizes": [
+    1365,
+    390
+  ],
+  "checks": [
+    {
+      "name": "desktop demo identity",
+      "pass": true
+    },
+    {
+      "name": "desktop home no persistence promise",
+      "pass": true
+    },
+    {
+      "name": "desktop offline API success",
+      "pass": true
+    },
+    {
+      "name": "desktop offline fixed bounded Fake",
+      "pass": true
+    },
+    {
+      "name": "desktop offline report visible",
+      "pass": true
+    },
+    {
+      "name": "desktop offline overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop sessions no mutation controls",
+      "pass": true
+    },
+    {
+      "name": "desktop alternative /demo",
+      "pass": true
+    },
+    {
+      "name": "desktop alternative /analyst?example=offline",
+      "pass": true
+    },
+    {
+      "name": "desktop alternative /analyst?example=historical",
+      "pass": true
+    },
+    {
+      "name": "desktop public-sessions overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop offline alternative works",
+      "pass": true
+    },
+    {
+      "name": "desktop historical alternative works",
+      "pass": true
+    },
+    {
+      "name": "desktop historical overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop release scope explicit",
+      "pass": true
+    },
+    {
+      "name": "desktop release-scope overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop registry scope explicit",
+      "pass": true
+    },
+    {
+      "name": "desktop registry-scope overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop scope return works",
+      "pass": true
+    },
+    {
+      "name": "desktop comparability missing explicit",
+      "pass": true
+    },
+    {
+      "name": "desktop comparability overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop diagnosis actionable runs CTA",
+      "pass": true
+    },
+    {
+      "name": "desktop diagnosis-empty overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop diagnosis runs destination",
+      "pass": true
+    },
+    {
+      "name": "desktop connections English copy",
+      "pass": true
+    },
+    {
+      "name": "desktop connections overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop server mutation denied",
+      "pass": true
+    },
+    {
+      "name": "desktop only offline browser POSTs",
+      "pass": true,
+      "mutations": [
+        {
+          "method": "POST",
+          "path": "/api/workbench/analyst/examples/offline"
+        },
+        {
+          "method": "POST",
+          "path": "/api/workbench/analyst/examples/offline"
+        }
+      ]
+    },
+    {
+      "name": "desktop no page errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "mobile demo identity",
+      "pass": true
+    },
+    {
+      "name": "mobile home no persistence promise",
+      "pass": true
+    },
+    {
+      "name": "mobile offline API success",
+      "pass": true
+    },
+    {
+      "name": "mobile offline fixed bounded Fake",
+      "pass": true
+    },
+    {
+      "name": "mobile offline report visible",
+      "pass": true
+    },
+    {
+      "name": "mobile offline overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile sessions no mutation controls",
+      "pass": true
+    },
+    {
+      "name": "mobile alternative /demo",
+      "pass": true
+    },
+    {
+      "name": "mobile alternative /analyst?example=offline",
+      "pass": true
+    },
+    {
+      "name": "mobile alternative /analyst?example=historical",
+      "pass": true
+    },
+    {
+      "name": "mobile public-sessions overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile offline alternative works",
+      "pass": true
+    },
+    {
+      "name": "mobile historical alternative works",
+      "pass": true
+    },
+    {
+      "name": "mobile historical overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile release scope explicit",
+      "pass": true
+    },
+    {
+      "name": "mobile release-scope overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile registry scope explicit",
+      "pass": true
+    },
+    {
+      "name": "mobile registry-scope overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile scope return works",
+      "pass": true
+    },
+    {
+      "name": "mobile comparability missing explicit",
+      "pass": true
+    },
+    {
+      "name": "mobile comparability overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile diagnosis actionable runs CTA",
+      "pass": true
+    },
+    {
+      "name": "mobile diagnosis-empty overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile diagnosis runs destination",
+      "pass": true
+    },
+    {
+      "name": "mobile connections English copy",
+      "pass": true
+    },
+    {
+      "name": "mobile connections overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile server mutation denied",
+      "pass": true
+    },
+    {
+      "name": "mobile only offline browser POSTs",
+      "pass": true,
+      "mutations": [
+        {
+          "method": "POST",
+          "path": "/api/workbench/analyst/examples/offline"
+        },
+        {
+          "method": "POST",
+          "path": "/api/workbench/analyst/examples/offline"
+        }
+      ]
+    },
+    {
+      "name": "mobile no page errors",
+      "pass": true,
+      "errors": []
+    }
+  ],
+  "PASS": true,
+  "failure": null,
+  "evidence_scope": "LOCAL_CHROMIUM_THROUGH_TAILNET",
+  "public_projection_of_sha256": "sha256:97138c94bbc677af38263d34891d809505ff6ac283d5c4a9366a063920e5d55c"
+}

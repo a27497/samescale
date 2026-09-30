@@ -149,7 +149,7 @@ watch(() => route.query.tab, value => { tab.value = tabs.find(item => item === v
           </div>
           <dl class="definition-list" style="margin-top: 16px"><dt>Analysis digest</dt><dd class="technical">{{ store.modelComparison?.analysis_digest }}</dd><dt>Recovery distinction</dt><dd>{{ analysis.recovery_attempts.note }}</dd></dl>
         </div>
-        <div v-else class="panel"><div class="notice">Statistics are rendered from the immutable backend ExperimentReport. Regression comparison makes directional claims only and never causal attribution.</div><dl class="definition-list" style="margin-top: 14px"><dt>Comparability</dt><dd><span v-for="(count, status) in store.selected.comparability_summary" :key="status"><StatusBadge :value="String(status)" /> {{ count }} </span></dd><dt>Report digest</dt><dd class="technical">{{ store.selected.report_digest }}</dd></dl></div>
+        <div v-else class="panel"><div class="notice">Statistics are rendered from the immutable backend ExperimentReport. Regression comparison makes directional claims only and never causal attribution.</div><dl class="definition-list" style="margin-top: 14px"><dt>Comparability</dt><dd><StatusBadge v-if="!Object.keys(store.selected.comparability_summary ?? {}).length" value="NOT_REPORTED" /><span v-for="(count, status) in store.selected.comparability_summary" :key="status"><StatusBadge :value="String(status)" /> {{ count }} </span></dd><dt>Report digest</dt><dd class="technical">{{ store.selected.report_digest }}</dd></dl></div>
       </template>
     </template>
   </section>

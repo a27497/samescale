@@ -124,3 +124,10 @@ describe('Diagnosis Workbench', () => {
     expect(wrapper.text()).toContain('FIXTURE_OFFLINE')
   })
 })
+
+it('offers an executable runs link when diagnosis has no failures', async () => {
+  api.getDiagnosis.mockResolvedValue({ ...report, failure_run_count: 0, cells: [] })
+  const wrapper = mount(DiagnosisView, { global: { plugins: [router] } }); await flushPromises()
+  expect(wrapper.get('a[href="/experiments/diagnosis-fixture?tab=runs"]').text()).toBe('Inspect experiment runs →')
+  expect(wrapper.text()).not.toContain('Open a run to inspect')
+})

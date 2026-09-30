@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { registryApi } from '@/api/client'
-import { t } from '@/composables/i18n'
+import { useTranslation } from '@/composables/i18n'
+const t = useTranslation('en')
 import LocalModelConfigurations from '@/components/LocalModelConfigurations.vue'
 import type { ProviderModelProfile, ProviderDefinition, HarnessDefinition } from '@/types/registry'
 

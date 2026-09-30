@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import AnalystView from '@/views/AnalystView.vue'
 import router from '@/router'
 import type { AnalystSession } from '@/types/analyst'
-const api = vi.hoisted(() => ({ list: vi.fn(), get: vi.fn(), create: vi.fn(), resume: vi.fn(), propose: vi.fn(), approve: vi.fn(), preflight: vi.fn() }))
+const api = vi.hoisted(() => ({ capabilities: vi.fn(), list: vi.fn(), get: vi.fn(), create: vi.fn(), resume: vi.fn(), propose: vi.fn(), approve: vi.fn(), preflight: vi.fn() }))
 const registry = vi.hoisted(() => ({ models: vi.fn() }))
 const workbench = vi.hoisted(() => ({ listExperiments: vi.fn() }))
 vi.mock('@/api/analyst', () => ({ analystApi: api }))
@@ -26,6 +26,7 @@ function button(wrapper: ReturnType<typeof mount>, text: string) {
 }
 beforeEach(() => {
   vi.resetAllMocks()
+  api.capabilities.mockResolvedValue({ public_demo_read_only: false, persistent_sessions_allowed: true })
   workbench.listExperiments.mockResolvedValue({ items: [{ experiment_id: 'experiment-one', name: 'One' }] })
   registry.models.mockResolvedValue({ provider_profiles: [{ profile_id: 'registered-profile', enabled: true, automation_allowed: true }] })
   api.list.mockResolvedValue({ items: [fixture()] })
@@ -187,4 +188,28 @@ it('rejects reviewer labels outside the existing backend contract before approva
   expect(api.approve).not.toHaveBeenCalled()
   await wrapper.get('[aria-label="Reviewer label"]').setValue('local-reviewer')
   expect(button(wrapper, 'Approve proposal only').attributes('disabled')).toBeUndefined()
+})
+
+it.each(['fake', 'real'])('public Demo removes all session mutations for %s entry', async backend => {
+  window.history.replaceState({}, '', `/analyst/sessions?backend=${backend}`)
+  api.capabilities.mockResolvedValue({ public_demo_read_only: true, persistent_sessions_allowed: false })
+  const wrapper = mount(AnalystView, { global: { plugins: [router] } }); await flushPromises()
+  expect(wrapper.text()).toContain('Public Demo is read-only.')
+  expect(wrapper.text()).toContain('Persistent Analyst sessions are available only in a local/private workspace.')
+  expect(wrapper.findAll('button')).toHaveLength(0)
+  expect(wrapper.find('select').exists()).toBe(false)
+  expect(wrapper.findAll('a').map(link => link.attributes('href'))).toEqual([
+    '/demo', '/analyst?example=offline', '/analyst?example=historical',
+  ])
+  for (const call of [api.create, api.resume, api.propose, api.approve, api.list, registry.models, workbench.listExperiments]) expect(call).not.toHaveBeenCalled()
+  wrapper.unmount()
+  window.history.replaceState({}, '', '/analyst/sessions')
+})
+
+it('does not expose session controls while permissions are unavailable', async () => {
+  api.capabilities.mockRejectedValue(new Error('unavailable'))
+  const wrapper = mount(AnalystView); await flushPromises()
+  expect(wrapper.text()).toContain('Workspace permissions are unavailable')
+  expect(wrapper.find('fieldset').exists()).toBe(false)
+  expect(api.create).not.toHaveBeenCalled()
 })

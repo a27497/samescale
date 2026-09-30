@@ -1,0 +1,40 @@
+{
+  "checked_at": "2026-09-30T17:54:02.174558+08:00",
+  "checks": [
+    {
+      "method": "POST",
+      "path": "/api/workbench/analyst/sessions",
+      "status": 403,
+      "code": "PUBLIC_DEMO_READ_ONLY",
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/experiments",
+      "status": 403,
+      "code": "PUBLIC_DEMO_READ_ONLY",
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/local-configuration/providers",
+      "status": 403,
+      "code": "PUBLIC_DEMO_READ_ONLY",
+      "pass": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/local-configuration/providers/not-a-provider",
+      "status": 403,
+      "code": "PUBLIC_DEMO_READ_ONLY",
+      "pass": true
+    },
+    {
+      "check": "original demo response unchanged",
+      "pass": true
+    }
+  ],
+  "PASS": true,
+  "evidence_scope": "TAILNET_ONLY",
+  "public_projection_of_sha256": "sha256:7b3818a58569ebe1e692d9371316c0fd3704406e02c1349f804a4ac9b082ed84"
+}

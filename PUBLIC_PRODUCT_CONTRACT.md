@@ -49,7 +49,8 @@ SameScale helps an AI Coding developer inspect an engineering failure, follow ve
 separate facts from hypotheses, and review a regression proposal. The initial product continues
 the existing HarnessLab P0 Analyst application; S1 updates its external brand and investigation
 experience while preserving the S0 development and evidence boundaries.
-“Public” defines what product copy may promise, not permission to publish this private repository.
+The GitHub repository is PUBLIC (verified during the 2026-09-30 Git closeout). Product public claims
+remain evidence-scoped; repository visibility does not verify public deployment or trusted TLS.
 
 ## User journey and evidence
 
@@ -64,8 +65,22 @@ must lead to the corresponding tool data and digest bindings. Unavailable eviden
 | --- | --- | --- |
 | `/` → `/analyst`: offline Fake | Fixed synthetic deduplication case runs the existing graph and fact validator; 2 decisions, 2 tools, 0 Provider requests | Local API and built frontend; no PostgreSQL, Docker, or credentials; no persistence or model-reasoning claim |
 | `/analyst`: historical Real | Reads digest-checked frozen v6 report, proposal, and session summary; shows provenance and effective-limit correction | No new model request or database restoration; original bytes preserved; no resume/approval controls |
-| `/analyst/sessions`: current Fake/Real | Lists and saves current database investigations; bounded resume, cited results, versioned proposal and review-only approval | PostgreSQL, migrations, verifiable experiment evidence; Fake is deterministic; Real additionally needs enabled server/profile, credentials, budgets, and explicit confirmation |
+| `/analyst/sessions`: current Fake/Real in local/private workspace | Lists and saves current database investigations; bounded resume, cited results, versioned proposal and review-only approval | PostgreSQL, migrations, verifiable experiment evidence; Fake is deterministic; Real additionally needs enabled server/profile, credentials, budgets, and explicit confirmation |
 | Advanced evaluation pages | Existing Overview at `/overview`, experiments, Registry, Matrix, JudgeLab, diagnosis, regression, and settings remain accessible | Existing component prerequisites and backend authority continue to apply |
+
+Public Demo is read-only. Persistent Analyst sessions are available only in a local/private
+workspace. The public home and sessions pages show the evidence story, Offline Fake demo and
+historical Real read-only report as alternatives; they do not offer session creation, Real
+execution, resume, proposal saving or approval. The server rejects session mutations with
+`403 / PUBLIC_DEMO_READ_ONLY`. Only the exact `POST /api/workbench/analyst/examples/offline`
+endpoint is additionally allowed for bounded fixed Fake computation: no database/artifact writes,
+Provider requests or external network calls. This does not grant general POST permission.
+
+Core Readiness labels `REAL_JUDGE_SMOKE` as **Frozen release snapshot**. JudgeLab labels it as
+**Current JudgeLab registry**, derived by the backend from digest/identity-validated completed
+reports across the registry, independent of pagination. No current report means `NOT_RUN`;
+unverifiable completed evidence means `NOT_VERIFIED` unless another verified smoke report exists.
+The release snapshot and the current JudgeLab registry are different evidence scopes.
 
 Real failure must not silently fall back to Fake. Creating a session, reading it, preflight, and
 approval do not invoke a model. Resume can make a paid call only within current authorization.

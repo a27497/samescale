@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Query, Request, Response
 
 from harnesslab.analyst.api_models import (
     AnalystSessionList,
@@ -57,6 +57,20 @@ Service = Annotated[AnalystSessions, Depends(analyst_service)]
 
 class ResumeRequest(StrictModel):
     confirm_real: bool = False
+
+
+class AnalystCapabilities(StrictModel):
+    public_demo_read_only: bool
+    persistent_sessions_allowed: bool
+
+
+@router.get("/capabilities", response_model=AnalystCapabilities)
+async def analyst_capabilities(response: Response) -> AnalystCapabilities:
+    response.headers["Cache-Control"] = "no-store"
+    public_demo = bool(os.environ.get("HARNESSLAB_PUBLIC_DEMO_MANIFEST"))
+    return AnalystCapabilities(
+        public_demo_read_only=public_demo, persistent_sessions_allowed=not public_demo
+    )
 
 
 @router.get("/sessions", response_model=AnalystSessionList)

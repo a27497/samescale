@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import AnalystHomeView from '@/views/AnalystHomeView.vue'
 import InvestigationReport from '@/components/InvestigationReport.vue'
 import router from '@/router'
-const api = vi.hoisted(() => ({ offline: vi.fn(), historical: vi.fn() }))
+const api = vi.hoisted(() => ({ capabilities: vi.fn(), offline: vi.fn(), historical: vi.fn() }))
 vi.mock('@/api/analyst', () => ({ analystApi: api }))
 const report = {
   summary: 'Output order differs',
@@ -12,10 +12,11 @@ const report = {
   limitations: ['Synthetic inputs only'],
   evidence_catalog: [{ ref: { id: 'run:demo' }, digest_bindings: ['digest'], data_by_tool: { inspect_failure: { observed: ['a', 'b'] } } }],
 }
-function mountHome() { return mount(AnalystHomeView, { global: { stubs: { RouterLink: { template: '<a><slot /></a>' } } } }) }
+function mountHome() { return mount(AnalystHomeView, { global: { plugins: [router], stubs: { RouterLink: { template: '<a><slot /></a>' } } } }) }
 function button(wrapper: ReturnType<typeof mount>, name: string) { return wrapper.findAll('button').find(button => button.text() === name)! }
 beforeEach(() => {
   vi.resetAllMocks()
+  api.capabilities.mockResolvedValue({ public_demo_read_only: false, persistent_sessions_allowed: true })
   api.offline.mockResolvedValue({ kind: 'offline_fake', provenance: 'Fake / synthetic', report, metadata: { decisions: 2, tools: 2, provider_requests: 0 }, next_steps: ['Add regression'], proposal: null })
   api.historical.mockResolvedValue({ kind: 'historical_real', provenance: 'Historical real / read only', report, metadata: { decision_limit: 4 }, next_steps: ['Review historical plan'], proposal: null })
 })
@@ -71,8 +72,28 @@ describe('Agent product entry', () => {
 })
 
 it('focuses the loaded result after keyboard activation', async () => {
-  const wrapper = mount(AnalystHomeView, { attachTo: document.body, global: { stubs: { RouterLink: true } } })
+  const wrapper = mount(AnalystHomeView, { attachTo: document.body, global: { plugins: [router], stubs: { RouterLink: true } } })
   await button(wrapper, '运行离线演示').trigger('click'); await flushPromises()
   expect(document.activeElement).toBe(wrapper.get('[aria-label="调查案例"]').element)
   wrapper.unmount()
+})
+
+it('public entry offers read-only alternatives without persistence promises', async () => {
+  api.capabilities.mockResolvedValue({ public_demo_read_only: true, persistent_sessions_allowed: false })
+  const wrapper = mountHome(); await flushPromises()
+  expect(wrapper.text()).toContain('Public Demo is read-only.')
+  expect(wrapper.text()).not.toContain('Fake 可无密钥演练持久化')
+  expect(wrapper.text()).not.toContain('进入 Real 调查')
+  expect(wrapper.findAll('button').map(button => button.text())).toEqual(['运行离线演示', '查看历史真实记录'])
+})
+
+it('read-only alternative links open the requested example, including same-page navigation', async () => {
+  await router.push('/analyst?example=offline')
+  const wrapper = mountHome(); await flushPromises()
+  expect(api.offline).toHaveBeenCalledOnce()
+  await router.push('/analyst?example=historical'); await flushPromises()
+  expect(api.historical).toHaveBeenCalledOnce()
+  expect(wrapper.get('[aria-label="调查案例"]').text()).toContain('Historical real / read only')
+  wrapper.unmount()
+  await router.push('/analyst')
 })

@@ -307,6 +307,15 @@ export interface ExperimentStatus {
   refreshed_at: string
 }
 
+export interface JudgeCalibrationListResponse {
+  items: JudgeCalibrationSummary[]
+  total: number
+  limit: number
+  offset: number
+  evidence_scope: 'CURRENT_JUDGELAB_REGISTRY'
+  real_judge_smoke: 'VERIFIED' | 'NOT_RUN' | 'NOT_VERIFIED'
+}
+
 export interface JudgeCalibrationSummary {
   calibration_id: string
   suite_id: string
@@ -396,6 +405,7 @@ export interface ReadinessCheck {
   label: string
   status: 'READY' | 'BLOCKED' | 'NOT_REPORTED' | 'NOT_VERIFIED'
   evidence: string
+  evidence_scope?: 'FROZEN_RELEASE_SNAPSHOT' | null
   source_id: string | null
   snapshot: string | null
   generated_at: string | null

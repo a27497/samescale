@@ -9,7 +9,7 @@ import type {
   ExperimentListResponse,
   ExperimentStatus,
   JudgeCalibrationDetail,
-  JudgeCalibrationSummary,
+  JudgeCalibrationListResponse,
   MatrixResponse,
   ModelComparisonCloseout,
   RegressionResponse,
@@ -76,12 +76,7 @@ export const workbenchApi = {
     ).data,
   listCalibrations: async () =>
     (
-      await apiClient.get<{
-        items: JudgeCalibrationSummary[]
-        total: number
-        limit: number
-        offset: number
-      }>('/judgelab/calibrations')
+      await apiClient.get<JudgeCalibrationListResponse>('/judgelab/calibrations')
     ).data,
   getCalibration: async (id: string) =>
     (

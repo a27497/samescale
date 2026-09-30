@@ -1,0 +1,231 @@
+{
+  "baseline_head": "18664549ff18c07c0b4ab2472abf5d2032f57977",
+  "tracked_dirty_files": 32,
+  "untracked_entry_files": 63,
+  "allowed_runtime_scope": [
+    "M1",
+    "M2",
+    "M3",
+    "N1",
+    "N2",
+    "P1"
+  ],
+  "prior_branch_commits": [
+    "8ad71d87fc0977fff008c956165d877d2f9c0b83",
+    "18664549ff18c07c0b4ab2472abf5d2032f57977"
+  ],
+  "prior_branch_scope": "Accepted SameScale trust/UI closeout, keyless Public Demo recovery and evidence protection; no unrelated commit between origin/main and entry HEAD.",
+  "excluded_original_untracked": [
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/browser-production/acceptance.json",
+      "sha256": "1f8e02773b4f3f009e407e3c42e76abcfcd4cd6e7b966b50c7c7e74e50ac5fcd",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/browser-production/desktop-entry.png",
+      "sha256": "9f6cced83c0e2179bcb6e5c31827214115dc1ea9f52662fd3eb4ae42ed74c640",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/browser-production/mobile-entry.png",
+      "sha256": "a4d5db60ab18d8318093fbc0be5f9ec498f7bc9da1d13cc2a70cfcd437229772",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/deployed-loopback-gate.json",
+      "sha256": "5e424b47d388e4a4d277a1bc5ea18ebf12bc62049be378949cbea9d11e160605",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/deployment.json",
+      "sha256": "d9913ba4811bfe91ca3e425eb4b9f7f82f86549929c71b9d33b60fef65e5641e",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/production-gate.json",
+      "sha256": "ee6ce74613decb877ef4178de456da710dc735f57062dd46e1d820c3d57b738d",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/README.md",
+      "sha256": "1d951b8a18b128671045f30755c01d2c8404469b3f6b3d9e5a3cec37e0e2477f",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/boundary.json",
+      "sha256": "8b7973c0b5a7d9c6bef6e3028dcfb5096965a298c56dbb9b89e2c456b2842646",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/handoff.json",
+      "sha256": "d1c8365621fb24de7605cec1eccc48e4fed0fd0ce83adcd1f154a2976646ef89",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/magicdns-gate.json",
+      "sha256": "46018496b092a74b2cd33f40602c8b31712712a6496b167c08245a7e6b9feca2",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/read-only.json",
+      "sha256": "7b3818a58569ebe1e692d9371316c0fd3704406e02c1349f804a4ac9b082ed84",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/serve-after.json",
+      "sha256": "d2e7f4dd650c4a118acfc439158aa47d646045e0e5414208f11f0c0f4cb490c8",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/serve-before.json",
+      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/README.md",
+      "sha256": "a46098f3dba1e628989b2414a34b053f686fdc8747e4cc36e24400a2219c885f",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/backend-correction.txt",
+      "sha256": "82763a90c0af4591f9f3e117cf53b9603faf62aeb3c525607d714f69fcb32078",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/backend-focused.txt",
+      "sha256": "cefa4a22f69c231bc17db218941c5698834fef28284ba85b2cce77dc747b0ad5",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/backend-full.xml",
+      "sha256": "c5546e8def85af8229027b754c242afa3f1fe29a00a86375f709211098176641",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser-hidden-navigation-attempt.json",
+      "sha256": "9a25a6181c04dc42c4f70fdbd855935b2ce897a6866b927fa6b11959fd14f70c",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser-selector-attempt.json",
+      "sha256": "59cecfa119b0b2ba19f9497dc8a4b7fba9d1a5891a4916fb5f08a3c0874212f2",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser.mjs",
+      "sha256": "678df1f1f1e043cd284a06971a1cbef3106a6ce93b0eed8420e741f46d58947d",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/acceptance.json",
+      "sha256": "97138c94bbc677af38263d34891d809505ff6ac283d5c4a9366a063920e5d55c",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/build.txt",
+      "sha256": "932344836695f2336d6c1434260bed60cc5b5cc272c5f077e156a31e3d7917a8",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/configuration-after.json",
+      "sha256": "c98f709189852a3380f22a61ebf0067eabda46f7ccddb0dd910ff5d7107e0015",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/configuration-before.json",
+      "sha256": "c98f709189852a3380f22a61ebf0067eabda46f7ccddb0dd910ff5d7107e0015",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/demo-before.json",
+      "sha256": "002440fc958427896e642cc4eb3904e5977653017d0e502d15d3e331bdee2d85",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/documentation-links.json",
+      "sha256": "a3dbe7d7e9df6ab5ba4ac790c177f56d5b58c5045dcd184bc729e1a310e3a8f2",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/frontend.txt",
+      "sha256": "8764bf87301aeb64a99607f63a33f524dfe1ec797181c4ccced04a905883ca0c",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/integrity-suite.json",
+      "sha256": "0cfebdf31adb84a0cdaf30f12d3062bcb278128d1e4dbf3413a47c67517b3d46",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/live-db-after.json",
+      "sha256": "cee33e8d1f33b06e5f1bf5a31db3d6bb56849ed28f0be363515e8347783c7771",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/live-db-before.json",
+      "sha256": "cee33e8d1f33b06e5f1bf5a31db3d6bb56849ed28f0be363515e8347783c7771",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/mypy.txt",
+      "sha256": "71144743c83babea384888a735db0c4daba3d4d7b7942b6839984bd5c21b52bb",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/preexisting-status.txt",
+      "sha256": "56ca28c2685fd639617da82f1bcc6405fd2354587272ab3fd50d08431e2ba7cd",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/ruff.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/serve-after.json",
+      "sha256": "d2e7f4dd650c4a118acfc439158aa47d646045e0e5414208f11f0c0f4cb490c8",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/serve-before.json",
+      "sha256": "d2e7f4dd650c4a118acfc439158aa47d646045e0e5414208f11f0c0f4cb490c8",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/service-after-restart.txt",
+      "sha256": "06c562b64505761241777861aea40a998b8636a706f968a032df3d78ba549c9b",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/storage-before-restart.txt",
+      "sha256": "a2bd10b1ef2ebcafa353f204794dbf2c724137ca03c86b766121290fe31b5324",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/summary.json",
+      "sha256": "30d5eae0599d7b22cd1850b3fa5004387aad7a112db6bcd5a34bb1a37dbd4dc9",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/tailnet-gate.json",
+      "sha256": "964c88d9b531b77f6be36b198edea238b8b2b8478e36aa85e246dc949b51a49a",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/test-database-cleanup.json",
+      "sha256": "584dca9db5ac3cbec4d43c9e4aefc53ca79cced2a784ee4c5acbf486762862e0",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/typecheck.txt",
+      "sha256": "7f3bd13661a182cd67dc1f3def9ebb510fedae4ad90554f5a38bd8fbd4f98dc2",
+      "reason": "Raw operational/debug output or duplicate receipt; original privately archived; public successor retains relevant acceptance facts."
+    }
+  ],
+  "originals_preserved_outside_git": true,
+  "frozen_committed_evidence_rewritten": false,
+  "public_repo_scan": "PASS; literal matches reviewed as keyless-placeholder/mock-key and negative leakage assertions; images visually inspected.",
+  "paid_calls": 0,
+  "new_features": false,
+  "deployment_or_network_changes": false
+}

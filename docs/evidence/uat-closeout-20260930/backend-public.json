@@ -1,0 +1,11 @@
+{
+  "scope": "full backend",
+  "tests": 1722,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 1088.291,
+  "raw_junit_sha256": "sha256:c5546e8def85af8229027b754c242afa3f1fe29a00a86375f709211098176641",
+  "reused": true,
+  "reason": "No runtime or test source changed since this full suite completed in this session; subsequent edits are documentation/evidence packaging."
+}

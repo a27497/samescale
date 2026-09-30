@@ -942,6 +942,10 @@ async def test_analyst_api_create_resume_get_list_propose_and_approve(
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://test"
     ) as client:
+        assert (await client.get("/api/workbench/analyst/capabilities")).json() == {
+            "public_demo_read_only": False,
+            "persistent_sessions_allowed": True,
+        }
         prefix = "/api/workbench/analyst/sessions"
         response = await client.post(
             prefix, json={"experiment_id": experiment, "question": "Inspect", "decision_limit": 2}

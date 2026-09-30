@@ -2,7 +2,8 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { localConfigurationApi as api, type ConnectionMetadata, type CredentialMetadata } from '@/api/localConfiguration'
 import type { ProviderDefinition } from '@/types/registry'
-import { t } from '@/composables/i18n'
+import { useTranslation } from '@/composables/i18n'
+const t = useTranslation()
 
 const props = defineProps<{ token: string; providers: ProviderDefinition[] }>()
 const emit = defineEmits<{ updated: [connections: ConnectionMetadata[]]; changed: [] }>()

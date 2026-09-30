@@ -2,7 +2,8 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { localConfigurationApi as api, type ConfigurationOptions, type LocalHarnessConfiguration } from '@/api/localConfiguration'
 import type { ProviderModelProfile } from '@/types/registry'
-import { t } from '@/composables/i18n'
+import { useTranslation } from '@/composables/i18n'
+const t = useTranslation()
 const props = defineProps<{ token: string; profiles: ProviderModelProfile[] }>()
 const emit = defineEmits<{ changed: [] }>()
 const items = ref<LocalHarnessConfiguration[]>([])

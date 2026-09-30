@@ -1,5 +1,24 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 最终授权：求职冻结版 Git closeout（2026-09-30）
+
+开发停止。仅审计 UAT / Public Demo recovery / Tailnet QA 收口修改，排除临时运维残留，
+核对公开仓库安全和 evidence scope，执行必要 gate；提交并 push 当前分支，CI PASS 后
+仅合并已验收范围到 main、push 并核对 main CI。成功后记录冻结完成并停止。
+不新增功能，不运行付费 Provider，不部署或修改 TLS / firewall / Tailscale。
+以下是原历史授权，不能扩大本轮范围。
+
+## 当前授权：UAT closeout（2026-09-30）
+
+仅修 Grok `PASS_WITH_ISSUES` 暴露的 3 MAJOR 和 Comparability 空值、Diagnosis 空态入口、
+Connections 文案语言。Offline Demo 在证明固定 Fake、无 DB/artifact/Provider/network 副作用后
+精确放行；Public Sessions 保持服务器只读拒绝并对齐页面入口；区分冻结 release 与当前
+JudgeLab registry 的 smoke scope，不改历史结果。验收为 backend/frontend full、typecheck/build、
+offline/integrity、12 项 Public Demo Gate 和当前 Tailnet 地址 1365/390px 定向浏览器复测。
+保持 `public-demo-20260930-9569db12e23a` 身份，完整性失败即停止；不启动 Real 路径、付费
+Provider、新功能或公网/Tailscale/TLS 配置工作。不含 commit/push 授权；完成后停止。
+以下记录保留原历史授权，不扩大本轮范围。
+
 ## 当前授权：Evidence Integrity / Public Demo Recovery（2026-09-30）
 
 只读查找原 QA artifact 并逐字节比对原 digest；找不到则保留旧身份与 integrity failure，

@@ -368,6 +368,7 @@ describe('Workbench contracts', () => {
 
   it('distinguishes corrupt Judge report evidence from an unreported report', async () => {
     api.listCalibrations.mockResolvedValue({
+      evidence_scope: 'CURRENT_JUDGELAB_REGISTRY', real_judge_smoke: 'NOT_VERIFIED',
       items: [{
         calibration_id: 'judge-corrupt', suite_id: 'core-calibration', suite_version: '1.0.0',
         plan_digest: 'sha256:plan', report_digest: 'sha256:report', status: 'completed',
@@ -520,4 +521,38 @@ describe('Workbench contracts', () => {
     expect(api.getExperiment).toHaveBeenCalledTimes(2)
     expect(reconstructed.selected?.experiment_id).toBe('matrix-keyless')
   })
+})
+
+
+it.each(['NOT_RUN', 'VERIFIED', 'NOT_VERIFIED'])('JudgeLab displays backend scoped status %s', async status => {
+  api.listCalibrations.mockResolvedValue({ items: [], total: 0, limit: 25, offset: 0, evidence_scope: 'CURRENT_JUDGELAB_REGISTRY', real_judge_smoke: status })
+  const registry = mount(JudgeLabView, { global: { plugins: [router] } }); await flushPromises()
+  expect(registry.text()).toContain('Current JudgeLab registry')
+  expect(registry.text()).toContain(`REAL_JUDGE_SMOKE=${status}`)
+  expect(registry.text()).toContain('The release snapshot and the current JudgeLab registry are different evidence scopes.')
+  api.readiness.mockResolvedValue({ status: 'NOT_READY', task_corpus_size: 18, evaluated_at: '2026-09-30T00:00:00Z', blockers: [], checks: [{ key: 'JUDGE_EVIDENCE', label: 'Core real Judge evidence', status: 'READY', evidence_scope: 'FROZEN_RELEASE_SNAPSHOT', evidence: 'Frozen release snapshot: REAL_JUDGE_SMOKE=VERIFIED' }] })
+  const release = mount(CoreReadinessView, { global: { plugins: [router] } }); await flushPromises()
+  expect(release.text()).toContain('Frozen release snapshot: REAL_JUDGE_SMOKE=VERIFIED')
+  expect(release.text()).toContain('The release snapshot and the current JudgeLab registry are different evidence scopes.')
+})
+
+it('does not invent a JudgeLab smoke status on loading or API failure', async () => {
+  api.listCalibrations.mockRejectedValue(new Error('unavailable'))
+  const wrapper = mount(JudgeLabView); await flushPromises()
+  expect(wrapper.text()).toContain('Judge calibration evidence is unavailable')
+  expect(wrapper.text()).not.toContain('REAL_JUDGE_SMOKE=')
+})
+
+
+it('Statistics explicitly reports missing comparability instead of a blank value', async () => {
+  api.getExperiment.mockResolvedValueOnce({
+    ...experiment, repeat_count: 1, execution_seed: 1, evaluation_mode: 'QUICK',
+    comparison_intent: 'HARNESS_COMPARISON', evidence_tiers: ['SMOKE'],
+    comparability_summary: {}, report_digest: 'sha256:report', cells: [], tasks: [],
+  })
+  await router.push('/experiments/matrix-keyless')
+  const wrapper = mount(ExperimentDetailView, { global: { plugins: [createPinia(), router] } }); await flushPromises()
+  await wrapper.findAll('.tab-button')[3].trigger('click'); await flushPromises()
+  const label = wrapper.findAll('dt').find(item => item.text() === 'Comparability')!
+  expect(label.element.nextElementSibling?.textContent).toBe('NOT_REPORTED')
 })

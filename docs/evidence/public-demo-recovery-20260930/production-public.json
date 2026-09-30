@@ -1,0 +1,74 @@
+{
+  "generated_at": "2026-09-30T09:35:25.034973+00:00",
+  "expected_demo_id": "public-demo-20260930-9569db12e23a",
+  "PUBLIC_DEMO_READY": false,
+  "checks": [
+    {
+      "check": "public demo experiment exists",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "run readable",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "artifact exists",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "SHA256 correct",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "verifier verdict readable",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "Diagnosis opens",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "Regression opens",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "provenance explainable",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "no broken reference",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "no HTTP 409/404/500",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "fixture/offline/historical/real distinguished",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    },
+    {
+      "check": "no browsing credential needed",
+      "pass": false,
+      "state": "NOT_VERIFIED"
+    }
+  ],
+  "responses": [],
+  "error": {
+    "type": "ConnectError",
+    "message": "Connection refused before HTTP response; TLS not reached."
+  },
+  "evidence_scope": "PUBLIC_INTERNET_NOT_VERIFIED",
+  "public_projection_of_sha256": "sha256:ee6ce74613decb877ef4178de456da710dc735f57062dd46e1d820c3d57b738d"
+}

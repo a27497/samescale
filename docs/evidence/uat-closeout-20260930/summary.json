@@ -1,0 +1,132 @@
+{
+  "date": "2026-09-30 (Asia/Shanghai)",
+  "branch": "codex/evidence-integrity-demo",
+  "majors": {
+    "M1": "CLOSED",
+    "M2": "CLOSED",
+    "M3": "CLOSED"
+  },
+  "minors": {
+    "N1": "CLOSED",
+    "N2": "CLOSED",
+    "P1": "CLOSED"
+  },
+  "backend": {
+    "passed": 1722,
+    "failed": 0,
+    "skipped": 0,
+    "new_cases": 16
+  },
+  "frontend": {
+    "passed": 99,
+    "failed": 0,
+    "new_cases": 12
+  },
+  "typecheck": "PASS",
+  "build": "PASS",
+  "ruff": {
+    "scope": "entire repository",
+    "check": "PASS",
+    "format": "PASS",
+    "files_formatted": 748
+  },
+  "mypy": {
+    "scope": "src tests scripts",
+    "status": "PASS",
+    "files": 388
+  },
+  "offline": {
+    "schema_version": 1,
+    "status": "PASS",
+    "network_namespace": {
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_routes": 0,
+      "loopback": "down"
+    },
+    "tests_passed": 73,
+    "archive_digest": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+    "inputs_digest": "sha256:d77d964fe60158da4e22ee7e60df0cfb54178a99c957298d861d977f925d0395",
+    "identical_outputs": {
+      "claude.json": "sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d",
+      "codex.json": "sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe",
+      "diagnosis.md": "sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1",
+      "offline-boundary.json": "sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097",
+      "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef"
+    },
+    "replayed_runs": 2,
+    "replay_passes": 2,
+    "external_calls": 0,
+    "provider_calls": 0,
+    "model_calls": 0,
+    "claude_calls": 0,
+    "judge_calls": 0,
+    "subject_executed": false,
+    "verifier_executed": false
+  },
+  "integrity": {
+    "files": 451,
+    "before_equals_after": true
+  },
+  "live_database": {
+    "tables": 23,
+    "rows": 68,
+    "before_equals_after": true
+  },
+  "demo": {
+    "demo_id": "public-demo-20260930-9569db12e23a",
+    "generated_at": "2026-09-30T09:02:19.299882Z",
+    "provenance": "FIXTURE_OFFLINE",
+    "public_demo_ready": true,
+    "baseline_id": "public-demo-20260930-9569db12e23a-baseline",
+    "candidate_id": "public-demo-20260930-9569db12e23a-candidate",
+    "failed_run_id": "run-4aa5c58b6cca90bf5a5b76526b838baa526101050fbf337004b85d6dff9cd35a",
+    "run_count": 12,
+    "artifact_file_count": 108,
+    "manifest_digest": "sha256:593a54eff3ef0f89212d3097ea3d1f3349d1b7b085f618d2ca8f9805746171d7",
+    "historical_integrity_failures": [
+      "phase-i-matrix-baseline",
+      "phase-i-matrix-candidate",
+      "phase-i-matrix-multi-task"
+    ],
+    "limitation": "New keyless Fake fixtures with independent verifier results; no real Provider/model execution, benchmark ranking, or causal claim."
+  },
+  "public_demo_gate": {
+    "scope": "current Tailnet Serve",
+    "passed": 12,
+    "total": 12
+  },
+  "browser": {
+    "scope": "local Chromium through current Tailnet MagicDNS URL",
+    "passed": 58,
+    "viewports": [
+      1365,
+      390
+    ],
+    "real_execution": false,
+    "page_errors": 0,
+    "overflow": false
+  },
+  "configuration_unchanged": true,
+  "preexisting_work_preserved": true,
+  "remaining": "Public internet / trusted TLS remain NOT_VERIFIED. Git publication and CI status are recorded separately.",
+  "acceptance_base_head": "18664549ff18c07c0b4ab2472abf5d2032f57977",
+  "grok_targeted_uat": {
+    "source": "USER_REPORTED_INDEPENDENT_GROK_TARGETED_UAT",
+    "received_date": "2026-09-30",
+    "evidence_scope": "TAILNET_QA",
+    "findings": {
+      "M1": "PASS",
+      "M2": "PASS",
+      "M3": "PASS",
+      "N1": "PASS",
+      "N2": "PASS",
+      "P1": "PASS"
+    },
+    "new_regression": "NONE",
+    "TARGETED_UAT": "PASS",
+    "raw_external_report_retrieved": false,
+    "limitation": "Result supplied explicitly by the user in this closeout request; no independent external report was fetched or fabricated."
+  }
+}

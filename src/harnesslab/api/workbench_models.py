@@ -225,6 +225,8 @@ class JudgeCalibrationSummary(WorkbenchModel):
 
 
 class JudgeCalibrationListResponse(WorkbenchModel):
+    evidence_scope: Literal["CURRENT_JUDGELAB_REGISTRY"] = "CURRENT_JUDGELAB_REGISTRY"
+    real_judge_smoke: Literal["VERIFIED", "NOT_RUN", "NOT_VERIFIED"]
     items: tuple[JudgeCalibrationSummary, ...]
     total: int
     limit: int
@@ -337,6 +339,7 @@ class ReadinessCheck(WorkbenchModel):
     label: str
     status: Literal["READY", "BLOCKED", "NOT_REPORTED", "NOT_VERIFIED"]
     evidence: str
+    evidence_scope: Literal["FROZEN_RELEASE_SNAPSHOT"] | None = None
     source_id: str | None = None
     snapshot: str | None = None
     generated_at: datetime | None = None

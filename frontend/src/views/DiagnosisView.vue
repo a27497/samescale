@@ -148,7 +148,7 @@ onMounted(async () => {
       <PageState v-if="error" kind="error">{{ error }}</PageState>
 
       <div v-if="crossCellPatterns.length" class="panel"><div class="panel-title"><h3>Failure patterns across cells</h3><span class="muted">Grouped by task, verifier signature, final workspace, trace and tool pattern; correlation only.</span></div><div class="diagnosis-pattern-grid"><article v-for="pattern in crossCellPatterns" :key="`${pattern.task}:${pattern.verifier}:${pattern.failure}`" class="panel"><strong>{{ pattern.failure }}</strong><p>{{ pattern.task }} · {{ pattern.verifier }}</p><small>{{ pattern.runs }} runs across {{ [...pattern.cells].join(', ') }}</small></article></div></div>
-      <PageState v-if="!report.failure_run_count" kind="empty">No failed runs in this experiment. Open a run to inspect its verified outcome, or choose another experiment.</PageState>
+      <PageState v-if="!report.failure_run_count" kind="empty">No failed runs in this experiment. <RouterLink class="table-link" :to="`/experiments/${encodeURIComponent(selectedExperiment)}?tab=runs`">Inspect experiment runs →</RouterLink> Or choose another experiment above.</PageState>
       <div class="diagnosis-tree">
         <details v-for="cell in report.cells" :key="cell.cell_id" open class="diagnosis-level diagnosis-cell">
           <summary><span>Experiment → Cell</span><strong>{{ cell.cell_id }}</strong></summary>

@@ -1,8 +1,18 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
 import { analystApi } from '@/api/analyst'
+import { useRoute } from 'vue-router'
+import PublicAnalystNotice from '@/components/PublicAnalystNotice.vue'
+import { useAnalystAccess } from '@/composables/analystAccess'
 import InvestigationReport from '@/components/InvestigationReport.vue'
 import type { InvestigationExample } from '@/types/analyst'
+const { access, loadAccess } = useAnalystAccess()
+const route = useRoute()
+function openRequestedExample() {
+  if (route.query.example === 'offline' || route.query.example === 'historical') void open(route.query.example)
+}
+onMounted(() => { void loadAccess(); openRequestedExample() })
+watch(() => route.query.example, openRequestedExample)
 const example = ref<InvestigationExample | null>(null)
 const busy = ref(false)
 const error = ref('')
@@ -40,10 +50,14 @@ async function open(kind: 'offline' | 'historical') {
         <p class="muted">读取冻结文件；不是当前会话，原数据库会话尚未恢复。</p>
         <button :disabled="busy" @click="open('historical')">查看历史真实记录</button></article>
       <article><span class="status-pill neutral">CURRENT SESSIONS</span><h3>调查已有工程证据</h3>
+        <PublicAnalystNotice v-if="access === 'public'" />
+        <p v-else-if="access === 'loading'" role="status">Checking workspace permissions…</p>
+        <p v-else-if="access === 'unavailable'" role="alert">Workspace permissions are unavailable. <button @click="loadAccess">Retry permissions</button></p>
+        <template v-else>
         <p>选择当前数据库中的实验，新建或恢复有界调查，保存并审阅回归方案。</p>
         <p class="muted">Fake 可无密钥演练持久化；Real 需配置、预算与逐步确认，无静默回退。</p>
         <RouterLink to="/analyst/sessions?backend=real" class="entry-link">进入 Real 调查</RouterLink>
-        <RouterLink to="/analyst/sessions" class="entry-link">Fake 与已保存会话</RouterLink></article>
+        <RouterLink to="/analyst/sessions" class="entry-link">Fake 与已保存会话</RouterLink></template></article>
     </div>
     <p v-if="busy" role="status" class="loading-state">{{ requestedKind === 'offline' ? '正在运行合成案例并校验事实…' : '正在核对冻结历史证据…' }}</p>
     <div v-if="error" role="alert" class="error-state"><p>{{ error }}</p><button @click="open(requestedKind)">重试加载</button></div>

@@ -1,0 +1,39 @@
+{
+  "backend_full": {
+    "status": "PASS",
+    "passed": 1722,
+    "reused": true
+  },
+  "frontend_full": {
+    "status": "PASS",
+    "passed": 99,
+    "rerun": true
+  },
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "ruff_check": "PASS",
+  "ruff_format": "PASS",
+  "mypy": "PASS",
+  "offline_regression": {
+    "status": "PASS",
+    "passed": 73,
+    "reused": true,
+    "provider_calls": 0
+  },
+  "evidence_integrity": "PASS",
+  "public_demo_gate": {
+    "status": "PASS",
+    "scope": "LOOPBACK",
+    "passed": 12,
+    "total": 12
+  },
+  "git_diff_check": "PASS",
+  "source_inventory_sha256": "sha256:6ae52cf31f3f8d29b7d288b8149f3be81029c4b54f56e11eaef49ec532bda653",
+  "raw_final_log_sha256": {
+    "frontend.txt": "sha256:d5233f5ae6e51e12f6965e8dde4bc497d45a7bf5cdf3578e4c2b1e9a73d9dee5",
+    "typecheck.txt": "sha256:7f3bd13661a182cd67dc1f3def9ebb510fedae4ad90554f5a38bd8fbd4f98dc2",
+    "build.txt": "sha256:82458c220929f1c7f429d1adf64a6b44dff9fe66144ba3ba0dc4b57258f32250",
+    "loopback-gate.json": "sha256:109034e1ab6baefdd9a39c537876b761bfeb930d3111a521ecfa60a333d48421"
+  },
+  "paid_calls": 0
+}

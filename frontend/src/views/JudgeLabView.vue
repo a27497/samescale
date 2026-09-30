@@ -4,20 +4,22 @@ import { onMounted, ref } from 'vue'
 
 import { workbenchApi } from '@/api/client'
 import StatusBadge from '@/components/StatusBadge.vue'
-import type { JudgeCalibrationSummary } from '@/types/workbench'
+import type { JudgeCalibrationSummary, JudgeCalibrationListResponse } from '@/types/workbench'
 
+const registry = ref<JudgeCalibrationListResponse | null>(null)
 const items = ref<JudgeCalibrationSummary[]>([])
 const loading = ref(true)
 const error = ref(false)
 onMounted(async () => {
-  try { items.value = (await workbenchApi.listCalibrations()).items }
+  try { registry.value = await workbenchApi.listCalibrations(); items.value = registry.value.items }
   catch { error.value = true } finally { loading.value = false }
 })
 </script>
 
 <template>
   <section>
-    <div class="page-heading"><div><h2>JudgeLab calibrations</h2><p>Suite-scoped qualification from saved Judge reports. Real Judge smoke has not run.</p></div><StatusBadge value="REAL_JUDGE_SMOKE=NOT_RUN" /></div>
+    <div class="page-heading"><div><h2>JudgeLab calibrations</h2><p>Current JudgeLab registry — suite-scoped qualification from saved reports.</p></div><StatusBadge v-if="registry" :value="`REAL_JUDGE_SMOKE=${registry.real_judge_smoke}`" /></div>
+    <div class="notice">The release snapshot and the current JudgeLab registry are different evidence scopes. <RouterLink class="table-link" to="/core-readiness">View frozen release snapshot →</RouterLink></div>
     <div class="notice">The phase-i-judge-keyless calibration is an offline fixture. A persisted report does not establish a real Judge model call.</div>
     <div class="panel">
       <PageState v-if="loading" kind="loading">Loading persisted Judge reports…</PageState>

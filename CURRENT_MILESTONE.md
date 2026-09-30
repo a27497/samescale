@@ -1,5 +1,25 @@
 # SameScale Product — Current Milestone
 
+## Final Git closeout — 2026-09-30
+
+User supplied the latest independent Grok targeted UAT: **PASS**.
+**M1/M2/M3/N1/N2/P1 CLOSED; NEW REGRESSION=NONE**. Product development has stopped.
+Public Demo **FIXTURE_OFFLINE / read-only**, identity `public-demo-20260930-9569db12e23a`.
+Offline Fake permits side-effect-free computation; persistent Analyst sessions are forbidden in
+Public Demo and remain available in local/private workspaces. Frozen release snapshot
+`REAL_JUDGE_SMOKE=VERIFIED`; current JudgeLab registry `NOT_RUN`: different evidence scopes.
+
+Backend full **1722 PASS** and offline regression **73 PASS** reused from unchanged source;
+frontend full **99 PASS**, typecheck, production build, full Ruff and mypy **PASS** during closeout.
+**Public Demo Gate PASS (12/12, Tailnet/loopback); Evidence integrity PASS (451 protected files unchanged)**.
+QA database 23 tables / 68 rows and Demo identities/digest unchanged during acceptance.
+**Tailnet QA verified** by user-supplied Grok UAT; **public internet / sslip.io / trusted TLS NOT_VERIFIED**.
+No paid model execution or deployment/network changes. [Closeout evidence](docs/evidence/uat-closeout-20260930/README.md).
+
+Git publication and branch/main CI are pending the authorized closeout sequence.
+SameScale Job Search Freeze completion will be recorded after successful integration.
+Older dated entries below retain their historical scope; latest acceptance above supersedes pending QA claims.
+
 ## Evidence Integrity / Public Demo Recovery — 2026-09-30
 
 Recovery completed with **ORIGINAL_NOT_FOUND**: 4,432 filesystem manifests, all 4,748
@@ -14,11 +34,22 @@ refuse protected databases, reject frozen-evidence writes/deletes and compare in
 Backend **1706/1706 PASS**, Frontend **87/87 PASS**, typecheck/build **PASS**, offline S3
 **73 PASS** and two replay passes. The full suite's **406 protected files BEFORE == AFTER**.
 Local Demo Gate **12/12 PASS**; desktop/mobile browser acceptance **38/38 PASS**. See
-[recovery evidence](docs/evidence/public-demo-recovery-20260930/README.md). Public production
-acceptance is pending; the existing dynamic-workbench URL is IP restricted with a self-signed
-certificate, while `getsamescale.com/demo/` belongs to a separate static showcase. No paid call
-or secret change. The authorized next action is scoped commit/push and startup-gated deployment,
-then production gate/browser acceptance; stop and report if production acceptance fails.
+[recovery evidence](docs/evidence/public-demo-recovery-20260930/README.md).
+
+Implementation commit `18664549ff18c07c0b4ab2472abf5d2032f57977` was pushed to
+`origin/codex/evidence-integrity-demo`; the remote SHA matches. The current workbench service
+was restarted with the new bundle, a mandatory startup integrity gate and execution/configuration
+writes disabled. Startup **PASS**, service **active/running**, deployed loopback gate **12/12 PASS**.
+The authorized public URL `https://samescale.34.81.153.182.sslip.io/demo` failed with
+**Connection refused**. Chromium at 1365px and 390px both failed with
+`net::ERR_CONNECTION_REFUSED`. All 12 public HTTP checks and the public journey are
+**NOT_VERIFIED**; TLS was not reached. **PUBLIC_DEMO_READY = false**.
+See [deployment receipt](docs/evidence/public-demo-recovery-20260930/deployment-public.json),
+[public gate](docs/evidence/public-demo-recovery-20260930/production-public.json), and
+[browser failure](docs/evidence/public-demo-recovery-20260930/deployment-public.json).
+Work stopped at the failed production acceptance as requested; no network/certificate/secret
+changes or paid calls. Post-deployment facts are retained in public-safe successor receipts during final Git closeout.
+`getsamescale.com/demo/` is a separate static showcase and was not deployed by this task.
 
 ## Trusted-evidence product closeout — 2026-09-29
 

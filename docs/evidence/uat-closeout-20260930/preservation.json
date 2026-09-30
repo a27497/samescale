@@ -1,0 +1,8 @@
+{
+  "protected-before.json == protected-after-tests.json": true,
+  "protected-before.json == protected-after-uat.json": true,
+  "live-db-before.json == live-db-after.json": true,
+  "demo-before.json == demo-after.json": true,
+  "serve-before.json == serve-after.json": true,
+  "configuration-before.json == configuration-after.json": true
+}

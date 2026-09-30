@@ -40,3 +40,14 @@ The incident arose because the QA seed imported test builders whose defaults use
 - [Browser](browser-local/acceptance.json): **38/38 PASS**, Chromium at 1365×900 and 390×844; new entry → experiment → failed run → diagnosis → regression → original verifier artifact. Refresh, browser Back, deep links, download/hash, actual old integrity failure, injected no-config state, and overflow/page errors are checked. Screenshots are in `browser-local/`.
 
 The deployment startup gate is `scripts/verify_public_demo_storage.py`; the HTTP gate is `scripts/public_demo_gate.py`. Production status is recorded in CURRENT_MILESTONE and the production acceptance artifacts after deployment. Local success does not establish public-network or TLS acceptance.
+
+## Production acceptance — preserved failure
+
+[Public deployment receipt](deployment-public.json): implementation commit `18664549ff18c07c0b4ab2472abf5d2032f57977`
+was pushed with matching remote SHA. Startup storage integrity and deployed loopback gate **12/12 PASS**.
+[Public HTTP gate](production-public.json): connection refused before any HTTP response; all 12
+checks **NOT_VERIFIED**. Normal-TLS desktop/mobile browser entry also returned `ERR_CONNECTION_REFUSED`.
+**PUBLIC_DEMO_READY=false** for public internet; trusted TLS and recruiter-network access remain
+**NOT_VERIFIED**. Raw operational receipts and duplicate failure screenshots are privately preserved;
+public successor receipts retain results and raw SHA256 references without internal connection details.
+The later [Tailnet QA](../tailnet-qa-20260930/README.md) PASS does not revise this public-internet failure.
