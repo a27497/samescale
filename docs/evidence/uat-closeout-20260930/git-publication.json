@@ -1,0 +1,54 @@
+{
+  "accepted_implementation_sha": "240a60f3c661c859f2f3d538da70a750dd77868f",
+  "feature_branch": "codex/evidence-integrity-demo",
+  "feature_remote_sha_verified": true,
+  "main_merge": "FAST_FORWARD",
+  "main_remote_sha_verified": true,
+  "ci": [
+    {
+      "conclusion": "success",
+      "databaseId": 36710675561,
+      "headBranch": "codex/evidence-integrity-demo",
+      "headSha": "240a60f3c661c859f2f3d538da70a750dd77868f",
+      "status": "completed",
+      "url": "https://github.com/a27497/samescale/actions/runs/36710675561",
+      "workflowName": "HarnessLab Fast CI"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 36710675560,
+      "headBranch": "codex/evidence-integrity-demo",
+      "headSha": "240a60f3c661c859f2f3d538da70a750dd77868f",
+      "status": "completed",
+      "url": "https://github.com/a27497/samescale/actions/runs/36710675560",
+      "workflowName": "SameScale Offline Regression"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 36711161875,
+      "headBranch": "main",
+      "headSha": "240a60f3c661c859f2f3d538da70a750dd77868f",
+      "status": "completed",
+      "url": "https://github.com/a27497/samescale/actions/runs/36711161875",
+      "workflowName": "HarnessLab Fast CI"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 36711161934,
+      "headBranch": "main",
+      "headSha": "240a60f3c661c859f2f3d538da70a750dd77868f",
+      "status": "completed",
+      "url": "https://github.com/a27497/samescale/actions/runs/36711161934",
+      "workflowName": "SameScale Offline Regression"
+    }
+  ],
+  "targeted_grok_uat": "PASS",
+  "new_regression": "NONE",
+  "public_demo_gate": "PASS",
+  "evidence_integrity": "PASS",
+  "Tailnet_QA": "VERIFIED_FOR_INTERNAL_UAT",
+  "public_internet": "NOT_VERIFIED",
+  "trusted_tls": "NOT_VERIFIED",
+  "job_search_freeze": "COMPLETE",
+  "following_commit_scope": "Documentation and audit receipts only; its final remote SHA and CI are checked after push."
+}

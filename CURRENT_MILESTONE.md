@@ -16,8 +16,11 @@ QA database 23 tables / 68 rows and Demo identities/digest unchanged during acce
 **Tailnet QA verified** by user-supplied Grok UAT; **public internet / sslip.io / trusted TLS NOT_VERIFIED**.
 No paid model execution or deployment/network changes. [Closeout evidence](docs/evidence/uat-closeout-20260930/README.md).
 
-Git publication and branch/main CI are pending the authorized closeout sequence.
-SameScale Job Search Freeze completion will be recorded after successful integration.
+Implementation commit `240a60f3c661c859f2f3d538da70a750dd77868f` was pushed to the feature branch
+and fast-forwarded into main; both remote SHAs matched. Fast CI and Offline Regression **PASS**
+on both the feature branch and main. [Git publication receipts](docs/evidence/uat-closeout-20260930/git-publication.json)
+and [per-file dirty-work audit](docs/evidence/uat-closeout-20260930/dirty-classification.json) preserve the closeout facts.
+**SameScale Job Search Freeze COMPLETE.** No further product development is authorized.
 Older dated entries below retain their historical scope; latest acceptance above supersedes pending QA claims.
 
 ## Evidence Integrity / Public Demo Recovery — 2026-09-30

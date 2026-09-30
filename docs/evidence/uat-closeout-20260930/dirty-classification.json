@@ -1,0 +1,774 @@
+{
+  "entry_head": "18664549ff18c07c0b4ab2472abf5d2032f57977",
+  "categories": {
+    "1": "UAT closeout necessary code / tests",
+    "2": "Product contract / milestone documentation",
+    "3": "Durable acceptance evidence",
+    "4": "Temporary / debug / non-public operational residue"
+  },
+  "files": [
+    {
+      "file": "CURRENT_MILESTONE.md",
+      "initial_state": "tracked",
+      "category": 2,
+      "disposition": "INCLUDED",
+      "reason": "Current product contract, milestone or authorization scope.",
+      "original_sha256": "a881f858142c661d6d356cc68addeb9fe6396223a496de186684c075b8bbfdb7"
+    },
+    {
+      "file": "PUBLIC_PRODUCT_CONTRACT.md",
+      "initial_state": "tracked",
+      "category": 2,
+      "disposition": "INCLUDED",
+      "reason": "Current product contract, milestone or authorization scope.",
+      "original_sha256": "f80517b2f34efb9e023a9707b89301d38de2f5c3f7fff085a0b2a667456fa008"
+    },
+    {
+      "file": "docs/PROJECT_BLUEPRINT.md",
+      "initial_state": "tracked",
+      "category": 2,
+      "disposition": "INCLUDED",
+      "reason": "Current product contract, milestone or authorization scope.",
+      "original_sha256": "504c16f078c665bcc746b808a44d60d7dcacb057328828d765d21404889ef0d7"
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/README.md",
+      "initial_state": "tracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "b3cc1c2bb930729418489ce6d616c5fcdc9df55de0feba88eaabd565ed7704ae"
+    },
+    {
+      "file": "frontend/src/App.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "7075e7434944222da48facaadd850532b9fe8fd157deaed10938a94c4f41fc4c"
+    },
+    {
+      "file": "frontend/src/api/analyst.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "43ad121534d9ad57d25da2ba8dee96c18f8e50109505f9ddc2d69d4d57ed90b1"
+    },
+    {
+      "file": "frontend/src/api/client.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "f0b2e26aa9eb98c96b9468e6021bf2567d1b9dd9bcd7dd86959a6f2f1a13581c"
+    },
+    {
+      "file": "frontend/src/components/LocalConnections.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "6905750c6f9790c3f7060cd63fda3a0e68249b36bea3b2910b7da844a5b8b964"
+    },
+    {
+      "file": "frontend/src/components/LocalHarnessConfigurations.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "5d0bec0c5b9d46c5f65c1f1c12f207ab97af3827524654511d9d8a6999f813a0"
+    },
+    {
+      "file": "frontend/src/components/LocalModelConfigurations.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "a783e44c16beda414006d297d1f35ed2b8b2c14ca6bcf7c40b0c4439ce5dd8b3"
+    },
+    {
+      "file": "frontend/src/composables/i18n.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "9eb011579321b40c290f82dc97d0c471e663c3b7159e3cf41fa49d2b89a6eff1"
+    },
+    {
+      "file": "frontend/src/router/index.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "96400d3951edf586addf7b5b4392325ad2b813702f14083da76db9253e11611d"
+    },
+    {
+      "file": "frontend/src/types/workbench.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "089f013ba2db19abf261945cac64d19331aa6ad26f6a36e0efce476c4a052896"
+    },
+    {
+      "file": "frontend/src/views/AnalystHomeView.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "242b66ee048ae24340aa7bf5a8f9ef73844bac2f30bba95106518f29068b28d7"
+    },
+    {
+      "file": "frontend/src/views/AnalystView.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "b60624872e1c7533392d6e6f0760547e6483b6030d8b547a6926ce60b5eedf84"
+    },
+    {
+      "file": "frontend/src/views/ConnectionsView.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "c8a411889800fe61f73dd786c0e770b5a09326e8d3c2b022471036ba701212d7"
+    },
+    {
+      "file": "frontend/src/views/CoreReadinessView.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "b3505f93189b2d1f3b924d10886033584daaa9ef6076a9e178f89b5d319f2208"
+    },
+    {
+      "file": "frontend/src/views/DiagnosisView.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "40b9e4879c840055fd8f027b9ca7714ef83c07fe6afb036921871cc37466882d"
+    },
+    {
+      "file": "frontend/src/views/ExperimentDetailView.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "910556c6c9b36032c27f82d629015c512f61c26fecb02a3b0a1d100658a4fe2e"
+    },
+    {
+      "file": "frontend/src/views/JudgeLabView.vue",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "7a9e2fd9055141f45d58e55a4b270772f4477cb3501e98480e2df0e40336873a"
+    },
+    {
+      "file": "frontend/tests/analyst-home.spec.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "91f783e8f54f895fe288b93dd6d4c8502892008c7bb4dc61a83a5c6ec6484a73"
+    },
+    {
+      "file": "frontend/tests/analyst.spec.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "befc690b7997c0a90787d23e80ec1ea803a5345bccc4412e1440ee18a9752abc"
+    },
+    {
+      "file": "frontend/tests/diagnosis.spec.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "74bb612814b1df8dd7f8225a801ee0efcef4b23e867a79610bb39332a5d0207d"
+    },
+    {
+      "file": "frontend/tests/local-configuration-entry.spec.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "fb2bfc2152cde945d9a915917f6100af9f54c3283301fe9e1a8037c7c45e369c"
+    },
+    {
+      "file": "frontend/tests/workbench.spec.ts",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "cb57d0f50e2e557d36312dc14cb464e1957a3a29154423b5d4038f718a321b21"
+    },
+    {
+      "file": "src/harnesslab/analyst/api.py",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "580a65d744ec2b140c363432c1d1832c7d3b825665e996022458a2db3b5e2e2f"
+    },
+    {
+      "file": "src/harnesslab/api/app.py",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "ea293864961b02ef8b4f73b90a1388c39943bb8a58fef9c58610d4843254d124"
+    },
+    {
+      "file": "src/harnesslab/api/workbench_models.py",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "82c4df0114c6758bf151e707a35a8243683ef91b663e6ed90e3031ce69fa46bd"
+    },
+    {
+      "file": "src/harnesslab/api/workbench_service.py",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "ca95550eec61e4d4a62e21a30212f8de2beddfaf3e916f143eda67f3ceffbaa4"
+    },
+    {
+      "file": "tests/test_analyst_sessions.py",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "ba25c28594b0a74d35f1196d50aca6784a2b6e51b0766a5b199ea8b8497817b9"
+    },
+    {
+      "file": "tests/test_evidence_integrity.py",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "33a780a4cff7be0b7425f07f9f4e93c06a8af87eb3a7c4a72e8e4490c5341d83"
+    },
+    {
+      "file": "tests/test_workbench_api.py",
+      "initial_state": "tracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "d35525433e06976c1b2bdd284585108d5e1fc50c917efa8fc5c19da9c063fa17"
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/browser-production/acceptance.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "1f8e02773b4f3f009e407e3c42e76abcfcd4cd6e7b966b50c7c7e74e50ac5fcd"
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/browser-production/desktop-entry.png",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "9f6cced83c0e2179bcb6e5c31827214115dc1ea9f52662fd3eb4ae42ed74c640"
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/browser-production/mobile-entry.png",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "a4d5db60ab18d8318093fbc0be5f9ec498f7bc9da1d13cc2a70cfcd437229772"
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/deployed-loopback-gate.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "5e424b47d388e4a4d277a1bc5ea18ebf12bc62049be378949cbea9d11e160605"
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/deployment.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "d9913ba4811bfe91ca3e425eb4b9f7f82f86549929c71b9d33b60fef65e5641e"
+    },
+    {
+      "file": "docs/evidence/public-demo-recovery-20260930/production-gate.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "ee6ce74613decb877ef4178de456da710dc735f57062dd46e1d820c3d57b738d"
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/README.md",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "1d951b8a18b128671045f30755c01d2c8404469b3f6b3d9e5a3cec37e0e2477f"
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/boundary.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "8b7973c0b5a7d9c6bef6e3028dcfb5096965a298c56dbb9b89e2c456b2842646"
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/handoff.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "d1c8365621fb24de7605cec1eccc48e4fed0fd0ce83adcd1f154a2976646ef89"
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/magicdns-gate.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "46018496b092a74b2cd33f40602c8b31712712a6496b167c08245a7e6b9feca2"
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/read-only.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "7b3818a58569ebe1e692d9371316c0fd3704406e02c1349f804a4ac9b082ed84"
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/serve-after.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "d2e7f4dd650c4a118acfc439158aa47d646045e0e5414208f11f0c0f4cb490c8"
+    },
+    {
+      "file": "docs/evidence/tailnet-qa-20260930/serve-before.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/README.md",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "a46098f3dba1e628989b2414a34b053f686fdc8747e4cc36e24400a2219c885f"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/backend-correction.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "82763a90c0af4591f9f3e117cf53b9603faf62aeb3c525607d714f69fcb32078"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/backend-focused.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "cefa4a22f69c231bc17db218941c5698834fef28284ba85b2cce77dc747b0ad5"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/backend-full.txt",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "7dc23f4092f6dcf86ef9dfb9984040e0a68fa07150a2d75d840ca9cf85fcbbe7"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/backend-full.xml",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "c5546e8def85af8229027b754c242afa3f1fe29a00a86375f709211098176641"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser-hidden-navigation-attempt.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "9a25a6181c04dc42c4f70fdbd855935b2ce897a6866b927fa6b11959fd14f70c"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser-selector-attempt.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "59cecfa119b0b2ba19f9497dc8a4b7fba9d1a5891a4916fb5f08a3c0874212f2"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser.mjs",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "678df1f1f1e043cd284a06971a1cbef3106a6ce93b0eed8420e741f46d58947d"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/acceptance.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "97138c94bbc677af38263d34891d809505ff6ac283d5c4a9366a063920e5d55c"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/desktop-comparability.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "d9d3511d6bf60bc378659b7949a92354605d719a21cdcb194458d672c17bcae9"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/desktop-connections.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "676e227282f2ea739481c6d89217a6784cd0a691cbeea0b2f2c638d5235f2f7d"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/desktop-diagnosis-empty.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "acd03cb1e33c2b7769e63a27059cba0068bf188d3ff13a5a023cc6becbe9fef5"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/desktop-historical.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "510d98d56bc777875204a5d110bdd15400ad5e4771c3a20297e796c54013f703"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/desktop-offline.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "ec6ff5c1ffd661b874f3d966a708cdf30fb194d0c7129666433deb22f1ca2ca7"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/desktop-public-sessions.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "b1f69b9340db89623cfb3f469e83cae71b7ed78091c025dd8c6bc6b6e298d7fc"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/desktop-registry-scope.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "fdd5881ce5906a254b8f2c4dcf2d978b683dd122b1015aa6e414c78ec16dee77"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/desktop-release-scope.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "4db580ab2120bce03efdea042c82e025e7e25996fc1026d3e3873eacdce45539"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/mobile-comparability.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "f96377e39c44c245c654081e94174bdbc82f6e3aeec5ab4e1b276c3da2082f04"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/mobile-connections.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "77dc8c4101c5476bb07add51c842ae0b06162c4ca05a4d91b5fcc13c89047046"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/mobile-diagnosis-empty.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "0dd4b8df4abadb75ef3810abee298aca979090819905a2a39e3e767beacb88c8"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/mobile-historical.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "bfa937e9ddce07f87998918c6c9d5d7a266e662e337e7b78e5e04e9392ab0d28"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/mobile-offline.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "237d76595fe57caf0cc2904c51c4ff254be8d533fabf2a1361d3ffafe09fadae"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/mobile-public-sessions.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "9064735e350ef4dabe581caf6480da60a3a0483d3c19912f11fae4b322009542"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/mobile-registry-scope.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "532ac1b71efdba5184e37a8652b84f74c4f565f1d32f6fbaea2d6fa0a15b8f8b"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/browser/mobile-release-scope.png",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "3069ec5af6ada37d27603c071c904005be063de11d7bf012e02953dbc69919f3"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/build.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "932344836695f2336d6c1434260bed60cc5b5cc272c5f077e156a31e3d7917a8"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/configuration-after.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "c98f709189852a3380f22a61ebf0067eabda46f7ccddb0dd910ff5d7107e0015"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/configuration-before.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "c98f709189852a3380f22a61ebf0067eabda46f7ccddb0dd910ff5d7107e0015"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/demo-after.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "002440fc958427896e642cc4eb3904e5977653017d0e502d15d3e331bdee2d85"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/demo-before.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "002440fc958427896e642cc4eb3904e5977653017d0e502d15d3e331bdee2d85"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/documentation-links.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "a3dbe7d7e9df6ab5ba4ac790c177f56d5b58c5045dcd184bc729e1a310e3a8f2"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/frontend.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "8764bf87301aeb64a99607f63a33f524dfe1ec797181c4ccced04a905883ca0c"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/integrity-suite.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "0cfebdf31adb84a0cdaf30f12d3062bcb278128d1e4dbf3413a47c67517b3d46"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/live-db-after.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "cee33e8d1f33b06e5f1bf5a31db3d6bb56849ed28f0be363515e8347783c7771"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/live-db-before.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "cee33e8d1f33b06e5f1bf5a31db3d6bb56849ed28f0be363515e8347783c7771"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/mypy.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "71144743c83babea384888a735db0c4daba3d4d7b7942b6839984bd5c21b52bb"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/offline-result.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "0089cfbf487fce7c185243bf8ce16b570fa448a5cf1247d30e61eb5fa0bff8f3"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/preexisting-status.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "56ca28c2685fd639617da82f1bcc6405fd2354587272ab3fd50d08431e2ba7cd"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/preservation.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "INCLUDED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "741ab4162f322a21dc2bbccfe266f2bc983851d76addbbeb44de1610c2b0ecf5"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/ruff.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/serve-after.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "d2e7f4dd650c4a118acfc439158aa47d646045e0e5414208f11f0c0f4cb490c8"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/serve-before.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "d2e7f4dd650c4a118acfc439158aa47d646045e0e5414208f11f0c0f4cb490c8"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/service-after-restart.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "06c562b64505761241777861aea40a998b8636a706f968a032df3d78ba549c9b"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/storage-before-restart.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "a2bd10b1ef2ebcafa353f204794dbf2c724137ca03c86b766121290fe31b5324"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/summary.json",
+      "initial_state": "untracked",
+      "category": 3,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Durable UAT, recovery or Tailnet acceptance; excluded raw forms have public successor projections where needed.",
+      "original_sha256": "30d5eae0599d7b22cd1850b3fa5004387aad7a112db6bcd5a34bb1a37dbd4dc9"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/tailnet-gate.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "964c88d9b531b77f6be36b198edea238b8b2b8478e36aa85e246dc949b51a49a"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/test-database-cleanup.json",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "584dca9db5ac3cbec4d43c9e4aefc53ca79cced2a784ee4c5acbf486762862e0"
+    },
+    {
+      "file": "docs/evidence/uat-closeout-20260930/typecheck.txt",
+      "initial_state": "untracked",
+      "category": 4,
+      "disposition": "EXCLUDED_RAW_PRIVATELY_ARCHIVED",
+      "reason": "Duplicate/temporary diagnostic output, internal configuration, operator paths or raw test output without additional public evidence value.",
+      "original_sha256": "7f3bd13661a182cd67dc1f3def9ebb510fedae4ad90554f5a38bd8fbd4f98dc2"
+    },
+    {
+      "file": "frontend/src/components/PublicAnalystNotice.vue",
+      "initial_state": "untracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "15bf00913e58758cc73ce64ba479ee2da87ff387da4b31a3d0f4de7f91376741"
+    },
+    {
+      "file": "frontend/src/composables/analystAccess.ts",
+      "initial_state": "untracked",
+      "category": 1,
+      "disposition": "INCLUDED",
+      "reason": "Bounded M1/M2/M3/N1/N2/P1 runtime contract or corresponding regression tests.",
+      "original_sha256": "48acd6a04d5cfd8555db9b0ad2c3032a210cd08932bbadde4f452d44575bcb72"
+    }
+  ],
+  "originals_preserved_outside_git": true,
+  "no_reset": true,
+  "no_unrelated_change": true
+}
