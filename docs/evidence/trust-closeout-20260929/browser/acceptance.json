@@ -1,0 +1,168 @@
+[
+  {
+    "device": "desktop",
+    "name": "experiment",
+    "url": "http://127.0.0.1:8069/experiments/phase-i-matrix-multi-task?tab=runs",
+    "scroll": 1365,
+    "viewport": 1365,
+    "overflow": false
+  },
+  {
+    "device": "desktop",
+    "check": "experiment provenance and deep link",
+    "pass": true
+  },
+  {
+    "device": "desktop",
+    "check": "failed run claim and verifier",
+    "pass": true,
+    "overflow": false
+  },
+  {
+    "device": "desktop",
+    "check": "diagnosis route and source",
+    "pass": true,
+    "overflow": false
+  },
+  {
+    "device": "desktop",
+    "check": "BadCases download",
+    "pass": true
+  },
+  {
+    "device": "desktop",
+    "name": "regression",
+    "url": "http://127.0.0.1:8069/regression?baseline=phase-i-matrix-multi-task&candidate=phase-i-matrix-candidate",
+    "scroll": 1365,
+    "viewport": 1365,
+    "overflow": false
+  },
+  {
+    "device": "desktop",
+    "check": "regression no false improvement",
+    "pass": true
+  },
+  {
+    "device": "desktop",
+    "name": "settings",
+    "url": "http://127.0.0.1:8069/settings",
+    "scroll": 1365,
+    "viewport": 1365,
+    "overflow": false
+  },
+  {
+    "device": "desktop",
+    "name": "providers",
+    "url": "http://127.0.0.1:8069/providers",
+    "scroll": 1365,
+    "viewport": 1365,
+    "overflow": false
+  },
+  {
+    "device": "desktop",
+    "check": "provider state",
+    "pass": true
+  },
+  {
+    "device": "desktop",
+    "name": "readiness",
+    "url": "http://127.0.0.1:8069/core-readiness",
+    "scroll": 1365,
+    "viewport": 1365,
+    "overflow": false
+  },
+  {
+    "device": "desktop",
+    "check": "readiness source and not ready",
+    "pass": true
+  },
+  {
+    "device": "desktop",
+    "check": "page script errors",
+    "errors": [],
+    "pass": true
+  },
+  {
+    "device": "mobile",
+    "name": "experiment",
+    "url": "http://127.0.0.1:8069/experiments/phase-i-matrix-multi-task?tab=runs",
+    "scroll": 390,
+    "viewport": 390,
+    "overflow": false
+  },
+  {
+    "device": "mobile",
+    "check": "experiment provenance and deep link",
+    "pass": true
+  },
+  {
+    "device": "mobile",
+    "check": "failed run claim and verifier",
+    "pass": true,
+    "overflow": false
+  },
+  {
+    "device": "mobile",
+    "check": "diagnosis route and source",
+    "pass": true,
+    "overflow": false
+  },
+  {
+    "device": "mobile",
+    "check": "BadCases download",
+    "pass": true
+  },
+  {
+    "device": "mobile",
+    "name": "regression",
+    "url": "http://127.0.0.1:8069/regression?baseline=phase-i-matrix-multi-task&candidate=phase-i-matrix-candidate",
+    "scroll": 390,
+    "viewport": 390,
+    "overflow": false
+  },
+  {
+    "device": "mobile",
+    "check": "regression no false improvement",
+    "pass": true
+  },
+  {
+    "device": "mobile",
+    "name": "settings",
+    "url": "http://127.0.0.1:8069/settings",
+    "scroll": 390,
+    "viewport": 390,
+    "overflow": false
+  },
+  {
+    "device": "mobile",
+    "name": "providers",
+    "url": "http://127.0.0.1:8069/providers",
+    "scroll": 390,
+    "viewport": 390,
+    "overflow": false
+  },
+  {
+    "device": "mobile",
+    "check": "provider state",
+    "pass": true
+  },
+  {
+    "device": "mobile",
+    "name": "readiness",
+    "url": "http://127.0.0.1:8069/core-readiness",
+    "scroll": 390,
+    "viewport": 390,
+    "overflow": false
+  },
+  {
+    "device": "mobile",
+    "check": "readiness source and not ready",
+    "pass": true
+  },
+  {
+    "device": "mobile",
+    "check": "page script errors",
+    "errors": [],
+    "pass": true
+  }
+]

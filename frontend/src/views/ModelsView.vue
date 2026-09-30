@@ -56,7 +56,7 @@ const enabledControlNames = (model: ModelDefinition) =>
         <details v-else class="profile-details">
           <summary>Provider profiles · {{ modelProfiles(model.model_id).length }} <small>路由与身份详情</small></summary>
           <div v-for="profile in modelProfiles(model.model_id)" :key="profile.profile_id" class="provider-profile">
-            <div class="provider-profile-head"><strong class="technical">{{ profile.profile_id }}</strong><StatusBadge :value="profile.enabled ? 'ENABLED' : 'DISABLED'" /></div>
+            <div class="provider-profile-head"><strong class="technical">{{ profile.profile_id }}</strong><StatusBadge :value="profile.enabled ? 'REGISTERED FOR PLANNING' : 'DISABLED'" /></div>
             <dl class="mini-definition-list">
               <dt>Provider / protocol</dt><dd>{{ profile.provider_id }} / {{ profile.protocol }}</dd>
               <dt>Requested model</dt><dd class="technical">{{ profile.requested_model }}</dd>

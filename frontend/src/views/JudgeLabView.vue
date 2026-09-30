@@ -17,7 +17,8 @@ onMounted(async () => {
 
 <template>
   <section>
-    <div class="page-heading"><div><h2>JudgeLab calibrations</h2><p>Suite-scoped qualification from persisted Phase H reports.</p></div><StatusBadge value="REAL_JUDGE_SMOKE=NOT_RUN" /></div>
+    <div class="page-heading"><div><h2>JudgeLab calibrations</h2><p>Suite-scoped qualification from saved Judge reports. Real Judge smoke has not run.</p></div><StatusBadge value="REAL_JUDGE_SMOKE=NOT_RUN" /></div>
+    <div class="notice">The phase-i-judge-keyless calibration is an offline fixture. A persisted report does not establish a real Judge model call.</div>
     <div class="panel">
       <PageState v-if="loading" kind="loading">Loading persisted Judge reports…</PageState>
       <PageState v-else-if="error" kind="error" reload>Judge calibration evidence is unavailable.</PageState>

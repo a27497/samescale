@@ -13,9 +13,11 @@ export interface EvidenceValue {
 }
 
 export interface ExperimentSummary {
+  integrity_status?: 'VERIFIED' | 'INTEGRITY_FAILED' | 'NOT_VERIFIED'
   experiment_id: string
   name: string
   status: string
+  provenance: 'FIXTURE_OFFLINE' | 'PERSISTED_EXECUTION_UNVERIFIED' | 'UNVERIFIED_SOURCE'
   plan_digest: string
   cell_count: number
   task_count: number
@@ -247,6 +249,7 @@ export interface RunSummary {
   lane: string
   repeat_index: number
   status: string
+  provenance: ExperimentSummary['provenance']
   normalized_outcome: string | null
   attempt: number
   duration_ms: EvidenceValue
@@ -358,6 +361,12 @@ export interface RegressionComparison {
   candidate_value: EvidenceValue
   delta: EvidenceValue
   direction: 'IMPROVED' | 'DECREASED' | 'UNCHANGED' | 'NOT_REPORTED'
+  overall_baseline_value: EvidenceValue
+  overall_candidate_value: EvidenceValue
+  overall_delta: EvidenceValue
+  common_baseline_value: EvidenceValue
+  common_candidate_value: EvidenceValue
+  eligible_paired_observations: number
   baseline_tier: string
   candidate_tier: string
   comparability: Comparability
@@ -375,6 +384,8 @@ export interface RegressionResponse {
   baseline_report_digest: string
   candidate_report_digest: string
   intent: RegressionIntent
+  baseline_provenance: string
+  candidate_provenance: string
   common_tasks: string[]
   comparisons: RegressionComparison[]
   limitation: string
@@ -385,6 +396,11 @@ export interface ReadinessCheck {
   label: string
   status: 'READY' | 'BLOCKED' | 'NOT_REPORTED' | 'NOT_VERIFIED'
   evidence: string
+  source_id: string | null
+  snapshot: string | null
+  generated_at: string | null
+  artifact_reference: string | null
+  source_route: string | null
 }
 
 export interface CoreReadiness {
@@ -482,5 +498,21 @@ export interface BadCaseExport {
   export_digest: string
   real_case_count: number
   synthetic_qualification_case_count: number
+  limitation: string
+  cases: Array<{ origin: string; [key: string]: unknown }>
+}
+
+export interface PublicDemo {
+  demo_id: string
+  generated_at: string
+  provenance: 'FIXTURE_OFFLINE'
+  public_demo_ready: boolean
+  baseline_id: string
+  candidate_id: string
+  failed_run_id: string
+  run_count: number
+  artifact_file_count: number
+  manifest_digest: string
+  historical_integrity_failures: string[]
   limitation: string
 }

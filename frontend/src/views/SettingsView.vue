@@ -47,9 +47,10 @@ onMounted(async () => {
         </div>
       </div>
       <div class="panel provider-settings-panel">
-        <div class="panel-title"><div><span class="panel-kicker">PROVIDERS</span><h3>Product availability</h3></div><RouterLink class="table-link" to="/providers">Inspect registry →</RouterLink></div>
+        <div class="panel-title"><div><span class="panel-kicker">PROVIDERS</span><h3>Planning registration</h3></div><RouterLink class="table-link" to="/providers">Inspect operational state →</RouterLink></div>
+        <div class="notice">Registered or enabled means selectable for planning. Execution also requires a present credential, a healthy runtime, and successful preflight.</div>
         <div class="provider-toggle-grid">
-          <div v-for="(enabled, provider) in settings.provider_enabled" :key="provider" class="provider-toggle-row"><span class="technical">{{ provider }}</span><StatusBadge :value="enabled ? 'ENABLED' : 'DISABLED'" /></div>
+          <div v-for="(enabled, provider) in settings.provider_enabled" :key="provider" class="provider-toggle-row"><span class="technical">{{ provider }}</span><StatusBadge :value="enabled ? 'REGISTERED FOR PLANNING' : 'DISABLED'" /></div>
         </div>
       </div>
     </template>

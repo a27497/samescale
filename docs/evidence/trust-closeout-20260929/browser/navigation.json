@@ -1,0 +1,18 @@
+[
+  {
+    "check": "Overview Diagnosis launchpad",
+    "pass": true
+  },
+  {
+    "check": "browser Back restores Runs tab",
+    "pass": true
+  },
+  {
+    "check": "Run Back to runs link",
+    "pass": true
+  },
+  {
+    "check": "manual Regression compare writes baseline/candidate/intent to URL",
+    "pass": true
+  }
+]

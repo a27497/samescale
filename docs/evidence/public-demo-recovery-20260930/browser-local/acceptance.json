@@ -1,0 +1,190 @@
+{
+  "base": "http://127.0.0.1:8069",
+  "checks": [
+    {
+      "name": "desktop default entry new identity",
+      "pass": true
+    },
+    {
+      "name": "desktop entry overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop experiment deep link",
+      "pass": true
+    },
+    {
+      "name": "desktop experiment overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop claim and verdict",
+      "pass": true
+    },
+    {
+      "name": "desktop failed-run overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop browser back",
+      "pass": true
+    },
+    {
+      "name": "desktop artifact download hash",
+      "pass": true
+    },
+    {
+      "name": "desktop diagnosis identity",
+      "pass": true
+    },
+    {
+      "name": "desktop diagnosis overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop regression identities",
+      "pass": true
+    },
+    {
+      "name": "desktop regression overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop regression refresh",
+      "pass": true
+    },
+    {
+      "name": "desktop artifact view",
+      "pass": true
+    },
+    {
+      "name": "desktop historical-integrity-failure overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop old failure remains",
+      "pass": true
+    },
+    {
+      "name": "desktop empty-demo overflow",
+      "pass": true,
+      "width": 1365,
+      "scroll": 1365
+    },
+    {
+      "name": "desktop empty state",
+      "pass": true,
+      "source": "browser-injected unavailable configuration"
+    },
+    {
+      "name": "desktop page errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "mobile default entry new identity",
+      "pass": true
+    },
+    {
+      "name": "mobile entry overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile experiment deep link",
+      "pass": true
+    },
+    {
+      "name": "mobile experiment overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile claim and verdict",
+      "pass": true
+    },
+    {
+      "name": "mobile failed-run overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile browser back",
+      "pass": true
+    },
+    {
+      "name": "mobile artifact download hash",
+      "pass": true
+    },
+    {
+      "name": "mobile diagnosis identity",
+      "pass": true
+    },
+    {
+      "name": "mobile diagnosis overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile regression identities",
+      "pass": true
+    },
+    {
+      "name": "mobile regression overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile regression refresh",
+      "pass": true
+    },
+    {
+      "name": "mobile artifact view",
+      "pass": true
+    },
+    {
+      "name": "mobile historical-integrity-failure overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile old failure remains",
+      "pass": true
+    },
+    {
+      "name": "mobile empty-demo overflow",
+      "pass": true,
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "name": "mobile empty state",
+      "pass": true,
+      "source": "browser-injected unavailable configuration"
+    },
+    {
+      "name": "mobile page errors",
+      "pass": true,
+      "errors": []
+    }
+  ],
+  "PASS": true
+}

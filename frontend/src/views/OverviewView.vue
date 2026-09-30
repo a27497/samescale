@@ -5,6 +5,7 @@ import { computed, onMounted, ref } from 'vue'
 import { workbenchApi } from '@/api/client'
 import StatusBadge from '@/components/StatusBadge.vue'
 import type { CoreReadiness, ExperimentSummary } from '@/types/workbench'
+import { experimentDisplayName } from '@/utils/evidenceCopy'
 
 const readiness = ref<CoreReadiness | null>(null)
 const experiments = ref<ExperimentSummary[]>([])
@@ -37,7 +38,7 @@ onMounted(async () => {
         <span class="eyebrow">EVIDENCE OPERATIONS</span>
         <h2>Controlled evaluation, from registry to trace.</h2>
         <p>
-          Plan keylessly, inspect authoritative run state, and keep capability outcomes separate
+          Plan keylessly, inspect saved run evidence, and keep capability outcomes separate
           from infrastructure recovery.
         </p>
         <div class="hero-actions">
@@ -85,10 +86,11 @@ onMounted(async () => {
           <PageState v-if="!experiments.length" kind="empty">No persisted experiments.</PageState>
           <div v-else class="responsive-table" role="region" aria-label="Recent experiments" tabindex="0">
             <table class="data-table">
-              <thead><tr><th>Experiment</th><th>Status</th><th>Matrix</th><th>Capability / Infra</th></tr></thead>
+              <thead><tr><th>Experiment</th><th>Source</th><th>Status</th><th>Matrix</th><th>Capability / Infra</th></tr></thead>
               <tbody>
                 <tr v-for="item in experiments" :key="item.experiment_id">
-                  <td><RouterLink class="table-link technical" :to="`/experiments/${item.experiment_id}`">{{ item.experiment_id }}</RouterLink><br><span class="muted">{{ item.name }}</span></td>
+                  <td><RouterLink class="table-link technical" :to="`/experiments/${item.experiment_id}`">{{ item.experiment_id }}</RouterLink><br><span class="muted">{{ experimentDisplayName(item.name, item.provenance) }}</span></td>
+                  <td><StatusBadge :value="item.provenance ?? 'UNVERIFIED_SOURCE'" /></td>
                   <td><StatusBadge :value="item.status" /></td>
                   <td>{{ item.task_count }} tasks × {{ item.cell_count }} cells</td>
                   <td>{{ item.completed_capability_count }} / {{ item.infra_count }}</td>
@@ -103,7 +105,8 @@ onMounted(async () => {
           <RouterLink to="/models"><span class="launch-mark">01</span><span><strong>Registry</strong><small>Models, providers, harnesses, compatibility</small></span><b>→</b></RouterLink>
           <RouterLink to="/experiments/new"><span class="launch-mark">02</span><span><strong>Experiment Builder</strong><small>Backend-validated planning, no execution</small></span><b>→</b></RouterLink>
           <RouterLink to="/run-control"><span class="launch-mark">03</span><span><strong>Run Control</strong><small>Lifecycle and recovery boundaries</small></span><b>→</b></RouterLink>
-          <RouterLink to="/regression"><span class="launch-mark">04</span><span><strong>Diagnosis</strong><small>Regression and comparative evidence</small></span><b>→</b></RouterLink>
+          <RouterLink to="/diagnosis"><span class="launch-mark">04</span><span><strong>Diagnosis</strong><small>Inspect verified failure evidence</small></span><b>→</b></RouterLink>
+          <RouterLink to="/regression"><span class="launch-mark">05</span><span><strong>Regression</strong><small>Compare eligible common tasks</small></span><b>→</b></RouterLink>
         </aside>
       </div>
     </template>

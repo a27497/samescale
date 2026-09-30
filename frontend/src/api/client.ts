@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import type {
   CoreReadiness,
+  PublicDemo,
   BadCaseExport,
   DiagnosisReport,
   ExperimentDetail,
@@ -38,6 +39,7 @@ export const apiClient = axios.create({
 })
 
 export const workbenchApi = {
+  getPublicDemo: async () => (await apiClient.get<PublicDemo>('/public-demo')).data,
   listExperiments: async (params: Record<string, string | number | undefined> = {}) =>
     (await apiClient.get<ExperimentListResponse>('/experiments', { params })).data,
   getExperiment: async (id: string) =>

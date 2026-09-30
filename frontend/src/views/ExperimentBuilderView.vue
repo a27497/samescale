@@ -114,7 +114,8 @@ async function freezeSnapshot() {
 
 <template>
   <section>
-    <div class="page-heading"><div><h2>Experiment Builder Lite</h2><p>Methodology v2 authoritative planning only — no provider call and no run creation.</p></div><StatusBadge :value="preflight?.status ?? 'NOT_REPORTED'" /></div>
+    <div class="page-heading"><div><h2>Experiment Builder</h2><p>Server validated planning only. No Provider call or run creation occurs here.</p></div><StatusBadge :value="preflight?.status ?? 'NOT_REPORTED'" /></div>
+    <div class="notice">A registered profile is selectable for planning; execution readiness also requires a credential, healthy runtime and successful preflight. Inspect <RouterLink to="/providers">Provider operational state</RouterLink> before execution.</div>
     <button class="secondary-button" :disabled="loading || busy" @click="load">Reload planning configuration</button>
     <PageState v-if="loading" kind="loading">Loading Registry contracts…</PageState>
     <div v-else class="builder-layout">

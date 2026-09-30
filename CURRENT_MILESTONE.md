@@ -1,5 +1,48 @@
 # SameScale Product — Current Milestone
 
+## Evidence Integrity / Public Demo Recovery — 2026-09-30
+
+Recovery completed with **ORIGINAL_NOT_FOUND**: 4,432 filesystem manifests, all 4,748
+reachable Git blobs, existing archives/worktrees and runner candidates yielded no original
+QA digest match. The old 36 QA identities/digests remain unchanged and fail with HTTP 409.
+A new read-only fixture/offline bundle `public-demo-20260930-9569db12e23a` contains 12 new
+Runs and 108 artifact files, stored outside the repository/test workspace with a complete
+hash inventory and a separate byte-preserving backup. The default `/demo` journey uses
+these new identities. Legacy seeding is retired; tests require explicit temporary roots,
+refuse protected databases, reject frozen-evidence writes/deletes and compare inventories.
+
+Backend **1706/1706 PASS**, Frontend **87/87 PASS**, typecheck/build **PASS**, offline S3
+**73 PASS** and two replay passes. The full suite's **406 protected files BEFORE == AFTER**.
+Local Demo Gate **12/12 PASS**; desktop/mobile browser acceptance **38/38 PASS**. See
+[recovery evidence](docs/evidence/public-demo-recovery-20260930/README.md). Public production
+acceptance is pending; the existing dynamic-workbench URL is IP restricted with a self-signed
+certificate, while `getsamescale.com/demo/` belongs to a separate static showcase. No paid call
+or secret change. The authorized next action is scoped commit/push and startup-gated deployment,
+then production gate/browser acceptance; stop and report if production acceptance fails.
+
+## Trusted-evidence product closeout — 2026-09-29
+
+Started from `8ad71d87fc0977fff008c956165d877d2f9c0b83` on `main` with a clean
+worktree. The requested regression, provenance, diagnosis, failed-run, readiness,
+provider, navigation, and responsive UI corrections are implemented but uncommitted.
+The full backend suite passed **1696/1696** on an isolated migrated PostgreSQL test
+database; focused diagnosis/API tests passed **43/43**. Frontend tests passed
+**83/83**, TypeScript and production build passed, and the offline S3 gate passed
+**73 tests** with two replay passes and no external calls. Local Chromium acceptance
+covered desktop and mobile workflows, empty/error states, downloads, navigation,
+page errors, and overflow; see [closeout evidence](docs/evidence/trust-closeout-20260929/README.md).
+
+**Public-demo blocker:** the pre-existing workbench API test fixture deleted the shared
+QA artifact directory during the first focused test. QA's 36 saved manifest digests and
+database records remain unchanged, but original artifact bytes could not be recovered
+locally. Regenerated scratch artifacts have different digests and were not substituted.
+The QA experiment-detail endpoint now fails integrity validation with HTTP 409. The
+test fixture has been isolated to temporary artifact/runtime paths. The QA instance
+must not be presented as a working public demo until a trusted backup restores the
+original artifacts or a separately authorized new QA dataset/instance is created.
+Local browser acceptance does not verify user-network access, real Provider execution,
+or the existing QA deployment. No commit, push, deployment, or paid call was made.
+
 ## Tailscale black-box QA handoff — 2026-09-29
 
 This handoff packages the completed UI usability work and starts a separate keyless QA

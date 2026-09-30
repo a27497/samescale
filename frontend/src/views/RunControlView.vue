@@ -99,7 +99,7 @@ onMounted(async () => {
 
     <div class="control-banner">
       <span class="control-banner-mark">RC</span>
-      <div><strong>Authoritative lifecycle only</strong><p>Refresh reads persisted backend state. No provider request is triggered by opening or refreshing this page.</p></div>
+      <div><strong>Saved lifecycle state</strong><p>Refresh reads persisted backend state. No provider request is triggered by opening or refreshing this page.</p></div>
       <span class="status-pill neutral">NO RETRY-ALL</span>
     </div>
 
@@ -112,18 +112,19 @@ onMounted(async () => {
             <option v-if="!experiments.length" value="">No experiments reported</option>
             <option v-else-if="selectedExperimentId && !selectedIsListed" :value="selectedExperimentId">{{ selectedExperimentId }} · direct link</option>
             <option v-for="item in experiments" :key="item.experiment_id" :value="item.experiment_id">
-              {{ item.name }} · {{ item.experiment_id }}
+              {{ item.name }} · {{ item.experiment_id }} · {{ item.provenance ?? 'UNVERIFIED_SOURCE' }}
             </option>
           </select>
         </label>
         <button class="secondary-button" :disabled="refreshing || !selectedExperimentId" @click="loadSelected(false)">
-          {{ refreshing ? 'Refreshing…' : 'Refresh authoritative state' }}
+          {{ refreshing ? 'Refreshing…' : 'Refresh saved state' }}
         </button>
         <RouterLink v-if="selectedExperimentId" class="table-link" :to="`/experiments/${selectedExperimentId}`">Open experiment evidence →</RouterLink>
       </div>
 
       <PageState v-if="error" kind="error">{{ error }}</PageState>
       <template v-else-if="selectedExperimentId">
+        <div class="notice">Provider registration alone does not mean ready to execute. Check credential presence, runtime health and preflight in Settings and Providers. Saved fixture runs are labeled by source below.</div>
         <div class="metric-grid">
           <div class="metric-card accent"><div class="label">Lifecycle</div><div class="value compact-value">{{ status?.status ?? 'NOT_REPORTED' }}</div><div class="detail">{{ status?.terminal ? 'Durable terminal state' : 'May still change' }}</div></div>
           <div class="metric-card"><div class="label">Reported runs</div><div class="value">{{ runs.length }}</div><div class="detail">First 100 persisted logical runs</div></div>
@@ -152,11 +153,12 @@ onMounted(async () => {
           <PageState v-if="!visibleRuns.length" kind="empty">No runs match this lifecycle class.</PageState>
           <div v-else class="responsive-table" role="region" aria-label="Run lifecycle" tabindex="0">
             <table class="data-table run-control-table">
-              <thead><tr><th>Run identity</th><th>Slot</th><th>Status / outcome</th><th>Control boundary</th><th>Evidence</th></tr></thead>
+              <thead><tr><th>Run identity</th><th>Slot</th><th>Source</th><th>Status / outcome</th><th>Control boundary</th><th>Evidence</th></tr></thead>
               <tbody>
                 <tr v-for="run in visibleRuns" :key="run.run_id">
                   <td><strong class="technical">{{ run.run_id }}</strong><div class="muted">attempt {{ run.attempt }}</div></td>
                   <td>{{ run.cell_id }} · {{ run.task_id }}<div class="technical muted">repeat={{ run.repeat_index }} · lane={{ run.lane }}</div></td>
+                  <td><StatusBadge :value="run.provenance ?? 'UNVERIFIED_SOURCE'" /></td>
                   <td><StatusBadge :value="run.status" /> <StatusBadge :value="run.normalized_outcome ?? 'NOT_REPORTED'" /></td>
                   <td><span class="status-pill" :class="outcomeClass(run) === 'INFRASTRUCTURE' ? 'warn' : 'neutral'">{{ controlLabel(run) }}</span><div class="boundary-note">{{ outcomeClass(run) === 'INFRASTRUCTURE' ? 'Preserve exact treatment; review explicit recovery.' : outcomeClass(run) === 'CAPABILITY_TERMINAL' ? 'Recorded evidence; no semantic retry.' : 'Observe backend lifecycle state.' }}</div></td>
                   <td><RouterLink class="table-link" :to="`/runs/${run.run_id}`">Diagnosis & trace →</RouterLink></td>

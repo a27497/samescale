@@ -1,0 +1,1 @@
+{"schema_version":1,"passed":false,"score":0.3333333333333333,"checks":[{"name":"lower-bound","passed":true,"score":1.0},{"name":"upper-bound","passed":false,"score":0.0},{"name":"in-range","passed":false,"score":0.0}],"summary":"deterministic TypeScript clamp cases"}

@@ -80,10 +80,16 @@ export const useExperimentStore = defineStore('experiments', {
         this.modelComparison = modelComparison
         this.runs = runs.items
         return true
-      } catch {
+      } catch (error) {
         if (!isCurrent()) return false
+        this.selected = null
+        this.matrix = null
+        this.runs = []
         this.modelComparison = null
-        this.error = 'Persisted experiment evidence could not be verified.'
+        const code = (error as { response?: { data?: { error?: { code?: string } } } })?.response?.data?.error?.code
+        this.error = code === 'ARTIFACT_INTEGRITY_ERROR'
+          ? `${id.startsWith('phase-i-matrix-') ? 'HISTORICAL EVIDENCE' : 'EVIDENCE'} — ARTIFACT INTEGRITY FAILED. The original record remains preserved; replacement evidence was not used.`
+          : 'Persisted experiment evidence could not be verified.'
         return false
       } finally {
         if (isCurrent()) this.loading = false

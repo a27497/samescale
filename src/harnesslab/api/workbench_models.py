@@ -54,6 +54,8 @@ class ExperimentSummary(WorkbenchModel):
     experiment_id: str
     name: str
     status: str
+    provenance: Literal["FIXTURE_OFFLINE", "PERSISTED_EXECUTION_UNVERIFIED", "UNVERIFIED_SOURCE"]
+    integrity_status: Literal["VERIFIED", "INTEGRITY_FAILED", "NOT_VERIFIED"] = "NOT_VERIFIED"
     plan_digest: str
     cell_count: int
     task_count: int
@@ -158,6 +160,7 @@ class RunSummary(WorkbenchModel):
     lane: str
     repeat_index: int
     status: str
+    provenance: Literal["FIXTURE_OFFLINE", "PERSISTED_EXECUTION_UNVERIFIED", "UNVERIFIED_SOURCE"]
     normalized_outcome: str | None
     attempt: int
     duration_ms: IntegerEvidence
@@ -287,6 +290,12 @@ class RegressionCellComparison(WorkbenchModel):
     candidate_value: NumericEvidence
     delta: NumericEvidence
     direction: Literal["IMPROVED", "DECREASED", "UNCHANGED", "NOT_REPORTED"]
+    overall_baseline_value: NumericEvidence
+    overall_candidate_value: NumericEvidence
+    overall_delta: NumericEvidence
+    common_baseline_value: NumericEvidence
+    common_candidate_value: NumericEvidence
+    eligible_paired_observations: int
     baseline_tier: str
     candidate_tier: str
     comparability: ComparabilityValue
@@ -294,6 +303,18 @@ class RegressionCellComparison(WorkbenchModel):
     paired_observations: int
     baseline_infra_count: int
     candidate_infra_count: int
+
+    @model_validator(mode="after")
+    def direction_requires_comparable_pairs(self) -> RegressionCellComparison:
+        if self.eligible_paired_observations > self.paired_observations:
+            raise ValueError("eligible pairs cannot exceed all paired observations")
+        if self.comparability != "COMPARABLE" and (
+            self.direction != "NOT_REPORTED" or self.delta.status != "NOT_REPORTED"
+        ):
+            raise ValueError("ineligible comparison cannot report a direction or delta")
+        if self.direction != "NOT_REPORTED" and self.eligible_paired_observations == 0:
+            raise ValueError("direction requires comparable paired observations")
+        return self
 
 
 class RegressionCompareResponse(WorkbenchModel):
@@ -304,6 +325,8 @@ class RegressionCompareResponse(WorkbenchModel):
     baseline_report_digest: str
     candidate_report_digest: str
     intent: ComparabilityIntent
+    baseline_provenance: str
+    candidate_provenance: str
     common_tasks: tuple[str, ...]
     comparisons: tuple[RegressionCellComparison, ...]
     limitation: str
@@ -314,6 +337,11 @@ class ReadinessCheck(WorkbenchModel):
     label: str
     status: Literal["READY", "BLOCKED", "NOT_REPORTED", "NOT_VERIFIED"]
     evidence: str
+    source_id: str | None = None
+    snapshot: str | None = None
+    generated_at: datetime | None = None
+    artifact_reference: str | None = None
+    source_route: str | None = None
 
 
 class CoreReadinessResponse(WorkbenchModel):

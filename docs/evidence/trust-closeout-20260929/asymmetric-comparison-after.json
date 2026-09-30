@@ -1,0 +1,44 @@
+{
+  "comparability": "NOT_COMPARABLE",
+  "reason_codes": [
+    "INTENDED_TREATMENT_DIFFERENCE",
+    "OBSERVED_MODEL_MISSING",
+    "RESOURCE_ENVELOPE_MISSING"
+  ],
+  "paired_observations": 3,
+  "eligible_paired_observations": 0,
+  "common_baseline_value": {
+    "status": "REPORTED",
+    "value": 1.0
+  },
+  "common_candidate_value": {
+    "status": "REPORTED",
+    "value": 1.0
+  },
+  "baseline_value": {
+    "status": "NOT_REPORTED",
+    "value": null
+  },
+  "candidate_value": {
+    "status": "NOT_REPORTED",
+    "value": null
+  },
+  "overall_baseline_value": {
+    "status": "REPORTED",
+    "value": 0.5
+  },
+  "overall_candidate_value": {
+    "status": "REPORTED",
+    "value": 1.0
+  },
+  "delta": {
+    "status": "NOT_REPORTED",
+    "value": null
+  },
+  "direction": "NOT_REPORTED",
+  "common_tasks": [
+    "micro-python-clamp"
+  ],
+  "baseline_provenance": "FIXTURE_OFFLINE",
+  "candidate_provenance": "FIXTURE_OFFLINE"
+}

@@ -7,6 +7,7 @@ import DiagnosisView from '@/views/DiagnosisView.vue'
 const api = vi.hoisted(() => ({
   listExperiments: vi.fn(),
   getDiagnosis: vi.fn(),
+  getExperiment: vi.fn(),
   exportBadCases: vi.fn(),
 }))
 
@@ -62,6 +63,7 @@ beforeEach(() => {
   api.exportBadCases.mockResolvedValue({
     experiment_id: 'diagnosis-fixture', export_digest: `sha256:${'5'.repeat(64)}`,
     real_case_count: 1, synthetic_qualification_case_count: 0,
+    cases: [{ run_id: 'fixture-run', origin: 'IMMUTABLE_EXPERIMENT' }],
     limitation: 'Real BadCases require verified immutable evidence; synthetic qualification cases are labeled and never counted as real BadCases.',
   })
 })
@@ -83,7 +85,7 @@ describe('Diagnosis Workbench', () => {
     expect(text).toContain('targeted-bug-fix')
     expect(text).toContain('Test Failure')
     expect(text).toContain('Trace')
-    expect(text).toContain('Workspace diff')
+    expect(text).toContain('Final workspace diff')
     expect(text).toContain('Tool calls')
     expect(text).toContain('Verifier')
     expect(text).toContain('VERIFIED_FACT')
@@ -93,13 +95,32 @@ describe('Diagnosis Workbench', () => {
   })
 
   it('exports only backend-selected real BadCases', async () => {
+    const createObjectURL = vi.fn(() => 'blob:fixture')
+    const revokeObjectURL = vi.fn()
+    Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: createObjectURL })
+    Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: revokeObjectURL })
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
     const wrapper = mount(DiagnosisView, { global: { plugins: [router] } })
     await flushPromises()
     await wrapper.get('button.primary-button').trigger('click')
     await flushPromises()
 
     expect(api.exportBadCases).toHaveBeenCalledWith('diagnosis-fixture')
-    expect(wrapper.text()).toContain('Exported 1 real BadCases and 0 synthetic cases')
-    expect(wrapper.text()).toContain('never counted as real BadCases')
+    expect(createObjectURL).toHaveBeenCalledOnce()
+    expect(click).toHaveBeenCalledOnce()
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:fixture')
+    expect(wrapper.text()).toContain('Downloaded 1 persisted BadCases and 0 synthetic qualification cases')
+    expect(wrapper.text()).toContain('a persisted case is not automatically a real Provider run')
+    click.mockRestore()
+  })
+
+  it('loads a linked experiment outside the first list page', async () => {
+    api.getExperiment.mockResolvedValue({ experiment_id: 'outside-first-page', name: 'Older run', provenance: 'FIXTURE_OFFLINE' })
+    await router.push('/diagnosis?experiment=outside-first-page')
+    const wrapper = mount(DiagnosisView, { global: { plugins: [router] } })
+    await flushPromises()
+    expect(api.getExperiment).toHaveBeenCalledWith('outside-first-page')
+    expect(api.getDiagnosis).toHaveBeenCalledWith('outside-first-page')
+    expect(wrapper.text()).toContain('FIXTURE_OFFLINE')
   })
 })

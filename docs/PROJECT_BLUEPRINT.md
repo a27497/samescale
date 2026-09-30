@@ -1,5 +1,13 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：Evidence Integrity / Public Demo Recovery（2026-09-30）
+
+只读查找原 QA artifact 并逐字节比对原 digest；找不到则保留旧身份与 integrity failure，
+创建独立的新 fixture/offline Public Demo 身份。消除共享测试目录默认值，保护冻结与 Demo
+evidence，加入运行时完整性校验和部署前/生产 Demo gate。通过全量测试、离线 replay、
+桌面/手机浏览器与本地 gate 后，授权提交上一轮 trust closeout 和本轮恢复修改、push、
+部署当前实例；生产 gate 或浏览器失败时停止且不得宣称 ready。不新增付费调用或普通 UI 功能。
+
 ## 当前授权：Phase S4 — Recruiter Demo + Job-search Freeze（2026-09-21）
 
 复用 S1–S3 真实历史 evidence、既有 Offline Replay/CI 和单文件离线 HTML 模式，交付

@@ -1,5 +1,40 @@
 # SameScale Product — Public Product Contract
 
+## Public demo integrity — 2026-09-30
+
+An explicitly configured `/demo` selects the new `FIXTURE_OFFLINE` bundle and saved run identities.
+The configured manifest digest, complete file inventory, database identities, verifier verdicts,
+Diagnosis and Regression references must verify before the demo can report ready. Missing/hash/
+identity failure returns HTTP 409 with no substitute file or regenerated evidence. Public browsing
+requires no Provider credential; configuration and execution writes are disabled. The verifier
+artifact endpoint serves only allowlisted, digest-checked fixture stdout, never private native
+transcripts. Historical QA integrity failures retain their original records/digests and are labeled
+as unavailable, outside the default journey. Public access requires a separate production gate;
+local acceptance alone does not establish a ready public deployment.
+
+## Evidence trust boundary — 2026-09-29
+
+The evaluation UI identifies known keyless Fake/fixture experiments as `FIXTURE_OFFLINE` on
+experiment, run, diagnosis, and regression surfaces. A persisted `IMMUTABLE_EXPERIMENT` run is a
+database/evidence identity, not proof of a real Provider or model call. Provider execution records
+remain distinct from frozen historical release evidence, which is outside the current experiment
+registry. Other saved execution records remain source-unverified unless provenance is established;
+the original record name and bytes remain unchanged; an offline fixture is never presented
+as a live model benchmark.
+
+Regression direction uses comparable paired capability observations from common task/repeat slots.
+The UI separately presents common-task raw rates and each report's overall raw rate. A
+`NOT_COMPARABLE` or `PARTIALLY_COMPARABLE` comparison does not declare improvement or regression.
+Direction remains descriptive and never establishes causality or significance by itself.
+
+`FILE_CHANGE` reports a trace event; `No Modification` reports no persisted final workspace change.
+The UI describes both when observed. Agent success statements remain separate from the independent
+verifier. Downloads contain safe normalized API projections, not hidden native reasoning or private
+artifact paths. Core Readiness remains `NOT_READY` while any required check is unresolved. Its READY
+rows cite the frozen source identity/version and available timestamp; QA fixture counts do not revise
+frozen V6 records. Provider registration, credential presence, runtime health and execution preflight
+are separate states.
+
 ## Recruiter Demo — Phase S4 冻结范围（2026-09-21）
 
 `docs/recruiter/demo/index.html` 是从 S1–S3 已保存证据导出的只读分享页，不是实时运行界面。

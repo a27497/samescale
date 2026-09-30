@@ -25,6 +25,7 @@ onMounted(async () => {
     <PageState v-if="loading" kind="loading">Loading verified Judge report…</PageState>
     <PageState v-else-if="error || !detail" kind="error" reload>Judge report is unavailable or failed digest verification.</PageState>
     <template v-else>
+      <div v-if="id.startsWith('phase-i-judge-keyless')" class="notice">Offline Fake Judge fixture. No real Judge model call was made.</div>
       <div class="notice">QUALIFIED_FOR_SUITE applies only to {{ detail.suite_id }}@{{ detail.suite_version }}. It is not universal Judge reliability.</div>
       <div v-for="cell in detail.cells" :key="cell.judge_cell_id" class="panel">
         <div class="panel-title"><div><h3>{{ cell.judge_cell_id }}</h3><span class="muted">{{ cell.requested_judge_model }}</span></div><StatusBadge :value="cell.qualification" /></div>

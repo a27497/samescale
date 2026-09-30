@@ -1,0 +1,16 @@
+{
+  "original_record_count": 36,
+  "records_unchanged": true,
+  "original_digest_matches_found": 0,
+  "new_demo": {
+    "demo_id": "public-demo-20260930-9569db12e23a",
+    "manifest": "/home/dev/.local/share/samescale/public-demo/recovery-20260930/public-demo.json",
+    "manifest_digest": "sha256:593a54eff3ef0f89212d3097ea3d1f3349d1b7b085f618d2ca8f9805746171d7",
+    "runs": 12,
+    "files": 108
+  },
+  "generation_source_hashes": {
+    "scripts/seed_public_demo.py": "sha256:dbf9b59278718a405e97098a8b3b2aa4cf668fe8147ba24604fe599d2a595e50",
+    "src/harnesslab/demo/fixtures.py": "sha256:c87d701d65ff21264dad2b7a1c17a59441ebb2da8a0f7cc287e7706637f321c4"
+  }
+}

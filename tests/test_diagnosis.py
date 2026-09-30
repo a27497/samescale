@@ -205,6 +205,11 @@ def test_controlled_ablation_strengthens_association_without_claiming_causality(
         ),
         verified_ablation_contrast_run_ids=frozenset({"variant"}),
     )
+    # Cell identity is navigation context; identical task/verifier/workspace/trace
+    # signatures retain one diagnostic pattern identity across cells.
+    assert report.cells[0].task_families[0].clusters[0].cluster_id == (
+        report.cells[1].task_families[0].clusters[0].cluster_id
+    )
 
     hypotheses = [
         attribution
@@ -218,7 +223,8 @@ def test_controlled_ablation_strengthens_association_without_claiming_causality(
     assert hypotheses
     by_statement = {item.statement: item for item in hypotheses}
     strengthened = by_statement[
-        "The failure pattern is associated with a preregistered controlled-ablation pair."
+        "Review the preregistered ablation contrast and its verifier outcomes "
+        "before attributing this failure."
     ]
     assert strengthened.causal_strength is CausalStrength.CONTROLLED_ABLATION_ASSOCIATION
     assert "does not by itself prove causality" in (strengthened.caveat or "")

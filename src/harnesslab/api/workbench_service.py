@@ -95,6 +95,18 @@ def numeric(value: object) -> NumericEvidence:
     return NumericEvidence(status="NOT_REPORTED", value=None)
 
 
+def _paired_pass_rate(
+    by_slot: dict[tuple[str, int], Any], eligible_slots: tuple[tuple[str, int], ...]
+) -> NumericEvidence:
+    if not eligible_slots:
+        return numeric(None)
+    passed = sum(
+        by_slot[slot].observation.outcome is StatisticalOutcome.CAPABILITY_PASS
+        for slot in eligible_slots
+    )
+    return numeric(passed / len(eligible_slots))
+
+
 def integer(value: object) -> IntegerEvidence:
     if isinstance(value, int) and not isinstance(value, bool):
         return IntegerEvidence(status="REPORTED", value=value)
@@ -109,6 +121,20 @@ def _comparability_value(value: str) -> ComparabilityValue:
     if value == "NOT_COMPARABLE":
         return "NOT_COMPARABLE"
     raise WorkbenchAPIError(409, "ARTIFACT_INTEGRITY_ERROR", "invalid comparability value")
+
+
+def _provenance(
+    *, experiment_id: str, models: tuple[str, ...], routes: tuple[str, ...], executed: bool = False
+) -> str:
+    """Expose known offline fixtures without treating persistence as provider authenticity."""
+    if experiment_id.startswith("phase-i-matrix-") or any(
+        value.lower().startswith("fake-") or "fake.invalid" in value.lower()
+        for value in (*models, *routes)
+    ):
+        return "FIXTURE_OFFLINE"
+    if executed and models and routes and all(models) and all(routes):
+        return "PERSISTED_EXECUTION_UNVERIFIED"
+    return "UNVERIFIED_SOURCE"
 
 
 def _plan(record: ExperimentRecord) -> AnyExperimentPlan:
@@ -215,6 +241,15 @@ def _summary(
         experiment_id=record.id,
         name=record.name,
         status=record.status,
+        provenance=cast(
+            Any,
+            _provenance(
+                experiment_id=record.id,
+                models=tuple(cell.requested_model for cell in plan.cells),
+                routes=tuple(cell.provider_route for cell in plan.cells),
+                executed=record.status in TERMINAL_EXPERIMENT_STATUSES and counts["total"] > 0,
+            ),
+        ),
         plan_digest=record.plan_digest,
         cell_count=len(plan.cells),
         task_count=len(plan.tasks),
@@ -234,6 +269,7 @@ async def list_experiments(
     offset: int,
     status_filter: str | None,
     search: str | None,
+    roots: tuple[Path, ...],
 ) -> ExperimentListResponse:
     filters: list[ColumnElement[bool]] = []
     if status_filter:
@@ -257,10 +293,19 @@ async def list_experiments(
     )
     counts = await _run_counts(session, tuple(record.id for record in records))
     total = int(await session.scalar(total_statement) or 0)
+    summaries: list[ExperimentSummary] = []
+    for record in records:
+        summary = _summary(record, _plan(record), counts.get(record.id, Counter()))
+        if record.status in TERMINAL_EXPERIMENT_STATUSES:
+            try:
+                await _report(session, record.id, roots)
+                integrity = "VERIFIED"
+            except WorkbenchAPIError:
+                integrity = "INTEGRITY_FAILED"
+            summary = summary.model_copy(update={"integrity_status": integrity})
+        summaries.append(summary)
     return ExperimentListResponse(
-        items=tuple(
-            _summary(record, _plan(record), counts.get(record.id, Counter())) for record in records
-        ),
+        items=tuple(summaries),
         total=total,
         limit=limit,
         offset=offset,
@@ -277,6 +322,7 @@ async def experiment_detail(
     report: ExperimentReport | None = None
     if record.status in TERMINAL_EXPERIMENT_STATUSES:
         report = await _report(session, experiment_id, roots)
+        summary = summary.model_copy(update={"integrity_status": "VERIFIED"})
     comparability = Counter[str]()
     if report is not None:
         comparability.update(item.comparability.value for item in report.pair_evidence)
@@ -479,6 +525,16 @@ def _run_summary(run: ExperimentRunRecord) -> RunSummary:
         lane=run.lane,
         repeat_index=run.repeat_index,
         status=run.status,
+        provenance=cast(
+            Any,
+            _provenance(
+                experiment_id=run.experiment_id,
+                models=(str(run.slot_json.get("requested_model") or ""),),
+                routes=(str(run.slot_json.get("provider_route") or ""),),
+                executed=run.status in TERMINAL_RUN_STATUSES
+                and run.artifact_manifest_path is not None,
+            ),
+        ),
         normalized_outcome=run.normalized_outcome,
         attempt=run.attempt,
         duration_ms=integer(run.duration_ms),
@@ -837,6 +893,7 @@ async def regression_compare(
         }
         paired_slots = sorted(set(baseline_by_slot) & set(candidate_by_slot))
         statuses: list[ComparabilityValue] = []
+        eligible_slots: list[tuple[str, int]] = []
         reason_codes: set[str] = set()
         engine = ComparabilityEngine()
         for slot in paired_slots:
@@ -849,6 +906,8 @@ async def regression_compare(
                 intent=request.intent,
             )
             statuses.append(_comparability_value(assessment.status.value))
+            if assessment.status.value == "COMPARABLE":
+                eligible_slots.append(slot)
             reason_codes.update(reason.code.value for reason in assessment.reasons)
         if not statuses:
             status: ComparabilityValue = "NOT_COMPARABLE"
@@ -860,9 +919,16 @@ async def regression_compare(
             reason_codes.add("GENERAL_EXPLORATORY_ONLY")
         reasons = tuple(sorted(reason_codes))
         common_task_ids.update(task_id for task_id, _repeat_index in paired_slots)
-        left_value = numeric(left.success_rate)
-        right_value = numeric(right.success_rate)
-        if left_value.value is None or right_value.value is None:
+        left_value = _paired_pass_rate(baseline_by_slot, tuple(eligible_slots))
+        right_value = _paired_pass_rate(candidate_by_slot, tuple(eligible_slots))
+        overall_left = numeric(left.success_rate)
+        overall_right = numeric(right.success_rate)
+        overall_delta = numeric(
+            overall_right.value - overall_left.value
+            if overall_left.value is not None and overall_right.value is not None
+            else None
+        )
+        if status != "COMPARABLE" or left_value.value is None or right_value.value is None:
             delta = numeric(None)
             direction = "NOT_REPORTED"
         else:
@@ -879,6 +945,12 @@ async def regression_compare(
                 candidate_value=right_value,
                 delta=delta,
                 direction=cast(Any, direction),
+                overall_baseline_value=overall_left,
+                overall_candidate_value=overall_right,
+                overall_delta=overall_delta,
+                common_baseline_value=_paired_pass_rate(baseline_by_slot, tuple(paired_slots)),
+                common_candidate_value=_paired_pass_rate(candidate_by_slot, tuple(paired_slots)),
+                eligible_paired_observations=len(eligible_slots),
                 baseline_tier=left.evidence_tier.value,
                 candidate_tier=right.evidence_tier.value,
                 comparability=status,
@@ -896,10 +968,23 @@ async def regression_compare(
         baseline_report_digest=baseline_report.digest,
         candidate_report_digest=candidate_report.digest,
         intent=request.intent,
+        baseline_provenance=_provenance(
+            experiment_id=baseline_record.id,
+            models=tuple(cell.requested_model for cell in _plan(baseline_record).cells),
+            routes=tuple(cell.provider_route for cell in _plan(baseline_record).cells),
+            executed=True,
+        ),
+        candidate_provenance=_provenance(
+            experiment_id=candidate_record.id,
+            models=tuple(cell.requested_model for cell in _plan(candidate_record).cells),
+            routes=tuple(cell.provider_route for cell in _plan(candidate_record).cells),
+            executed=True,
+        ),
         common_tasks=tuple(sorted(common_task_ids)),
         comparisons=tuple(comparisons),
         limitation=(
-            "Directional evidence only; no causal attribution or new significance claim is made."
+            "Direction uses only comparable paired capability observations. "
+            "Overall rates are descriptive; no causal attribution or significance claim is made."
         ),
     )
 
@@ -913,12 +998,14 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
         ).all()
     )
     judge_count = 0
+    verified_judge_record: JudgeCalibrationRecord | None = None
     for judge_record in completed_judges:
         try:
             _judge_report(judge_record, roots)
         except WorkbenchAPIError:
             continue
         judge_count += 1
+        verified_judge_record = judge_record
     repository_root = Path(__file__).resolve().parents[3]
     badcases_ready = False
     accepted_v6 = False
@@ -1143,6 +1230,59 @@ async def core_readiness(session: AsyncSession, roots: tuple[Path, ...]) -> Core
             ),
         }
         checks = tuple(current_checks.get(check.key, check) for check in checks)
+    frozen_sources = {
+        "TASK_CORPUS": ("harnesslab-core-18-v1", "release/core-corpus.json"),
+        "MODEL_ONLY_PROFILES": ("core-real-matrix-v6", "release/core-real-evidence-plan-v6.json"),
+        "HARNESS_MATRIX_PLAN": ("core-real-matrix-v6", "release/core-real-evidence-plan-v6.json"),
+        "REAL_MATRIX_EVIDENCE": (
+            "experiment-report:core-real-matrix-v6",
+            "release/release-evidence.json",
+        ),
+        "JUDGE_EVIDENCE": (
+            "judge-suite:core-calibration-objective@2.0.0",
+            "release/release-evidence.json",
+        ),
+        "PAIRED_LANE": (
+            "experiment-pair:gpt56-relay-direct-vs-codex",
+            "release/kb4-gpt-codex-timeout-sensitivity.json",
+        ),
+        "ABLATION": (
+            "experiment-ablation:codex-gpt56-reasoning-effort",
+            "release/kb4-gpt-codex-timeout-sensitivity.json",
+        ),
+        "PHASE_J": ("phase-j-analyst", "release/resume-claim-evidence.json"),
+        "RELEASE_DOCUMENTATION": ("core-release-documentation", "docs/RELEASE_EVIDENCE.md"),
+        "BADCASE_EVIDENCE": ("core-real-matrix-v6", "release/badcases.json"),
+        "RELEASE_EVIDENCE": ("v1.0.0-core", "release/release-evidence.json"),
+        "REMOTE_CI": ("v1.0.0-core", "release/release-evidence.json"),
+    }
+    checks = tuple(
+        check.model_copy(
+            update={
+                "source_id": frozen_sources[check.key][0],
+                "snapshot": "accepted-v6" if accepted_v6 else "release-schema-v1",
+                "artifact_reference": frozen_sources[check.key][1],
+            }
+        )
+        if check.status == "READY" and check.key in frozen_sources
+        else check
+        for check in checks
+    )
+    if verified_judge_record is not None:
+        checks = tuple(
+            check.model_copy(
+                update={
+                    "source_id": verified_judge_record.id,
+                    "snapshot": f"plan schema {verified_judge_record.schema_version}",
+                    "generated_at": verified_judge_record.finished_at,
+                    "artifact_reference": verified_judge_record.report_digest,
+                    "source_route": f"/judgelab/{verified_judge_record.id}",
+                }
+            )
+            if check.key == "JUDGE_CALIBRATION" and check.status == "READY"
+            else check
+            for check in checks
+        )
     blockers = tuple(check.key for check in checks if check.status != "READY")
     return CoreReadinessResponse(
         status="NOT_READY" if blockers else "READY",

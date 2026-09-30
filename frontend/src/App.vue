@@ -36,6 +36,7 @@ const isInvestigation = computed(() => route.meta.section === 'Investigation')
 
 const navigation = [
   { label: '调查工作区', items: [
+    { to: '/demo', label: 'Public Demo', mark: 'DE' },
     { to: '/analyst', label: '开始调查', mark: '01' },
     { to: '/analyst/sessions', label: '已保存调查', mark: '02' },
   ] },
@@ -139,14 +140,11 @@ watch(
           <h1>{{ title }}</h1>
           </div>
         </div>
-        <div v-if="!isInvestigation" class="topbar-status">
-          <span class="status-pill neutral">SERVER AUTHORITY</span>
-          <span class="status-pill info">EXPLICIT EXECUTION</span>
-        </div>
+        <div v-if="!isInvestigation" class="topbar-status"><span class="status-pill neutral">Evidence &amp; provenance shown per record</span></div>
       </header>
       <div class="page-container">
         <ElTooltip v-if="!isInvestigation" content="Registry planning is backend-validated; credentials and runtime URLs never enter browser state." placement="bottom">
-          <span class="readonly-context">BACKEND-VALIDATED · NO SECRET MATERIAL</span>
+          <span class="readonly-context">Planning is server validated · execution requires explicit preflight · secret values stay server side</span>
         </ElTooltip>
         <RouterView />
       </div>

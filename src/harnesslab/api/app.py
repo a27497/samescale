@@ -1,7 +1,9 @@
+import os
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.exc import DBAPIError
 
 from harnesslab import __version__
@@ -19,6 +21,7 @@ from harnesslab.api.workbench_errors import (
     workbench_error_handler,
 )
 from harnesslab.custom_eval.api import router as custom_eval_router
+from harnesslab.demo.integrity import DemoIntegrityError, load_bundle
 
 
 def create_app(*, workbench_dist: Path | None = None) -> FastAPI:
@@ -29,7 +32,56 @@ def create_app(*, workbench_dist: Path | None = None) -> FastAPI:
             "SameScale evidence workbench and keyless Registry Lite API (HarnessLab-compatible)"
         ),
     )
-    application.state.local_configuration_allowed = True
+    application.state.local_configuration_allowed = not bool(
+        os.environ.get("HARNESSLAB_PUBLIC_DEMO_MANIFEST")
+    )
+
+    @application.middleware("http")
+    async def demo_boundary(request: Request, call_next):  # type: ignore[no-untyped-def]
+        manifest = os.environ.get("HARNESSLAB_PUBLIC_DEMO_MANIFEST")
+        if manifest:
+            if request.url.path == "/":
+                return RedirectResponse("/demo", status_code=307)
+            allowed_post = request.url.path == "/api/workbench/regression/compare" or (
+                request.url.path.startswith("/api/workbench/experiments/")
+                and request.url.path.endswith("/diagnosis/badcases")
+            )
+            if request.method not in {"GET", "HEAD"} and not (
+                request.method == "POST" and allowed_post
+            ):
+                return JSONResponse(
+                    status_code=403,
+                    content={
+                        "error": {
+                            "code": "PUBLIC_DEMO_READ_ONLY",
+                            "message": (
+                                "Public demo evidence is read-only. "
+                                "Execution and configuration changes are disabled."
+                            ),
+                        }
+                    },
+                )
+            if (
+                request.url.path.startswith("/api/workbench/")
+                and request.url.path != "/api/workbench/experiments"
+            ):
+                try:
+                    load_bundle(Path(manifest), os.environ.get("HARNESSLAB_PUBLIC_DEMO_DIGEST", ""))
+                except DemoIntegrityError:
+                    return JSONResponse(
+                        status_code=409,
+                        content={
+                            "error": {
+                                "code": "ARTIFACT_INTEGRITY_ERROR",
+                                "message": (
+                                    "Public demo evidence integrity failed. "
+                                    "No replacement evidence was used."
+                                ),
+                            }
+                        },
+                    )
+        return await call_next(request)
+
     application.include_router(local_configuration_router, prefix="/api")
     application.include_router(health_router, prefix="/api")
     application.include_router(analyst_router, prefix="/api")

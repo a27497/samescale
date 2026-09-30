@@ -1,0 +1,1093 @@
+{
+  "original_records": 36,
+  "search_roots": [
+    "/home/dev",
+    "/tmp",
+    "/opt",
+    "/srv",
+    "/var/backups"
+  ],
+  "manifest_candidates": [
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-6c6a5cdb5df29a48fc2cfc922dd40b1feda9b003d62c7e1eaf9bad37f2543e12-a1/manifest.json",
+      "size": 5621,
+      "sha256": "ac66a3347facacf6fcbf2c5707f32f5879587050b2c7467f9baa4518b777a230",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-6c6a5cdb5df29a48fc2cfc922dd40b1feda9b003d62c7e1eaf9bad37f2543e12",
+          "expected_sha256": "sha256:845074ad3137d5e89a78a9f2e728bc866fcea8b00af59afbba6b12dcdb0c49d4",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-6c6a5cdb5df29a48fc2cfc922dd40b1feda9b003d62c7e1eaf9bad37f2543e12-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "7bca47788efea2010be0e1271bc1ee03a69a825926a1f3d4b3e965d72b7895e4",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-6c6a5cdb5df29a48fc2cfc922dd40b1feda9b003d62c7e1eaf9bad37f2543e12",
+          "expected_sha256": "sha256:845074ad3137d5e89a78a9f2e728bc866fcea8b00af59afbba6b12dcdb0c49d4",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-e8006ac7c34a104d9075ce1ee135a6d20cc2f244150a4791f8465b7f42d11506-a1/manifest.json",
+      "size": 5621,
+      "sha256": "fac67ea9d3c284119d1ddf51cd309ddfe9fc660d251cdb51ae3c5029f042c64e",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-e8006ac7c34a104d9075ce1ee135a6d20cc2f244150a4791f8465b7f42d11506",
+          "expected_sha256": "sha256:66fda622ffdeed94db506c3f9fcd8d96929b1671867a7ddfdfe69bdbd7144c36",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-e8006ac7c34a104d9075ce1ee135a6d20cc2f244150a4791f8465b7f42d11506-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "4c83691251741deb2afc0fbf69da8153d5b0ad7dabfd27446c1aa677da261b71",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-e8006ac7c34a104d9075ce1ee135a6d20cc2f244150a4791f8465b7f42d11506",
+          "expected_sha256": "sha256:66fda622ffdeed94db506c3f9fcd8d96929b1671867a7ddfdfe69bdbd7144c36",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-fcf5565729d32d4d55e1ec797e28fc7d7c525141163d08e19e0db88f3ca4f087-a1/manifest.json",
+      "size": 5621,
+      "sha256": "a05b789e86b3c47db7a5d351964593bbda0b51e912f201b72d60da00faf9f049",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-fcf5565729d32d4d55e1ec797e28fc7d7c525141163d08e19e0db88f3ca4f087",
+          "expected_sha256": "sha256:07b07f64281e65a972b564e5f359c156705b0c69e7ba29605abd5dafee9dbc86",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-fcf5565729d32d4d55e1ec797e28fc7d7c525141163d08e19e0db88f3ca4f087-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "9e4a3dd949af1b2657193282b319aa9abb565c654d3847a0ed01c7f63484082a",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-fcf5565729d32d4d55e1ec797e28fc7d7c525141163d08e19e0db88f3ca4f087",
+          "expected_sha256": "sha256:07b07f64281e65a972b564e5f359c156705b0c69e7ba29605abd5dafee9dbc86",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-bdf72b1eab32beb160d5799b1224b34745ed73c11c5cba2f032e8ede8eaa543b-a1/manifest.json",
+      "size": 5621,
+      "sha256": "9773ca90f19c32f2a6858e1ee82282a06438340613750fb5defc014ec1a899d7",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-bdf72b1eab32beb160d5799b1224b34745ed73c11c5cba2f032e8ede8eaa543b",
+          "expected_sha256": "sha256:059060285ec78267e65ddc2445e111494669021e47a3af6679907cd08c236108",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-bdf72b1eab32beb160d5799b1224b34745ed73c11c5cba2f032e8ede8eaa543b-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "41fa4dc6ef4c4f6406aa12c58fffb4d8e45d9399ea927a88b60c664e47bd27f3",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-bdf72b1eab32beb160d5799b1224b34745ed73c11c5cba2f032e8ede8eaa543b",
+          "expected_sha256": "sha256:059060285ec78267e65ddc2445e111494669021e47a3af6679907cd08c236108",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-8f2d1230dd0300948c4351e9a91cf856c6b7f3e5707039ea042b5da3b7caad71-a1/manifest.json",
+      "size": 5622,
+      "sha256": "1acbd581e3ec6042260aca2b4b19da2f21af57e7826d387204942ffb7fa64169",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-8f2d1230dd0300948c4351e9a91cf856c6b7f3e5707039ea042b5da3b7caad71",
+          "expected_sha256": "sha256:393cbc6123ee33e39a855922ba2b768ed73839fff49aae7b85205ad8250ff961",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-8f2d1230dd0300948c4351e9a91cf856c6b7f3e5707039ea042b5da3b7caad71-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "fa1aebd7d41f5d454fa9e9ea57df327f56f5cc00376ee1cc412e06d8d302af51",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-8f2d1230dd0300948c4351e9a91cf856c6b7f3e5707039ea042b5da3b7caad71",
+          "expected_sha256": "sha256:393cbc6123ee33e39a855922ba2b768ed73839fff49aae7b85205ad8250ff961",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-6bf0faf66e33202aa22b859c5288832a6104912a57c3f1d28ec1c2dfdaf137e8-a1/manifest.json",
+      "size": 5611,
+      "sha256": "51ee14fe4890f19d43fe1a1519d3175a55e3e6ab44f41e296eaa35cd0149dda6",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-6bf0faf66e33202aa22b859c5288832a6104912a57c3f1d28ec1c2dfdaf137e8",
+          "expected_sha256": "sha256:ee8512194c1becf5628c1f7363f974901649a9281bab44ba912767c43d7c2193",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-6bf0faf66e33202aa22b859c5288832a6104912a57c3f1d28ec1c2dfdaf137e8-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "ba5c0ddb2dc8db992f041897673eafa2ab7318d28d32f9c463ae84d21afd267d",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-6bf0faf66e33202aa22b859c5288832a6104912a57c3f1d28ec1c2dfdaf137e8",
+          "expected_sha256": "sha256:ee8512194c1becf5628c1f7363f974901649a9281bab44ba912767c43d7c2193",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-75e07d35d067d052537ade5e4b77ff6a6a0a966bbf799cecde3163c467c86fca-a1/manifest.json",
+      "size": 5621,
+      "sha256": "cd3a334673864b9b579d14cadfd2bf0c1168f1ed530c8b7130a9479937fc6e6c",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-75e07d35d067d052537ade5e4b77ff6a6a0a966bbf799cecde3163c467c86fca",
+          "expected_sha256": "sha256:387d39cefbc336a187630a150cd95f8aff24bee2b6125e236dabcabce91c1a87",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-75e07d35d067d052537ade5e4b77ff6a6a0a966bbf799cecde3163c467c86fca-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "aca8d9a2e2805bf8613ac880ae891d7ea61abb3555407950f461cf9ee1b3c823",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-75e07d35d067d052537ade5e4b77ff6a6a0a966bbf799cecde3163c467c86fca",
+          "expected_sha256": "sha256:387d39cefbc336a187630a150cd95f8aff24bee2b6125e236dabcabce91c1a87",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-8f71ac07a29c924afa02a32739604ec484a04987072d0a55310a6b15501f0a84-a1/manifest.json",
+      "size": 5493,
+      "sha256": "e3ee23ffb28f21bd43fb3dec3d63673c614748b24fd8bf4e13353d4811e5fa1f",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-8f71ac07a29c924afa02a32739604ec484a04987072d0a55310a6b15501f0a84",
+          "expected_sha256": "sha256:e686ef3b0cb3b47a0adf99d81ad48eef63c02eeb36ff3a7ddf6e2bbfe4568f78",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-8f71ac07a29c924afa02a32739604ec484a04987072d0a55310a6b15501f0a84-a1/verifier/manifest.json",
+      "size": 1950,
+      "sha256": "d9fe185c9b5c7ee8fdce185a4fd1f49e0a7f9bce086e4f487c43ad87489f64f0",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-8f71ac07a29c924afa02a32739604ec484a04987072d0a55310a6b15501f0a84",
+          "expected_sha256": "sha256:e686ef3b0cb3b47a0adf99d81ad48eef63c02eeb36ff3a7ddf6e2bbfe4568f78",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-4c3559f5361179f0f1c355c80987ebdccb20b128c6c2f63db2fbede96f96200c-a1/manifest.json",
+      "size": 5493,
+      "sha256": "9d45294f2f22788ff72c3e3a551b127b1a3ca97535525feb21c0a3ef09309019",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-4c3559f5361179f0f1c355c80987ebdccb20b128c6c2f63db2fbede96f96200c",
+          "expected_sha256": "sha256:321adeefdf62e6258e9caee0d735ed92aada21f8f056dd28ce6f8bfd1bc510da",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-4c3559f5361179f0f1c355c80987ebdccb20b128c6c2f63db2fbede96f96200c-a1/verifier/manifest.json",
+      "size": 1950,
+      "sha256": "5e6a3efcc1161c546627abfe165114056b3cc282b7949c824a60fddbe9383f6c",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-4c3559f5361179f0f1c355c80987ebdccb20b128c6c2f63db2fbede96f96200c",
+          "expected_sha256": "sha256:321adeefdf62e6258e9caee0d735ed92aada21f8f056dd28ce6f8bfd1bc510da",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-6f83361d455ad84608ccad4843aaaf5f1b8f3de44d36069755071553c9474422-a1/manifest.json",
+      "size": 5494,
+      "sha256": "fa87ca07f0d59f5a677f86ee170630fc7f02810b9c7cc7e44f2c8c5c7505f0ab",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-6f83361d455ad84608ccad4843aaaf5f1b8f3de44d36069755071553c9474422",
+          "expected_sha256": "sha256:cff95cec75a7e43449e1b1c4dc835110c0e7e1a8d3257b54999fb8a74b27a9f5",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-6f83361d455ad84608ccad4843aaaf5f1b8f3de44d36069755071553c9474422-a1/verifier/manifest.json",
+      "size": 1950,
+      "sha256": "1c57ace6adc05e03fdf756310197d3a68e61d14884db8f3bc08181973dfec64e",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-6f83361d455ad84608ccad4843aaaf5f1b8f3de44d36069755071553c9474422",
+          "expected_sha256": "sha256:cff95cec75a7e43449e1b1c4dc835110c0e7e1a8d3257b54999fb8a74b27a9f5",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-efc12ae30dbbd37b041b4ec9c6533a476b0f0ecd8677c5b2ddc57858755aa948-a1/manifest.json",
+      "size": 5622,
+      "sha256": "721c225896472800f2ad5db7ee39c137eb7e03cf76030442bfc94cb040cfc27f",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-efc12ae30dbbd37b041b4ec9c6533a476b0f0ecd8677c5b2ddc57858755aa948",
+          "expected_sha256": "sha256:25e7931aad4d2a90a2eb44b1cd02f7d97d9e6af4c948a61d61e59ace14136aeb",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-efc12ae30dbbd37b041b4ec9c6533a476b0f0ecd8677c5b2ddc57858755aa948-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "232ad680195989cb1402fab6143fdc48ddb62f42b6d49c0a9ceb0f2d693e8861",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-efc12ae30dbbd37b041b4ec9c6533a476b0f0ecd8677c5b2ddc57858755aa948",
+          "expected_sha256": "sha256:25e7931aad4d2a90a2eb44b1cd02f7d97d9e6af4c948a61d61e59ace14136aeb",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-b536c6918c210319cd51390de0555f706ab86d68a1eaea4dfc5c6a951783fb4e-a1/manifest.json",
+      "size": 5622,
+      "sha256": "6988de0dc59c639ddc3ffcf0a6b6ab823143110597d10656e50e80f11db2b0e9",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-b536c6918c210319cd51390de0555f706ab86d68a1eaea4dfc5c6a951783fb4e",
+          "expected_sha256": "sha256:0b61b7f7c522e3cff3c8f2727bef943468f4ad7e39dfd08ce5d52b7ed01cb25d",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-b536c6918c210319cd51390de0555f706ab86d68a1eaea4dfc5c6a951783fb4e-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "ed40edc8e871423e098a32a46e63acadf4ad205f74d00f72dfdf72e49796bcda",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-b536c6918c210319cd51390de0555f706ab86d68a1eaea4dfc5c6a951783fb4e",
+          "expected_sha256": "sha256:0b61b7f7c522e3cff3c8f2727bef943468f4ad7e39dfd08ce5d52b7ed01cb25d",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-f303686c59461eb396a7d58202496c08a363096620f79eb57b6c11a58fd426e3-a1/manifest.json",
+      "size": 5493,
+      "sha256": "fb6cbb5f692d9fc7caa04cfd7c5a2d009a5009c33eee2b2f502e00a9186cb2c7",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-f303686c59461eb396a7d58202496c08a363096620f79eb57b6c11a58fd426e3",
+          "expected_sha256": "sha256:99b7cefe1831d4fea1575d46cd1184d2c5b4936b49d110d27eaddb0499dc1dba",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-f303686c59461eb396a7d58202496c08a363096620f79eb57b6c11a58fd426e3-a1/verifier/manifest.json",
+      "size": 1950,
+      "sha256": "346f9aafe0d263fe65f13ff100515ec92f16f2771539567a1b991c1884056705",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-f303686c59461eb396a7d58202496c08a363096620f79eb57b6c11a58fd426e3",
+          "expected_sha256": "sha256:99b7cefe1831d4fea1575d46cd1184d2c5b4936b49d110d27eaddb0499dc1dba",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-1ca98bc504432b82d0cfbb7d9371d3af780ab505df500335f661f351af358f3b-a1/manifest.json",
+      "size": 5611,
+      "sha256": "007fcb51f3c9061a830124121e2b7cd707955f93a10b31a89f9c18e9ae6d3b2e",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-1ca98bc504432b82d0cfbb7d9371d3af780ab505df500335f661f351af358f3b",
+          "expected_sha256": "sha256:c2a4569278115d34e02ffd1c807e84b7135c660fd3a39bdcca71a13daa5bd613",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-1ca98bc504432b82d0cfbb7d9371d3af780ab505df500335f661f351af358f3b-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "035e51622dcce32f2f8ac3110c1a7f550866e0e52513443efe6185f9d2b6673b",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-1ca98bc504432b82d0cfbb7d9371d3af780ab505df500335f661f351af358f3b",
+          "expected_sha256": "sha256:c2a4569278115d34e02ffd1c807e84b7135c660fd3a39bdcca71a13daa5bd613",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-92a6eb0842fa48b94104b218ee9e78c0aa254e971b28da92def2a8b32f4e2d22-a1/manifest.json",
+      "size": 4497,
+      "sha256": "fa89895a28fdf3fa275339965f110b4a1fb98fe4830941ed08a1ad0baf19ba90",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-92a6eb0842fa48b94104b218ee9e78c0aa254e971b28da92def2a8b32f4e2d22",
+          "expected_sha256": "sha256:f03267618a51d654a8877624dbc14104f98aac8090af699e8e49e090baf51d20",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-92a6eb0842fa48b94104b218ee9e78c0aa254e971b28da92def2a8b32f4e2d22-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "7dffc3c9305774300ec9d8503b9df5765de28f4f87faf845f78233ccf7d8b159",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-92a6eb0842fa48b94104b218ee9e78c0aa254e971b28da92def2a8b32f4e2d22",
+          "expected_sha256": "sha256:f03267618a51d654a8877624dbc14104f98aac8090af699e8e49e090baf51d20",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-46c49e822152faf01f638d8e5b9f7bcec558f739092e78f0410b99c43e6e75c5-a1/manifest.json",
+      "size": 4497,
+      "sha256": "e5c933d8ac983892dd56a856ff95871444e589256a616efc8533a02cb57d9401",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-46c49e822152faf01f638d8e5b9f7bcec558f739092e78f0410b99c43e6e75c5",
+          "expected_sha256": "sha256:a3686431eb813a01f6c2312d9372a8602e6514f1d03f64daaa73b2df93421bd0",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-46c49e822152faf01f638d8e5b9f7bcec558f739092e78f0410b99c43e6e75c5-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "1344648b86a1b3fa06afa73c2c37983679e123f712fa0692f51fc5d595a25fc4",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-46c49e822152faf01f638d8e5b9f7bcec558f739092e78f0410b99c43e6e75c5",
+          "expected_sha256": "sha256:a3686431eb813a01f6c2312d9372a8602e6514f1d03f64daaa73b2df93421bd0",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-8fce34baee92542fc501d6fd409d219adfdb7723359f96a73bf6637c32bfb44b-a1/manifest.json",
+      "size": 5494,
+      "sha256": "6e33e4b5de027904b27d6b0bda79a7ac5ffd1add01100c065a40efb00f2628f1",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-8fce34baee92542fc501d6fd409d219adfdb7723359f96a73bf6637c32bfb44b",
+          "expected_sha256": "sha256:8b70c2a4ff1162ef05661a07183116cea16bb4e78b00aec660d5c3c3f7478be5",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-8fce34baee92542fc501d6fd409d219adfdb7723359f96a73bf6637c32bfb44b-a1/verifier/manifest.json",
+      "size": 1950,
+      "sha256": "caa943300c39f2c6d4d0326fc0c193c5a29f13ba6b4eb97a0da05c5a8ae6a84a",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-8fce34baee92542fc501d6fd409d219adfdb7723359f96a73bf6637c32bfb44b",
+          "expected_sha256": "sha256:8b70c2a4ff1162ef05661a07183116cea16bb4e78b00aec660d5c3c3f7478be5",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-f38747860f4ecc3646b2b739edd704022f7e904f115ea768a934a3d8c3a3ee3b-a1/manifest.json",
+      "size": 4497,
+      "sha256": "bf4494f7151c450e7983beab56d6676359e7b3bcea03588803cb860beca5a17e",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-f38747860f4ecc3646b2b739edd704022f7e904f115ea768a934a3d8c3a3ee3b",
+          "expected_sha256": "sha256:2994b8cb23e4daa0b06e0c682cd73dea3f418203edd1fbbaee9b5a8ff33aa8b5",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-f38747860f4ecc3646b2b739edd704022f7e904f115ea768a934a3d8c3a3ee3b-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "42c258ec92fe22f545767b4b252b3c19fff75a82f9b50cdd4b7894105a36021a",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-f38747860f4ecc3646b2b739edd704022f7e904f115ea768a934a3d8c3a3ee3b",
+          "expected_sha256": "sha256:2994b8cb23e4daa0b06e0c682cd73dea3f418203edd1fbbaee9b5a8ff33aa8b5",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-4acee19e20051cff59f370979b20dcad030e02b58f78ae06fa513adf8983b4ab-a1/manifest.json",
+      "size": 5622,
+      "sha256": "1ee18d551db72dffaa347f4dd2566d5a451e23e273a3446f4cba0564f1f23f03",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-4acee19e20051cff59f370979b20dcad030e02b58f78ae06fa513adf8983b4ab",
+          "expected_sha256": "sha256:d94a012638128613138e8a6f552367d90ed6934c009b4fdad2f681eed4d2c31c",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-4acee19e20051cff59f370979b20dcad030e02b58f78ae06fa513adf8983b4ab-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "bc14b23879e8e4d28aff921055ddba697f8b84ccbe5e23a96edd17f8bdd22feb",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-4acee19e20051cff59f370979b20dcad030e02b58f78ae06fa513adf8983b4ab",
+          "expected_sha256": "sha256:d94a012638128613138e8a6f552367d90ed6934c009b4fdad2f681eed4d2c31c",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-f4cf31196380dc9ef770f66f2dfed89226468f9aabc2fb3ccc695d14a183ca44-a1/manifest.json",
+      "size": 4497,
+      "sha256": "1bcde0ddc466699f44f021a61a60dea53cce2b7634131d16fe6a57143a78c14e",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-f4cf31196380dc9ef770f66f2dfed89226468f9aabc2fb3ccc695d14a183ca44",
+          "expected_sha256": "sha256:6ee3c0c09d6e3826d12dc2d15732f4066e99948552c766616362abe9fe57fe5e",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-f4cf31196380dc9ef770f66f2dfed89226468f9aabc2fb3ccc695d14a183ca44-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "8341c95738fe46e93d9eebed86748db0c207e05fe3aa3ced3eddfc094e16ac25",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-f4cf31196380dc9ef770f66f2dfed89226468f9aabc2fb3ccc695d14a183ca44",
+          "expected_sha256": "sha256:6ee3c0c09d6e3826d12dc2d15732f4066e99948552c766616362abe9fe57fe5e",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-8dd85826766e9c76004c06e7c3b8343a118810fec818002d13d3c0657613820d-a1/manifest.json",
+      "size": 5622,
+      "sha256": "a7eb052d052c45db4f89586c3cac44ac8b83ef05d860af236d291320bd7600ab",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-8dd85826766e9c76004c06e7c3b8343a118810fec818002d13d3c0657613820d",
+          "expected_sha256": "sha256:c8c8cfdc0247f79c32b244bdb68c1ce3c8c3ae6d536150748b155bcecbf9363d",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-8dd85826766e9c76004c06e7c3b8343a118810fec818002d13d3c0657613820d-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "6367f2c48081e25ceacfc784c1fb3a58540f99d6485ec276523c776459c251ea",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-8dd85826766e9c76004c06e7c3b8343a118810fec818002d13d3c0657613820d",
+          "expected_sha256": "sha256:c8c8cfdc0247f79c32b244bdb68c1ce3c8c3ae6d536150748b155bcecbf9363d",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-83a1754de5649cce2c317033abe3cd7dc2ee5550ba36cb86bcc7e5790d1fdef9-a1/manifest.json",
+      "size": 5621,
+      "sha256": "a5311a02e865ad153de008a860484181a62efa274e674eb9d9d46f74d1d9c6c4",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-83a1754de5649cce2c317033abe3cd7dc2ee5550ba36cb86bcc7e5790d1fdef9",
+          "expected_sha256": "sha256:88fce0309e4cfb152483a95b8c6010ab474436c81e25de35aebc7d5366f7eb36",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-83a1754de5649cce2c317033abe3cd7dc2ee5550ba36cb86bcc7e5790d1fdef9-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "0c3b9904db8d1d1898e529d0379b7204558b29a2d48c1ba223c6e2dd2ec337ee",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-83a1754de5649cce2c317033abe3cd7dc2ee5550ba36cb86bcc7e5790d1fdef9",
+          "expected_sha256": "sha256:88fce0309e4cfb152483a95b8c6010ab474436c81e25de35aebc7d5366f7eb36",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-064a6868455605f3519a8cc2c04c91a3b84ece998811a2425ddd9de303d81969-a1/manifest.json",
+      "size": 5493,
+      "sha256": "6e337859327a724281a483dd9e5516b1fab1651a0d19080d26928e9028de64df",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-064a6868455605f3519a8cc2c04c91a3b84ece998811a2425ddd9de303d81969",
+          "expected_sha256": "sha256:5a76ad3c9d9152c277e5dc6edcfe547fe106904a34992cac01e2d0816996881c",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-064a6868455605f3519a8cc2c04c91a3b84ece998811a2425ddd9de303d81969-a1/verifier/manifest.json",
+      "size": 1950,
+      "sha256": "bfefb6c73d3ff65194b36024d74a74a3cc1ec84bc47ab68071e561d072da1fe0",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-064a6868455605f3519a8cc2c04c91a3b84ece998811a2425ddd9de303d81969",
+          "expected_sha256": "sha256:5a76ad3c9d9152c277e5dc6edcfe547fe106904a34992cac01e2d0816996881c",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-bd095331f00425bafa57ce82bcf7bc2120113d33dd53b6db1ce71752465daa64-a1/manifest.json",
+      "size": 5622,
+      "sha256": "0a16fce94a3c9801ad3aafb52d328fdba1452e6710a0628a977e169b48a42b5f",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-bd095331f00425bafa57ce82bcf7bc2120113d33dd53b6db1ce71752465daa64",
+          "expected_sha256": "sha256:3fdb49a05bffad4177708c31c6004229c0dcf7ebcf6aa1906f4566d62f76befb",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-bd095331f00425bafa57ce82bcf7bc2120113d33dd53b6db1ce71752465daa64-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "54384fc9be063aabe00b6975422de0bb235abd396acfb44bd74a7e200d8146a2",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-bd095331f00425bafa57ce82bcf7bc2120113d33dd53b6db1ce71752465daa64",
+          "expected_sha256": "sha256:3fdb49a05bffad4177708c31c6004229c0dcf7ebcf6aa1906f4566d62f76befb",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-255568a333992b108a1197443945bb8312931b617cdc768f6c1a08125d4ca9b1-a1/manifest.json",
+      "size": 5493,
+      "sha256": "7c8063414fdb57dbd5ceeb73f585e3d2ea6032233d83deea358566bbe5c8c425",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-255568a333992b108a1197443945bb8312931b617cdc768f6c1a08125d4ca9b1",
+          "expected_sha256": "sha256:74e6079c86018a14fbddbc68551143218cd7536e94251a3d313e9a5d59d9b9f6",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-255568a333992b108a1197443945bb8312931b617cdc768f6c1a08125d4ca9b1-a1/verifier/manifest.json",
+      "size": 1950,
+      "sha256": "01c5e3e9d0111a076b384f9e1c58c16e9d306526f666b78cf105813e18e58307",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-255568a333992b108a1197443945bb8312931b617cdc768f6c1a08125d4ca9b1",
+          "expected_sha256": "sha256:74e6079c86018a14fbddbc68551143218cd7536e94251a3d313e9a5d59d9b9f6",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-d864c2a1f9225fe4d3a03de826d651ec7e3f7c2f1703a358a1a623db63553e06-a1/manifest.json",
+      "size": 5493,
+      "sha256": "bfe4731ce2ec1aa66566534a265dbcfe9e3027b74cb8bb57cf9b17d0200aac80",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-d864c2a1f9225fe4d3a03de826d651ec7e3f7c2f1703a358a1a623db63553e06",
+          "expected_sha256": "sha256:d15485ca765380977d6879253f5fd243b9601b354c145f5623c6e2271d70b497",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-d864c2a1f9225fe4d3a03de826d651ec7e3f7c2f1703a358a1a623db63553e06-a1/verifier/manifest.json",
+      "size": 1950,
+      "sha256": "8a10def85deac054831ac360f96ec6c105ea86d22cbdf5c5c5f300f9d0f33296",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-d864c2a1f9225fe4d3a03de826d651ec7e3f7c2f1703a358a1a623db63553e06",
+          "expected_sha256": "sha256:d15485ca765380977d6879253f5fd243b9601b354c145f5623c6e2271d70b497",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-6bfe848563fff5f8799bb5b36f9cdf6c486189ce450f852e70a1e8846a88e18e-a1/manifest.json",
+      "size": 5622,
+      "sha256": "0b1f9ca6673b0c24b23cb444a310f6fcd71bdaaf3d07b4c98cea20e0b3f786a6",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-6bfe848563fff5f8799bb5b36f9cdf6c486189ce450f852e70a1e8846a88e18e",
+          "expected_sha256": "sha256:4a727c7536584e86acc710611f2767f83ef74bd3512f352b48a31b7d179eeb6d",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-6bfe848563fff5f8799bb5b36f9cdf6c486189ce450f852e70a1e8846a88e18e-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "6e67b0320448cdedb380a7538d347acad84a5838f4cccbd12ea917b13296a369",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-6bfe848563fff5f8799bb5b36f9cdf6c486189ce450f852e70a1e8846a88e18e",
+          "expected_sha256": "sha256:4a727c7536584e86acc710611f2767f83ef74bd3512f352b48a31b7d179eeb6d",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-e70fd993d446ab144eb28e3e167f25a6e93e0667354affd00b202d37c9ac85ae-a1/manifest.json",
+      "size": 5494,
+      "sha256": "d34f7334f1fa52c75391810d7bcc0d5cefd49740609777753494d0f24a50f8b7",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-e70fd993d446ab144eb28e3e167f25a6e93e0667354affd00b202d37c9ac85ae",
+          "expected_sha256": "sha256:2803a90edbd648c73003bf7c29368fe7ee68c532a3732e42ce7230139c7e5d43",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-e70fd993d446ab144eb28e3e167f25a6e93e0667354affd00b202d37c9ac85ae-a1/verifier/manifest.json",
+      "size": 1950,
+      "sha256": "4ecd163052a1cb1395bc87088b41be73bd90e7c6dea1b957146633d425ca2323",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-e70fd993d446ab144eb28e3e167f25a6e93e0667354affd00b202d37c9ac85ae",
+          "expected_sha256": "sha256:2803a90edbd648c73003bf7c29368fe7ee68c532a3732e42ce7230139c7e5d43",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-457f681c2808a8c6c4ea7f298bc72128f0bc01d8744814715e485a695bdae8fd-a1/manifest.json",
+      "size": 4497,
+      "sha256": "7b24d972fb9adfcd18bb6c99d3aff58c1d96da4209f461608548d4cad0322b62",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-457f681c2808a8c6c4ea7f298bc72128f0bc01d8744814715e485a695bdae8fd",
+          "expected_sha256": "sha256:d1ae2ac67dba8ad1770c7549e74e979b4000131da317eed5f32ad7529c84fb9e",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-457f681c2808a8c6c4ea7f298bc72128f0bc01d8744814715e485a695bdae8fd-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "3dc0731c92bd81a7fef0689a7e58d41ed65e77f224ec39d398deba221ef63ff3",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-457f681c2808a8c6c4ea7f298bc72128f0bc01d8744814715e485a695bdae8fd",
+          "expected_sha256": "sha256:d1ae2ac67dba8ad1770c7549e74e979b4000131da317eed5f32ad7529c84fb9e",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-f34dc19b8bc278931749f6f29f026c6a5329fbbbb3d98e80dbdb470bbc73a385-a1/manifest.json",
+      "size": 5622,
+      "sha256": "595e315922893150e7ac30f0cdc483e262727e12df44ce38902d7ae63fcd6c1d",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-f34dc19b8bc278931749f6f29f026c6a5329fbbbb3d98e80dbdb470bbc73a385",
+          "expected_sha256": "sha256:302dbf0615906ca68c1bc5817746d024790f29e167d00fb5c45e7d91efe825e7",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-f34dc19b8bc278931749f6f29f026c6a5329fbbbb3d98e80dbdb470bbc73a385-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "dc542c396615bf2fc0d08a2735741dfee70271bf9aac241f993d30adf83133b0",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-f34dc19b8bc278931749f6f29f026c6a5329fbbbb3d98e80dbdb470bbc73a385",
+          "expected_sha256": "sha256:302dbf0615906ca68c1bc5817746d024790f29e167d00fb5c45e7d91efe825e7",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-62e73d40187eadd847f225915394c731b8004debdf1bbbd2f254c04a6386c32d-a1/manifest.json",
+      "size": 5621,
+      "sha256": "85cea2d2dcaefc571829f1433be435de5e4016fc8b605dba2a6d0e29633291fb",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-62e73d40187eadd847f225915394c731b8004debdf1bbbd2f254c04a6386c32d",
+          "expected_sha256": "sha256:f32211eb03a093925b4050a820b6f079b70695baaaa7f0f545c3c6e54c6d34d4",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-62e73d40187eadd847f225915394c731b8004debdf1bbbd2f254c04a6386c32d-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "d032cbe0f6153d37ef8b3ca492e74a83bb96c11db6cf7f9e21c15726a07341fe",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-62e73d40187eadd847f225915394c731b8004debdf1bbbd2f254c04a6386c32d",
+          "expected_sha256": "sha256:f32211eb03a093925b4050a820b6f079b70695baaaa7f0f545c3c6e54c6d34d4",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-099927dfa1744d0f5c71699585e6fc6a05d98e78a2a89816a8f3c90c34712719-a1/manifest.json",
+      "size": 4497,
+      "sha256": "5a549a3473788102de6f43bfa56cb52b14641af2d78f2d0c0a16492e3d1adf2d",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-099927dfa1744d0f5c71699585e6fc6a05d98e78a2a89816a8f3c90c34712719",
+          "expected_sha256": "sha256:d01293c8dd4af7dce1de9d388303995611f8069be5ac63f3f9ccfeada7c3cc43",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-099927dfa1744d0f5c71699585e6fc6a05d98e78a2a89816a8f3c90c34712719-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "ee7f06df11c0ffd495d37b3f5a400e684ffbebe4905b9c300b2d51d7d56245e3",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-099927dfa1744d0f5c71699585e6fc6a05d98e78a2a89816a8f3c90c34712719",
+          "expected_sha256": "sha256:d01293c8dd4af7dce1de9d388303995611f8069be5ac63f3f9ccfeada7c3cc43",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-fc201b08e0eddc283ee4b2f81b68f28637934ecebbfc4a4ba9ca77a94f391dd1-a1/manifest.json",
+      "size": 5622,
+      "sha256": "1e1b9085a0270030406b0d626ae8b88836e7bc101df4ec66238b15360d77c1ff",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-fc201b08e0eddc283ee4b2f81b68f28637934ecebbfc4a4ba9ca77a94f391dd1",
+          "expected_sha256": "sha256:58ca1e9e7171ae7a9db703b19f6534a73c66bea6c64ec7e71681a5dccfd538b9",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-fc201b08e0eddc283ee4b2f81b68f28637934ecebbfc4a4ba9ca77a94f391dd1-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "e31172868b2895d6e1dc68b4b8e06bf92c8cb6f0bc3d5e4d0469f846db156ce8",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-multi-task",
+          "run_id": "run-fc201b08e0eddc283ee4b2f81b68f28637934ecebbfc4a4ba9ca77a94f391dd1",
+          "expected_sha256": "sha256:58ca1e9e7171ae7a9db703b19f6534a73c66bea6c64ec7e71681a5dccfd538b9",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-ef2ba836eff3b583e6a8b88cb340ed6abe69c8926f1864f09b39ee447e966159-a1/manifest.json",
+      "size": 5611,
+      "sha256": "1ab1b1c19482c747d530df2018e85a555108efb0184c7691ff72879dee7bacc0",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-ef2ba836eff3b583e6a8b88cb340ed6abe69c8926f1864f09b39ee447e966159",
+          "expected_sha256": "sha256:55b6018f9dfc0efb5feb6f5f2832484cd50069738bdddab9840f6e75c00bcdea",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-ef2ba836eff3b583e6a8b88cb340ed6abe69c8926f1864f09b39ee447e966159-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "93a1700581becdc6bf55c5df35c861f8d77beea87e92244f12db15d439e2d916",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-candidate",
+          "run_id": "run-ef2ba836eff3b583e6a8b88cb340ed6abe69c8926f1864f09b39ee447e966159",
+          "expected_sha256": "sha256:55b6018f9dfc0efb5feb6f5f2832484cd50069738bdddab9840f6e75c00bcdea",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-a457b87cda2226ae3350739c0f447cd89a0f13518e6c643387fc11d385dfb6e2-a1/manifest.json",
+      "size": 5621,
+      "sha256": "f49678419a36d9c0bb8df8219d42b0e63143b2373ed6eb2481277204ba3af1c4",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-a457b87cda2226ae3350739c0f447cd89a0f13518e6c643387fc11d385dfb6e2",
+          "expected_sha256": "sha256:0f51c3ac402ef27d5e5d8ef361279f29decf06dfe26a9fe57d4ab4b5dab9939e",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-a457b87cda2226ae3350739c0f447cd89a0f13518e6c643387fc11d385dfb6e2-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "982eadc6e995af489963cdfe16450577c75109872ddb14a4e52cb423670cb8a2",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-a457b87cda2226ae3350739c0f447cd89a0f13518e6c643387fc11d385dfb6e2",
+          "expected_sha256": "sha256:0f51c3ac402ef27d5e5d8ef361279f29decf06dfe26a9fe57d4ab4b5dab9939e",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-38e46d38c0212417a3a201dffc7fedefffb8ef7d458999cc3d26fa101e59a682-a1/manifest.json",
+      "size": 5621,
+      "sha256": "db00653b272fcb4bb60740516ae05c0659fd528b521f6c9efcb151d659a33998",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-38e46d38c0212417a3a201dffc7fedefffb8ef7d458999cc3d26fa101e59a682",
+          "expected_sha256": "sha256:6a8b840f71e7a8c7e89dade5f1d9b278df2b42c19c4bc0b0eb74341ce6b03f24",
+          "exact_match": false
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/.phase-i-test-artifacts/run-38e46d38c0212417a3a201dffc7fedefffb8ef7d458999cc3d26fa101e59a682-a1/verifier/manifest.json",
+      "size": 1946,
+      "sha256": "200f8f0d691f401b038e015e370b5740909f32398d29b461a54def258a0c02ba",
+      "record_matches": [
+        {
+          "experiment_id": "phase-i-matrix-baseline",
+          "run_id": "run-38e46d38c0212417a3a201dffc7fedefffb8ef7d458999cc3d26fa101e59a682",
+          "expected_sha256": "sha256:6a8b840f71e7a8c7e89dade5f1d9b278df2b42c19c4bc0b0eb74341ce6b03f24",
+          "exact_match": false
+        }
+      ]
+    }
+  ],
+  "archives": [
+    {
+      "path": "/home/dev/artifacts/lecturelens-t1-samescale-1.0.1.tar.gz",
+      "size": 10326748,
+      "sha256": "836a7c90b18f2c29bbe297737b6f489e10aba8d6fd30166550d845fdc5f30294",
+      "matching_members": []
+    },
+    {
+      "path": "/home/dev/artifacts/samescale-worktree-closeout-20260920/diagnostic-venv/lib/python3.12/site-packages/dateutil/zoneinfo/dateutil-zoneinfo.tar.gz",
+      "size": 156400,
+      "sha256": "d3ea52e7b6e968de0d884df1288193596fa95b803db4f92a18279a7398004475",
+      "matching_members": []
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/artifacts/SameScale-S2-UI-v02.zip",
+      "size": 3765149,
+      "sha256": "52e84b730478c0a965fca8b7fe0d4750f20d4430c461c0b58d3f385e449b6eb1",
+      "matching_members": []
+    },
+    {
+      "path": "/home/dev/projects/harnesslab-ai-integration/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip",
+      "size": 860706,
+      "sha256": "ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+      "matching_members": [
+        {
+          "path": "/home/dev/projects/harnesslab-ai-integration/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip::bundles/claude/run/manifest.json",
+          "size": 72527,
+          "sha256": "51232df08d74fb6ec591f7da044352b1c7b79054bfc1f644fde9fa276a9b35d5"
+        },
+        {
+          "path": "/home/dev/projects/harnesslab-ai-integration/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip::bundles/codex/run/manifest.json",
+          "size": 6863,
+          "sha256": "3ddd0531143839bff7cc194c6c538d4dc1859048090c6c2bcbdf0bb116df7671"
+        },
+        {
+          "path": "/home/dev/projects/harnesslab-ai-integration/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip::bundles/codex/run/verifier/manifest.json",
+          "size": 1934,
+          "sha256": "584f58bb78861096f11c698d1fff96f232f66977520a7a8c8f2d20c819d0b528"
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/projects/samescale-phase0-candidate-20260922/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip",
+      "size": 860706,
+      "sha256": "ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+      "matching_members": [
+        {
+          "path": "/home/dev/projects/samescale-phase0-candidate-20260922/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip::bundles/claude/run/manifest.json",
+          "size": 72527,
+          "sha256": "51232df08d74fb6ec591f7da044352b1c7b79054bfc1f644fde9fa276a9b35d5"
+        },
+        {
+          "path": "/home/dev/projects/samescale-phase0-candidate-20260922/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip::bundles/codex/run/manifest.json",
+          "size": 6863,
+          "sha256": "3ddd0531143839bff7cc194c6c538d4dc1859048090c6c2bcbdf0bb116df7671"
+        },
+        {
+          "path": "/home/dev/projects/samescale-phase0-candidate-20260922/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip::bundles/codex/run/verifier/manifest.json",
+          "size": 1934,
+          "sha256": "584f58bb78861096f11c698d1fff96f232f66977520a7a8c8f2d20c819d0b528"
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/archives/samescale-dirty-20260924/dirty-workspace.tar.gz",
+      "size": 59825204,
+      "sha256": "645303b86b21f499f58eb04f3bde354694a5a00fa25e6db404c917d2c87f93ff",
+      "matching_members": []
+    },
+    {
+      "path": "/home/dev/migration-staging/emergency/harnesslab-all.bundle",
+      "size": 2305247,
+      "sha256": "58ca082e38ea279c996447a40038dbe2c6b194b1015e4de08df41e90c205a829",
+      "matching_members": []
+    },
+    {
+      "path": "/home/dev/migration-staging/critical/harnesslab-all-refs.bundle",
+      "size": 2296744,
+      "sha256": "72acb28b335d6cd40f8e800acadf6098f40ce0fb527d0e5f0005540962e151b2",
+      "matching_members": []
+    },
+    {
+      "path": "/home/dev/.local/share/samescale/manual-test-ef135bb/source/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip",
+      "size": 860706,
+      "sha256": "ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+      "matching_members": [
+        {
+          "path": "/home/dev/.local/share/samescale/manual-test-ef135bb/source/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip::bundles/claude/run/manifest.json",
+          "size": 72527,
+          "sha256": "51232df08d74fb6ec591f7da044352b1c7b79054bfc1f644fde9fa276a9b35d5"
+        },
+        {
+          "path": "/home/dev/.local/share/samescale/manual-test-ef135bb/source/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip::bundles/codex/run/manifest.json",
+          "size": 6863,
+          "sha256": "3ddd0531143839bff7cc194c6c538d4dc1859048090c6c2bcbdf0bb116df7671"
+        },
+        {
+          "path": "/home/dev/.local/share/samescale/manual-test-ef135bb/source/docs/evidence/s2-offline-replay-20260921/representative-bundles.zip::bundles/codex/run/verifier/manifest.json",
+          "size": 1934,
+          "sha256": "584f58bb78861096f11c698d1fff96f232f66977520a7a8c8f2d20c819d0b528"
+        }
+      ]
+    },
+    {
+      "path": "/home/dev/.local/share/samescale-workspace/tools/harnesslab-ai/lib/python3.12/site-packages/dateutil/zoneinfo/dateutil-zoneinfo.tar.gz",
+      "size": 156400,
+      "sha256": "d3ea52e7b6e968de0d884df1288193596fa95b803db4f92a18279a7398004475",
+      "matching_members": []
+    },
+    {
+      "path": "/home/dev/.local/share/samescale-preview/tools/harnesslab-ai/lib/python3.12/site-packages/dateutil/zoneinfo/dateutil-zoneinfo.tar.gz",
+      "size": 156400,
+      "sha256": "d3ea52e7b6e968de0d884df1288193596fa95b803db4f92a18279a7398004475",
+      "matching_members": []
+    }
+  ],
+  "matches": [],
+  "inaccessible": [
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/probe-tool-ad7557d3c7/workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/probe-tool-2089421c44/workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/final-probes/isolation-r2-01-workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/final-probes/isolation-02-workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/final-probes/tool-03-workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/final-probes/tool-broken-03-workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/probe-tool-fdbd742afe/workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/acceptance-01/tool-workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/acceptance-01/tool-broken-workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/wiring-01/runtime/s1-successor-claude-local-uikbpl5w/harnesslab-task-_md_dyt4/workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/probe-tool-ea1e5e13c3/workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/home/dev/artifacts/samescale-s1-successor-20260921/probe-tool-61e411d3f2/workspace/.claude/.cc-writes'",
+    "[Errno 13] Permission denied: '/tmp/systemd-private-b1d6ddb54f4e4e4980e1d5681d89df44-systemd-resolved.service-qZMTgy'",
+    "[Errno 13] Permission denied: '/tmp/snap-private-tmp'",
+    "[Errno 13] Permission denied: '/tmp/systemd-private-b1d6ddb54f4e4e4980e1d5681d89df44-polkit.service-dl4pOb'",
+    "[Errno 13] Permission denied: '/tmp/systemd-private-b1d6ddb54f4e4e4980e1d5681d89df44-chrony.service-NKIfNG'",
+    "[Errno 13] Permission denied: '/tmp/systemd-private-b1d6ddb54f4e4e4980e1d5681d89df44-systemd-logind.service-LZpyoo'",
+    "[Errno 13] Permission denied: '/opt/containerd'",
+    "[Errno 13] Permission denied: '/opt/harnesslab-runners/harnesslab-tokyo-2/_work'",
+    "[Errno 13] Permission denied: '/opt/harnesslab-runners/harnesslab-tokyo-3/_diag/pages'",
+    "[Errno 13] Permission denied: '/opt/harnesslab-runners/harnesslab-tokyo-3/_diag/blocks'",
+    "[Errno 13] Permission denied: '/opt/harnesslab-runners/harnesslab-tokyo-3/_work'",
+    "[Errno 13] Permission denied: '/opt/harnesslab-runners/harnesslab-tokyo-1/_work'"
+  ],
+  "git_candidates": [],
+  "manifest_files_hashed": 4432,
+  "recovery": "ORIGINAL_NOT_FOUND"
+}

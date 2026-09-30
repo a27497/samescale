@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from harnesslab.api.workbench_dependencies import workbench_artifact_roots, workbench_session
@@ -38,6 +39,7 @@ from harnesslab.api.workbench_service import (
     run_detail,
     trace_detail,
 )
+from harnesslab.demo.service import public_artifact, public_demo
 from harnesslab.diagnosis.models import (
     BadCaseExport,
     BadCaseExportRequest,
@@ -67,6 +69,7 @@ PageOffset = Annotated[int, Query(ge=0, le=100_000)]
 @router.get("/experiments", response_model=ExperimentListResponse)
 async def experiments(
     session: Session,
+    artifact_roots: ArtifactRoots,
     limit: PageLimit = 25,
     offset: PageOffset = 0,
     status: str | None = Query(default=None, max_length=30),
@@ -78,6 +81,7 @@ async def experiments(
         offset=offset,
         status_filter=status,
         search=search,
+        roots=artifact_roots,
     )
 
 
@@ -257,3 +261,26 @@ async def compare(
 @router.get("/core-readiness", response_model=CoreReadinessResponse)
 async def readiness(session: Session, artifact_roots: ArtifactRoots) -> CoreReadinessResponse:
     return await core_readiness(session, artifact_roots)
+
+
+@router.get("/public-demo")
+async def get_public_demo(session: Session, artifact_roots: ArtifactRoots) -> dict[str, object]:
+    return await public_demo(session, artifact_roots)
+
+
+@router.get("/runs/{run_id}/public-artifact")
+async def get_public_artifact(
+    run_id: str, session: Session, artifact_roots: ArtifactRoots, download: bool = False
+) -> Response:
+    data, digest = await public_artifact(session, run_id, artifact_roots)
+    return Response(
+        content=data,
+        media_type="application/json",
+        headers={
+            "X-Evidence-SHA256": digest,
+            "Content-Disposition": (
+                f'{"attachment" if download else "inline"}; filename="verifier-result.json"'
+            ),
+            "Cache-Control": "no-store",
+        },
+    )

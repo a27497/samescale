@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import PageState from '@/components/PageState.vue'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import MatrixHeatmap from '@/components/MatrixHeatmap.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useExperimentStore } from '@/stores/experiments'
 import type { MatrixMetricKey } from '@/types/workbench'
+import { experimentDisplayName } from '@/utils/evidenceCopy'
 
 const route = useRoute()
+const router = useRouter()
 const store = useExperimentStore()
-const tab = ref<'overview' | 'matrix' | 'runs' | 'statistics'>('overview')
+const tabs = ['overview', 'matrix', 'runs', 'statistics'] as const
+const tab = ref<typeof tabs[number]>(tabs.find(value => value === route.query.tab) ?? 'overview')
+function selectTab(value: typeof tabs[number]) { tab.value = value; void router.push({ query: { ...route.query, tab: value } }) }
 const id = computed(() => String(route.params.id))
 const analysis = computed(() => store.modelComparison?.analysis ?? null)
 const metrics: Array<{ key: MatrixMetricKey; label: string }> = [
@@ -38,19 +42,22 @@ onMounted(async () => {
   if (store.selected && !['completed', 'failed', 'cancelled'].includes(store.selected.status)) store.startPolling(id.value)
 })
 onBeforeUnmount(() => store.stopPolling())
+watch(() => route.params.id, async value => { if (value) await store.fetchExperiment(String(value)) })
+watch(() => route.query.tab, value => { tab.value = tabs.find(item => item === value) ?? 'overview' })
 </script>
 
 <template>
   <section>
     <div class="page-heading">
-      <div><h2>{{ store.selected?.name ?? id }}</h2><p class="technical">{{ id }}</p></div>
+      <div><h2>{{ store.selected ? experimentDisplayName(store.selected.name, store.selected.provenance) : id }}</h2><p class="technical">{{ id }}</p></div>
       <div class="toolbar"><StatusBadge v-if="store.selected" :value="store.selected.status" /><StatusBadge v-if="store.durableStatus" :value="store.durableStatus.terminal ? 'DURABLE TERMINAL' : 'POLLING POSTGRES'" /></div>
     </div>
     <PageState v-if="store.loading" kind="loading">Loading persisted Matrix evidence…</PageState>
     <PageState v-else-if="store.error" kind="error" reload>{{ store.error }}</PageState>
     <template v-else-if="store.selected">
+      <div class="notice">Source: {{ store.selected.provenance ?? 'UNVERIFIED_SOURCE' }}. {{ store.selected.provenance === 'FIXTURE_OFFLINE' ? 'Keyless Fake fixture evidence; no real Provider/model execution.' : 'Persisted evidence does not by itself authenticate a Provider response.' }}</div>
       <div class="tabs" role="tablist">
-        <button v-for="name in ['overview', 'matrix', 'runs', 'statistics'] as const" :key="name" class="tab-button" :class="{ active: tab === name }" @click="tab = name">{{ name.toUpperCase() }}</button>
+        <button v-for="name in tabs" :key="name" class="tab-button" :class="{ active: tab === name }" @click="selectTab(name)">{{ name.toUpperCase() }}</button>
       </div>
       <template v-if="tab === 'overview'">
         <div class="metric-grid">
@@ -71,7 +78,7 @@ onBeforeUnmount(() => store.stopPolling())
       </div>
       <div v-else-if="tab === 'runs'" class="panel">
         <div class="panel-title"><h3>Runs</h3><span class="muted">Persisted logical run IDs</span></div>
-        <div class="responsive-table" role="region" aria-label="Experiment evidence" tabindex="0"><table class="data-table"><thead><tr><th>Run</th><th>Cell / Task</th><th>Lane</th><th>Status</th><th>Outcome</th></tr></thead><tbody><tr v-for="run in store.runs" :key="run.run_id"><td><RouterLink class="table-link technical" :to="`/runs/${run.run_id}`">{{ run.run_id.slice(0, 24) }}…</RouterLink></td><td>{{ run.cell_id }}<br/><span class="muted">{{ run.task_id }} r{{ run.repeat_index }}</span></td><td>{{ run.lane }}</td><td><StatusBadge :value="run.status" /></td><td><StatusBadge :value="run.normalized_outcome ?? 'NOT_REPORTED'" /></td></tr></tbody></table></div>
+        <div class="responsive-table" role="region" aria-label="Experiment evidence" tabindex="0"><table class="data-table"><thead><tr><th>Run</th><th>Cell / Task</th><th>Lane</th><th>Status</th><th>Outcome</th></tr></thead><tbody><tr v-for="run in store.runs" :key="run.run_id"><td><RouterLink class="table-link technical" :to="{ path: `/runs/${run.run_id}`, query: route.query.candidate ? { candidate: route.query.candidate } : {} }">{{ run.run_id.slice(0, 24) }}…</RouterLink></td><td>{{ run.cell_id }}<br/><span class="muted">{{ run.task_id }} r{{ run.repeat_index }}</span></td><td>{{ run.lane }}</td><td><StatusBadge :value="run.status" /></td><td><StatusBadge :value="run.normalized_outcome ?? 'NOT_REPORTED'" /></td></tr></tbody></table></div>
       </div>
       <template v-else>
         <div v-if="analysis" class="panel">

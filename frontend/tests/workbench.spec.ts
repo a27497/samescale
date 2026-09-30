@@ -168,7 +168,7 @@ describe('Workbench contracts', () => {
     expect(wrapper.text()).toContain('调查工作区')
     expect(document.title).toBe('Run Control · SameScale')
     expect(wrapper.get('.advanced-nav').attributes('open')).toBeDefined()
-    expect(wrapper.findAll('.nav-link')[0]!.attributes('href')).toBe('/analyst')
+    expect(wrapper.findAll('.nav-link')[0]!.attributes('href')).toBe('/demo')
     expect(wrapper.text()).toContain('Registry')
     expect(wrapper.text()).toContain('评测证据 · Advanced')
     expect(wrapper.find('.topbar h1').text()).toBe('Run Control')
@@ -385,8 +385,8 @@ describe('Workbench contracts', () => {
     api.compare.mockResolvedValue({
       baseline_experiment_id: 'a', candidate_experiment_id: 'b', baseline_plan_digest: 'sha256:a',
       candidate_plan_digest: 'sha256:b', baseline_report_digest: 'sha256:ra', candidate_report_digest: 'sha256:rb',
-      intent: 'MODEL_COMPARISON', common_tasks: ['task'], limitation: 'Directional evidence only; no causal attribution.',
-      comparisons: [{ baseline_cell_id: 'direct', candidate_cell_id: 'codex', baseline_value: reported(1), candidate_value: reported(.5), delta: reported(-.5), direction: 'DECREASED', baseline_tier: 'INFORMAL', candidate_tier: 'INFORMAL', comparability: 'NOT_COMPARABLE', reason_codes: ['HARD_CONTROL_MISMATCH'], paired_observations: 3, baseline_infra_count: 0, candidate_infra_count: 1 }],
+      intent: 'MODEL_COMPARISON', common_tasks: ['task'], limitation: 'Directional evidence only; no causal attribution.', baseline_provenance: 'FIXTURE_OFFLINE', candidate_provenance: 'FIXTURE_OFFLINE',
+      comparisons: [{ baseline_cell_id: 'direct', candidate_cell_id: 'codex', baseline_value: { status: 'NOT_REPORTED', value: null }, candidate_value: { status: 'NOT_REPORTED', value: null }, delta: { status: 'NOT_REPORTED', value: null }, direction: 'NOT_REPORTED', common_baseline_value: reported(1), common_candidate_value: reported(.5), overall_baseline_value: reported(1), overall_candidate_value: reported(.5), overall_delta: reported(-.5), eligible_paired_observations: 0, baseline_tier: 'INFORMAL', candidate_tier: 'INFORMAL', comparability: 'NOT_COMPARABLE', reason_codes: ['HARD_CONTROL_MISMATCH'], paired_observations: 3, baseline_infra_count: 0, candidate_infra_count: 1 }],
     })
     const wrapper = mount(RegressionView)
     await wrapper.get('[aria-label="Baseline experiment ID"]').setValue('a')
@@ -397,7 +397,8 @@ describe('Workbench contracts', () => {
     expect(wrapper.text()).toContain('NOT_COMPARABLE')
     expect(wrapper.text()).toContain('no causal attribution')
     expect(wrapper.text()).toContain('HARD_CONTROL_MISMATCH')
-    expect(wrapper.text()).toContain('Raw direction')
+    expect(wrapper.text()).toContain('INSUFFICIENT_EVIDENCE')
+    expect(wrapper.text()).toContain('Overall raw baseline / candidate')
     expect(api.compare).toHaveBeenCalledWith('a', 'b', 'MODEL_COMPARISON')
   })
 

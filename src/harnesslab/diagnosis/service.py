@@ -54,6 +54,7 @@ CLUSTER_DIMENSIONS = (
     "trace_pattern",
     "tool_pattern",
     "workspace_diff_pattern",
+    "verifier_signature",
 )
 
 
@@ -134,6 +135,13 @@ def _dimensions(item: DiagnosisInput, failure: FailureClass, scope: FailureScope
         "trace_pattern": item.trace.pattern,
         "tool_pattern": item.tool_calls.pattern,
         "workspace_diff_pattern": item.workspace_diff.pattern,
+        "verifier_signature": ";".join(
+            (
+                item.verifier.status,
+                item.verifier.failure_subtype or "no-subtype",
+                item.verifier.sandbox_status or "no-sandbox-status",
+            )
+        ),
     }
 
 
@@ -151,9 +159,19 @@ def _diagnosed_run(item: DiagnosisInput, *, ablation_supported: bool) -> Diagnos
         else CausalStrength.CORRELATION_ONLY
     )
     hypothesis = (
-        "The failure pattern is associated with a preregistered controlled-ablation pair."
+        "Review the preregistered ablation contrast and its verifier outcomes "
+        "before attributing this failure."
         if ablation_supported
-        else "The shared trace, tool, and workspace patterns may help explain this failure cluster."
+        else "Check the task contract against the final workspace and verifier failure; "
+        "use trace/tool patterns to choose the next inspection, not as a root-cause verdict."
+    )
+    verifier_fact = f"Independent verifier: {item.verifier.status}"
+    if item.verifier.score is not None:
+        verifier_fact += f" (score {item.verifier.score:.2f})"
+    workspace_fact = (
+        "no persisted workspace modification"
+        if item.workspace_diff.pattern == "no-modification"
+        else f"final workspace pattern {item.workspace_diff.pattern}"
     )
     return DiagnosisRun(
         run_id=item.run_id,
@@ -176,8 +194,8 @@ def _diagnosed_run(item: DiagnosisInput, *, ablation_supported: bool) -> Diagnos
             Attribution(
                 kind=AttributionKind.VERIFIED_FACT,
                 statement=(
-                    f"Structured evidence classifies this run as {failure.value} "
-                    f"with {scope.value} scope."
+                    f"{verifier_fact}; {workspace_fact}. "
+                    f"Recorded failure class: {failure.value} ({scope.value})."
                 ),
                 evidence_references=tuple(fact_refs),
                 causal_strength=CausalStrength.NOT_APPLICABLE,
@@ -224,7 +242,20 @@ def build_diagnosis_report(
             ablation_supported=item.run_id in verified_ablation_contrast_run_ids,
         )
         dimensions = _dimensions(item, run.failure_class, run.failure_scope)
-        cluster_id = _digest(dimensions)
+        cluster_id = _digest(
+            {
+                key: dimensions[key]
+                for key in (
+                    "task",
+                    "failure_class",
+                    "failure_scope",
+                    "verifier_signature",
+                    "workspace_diff_pattern",
+                    "trace_pattern",
+                    "tool_pattern",
+                )
+            }
+        )
         key = (item.cell_id, item.task_family, cluster_id)
         grouped[key].append(run)
         cluster_dimensions[key] = dimensions
