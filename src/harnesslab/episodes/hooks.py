@@ -307,7 +307,7 @@ def freeze_hook_case(
 def replay_hook_case(path: Path, expected: str) -> dict[str, Any]:
     require(path.stat().st_size <= MAX_INPUT * 4, "oversized regression case")
     case = decode(read_pinned(path, expected))
-    if case.get("kind") == "verified-hook-regression-v1":
+    if case.get("kind") in {"verified-hook-regression-v1", "verified-hook-observation-v1"}:
         from harnesslab.episodes.verified_hooks import replay_verified_hook_case
 
         return replay_verified_hook_case(path, expected, case)

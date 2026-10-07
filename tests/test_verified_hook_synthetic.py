@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -213,3 +214,253 @@ def test_verified_bundle_tamper_rejected(tmp_path: Path) -> None:
     (bundle / "verifier-run/stdout.txt").write_bytes(b"changed")
     with pytest.raises(ReplayError):
         read_verified_hook_bundle(bundle, expected)
+
+
+def _passing_bundle(tmp_path: Path) -> tuple[Path, Path, str]:
+    spool, bundle, _ = _bundle(tmp_path)
+    report = VerifierReport(
+        schema_version=1,
+        passed=True,
+        score=1.0,
+        checks=(CheckResult(name="synthetic-contract", passed=True, score=1.0),),
+        summary="Independent synthetic workspace contract pass",
+    )
+    stdout = encode(report.model_dump(mode="json"))
+    _write(bundle / "verifier-run/stdout.txt", stdout)
+    manifest_path = bundle / "verifier-run/manifest.json"
+    manifest = json.loads(manifest_path.read_bytes())
+    manifest["stdout"]["digest"] = manifest["stdout_stream_digest"] = sha256_bytes(stdout)
+    _write(manifest_path, encode(manifest))
+    return spool, bundle, _index(bundle)
+
+
+def test_verified_pass_requires_neutral_opt_in_and_replays(tmp_path: Path) -> None:
+    spool, bundle, expected = _passing_bundle(tmp_path)
+    episode_before = (bundle / "episode.json").read_bytes()
+    case = tmp_path / "case.json"
+    with pytest.raises(ReplayError, match="passing workspace is not a Bad Case"):
+        freeze_verified_hook_case(
+            spool, tmp_path / "store", bundle, expected, case, source_kind="synthetic"
+        )
+    assert not case.exists()
+    digest = freeze_verified_hook_case(
+        spool,
+        tmp_path / "store",
+        bundle,
+        expected,
+        case,
+        source_kind="synthetic",
+        allow_pass=True,
+    )
+    frozen = case.read_bytes()
+    first = encode(replay_hook_case(case, digest))
+    assert first == encode(replay_hook_case(case, digest))
+    assert case.read_bytes() == frozen
+    result = json.loads(first)
+    assert result["acceptance"] == "VERIFIED_PASS" and "bad_case" not in result
+    assert result["verification_result"]["root_cause"] is None
+    assert result["verification_result"]["source_authenticity"] == "NOT_ATTESTED"
+    assert result["verification_result"]["namespace"] == "CUSTOM"
+    assert result["verification_result"]["comparison_eligible"] is False
+    assert result["external_calls"] == 0
+    assert result["subject_executed"] is result["verifier_executed"] is False
+    assert (bundle / "episode.json").read_bytes() == episode_before
+    stored_episode = next((tmp_path / "store").glob("*.json"))
+    assert stored_episode.read_bytes() == episode_before
+    assert json.loads(episode_before)["acceptance"] == "NOT_VERIFIED"
+
+    from typer.testing import CliRunner
+
+    from harnesslab.episodes.cli import episode_app
+
+    cli_case = tmp_path / "cli-case.json"
+    cli_result = CliRunner().invoke(
+        episode_app,
+        [
+            "freeze-hooks",
+            str(spool),
+            "--store",
+            str(tmp_path / "cli-store"),
+            "--output",
+            str(cli_case),
+            "--verification",
+            str(bundle),
+            "--verification-sha256",
+            expected,
+            "--allow-pass",
+            "--source-kind",
+            "synthetic",
+        ],
+    )
+    assert cli_result.exit_code == 0
+    assert cli_case.read_bytes() == frozen
+
+    # Relabeling a pass as the historical failure-only schema must still fail closed.
+    relabeled = json.loads(frozen)
+    relabeled["kind"] = "verified-hook-regression-v1"
+    relabeled["bad_case"] = relabeled.pop("verification_result")
+    bad_case = tmp_path / "relabeled.json"
+    _write(bad_case, encode(relabeled))
+    with pytest.raises(ReplayError, match="passing workspace is not a Bad Case"):
+        replay_hook_case(bad_case, sha256_bytes(bad_case.read_bytes()))
+
+
+def test_allow_pass_requires_independent_verification(tmp_path: Path) -> None:
+    from typer.testing import CliRunner
+
+    from harnesslab.episodes.cli import episode_app
+
+    spool, _, _ = _bundle(tmp_path)
+    case = tmp_path / "case.json"
+    result = CliRunner().invoke(
+        episode_app,
+        [
+            "freeze-hooks",
+            str(spool),
+            "--store",
+            str(tmp_path / "store"),
+            "--output",
+            str(case),
+            "--allow-pass",
+        ],
+    )
+    assert result.exit_code == 1 and "FAIL_CLOSED" in result.stdout
+    assert not case.exists()
+
+
+def test_task_lane_set_order_does_not_change_identity(tmp_path: Path) -> None:
+    _, bundle, _ = _bundle(tmp_path)
+    task_path = bundle / "task.json"
+    task = json.loads(task_path.read_bytes())
+    assert len(task["lane_support"]) > 1
+    task["lane_support"].reverse()
+    _write(task_path, encode(task))
+    expected = _index(bundle)
+    assert read_verified_hook_bundle(bundle, expected)["acceptance"] == "VERIFIED_FAIL"
+    task["lane_support"] = ["M"]
+    _write(task_path, encode(task))
+    with pytest.raises(ReplayError, match="task package identity drift"):
+        read_verified_hook_bundle(bundle, _index(bundle))
+
+
+@pytest.mark.parametrize("mutation", ["missing-default", "coerced-budget", "duplicate-lane"])
+def test_task_identity_only_ignores_lane_order(tmp_path: Path, mutation: str) -> None:
+    _, bundle, _ = _passing_bundle(tmp_path)
+    task_path = bundle / "task.json"
+    task = json.loads(task_path.read_bytes())
+    if mutation == "missing-default":
+        task.pop("context_bundle")
+    elif mutation == "coerced-budget":
+        task["budget"]["timeout_seconds"] = str(task["budget"]["timeout_seconds"])
+    else:
+        task["lane_support"].append(task["lane_support"][0])
+    _write(task_path, encode(task))
+    with pytest.raises(ReplayError, match="task package identity drift"):
+        read_verified_hook_bundle(bundle, _index(bundle))
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["zero-checks", "duplicate-checks", "contradictory-pass", "contradictory-score", "non-bool"],
+)
+def test_allow_pass_rejects_invalid_verifier_report(tmp_path: Path, mutation: str) -> None:
+    spool, bundle, _ = _passing_bundle(tmp_path)
+    report_path = bundle / "verifier-run/stdout.txt"
+    report = json.loads(report_path.read_bytes())
+    if mutation == "zero-checks":
+        report["checks"] = []
+    elif mutation == "duplicate-checks":
+        report["checks"].append(report["checks"][0])
+    elif mutation == "contradictory-pass":
+        report["passed"] = False
+    elif mutation == "contradictory-score":
+        report["checks"][0]["score"] = 0.0
+    else:
+        report["checks"][0]["passed"] = "true"
+    stdout = encode(report)
+    _write(report_path, stdout)
+    manifest_path = bundle / "verifier-run/manifest.json"
+    manifest = json.loads(manifest_path.read_bytes())
+    manifest["stdout"]["digest"] = manifest["stdout_stream_digest"] = sha256_bytes(stdout)
+    _write(manifest_path, encode(manifest))
+    case = tmp_path / "case.json"
+    with pytest.raises(ReplayError):
+        freeze_verified_hook_case(
+            spool,
+            tmp_path / "store",
+            bundle,
+            _index(bundle),
+            case,
+            source_kind="synthetic",
+            allow_pass=True,
+        )
+    assert not case.exists()
+
+
+@pytest.mark.parametrize(
+    "mutation", ["workspace", "nonzero-exit", "lifecycle", "binding", "provenance", "episode-pass"]
+)
+def test_allow_pass_preserves_verification_bindings(tmp_path: Path, mutation: str) -> None:
+    spool, bundle, _ = _passing_bundle(tmp_path)
+    if mutation == "workspace":
+        target = next((bundle / "verifier-run/workspace").rglob("*.py"))
+        target.write_bytes(target.read_bytes() + b"\n# drift\n")
+    else:
+        filename = {
+            "nonzero-exit": "verifier-run/manifest.json",
+            "lifecycle": "verifier-lifecycle.json",
+            "binding": "binding.json",
+            "provenance": "episode.json",
+            "episode-pass": "episode.json",
+        }[mutation]
+        target = bundle / filename
+        data = json.loads(target.read_bytes())
+        if mutation == "nonzero-exit":
+            data["exit_code"] = 1
+        elif mutation == "lifecycle":
+            data["stages"] = []
+        elif mutation == "binding":
+            data["episode_identity"] = sha256_bytes(b"another-session")
+        elif mutation == "provenance":
+            data["source_authenticity"] = "ATTESTED"
+        else:
+            data["acceptance"] = "VERIFIED_PASS"
+        _write(target, encode(data))
+    case = tmp_path / "case.json"
+    with pytest.raises(ValueError):
+        freeze_verified_hook_case(
+            spool,
+            tmp_path / "store",
+            bundle,
+            _index(bundle),
+            case,
+            source_kind="synthetic",
+            allow_pass=True,
+        )
+    assert not case.exists()
+
+
+def test_allow_pass_rejects_verification_for_another_episode(tmp_path: Path) -> None:
+    _, bundle, expected = _passing_bundle(tmp_path)
+    other_spool = tmp_path / "other-hooks"
+    for event in ("SessionStart", "PreToolUse", "PostToolUse", "Stop"):
+        raw: dict[str, object] = {"hook_event_name": event, "session_id": "another-session"}
+        if "ToolUse" in event:
+            raw.update(tool_name="Bash", tool_use_id="another-call")
+        receive_hook(
+            encode(raw),
+            "codex",
+            other_spool,
+        )
+    case = tmp_path / "case.json"
+    with pytest.raises(ReplayError, match="wrong session verification"):
+        freeze_verified_hook_case(
+            other_spool,
+            tmp_path / "store",
+            bundle,
+            expected,
+            case,
+            source_kind="synthetic",
+            allow_pass=True,
+        )
+    assert not case.exists()

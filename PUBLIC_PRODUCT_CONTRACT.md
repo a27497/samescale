@@ -1,5 +1,16 @@
 # SameScale Product — Public Product Contract
 
+## Bounded native-hook observation — 2026-10-07
+
+One [operator-observed real Codex case](docs/evidence/real-codex-native-hook-20261007/README.md)
+has a completed passive native-hook turn, a digest-bound final workspace, independent **5/5 L0
+checks**, and two byte-identical offline replays. `freeze-hooks --allow-pass` permits a neutral
+verified observation with independent verification; the failure-only format retains its original
+meaning. CUSTOM hook Episodes keep their original `NOT_VERIFIED` acceptance; separately bound
+verifier results do not rewrite them. Missing tool exit codes, usage, cost and root cause stay
+unknown, and hashes do not attest origin. This bounded case establishes neither general model
+quality nor a causal comparison; it adds no automatic execution or repair permission.
+
 ## Public demo integrity — 2026-09-30
 
 An explicitly configured `/demo` selects the new `FIXTURE_OFFLINE` bundle and saved run identities.

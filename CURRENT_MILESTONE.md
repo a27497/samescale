@@ -1,5 +1,57 @@
 # SameScale Product — Current Milestone
 
+## Native-hook publication preparation — 2026-10-08
+
+The audited changes are packaged for review on
+`codex/native-hook-observation-publication-20261008`, based on `199e45be1fe962fc7fcb140d1aab8daf044b0ec2`.
+No implementation or frozen evidence changed after the audit. Pre-publication full Ruff lint and
+format (766 files), mypy (388 files), and the 54-file case inventory / 52 pinned evidence hashes
+**PASS**. The audit's 66 targeted tests and 73-test offline gate remain the local acceptance.
+Remote push identity and CI are checked separately against the exact commit after publication;
+this preparation snapshot does not claim remote CI completion. No merge, deployment or new real
+Agent/verifier execution is authorized in this publication step.
+
+## Native-hook uncommitted-change audit — 2026-10-08
+
+Passing observation support is retained after one minimal task-identity correction. Comparing
+Pydantic task objects accepted missing default fields, coerced budget values and duplicate lanes;
+the reader now ignores only `lane_support` ordering and preserves the original comparison for
+every other field. Synthetic negative tests cover these cases and independent verifier outcomes,
+workspace/session bindings, process/lifecycle completion and Episode provenance. The failure-only
+format still rejects a pass. Original Episodes remain `NOT_VERIFIED` / `NOT_ATTESTED`.
+
+Local targeted tests **66 PASS**; focused Ruff lint/format and mypy (4 files) **PASS**. Existing
+network-isolated S3 offline gate **73 PASS**, with both historical replay passes matching all five
+golden outputs. Two fresh native-hook replay processes with different Python hash seeds match
+both saved outputs byte-for-byte; **52 case evidence hashes**, **869 tracked historical assets**,
+**38 local documentation links**, and **419 protected files before/after tests** verify unchanged
+or valid as applicable. No historical task/evidence or original receipt was rewritten; the original
+receipt's source hashes retain their pre-audit scope. `git diff --check` **PASS**.
+
+The one operator-observed attempt and separate **5/5 L0 final-workspace result** retain their scope;
+no repair, authenticity attestation, instruction-compliance, causal or general benchmark proof is
+added. No new Agent/verifier execution, commit, push, merge or deployment. **No blocker; STOP.**
+
+## Bounded REAL Codex Native Hook case — 2026-10-07
+
+The user's separately authorized internship evidence task completed **one real Codex CLI 0.160.1
+attempt**, configured `gpt-6.1-sol` / high, on existing `core-python-deduplicate/1.0.2` in an isolated
+temporary workspace. Native passive capture completed **12 receipts / 5 paired tool calls**.
+The original CUSTOM Episode remains `NOT_VERIFIED`; the independently bound final workspace
+passed **5/5 deterministic L0 checks** in the existing read-only, network-disabled Docker verifier.
+All verifier lifecycle stages and cleanup passed. First attempt passed, so **0 repair runs**.
+
+Frozen evidence replayed twice with byte-identical outputs, **0 external calls, no subject or
+verifier execution**. Small source corrections add opt-in verified-pass freezing and compare task
+lane sets semantically across processes; the historical failure-only format and evidence bytes
+are preserved. Focused tests, Ruff and mypy results are recorded in the
+[public-safe case receipt](docs/evidence/real-codex-native-hook-20261007/receipt.json).
+Actual serving model, hook tool exit codes, usage, cost and root cause remain unknown;
+source authenticity is operator-observed, `NOT_ATTESTED`. No general benchmark, causal comparison,
+human ownership, CI or deployment claim. No raw subject prompt/output/transcript was saved and
+global Codex configuration was unchanged. No Judge, other provider campaign, commit, push,
+deployment or release. This bounded case does not reopen product roadmap phases.
+
 ## Final Git closeout — 2026-09-30
 
 User supplied the latest independent Grok targeted UAT: **PASS**.

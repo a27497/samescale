@@ -1,0 +1,1 @@
+{"call":"sha256:36fb24655ba04c7d407e458b9b0faf4128965e6786ea00032de7db6a3eba025c","event":"PostToolUse","exit_code":null,"failure":false,"schema_version":1,"session":"sha256:c4e023268613e54cba271e6b91187de3e1a6ff3575e02c15f7682e8d76ddc2c9","source":"codex","tool":"Bash"}

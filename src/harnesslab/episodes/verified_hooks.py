@@ -100,7 +100,16 @@ def read_verified_hook_bundle(root: Path, expected: str) -> dict[str, Any]:
         )
     task = decode(files["task.json"])
     package = TaskPackage.load(safe_path(root, f"task-package/{task['id']}/{task['version']}"))
-    require(package.definition.model_dump(mode="json") == task, "task package identity drift")
+    # Only lane order may differ across processes; retain exact identity for other fields.
+    package_task = package.definition.model_dump(mode="json")
+    lanes = task.get("lane_support")
+    require(
+        isinstance(lanes, list)
+        and all(isinstance(lane, str) for lane in lanes)
+        and sorted(lanes) == sorted(package_task["lane_support"])
+        and {**task, "lane_support": package_task["lane_support"]} == package_task,
+        "task package identity drift",
+    )
     require(
         tree_digest(files, "verifier-source/") == package.verifier_digest, "verifier source drift"
     )
@@ -202,11 +211,14 @@ def freeze_verified_hook_case(
     destination: Path,
     *,
     source_kind: SourceKind,
+    allow_pass: bool = False,
 ) -> str:
     episode = import_hook_episode(spool, store, source_kind=source_kind)
     result = read_verified_hook_bundle(bundle, expected)
     require(result["episode_identity"] == episode.identity, "wrong session verification")
-    require(result["acceptance"] == "VERIFIED_FAIL", "passing workspace is not a Bad Case")
+    require(
+        allow_pass or result["acceptance"] == "VERIFIED_FAIL", "passing workspace is not a Bad Case"
+    )
     relative = bundle.resolve().relative_to(destination.parent.resolve()).as_posix()
     safe_path(destination.parent, relative)
     require(
@@ -214,9 +226,9 @@ def freeze_verified_hook_case(
     )
     case = {
         "schema_version": 1,
-        "kind": "verified-hook-regression-v1",
+        "kind": "verified-hook-observation-v1" if allow_pass else "verified-hook-regression-v1",
         "verification": {"path": relative, "sha256": expected},
-        "bad_case": result,
+        "verification_result" if allow_pass else "bad_case": result,
     }
     _directory(destination.parent)
     _write_once(destination, encode(case))
@@ -224,23 +236,32 @@ def freeze_verified_hook_case(
 
 
 def replay_verified_hook_case(path: Path, expected: str, case: dict[str, Any]) -> dict[str, Any]:
+    observation = case.get("kind") == "verified-hook-observation-v1"
+    result_key = "verification_result" if observation else "bad_case"
     require(
-        set(case) == {"schema_version", "kind", "verification", "bad_case"}, "invalid case schema"
+        set(case) == {"schema_version", "kind", "verification", result_key}, "invalid case schema"
     )
-    require(case["schema_version"] == 1, "unsupported verified case version")
+    require(
+        case["schema_version"] == 1
+        and case["kind"] in {"verified-hook-regression-v1", "verified-hook-observation-v1"},
+        "unsupported verified case version",
+    )
     reference = case["verification"]
     require(set(reference) == {"path", "sha256"}, "invalid verification reference")
     result = read_verified_hook_bundle(
         safe_path(path.parent, reference["path"]), reference["sha256"]
     )
-    require(result["acceptance"] == "VERIFIED_FAIL", "passing workspace is not a Bad Case")
-    require(result == case["bad_case"], "verified attribution replay drift")
+    require(
+        observation or result["acceptance"] == "VERIFIED_FAIL",
+        "passing workspace is not a Bad Case",
+    )
+    require(result == case[result_key], "verified attribution replay drift")
     return {
         "status": "PASS",
         "case_digest": expected,
         "episode_identity": result["episode_identity"],
         "acceptance": result["acceptance"],
-        "bad_case": result,
+        result_key: result,
         "external_calls": 0,
         "subject_executed": False,
         "verifier_executed": False,

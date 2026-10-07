@@ -66,16 +66,23 @@ def freeze_hooks(
     source_kind: Literal["historical", "synthetic", "unverified"] = "unverified",
     verification: Annotated[Path | None, typer.Option("--verification")] = None,
     verification_sha256: Annotated[str | None, typer.Option("--verification-sha256")] = None,
+    allow_pass: Annotated[bool, typer.Option("--allow-pass")] = False,
 ) -> None:
-    """Freeze observed tool failures as a CUSTOM offline regression case."""
+    """Freeze CUSTOM failures, or an independent verified observation with --allow-pass."""
     try:
         if verification is not None and verification_sha256 is not None:
             from harnesslab.episodes.verified_hooks import freeze_verified_hook_case
 
             digest = freeze_verified_hook_case(
-                source, store, verification, verification_sha256, output, source_kind=source_kind
+                source,
+                store,
+                verification,
+                verification_sha256,
+                output,
+                source_kind=source_kind,
+                allow_pass=allow_pass,
             )
-        elif verification is not None or verification_sha256 is not None:
+        elif verification is not None or verification_sha256 is not None or allow_pass:
             raise ValueError("verification requires an external digest")
         else:
             digest = freeze_hook_case(source, store, output, source_kind=source_kind)
