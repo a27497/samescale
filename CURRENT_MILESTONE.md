@@ -23,8 +23,8 @@ API identity remain unchanged. See [local QA and screenshot index](docs/qa/ui-ux
 The default build directory was found to be consumed by an existing local service: it briefly
 served the new generated frontend. That directory was restored from the unchanged `main` source,
 and the service's baseline HTML and UI were browser-verified. New artifacts and preview are now
-isolated outside the repository's served build directory. No service configuration/restart,
-remote publication or paid execution was performed. Physical-device, non-Chromium, full
+isolated outside the repository's served build directory. Initial local acceptance performed no
+service configuration/restart, remote publication or paid execution. Physical-device, non-Chromium, full
 screen-reader and first-touch comprehension acceptance remain unverified.
 The user accepted the desktop Analyst and Public Demo design and authorized bounded closeout,
 commit/push to this development branch, and exact pushed-SHA CI verification. Public Analyst's
@@ -34,9 +34,14 @@ are retained. Closeout frontend **99/99 PASS**, typecheck/build **PASS**, and Ch
 no private persistence or Real execution is claimed. **297 protected files**, Demo API identity
 and `main` ref verify unchanged. The initial browser navigation check ran before the lazy Demo
 finished rendering; the corrected wait passed, with the initial report retained.
-See [closeout receipt](docs/qa/ui1-closeout-20261008.json). Remote CI is pending publication at
-this snapshot and must be checked against the pushed SHA. No merge, deployment or real
-Agent/Provider execution. **No technical blocker; stop after branch publication and CI verification.**
+Implementation commit `e0e7db285b5e88ef0d44a05611b2dd9cc9113de1` is pushed to this development
+branch; its remote SHA matched. Exact-SHA [Fast CI](https://github.com/a27497/samescale/actions/runs/37733695421)
+and [Offline Regression](https://github.com/a27497/samescale/actions/runs/37733695365) both **PASS**.
+Offline Regression confirms **73 tests**, two identical replay passes and **0 external/model/Provider
+calls**, with no subject or verifier execution. See [closeout receipt](docs/qa/ui1-closeout-20261008.json).
+This receipt update changes documentation only; its final pushed SHA and CI are checked separately
+in the task's final publication report. No merge, deployment or real Agent/Provider execution.
+**UI-1 desktop closeout accepted; no technical blocker; STOP after final publication verification.**
 
 ## Native-hook publication preparation — 2026-10-08
 
