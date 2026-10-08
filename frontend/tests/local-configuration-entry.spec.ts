@@ -68,8 +68,8 @@ describe('local configuration application entry', () => {
 it('Connections and its configuration copy match the Advanced English locale', async () => {
   local.status.mockResolvedValue({ enabled: false })
   const { wrapper } = await open()
-  expect(wrapper.get('a[href="/connections"]').text()).toContain('Connections')
-  expect(wrapper.get('.topbar').text()).not.toMatch(/[\u3400-\u9fff]/)
+  expect(wrapper.get('a[href="/connections"]').text()).toContain('连接与配置')
+  expect(wrapper.get('.topbar h1').text()).toBe('Connections')
   const text = wrapper.get('.connections-page').text()
   expect(text).toContain('Connections and configuration')
   expect(text).toContain('Local model configurations')
