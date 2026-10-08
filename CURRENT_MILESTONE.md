@@ -1,5 +1,69 @@
 # SameScale Product — Current Milestone
 
+## Visual v1 formally accepted — development-branch Git closeout — 2026-10-08
+
+The user **formally passed Visual v1 human visual acceptance on 2026-10-08** and authorized bounded
+commit/push of the accepted candidate to `codex/samescale-visual-v1-20261008`, with final local/remote
+SHA identity and exact-SHA Fast CI / Offline Regression verification. No implementation changes
+are introduced during this closeout. All 21 accepted frontend source/test files match their local
+acceptance bytes: **134/134 frontend tests**, typecheck, isolated build and **44/44 browser checks**
+remain the applicable local results. Original UI-2 **1494 files** and dirty diff, frozen evidence,
+saved Demo/Run/Trace/Diagnosis and main remain unchanged at pre-publication verification.
+
+[Git closeout scope and acceptance](docs/qa/visual-v1-git-closeout-20261008.md) and
+[candidate source hashes](docs/qa/visual-v1-acceptance-20261008.json) preserve formal acceptance.
+Historical receipts below retain their original observation dates, old HEADs and then-pending human
+acceptance status. The final task closeout receipt reports the final pushed head and its exact-SHA
+Actions results after push; this source snapshot does not anticipate remote CI success.
+**Human visual acceptance PASS; STOP after publication verification, awaiting merge-review authorization.**
+No PR creation, merge main, history rewrite, deployment or real Agent/Provider execution is authorized.
+
+
+## Visual v1 final-review corrections — 2026-10-08
+
+The current Visual v1 candidate received bounded frontend corrections only: `failed_subject`
+now labels subject lifecycle failure, independent of Verifier; Run diagnosis actions distinguish
+passed / failed / not verified; Public Demo re-reads discard old stage data and settle independently,
+with failed stages unavailable, duplicate retries blocked and fresh valid stages still readable.
+Layout, theme and original evidence text are unchanged.
+
+Added **18 targeted tests** covering both locales, Run three-state verification/actions and
+all four supplemental stages succeeding, then failing on retry, then recovering. Frontend full
+**134/134 PASS (12 files)**, typecheck and isolated production build **PASS**, Chromium production
+preview **44/44 PASS**. Run and Demo 1440px screenshots in both locales retain the previous normal
+page dimensions with no overflow; controlled trace-retry failures are separately labeled.
+Original UI-2 **1494 protected files** and dirty diff, saved evidence and source identities remain
+unchanged. No backend/API/evidence/data changes, real Agent/Provider, commit/push/merge or deployment.
+See [final-review receipt and screenshots](docs/qa/visual-v1-final-review-20261008.md).
+**STOP awaiting final human visual confirmation; no known technical blocker.**
+
+
+## SameScale Visual Design v1 — 2026-10-08
+
+User-authorized implementation is isolated in `/home/dev/.worktrees/samescale-visual-v1`, branch
+`codex/samescale-visual-v1-20261008`, based on `ec14e936a79e88446347dd010f68bd6bde55aaec`.
+The frozen Stitch theme is implemented across the shared Shell, Home, Run Detail, Diagnosis,
+Regression and Public Demo with zh-CN default / en-US switching. Original evidence, IDs, summaries,
+API and permissions remain authoritative; Verifier and Agent claims are independent, missing
+values stay missing, and incomparable results declare no winner. Existing routes, operations,
+advanced navigation, safe exports and small-screen navigation remain available.
+
+Frontend full **116/116 PASS (12 files)**; final Demo-focused **20/20 PASS**;
+typecheck and isolated production build **PASS**; local production-preview Chromium acceptance
+**50/50 PASS**, with **30 screenshots** across five pages, two locales and 1366/1440/1920px.
+Screenshots use actual saved FIXTURE_OFFLINE evidence; controlled exceptions are labeled separately.
+The original UI-2 worktree's **1494 protected files** and original diff hash remain unchanged;
+Demo/Run/Trace/Diagnosis identities and content remain unchanged. Build output and preview are
+isolated outside the default served frontend/dist. No backend, schema, dependency, permission,
+frozen evidence or Demo-data changes, no real Agent/Provider execution, no commit/push/merge or deploy.
+
+[Acceptance report and screenshot index](docs/qa/visual-v1-20261008.md) records source bindings,
+checks and remaining layout differences from real content and font fallbacks. Private persistence,
+non-Chromium, remote CI and human visual acceptance are not claimed.
+**Local technical acceptance complete; STOP awaiting human visual acceptance.**
+
+Older dated authorizations and publication results below retain their original scope.
+
 ## Core product UI/UX iteration 1 — 2026-10-08
 
 User-authorized presentation work is accepted for publication on `codex/core-ui-ux-20261008`, based on

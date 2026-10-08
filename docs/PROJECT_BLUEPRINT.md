@@ -1,5 +1,35 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：Visual v1 Git 收口与 exact-SHA CI（2026-10-08）
+
+用户已正式通过 Visual v1 人工视觉验收。仅核查并整理已验收前端源码、测试和产品／验收
+文档，保留历史观察记录并准确记载正式人工通过；复用源文件未变的本地验收，执行必要的
+发布前范围／敏感信息／证据／工作区保护检查。合理提交并正常推送当前开发分支，核对
+最终本地／远端 SHA 一致，验证其 Fast CI 与 Offline Regression。CI 问题仅在本阶段范围
+内做最小修复，范围外阻塞则 STOP。保护原 UI-2、后端契约、冻结 evidence 和 Demo 数据；
+禁止 force push、改写历史、创建 PR、合并 main、部署或真实 Agent/Provider。完成后
+**STOP 等待合并审查授权**。下方验收及旧阶段授权均为历史范围。
+
+## 当前授权：SameScale Visual Design v1（2026-10-08）
+
+本轮最终审核补充授权仅修 Run 生命周期／Verifier 三态诊断入口与 Public Demo 补充证据
+重试的过期数据问题；保留五页布局、主题、语言体系及全部既有候选修改。增加针对性
+中英文／三态／正常异常恢复测试，执行前端回归、类型检查和隔离构建；标签受影响的
+Run / Demo 补充 1440px 中英文截图。原工作区、后端、API 和证据均只读；完成后 STOP。
+
+仅在 `/home/dev/.worktrees/samescale-visual-v1` 将五张已人工确认的 Stitch 截图与 DESIGN.md
+落地为共享 Shell、Home、Run Detail、Diagnosis、Regression、Public Demo。沿用现有 Vue 3
+架构和真实 API／权限，完成产品化中文文案与 zh-CN / en-US 界面切换；不重新探索主题。
+业务映射和文案交接材料为参考，当前源码、公共产品契约和用户本轮约束决定功能。
+保护原 UI-2 dirty 工作区、后端／schema／权限、冻结 evidence 和 Demo 原始数据；
+保留全部路由／深链接、真实操作、门禁、安全导出和高级入口，不新增虚构能力。
+
+验收：五页及 Shell 桌面视觉对照、真实保存证据与受控异常的浏览器检查、五页两种语言
+在 1366/1440/1920px 的截图、相关前端回归、类型检查、隔离构建和保护性核验。
+构建／预览不得写现有服务的默认 frontend/dist；保留既有小屏功能但不新增移动端设计。
+不执行真实 Agent/Provider、不部署、不提交／推送／合并。结果写 CURRENT_MILESTONE 和
+验收报告；完成后 **STOP 等待人工视觉验收**。以下旧授权均保留历史范围，不启动后续阶段。
+
 ## 最终授权：求职冻结版 Git closeout（2026-09-30）
 
 开发停止。仅审计 UAT / Public Demo recovery / Tailnet QA 收口修改，排除临时运维残留，

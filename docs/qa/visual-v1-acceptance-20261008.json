@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "acceptance_date": "2026-10-08",
+  "timezone": "Asia/Shanghai",
+  "human_visual_acceptance": "PASS",
+  "authority": "User explicitly confirmed formal Visual v1 visual acceptance and authorized development-branch commit/push with exact-SHA CI verification.",
+  "branch": "codex/samescale-visual-v1-20261008",
+  "base_sha": "ec14e936a79e88446347dd010f68bd6bde55aaec",
+  "scope": [
+    "Shared App Shell",
+    "Home",
+    "Run Detail",
+    "Diagnosis",
+    "Regression",
+    "Public Demo",
+    "zh-CN / en-US",
+    "Final lifecycle/verifier semantics and supplemental-stage retry corrections"
+  ],
+  "frontend_source_and_test_sha256": {
+    "frontend/src/App.vue": "902ad3a66b90189969aafb67bf1212392880ac6936a92e90a63de43fa3037991",
+    "frontend/src/components/EvidenceValue.vue": "e4313a8683ed5ed1ab01a00ab6de486361a70734bbb8116274ef1beb27b326a3",
+    "frontend/src/components/InvestigationReport.vue": "b3de84970ed978bebf08afab0cf387f3cb91e5062a17081038e70be342760f58",
+    "frontend/src/components/PageState.vue": "f583ebab8ebca6586719126a6e6aa9cff4d5827c20015aa09de8ad1604cf7e8f",
+    "frontend/src/components/StatusBadge.vue": "84b1e980d8ee5a18f98c169d526b7027f90ee838bec8d420bdb20c8088dc94f1",
+    "frontend/src/components/TraceTimeline.vue": "87f5ec4b2b1c9d00bdd6b5bd4cc7e87bf6cc7c4ed7e02916cbad76515dd3e5ef",
+    "frontend/src/composables/i18n.ts": "fc8e89bf675bbf22f56191c86ba8436761eb9bc88e70df6b6c0faa8d87a76d0f",
+    "frontend/src/styles.css": "5af4cafe178d694fb52a960e96e6ee848553118eefabbeb9010178a87d846299",
+    "frontend/src/views/AnalystHomeView.vue": "dd40edf35e9e8122dd1413c97f2e3c760a9af6300df505bb01c50aa71206cdc5",
+    "frontend/src/views/DiagnosisView.vue": "abe2cd6738a7126b95a8e267f40d76f25a4ee32b9744e50baad235ce64d009f2",
+    "frontend/src/views/PublicDemoView.vue": "400ff3419096cba879370c8963c0b0bf3e3c4260f45f4e08129733640711c60c",
+    "frontend/src/views/RegressionView.vue": "9b9c6c6f629e6f4eee3a95f6bd8ef361c4823fd2ca5f523ddcd5b1564ad10903",
+    "frontend/src/views/RunDetailView.vue": "f0495bc172e533d416af1016d1c73b8f755b2f30892fc857f24c06091896862c",
+    "frontend/tests/analyst-home.spec.ts": "92db89e643990ed48f48d5d8fc0cd8935d512ed3e87e279e1aedd96d60ff4a3f",
+    "frontend/tests/diagnosis.spec.ts": "db42b4c594fadce14d9a4b74b1868e4628a8e88f565361ef014546dd95cafc7c",
+    "frontend/tests/local-configuration-entry.spec.ts": "9b044f142a8b96dfdb6733abcd1ff1efe443800441d12c7f56301c5dcbdc76fa",
+    "frontend/tests/public-demo.spec.ts": "023513cb6da8ca309e81471e111f8b9d9c0bfe7b88aa1b9174c6f44feef0699f",
+    "frontend/tests/workbench.spec.ts": "a1d58ebffc21e6c1b5f81c4e73fcdcfc7265f548ba05365741d0c512d0be4cd7",
+    "frontend/src/composables/visualLocale.ts": "45d0dd93bc81cdc5d0d2eedb292c74d5f47ea03bccbaf63949aeede242b0663e",
+    "frontend/src/utils/visualEvidence.ts": "4ee3e02b5b6c13abf0ba48e5e467140f73fffef180c6c9bfd2da6345ccb1a137",
+    "frontend/tests/visual-v1.spec.ts": "f3531b2d3e4c7fb1b0e5eef43dc8272641e093f622d26b82c4f0ddd724587b43"
+  },
+  "accepted_local_validation": {
+    "frontend_tests": {
+      "passed": 134,
+      "files": 12
+    },
+    "typecheck": "PASS",
+    "isolated_build": "PASS",
+    "final_review_browser_checks": {
+      "passed": 44,
+      "runtime_errors": 0
+    },
+    "initial_desktop_screenshots": {
+      "count": 30,
+      "widths": [
+        1366,
+        1440,
+        1920
+      ],
+      "locales": [
+        "zh-CN",
+        "en-US"
+      ]
+    },
+    "final_review_1440_screenshots": {
+      "normal": 4,
+      "controlled_error": 2
+    }
+  },
+  "protected_workspace": {
+    "file_count": 1494,
+    "diff_sha256": "7039698aa27d9ac3753d3389c0ebdf4e457446ab6e30f59d6c5fe58346a8e5fe",
+    "unchanged": true
+  },
+  "evidence": {
+    "demo_id": "public-demo-20260930-9569db12e23a",
+    "provenance": "FIXTURE_OFFLINE",
+    "manifest_digest": "sha256:593a54eff3ef0f89212d3097ea3d1f3349d1b7b085f618d2ca8f9805746171d7",
+    "demo_run_trace_diagnosis_unchanged": true,
+    "ready": true
+  },
+  "historical_receipts": [
+    "visual-v1-20261008.md",
+    "visual-v1-final-review-20261008.md"
+  ],
+  "publication_verification": "Final head SHA, remote identity and exact-SHA Actions results are recorded after push in the final closeout report and its separate local publication receipt; this pre-publication snapshot does not assert CI success.",
+  "excluded_actions": [
+    "force push",
+    "history rewrite",
+    "PR creation",
+    "merge main",
+    "deployment",
+    "real Agent/Provider execution"
+  ]
+}

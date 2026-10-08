@@ -56,8 +56,9 @@ const report = {
   }],
 }
 
-beforeEach(() => {
-  vi.clearAllMocks()
+beforeEach(async () => {
+  vi.resetAllMocks()
+  await router.push('/diagnosis')
   api.listExperiments.mockResolvedValue({ items: [{ experiment_id: 'diagnosis-fixture', name: 'Diagnosis fixture' }], total: 1, limit: 100, offset: 0 })
   api.getDiagnosis.mockResolvedValue(report)
   api.exportBadCases.mockResolvedValue({
@@ -80,13 +81,13 @@ describe('Diagnosis Workbench', () => {
     await flushPromises()
 
     const text = wrapper.text()
-    expect(text).toContain('Experiment → Cell')
+    expect(text).toContain('失败模式')
     expect(text).toContain('codex-low')
     expect(text).toContain('targeted-bug-fix')
     expect(text).toContain('Test Failure')
     expect(text).toContain('Trace')
-    expect(text).toContain('Final workspace diff')
-    expect(text).toContain('Tool calls')
+    expect(text).toContain('最终工作区差异')
+    expect(text).toContain('工具调用')
     expect(text).toContain('Verifier')
     expect(text).toContain('VERIFIED_FACT')
     expect(text).toContain('HYPOTHESIS')
@@ -109,8 +110,8 @@ describe('Diagnosis Workbench', () => {
     expect(createObjectURL).toHaveBeenCalledOnce()
     expect(click).toHaveBeenCalledOnce()
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:fixture')
-    expect(wrapper.text()).toContain('Downloaded 1 persisted BadCases and 0 synthetic qualification cases')
-    expect(wrapper.text()).toContain('a persisted case is not automatically a real Provider run')
+    expect(wrapper.text()).toContain('已下载持久化案例 / 合成资格案例: 1 / 0')
+    expect(wrapper.text()).toContain('保存记录不自动认证真实 Provider 调用')
     click.mockRestore()
   })
 
@@ -128,6 +129,21 @@ describe('Diagnosis Workbench', () => {
 it('offers an executable runs link when diagnosis has no failures', async () => {
   api.getDiagnosis.mockResolvedValue({ ...report, failure_run_count: 0, cells: [] })
   const wrapper = mount(DiagnosisView, { global: { plugins: [router] } }); await flushPromises()
-  expect(wrapper.get('a[href="/experiments/diagnosis-fixture?tab=runs"]').text()).toBe('Inspect experiment runs →')
+  expect(wrapper.get('a[href="/experiments/diagnosis-fixture?tab=runs"]').text()).toBe('查看实验运行')
   expect(wrapper.text()).not.toContain('Open a run to inspect')
+})
+
+
+it('updates a same-page experiment deep link outside the bounded list without keeping the old report', async () => {
+  await router.push('/diagnosis?experiment=diagnosis-fixture')
+  const wrapper = mount(DiagnosisView, { global: { plugins: [router] } })
+  await flushPromises()
+  api.getExperiment.mockResolvedValue({ experiment_id: 'older-linked', name: 'Older record', provenance: 'FIXTURE_OFFLINE' })
+  api.getDiagnosis.mockResolvedValue({ ...report, experiment_id: 'older-linked', failure_run_count: 0, cells: [] })
+  await router.push('/diagnosis?experiment=older-linked'); await flushPromises()
+  expect(api.getExperiment).toHaveBeenCalledWith('older-linked')
+  expect(api.getDiagnosis).toHaveBeenLastCalledWith('older-linked')
+  expect(wrapper.find('.selected-run-identity').exists()).toBe(false)
+  expect((wrapper.get('[data-test="diagnosis-experiment"]').element as HTMLSelectElement).value).toBe('older-linked')
+  expect(wrapper.text()).toContain('这不证明所有任务通过')
 })

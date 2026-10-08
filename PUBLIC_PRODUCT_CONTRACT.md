@@ -123,9 +123,13 @@ exactly-once guarantee or a native LangGraph PostgreSQL Checkpointer claim.
 ## Compatibility and change control
 
 SameScale is the external product name in the shell, route titles, browser metadata, and current
-README entry. HarnessLab remains the implementation and historical identity. The primary navigation
-contains investigation entry and saved sessions; evaluation tools remain in an expandable advanced
-area, automatically expanded when visiting their existing routes. No route is removed or renamed.
+README entry. HarnessLab remains the implementation and historical identity. Visual v1 navigation
+contains investigation entry, Public Demo, saved sessions, experiments, diagnosis and regression;
+other tools remain in an expandable advanced area, automatically expanded on their direct routes.
+Run evidence navigation is bound to an actual run context. No route is removed or renamed.
+Visual v1's five pages and shared Shell support zh-CN (default) and en-US; switching translates
+interface copy, not evidence, IDs, summaries or API-returned text. Status semantics stay bound to
+the original code. Advanced pages retain their existing locale implementation.
 Top-level CLI help and API documentation display SameScale with an explicit HarnessLab compatibility
 note. Package-version help, technical identifiers, and historical/evidence text retain their identity.
 S1.5 integrates the accepted work into `main` and renames the existing private GitHub repository
