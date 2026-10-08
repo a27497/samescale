@@ -179,6 +179,10 @@ describe('Workbench contracts', () => {
     expect(wrapper.get('.advanced-nav').attributes('open')).toBeUndefined()
     expect(wrapper.findAll('.nav-current').map(link => link.attributes('href'))).toEqual(['/analyst/sessions'])
     expect(wrapper.get('.workbench-shell').classes()).not.toContain('nav-open')
+    await router.push('/demo'); await flushPromises()
+    expect(wrapper.get('.advanced-nav').attributes('open')).toBeUndefined()
+    expect(wrapper.findAll('.nav-current').map(link => link.attributes('href'))).toEqual(['/demo'])
+    expect(wrapper.find('.readonly-context').exists()).toBe(false)
     wrapper.unmount()
   })
 

@@ -1,5 +1,43 @@
 # SameScale Product — Current Milestone
 
+## Core product UI/UX iteration 1 — 2026-10-08
+
+User-authorized presentation work is accepted for publication on `codex/core-ui-ux-20261008`, based on
+`050bc5638709f3a7faada834df2936dc9102504f`; the `main` ref is unchanged. Product navigation,
+Analyst home and Public Demo now have clearer entry hierarchy, Chinese primary copy, responsive
+cards, and a five-step evidence reading path. Existing routes, API calls, permissions and evidence
+states are preserved. Advanced pages keep their existing English locale contract. Public Demo
+remains `FIXTURE_OFFLINE`, separate from frozen real cases; integrity errors expose neither a
+ready journey nor replacement evidence. No backend, dependency, historical evidence or Demo data
+was changed.
+
+Frontend full **99/99 PASS (11 files)**, final Analyst-home **7/7 PASS**, TypeScript and production
+build **PASS**. Chromium covered **320 / 390 / 768 / 1024 / 1440px**, public sessions, advanced
+navigation, Fake and historical reports, keyboard focus/citation return, five Demo destinations,
+and injected integrity/no-config/gate-false states. **146 browser checks**, **18 focused follow-up
+checks**, and **9 final checks** pass; the initially blocked regression POST was a QA guard
+classification error, resolved against the existing read-only backend whitelist. Initial results
+are retained. **297 protected repository files**, **109 frozen Demo storage files**, and the Demo
+API identity remain unchanged. See [local QA and screenshot index](docs/qa/ui-ux-20261008.md).
+
+The default build directory was found to be consumed by an existing local service: it briefly
+served the new generated frontend. That directory was restored from the unchanged `main` source,
+and the service's baseline HTML and UI were browser-verified. New artifacts and preview are now
+isolated outside the repository's served build directory. No service configuration/restart,
+remote publication or paid execution was performed. Physical-device, non-Chromium, full
+screen-reader and first-touch comprehension acceptance remain unverified.
+The user accepted the desktop Analyst and Public Demo design and authorized bounded closeout,
+commit/push to this development branch, and exact pushed-SHA CI verification. Public Analyst's
+third card now says **会话功能仅限私有工作区 / READ ONLY**; private copy and session destinations
+are retained. Closeout frontend **99/99 PASS**, typecheck/build **PASS**, and Chromium at
+**1365 / 1440px: 22/22 PASS**. Private capabilities were injected only for presentation checks;
+no private persistence or Real execution is claimed. **297 protected files**, Demo API identity
+and `main` ref verify unchanged. The initial browser navigation check ran before the lazy Demo
+finished rendering; the corrected wait passed, with the initial report retained.
+See [closeout receipt](docs/qa/ui1-closeout-20261008.json). Remote CI is pending publication at
+this snapshot and must be checked against the pushed SHA. No merge, deployment or real
+Agent/Provider execution. **No technical blocker; stop after branch publication and CI verification.**
+
 ## Native-hook publication preparation — 2026-10-08
 
 The audited changes are packaged for review on

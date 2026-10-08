@@ -22,7 +22,7 @@ async function open(kind: 'offline' | 'historical') {
   requestedKind.value = kind
   busy.value = true; error.value = ''; example.value = null
   try { example.value = kind === 'offline' ? await analystApi.offline() : await analystApi.historical() }
-  catch { error.value = '案例加载失败。请确认本地 API 已启动；历史证据缺失或摘要不匹配时不会显示替代结果。可以重试或选择其他入口。' }
+  catch { error.value = '案例加载失败。请确认工作区 API 可访问；历史证据缺失或摘要不匹配时不会显示替代结果。可以重试或选择其他入口。' }
   finally { busy.value = false }
   if (example.value) {
     await nextTick()
@@ -34,25 +34,32 @@ async function open(kind: 'offline' | 'historical') {
 
 <template>
   <section class="analyst-home">
-    <div class="investigation-hero">
-      <span class="eyebrow">SAMESCALE / INVESTIGATE</span>
-      <h2>从一次失败，<br />找到有证据的下一步。</h2>
-      <p>查询运行记录，核对失败证据，区分事实与假设。<br />把工程问题变成一份可审阅的调查报告。</p>
-      <ol class="journey" aria-label="调查路径"><li>提出问题</li><li>核对证据</li><li>审阅下一步</li></ol>
+    <div class="workspace-hero investigation-hero">
+      <div class="hero-copy">
+        <span class="eyebrow">ANALYST / 工程问题调查</span>
+        <h2>从工程问题，<br />到有依据的结论。</h2>
+        <p>沿运行记录核对证据，区分事实与假设，<br class="desktop-copy-break" />把下一步整理成可审阅的调查报告。</p>
+        <span class="hero-caption">先看案例，再进入你的调查工作区。</span>
+      </div>
+      <aside class="report-outline" aria-label="调查报告的阅读顺序">
+        <span class="outline-label">你会得到什么</span>
+        <ol><li><span>01</span><div><strong>有依据的结论</strong><small>事实附可定位的证据引用</small></div></li><li><span>02</span><div><strong>明确的证明边界</strong><small>限制与待验证假设分开展示</small></div></li><li><span>03</span><div><strong>可审阅的下一步</strong><small>方案审阅与执行授权保持独立</small></div></li></ol>
+      </aside>
     </div>
+    <div class="entry-heading"><div><h3>选择你的起点</h3><p>演示、历史记录与当前会话，各自保留来源和证明范围。</p></div><span class="technical">THREE ENTRY POINTS</span></div>
     <div class="entry-cards">
-      <article class="primary-entry"><span class="status-pill info">FAKE · OFFLINE</span><h3>从一个失败案例开始</h3>
+      <article class="primary-entry"><div class="entry-top"><span class="entry-number">01 / 推荐起点</span><span class="status-pill info">FAKE · OFFLINE</span></div><h3>先体验一次调查</h3>
         <p>去重任务为什么没有通过？用固定合成案例运行现有调查图和事实校验。无需 Provider Key、数据库或 Docker。</p>
         <p class="muted">固定脚本，不调用模型；结果不保存为数据库会话。</p>
         <button class="start-demo" :disabled="busy" @click="open('offline')">运行离线演示</button></article>
-      <article><span class="status-pill neutral">HISTORICAL REAL · READ ONLY</span><h3>查看历史真实调查</h3>
+      <article><div class="entry-top"><span class="entry-number">02 / 历史记录</span><span class="status-pill neutral">HISTORICAL REAL</span></div><h3>阅读真实调查报告</h3>
         <p>回看 2026-09-09 的真实模型调查：为什么现有证据不足以证明某个 Harness 更强？</p>
         <p class="muted">读取冻结文件；不是当前会话，原数据库会话尚未恢复。</p>
         <button :disabled="busy" @click="open('historical')">查看历史真实记录</button></article>
-      <article><span class="status-pill neutral">CURRENT SESSIONS</span><h3>调查已有工程证据</h3>
-        <PublicAnalystNotice v-if="access === 'public'" />
-        <p v-else-if="access === 'loading'" role="status">Checking workspace permissions…</p>
-        <p v-else-if="access === 'unavailable'" role="alert">Workspace permissions are unavailable. <button @click="loadAccess">Retry permissions</button></p>
+      <article><div class="entry-top"><span class="entry-number">03 / 工作区</span><span class="status-pill neutral">{{ access === 'public' ? 'READ ONLY' : 'CURRENT SESSIONS' }}</span></div><h3>{{ access === 'public' ? '会话功能仅限私有工作区' : '继续调查已有证据' }}</h3>
+        <PublicAnalystNotice v-if="access === 'public'" compact />
+        <p v-else-if="access === 'loading'" role="status">正在确认工作区权限…</p>
+        <p v-else-if="access === 'unavailable'" role="alert">暂时无法确认工作区权限。<button @click="loadAccess">重试权限检查</button></p>
         <template v-else>
         <p>选择当前数据库中的实验，新建或恢复有界调查，保存并审阅回归方案。</p>
         <p class="muted">Fake 可无密钥演练持久化；Real 需配置、预算与逐步确认，无静默回退。</p>
@@ -65,7 +72,7 @@ async function open(kind: 'offline' | 'historical') {
       <h2 class="result-heading">{{ example.kind === 'offline_fake' ? '离线案例调查报告' : '历史真实调查报告' }}</h2>
       <p class="provenance" role="status">{{ example.provenance }}</p>
       <p v-if="example.kind === 'historical_real'">历史实际用量：{{ example.metadata.decisions }}/{{ example.metadata.decision_limit }} 决策 · {{ example.metadata.tools }}/{{ example.metadata.tool_limit }} 工具。{{ example.metadata.limit_correction }} {{ example.metadata.trace_limit }}</p>
-      <p v-else>本次运行：{{ example.metadata.decisions }} 决策 · {{ example.metadata.tools }} 工具 · Provider 请求 {{ example.metadata.provider_requests }}。刷新后可重新运行。</p>
+      <p v-else>本次合成演示：{{ example.metadata.decisions }} 决策 · {{ example.metadata.tools }} 工具 · Provider 请求 {{ example.metadata.provider_requests }}。刷新后可重新运行。</p>
       <p v-if="example.kind === 'historical_real'" class="reading-guide">阅读提示：当前证据不足以证明某个 Harness 在该任务上更强，也无法确立提高推理强度的因果收益。下方保留原始报告及其可定位引用。</p>
       <InvestigationReport :report="example.report" :evidence="example.report.evidence_catalog">
         <template #next><p v-if="example.proposal">历史待审阅方案：{{ example.proposal.objective }}</p>
@@ -78,29 +85,43 @@ async function open(kind: 'offline' | 'historical') {
 </template>
 
 <style scoped>
-.analyst-home { font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
-h2 { max-width: 760px; font-size: clamp(23px, 3vw, 34px); line-height: 1.3; }
-.investigation-hero { padding: 30px 0 24px; }
-.investigation-hero h2 { font-size: clamp(30px, 3.5vw, 46px); letter-spacing: -.04em; margin: 18px 0; }
-.investigation-hero p { color: var(--muted); font-size: 15px; }
-.journey { display: flex; flex-wrap: wrap; gap: 12px 30px; padding: 0; list-style: none; counter-reset: journey; color: var(--accent); margin: 26px 0 0; }
-.journey li { counter-increment: journey; }
-.journey li::before { content: '0' counter(journey); margin-right: 8px; font: 12px ui-monospace, monospace; }
-.primary-entry { border-top: 3px solid var(--accent) !important; }
-button.start-demo { background: var(--accent); color: white; border-color: var(--accent); }
+.analyst-home { font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
+.investigation-hero { background: var(--panel); }
+.investigation-hero h2 { color: var(--ink); }
+.hero-caption { display: block; margin-top: 24px; font-size: 13px; color: var(--accent); font-weight: 600; }
+.report-outline { border-left: 1px solid var(--line); padding-left: 32px; }
+.outline-label { color: var(--muted); font-size: 13px; }
+.report-outline ol { display: grid; gap: 22px; padding: 0; margin: 20px 0 0; list-style: none; }
+.report-outline li { display: flex; gap: 14px; align-items: baseline; }
+.report-outline li > span { font: 600 12px/1.5 ui-monospace, monospace; color: var(--accent); }
+.report-outline strong, .report-outline small { display: block; }
+.report-outline strong { font-weight: 600; }
+.report-outline small { margin-top: 3px; font-size: 13px; color: var(--muted); }
+.entry-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 32px 0 18px; }
+.entry-heading h3 { margin: 0; font-size: 18px; }
+.entry-heading p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+.entry-heading > span { color: var(--muted); flex: none; }
+.entry-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.entry-cards article { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; border: 1px solid var(--line); border-radius: 12px; padding: 24px; background: var(--panel); }
+.entry-cards .primary-entry { border-color: #9bc8c2; background: #f1f9f7; }
+.entry-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.entry-number { font-size: 12px; color: var(--muted); }
+h3 { font-size: 19px; margin: 22px 0 0; letter-spacing: -.02em; }
+.entry-cards p { margin: 12px 0; }
+.entry-cards .muted { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
 .entry-cards article > button:first-of-type, .entry-cards article > a:first-of-type { margin-top: auto; }
-.result-heading { font-size: 24px; margin-top: 30px; }
-.example { scroll-margin-top: 110px; }
-.example:focus { outline: none; }
-.entry-cards { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 18px; }
-.entry-cards article { display: flex; flex-direction: column; align-items: flex-start; border: 1px solid var(--line); border-radius: 8px; padding: 22px; background: var(--panel); }
-h3 { font-size: 18px; margin: 16px 0 0; }
-.muted { color: var(--muted); font-size: 12px; }
-button, .entry-link { padding: 11px 14px; margin-top: 10px; color: var(--accent); border: 1px solid var(--line); background: var(--panel); border-radius: 4px; cursor: pointer; font: inherit; }
-button:disabled { opacity: .55; }
-.example { margin-top: 28px; border-top: 1px solid var(--line); }
-.provenance { font-weight: 600; padding: 16px; border: 1px solid var(--accent); }
+button, .entry-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; margin-top: 8px; color: var(--accent); border: 1px solid var(--line); background: var(--panel); border-radius: 7px; cursor: pointer; font: inherit; font-weight: 600; text-decoration: none; text-align: center; max-width: 100%; }
+button:hover, .entry-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+button.start-demo { background: var(--accent); color: white; border-color: var(--accent); }
+button.start-demo:hover { background: #0c635b; }
+button:disabled { opacity: .55; cursor: wait; }
+.example { margin-top: 28px; padding: 28px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); scroll-margin-top: 110px; }
+.example:focus { outline: 2px solid var(--accent); outline-offset: 4px; }
+.result-heading { font-size: 25px; margin: 0 0 16px; }
+.provenance { font-weight: 600; padding: 14px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 6px 6px 0; }
 pre { max-height: 380px; overflow: auto; white-space: pre-wrap; font-size: 12px; }
-summary { cursor: pointer; }
-@media (max-width: 1050px) { .entry-cards { grid-template-columns: 1fr; } }
+summary { cursor: pointer; padding-block: 12px; }
+@media (max-width: 1120px) { .entry-cards { grid-template-columns: minmax(0, 1fr); } .entry-top { width: 100%; justify-content: space-between; } }
+@media (max-width: 1000px) { .report-outline { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 24px; } .report-outline ol { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; } }
+@media (max-width: 600px) { .report-outline { display: none; } .entry-heading > span { display: none; } .entry-cards article { padding: 22px; } .entry-cards article > button, .entry-cards article > .entry-link { width: 100%; } .example { padding: 18px; } }
 </style>

@@ -1,0 +1,170 @@
+{
+  "branch": "codex/core-ui-ux-20261008",
+  "baseline_sha": "050bc5638709f3a7faada834df2936dc9102504f",
+  "human_acceptance": "User accepted the existing desktop Analyst and Public Demo design and authorized this bounded closeout.",
+  "public_card": {
+    "heading": "会话功能仅限私有工作区",
+    "badge": "READ ONLY"
+  },
+  "private_card": "Original heading, badge and session links retained; permissions unchanged.",
+  "frontend": {
+    "test_files": 11,
+    "passed": 99,
+    "typecheck": "PASS",
+    "build": "PASS",
+    "build_directory": "/tmp/samescale-ui1-closeout-20261008/preview-dist"
+  },
+  "browser": {
+    "checked_at": "2026-10-08T05:40:54.928Z",
+    "widths": [
+      1440,
+      1365
+    ],
+    "private_capabilities": "Browser-injected presentation state only; no session execution",
+    "checks": [
+      {
+        "name": "1440: actual public heading and badge",
+        "pass": true
+      },
+      {
+        "name": "1440: public constraints explicit",
+        "pass": true
+      },
+      {
+        "name": "1440: no session action links",
+        "pass": true
+      },
+      {
+        "name": "1440: existing desktop grid retained",
+        "pass": true
+      },
+      {
+        "name": "1440: no Analyst overflow",
+        "pass": true
+      },
+      {
+        "name": "1440: public alternative opens saved Demo",
+        "pass": true
+      },
+      {
+        "name": "1440: no Demo overflow",
+        "pass": true
+      },
+      {
+        "name": "1440: public sessions remain read only",
+        "pass": true
+      },
+      {
+        "name": "1440: injected private heading and badge unchanged",
+        "pass": true
+      },
+      {
+        "name": "1440: private destinations unchanged (presentation only)",
+        "pass": true
+      },
+      {
+        "name": "1365: actual public heading and badge",
+        "pass": true
+      },
+      {
+        "name": "1365: public constraints explicit",
+        "pass": true
+      },
+      {
+        "name": "1365: no session action links",
+        "pass": true
+      },
+      {
+        "name": "1365: existing desktop grid retained",
+        "pass": true
+      },
+      {
+        "name": "1365: no Analyst overflow",
+        "pass": true
+      },
+      {
+        "name": "1365: public alternative opens saved Demo",
+        "pass": true
+      },
+      {
+        "name": "1365: no Demo overflow",
+        "pass": true
+      },
+      {
+        "name": "1365: public sessions remain read only",
+        "pass": true
+      },
+      {
+        "name": "1365: injected private heading and badge unchanged",
+        "pass": true
+      },
+      {
+        "name": "1365: private destinations unchanged (presentation only)",
+        "pass": true
+      },
+      {
+        "name": "No console/runtime/resource errors",
+        "pass": true
+      },
+      {
+        "name": "All observed API requests are read only",
+        "pass": true
+      }
+    ],
+    "errors": [],
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/api/workbench/analyst/capabilities"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workbench/public-demo"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workbench/analyst/capabilities"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workbench/analyst/capabilities"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workbench/public-demo"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workbench/analyst/capabilities"
+      }
+    ],
+    "pass": true
+  },
+  "integrity": {
+    "protected_files": 297,
+    "changed": [],
+    "public_demo_identity_unchanged": true,
+    "main_ref_unchanged": true
+  },
+  "source_sha256": {
+    "frontend/src/App.vue": "15219f5331ea186c0fb16e9a611301408faa59d95e64a74719b2a1e2f693cfc7",
+    "frontend/src/components/PublicAnalystNotice.vue": "f08a81fcb2266bdd0286cd80a8f521f08c13cf5a0c44d9f8ce502360806efc6a",
+    "frontend/src/router/index.ts": "3d60e92675b849e36375a1a0d245cadc4ae7a1ca9c762b87ff30351d5f23223f",
+    "frontend/src/styles.css": "4766d10702429b90c8f47f3d1de783e18c9fa398537abd3b32249d34c2d02d46",
+    "frontend/src/views/AnalystHomeView.vue": "e69137269ab144eec680e07f821a4a52b352246e5bc028820b713ff9b9c3b7ad",
+    "frontend/src/views/PublicDemoView.vue": "dbc3c83fce9de8f5b23fa0894b7f1d9f703244bcbcbcf927edd3d3e698980276",
+    "frontend/tests/analyst-home.spec.ts": "fd1969528e81da73a836f2b6e247fcf18fb6bc2acf0ede4ade34b29ecb74095a",
+    "frontend/tests/analyst.spec.ts": "5bd8e7ff1539255a43cc1b7ba4f996de8e12a2ed7056b606136d9e30f027ff2d",
+    "frontend/tests/public-demo.spec.ts": "fd844cdc06f2e0f1b6a1405689d3438dd4dfe1e98d8d09a5e0154d160a1bec3c",
+    "frontend/tests/workbench.spec.ts": "cd7932c854d52a60edcebb0e2519b8834ccb89d8848f84a5f1a18d683b9e66ad"
+  },
+  "remote_ci": {
+    "status": "PENDING_PUBLICATION",
+    "note": "Local acceptance is not remote CI. Verify the exact pushed SHA after publication."
+  },
+  "limitations": [
+    "Private capabilities injected for presentation only; no actual session execution tested.",
+    "Physical devices, non-Chromium browsers, full screen-reader and first-touch comprehension remain unverified.",
+    "No deployment or real Agent/Provider execution."
+  ]
+}

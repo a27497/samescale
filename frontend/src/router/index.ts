@@ -4,7 +4,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', redirect: '/analyst' },
-    { path: '/demo', name: 'public-demo', component: () => import('@/views/PublicDemoView.vue'), meta: { title: 'Public Demo', section: 'Evidence' } },
+    { path: '/demo', name: 'public-demo', component: () => import('@/views/PublicDemoView.vue'), meta: { title: '公开演示 · Public Demo', section: 'Evidence' } },
     {
       path: '/overview',
       name: 'overview',

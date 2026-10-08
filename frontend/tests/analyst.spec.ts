@@ -194,8 +194,8 @@ it.each(['fake', 'real'])('public Demo removes all session mutations for %s entr
   window.history.replaceState({}, '', `/analyst/sessions?backend=${backend}`)
   api.capabilities.mockResolvedValue({ public_demo_read_only: true, persistent_sessions_allowed: false })
   const wrapper = mount(AnalystView, { global: { plugins: [router] } }); await flushPromises()
-  expect(wrapper.text()).toContain('Public Demo is read-only.')
-  expect(wrapper.text()).toContain('Persistent Analyst sessions are available only in a local/private workspace.')
+  expect(wrapper.text()).toContain('当前为只读 Public Demo')
+  expect(wrapper.text()).toContain('持久化会话仅限本地 / 私有工作区')
   expect(wrapper.findAll('button')).toHaveLength(0)
   expect(wrapper.find('select').exists()).toBe(false)
   expect(wrapper.findAll('a').map(link => link.attributes('href'))).toEqual([

@@ -18,30 +18,43 @@ describe('Public demo identity', () => {
     api.getPublicDemo.mockResolvedValue(demo)
     const wrapper = mount(PublicDemoView, options)
     await flushPromises()
-    expect(wrapper.text()).toContain('Offline fixture demonstration')
+    expect(wrapper.text()).toContain('保存证据，不是实时执行')
+    expect(wrapper.text()).toContain('FIXTURE_OFFLINE')
     expect(wrapper.text()).toContain('no real Provider/model execution')
     expect(wrapper.find('.primary-button').attributes('data-target')).toContain('public-demo-new-baseline')
-    expect(wrapper.text()).toContain('Historical QA evidence — artifact integrity failed')
+    expect(wrapper.text()).toContain('历史 QA 证据不可用')
     expect(wrapper.find('details').attributes('open')).toBeUndefined()
+    const destinations = wrapper.findAll('[data-target]').map(link => JSON.parse(link.attributes('data-target')!))
+    expect(destinations).toEqual([
+      { path: '/experiments/public-demo-new-baseline', query: { tab: 'runs', candidate: demo.candidate_id } },
+      { path: '/runs/new-run', query: { candidate: demo.candidate_id } },
+      { path: '/diagnosis', query: { experiment: demo.baseline_id, candidate: demo.candidate_id, run: demo.failed_run_id } },
+      { path: '/regression', query: { baseline: demo.baseline_id, candidate: demo.candidate_id, run: demo.failed_run_id } },
+      '/experiments/phase-i-matrix-multi-task',
+    ])
+    expect(wrapper.get('a[target="_blank"]').attributes('href')).toBe('/api/workbench/runs/new-run/public-artifact')
+    expect(wrapper.text()).toContain(demo.manifest_digest)
   })
   it('fails closed when evidence integrity fails', async () => {
     api.getPublicDemo.mockRejectedValue({ response: { data: { error: { code: 'ARTIFACT_INTEGRITY_ERROR' } } } })
     const wrapper = mount(PublicDemoView, options)
     await flushPromises()
-    expect(wrapper.text()).toContain('Evidence integrity failed')
+    expect(wrapper.text()).toContain('证据完整性校验失败')
     expect(wrapper.find('.primary-button').exists()).toBe(false)
+    expect(wrapper.find('.demo-identity').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('FIXTURE_OFFLINE')
   })
   it('does not show a ready journey when the gate is false', async () => {
     api.getPublicDemo.mockResolvedValue({ ...demo, public_demo_ready: false })
     const wrapper = mount(PublicDemoView, options)
     await flushPromises()
-    expect(wrapper.text()).toContain('Public demo validation did not pass')
+    expect(wrapper.text()).toContain('公开演示未通过完整性校验')
     expect(wrapper.find('.primary-button').exists()).toBe(false)
   })
   it('shows an explicit state when no demo is configured', async () => {
     api.getPublicDemo.mockRejectedValue({ response: { data: { error: { code: 'DEMO_NOT_CONFIGURED' } } } })
     const wrapper = mount(PublicDemoView, options)
     await flushPromises()
-    expect(wrapper.text()).toContain('No public demo is configured')
+    expect(wrapper.text()).toContain('此工作区尚未配置公开演示')
   })
 })

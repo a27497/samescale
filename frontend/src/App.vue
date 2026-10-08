@@ -32,13 +32,13 @@ function navigationKeydown(event: KeyboardEvent) {
   }
 }
 const advancedOpen = ref(false)
-const isInvestigation = computed(() => route.meta.section === 'Investigation')
+const isInvestigation = computed(() => route.meta.section === 'Investigation' || route.name === 'public-demo')
 
-const navigation = [
+const navigation: { label: string; items: { to: string; label: string; description?: string; mark: string }[] }[] = [
   { label: '调查工作区', items: [
-    { to: '/demo', label: 'Public Demo', mark: 'DE' },
-    { to: '/analyst', label: '开始调查', mark: '01' },
-    { to: '/analyst/sessions', label: '已保存调查', mark: '02' },
+    { to: '/demo', label: '公开演示', description: 'Public Demo · 只读证据', mark: 'DE' },
+    { to: '/analyst', label: '开始调查', description: 'Analyst · 问题到报告', mark: '01' },
+    { to: '/analyst/sessions', label: '已保存调查', description: '查看会话与审阅方案', mark: '02' },
   ] },
   {
     label: '评测实验 · Advanced',
@@ -82,44 +82,44 @@ watch(
 </script>
 
 <template>
-  <a class="skip-link" href="#main-content">Skip to content</a>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
   <div class="workbench-shell" :class="{ 'nav-open': mobileNavOpen }" @keydown.esc="mobileNavOpen && closeNavigation()">
     <button
       v-if="mobileNavOpen"
       class="nav-scrim"
-      aria-label="Close navigation"
+      aria-label="关闭导航"
       tabindex="-1"
       @click="closeNavigation"
     />
-    <aside id="workbench-navigation" ref="navigationPanel" class="sidebar" aria-label="Workbench navigation" @keydown="navigationKeydown">
+    <aside id="workbench-navigation" ref="navigationPanel" class="sidebar" aria-label="产品导航" @keydown="navigationKeydown">
       <button class="secondary-button nav-close-button" @click="closeNavigation">关闭导航</button>
       <div class="brand">
         <span class="brand-mark" aria-hidden="true">S=</span>
         <div>
           <strong>SameScale</strong>
-          <small>EVIDENCE → INSIGHT</small>
+          <small>运行验证与工程调查</small>
         </div>
       </div>
-      <nav aria-label="Product areas">
+      <nav aria-label="产品功能">
         <div class="nav-group">
           <span class="nav-group-label">{{ navigation[0]!.label }}</span>
           <RouterLink v-for="item in navigation[0]!.items" :key="item.to" :to="item.to" class="nav-link" exact-active-class="nav-current" active-class="nav-parent">
-            <span class="nav-mark">{{ item.mark }}</span><span>{{ item.label }}</span>
+            <span class="nav-mark" aria-hidden="true">{{ item.mark }}</span><span class="nav-copy">{{ item.label }}<small>{{ item.description }}</small></span>
           </RouterLink>
         </div>
         <details :open="advancedOpen" class="advanced-nav" @toggle="advancedOpen = ($event.target as HTMLDetailsElement).open">
-          <summary>评测工具 · Advanced</summary>
+          <summary>评测工具 <small>Advanced</small></summary>
           <div v-for="group in navigation.slice(1)" :key="group.label" class="nav-group">
             <span class="nav-group-label">{{ group.label }}</span>
             <RouterLink v-for="item in group.items" :key="item.to" :to="item.to" class="nav-link">
-              <span class="nav-mark">{{ item.mark }}</span><span>{{ item.label }}</span>
+              <span class="nav-mark" aria-hidden="true">{{ item.mark }}</span><span>{{ item.label }}</span>
             </RouterLink>
           </div>
         </details>
       </nav>
       <div class="sidebar-foot">
-        <div><span class="readonly-dot" />LOCAL WORKBENCH</div>
-        <small>Secrets stay server-side</small>
+        <strong>结论沿证据可追溯</strong>
+        <small>来源与验收状态按记录展示</small>
       </div>
     </aside>
     <main id="main-content" class="main-panel" tabindex="-1">
@@ -128,7 +128,7 @@ watch(
           <button
             ref="menuButton"
             class="mobile-menu-button"
-            aria-label="Open navigation"
+            aria-label="打开导航"
             aria-controls="workbench-navigation"
             :aria-expanded="mobileNavOpen"
             @click="openNavigation"
@@ -140,7 +140,7 @@ watch(
           <h1>{{ title }}</h1>
           </div>
         </div>
-        <div v-if="!isInvestigation" class="topbar-status"><span class="status-pill neutral">Evidence &amp; provenance shown per record</span></div>
+        <div class="topbar-status"><span class="topbar-note">{{ route.name === 'public-demo' ? '保存证据 · 只读浏览' : isInvestigation ? '结论 · 证据 · 限制 · 下一步' : 'Evidence & provenance shown per record' }}</span></div>
       </header>
       <div class="page-container">
         <ElTooltip v-if="!isInvestigation" content="Registry planning is backend-validated; credentials and runtime URLs never enter browser state." placement="bottom">

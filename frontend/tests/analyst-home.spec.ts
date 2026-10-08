@@ -26,6 +26,10 @@ describe('Agent product entry', () => {
     for (const path of ['/overview', '/experiments', '/judgelab', '/analyst/sessions']) expect(router.getRoutes().some(route => route.path === path)).toBe(true)
     const wrapper = mountHome(); await flushPromises()
     expect(wrapper.text()).toContain('无需 Provider Key')
+    const workspace = wrapper.findAll('.entry-cards article')[2]!
+    expect(workspace.get('h3').text()).toBe('继续调查已有证据')
+    expect(workspace.get('.status-pill').text()).toBe('CURRENT SESSIONS')
+    expect(workspace.findAll('.entry-link').map(link => link.text())).toEqual(['进入 Real 调查', 'Fake 与已保存会话'])
     expect(api.offline).not.toHaveBeenCalled()
     expect(api.historical).not.toHaveBeenCalled()
   })
@@ -81,7 +85,12 @@ it('focuses the loaded result after keyboard activation', async () => {
 it('public entry offers read-only alternatives without persistence promises', async () => {
   api.capabilities.mockResolvedValue({ public_demo_read_only: true, persistent_sessions_allowed: false })
   const wrapper = mountHome(); await flushPromises()
-  expect(wrapper.text()).toContain('Public Demo is read-only.')
+  const workspace = wrapper.findAll('.entry-cards article')[2]!
+  expect(workspace.get('h3').text()).toBe('会话功能仅限私有工作区')
+  expect(workspace.get('.status-pill').text()).toBe('READ ONLY')
+  expect(workspace.text()).not.toContain('继续调查已有证据')
+  expect(workspace.find('.entry-link').exists()).toBe(false)
+  expect(wrapper.text()).toContain('当前为只读 Public Demo')
   expect(wrapper.text()).not.toContain('Fake 可无密钥演练持久化')
   expect(wrapper.text()).not.toContain('进入 Real 调查')
   expect(wrapper.findAll('button').map(button => button.text())).toEqual(['运行离线演示', '查看历史真实记录'])
