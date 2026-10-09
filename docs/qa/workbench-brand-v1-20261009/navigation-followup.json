@@ -1,0 +1,92 @@
+{
+  "passed": 20,
+  "total": 20,
+  "checks": [
+    {
+      "name": "http://127.0.0.1:5190 320 forward focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5190 320 reverse focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5190 320 mobile navigation loads Demo and closes drawer",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5190 390 forward focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5190 390 reverse focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5190 390 mobile navigation loads Demo and closes drawer",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5190 768 forward focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5190 768 reverse focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5190 768 mobile navigation loads Demo and closes drawer",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5190 advanced navigation route settled",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 320 forward focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 320 reverse focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 320 mobile navigation loads Demo and closes drawer",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 390 forward focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 390 reverse focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 390 mobile navigation loads Demo and closes drawer",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 768 forward focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 768 reverse focus trap",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 768 mobile navigation loads Demo and closes drawer",
+      "pass": true
+    },
+    {
+      "name": "http://127.0.0.1:5191 advanced navigation route settled",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "supersedes": [
+    "mobile navigation retains keyboard focus trap",
+    "advanced navigation and settings remain available"
+  ],
+  "cause": "Closed details descendants had client rects but were not focusable; settings assertion ran before router navigation settled. Both baseline and candidate pass with correct focus selection and route wait. No product code correction."
+}

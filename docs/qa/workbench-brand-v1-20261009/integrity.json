@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-10-09T07:25:43.602942+00:00",
+  "originalBranch": "codex/core-ui-ux-2-20261008",
+  "originalHead": "ec14e936a79e88446347dd010f68bd6bde55aaec",
+  "dirtyFilesUnchanged": 17,
+  "originalDiffSha256": "7039698aa27d9ac3753d3389c0ebdf4e457446ab6e30f59d6c5fe58346a8e5fe",
+  "protectedSourceEvidenceFilesUnchanged": 639,
+  "websiteSourceWorktreeClean": true,
+  "demoIdentityAndManifestUnchanged": true,
+  "demoId": "public-demo-20260930-9569db12e23a",
+  "manifestDigest": "sha256:593a54eff3ef0f89212d3097ea3d1f3349d1b7b085f618d2ca8f9805746171d7",
+  "defaultDistNotCreated": true,
+  "previewPorts": [
+    5190,
+    5191
+  ]
+}

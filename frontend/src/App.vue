@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { House, View, Document, Files, DataAnalysis, TrendCharts, Operation, Setting, Connection, Cpu, Box, Menu, Close, Collection, CircleCheck, Grid, Tools } from '@element-plus/icons-vue'
 import { copy as c, initializeLocale, setLocale } from '@/composables/visualLocale'
 import { preferences } from '@/composables/preferences'
+import WorkbenchBrand from '@/components/WorkbenchBrand.vue'
 
 initializeLocale()
 const route = useRoute()
@@ -74,7 +75,7 @@ watch(title, value => { document.title = `${value} · SameScale` }, { immediate:
     <button v-if="mobileNavOpen" class="nav-scrim" :aria-label="c('关闭导航', 'Close navigation')" tabindex="-1" @click="closeNavigation" />
     <aside id="workbench-navigation" ref="navigationPanel" class="sidebar" :aria-label="c('产品导航', 'Product navigation')" @keydown="navigationKeydown">
       <button class="secondary-button nav-close-button" @click="closeNavigation"><Close class="ui-icon" />{{ c('关闭导航', 'Close navigation') }}</button>
-      <RouterLink class="brand" to="/analyst"><span class="brand-mark"><Operation class="ui-icon" /></span><div><strong>SameScale</strong><small>{{ c('运行证据工作台', 'Evidence console') }}</small></div></RouterLink>
+      <RouterLink class="brand" to="/analyst"><div><WorkbenchBrand /><small>{{ c('运行证据工作台', 'Evidence console') }}</small></div></RouterLink>
       <nav :aria-label="c('产品功能', 'Product features')">
         <div v-for="group in navigation" :key="group.label" class="nav-group">
           <span class="nav-group-label">{{ group.label }}</span>
