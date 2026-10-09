@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "name": "before historical 1366 stable full-page capture from top",
+      "pass": true
+    },
+    {
+      "name": "before offline 1366 stable full-page capture from top",
+      "pass": true
+    },
+    {
+      "name": "before historical 1440 stable full-page capture from top",
+      "pass": true
+    },
+    {
+      "name": "before offline 1440 stable full-page capture from top",
+      "pass": true
+    },
+    {
+      "name": "after historical 1366 stable full-page capture from top",
+      "pass": true
+    },
+    {
+      "name": "after offline 1366 stable full-page capture from top",
+      "pass": true
+    },
+    {
+      "name": "after historical 1440 stable full-page capture from top",
+      "pass": true
+    },
+    {
+      "name": "after offline 1440 stable full-page capture from top",
+      "pass": true
+    }
+  ],
+  "note": "Screenshot scroll normalized only; original report focus, UI behavior and evidence unchanged."
+}

@@ -1,0 +1,101 @@
+{
+  "checks": [
+    {
+      "name": "experiments 1366 overflow and font gate",
+      "pass": true,
+      "detail": {
+        "overflow": false,
+        "small": []
+      }
+    },
+    {
+      "name": "experiments 1366 headers fit single line",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 overflow and font gate",
+      "pass": true,
+      "detail": {
+        "overflow": false,
+        "small": []
+      }
+    },
+    {
+      "name": "regression 1366 descriptive values readable at 14px",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1366 overflow and font gate",
+      "pass": true,
+      "detail": {
+        "overflow": false,
+        "small": []
+      }
+    },
+    {
+      "name": "experiment-overview 1366 aligned detail panels",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1366 overflow and font gate",
+      "pass": true,
+      "detail": {
+        "overflow": false,
+        "small": []
+      }
+    },
+    {
+      "name": "experiment-matrix 1366 Chinese chart field labels",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 overflow and font gate",
+      "pass": true,
+      "detail": {
+        "overflow": false,
+        "small": []
+      }
+    },
+    {
+      "name": "experiments 1440 headers fit single line",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 overflow and font gate",
+      "pass": true,
+      "detail": {
+        "overflow": false,
+        "small": []
+      }
+    },
+    {
+      "name": "regression 1440 descriptive values readable at 14px",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1440 overflow and font gate",
+      "pass": true,
+      "detail": {
+        "overflow": false,
+        "small": []
+      }
+    },
+    {
+      "name": "experiment-overview 1440 aligned detail panels",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1440 overflow and font gate",
+      "pass": true,
+      "detail": {
+        "overflow": false,
+        "small": []
+      }
+    },
+    {
+      "name": "experiment-matrix 1440 Chinese chart field labels",
+      "pass": true
+    }
+  ],
+  "scope": "Final list widths, numeric type, overview alignment and Matrix caption/axis spacing follow-up."
+}

@@ -1,0 +1,241 @@
+{
+  "checks": [
+    {
+      "name": "before analyst 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "before analyst 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "before analyst 1366 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "before historical 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "before historical 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "before historical 1366 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "before offline 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "before offline 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "before offline 1366 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "before analyst 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "before analyst 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "before analyst 1440 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "before historical 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "before historical 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "before historical 1440 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "before offline 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "before offline 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "before offline 1440 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "https analyst 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "https analyst 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "https analyst 1366 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "https historical 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "https historical 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "https historical 1366 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "https offline 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "https offline 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "https offline 1366 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "https analyst 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "https analyst 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "https analyst 1440 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "https historical 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "https historical 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "https historical 1440 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "https offline 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "https offline 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "https offline 1440 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "after analyst 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "after analyst 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "after analyst 1366 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "after historical 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "after historical 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "after historical 1366 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "after offline 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "after offline 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "after offline 1366 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "after analyst 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "after analyst 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "after analyst 1440 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "after historical 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "after historical 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "after historical 1440 no errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "after offline 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "after offline 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "after offline 1440 no errors",
+      "pass": true,
+      "errors": []
+    }
+  ],
+  "passed": 54,
+  "total": 54,
+  "browser": "153.0.8010.12"
+}

@@ -1,0 +1,61 @@
+
+> harnesslab-workbench@0.1.0 build
+> npm run type-check && vite build --outDir /tmp/samescale-git-closeout-20261010-zhkkzu3p/dist
+
+
+> harnesslab-workbench@0.1.0 type-check
+> vue-tsc --noEmit
+
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2330 modules transformed.
+
+(!) outDir /tmp/samescale-git-closeout-20261010-zhkkzu3p/dist is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/index.html                                     1.12 kB │ gzip:   0.63 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/ExperimentBuilderView-BdjRczjJ.css      0.13 kB │ gzip:   0.12 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/InvestigationReport-DdXYMwjM.css        2.02 kB │ gzip:   0.70 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/AnalystView-nvG3Z-f-.css                3.16 kB │ gzip:   0.97 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/ConnectionsView-DOj2gRzr.css            3.77 kB │ gzip:   0.83 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/index-CXzRbBgi.css                     65.98 kB │ gzip:  13.66 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/evidenceCopy-Q2SH71ot.js                0.10 kB │ gzip:   0.12 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/rolldown-runtime-DK3Fl9T5.js            0.15 kB │ gzip:   0.15 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/EvidenceValue--58WyQ_2.js               0.52 kB │ gzip:   0.36 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/NotFoundView-BzHLf-jh.js                0.60 kB │ gzip:   0.45 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/visualEvidence-CaNa_x0F.js              0.68 kB │ gzip:   0.46 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/analyst-DWHoKTDR.js                     0.76 kB │ gzip:   0.33 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/PageState-IrBhZ3EN.js                   0.89 kB │ gzip:   0.61 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/ExperimentPicker-DpCKR3LY.js            1.71 kB │ gzip:   0.91 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/JudgeLabView-Zrre-STD.js                2.70 kB │ gzip:   1.27 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/evidenceLabels-CK-LqSgZ.js              2.96 kB │ gzip:   1.63 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/ProvidersView-DgZ51h9a.js               3.03 kB │ gzip:   1.38 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/CoreReadinessView-CkzlheyH.js           3.20 kB │ gzip:   1.47 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/JudgeDetailView-BwSbEmus.js             3.41 kB │ gzip:   1.43 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/displayIdentity-ID6_LUbQ.js             3.43 kB │ gzip:   1.82 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/HarnessesView-DlqOxU37.js               3.67 kB │ gzip:   1.57 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/ModelsView-CDbNkXP1.js                  3.95 kB │ gzip:   1.74 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/SettingsView-Cl2ID6T3.js                4.12 kB │ gzip:   1.73 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/experiments-BI1rnp4W.js                 4.29 kB │ gzip:   1.52 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/CapabilitiesView-D0wttISG.js            5.37 kB │ gzip:   2.18 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/StatusBadge-DxdHMg-e.js                 5.57 kB │ gzip:   2.57 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/OverviewView-DZVNyJxS.js                5.71 kB │ gzip:   2.14 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/ExperimentsView-CDEjUfE8.js             5.77 kB │ gzip:   2.55 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/AnalystHomeView-BtdB8o2_.js             7.60 kB │ gzip:   3.58 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/RunControlView-BmL1bv5p.js              7.71 kB │ gzip:   3.21 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/InvestigationReport-DDoa2Lfj.js         9.92 kB │ gzip:   4.13 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/PublicDemoView-DGoKqYS8.js             12.07 kB │ gzip:   4.83 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/RegressionView-DxtDVwUz.js             12.22 kB │ gzip:   4.79 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/ExperimentBuilderView-DaK1We61.js      14.92 kB │ gzip:   4.93 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/RunDetailView-BB7Rj8LS.js              15.23 kB │ gzip:   5.90 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/AnalystView-DF1nFklJ.js                16.89 kB │ gzip:   6.54 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/DiagnosisView-Cpgi67RW.js              17.85 kB │ gzip:   6.48 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/ConnectionsView-C7jcfhqN.js            34.94 kB │ gzip:   9.87 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/client-HOGN3zTf.js                     49.31 kB │ gzip:  18.44 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/runtime-core.esm-bundler-D7Lq8KTP.js   63.71 kB │ gzip:  25.00 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/index-BADivbTY.js                     129.94 kB │ gzip:  47.75 kB
+../../../../../tmp/samescale-git-closeout-20261010-zhkkzu3p/dist/assets/ExperimentDetailView-CYD2zm5T.js      557.40 kB │ gzip: 187.39 kB
+
+✓ built in 896ms

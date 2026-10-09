@@ -1,0 +1,1232 @@
+{
+  "browser": "153.0.8010.52",
+  "demo_id": "public-demo-20261009-b13ae8d9b801",
+  "manifest_digest": "sha256:cd96bbc1274fe1dea7815ca85d619d27fec4559a1255d46cc458af7d5318a0af",
+  "checks": [
+    {
+      "name": "isolated pre-existing manifest ready",
+      "pass": true
+    },
+    {
+      "name": "analyst 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "analyst 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "analyst 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "demo 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "run 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "run 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "run 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "run 1366 task verdict from saved boolean",
+      "pass": true
+    },
+    {
+      "name": "run 1366 original verifier summary preserved",
+      "pass": true
+    },
+    {
+      "name": "run 1366 original agent message preserved",
+      "pass": true
+    },
+    {
+      "name": "run 1366 FILE_CHANGE boundary visible",
+      "pass": true
+    },
+    {
+      "name": "run 1366 diagnosis is primary action",
+      "pass": true
+    },
+    {
+      "name": "run 1366 keyboard exposes machine status",
+      "pass": true
+    },
+    {
+      "name": "run 1366 focused badge no overflow",
+      "pass": true
+    },
+    {
+      "name": "run 1366 safe evidence download",
+      "pass": true
+    },
+    {
+      "name": "run 1366 public artifact allowlisted",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "diagnosis 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 task failure distinct from process succeeded",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 succeeded process neutral",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 digest-only is not zero paths",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 Chinese hypothesis explanation",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 comparison primary export secondary",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 original hypothesis still inspectable",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 reference opens raw bound run",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 citation return control",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "regression 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 actual NOT_COMPARABLE gate",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 no implied candidate superiority",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 raw rates remain visible",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 Chinese known constraints",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 original direction and deltas inspectable",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiments 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 Chinese filters and table",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 completed status neutral",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 saved identity unchanged",
+      "pass": true
+    },
+    {
+      "name": "experiment 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "experiment 1366 lifecycle and task outcomes separate",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "historical 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 no Fake-only interface guidance",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 digest consistency not source attestation",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 original report summary preserved",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 bound evidence remains accessible",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 keyboard citation return",
+      "pass": true
+    },
+    {
+      "name": "offline 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "offline 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "offline 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "offline 1366 synthetic-only guidance visible",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-overview 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-matrix 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "experiment-statistics 1366 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-statistics 1366 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-statistics 1366 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "analyst 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "analyst 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "analyst 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "demo 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "run 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "run 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "run 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "run 1440 task verdict from saved boolean",
+      "pass": true
+    },
+    {
+      "name": "run 1440 original verifier summary preserved",
+      "pass": true
+    },
+    {
+      "name": "run 1440 original agent message preserved",
+      "pass": true
+    },
+    {
+      "name": "run 1440 FILE_CHANGE boundary visible",
+      "pass": true
+    },
+    {
+      "name": "run 1440 diagnosis is primary action",
+      "pass": true
+    },
+    {
+      "name": "run 1440 keyboard exposes machine status",
+      "pass": true
+    },
+    {
+      "name": "run 1440 focused badge no overflow",
+      "pass": true
+    },
+    {
+      "name": "run 1440 safe evidence download",
+      "pass": true
+    },
+    {
+      "name": "run 1440 public artifact allowlisted",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "diagnosis 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 task failure distinct from process succeeded",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 succeeded process neutral",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 digest-only is not zero paths",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 Chinese hypothesis explanation",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 comparison primary export secondary",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 original hypothesis still inspectable",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 reference opens raw bound run",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 citation return control",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "regression 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 actual NOT_COMPARABLE gate",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 no implied candidate superiority",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 raw rates remain visible",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 Chinese known constraints",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 original direction and deltas inspectable",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiments 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 Chinese filters and table",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 completed status neutral",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 saved identity unchanged",
+      "pass": true
+    },
+    {
+      "name": "experiment 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "experiment 1440 lifecycle and task outcomes separate",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "historical 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 no Fake-only interface guidance",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 digest consistency not source attestation",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 original report summary preserved",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 bound evidence remains accessible",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 keyboard citation return",
+      "pass": true
+    },
+    {
+      "name": "offline 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "offline 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "offline 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "offline 1440 synthetic-only guidance visible",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-overview 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-matrix 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "experiment-statistics 1440 no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-statistics 1440 visible text at least 12px",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-statistics 1440 no duplicate visible machine badges",
+      "pass": true
+    },
+    {
+      "name": "analyst English locale selected",
+      "pass": true
+    },
+    {
+      "name": "analyst English no overflow",
+      "pass": true
+    },
+    {
+      "name": "demo English locale selected",
+      "pass": true
+    },
+    {
+      "name": "demo English no overflow",
+      "pass": true
+    },
+    {
+      "name": "run English locale selected",
+      "pass": true
+    },
+    {
+      "name": "run English no overflow",
+      "pass": true
+    },
+    {
+      "name": "diagnosis English locale selected",
+      "pass": true
+    },
+    {
+      "name": "diagnosis English no overflow",
+      "pass": true
+    },
+    {
+      "name": "regression English locale selected",
+      "pass": true
+    },
+    {
+      "name": "regression English no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiments English locale selected",
+      "pass": true
+    },
+    {
+      "name": "experiments English no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment English locale selected",
+      "pass": true
+    },
+    {
+      "name": "experiment English no overflow",
+      "pass": true
+    },
+    {
+      "name": "controlled NOT_COMPARABLE suppresses improved paired direction",
+      "pass": true
+    },
+    {
+      "name": "controlled NOT_COMPARABLE preserves original improved source value",
+      "pass": true
+    },
+    {
+      "name": "controlled PARTIALLY_COMPARABLE suppresses improved paired direction",
+      "pass": true
+    },
+    {
+      "name": "controlled PARTIALLY_COMPARABLE preserves original improved source value",
+      "pass": true
+    },
+    {
+      "name": "controlled task VERIFIED_PASS from boolean only",
+      "pass": true
+    },
+    {
+      "name": "controlled task NOT_VERIFIED from boolean only",
+      "pass": true
+    },
+    {
+      "name": "baseline/candidate identical API /public-demo",
+      "pass": true
+    },
+    {
+      "name": "baseline/candidate identical API /runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "pass": true
+    },
+    {
+      "name": "baseline/candidate identical API /runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "pass": true
+    },
+    {
+      "name": "baseline/candidate identical API /experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "pass": true
+    },
+    {
+      "name": "baseline/candidate identical API /analyst/examples/historical",
+      "pass": true
+    },
+    {
+      "name": "normal browser no runtime console HTTP or external request errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "layouts": [
+    {
+      "name": "analyst",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "demo",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "run",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "diagnosis",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "regression",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiments",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiment",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "historical",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "offline",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiment-overview",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiment-matrix",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiment-statistics",
+      "width": 1366,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "analyst",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "demo",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "run",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "diagnosis",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "regression",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiments",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiment",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "historical",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "offline",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiment-overview",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiment-matrix",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    },
+    {
+      "name": "experiment-statistics",
+      "width": 1440,
+      "overflow": false,
+      "small": [],
+      "codeVisibility": false
+    }
+  ],
+  "screenshots": [
+    "after-analyst-1366.png",
+    "after-demo-1366.png",
+    "after-run-1366.png",
+    "after-diagnosis-1366.png",
+    "after-regression-1366.png",
+    "after-experiments-1366.png",
+    "after-experiment-1366.png",
+    "after-historical-1366.png",
+    "after-offline-1366.png",
+    "after-experiment-overview-1366.png",
+    "after-experiment-matrix-1366.png",
+    "after-experiment-statistics-1366.png",
+    "after-analyst-1440.png",
+    "after-demo-1440.png",
+    "after-run-1440.png",
+    "after-diagnosis-1440.png",
+    "after-regression-1440.png",
+    "after-experiments-1440.png",
+    "after-experiment-1440.png",
+    "after-historical-1440.png",
+    "after-offline-1440.png",
+    "after-experiment-overview-1440.png",
+    "after-experiment-matrix-1440.png",
+    "after-experiment-statistics-1440.png"
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/examples/historical"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/analyst/examples/offline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/examples/historical"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/analyst/examples/offline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    }
+  ],
+  "controlled_states": "Explicit API-response substitutions only; no persisted evidence changed."
+}

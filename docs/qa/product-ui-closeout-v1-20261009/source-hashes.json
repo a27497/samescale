@@ -1,0 +1,21 @@
+{
+  "frontend/src/App.vue": "5c47b77305fa172e320c5a57cad38b9c70a0462c06be9366c797077bf6b3e477",
+  "frontend/src/components/InvestigationReport.vue": "2bed6e19ce6a7bf9f609b05f4d0929a170da29b435802cb6a85df114be2e7758",
+  "frontend/src/components/MatrixHeatmap.vue": "21690cbf570fbd43d9a749b1e437d8d38fa6eeccf94f047801a7e988ed72b2f0",
+  "frontend/src/components/StatusBadge.vue": "cbb64dfdb8d0d8d0ba46ef156d1d52fdd48a2688ffd622a1fce9c6629008bd2a",
+  "frontend/src/styles.css": "b99905e987a3e2a399e2e373f1e961cb34b2291101161eea387d75496780bdaf",
+  "frontend/src/utils/evidenceLabels.ts": "851ef599b79baa388826a94a3389d34cd300d991e0868be681f1f49b7c3b1645",
+  "frontend/src/views/AnalystHomeView.vue": "becd067098963fe58d40a9e251b9f9dc9ae6cca9f93935ed5e632bea09e3c11a",
+  "frontend/src/views/DiagnosisView.vue": "6bc71bd7ca2193236c0960c8d99fa57b3b2ee454a1fd6a6911cd3e17a4333aa6",
+  "frontend/src/views/ExperimentDetailView.vue": "217b873f92942f20254dab42fc007ee316492cb189ba09c52714f4cdb016fb02",
+  "frontend/src/views/ExperimentsView.vue": "a5ff65e8c0d01c7f31324a149e5ba647b60291e4b0affcefa12ddbb78ecbc7f8",
+  "frontend/src/views/PublicDemoView.vue": "760020aac743ea171ecdeb4f5ad7a582fc27831b3a0a10d15fabd5fa84c6ab78",
+  "frontend/src/views/RegressionView.vue": "21d1850c60b6f93de01afc678789cccc53172fd5f08ca68d08601a03e3938998",
+  "frontend/src/views/RunDetailView.vue": "4692ea755ce0b75aca7e060fdadac301d373c10e6e25c08d0a4631c8a71800e2",
+  "frontend/tests/analyst-home.spec.ts": "08136c2aa877ae3f57ffdc02405c3e140b6dd5443ab8b2e55dfde743bde57781",
+  "frontend/tests/diagnosis.spec.ts": "4e2357d1d6ccbe3e94e3deb39a3032fb43419352b29de67be8745b0e01b427b7",
+  "frontend/tests/evidence-labels.spec.ts": "b08d07773bfa7fb7e94c0fdde98f7e95d1cf0994f760cd336c3b5160f4f03953",
+  "frontend/tests/public-demo.spec.ts": "5b3e1b3e07875d222ac99203a9dbeafba9aa9bd0473186136032b81b5cca9bca",
+  "frontend/tests/visual-v1.spec.ts": "f2c820d1d3e1ce57c74a688938b8bafc0102d58b5d69b71a08e0b8fc63fea0be",
+  "frontend/tests/workbench.spec.ts": "39b9c03b41df5f184161fac28727e093ee408dcf7f6a77155538c09704487c3c"
+}

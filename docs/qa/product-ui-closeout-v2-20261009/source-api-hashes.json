@@ -1,0 +1,13 @@
+{
+  "unchanged_from_v1": true,
+  "canonical_json_sha256": {
+    "manifest": "9f7d3e64ba4b628400a9ad38e270f6743fef51973dc1c3b8af65c70c2c091fab",
+    "run": "0201b81208ebb1e449472e3f3c59188a21ad67cfd904ffed88984e9a33b7b3f2",
+    "trace": "8295ef52699380dc4f9b98830a812de4d977d8e698311094c4cdc31d2d3477a7",
+    "diagnosis": "87645eddbf686fca5f1dc5fad5283334d8e358f23c9ab7760f208a0e55533ae0",
+    "historical": "09b2098063e90bc6a0ef135e4ccd88daafbdcfc811102ca6005b6e06ba4e69d0"
+  },
+  "database_unchanged": true,
+  "database_tables": 23,
+  "database_rows": 17
+}

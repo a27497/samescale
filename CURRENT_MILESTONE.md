@@ -1,5 +1,141 @@
 # SameScale Product — Current Milestone
 
+## Three-round UI Git closeout — pre-publication verification — 2026-10-10
+
+The user authorized one bounded commit, normal push and a PR to `main` from
+`codex/product-ui-closeout-v1-20261009`, retaining its three uncommitted UI/P0 rounds.
+The inspected base and remote main are `314fe71c4fc6d08c31b8a7b490435deaa1917be4`.
+No new design, product feature, backend, dependency or execution work is included.
+
+Fresh frontend **179/179 PASS (15 files)**, Vue typecheck and isolated production build **PASS**.
+All **56 built files** match the saved final P0 browser build byte-for-byte; its **77 source/test
+hashes** match the candidate. Network-isolated Offline Regression **73 PASS**, two replay passes
+match all five pinned outputs; **0 external/model/Provider/Judge calls**, no subject or verifier execution.
+The existing browser records retain their historical scope; no new browser campaign is claimed.
+
+Grok's final independent reassessment is **NOT_CONFIRMED**. The original six error messages remain
+unavailable. The unknown-Run gateway correction is an isolated validation artifact, not a production
+configuration change or a released public fix. Mobile, non-Chromium, full screen-reader testing,
+private persistence and real executions remain uncovered. Historical missing artifacts stay missing.
+
+[Git closeout checks and portable review screenshots](docs/qa/ui-git-closeout-20261010/README.md)
+record this pre-commit snapshot. Exact pushed SHA and remote Fast CI / Offline Regression are
+reported separately in the PR; they are **PENDING at this document snapshot**.
+No merge, deployment, service/database change or paid execution is authorized. **STOP after PR handoff.**
+
+## Grok round-2 P0 closeout — local acceptance — 2026-10-09
+
+Inherited both uncommitted UI rounds on `codex/product-ui-closeout-v1-20261009`, HEAD still
+`314fe71c4fc6d08c31b8a7b490435deaa1917be4`. White/Cobalt and the accepted page structure remain.
+Run / experiment lifecycle, Trace event and Verifier execution labels now have explicit contexts;
+FILE_CHANGE completed means event completion. Independent task verdicts remain separate. Passive
+badges no longer add keyboard stops, bilingual accessible duplication or source-obscuring popovers;
+raw enums remain in technical evidence. Stable core navigation replaces the dynamic Run sidebar item.
+
+Experiment list and overview distinguish collected capability results, passes, failures and
+infrastructure failures. Verdict counts use existing filtered run totals across all pages, guarded
+against invalid counts, identity/outcome mismatch and sum disagreement; unavailable evidence is
+unreported, never inferred from rates. Incomparable raw values default to a labeled disclosure with
+no improvement judgment. Exact prefilled identities retain readable loading / unknown labels and
+detail lookup after list failure. A failed Run read no longer triggers an extra Trace probe.
+
+Frontend **179/179 PASS (15 files)**, Vue typecheck and isolated build **PASS**. Chromium
+**153.0.8010.12**, **1366 / 1440px**: main journey **156/156**, count-column / deep-return checks
+**10/10**, Analyst / Real / Fake shared checks across old local, actual old HTTPS and candidate
+**54/54 PASS**; candidate isolated gateway **110/110 PASS**. Normal main paths have zero captured
+runtime / console / network errors. Actual before/after inspection and 44 PNGs document the changes.
+
+Unknown safe Run HTML enters the app only in the new **isolated gateway copy**; its API whitelist
+is byte-equivalent (116 method/path pairs), unknown API still 403. Product 404 is separately verified.
+Actual old HTTPS denial logs were captured, not represented by localhost success. Grok's original
+six messages are unavailable, so they cannot be matched individually; advanced private configuration
+denials remain intentional. No new P0 public tunnel or deployment is claimed.
+
+Original UI-2 **1494 files**, dirty status/diff, prior-round receipts, six existing services, old
+gateway configuration and old v2 local/HTTPS build remain unchanged. Existing QA DB **23 tables /
+17 rows**, Demo / Run / Trace identities, FIXTURE_OFFLINE source and manifest remain unchanged;
+no backend, API, dependency or frozen-evidence change and no Agent/Provider execution.
+[P0 acceptance, screenshots and remaining limits](docs/qa/product-p0-closeout-20261009/README.md).
+Candidate preview: `http://127.0.0.1:15941/demo`; old 15931 and HTTPS still serve round 2.
+**STOP: uncommitted local acceptance complete, awaiting human visual confirmation; no push, merge or deployment.**
+
+## Product UI/UX closeout v2 — local acceptance — 2026-10-09
+
+Continued directly from v1's uncommitted changes on `codex/product-ui-closeout-v1-20261009`.
+No reset, reimplementation or publication. V1 source/build snapshots and its QA receipts remain
+preserved. Default views now emphasize task/experiment names, outcomes and next actions;
+full IDs, digests, enums, configuration names and English source evidence remain in inspectable
+technical disclosures. Run labels include task, display repeat number, attempt and a compact
+identity key; peer collisions extend the key. Display repeat numbers are `repeat_index + 1`;
+the original zero-based index remains unchanged in source details, navigation and downloads.
+
+Demo leads with Agent / Verifier source records and has three reading steps: outcome, diagnosis,
+comparison. Repeated home entries and the core footer navigation are removed. Historical Real's
+Chinese overview reads exact verified assertion fields with completeness/consistency and available-citation guards;
+unknown or inconsistent records retain source-only presentation. Evidence prose is not rewritten.
+V1's source separation, process/task semantics, FILE_CHANGE distinction and incomparable direction
+guard remain intact. Experiment selectors retain prefilled IDs even outside a bounded list or when
+listing fails. Lists provide name/ID search and experiment pagination; Trace is initially bounded
+and expandable. History returns restore disclosures and scroll after async content/artifact readiness.
+
+Frontend **159/159 PASS (14 files)**, standalone Vue typecheck and isolated build **PASS**.
+Actual Chromium **153.0.8010.12** at **1366 / 1440px**: final main matrix **205/205 PASS**;
+final history/disclosure, exact copying and same-name follow-up **29/29 PASS**;
+missing-citation / null-source / latest historical checks **17/17 PASS**. Main screenshots
+cover five core pages, experiment list/four detail tabs, Historical Real and Offline Fake. Normal
+paths record zero runtime/console/HTTP/external errors, default long identities or enum piles,
+horizontal overflow, or visible text below 12px. Expected 404/503 browser fixtures are separately
+recorded. Twenty-four original v1 screenshots are byte-identical comparison baselines for twenty-four
+new candidate screenshots. Actual visual comparison was performed, separately from automation.
+
+UI-2 **1494 protected files**, dirty status and diff are unchanged. Existing isolated QA DB
+**23 tables / 17 rows** remains byte-equivalent at the row-hash level. Source API and downloaded
+run identities match v1; Demo identity/manifest, backend, schema, dependencies and frozen evidence
+are unchanged. No real Agent/Provider call, commit, push, merge or deployment occurred.
+
+[Round-2 acceptance, screenshots and limitations](docs/qa/product-ui-closeout-v2-20261009/README.md).
+Run filtering is limited to loaded records (existing 100-record bound); unknown source/configuration
+values and missing historical artifacts are not repaired. Mobile/non-Chromium, complete screen-reader
+verification, real executions and complex model-comparison browser campaigns are not covered.
+**STOP: local technical acceptance complete, awaiting human visual acceptance.**
+
+## Product UI/UX closeout v1 — local acceptance — 2026-10-09
+
+Implemented locally on `codex/product-ui-closeout-v1-20261009`, based on the requested
+`314fe71c4fc6d08c31b8a7b490435deaa1917be4` (remote main was read-only verified at this SHA).
+White/Cobalt theme, page structures and the Agent / independent Verifier comparison are retained.
+Chinese reading hierarchy is shared across the five core pages and Experiments list/detail.
+Historical Real reports no longer inherit synthetic-input guidance. Task verdicts and Verifier
+process states are separate; completed processes stay neutral. FILE_CHANGE is distinguished from
+saved final-workspace differences. Incomparable results retain raw observations and original
+recorded directions without presenting improvement. Machine states remain available through
+native tooltips, keyboard focus, accessible labels and source disclosures. Exact checked backend
+guidance gets labeled Chinese explanations; unknown source strings remain unchanged.
+
+Frontend **142/142 PASS (13 files)**, Vue typecheck and isolated production build **PASS**.
+Chromium **153.0.8010.52**, **1366 / 1440px**: main matrix **163/163 PASS**; final focused table,
+numeric type, overview alignment and chart follow-up **16/16 PASS**. Both sizes cover all five
+core pages, Experiments list, four detail tabs and offline / historical report scopes. English
+navigation smoke, keyboard source-code access, citations/return, safe download and separately
+injected comparability / pass / unknown states pass. Normal paths have zero recorded runtime,
+console, HTTP or external-request errors, no horizontal page overflow and no visible text below
+12px. Screenshots comprise 18 baseline and 24 candidate PNGs; report scroll positions are
+normalized for comparable full-page capture.
+
+Original UI-2's **1494 protected files**, dirty status and complete diff remain unchanged.
+Isolated existing QA database **23 tables / 17 rows** matches its before snapshot. Saved Demo,
+run, Trace, diagnosis and historical API responses match baseline/candidate. The pre-existing QA
+fixture identity `public-demo-20261009-b13ae8d9b801` and manifest remain unchanged; this is a
+separate existing QA dataset, not a production Demo replacement. Backend, schemas, dependencies,
+frozen evidence and execution permissions are unchanged. Builds remain outside served default
+frontend directories. No real Agent/Provider, commit, push, merge or formal deployment occurred.
+
+[Acceptance, screenshot index and limitations](docs/qa/product-ui-closeout-v1-20261009/README.md).
+Unrestored historical artifacts, unknown source values and original English evidence retain their
+prior state. Mobile, non-Chromium, full screen-reader certification, private persistence and real
+execution are not covered. **Local implementation and acceptance complete; STOP awaiting human
+visual confirmation before any publication.** Older publication authorizations below remain historical.
+
 ## Workbench Brand v1 synchronization — 2026-10-09
 
 The website's released E3-F + W1 Cobalt assets at

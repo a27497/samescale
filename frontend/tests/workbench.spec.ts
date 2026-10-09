@@ -261,12 +261,12 @@ describe('Workbench contracts', () => {
     await wrapper.findAll('.tab-button')[3].trigger('click')
     const text = wrapper.text()
     expect(text).toContain('exploratory/descriptive only')
-    expect(text).toContain('Matched capability pairs')
-    expect(text).toContain('Per-model capability rates (B − A)')
-    expect(text).toContain('Matched capability-pair rates (B − A)')
+    expect(text).toContain('配对能力结果')
+    expect(text).toContain('各模型能力通过率差（B − A）')
+    expect(text).toContain('配对能力通过率差（B − A）')
     expect(text).toContain('BUDGET_EXHAUSTION')
     expect(text).toContain('NOT_AVAILABLE')
-    expect(text).toContain('Lease claims')
+    expect(text).toContain('租约领取次数')
     expect(text.toLowerCase()).not.toContain('statistically significant')
     expect(text.toLowerCase()).not.toContain('universally better')
     expect(text.toLowerCase()).not.toContain('causal uplift')
@@ -394,15 +394,15 @@ describe('Workbench contracts', () => {
       comparisons: [{ baseline_cell_id: 'direct', candidate_cell_id: 'codex', baseline_value: { status: 'NOT_REPORTED', value: null }, candidate_value: { status: 'NOT_REPORTED', value: null }, delta: { status: 'NOT_REPORTED', value: null }, direction: 'NOT_REPORTED', common_baseline_value: reported(1), common_candidate_value: reported(.5), overall_baseline_value: reported(1), overall_candidate_value: reported(.5), overall_delta: reported(-.5), eligible_paired_observations: 0, baseline_tier: 'INFORMAL', candidate_tier: 'INFORMAL', comparability: 'NOT_COMPARABLE', reason_codes: ['HARD_CONTROL_MISMATCH'], paired_observations: 3, baseline_infra_count: 0, candidate_infra_count: 1 }],
     })
     const wrapper = mount(RegressionView)
-    await wrapper.get('[data-test="baseline"]').setValue('a')
-    await wrapper.get('[data-test="candidate"]').setValue('b')
+    await wrapper.get('[aria-label="基线实验 ID"]').setValue('a')
+    await wrapper.get('[aria-label="候选实验 ID"]').setValue('b')
     await wrapper.get('[data-test="intent"]').setValue('MODEL_COMPARISON')
     await wrapper.get('button').trigger('click')
     await flushPromises()
     expect(wrapper.text()).toContain('NOT_COMPARABLE')
     expect(wrapper.text()).toContain('no causal attribution')
     expect(wrapper.text()).toContain('HARD_CONTROL_MISMATCH')
-    expect(wrapper.text()).toContain('INSUFFICIENT_EVIDENCE')
+    expect(wrapper.text()).toContain('这些描述值不构成优劣或改进结论')
     expect(wrapper.text()).toContain('全量原始通过率')
     expect(api.compare).toHaveBeenCalledWith('a', 'b', 'MODEL_COMPARISON')
   })
@@ -557,6 +557,28 @@ it('Statistics explicitly reports missing comparability instead of a blank value
   await router.push('/experiments/matrix-keyless')
   const wrapper = mount(ExperimentDetailView, { global: { plugins: [createPinia(), router] } }); await flushPromises()
   await wrapper.findAll('.tab-button')[3].trigger('click'); await flushPromises()
-  const label = wrapper.findAll('dt').find(item => item.text() === 'Comparability')!
-  expect(label.element.nextElementSibling?.textContent).toBe('NOT_REPORTED')
+  const label = wrapper.findAll('dt').find(item => item.text() === '可比性')!
+  expect(label.element.nextElementSibling?.querySelector('[data-status="NOT_REPORTED"]')).not.toBeNull()
+})
+
+it('ignores an experiment detail response that arrives after navigation to another identity', async () => {
+  const store = useExperimentStore(createPinia())
+  let finishOld!: (value: typeof experiment) => void
+  api.getExperiment.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve }))
+  const old = store.fetchExperiment('old-identity')
+  api.getExperiment.mockResolvedValueOnce({ ...experiment, experiment_id: 'new-identity' })
+  await store.fetchExperiment('new-identity')
+  finishOld({ ...experiment, experiment_id: 'old-identity' }); await old
+  expect(store.selected?.experiment_id).toBe('new-identity')
+})
+
+it('loads another experiment page with the original search and status without duplicate identities', async () => {
+  const store = useExperimentStore(createPinia())
+  store.search = 'original-id-query'; store.statusFilter = 'completed'
+  api.listExperiments.mockResolvedValueOnce({ items: [experiment], total: 2, limit: 1, offset: 0 })
+  await store.fetchList()
+  api.listExperiments.mockResolvedValueOnce({ items: [experiment, { ...experiment, experiment_id: 'another-identity' }], total: 2, limit: 1, offset: 1 })
+  await store.loadMore()
+  expect(api.listExperiments).toHaveBeenLastCalledWith({ search: 'original-id-query', status: 'completed', offset: 1 })
+  expect(store.items.map(item => item.experiment_id)).toEqual(['matrix-keyless', 'another-identity'])
 })

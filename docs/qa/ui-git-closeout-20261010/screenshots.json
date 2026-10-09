@@ -1,0 +1,133 @@
+{
+  "scope": "Existing P0 browser images copied for PR review; no new browser run",
+  "files": [
+    {
+      "path": "screenshots/before-experiments-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "before-experiments-1440.png",
+      "sha256": "42671df227de2762f23fd525abac306b0f28a038d20dea0d534eca42c1c6f5a2",
+      "bytes": 91951,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/after-experiments-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "after-experiments-1440.png",
+      "sha256": "8a9a09021b07d4067d95e584e0815039983a0255eecaae46f93fa19b6a0091d1",
+      "bytes": 101937,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/before-overview-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "before-overview-1440.png",
+      "sha256": "a29e4cacc03eaeeb52bf020d1b3c4779f6796348b3cc019d7562bbc3dff23db5",
+      "bytes": 107052,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/after-overview-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "after-overview-1440.png",
+      "sha256": "41ebc9bdd7aa10f79717285572bc2d47b13f68cd84f562681a91812815ff900a",
+      "bytes": 109758,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/before-filechange-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "before-filechange-1440.png",
+      "sha256": "d0e31ae160458e7437092016b3cb59b13e0bfbff91c20055b80b766ca358250b",
+      "bytes": 111640,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/after-filechange-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "after-filechange-1440.png",
+      "sha256": "0fad88930e82ce1b83988ca50421bd5cb9d0dca4b62a7dc907fa718cedec46d5",
+      "bytes": 105684,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/before-regression-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "before-regression-1440.png",
+      "sha256": "5f850e761da208b033f1210f298e379f63ba395abf6cef1ca3d7e0f30c74b946",
+      "bytes": 174347,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/after-regression-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "after-regression-1440.png",
+      "sha256": "6d5124297398d7e044081b3eb65954f59a740aa23d4a547ec9f5f5246b55f591",
+      "bytes": 112761,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/before-run-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "before-run-1440.png",
+      "sha256": "211ba2226bdb3b1cfacca72dc7fd0a0edb2799b88dc0b2e2344086f1016ac7fa",
+      "bytes": 203598,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/after-run-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "after-run-1440.png",
+      "sha256": "1a80c01caf5c2e2877e9e7bb74de0cc7805661e94307640ec11e52bd8da748e8",
+      "bytes": 199908,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/before-diagnosis-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "before-diagnosis-1440.png",
+      "sha256": "573aa78c601eec3e724c84c3cf8a98d9866c4fe0b5ef3505585afef9ea10ac19",
+      "bytes": 230089,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/after-diagnosis-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "after-diagnosis-1440.png",
+      "sha256": "bb5eb2b5f896dd00317929f73c09d7d848c8267ca2710172e5d8ca98971b898d",
+      "bytes": 229545,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/before-demo-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "before-demo-1440.png",
+      "sha256": "8d8bc4d69cc32cd598dd0b0f1d9a3ce917bd57765450f6b69b6e60e4c389a60a",
+      "bytes": 172359,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/after-demo-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "after-demo-1440.png",
+      "sha256": "b777e34f68bdbb5b4a414b851fb90201ae11589f33a96b6a0b5305681f4ce475",
+      "bytes": 172437,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/before-historical-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "before-historical-1440.png",
+      "sha256": "2855865addb8f1a45d93ca89c5575ccd25de4291946f6bef981e9f0f6cb4a939",
+      "bytes": 264338,
+      "copied_without_edit": true
+    },
+    {
+      "path": "screenshots/after-historical-1440.png",
+      "source_gallery": "samescale-product-p0",
+      "source_name": "after-historical-1440.png",
+      "sha256": "e9bc294a627ee95aef661be8f9fced0de5918b475612ac41507f420c0e368cfc",
+      "bytes": 264390,
+      "copied_without_edit": true
+    }
+  ]
+}

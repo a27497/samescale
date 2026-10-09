@@ -1,7 +1,38 @@
+import { nextTick } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
+
+// Ephemeral UI state only; no evidence or credentials are stored.
+const disclosureHistory = new Map<string, Array<{ index: number; summary: string }>>()
 
 const router = createRouter({
   history: createWebHistory(),
+  async scrollBehavior(to, from, savedPosition) {
+    // Query-only selections keep their viewport. History returns wait for async evidence.
+    if (!savedPosition && to.path === from.path && !to.hash) return false
+    await nextTick()
+    if (document.querySelector('.page-container')) {
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+      if (document.querySelector('.page-container [aria-busy="true"], .page-container .loading-state')) {
+        await new Promise<void>(resolve => {
+          const observer = new MutationObserver(() => {
+            if (!document.querySelector('.page-container [aria-busy="true"], .page-container .loading-state')) finish()
+          })
+          const timer = window.setTimeout(finish, 5000)
+          function finish() { observer.disconnect(); window.clearTimeout(timer); resolve() }
+          observer.observe(document.querySelector('.page-container')!, { childList: true, subtree: true, attributes: true })
+        })
+      }
+    }
+    if (savedPosition) {
+      const details = document.querySelectorAll<HTMLDetailsElement>('.page-container details')
+      for (const saved of disclosureHistory.get(to.fullPath) ?? []) {
+        const detail = details[saved.index]
+        if (detail?.querySelector(':scope > summary')?.textContent === saved.summary) detail.open = true
+      }
+      await nextTick()
+    }
+    return savedPosition ?? (to.hash ? { el: to.hash, top: 96 } : { left: 0, top: 0 })
+  },
   routes: [
     { path: '/', redirect: '/analyst' },
     { path: '/demo', name: 'public-demo', component: () => import('@/views/PublicDemoView.vue'), meta: { title: '公开演示 · Public Demo', section: 'Evidence' } },
@@ -106,6 +137,11 @@ const router = createRouter({
       meta: { title: 'Page not found', section: 'Workbench' },
     },
   ],
+})
+
+router.beforeEach((_to, from) => {
+  disclosureHistory.set(from.fullPath, Array.from(document.querySelectorAll<HTMLDetailsElement>('.page-container details')).flatMap((detail, index) => detail.open ? [{ index, summary: detail.querySelector(':scope > summary')?.textContent ?? '' }] : []))
+  if (disclosureHistory.size > 50) disclosureHistory.delete(disclosureHistory.keys().next().value!)
 })
 
 export default router

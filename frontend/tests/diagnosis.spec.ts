@@ -2,6 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import router from '@/router'
+import type { DiagnosisReport } from '@/types/workbench'
 import DiagnosisView from '@/views/DiagnosisView.vue'
 
 const api = vi.hoisted(() => ({
@@ -13,7 +14,7 @@ const api = vi.hoisted(() => ({
 
 vi.mock('@/api/client', () => ({ workbenchApi: api }))
 
-const report = {
+const report: DiagnosisReport = {
   schema_version: 1 as const,
   experiment_id: 'diagnosis-fixture',
   plan_digest: `sha256:${'1'.repeat(64)}`,
@@ -103,7 +104,7 @@ describe('Diagnosis Workbench', () => {
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
     const wrapper = mount(DiagnosisView, { global: { plugins: [router] } })
     await flushPromises()
-    await wrapper.get('button.primary-button').trigger('click')
+    await wrapper.get('[data-test="export-failures"]').trigger('click')
     await flushPromises()
 
     expect(api.exportBadCases).toHaveBeenCalledWith('diagnosis-fixture')
@@ -111,7 +112,7 @@ describe('Diagnosis Workbench', () => {
     expect(click).toHaveBeenCalledOnce()
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:fixture')
     expect(wrapper.text()).toContain('已下载持久化案例 / 合成资格案例: 1 / 0')
-    expect(wrapper.text()).toContain('保存记录不自动认证真实 Provider 调用')
+    expect(wrapper.find('[data-status="UNVERIFIED_SOURCE"]').exists()).toBe(true)
     click.mockRestore()
   })
 
@@ -122,7 +123,7 @@ describe('Diagnosis Workbench', () => {
     await flushPromises()
     expect(api.getExperiment).toHaveBeenCalledWith('outside-first-page')
     expect(api.getDiagnosis).toHaveBeenCalledWith('outside-first-page')
-    expect(wrapper.text()).toContain('FIXTURE_OFFLINE')
+    expect(wrapper.find('[data-status="FIXTURE_OFFLINE"]').exists()).toBe(true)
   })
 })
 
@@ -146,4 +147,36 @@ it('updates a same-page experiment deep link outside the bounded list without ke
   expect(wrapper.find('.selected-run-identity').exists()).toBe(false)
   expect((wrapper.get('[data-test="diagnosis-experiment"]').element as HTMLSelectElement).value).toBe('older-linked')
   expect(wrapper.text()).toContain('这不证明所有任务通过')
+})
+
+
+it('separates a succeeded verifier process from the failed task verdict', async () => {
+  const wrapper = mount(DiagnosisView, { global: { plugins: [router] } }); await flushPromises()
+  const verifier = wrapper.get('.diagnosis-verifier')
+  expect(verifier.text()).toContain('任务验收结论')
+  expect(verifier.get('[data-status="FAILED"]').classes()).toContain('bad')
+  expect(verifier.get('[data-status="succeeded"]').classes()).toContain('neutral')
+  expect(verifier.get('[data-status="succeeded"]').attributes('data-status')).toBe('succeeded')
+  expect(verifier.text()).toContain('Verifier 进程')
+  expect(verifier.find('[data-status="PASSED"]').exists()).toBe(false)
+  wrapper.unmount()
+})
+
+it('explains FILE_CHANGE separately from a digest-only final workspace without inventing changed paths', async () => {
+  const source = structuredClone(report)
+  const selected = source.cells[0]!.task_families[0]!.clusters[0]!.runs[0]!
+  selected.workspace_diff = { status: 'DIGEST_ONLY', input_digest: 'same', output_digest: 'same', pattern: 'no-modification', changed_paths: [], protected_paths_changed: [] }
+  selected.trace.events = [{ ordinal: 1, type: 'FILE_CHANGE', status: 'completed', exit_code: null }]
+  api.getDiagnosis.mockResolvedValueOnce(source)
+  const wrapper = mount(DiagnosisView, { global: { plugins: [router] } }); await flushPromises()
+  const facts = wrapper.get('.facts-panel')
+  expect(facts.text()).toContain('最终工作区无修改')
+  expect(facts.text()).toContain('仅有摘要对照')
+  expect(facts.text()).not.toContain('0 条路径记录')
+  expect(facts.text()).toContain('FILE_CHANGE 是事件记录')
+  expect(facts.text()).toContain('进程执行完成也不代表任务验收通过')
+  expect(wrapper.get('.raw-evidence').text()).toContain('"pattern": "no-modification"')
+  expect(wrapper.get('.raw-evidence').text()).toContain('"type": "FILE_CHANGE"')
+  expect(selected.workspace_diff.changed_paths).toEqual([])
+  wrapper.unmount()
 })

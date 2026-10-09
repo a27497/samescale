@@ -1,0 +1,10 @@
+{
+  "scope": "direct isolated backend, not public gateway",
+  "status": 404,
+  "body": {
+    "error": {
+      "code": "NOT_FOUND",
+      "message": "run does not exist"
+    }
+  }
+}

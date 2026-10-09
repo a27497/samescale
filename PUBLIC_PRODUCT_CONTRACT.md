@@ -1,5 +1,22 @@
 # SameScale Product — Public Product Contract
 
+## UI evidence reading boundaries — 2026-10-09
+
+Run/experiment lifecycle, individual Trace events, Verifier execution and independent task
+acceptance have distinct labels. A FILE_CHANGE event's `completed` status describes that event;
+it does not establish run completion, task acceptance or persisted final-workspace change.
+Neutral execution completion never substitutes for an independent verdict. Original status enums
+and source text remain inspectable in explicit technical disclosures without passive badge focus
+stops or duplicated bilingual accessible labels.
+
+Collected task-result counts mean `capability_pass + capability_fail`; infrastructure failures are
+separate. Pass/fail counts use existing authoritative filtered totals and consistency guards, not
+rounded rates or the currently loaded page. Missing/inconsistent counts remain unreported.
+Incomparable and partially comparable raw observations default to a disclosure explicitly excluding
+quality/improvement conclusions; full original values and source direction remain accessible.
+An access denial cannot establish whether a Run exists: UI 403 feedback stays distinct from a
+product 404. Local gateway acceptance does not establish public release readiness or authorize API access.
+
 ## Bounded native-hook observation — 2026-10-07
 
 One [operator-observed real Codex case](docs/evidence/real-codex-native-hook-20261007/README.md)
@@ -127,9 +144,21 @@ README entry. HarnessLab remains the implementation and historical identity. Vis
 contains investigation entry, Public Demo, saved sessions, experiments, diagnosis and regression;
 other tools remain in an expandable advanced area, automatically expanded on their direct routes.
 Run evidence navigation is bound to an actual run context. No route is removed or renamed.
-Visual v1's five pages and shared Shell support zh-CN (default) and en-US; switching translates
-interface copy, not evidence, IDs, summaries or API-returned text. Status semantics stay bound to
-the original code. Advanced pages retain their existing locale implementation.
+Visual v1's five core pages and shared Shell support zh-CN (default) and en-US. The local
+2026-10-09 UI closeout candidate extends this interface locale to Experiments list/detail;
+other advanced pages retain their existing locale implementation. Locale switching translates
+interface copy and exact checked code labels, not evidence bytes, IDs or backend summaries.
+Checked backend guidance can have a labeled Chinese explanation with its source text retained.
+Unknown source strings remain unchanged. Machine states remain inspectable through explicit
+technical disclosures, exact-value copy actions and original evidence; passive badges do not add
+focus stops or duplicate bilingual labels. Lifecycle completion is
+separate from task verification and does not use task-pass presentation. The second local closeout
+keeps full technical identities in disclosures/copy actions while names and peer-distinguishing keys
+serve as interface labels. Search, routes, references and downloads continue to use original identities.
+Historical Real overviews are bounded projections of exact checked assertion fields, with the source
+report retained; free-form summaries are not interpreted as source authentication or causal proof.
+The candidate is authorized for PR review. Grok's final independent reassessment and final human
+visual acceptance remain unconfirmed; branch publication does not establish deployment.
 Top-level CLI help and API documentation display SameScale with an explicit HarnessLab compatibility
 note. Package-version help, technical identifiers, and historical/evidence text retain their identity.
 S1.5 integrates the accepted work into `main` and renames the existing private GitHub repository

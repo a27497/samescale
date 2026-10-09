@@ -1,0 +1,1951 @@
+{
+  "browserVersion": "153.0.8010.12",
+  "checks": [
+    {
+      "name": "manifest identity ready and unchanged",
+      "pass": true
+    },
+    {
+      "name": "analyst 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "analyst 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "analyst 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "analyst 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "analyst 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "demo 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "demo 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "demo 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 complete contrast on first screen",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 one primary action",
+      "pass": true
+    },
+    {
+      "name": "run 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "run 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "run 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "run 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "run 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "diagnosis 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "diagnosis 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "diagnosis 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "regression 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "regression 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "regression 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 preserved raw observations",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 direction suppressed",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiments 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiments 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiments 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "experiment 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "historical 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "historical 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "historical 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 structured Chinese overview",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 English report collapsed",
+      "pass": true
+    },
+    {
+      "name": "historical 1366 no Fake guidance",
+      "pass": true
+    },
+    {
+      "name": "offline 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "offline 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "offline 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "offline 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "offline 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-overview 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-overview 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-overview 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-matrix 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-matrix 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-matrix 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "experiment-statistics 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-statistics 1366 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-statistics 1366 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-statistics 1366 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-statistics 1366 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "flow 1366 Demo to exact run",
+      "pass": true
+    },
+    {
+      "name": "flow 1366 new page starts at top",
+      "pass": true
+    },
+    {
+      "name": "flow 1366 explicit return restores Demo position",
+      "pass": true,
+      "detail": {
+        "expected": 180,
+        "actual": 180
+      }
+    },
+    {
+      "name": "flow 1366 run to exact diagnosis",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 same-task records distinguishable",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 selection has no route scroll jump",
+      "pass": true,
+      "detail": {
+        "before": 14,
+        "after": 14
+      }
+    },
+    {
+      "name": "diagnosis 1366 history restores run selection",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 citation opens exact source",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 citation returns focus",
+      "pass": true
+    },
+    {
+      "name": "flow 1366 diagnosis to exact comparison",
+      "pass": true
+    },
+    {
+      "name": "flow 1366 prefill is actually selected",
+      "pass": true
+    },
+    {
+      "name": "flow 1366 no false empty prompt",
+      "pass": true
+    },
+    {
+      "name": "flow 1366 browser back retains exact diagnosis selection",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 six run identities distinguishable",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 route uses original identity",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 original task ID search",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 return keeps filter and URL",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 return restores scroll",
+      "pass": true,
+      "detail": {
+        "expected": 0,
+        "actual": 0
+      }
+    },
+    {
+      "name": "analyst 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "analyst 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "analyst 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "analyst 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "analyst 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "demo 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "demo 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "demo 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 complete contrast on first screen",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 one primary action",
+      "pass": true
+    },
+    {
+      "name": "run 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "run 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "run 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "run 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "run 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "diagnosis 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "diagnosis 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "diagnosis 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "regression 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "regression 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "regression 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 preserved raw observations",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 direction suppressed",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiments 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiments 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiments 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "experiment 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "historical 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "historical 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "historical 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 structured Chinese overview",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 English report collapsed",
+      "pass": true
+    },
+    {
+      "name": "historical 1440 no Fake guidance",
+      "pass": true
+    },
+    {
+      "name": "offline 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "offline 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "offline 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "offline 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "offline 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-overview 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-overview 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-overview 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-overview 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-matrix 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-matrix 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-matrix 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-matrix 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "experiment-statistics 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiment-statistics 1440 no default long identities",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-statistics 1440 no default machine enum pile",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-statistics 1440 typography min12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "experiment-statistics 1440 no duplicated badge codes",
+      "pass": true
+    },
+    {
+      "name": "flow 1440 Demo to exact run",
+      "pass": true
+    },
+    {
+      "name": "flow 1440 new page starts at top",
+      "pass": true
+    },
+    {
+      "name": "flow 1440 explicit return restores Demo position",
+      "pass": true,
+      "detail": {
+        "expected": 180,
+        "actual": 180
+      }
+    },
+    {
+      "name": "flow 1440 run to exact diagnosis",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 same-task records distinguishable",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 selection has no route scroll jump",
+      "pass": true,
+      "detail": {
+        "before": 14,
+        "after": 14
+      }
+    },
+    {
+      "name": "diagnosis 1440 history restores run selection",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 citation opens exact source",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 citation returns focus",
+      "pass": true
+    },
+    {
+      "name": "flow 1440 diagnosis to exact comparison",
+      "pass": true
+    },
+    {
+      "name": "flow 1440 prefill is actually selected",
+      "pass": true
+    },
+    {
+      "name": "flow 1440 no false empty prompt",
+      "pass": true
+    },
+    {
+      "name": "flow 1440 browser back retains exact diagnosis selection",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 six run identities distinguishable",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 route uses original identity",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 original task ID search",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 return keeps filter and URL",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 return restores scroll",
+      "pass": true,
+      "detail": {
+        "expected": 0,
+        "actual": 0
+      }
+    },
+    {
+      "name": "clipboard full Run ID",
+      "pass": true
+    },
+    {
+      "name": "clipboard full evidence digest",
+      "pass": true
+    },
+    {
+      "name": "keyboard machine code reveal without layout shift",
+      "pass": true
+    },
+    {
+      "name": "keyboard state raw preserved",
+      "pass": true
+    },
+    {
+      "name": "download filename retains complete identity",
+      "pass": true
+    },
+    {
+      "name": "Trace opens original event summary",
+      "pass": true
+    },
+    {
+      "name": "FILE_CHANGE explanation preserved",
+      "pass": true
+    },
+    {
+      "name": "historical full English summary byte-preserved",
+      "pass": true
+    },
+    {
+      "name": "historical catalog exact ref and source data",
+      "pass": true
+    },
+    {
+      "name": "historical citation return focus",
+      "pass": true
+    },
+    {
+      "name": "source unchanged /api/workbench/public-demo",
+      "pass": true
+    },
+    {
+      "name": "source unchanged /api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "pass": true
+    },
+    {
+      "name": "source unchanged /api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "pass": true
+    },
+    {
+      "name": "source unchanged /api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "pass": true
+    },
+    {
+      "name": "source unchanged /api/workbench/analyst/examples/historical",
+      "pass": true
+    },
+    {
+      "name": "missing run explicit error and no substitute",
+      "pass": true
+    },
+    {
+      "name": "failed list retains exact prefill and usable result",
+      "pass": true
+    },
+    {
+      "name": "NOT_COMPARABLE hides improved direction",
+      "pass": true
+    },
+    {
+      "name": "NOT_COMPARABLE retains original direction and numeric values",
+      "pass": true
+    },
+    {
+      "name": "PARTIALLY_COMPARABLE hides improved direction",
+      "pass": true
+    },
+    {
+      "name": "PARTIALLY_COMPARABLE retains original direction and numeric values",
+      "pass": true
+    },
+    {
+      "name": "unmatched diagnosis run remains unselected",
+      "pass": true
+    },
+    {
+      "name": "clipboard denied retains full selectable value",
+      "pass": true
+    },
+    {
+      "name": "long trace bounded initial rows",
+      "pass": true
+    },
+    {
+      "name": "long trace all original events available",
+      "pass": true
+    },
+    {
+      "name": "long trace last summary original",
+      "pass": true
+    },
+    {
+      "name": "English demo no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "English run no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "English diagnosis no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "English regression no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "English experiments no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "English experiment no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "English historical no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "normal paths zero runtime/console/HTTP/external errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "expectedErrors": [
+    {
+      "type": "http",
+      "status": 404,
+      "path": "/api/workbench/runs/absent-round2"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "http",
+      "status": 404,
+      "path": "/api/workbench/runs/absent-round2/trace"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "http",
+      "status": 503,
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+    }
+  ],
+  "layouts": [
+    {
+      "name": "analyst",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    },
+    {
+      "name": "demo",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1415
+    },
+    {
+      "name": "run",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1579
+    },
+    {
+      "name": "diagnosis",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1788
+    },
+    {
+      "name": "regression",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1431
+    },
+    {
+      "name": "experiments",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    },
+    {
+      "name": "experiment",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1173
+    },
+    {
+      "name": "historical",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 2048
+    },
+    {
+      "name": "offline",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1654
+    },
+    {
+      "name": "experiment-overview",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    },
+    {
+      "name": "experiment-matrix",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    },
+    {
+      "name": "experiment-statistics",
+      "width": 1366,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    },
+    {
+      "name": "analyst",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    },
+    {
+      "name": "demo",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1415
+    },
+    {
+      "name": "run",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1579
+    },
+    {
+      "name": "diagnosis",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1738
+    },
+    {
+      "name": "regression",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1431
+    },
+    {
+      "name": "experiments",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    },
+    {
+      "name": "experiment",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1173
+    },
+    {
+      "name": "historical",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 2048
+    },
+    {
+      "name": "offline",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 1629
+    },
+    {
+      "name": "experiment-overview",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    },
+    {
+      "name": "experiment-matrix",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    },
+    {
+      "name": "experiment-statistics",
+      "width": 1440,
+      "overflow": false,
+      "fullTechnical": [],
+      "machineCodes": [],
+      "small": [],
+      "duplicateCodes": [],
+      "scroll": 0,
+      "height": 960
+    }
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/examples/historical"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/analyst/examples/offline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/examples/historical"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/analyst/examples/offline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/examples/historical"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/public-demo"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/workbench/regression/compare"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/analyst/examples/historical"
+    }
+  ],
+  "screenshots": [
+    "after-analyst-1366.png",
+    "after-demo-1366.png",
+    "after-run-1366.png",
+    "after-diagnosis-1366.png",
+    "after-regression-1366.png",
+    "after-experiments-1366.png",
+    "after-experiment-1366.png",
+    "after-historical-1366.png",
+    "after-offline-1366.png",
+    "after-experiment-overview-1366.png",
+    "after-experiment-matrix-1366.png",
+    "after-experiment-statistics-1366.png",
+    "after-analyst-1440.png",
+    "after-demo-1440.png",
+    "after-run-1440.png",
+    "after-diagnosis-1440.png",
+    "after-regression-1440.png",
+    "after-experiments-1440.png",
+    "after-experiment-1440.png",
+    "after-historical-1440.png",
+    "after-offline-1440.png",
+    "after-experiment-overview-1440.png",
+    "after-experiment-matrix-1440.png",
+    "after-experiment-statistics-1440.png"
+  ],
+  "source": {
+    "demo_id": "public-demo-20261009-b13ae8d9b801",
+    "manifest_digest": "sha256:cd96bbc1274fe1dea7815ca85d619d27fec4559a1255d46cc458af7d5318a0af"
+  },
+  "note": "Screenshots use saved evidence. Response substitutions are isolated browser tests and are never written to the API."
+}

@@ -1,0 +1,802 @@
+{
+  "url": "http://127.0.0.1:15941",
+  "checks": [
+    {
+      "name": "HTTPS index matches final build",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CSP isolation",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "no credential cookies",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "public read /api/health",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "68fd26fd028c249fb77980d91904c5713a103acb2f179ad7dfcd5164b708ae39"
+      }
+    },
+    {
+      "name": "public read /api/workbench/public-demo",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "2a5c038512bbda5d13bbc60b3d804400d7ef131b89241ea06e9d1560d9b33d2b"
+      }
+    },
+    {
+      "name": "public read /api/workbench/experiments",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "83f2f1c3e5930dfc0815a49deb3a8574c2d3884307426c11f333c5a39a1a7f94"
+      }
+    },
+    {
+      "name": "public read /api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "5817e7e7623c02e71b7675106f03e831f14f90ef0a604f32f91bf24ed8191031"
+      }
+    },
+    {
+      "name": "public read /api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "383b7b86bd43d762b748d9fd03c10c3b61d8253bf4eb41bb2dd3e6650bf46a7c"
+      }
+    },
+    {
+      "name": "public read /api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "0f9e1eeef5c1f341fa405ec93710c09d34c58ddbac17e981b168e724e3152d1e"
+      }
+    },
+    {
+      "name": "public read /api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/report",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "2325e002fbfa3b61a84ac246b98945d60c1e5825cc50e24b1e2f4a2684c8fc25"
+      }
+    },
+    {
+      "name": "public read /api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "f2715a171f879c94fa4fff5bcb773b6a76dbbfeb3e778a1491aaf6786112664c"
+      }
+    },
+    {
+      "name": "public read /api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "2e2ac610a65c9bdbd91f47ad3414456ecb37681e1c90ad4785ff2d2ac1e5329a"
+      }
+    },
+    {
+      "name": "public read /api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "c9d439f30c8f8debb3ca6e38ed7042993eed0f5e463e6d513a4dbb06dee61545"
+      }
+    },
+    {
+      "name": "public read /api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact?download=true",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "fdbf88263293b5fad0c64283b2d420a12eeee5ce62241eea21864b889174b927"
+      }
+    },
+    {
+      "name": "public read /api/workbench/analyst/capabilities",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "f5844101f9b58661decbdf5335e20e31a813ee836f7ad7aba3741fe533e3e787"
+      }
+    },
+    {
+      "name": "public sessions disabled",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "public read /api/workbench/analyst/examples/historical",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "sha256": "7e4443b5e7b051c2001606691ff88bf4660106db720e1c8e720e1ba24550c00f"
+      }
+    },
+    {
+      "name": "HTTPS source equals existing preview /api/workbench/public-demo",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "HTTPS source equals existing preview /api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "HTTPS source equals existing preview /api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "HTTPS source equals existing preview /api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "HTTPS source equals existing preview /api/workbench/analyst/examples/historical",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "bounded read-only computation /api/workbench/analyst/examples/offline",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "bounded read-only computation /api/workbench/regression/compare",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "bounded read-only computation /api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis/badcases",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "reject POST /api/workbench/analyst/sessions",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject POST /api/workbench/analyst/sessions/x/resume",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject PUT /api/workbench/analyst/sessions/x/proposal",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject POST /api/workbench/analyst/sessions/x/approval",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject POST /api/experiments/snapshot",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject POST /api/experiments/preflight",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject POST /api/local-configuration/models",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject DELETE /api/workbench/experiments/x",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject OPTIONS /api/workbench/analyst/sessions",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /api/local-configuration/credentials",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /openapi.json",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /.env",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /.git/config",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /tasks/micro-python-clamp/1.0.0/oracle/calculator.py",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /docs",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /metrics",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject POST /api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/start",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject POST /api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/execute",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject POST /api/workbench/analyst/examples/offline",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject POST /api/workbench/regression/compare",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /api/workbench/runs/private-run",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /api/workbench/experiments/phase-i-matrix-baseline",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/artifacts",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /api/workbench/analyst/sessions/private",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /assets/../.env",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET /%2e%2e/.env",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject GET //api/health",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "edgeCanonicalization": true
+      }
+    },
+    {
+      "name": "reject GET /api/workbench/%65xperiments",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "reject PATCH /demo",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "edgeCanonicalization": false
+      }
+    },
+    {
+      "name": "public build bytes favicon.ico",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes favicon-32x32.png",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes apple-touch-icon.png",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes favicon.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes index.html",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-symbol-16px-cobalt-dark.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-lockup-cobalt-on-dark.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-symbol-24px-cobalt.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-symbol-cobalt-dark.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-symbol-cobalt.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-symbol-32px-cobalt-dark.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-symbol-32px-cobalt.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-lockup-cobalt.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-symbol-16px-cobalt.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes brand/samescale-symbol-24px-cobalt-dark.svg",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/PageState-IrBhZ3EN.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/RegressionView-DxtDVwUz.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/index-BADivbTY.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/ExperimentDetailView-CYD2zm5T.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/analyst-DWHoKTDR.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/InvestigationReport-DdXYMwjM.css",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/InvestigationReport-DDoa2Lfj.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/displayIdentity-ID6_LUbQ.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/evidenceLabels-CK-LqSgZ.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/ExperimentsView-CDEjUfE8.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/SettingsView-Cl2ID6T3.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/experiments-BI1rnp4W.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/ConnectionsView-DOj2gRzr.css",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/JudgeLabView-Zrre-STD.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/DiagnosisView-Cpgi67RW.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/StatusBadge-DxdHMg-e.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/evidenceCopy-Q2SH71ot.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/rolldown-runtime-DK3Fl9T5.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/ExperimentBuilderView-BdjRczjJ.css",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/AnalystView-DF1nFklJ.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/AnalystView-nvG3Z-f-.css",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/PublicDemoView-DGoKqYS8.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/AnalystHomeView-BtdB8o2_.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/ModelsView-CDbNkXP1.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/ProvidersView-DgZ51h9a.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/ExperimentPicker-DpCKR3LY.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/NotFoundView-BzHLf-jh.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/CapabilitiesView-D0wttISG.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/JudgeDetailView-BwSbEmus.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/ConnectionsView-C7jcfhqN.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/HarnessesView-DlqOxU37.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/RunControlView-BmL1bv5p.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/client-HOGN3zTf.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/index-CXzRbBgi.css",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/OverviewView-DZVNyJxS.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/ExperimentBuilderView-DaK1We61.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/RunDetailView-BB7Rj8LS.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/CoreReadinessView-CkzlheyH.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/EvidenceValue--58WyQ_2.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "public build bytes assets/visualEvidence-CaNa_x0F.js",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    }
+  ],
+  "passed": 110,
+  "total": 110,
+  "tls_verified": true
+}

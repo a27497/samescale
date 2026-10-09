@@ -1,0 +1,75 @@
+{
+  "checks": [
+    {
+      "name": "latest historical 1366 valid cited Chinese overview",
+      "pass": true
+    },
+    {
+      "name": "latest historical 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "orphan reference 1366 no default full IDs",
+      "pass": true
+    },
+    {
+      "name": "orphan reference 1366 specific overview withheld",
+      "pass": true
+    },
+    {
+      "name": "orphan reference 1366 complete reference copied",
+      "pass": true
+    },
+    {
+      "name": "null source 1366 human missing-value label",
+      "pass": true
+    },
+    {
+      "name": "null source 1366 no default machine missing-value codes",
+      "pass": true
+    },
+    {
+      "name": "null source 1366 original null retained",
+      "pass": true
+    },
+    {
+      "name": "latest historical 1440 valid cited Chinese overview",
+      "pass": true
+    },
+    {
+      "name": "latest historical 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "orphan reference 1440 no default full IDs",
+      "pass": true
+    },
+    {
+      "name": "orphan reference 1440 specific overview withheld",
+      "pass": true
+    },
+    {
+      "name": "orphan reference 1440 complete reference copied",
+      "pass": true
+    },
+    {
+      "name": "null source 1440 human missing-value label",
+      "pass": true
+    },
+    {
+      "name": "null source 1440 no default machine missing-value codes",
+      "pass": true
+    },
+    {
+      "name": "null source 1440 original null retained",
+      "pass": true
+    },
+    {
+      "name": "boundary followup zero runtime errors",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "browserVersion": "153.0.8010.12",
+  "note": "Missing references and null source fields are explicitly controlled browser responses; not persisted evidence."
+}
