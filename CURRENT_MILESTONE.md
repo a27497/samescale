@@ -1,5 +1,31 @@
 # SameScale Product — Current Milestone
 
+## Workbench Brand v1 synchronization — 2026-10-09
+
+The website's released E3-F + W1 Cobalt assets at
+`a27497/samescale-site@73063c5a6f311de61970862d16311cb0e2ada814` are synchronized on
+`codex/workbench-brand-v1-20261009`, based on current product main
+`98b8f7d605794d4db1939a46be0c25ce877a25e7`. The official outlined navigation wordmark uses
+its dedicated 24px symbol; favicon fallbacks and product metadata are updated. Primary actions,
+selected navigation and focus use `#4263D5`; business statuses, layout, routes, API and evidence
+remain unchanged. No dependency, backend, website, frozen Demo or deployment changes.
+
+Frontend **134/134 PASS**, Vue typecheck and isolated production build **PASS**. Chromium
+compares five main pages at **320/390/768/1440px**, with both locales; geometry, text and status
+colors match main, with no horizontal overflow. Initial browser matrix **196/198**, errors **0**;
+two harness assertions were corrected and superseded by **20/20 focused navigation checks**
+on both baseline and candidate, without product navigation changes. Eight screenshots inspected.
+Original UI-2's **17 dirty files and diff**, **639 protected source/evidence files**, and the actual
+Demo identity/manifest remain unchanged. All **14 official assets** match the website source bytes.
+
+[Brand sync acceptance and screenshots](docs/qa/workbench-brand-v1-20261009/README.md)
+records the initial results, focused follow-up, provenance and limits. Non-Chromium, physical-device,
+native icon installation and private persistence remain unverified. npm ci reports six existing
+high-severity dependency advisories; no dependency remediation is included. The task authorizes
+one coherent commit and branch push for review; exact remote SHA and available CI are reported
+after push, separately from local QA. **STOP after publication; awaiting review, no merge or deploy.**
+
+
 ## Visual v1 formally accepted — development-branch Git closeout — 2026-10-08
 
 The user **formally passed Visual v1 human visual acceptance on 2026-10-08** and authorized bounded

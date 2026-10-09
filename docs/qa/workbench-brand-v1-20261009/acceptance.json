@@ -1,0 +1,75 @@
+{
+  "implementationBase": "98b8f7d605794d4db1939a46be0c25ce877a25e7",
+  "brandSource": "a27497/samescale-site",
+  "brandSourceSha": "73063c5a6f311de61970862d16311cb0e2ada814",
+  "branch": "codex/workbench-brand-v1-20261009",
+  "officialAssetsCopiedExactly": 14,
+  "frontendTests": {
+    "passed": 134,
+    "total": 134,
+    "files": 12
+  },
+  "vueTypecheckAndIsolatedBuild": "PASS",
+  "browserInitial": {
+    "passed": 196,
+    "total": 198,
+    "errors": [],
+    "twoHarnessAssertionsSuperseded": [
+      "mobile navigation retains keyboard focus trap",
+      "advanced navigation and settings remain available"
+    ]
+  },
+  "browserFocusedFollowup": {
+    "passed": 20,
+    "total": 20,
+    "errors": []
+  },
+  "finalBrowserGate": "PASS; 196 original passing items plus corrected focused evidence for the 2 original harness failures",
+  "widths": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "primaryPages": [
+    "Home",
+    "Run Detail",
+    "Diagnosis",
+    "Regression",
+    "Public Demo"
+  ],
+  "locales": [
+    "zh-CN",
+    "en-US"
+  ],
+  "screenshotsManuallyInspected": 8,
+  "layoutTextAndStatusColorsUnchanged": true,
+  "noHorizontalOverflow": true,
+  "staticReview": "PASS for changed UI, branding and metadata files",
+  "protectedSemanticCssRulesUnchanged": 5,
+  "remaining": [
+    "Local isolated production previews; no product deployment",
+    "Dark background asset rendering only; existing product has no dark theme",
+    "No Safari/Firefox, physical devices, native favicon cache or Apple installation",
+    "No real Agent/Provider/model execution or private persistence",
+    "npm ci reports 6 existing high-severity dependency advisories; no dependency change in this branding task",
+    "Remote CI checked separately after push"
+  ],
+  "protected": {
+    "checkedAt": "2026-10-09T07:25:43.602942+00:00",
+    "originalBranch": "codex/core-ui-ux-2-20261008",
+    "originalHead": "ec14e936a79e88446347dd010f68bd6bde55aaec",
+    "dirtyFilesUnchanged": 17,
+    "originalDiffSha256": "7039698aa27d9ac3753d3389c0ebdf4e457446ab6e30f59d6c5fe58346a8e5fe",
+    "protectedSourceEvidenceFilesUnchanged": 639,
+    "websiteSourceWorktreeClean": true,
+    "demoIdentityAndManifestUnchanged": true,
+    "demoId": "public-demo-20260930-9569db12e23a",
+    "manifestDigest": "sha256:593a54eff3ef0f89212d3097ea3d1f3349d1b7b085f618d2ca8f9805746171d7",
+    "defaultDistNotCreated": true,
+    "previewPorts": [
+      5190,
+      5191
+    ]
+  }
+}
