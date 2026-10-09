@@ -1,0 +1,12 @@
+
+> harnesslab-workbench@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 /home/dev/.worktrees/samescale-mvp-phase1-20261010/frontend
+
+
+ Test Files  16 passed (16)
+      Tests  194 passed (194)
+   Start at  18:13:17
+   Duration  8.12s (transform 7.67s, setup 1.99s, import 12.74s, tests 9.91s, environment 20.80s)

@@ -1,0 +1,9 @@
+{
+  "scope": "DISPOSABLE_PHASE1_TEST_DB_ONLY",
+  "experiment": 0,
+  "run": 0,
+  "run_attempt": 0,
+  "execution_lease": 0,
+  "budget_reservation": 0,
+  "saved_synthetic_plans": 11
+}

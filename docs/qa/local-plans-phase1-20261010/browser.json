@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "browser": "153.0.8010.12",
+  "source": "ACTUAL_BUILT_UI_PRIVATE_API_ISOLATED_POSTGRES_SYNTHETIC_PRIOR_EVIDENCE",
+  "checks": [
+    "operator-required-1366",
+    "prior-evidence-not-new-verification-1366",
+    "preflight-ready-with-no-calls",
+    "one-task-one-attempt-1366",
+    "confirmation-required-1366",
+    "persisted-plan-only-1366",
+    "execute-disabled-1366",
+    "no-horizontal-overflow-1366",
+    "refresh-restores-exact-plan-1366",
+    "operator-not-in-browser-storage-1366",
+    "operator-required-1440",
+    "prior-evidence-not-new-verification-1440",
+    "preflight-ready-with-no-calls",
+    "one-task-one-attempt-1440",
+    "confirmation-required-1440",
+    "persisted-plan-only-1440",
+    "execute-disabled-1440",
+    "no-horizontal-overflow-1440",
+    "refresh-restores-exact-plan-1440",
+    "operator-not-in-browser-storage-1440",
+    "unauthorized-read",
+    "cross-origin-write",
+    "traversal-rejected",
+    "execute-api-closed",
+    "missing-budget-blocks-plan",
+    "source-drift-invalidates-preflight",
+    "stale-plan-original-preserved",
+    "stale-ui-remains-readable",
+    "normal-ui-no-runtime-errors",
+    "zero-external-browser-requests"
+  ],
+  "errors": [],
+  "external": [],
+  "saved": [
+    {
+      "plan_id": "plan-cb01e38433845a8fb4c3a822ed07972d",
+      "plan_digest": "sha256:101b0a6f579555ddb091bbe4887f809961ce2fb31f9e411dc80786f389ca8cc1",
+      "width": 1366
+    },
+    {
+      "plan_id": "plan-fc9fc8e039ed0b45286ef21a4be0b3cc",
+      "plan_digest": "sha256:6579882a713dbbfec136a8a0e018c37b89b71e846b0fc0a0c21ac089b41bce5f",
+      "width": 1440
+    }
+  ]
+}

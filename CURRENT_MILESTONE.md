@@ -1,5 +1,46 @@
 # SameScale Product — Current Milestone
 
+## Product MVP Phase 1 — local acceptance — 2026-10-10
+
+Independent clean worktree/branch `codex/product-mvp-phase1-20261010`, based on
+`main@eb115417772bc36063afd6151c0d6da449ab7883` (PR #6 integration). Exact base main Fast CI
+37967471260 and Offline Regression 37967471294 rechecked SUCCESS. This authorization supersedes
+older stopping points below for this bounded phase; it permits commit/push/a Draft PR, not merge.
+
+Implemented private `/plans`: trusted local package selection/import/inspection → one real registered
+Codex configuration → configuration/task/budget preflight → explicit plan-only confirmation →
+immutable persistent plan → reload/process-restart reads and current drift reasons. Reuses Custom
+Task Store/TaskPackage, canonical one-target Quick plan, Registry/local configuration and PostgreSQL.
+No fake second Cell; legacy dual configurations remain. Two new append-only tables, no existing
+record migration/rewrite, queue, Run/Episode, Worker or execution authorization. `/execute` stays 403.
+
+Operator-owned root/evidence/image allowlists bind exact task/Workspace/verifier/oracle/qualification,
+configuration/endpoint/credential references, image ID and application version/code digest. Structural
+checks and trusted prior behavior stay distinct. Snapshot HTTP serialization round-trips canonical
+identities without changing Registry's historical DTO. Drift/expiry blocks first save; UUID/receipt
+uniqueness and transactional recovery make concurrent/lost-response retries idempotent.
+Wall time records existing runner timeout support; output tokens/USD are estimates, not active caps.
+
+Local acceptance: **157 distinct backend/compatibility tests PASS**, including **75 Phase-1 tests**
+with process/external HTTP denial sentinels; **194 frontend tests PASS**, full Ruff/mypy (396 files),
+Vue typecheck/isolated production build and whitespace PASS. Actual Chromium 153.0.8010.12 at
+1366/1440px: **30 planning checks + 3 process-restart checks PASS** with a migrated disposable
+PostgreSQL and explicitly synthetic prior task evidence. This establishes no real task behavioral
+validation or model result. Network-isolated Offline Regression **73 PASS**, two replay passes with
+five byte-identical outputs, zero subject/verifier/model/Provider/Judge calls.
+
+Original UI-2 17 dirty modifications and 1,494 files, six original worktree HEAD/status/diff/file
+inventories, 14 existing services and 437 read-only mounted files remain unchanged. Only a newly
+created test DB/API/build were used; existing databases/services/site/frozen evidence were not
+changed. Grok final reassessment remains **NOT_CONFIRMED**. No live Provider, actual CLI probe,
+real Verifier/Worker/paid execution, enforced token/cost cap or production Compose integration is
+claimed. [Phase-1 acceptance and review images](docs/qa/local-plans-phase1-20261010/README.md),
+[operator setup](docs/LOCAL_PLANNING.md), and [concrete Phase-2 gaps](docs/PROJECT_BLUEPRINT.md#phase-2-的具体接口与缺口规划不启动).
+
+Candidate commit/Draft PR and exact-SHA remote CI are **PENDING at this pre-publication snapshot**;
+verify/report them separately in the PR handoff. **STOP after Phase 1 Git/CI handoff; Phase 2 NOT_STARTED.**
+The records below retain their original historical authorization and acceptance scope.
+
 ## Three-round UI Git closeout — pre-publication verification — 2026-10-10
 
 The user authorized one bounded commit, normal push and a PR to `main` from

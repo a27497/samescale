@@ -62,13 +62,14 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           npm run type-check
-          npm run test -- tests/workbench.spec.ts tests/registry.spec.ts tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts
+          npm run test -- tests/workbench.spec.ts tests/registry.spec.ts tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts tests/local-plans.spec.ts
       - name: Run bounded deterministic core regressions
         run: >-
           uv run --locked pytest -q
           tests/test_analyst_sessions.py
           tests/test_analyst_contracts.py
           tests/test_analyst_showcase.py
+          tests/test_local_plans.py
           tests/test_api_health.py
           tests/test_contracts.py
           tests/test_workbench_api.py::test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel

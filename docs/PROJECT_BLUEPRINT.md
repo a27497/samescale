@@ -1,5 +1,47 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：产品化 MVP Phase 1 — 2026-10-10
+
+从 `main@eb115417772bc36063afd6151c0d6da449ab7883` 的独立干净 worktree，完成可信本地任务接入、
+一个 Codex 配置、一个合格 Custom 任务和一次计划尝试，预检、明确确认、不可变保存及私有 UI 读取。
+复用 Custom Task Store、TaskPackage、Registry/本地配置和现有 PostgreSQL；双配置实验契约不变。
+白色/Cobalt 体系增加 `/plans` 与 `/plans/:planId`，保留调查、离线 Demo 和官网原有范围。
+
+准入由操作员拥有、不可共享写的服务端策略指定源根、独立 store、外置历史 qualification/validation
+及精确本地运行镜像摘要。只读取文件/本地 Docker 元数据，不导入任务 Python、不执行 Verifier 或
+Provider 健康探测。结构检查与操作员信任的既有行为验收分开；哈希绑定不认证证据来源。
+成功预检才写入 15 分钟有效的 receipt；保存前重新绑定任务、Workspace、准入、配置、镜像和程序身份。
+确认仅授权保存，UUID 幂等键与 receipt 唯一约束处理重试/并发，PostgreSQL 拒绝两张新表的 UPDATE/DELETE。
+已保存原计划始终保留，当前漂移单独展示；未创建 Run/Episode、执行队列或付费授权。
+
+验收覆盖非法路径/文件、预算、来源/身份/配置漂移、权限隔离、并发幂等、数据库不可变与重启恢复；
+仅使用新建隔离 PostgreSQL 和合成测试数据。保护原 UI-2 的 17 项修改、其他 worktree、冻结证据、
+历史记录、官网及现有服务。允许新分支 commit、正常 push、面向 main 的 Draft PR 及 exact-SHA CI；
+不合并、部署、修改现有数据库/服务、升级 Codex 或运行真实 Agent/Provider/Verifier。
+Grok 最终复评保留 **NOT_CONFIRMED**。整个 Phase 1 交付后 **STOP**，Phase 2 未获启动授权。
+
+### Phase 2 的具体接口与缺口（规划，不启动）
+
+- 输入 `SavedPlan.plan_id/plan_digest`、单 `custom_plan.run_slots[0]`、完整 `PlanMaterial`；
+  由服务端策略解析 managed snapshot 和凭据引用，不从 UI 接收任意命令/路径/secret。
+- 增加独立的执行授权/预算确认与 Worker claim/队列契约。Phase 1 的 `confirm_plan_only`、
+  receipt 和 `execution_authorized=false` 不得转换成授权；`POST /api/local-plans/plans/{id}/execute`
+  当前固定 403。Legacy 双 Cell executor 不能直接消费新单 slot 计划。
+- Worker 必须重新核验所有身份和准入、读取镜像精确 ID、验证容器实际 Codex CLI 版本/协议，
+  再创建隔离 subject Workspace，排除 verifier/oracle/context hidden assets，并应用 timeout、
+  网络 allowlist、资源与退出/取消/清理约束。Phase 1 的 wall-time 支持来自已有 runner；
+  token/费用只是参考，硬费用上限与额度预留尚无实现，必须继续如实标注或补齐安全预算机制。
+- 复用 native Codex runner/passive Hook 的 Trace 与 final Workspace 收集，但需新增 plan→attempt→
+  Run/Episode 关联、独立不可变 execution attempt/receipt、幂等 claim、故障恢复与安全 artifact 读取。
+  现有 `CUSTOM/NOT_VERIFIED` Episode 不能被后续验收改写。
+- 独立隔离 Verifier 接收绑定的 final Workspace + 外置 hidden assets，保存 L0 结果、checks、
+  退出码/摘要与基础设施分类，再连接现有 diagnosis/offline replay。Fresh baseline/oracle qualification
+  也须在独立隔离边界完成；Phase 1 只消费操作员信任的历史记录，不解决证据来源认证。
+- Phase 2 必须重新获得真实执行/付费授权后才进行一个真实工程任务验收。未覆盖 live Provider、
+  真正预算执行、真实 CLI 探测、Worker、Verifier 隔离与完整真实运行闭环，均不得宣称已通过。
+
+以下旧“当前授权”标题为保留的历史记录，不是本阶段的停止点或新授权。
+
 ## 当前授权：三轮 UI/P0 Git 安全收口与 PR（2026-10-10）
 
 仅整理 `codex/product-ui-closeout-v1-20261009` 候选工作区已有的两轮 UI 优化、第三轮 P0

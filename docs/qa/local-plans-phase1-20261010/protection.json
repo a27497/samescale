@@ -1,0 +1,66 @@
+{
+  "status": "PASS",
+  "worktrees": [
+    {
+      "path": "/home/dev/projects/samescale",
+      "files_checked": 1494,
+      "files_equal": true,
+      "head_equal": true,
+      "status_equal": true,
+      "diff_equal": true,
+      "dirty_count": 17
+    },
+    {
+      "path": "/home/dev/.worktrees/samescale-brand-v1",
+      "files_checked": 1528,
+      "files_equal": true,
+      "head_equal": true,
+      "status_equal": true,
+      "diff_equal": true,
+      "dirty_count": 0
+    },
+    {
+      "path": "/home/dev/.worktrees/samescale-grok-qa-20261009",
+      "files_checked": 1528,
+      "files_equal": true,
+      "head_equal": true,
+      "status_equal": true,
+      "diff_equal": true,
+      "dirty_count": 0
+    },
+    {
+      "path": "/home/dev/.worktrees/samescale-main-baseline-20261009",
+      "files_checked": 1528,
+      "files_equal": true,
+      "head_equal": true,
+      "status_equal": true,
+      "diff_equal": true,
+      "dirty_count": 0
+    },
+    {
+      "path": "/home/dev/.worktrees/samescale-ui-closeout-v1-20261009",
+      "files_checked": 1591,
+      "files_equal": true,
+      "head_equal": true,
+      "status_equal": true,
+      "diff_equal": true,
+      "dirty_count": 0
+    },
+    {
+      "path": "/home/dev/.worktrees/samescale-visual-v1",
+      "files_checked": 1497,
+      "files_equal": true,
+      "head_equal": true,
+      "status_equal": true,
+      "diff_equal": true,
+      "dirty_count": 0
+    }
+  ],
+  "services_checked": 14,
+  "services_changed": [],
+  "readonly_service_files_checked": 437,
+  "readonly_service_files_changed": [],
+  "database_scope": "Existing databases not queried, migrated or written; isolated disposable Phase-1 PostgreSQL only.",
+  "website_scope": "No website edits or deployment",
+  "local_refs_scope": "Only the new Phase-1 branch/ref may change; all original worktree HEADs separately checked."
+}
