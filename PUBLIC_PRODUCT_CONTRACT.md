@@ -1,5 +1,33 @@
 # SameScale Product — Public Product Contract
 
+## Private local planning — Phase 1 — 2026-10-10
+
+`/plans` and `/plans/:planId` provide trusted local import/inspection → one compatible Codex
+configuration → local preflight → explicit plan-only confirmation → immutable saved-plan reads.
+The operator credential stays in component memory; private APIs require the existing local
+operator/origin boundary and are disabled in public Demo mode. This is one local operator,
+not multi-tenant isolation or remote task upload. Existing dual-configuration experiments remain.
+
+Only server-approved roots and exact task snapshots are accepted; traversal, links, special files,
+credential/repository files and bounded size/count violations are rejected. Eligible plans require
+operator-trusted existing Custom qualification and baseline-fail/oracle-pass validation, bound to
+task/verifier/workspace identities. Structure and hashing are data-only checks; **no new behavioral
+validation or source attestation** is claimed. Missing/invalid prior evidence blocks saving.
+
+Preflight binds task/source/Workspace, qualification, registry configuration, endpoint fingerprint,
+credential-reference availability, local image ID, application version/code identity, budgets and
+one planned attempt. Approved local image metadata is checked; actual CLI/version/protocol and
+live Provider health are **NOT_PROBED**. Drift invalidates old preflight; blocked preflight cannot
+create a saved plan. Confirmed snapshots persist in PostgreSQL with append-only DB triggers,
+concurrent idempotence and restart-readable identities. Current drift does not rewrite originals.
+
+**Execution is disabled.** Saving creates zero Run/Episode, no queue/worker and no paid authorization.
+Existing Codex runner timeout support is recorded as a future Worker requirement; it is inactive
+here. Token and USD values are estimates/reference budgets, not hard caps or reserved quota.
+The Phase-1 confirm action cannot authorize a later execution. Real task/Provider/Verifier execution,
+Worker isolation, cost enforcement and live runtime verification remain outside this delivery.
+[Operator setup](docs/LOCAL_PLANNING.md) and [bounded acceptance](docs/qa/local-plans-phase1-20261010/README.md).
+
 ## UI evidence reading boundaries — 2026-10-09
 
 Run/experiment lifecycle, individual Trace events, Verifier execution and independent task

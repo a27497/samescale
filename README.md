@@ -9,6 +9,14 @@ SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回
 
 **[打开只读 Recruiter Demo](https://getsamescale.com/demo/)** · [下载离线 HTML](docs/recruiter/demo/index.html) · [4 分钟讲解稿](docs/RECRUITER_DEMO.md)
 
+## 私有本地任务计划（MVP Phase 1）
+
+在自己的本地工作区打开 **`/plans`**：可信本地任务导入/检查 → 一个 Codex 配置 → 预检 → 明确确认 → 保存、刷新或重启后查看不可变计划。导航的首个产品入口是“本地评测计划”；调查与只读 Demo 保留。
+
+本阶段只保存一次计划尝试，**不创建 Run/Episode，不执行 Agent、Provider 或 Verifier**。结构检查不等于行为验收；缺少可信历史 qualification/validation、固定镜像身份或预算时会阻塞。费用/token 仅供参考，确认计划不授权未来付费执行。
+
+[配置可信任务与私有工作区](docs/LOCAL_PLANNING.md) · [Phase 1 验收与限制](docs/qa/local-plans-phase1-20261010/README.md)
+
 ## Recruiter Demo
 
 [在线打开只读 Demo](https://getsamescale.com/demo/)：约 3–5 分钟查看 Task → Configurations → Result → Trace Diff → Diagnosis → Offline Replay → 已保存的 CI / regression evidence。它展示的是**另一组 S4 冻结记录**，不是 Case A 的后续步骤；页面不启动 Agent、模型、replay 或验收。

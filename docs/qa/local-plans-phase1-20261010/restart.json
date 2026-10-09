@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "checks": [
+    "exact-plan-digest-preserved-after-process-restart",
+    "current-source-revalidated-after-process-restart",
+    "no-execution-after-restart"
+  ],
+  "browser": "153.0.8010.12"
+}

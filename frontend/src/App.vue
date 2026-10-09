@@ -9,6 +9,7 @@ import WorkbenchBrand from '@/components/WorkbenchBrand.vue'
 initializeLocale()
 const route = useRoute()
 const titles: Record<string, [string, string]> = {
+  'local-plans': ['本地评测计划', 'Local evaluation plans'], 'local-plan-detail': ['已保存本地计划', 'Saved local plan'],
   analyst: ['调查首页', 'Investigation home'], 'public-demo': ['公开演示', 'Public demo'],
   'run-detail': ['运行证据', 'Run evidence'], diagnosis: ['失败诊断', 'Failure diagnosis'],
   regression: ['候选对比', 'Regression comparison'], 'analyst-sessions': ['已保存调查', 'Saved investigations'],
@@ -39,6 +40,7 @@ function navigationKeydown(event: KeyboardEvent) {
 }
 const navigation = computed(() => [
   { label: c('主要功能', 'Core'), items: [
+    { to: '/plans', label: c('本地评测计划', 'Local evaluation plans'), icon: Files },
     { to: '/analyst', label: c('调查首页', 'Investigation home'), icon: House },
     { to: '/demo', label: c('公开演示', 'Public demo'), icon: View },
     { to: '/analyst/sessions', label: c('已保存调查', 'Saved investigations'), icon: Document },
@@ -63,7 +65,7 @@ const advanced = computed(() => [
 ])
 watch(() => route.fullPath, () => {
   if (mobileNavOpen.value) closeNavigation()
-  advancedOpen.value = !coreRoute.value && !['experiments', 'experiment-detail', 'analyst-sessions'].includes(String(route.name))
+  advancedOpen.value = !coreRoute.value && !['experiments', 'experiment-detail', 'analyst-sessions', 'local-plans', 'local-plan-detail'].includes(String(route.name))
 }, { immediate: true })
 watch(title, value => { document.title = `${value} · SameScale` }, { immediate: true })
 </script>

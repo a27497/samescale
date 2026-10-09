@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "plan_id": "plan-cb01e38433845a8fb4c3a822ed07972d",
+  "created_at": "2026-10-09T18:22:49.072527Z",
+  "preflight": {
+    "schema_version": 1,
+    "receipt_id": "preflight-e2942243c30e4c3f8f928e4b42ba42d0",
+    "created_at": "2026-10-09T18:22:48.836790Z",
+    "expires_at": "2026-10-09T18:37:48.836790Z",
+    "status": "READY_TO_SAVE",
+    "checks": [
+      {
+        "code": "TASK_INTEGRITY_AND_SOURCE",
+        "passed": true
+      },
+      {
+        "code": "TRUSTED_PRIOR_QUALIFICATION",
+        "passed": true
+      },
+      {
+        "code": "ONE_CODEX_SUBJECT_CONFIGURATION",
+        "passed": true
+      },
+      {
+        "code": "MODEL_HARNESS_COMPATIBLE",
+        "passed": true
+      },
+      {
+        "code": "CREDENTIAL_REFERENCE_PRESENT",
+        "passed": true
+      },
+      {
+        "code": "PROVIDER_ROUTE_VALID",
+        "passed": true
+      },
+      {
+        "code": "PROVIDER_NOT_KNOWN_BLOCKED",
+        "passed": true
+      },
+      {
+        "code": "PINNED_LOCAL_IMAGE_PRESENT",
+        "passed": true
+      },
+      {
+        "code": "LOCAL_RUNTIME_IMAGE_APPROVED",
+        "passed": true
+      },
+      {
+        "code": "EXPLICIT_BUDGET_REQUIRED",
+        "passed": true
+      },
+      {
+        "code": "TASK_WALL_TIME_LIMIT",
+        "passed": true
+      },
+      {
+        "code": "OUTPUT_ESTIMATE_WITHIN_PROFILE",
+        "passed": true
+      }
+    ],
+    "material": {
+      "request": {
+        "name": "Browser planning 1366",
+        "task_reference": "phase1-fixture@1.0.0",
+        "provider_profile_id": "gpt56-relay-gpt56-responses",
+        "harness_profile_id": "codex-gpt56-high",
+        "budget": {
+          "wall_time_seconds": 90,
+          "output_tokens_estimate": 1000,
+          "cost_budget_usd": 1.0
+        }
+      },
+      "task": {
+        "reference": "phase1-fixture@1.0.0",
+        "task_owner": "unspecified-owner",
+        "task_category": "uncategorized",
+        "task_identity": "sha256:e748557b45a9e25ddfa19ceeb93fd5d9b5b9b667eeae94ed1fd1b5492f2eae5d",
+        "workspace_identity": "sha256:cfac99c48ea13cd587c6e30095a890d6b378f90922c109436ba2b733dc12b17c",
+        "verifier_identity": "sha256:d10582458b9b7308b7a5e1613e91c824f6dc554f508b13f080f42f7ab2709f0e",
+        "oracle_identity": "sha256:17e9453184829b28238af5f552f74494275e3dc6f7c709a8a8a002bd4f78b4aa",
+        "managed_snapshot_identity": "sha256:b2aaf68d4afbdd4535d0fa64deca361b6d7773334920c4ef1112cc8ea6477ac3",
+        "source_root_id": "trusted",
+        "source_relative_path": "phase1-fixture/1.0.0",
+        "source_identity": "sha256:e748557b45a9e25ddfa19ceeb93fd5d9b5b9b667eeae94ed1fd1b5492f2eae5d",
+        "structural_validation": "PASS",
+        "behavioral_validation": "TRUSTED_PRIOR_RESULT",
+        "qualification_identity": "sha256:ab2bd8f2d074dea06f967679b7db364c8e5caa3404dbce0299ba0b8b45077fec",
+        "eligible_for_planning": true,
+        "reason_codes": [],
+        "verifier_executed": false
+      },
+      "configuration": {
+        "provider": {
+          "provider_id": "gpt56-relay",
+          "display_name": "GPT-5.6 operator relay",
+          "provider_family": "OpenAI-compatible relay",
+          "region": "operator-managed",
+          "protocols": [
+            "responses"
+          ],
+          "endpoint_class": "PRIVATE_RELAY",
+          "base_url_reference": "HARNESSLAB_GPT56_RELAY_BASE_URL",
+          "protocol_base_url_references": {},
+          "credential_reference": "HARNESSLAB_GPT56_RELAY_API_KEY",
+          "billing_mode": "RELAY_ACCOUNT",
+          "automation_allowed": true,
+          "enabled": true,
+          "health_status": "UNKNOWN",
+          "capabilities": [
+            "responses",
+            "reasoning-effort"
+          ],
+          "pricing_snapshot_reference": null,
+          "runtime_endpoint_fingerprint": "sha256:211e0bb2b0bdb7799abf6331c55bcc0492adf46f3d7b5e8297aaf742c816b37b",
+          "runtime_endpoint_fingerprints": {},
+          "configuration_reason_codes": []
+        },
+        "model": {
+          "profile_id": "gpt56-relay-gpt56-responses",
+          "model_id": "gpt-5.6-sol",
+          "provider_id": "gpt56-relay",
+          "requested_model": "gpt-5.6-sol",
+          "protocol": "responses",
+          "route": "/responses",
+          "provider_route_identity": "gpt56-relay|responses|env:HARNESSLAB_GPT56_RELAY_BASE_URL/responses",
+          "credential_reference": "HARNESSLAB_GPT56_RELAY_API_KEY",
+          "reasoning_effort": "medium",
+          "max_output_tokens": 2000,
+          "request_timeout_seconds": 180,
+          "observed_model_capability": "RUN_EVIDENCE_ONLY",
+          "automation_allowed": true,
+          "enabled": true,
+          "pricing_snapshot_reference": null,
+          "runtime_endpoint_fingerprint": "sha256:211e0bb2b0bdb7799abf6331c55bcc0492adf46f3d7b5e8297aaf742c816b37b",
+          "profile_identity": "sha256:c02c03afc70ced86ebe32ab5a2c2fd8047e1ad82995d4dd14c2454ccd8c9c365"
+        },
+        "harness": {
+          "harness_id": "codex",
+          "display_name": "Codex",
+          "version": "0.149.0",
+          "image_reference": "harnesslab-phase-e-codex:0.149.0",
+          "image_digest": null,
+          "cli_runtime_identity": "codex-cli-0.149.0",
+          "profiles": [
+            {
+              "profile_id": "codex-gpt56-medium",
+              "profile_reference": "builtin:registry.codex-gpt56",
+              "supported_provider_profile_ids": [
+                "gpt56-relay-gpt56-responses"
+              ],
+              "reasoning_effort": "medium",
+              "harness_config_identity": "sha256:fb5be749febba4845a5d405aa20344505054921b69d41db7f69817494e926110"
+            },
+            {
+              "profile_id": "codex-gpt56-high",
+              "profile_reference": "builtin:registry.codex-gpt56",
+              "supported_provider_profile_ids": [
+                "gpt56-relay-gpt56-responses"
+              ],
+              "reasoning_effort": "high",
+              "harness_config_identity": "sha256:7317647c90c0fe058b83e2b18190ad4774a30235a44f5186f9cf5379f21a9ad2"
+            }
+          ],
+          "supported_protocols": [
+            "responses"
+          ],
+          "tool_surface": [
+            "shell",
+            "workspace"
+          ],
+          "trace_coverage": "FULL_STREAM",
+          "observed_model_exposure": "RUN_EVIDENCE_ONLY",
+          "network_capability": "PROVIDER_ALLOWLIST",
+          "mcp_capability": true,
+          "workspace_mutation": true,
+          "native_tools": true,
+          "runtime_health": "UNKNOWN",
+          "runner_contract": "codex-harness-v1"
+        },
+        "harness_profile": {
+          "profile_id": "codex-gpt56-high",
+          "profile_reference": "builtin:registry.codex-gpt56",
+          "supported_provider_profile_ids": [
+            "gpt56-relay-gpt56-responses"
+          ],
+          "reasoning_effort": "high",
+          "harness_config_identity": "sha256:7317647c90c0fe058b83e2b18190ad4774a30235a44f5186f9cf5379f21a9ad2"
+        },
+        "configuration_identity": "sha256:2a00fb8be1f5acfeebf3ecf2fa514b2907d01322b28363b84ea96923741bc031",
+        "image_identity": "sha256:a1dcc819a4b7d7b6b01a1e91bf0a2ecabc068911e949d9db6da51beac2d5ef53",
+        "application_version": "0.1.0",
+        "application_code_identity": "sha256:cfc86af6eb21b74218d010a951dc48614de12a09192c37b02f01f69d540b06ee",
+        "runtime_probe": "LOCAL_IMAGE_METADATA_ONLY",
+        "provider_health": "NOT_PROBED"
+      },
+      "policy_identity": "sha256:c37eff52d8b26e9f0ebc7023e5f4383242fd96ade96c260caec96b81ab469169",
+      "custom_plan": {
+        "schema_version": 1,
+        "namespace": "CUSTOM",
+        "official_benchmark_eligible": false,
+        "evaluation_id": "local-plan-0f47c42945ae24aa6221079c",
+        "name": "Browser planning 1366",
+        "preset": "Quick",
+        "evaluation_mode": "QUICK",
+        "repeat_count": 1,
+        "execution_seed": 0,
+        "tasks": [
+          {
+            "namespace": "CUSTOM",
+            "reference": "phase1-fixture@1.0.0",
+            "task_id": "phase1-fixture",
+            "task_version": "1.0.0",
+            "task_identity": "sha256:e748557b45a9e25ddfa19ceeb93fd5d9b5b9b667eeae94ed1fd1b5492f2eae5d",
+            "workspace_identity": "sha256:cfac99c48ea13cd587c6e30095a890d6b378f90922c109436ba2b733dc12b17c",
+            "verifier_identity": "sha256:d10582458b9b7308b7a5e1613e91c824f6dc554f508b13f080f42f7ab2709f0e",
+            "managed_snapshot_identity": "sha256:b2aaf68d4afbdd4535d0fa64deca361b6d7773334920c4ef1112cc8ea6477ac3",
+            "criteria": [
+              {
+                "id": "hidden-verifier",
+                "kind": "hidden_test",
+                "description": "The package's deterministic hidden verifier must pass.",
+                "required": true,
+                "threshold": null,
+                "unit": null,
+                "rubric": null
+              }
+            ]
+          }
+        ],
+        "targets": [
+          {
+            "id": "codex",
+            "requested_model": "gpt-5.6-sol",
+            "harness": "codex",
+            "harness_version": "0.149.0"
+          }
+        ],
+        "run_slots": [
+          {
+            "slot_id": "sha256:26c83f45fc8c742adedfe44b1ace345ee0a95dfaf1a34d62aa8d6e0f6d3dab73",
+            "slot_order": 0,
+            "evaluation_id": "local-plan-0f47c42945ae24aa6221079c",
+            "task": {
+              "namespace": "CUSTOM",
+              "reference": "phase1-fixture@1.0.0",
+              "task_id": "phase1-fixture",
+              "task_version": "1.0.0",
+              "task_identity": "sha256:e748557b45a9e25ddfa19ceeb93fd5d9b5b9b667eeae94ed1fd1b5492f2eae5d",
+              "workspace_identity": "sha256:cfac99c48ea13cd587c6e30095a890d6b378f90922c109436ba2b733dc12b17c",
+              "verifier_identity": "sha256:d10582458b9b7308b7a5e1613e91c824f6dc554f508b13f080f42f7ab2709f0e",
+              "managed_snapshot_identity": "sha256:b2aaf68d4afbdd4535d0fa64deca361b6d7773334920c4ef1112cc8ea6477ac3",
+              "criteria": [
+                {
+                  "id": "hidden-verifier",
+                  "kind": "hidden_test",
+                  "description": "The package's deterministic hidden verifier must pass.",
+                  "required": true,
+                  "threshold": null,
+                  "unit": null,
+                  "rubric": null
+                }
+              ]
+            },
+            "target": {
+              "id": "codex",
+              "requested_model": "gpt-5.6-sol",
+              "harness": "codex",
+              "harness_version": "0.149.0"
+            },
+            "repeat_index": 0
+          }
+        ]
+      },
+      "budget_semantics": {
+        "attempts": "EXACTLY_ONE_PLANNED_ATTEMPT_NO_RUN_CREATED",
+        "cost_budget_usd": "REFERENCE_ONLY_NO_HARD_COST_CAP_OR_RESERVATION",
+        "wall_time_seconds": "EXISTING_CODEX_RUNNER_TIMEOUT_SUPPORTED_WORKER_MUST_APPLY",
+        "active_enforcement": "NONE_PHASE1_EXECUTION_DISABLED",
+        "output_tokens_estimate": "ESTIMATE_ONLY_NOT_ENFORCED_BY_CODEX"
+      },
+      "workspace_policy": "ISOLATED_COPY_REQUIRED_HIDDEN_ASSETS_EXCLUDED",
+      "material_digest": "sha256:03f996675c287ceee2db99fe1523e693609b741a3192f986fa652af3ab718ac6"
+    },
+    "execution_authorized": false,
+    "provider_calls": 0,
+    "verifier_calls": 0,
+    "receipt_digest": "sha256:cb01e38433845a8fb4c3a822ed07972d3b9a55873d5c67711483bb699a0a94b3"
+  },
+  "status": "SAVED_PLAN_ONLY",
+  "execution_authorized": false,
+  "runs_created": 0,
+  "episodes_created": 0,
+  "plan_digest": "sha256:101b0a6f579555ddb091bbe4887f809961ce2fb31f9e411dc80786f389ca8cc1"
+}
