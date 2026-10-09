@@ -1,0 +1,314 @@
+[
+  {
+    "page": "after-analyst-1366.png",
+    "first_round_sha256": "385bc5522108c8f89f68dbc38dd6a00086b676925a735b7aa630dea7f7556410",
+    "second_round_sha256": "9fa5c508b17242669041034e3cdfab573c0594d8bb3eedffe6ac25bae68df520",
+    "before_size": [
+      1366,
+      1158
+    ],
+    "after_size": [
+      1366,
+      960
+    ]
+  },
+  {
+    "page": "after-analyst-1440.png",
+    "first_round_sha256": "d5a20e8059fa75b1e8229f1c78ee0b4c072be6a6fd5007ad525d17496f07b979",
+    "second_round_sha256": "fd4cc863d37c568edc8f471e93ee843e2f6437906a6c4f323b467c092265d18f",
+    "before_size": [
+      1440,
+      1158
+    ],
+    "after_size": [
+      1440,
+      960
+    ]
+  },
+  {
+    "page": "after-demo-1366.png",
+    "first_round_sha256": "f567d9a0f56cf174b41ce9af287bd1d4462cc5d41fe78dd4e7a50a0402c097b0",
+    "second_round_sha256": "9539d0615af3a5889497b2553d53466f446b4e6d96d2050ce437dbf09b7a2fc3",
+    "before_size": [
+      1366,
+      2425
+    ],
+    "after_size": [
+      1366,
+      1415
+    ]
+  },
+  {
+    "page": "after-demo-1440.png",
+    "first_round_sha256": "0c62684c56b9a2e9be9d5b2087010bf039abfde36f7dc97821e72d96947a7237",
+    "second_round_sha256": "a75bd40886a27ffd8b4040485e1e7d42f03c56d9e02f7fcda84ff13d40c5a515",
+    "before_size": [
+      1440,
+      2425
+    ],
+    "after_size": [
+      1440,
+      1415
+    ]
+  },
+  {
+    "page": "after-diagnosis-1366.png",
+    "first_round_sha256": "2697db4d44c034a2ba281b48a7160e5a81a46d865c54acd5a9da4bbd02287b9a",
+    "second_round_sha256": "c18f01dd59379eb5e6af29df0f4c52f2c44f0680396ad5cd81ad7ce6632bb661",
+    "before_size": [
+      1366,
+      2151
+    ],
+    "after_size": [
+      1366,
+      1788
+    ]
+  },
+  {
+    "page": "after-diagnosis-1440.png",
+    "first_round_sha256": "63b319d0047342a61c6db135f7acfa2d625100d83fd6f742b8d924c0bcdc11a3",
+    "second_round_sha256": "efc48ed146424e8b4c1daffb45624e26bd3e761ab39252d53dd7ff9ffd3dacae",
+    "before_size": [
+      1440,
+      2101
+    ],
+    "after_size": [
+      1440,
+      1738
+    ]
+  },
+  {
+    "page": "after-experiment-1366.png",
+    "first_round_sha256": "361de879c52a77cd6cb402edff2c1bd6e793aebee9938e74db1f59463b09b7ba",
+    "second_round_sha256": "e1d45ebfa40f017adfab80a1aae0fd8562595d6b3411683ffc95aa2bda1a0640",
+    "before_size": [
+      1366,
+      960
+    ],
+    "after_size": [
+      1366,
+      1173
+    ]
+  },
+  {
+    "page": "after-experiment-1440.png",
+    "first_round_sha256": "6d1aaacf83301ceedec37812e5e066943ec4738c0a8081eb7d0ecb5f53eddd53",
+    "second_round_sha256": "e6ceee5b053e99a53687fdc3a8495c322e32664dc20c7ea2d8e349a7626c2092",
+    "before_size": [
+      1440,
+      960
+    ],
+    "after_size": [
+      1440,
+      1173
+    ]
+  },
+  {
+    "page": "after-experiment-matrix-1366.png",
+    "first_round_sha256": "1d4abb209ecf0c3dcaf27c229c95196be49c9f0271c5e628c3f17daee979bfab",
+    "second_round_sha256": "f31512cc30732e2eb253757e38175ee2b1ce86d40104f3a0ca936bbd17474bdc",
+    "before_size": [
+      1366,
+      960
+    ],
+    "after_size": [
+      1366,
+      960
+    ]
+  },
+  {
+    "page": "after-experiment-matrix-1440.png",
+    "first_round_sha256": "6a6b05d09a8a867a0ec4491b9119c92ead75e1c7ff4d7aeb61506c18227369c2",
+    "second_round_sha256": "79ffba97ce5e84027c355994501acd4ccf0d473ad97cc921ca55a1d412e459e3",
+    "before_size": [
+      1440,
+      960
+    ],
+    "after_size": [
+      1440,
+      960
+    ]
+  },
+  {
+    "page": "after-experiment-overview-1366.png",
+    "first_round_sha256": "d0905eab5df948a5b7e46fa6e848fd39a58eff76d91e9ff37842501645d669b1",
+    "second_round_sha256": "ff78e3f8494a40d78108bd604413da1b51b2e3cacaa9606bee48349c8fb0d34d",
+    "before_size": [
+      1366,
+      960
+    ],
+    "after_size": [
+      1366,
+      960
+    ]
+  },
+  {
+    "page": "after-experiment-overview-1440.png",
+    "first_round_sha256": "425b1401e1162dd9518ba17265ab3ad9188d2c288daf2ada41adbfae481bf600",
+    "second_round_sha256": "d8ca98bae58415ef1e0de45eb926c2ad12e6ba8993b4fcd409309682cb57dce2",
+    "before_size": [
+      1440,
+      960
+    ],
+    "after_size": [
+      1440,
+      960
+    ]
+  },
+  {
+    "page": "after-experiment-statistics-1366.png",
+    "first_round_sha256": "86dfebcc8fd5217662de1916adab0844314eafea0c68882b7b9a4a2a964d268f",
+    "second_round_sha256": "24075186a430e198112df240ad13f8c4502d1c3c3b4fb0082f39131409d4e4d7",
+    "before_size": [
+      1366,
+      960
+    ],
+    "after_size": [
+      1366,
+      960
+    ]
+  },
+  {
+    "page": "after-experiment-statistics-1440.png",
+    "first_round_sha256": "da4a0b44918e9dd6f70ea11a285d828d036290a0de24acd4d47e2503ef818817",
+    "second_round_sha256": "30109231ea2bda57255acc9dbc1c37aa15787077d09a5e55ac837be314e32ec3",
+    "before_size": [
+      1440,
+      960
+    ],
+    "after_size": [
+      1440,
+      960
+    ]
+  },
+  {
+    "page": "after-experiments-1366.png",
+    "first_round_sha256": "a77e9f51301995508eec758850653264d8fe8b05e66f2371085b04ef4a85962a",
+    "second_round_sha256": "b33c818f45032c02fc9493fac38f1f9247ef73399b9a1f345d7a5d100a0f8f61",
+    "before_size": [
+      1366,
+      960
+    ],
+    "after_size": [
+      1366,
+      960
+    ]
+  },
+  {
+    "page": "after-experiments-1440.png",
+    "first_round_sha256": "c8423fc77a89855973a607c37fd4c794b7b3c74fce2f345fc45331123fcd7d1c",
+    "second_round_sha256": "84d8fc1e51c7b02c42edbf5898b5d3acee862b6175f2bd87714f1fade72ee166",
+    "before_size": [
+      1440,
+      960
+    ],
+    "after_size": [
+      1440,
+      960
+    ]
+  },
+  {
+    "page": "after-historical-1366.png",
+    "first_round_sha256": "9f333809d7c5ccae3763850c990d84f4ab6e695e5bc8c86edd12446c3b620ea4",
+    "second_round_sha256": "4bf55c3e45eba7d0d226396576706d186889ffd15d9f52c18738f0f831787b09",
+    "before_size": [
+      1366,
+      5011
+    ],
+    "after_size": [
+      1366,
+      2048
+    ]
+  },
+  {
+    "page": "after-historical-1440.png",
+    "first_round_sha256": "bc3ec6a1b2d536b1de7ce739f46f68525479a0430158c6199ed3d6099c5fe123",
+    "second_round_sha256": "832a226a29672d95c344d7c1df1e01e3f703b6aec24fbe0052801fd4b09093bb",
+    "before_size": [
+      1440,
+      4816
+    ],
+    "after_size": [
+      1440,
+      2048
+    ]
+  },
+  {
+    "page": "after-offline-1366.png",
+    "first_round_sha256": "1f2eb0d0b52bcb0932574e8be05ae5073fb7ecad5e91a3119c755804b53e2c8f",
+    "second_round_sha256": "56f4a954cc27c4c946dfaf523c1b61c145ccda3de488a80bafa37fd5b0e49557",
+    "before_size": [
+      1366,
+      2594
+    ],
+    "after_size": [
+      1366,
+      1654
+    ]
+  },
+  {
+    "page": "after-offline-1440.png",
+    "first_round_sha256": "ecbcf8007b06b04887d2c29114f59f5ca7d15eedde0f435ad94a21309e75907d",
+    "second_round_sha256": "4ea4c0af091f7976dd059c3ef78e5dbcedee9fbbdbee509d65745ee6c995c5be",
+    "before_size": [
+      1440,
+      2569
+    ],
+    "after_size": [
+      1440,
+      1629
+    ]
+  },
+  {
+    "page": "after-regression-1366.png",
+    "first_round_sha256": "4f740acc85ab96dc6a3aa3d5dca1285a428ef6636cee1568e745c82b3f003324",
+    "second_round_sha256": "dd4acd1031ae7d7938f1e4d1e0b7e0abd8bfb7ff84289687e141fbe863cf8d4d",
+    "before_size": [
+      1366,
+      1941
+    ],
+    "after_size": [
+      1366,
+      1431
+    ]
+  },
+  {
+    "page": "after-regression-1440.png",
+    "first_round_sha256": "d1fd4223bbcf2efa59b380ffe26461d39b6dc098529133ba18e86c5d3bc54a46",
+    "second_round_sha256": "0baf4689e25a96ef40a9d88dfecef30d53f4aca99a59668d25fdcad64dc8ce79",
+    "before_size": [
+      1440,
+      1941
+    ],
+    "after_size": [
+      1440,
+      1431
+    ]
+  },
+  {
+    "page": "after-run-1366.png",
+    "first_round_sha256": "5e8e6f89f788253c9bb67161c9c4d7c40580b97d5579c8debebbb1d0fdd6e99d",
+    "second_round_sha256": "466f0e4c793a0574bfbd6f39e133b106fcd4254b155c083bc5eeb084922d7563",
+    "before_size": [
+      1366,
+      1988
+    ],
+    "after_size": [
+      1366,
+      1579
+    ]
+  },
+  {
+    "page": "after-run-1440.png",
+    "first_round_sha256": "d0733be890f503249ca80d4d3016aebd364d306678e54ab81c88d75773b396d1",
+    "second_round_sha256": "127f04a2ead38f6893a13072afe174b10c94675cfa61222c6c9b2de4a1f34a03",
+    "before_size": [
+      1440,
+      1988
+    ],
+    "after_size": [
+      1440,
+      1579
+    ]
+  }
+]

@@ -13,7 +13,7 @@ const titles: Record<string, [string, string]> = {
   'run-detail': ['运行证据', 'Run evidence'], diagnosis: ['失败诊断', 'Failure diagnosis'],
   regression: ['候选对比', 'Regression comparison'], 'analyst-sessions': ['已保存调查', 'Saved investigations'],
   'run-control': ['运行控制', 'Run control'], experiments: ['实验与运行', 'Experiments & runs'],
-  overview: ['概览', 'Overview'], settings: ['设置', 'Settings'],
+  'experiment-detail': ['实验详情', 'Experiment details'], overview: ['概览', 'Overview'], settings: ['设置', 'Settings'],
 }
 const title = computed(() => { const pair = titles[String(route.name)]; return pair ? c(...pair) : String(route.meta.title ?? route.name ?? 'Workbench') })
 const coreRoute = computed(() => ['analyst', 'public-demo', 'run-detail', 'diagnosis', 'regression'].includes(String(route.name)))
@@ -45,7 +45,6 @@ const navigation = computed(() => [
   ] },
   { label: c('评测与证据', 'Evaluation & evidence'), items: [
     { to: '/experiments', label: c('实验与运行', 'Experiments & runs'), icon: Files },
-    ...(route.name === 'run-detail' && typeof route.params.runId === 'string' ? [{ to: `/runs/${encodeURIComponent(route.params.runId)}`, label: c('运行证据', 'Run evidence'), icon: Document }] : []),
     { to: '/diagnosis', label: c('失败诊断', 'Diagnosis'), icon: DataAnalysis },
     { to: '/regression', label: c('候选对比', 'Regression comparison'), icon: TrendCharts },
   ] },
@@ -91,10 +90,10 @@ watch(title, value => { document.title = `${value} · SameScale` }, { immediate:
     <main id="main-content" class="main-panel" tabindex="-1">
       <header class="topbar"><div class="topbar-heading">
         <button ref="menuButton" class="mobile-menu-button" :aria-label="c('打开导航', 'Open navigation')" aria-controls="workbench-navigation" :aria-expanded="mobileNavOpen" @click="openNavigation"><Menu class="ui-icon" /></button>
-        <RouterLink to="/analyst" class="breadcrumb-workspace">{{ c('工作区', 'Workspace') }}</RouterLink><span class="breadcrumb-divider">/</span><h1>{{ title }}</h1><code v-if="route.name === 'run-detail'" class="breadcrumb-id" :title="String(route.params.runId)">{{ route.params.runId }}</code>
+        <RouterLink to="/analyst" class="breadcrumb-workspace">{{ c('工作区', 'Workspace') }}</RouterLink><span class="breadcrumb-divider">/</span><h1>{{ title }}</h1>
       </div><div class="locale-switch" role="group" :aria-label="c('切换界面语言', 'Change interface language')"><button :aria-pressed="!['en', 'en-US'].includes(preferences.language)" @click="setLocale('zh-CN')">中文</button><button :aria-pressed="['en', 'en-US'].includes(preferences.language)" @click="setLocale('en-US')">EN</button></div></header>
       <div class="page-container"><RouterView /></div>
-      <footer v-if="coreRoute" class="axiom-footer"><p>{{ c('结论应能追溯至证据；缺失与限制保持可见。', 'Conclusions should be traceable to evidence; gaps and limits remain visible.') }}</p><div class="toolbar"><RouterLink to="/analyst">{{ c('调查首页', 'Home') }}</RouterLink><RouterLink to="/experiments">{{ c('实验与运行', 'Runs') }}</RouterLink><RouterLink to="/diagnosis">{{ c('失败诊断', 'Diagnosis') }}</RouterLink><RouterLink to="/regression">{{ c('候选对比', 'Comparison') }}</RouterLink></div></footer>
+
     </main>
   </div>
 </template>

@@ -1,0 +1,120 @@
+{
+  "scope": "Pre-commit Git closeout verification; existing UI/P0 implementation only",
+  "base_sha": "314fe71c4fc6d08c31b8a7b490435deaa1917be4",
+  "branch": "codex/product-ui-closeout-v1-20261009",
+  "frontend": {
+    "tests_passed": 179,
+    "test_files": 15,
+    "type_check": "PASS",
+    "build": "PASS",
+    "saved_p0_build_files_matched": 56,
+    "saved_source_test_hashes_matched": 77
+  },
+  "offline": {
+    "schema_version": 1,
+    "status": "PASS",
+    "network_namespace": {
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_routes": 0,
+      "loopback": "down"
+    },
+    "tests_passed": 73,
+    "archive_digest": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+    "inputs_digest": "sha256:d77d964fe60158da4e22ee7e60df0cfb54178a99c957298d861d977f925d0395",
+    "identical_outputs": {
+      "claude.json": "sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d",
+      "codex.json": "sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe",
+      "diagnosis.md": "sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1",
+      "offline-boundary.json": "sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097",
+      "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef"
+    },
+    "replayed_runs": 2,
+    "replay_passes": 2,
+    "external_calls": 0,
+    "provider_calls": 0,
+    "model_calls": 0,
+    "claude_calls": 0,
+    "judge_calls": 0,
+    "subject_executed": false,
+    "verifier_executed": false
+  },
+  "protection": {
+    "status": "PASS",
+    "other_worktrees": [
+      {
+        "path": "/home/dev/projects/samescale",
+        "files_checked": 1494,
+        "dirty_items": 17,
+        "files_equal": true,
+        "head_equal": true,
+        "status_equal": true,
+        "diff_equal": true
+      },
+      {
+        "path": "/home/dev/.worktrees/samescale-brand-v1",
+        "files_checked": 1528,
+        "dirty_items": 0,
+        "files_equal": true,
+        "head_equal": true,
+        "status_equal": true,
+        "diff_equal": true
+      },
+      {
+        "path": "/home/dev/.worktrees/samescale-grok-qa-20261009",
+        "files_checked": 1528,
+        "dirty_items": 0,
+        "files_equal": true,
+        "head_equal": true,
+        "status_equal": true,
+        "diff_equal": true
+      },
+      {
+        "path": "/home/dev/.worktrees/samescale-main-baseline-20261009",
+        "files_checked": 1528,
+        "dirty_items": 0,
+        "files_equal": true,
+        "head_equal": true,
+        "status_equal": true,
+        "diff_equal": true
+      },
+      {
+        "path": "/home/dev/.worktrees/samescale-visual-v1",
+        "files_checked": 1497,
+        "dirty_items": 0,
+        "files_equal": true,
+        "head_equal": true,
+        "status_equal": true,
+        "diff_equal": true
+      }
+    ],
+    "candidate_protected_files": 1457,
+    "candidate_protected_changes": [],
+    "prior_qa_files": 31,
+    "prior_qa_changes": [],
+    "services_checked": 14,
+    "service_comparison": "Original digest must match exactly; only Docker Mounts list ordering is enumerated",
+    "service_changes": [],
+    "main_ref_unchanged": true,
+    "database_scope": "No direct DB writes or migrations; local offline gate has no network",
+    "website_scope": "No website edits or deployment; frontend public assets match baseline"
+  },
+  "grok_final_independent_reassessment": "NOT_CONFIRMED",
+  "original_six_devtools_messages": "UNAVAILABLE",
+  "gateway_patch": "Isolated historical acceptance artifact only; no production config change",
+  "remote_ci": "PENDING at pre-commit snapshot; exact SHA results reported in PR",
+  "browser": "Existing historical results and unedited PNG copies; no new browser run",
+  "screenshot_validation": {
+    "v1_v2_hashes_matched": 48,
+    "p0_files_present": 44,
+    "unedited_portable_png_copies": 16
+  },
+  "sensitive_information_scan": "Pattern scan; no credential-pattern hits; not a full security certification",
+  "whitespace_check": {
+    "scope": "All staged files except original product-p0 tests-final.log",
+    "result": "PASS",
+    "preserved_historical_log_warning": "One trailing blank line at EOF in original tests-final.log; original bytes retained",
+    "fresh_test_log_copy": "Trailing blank lines normalized only in new Git closeout copy"
+  }
+}

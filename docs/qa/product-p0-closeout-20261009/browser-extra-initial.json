@@ -1,0 +1,76 @@
+{
+  "checks": [
+    {
+      "name": "full eight count columns fit 1366",
+      "pass": true,
+      "detail": {
+        "width": 1020,
+        "scrollWidth": 1020,
+        "headerHeight": 66.59375
+      }
+    },
+    {
+      "name": "count header readable height 1366",
+      "pass": true,
+      "detail": {
+        "width": 1020,
+        "scrollWidth": 1020,
+        "headerHeight": 66.59375
+      }
+    },
+    {
+      "name": "infra column visible 1366",
+      "pass": true
+    },
+    {
+      "name": "back restores deep source disclosure 1366",
+      "pass": true
+    },
+    {
+      "name": "back restores deep scroll 1366",
+      "pass": false,
+      "detail": {
+        "expected": 1765,
+        "actual": 0,
+        "originalURL": "http://127.0.0.1:15941/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c?candidate=public-demo-20261009-b13ae8d9b801-candidate&from=%2Fdemo"
+      }
+    },
+    {
+      "name": "full eight count columns fit 1440",
+      "pass": true,
+      "detail": {
+        "width": 1094,
+        "scrollWidth": 1094,
+        "headerHeight": 42.796875
+      }
+    },
+    {
+      "name": "count header readable height 1440",
+      "pass": true,
+      "detail": {
+        "width": 1094,
+        "scrollWidth": 1094,
+        "headerHeight": 42.796875
+      }
+    },
+    {
+      "name": "infra column visible 1440",
+      "pass": true
+    },
+    {
+      "name": "back restores deep source disclosure 1440",
+      "pass": true
+    },
+    {
+      "name": "back restores deep scroll 1440",
+      "pass": false,
+      "detail": {
+        "expected": 1765,
+        "actual": 0,
+        "originalURL": "http://127.0.0.1:15941/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c?candidate=public-demo-20261009-b13ae8d9b801-candidate&from=%2Fdemo"
+      }
+    }
+  ],
+  "passed": 8,
+  "total": 10
+}

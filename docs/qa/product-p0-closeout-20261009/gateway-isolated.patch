@@ -1,0 +1,17 @@
+--- original-public-v2/gateway.py (UNCHANGED)
++++ isolated-p0/gateway.py
+@@ -1,4 +1,4 @@
+-import http.client,json,mimetypes,pathlib,threading,time
++import http.client,json,mimetypes,pathlib,threading,time,re
+ from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
+ from urllib.parse import urlsplit
+ ROOT=pathlib.Path('/qa/dist'); POLICY=json.loads(pathlib.Path('/qa/policy.json').read_text())
+@@ -69,7 +69,7 @@
+    if p=='/':return self.reply(307,b'',{'Location':'/demo'})
+    rel=p.lstrip('/')
+    if rel in STATIC:file=ROOT/rel
+-   elif p in PAGES:file=ROOT/'index.html'
++   elif p in PAGES or re.fullmatch(r'/runs/[A-Za-z0-9][A-Za-z0-9_-]{0,159}', p):file=ROOT/'index.html'
+    else:return self.reject()
+    if not file.is_file():return self.reject(404,'QA_ASSET_NOT_FOUND')
+    self.reply(200,file.read_bytes(),{'Content-Type':mimetypes.guess_type(str(file))[0] or 'application/octet-stream'})

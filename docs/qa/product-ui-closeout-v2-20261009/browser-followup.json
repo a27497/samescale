@@ -1,0 +1,132 @@
+{
+  "checks": [
+    {
+      "name": "history 1366 raw evidence disclosure restored",
+      "pass": true
+    },
+    {
+      "name": "history 1366 nested identity disclosure restored",
+      "pass": true
+    },
+    {
+      "name": "history 1366 deep scroll restored after asynchronous data",
+      "pass": true,
+      "detail": {
+        "before": 1765,
+        "after": 1765
+      }
+    },
+    {
+      "name": "history 1366 original source available",
+      "pass": true
+    },
+    {
+      "name": "final 1366 Demo to original run",
+      "pass": true
+    },
+    {
+      "name": "final 1366 diagnosis preserves run query",
+      "pass": true
+    },
+    {
+      "name": "final 1366 succeeded process remains neutral",
+      "pass": true
+    },
+    {
+      "name": "final 1366 failed task remains failed",
+      "pass": true
+    },
+    {
+      "name": "final 1366 original comparison prefill",
+      "pass": true
+    },
+    {
+      "name": "final 1366 incomparable direction stays suppressed",
+      "pass": true
+    },
+    {
+      "name": "final 1366 no page overflow",
+      "pass": true
+    },
+    {
+      "name": "final 1366 experiment copy agrees with original route",
+      "pass": true
+    },
+    {
+      "name": "final 1366 full plan digest copied",
+      "pass": true
+    },
+    {
+      "name": "history 1440 raw evidence disclosure restored",
+      "pass": true
+    },
+    {
+      "name": "history 1440 nested identity disclosure restored",
+      "pass": true
+    },
+    {
+      "name": "history 1440 deep scroll restored after asynchronous data",
+      "pass": true,
+      "detail": {
+        "before": 1765,
+        "after": 1765
+      }
+    },
+    {
+      "name": "history 1440 original source available",
+      "pass": true
+    },
+    {
+      "name": "final 1440 Demo to original run",
+      "pass": true
+    },
+    {
+      "name": "final 1440 diagnosis preserves run query",
+      "pass": true
+    },
+    {
+      "name": "final 1440 succeeded process remains neutral",
+      "pass": true
+    },
+    {
+      "name": "final 1440 failed task remains failed",
+      "pass": true
+    },
+    {
+      "name": "final 1440 original comparison prefill",
+      "pass": true
+    },
+    {
+      "name": "final 1440 incomparable direction stays suppressed",
+      "pass": true
+    },
+    {
+      "name": "final 1440 no page overflow",
+      "pass": true
+    },
+    {
+      "name": "final 1440 experiment copy agrees with original route",
+      "pass": true
+    },
+    {
+      "name": "final 1440 full plan digest copied",
+      "pass": true
+    },
+    {
+      "name": "same-name experiments distinct default labels",
+      "pass": true
+    },
+    {
+      "name": "same-name experiments route to exact distinct identities",
+      "pass": true
+    },
+    {
+      "name": "final followup zero runtime errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "browserVersion": "153.0.8010.12",
+  "note": "Same-name experiment substitution is a labeled browser-only fixture; no backend writes."
+}

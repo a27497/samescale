@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 
 import { workbenchApi } from '@/api/client'
+import { loadOutcomeCounts, type OutcomeCounts } from '@/utils/experimentResults'
 import type {
   ExperimentDetail,
   ExperimentStatus,
@@ -12,6 +13,10 @@ import type {
 } from '@/types/workbench'
 
 interface ExperimentState {
+  outcomeCounts: Record<string, OutcomeCounts>
+  listGeneration: number
+  total: number
+  moreLoading: boolean
   items: ExperimentSummary[]
   selected: ExperimentDetail | null
   matrix: MatrixResponse | null
@@ -23,6 +28,7 @@ interface ExperimentState {
   search: string
   statusFilter: string
   selectedMetric: MatrixMetricKey
+  detailGeneration: number
   pollingGeneration: number
   refreshingGeneration: number | null
   pollingHandle: ReturnType<typeof setInterval> | null
@@ -30,6 +36,10 @@ interface ExperimentState {
 
 export const useExperimentStore = defineStore('experiments', {
   state: (): ExperimentState => ({
+    outcomeCounts: {},
+    listGeneration: 0,
+    total: 0,
+    moreLoading: false,
     items: [],
     selected: null,
     matrix: null,
@@ -42,27 +52,49 @@ export const useExperimentStore = defineStore('experiments', {
     statusFilter: '',
     selectedMetric: 'success_rate',
     pollingHandle: null,
+    detailGeneration: 0,
     pollingGeneration: 0,
     refreshingGeneration: null,
   }),
   actions: {
+    async readOutcomeCounts(items: ExperimentSummary[], generation: number) {
+      // Bound the additional count reads; a late list response cannot replace current counts.
+      const pending = [...items]
+      await Promise.all(Array.from({ length: Math.min(3, pending.length) }, async () => {
+        while (pending.length && generation === this.listGeneration) {
+          const item = pending.shift()!
+          const counts = await loadOutcomeCounts(item)
+          if (generation === this.listGeneration) this.outcomeCounts[item.experiment_id] = counts
+        }
+      }))
+    },
     async fetchList() {
-      this.loading = true
-      this.error = null
+      const request = ++this.listGeneration
+      this.loading = true; this.moreLoading = false; this.error = null; this.outcomeCounts = {}
       try {
-        const response = await workbenchApi.listExperiments({
-          search: this.search || undefined,
-          status: this.statusFilter || undefined,
-        })
-        this.items = response.items
-      } catch {
-        this.error = 'Experiment evidence could not be loaded.'
-      } finally {
-        this.loading = false
-      }
+        const response = await workbenchApi.listExperiments({ search: this.search || undefined, status: this.statusFilter || undefined })
+        if (request !== this.listGeneration) return
+        this.items = response.items; this.total = response.total
+        await this.readOutcomeCounts(response.items, request)
+      } catch { if (request === this.listGeneration) this.error = 'Experiment evidence could not be loaded.' }
+      finally { if (request === this.listGeneration) this.loading = false }
+    },
+    async loadMore() {
+      if (this.moreLoading || this.loading || this.items.length >= this.total) return
+      const request = this.listGeneration
+      this.moreLoading = true; this.error = null
+      try {
+        const response = await workbenchApi.listExperiments({ search: this.search || undefined, status: this.statusFilter || undefined, offset: this.items.length })
+        if (request !== this.listGeneration) return
+        this.items.push(...response.items.filter(item => !this.items.some(existing => existing.experiment_id === item.experiment_id)))
+        this.total = response.total
+        await this.readOutcomeCounts(response.items, request)
+      } catch { if (request === this.listGeneration) this.error = 'Experiment evidence could not be loaded.' }
+      finally { if (request === this.listGeneration) this.moreLoading = false }
     },
     async fetchExperiment(id: string, generation?: number): Promise<boolean> {
-      const isCurrent = () => generation === undefined || generation === this.pollingGeneration
+      const request = ++this.detailGeneration
+      const isCurrent = () => request === this.detailGeneration && (generation === undefined || generation === this.pollingGeneration)
       this.loading = true
       this.error = null
       try {

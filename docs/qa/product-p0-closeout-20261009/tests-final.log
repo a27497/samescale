@@ -1,0 +1,13 @@
+
+> harnesslab-workbench@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 /home/dev/.worktrees/samescale-ui-closeout-v1-20261009/frontend
+
+
+ Test Files  15 passed (15)
+      Tests  179 passed (179)
+   Start at  14:49:03
+   Duration  6.28s (transform 5.27s, setup 1.64s, import 9.13s, tests 7.19s, environment 17.06s)
+

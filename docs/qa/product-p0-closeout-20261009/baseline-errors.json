@@ -1,0 +1,430 @@
+[
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/demo",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c?candidate=public-demo-20261009-b13ae8d9b801-candidate&from=%2Fdemo",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/diagnosis?experiment=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate&run=run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/regression?baseline=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/experiments",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline?tab=overview",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline?tab=runs",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/demo",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c?candidate=public-demo-20261009-b13ae8d9b801-candidate&from=%2Fdemo",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/diagnosis?experiment=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate&run=run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/regression?baseline=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/experiments",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline?tab=overview",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline?tab=runs",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/runs/grok-unknown-run",
+    "width": 1440,
+    "documentStatus": 200,
+    "logs": [
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "http://127.0.0.1:15931/api/workbench/runs/grok-unknown-run",
+        "trigger": "http://127.0.0.1:15931/runs/grok-unknown-run"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+        "location": {
+          "url": "http://127.0.0.1:15931/api/workbench/runs/grok-unknown-run",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "http://127.0.0.1:15931/runs/grok-unknown-run"
+      },
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "http://127.0.0.1:15931/api/workbench/runs/grok-unknown-run/trace",
+        "trigger": "http://127.0.0.1:15931/runs/grok-unknown-run"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+        "location": {
+          "url": "http://127.0.0.1:15931/api/workbench/runs/grok-unknown-run/trace",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "http://127.0.0.1:15931/runs/grok-unknown-run"
+      }
+    ],
+    "visibleText": "跳到主要内容\nSameScale\n运行证据工作台\n主要功能\n调查首页\n公开演示\n已保存调查\n评测与证据\n实验与运行\n运行证据\n失败诊断\n候选对比\n配置与工具\nAdvanced\nSAMESCALE / EVIDENCE CONSOLE\n来源与状态按记录展示\n工作区\n/\n运行证据\n中文\nEN\n运行证据\n\n先看独立验收，再核对 Agent 自报与运行事件。\n\n只读\n\n运行证据暂不可用或完整性校验未通过；未展示替代记录。重试"
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/connections",
+    "width": 1440,
+    "documentStatus": 200,
+    "logs": [
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "http://127.0.0.1:15931/api/local-configuration/status",
+        "trigger": "http://127.0.0.1:15931/connections"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+        "location": {
+          "url": "http://127.0.0.1:15931/api/local-configuration/status",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "http://127.0.0.1:15931/connections"
+      }
+    ],
+    "visibleText": "跳到主要内容\nSameScale\n运行证据工作台\n主要功能\n调查首页\n公开演示\n已保存调查\n评测与证据\n实验与运行\n失败诊断\n候选对比\n配置与工具\nAdvanced\n概览\n运行控制\nJudgeLab\n连接与配置\n模型注册\nProvider 注册\nHarness 注册\n兼容能力\n就绪检查\n设置\nSAMESCALE / EVIDENCE CONSOLE\n来源与状态按记录展示\n工作区\n/\nConnections\n中文\nEN\nConnections and configuration\nReload configuration\nLocal model configurations\n\nCreate a configuration from a supported Direct template and choose a local connection with the same provider and protocol.\n\nEach save creates a new revision. Existing plans keep their original configuration. Agent runtime compatibility is not extended automatically.\n\nLocal editing status could not be loaded.\n\nReload"
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/settings",
+    "width": 1440,
+    "documentStatus": 200,
+    "logs": [],
+    "visibleText": "跳到主要内容\nSameScale\n运行证据工作台\n主要功能\n调查首页\n公开演示\n已保存调查\n评测与证据\n实验与运行\n失败诊断\n候选对比\n配置与工具\nAdvanced\n概览\n运行控制\nJudgeLab\n连接与配置\n模型注册\nProvider 注册\nHarness 注册\n兼容能力\n就绪检查\n设置\nSAMESCALE / EVIDENCE CONSOLE\n来源与状态按记录展示\n工作区\n/\n设置\n中文\nEN\nSettings\n\nNon-secret product defaults and presence-only environment references.\n\nSERVER MANAGED\n•••\nSecret-safe by construction\n\nSecret editing is intentionally unavailable. Credential values are never returned or persisted in browser state; only reference names and SET / MISSING presence are shown.\n\nPLANNING\nExperiment defaults\nNON-SECRET\nProvider profile\ngpt56-relay-gpt56-responses\nEvaluation mode\nQUICK\nSchedule seed\n20260828\nConcurrency\n1\nCost budget\nNOT_AVAILABLE\nThese values seed backend preflight requests. Methodology-owned repeat counts and validation remain backend-authoritative.\nENVIRONMENT\nCredential presence\n0 / 4 set\nDEEPSEEK_API_KEY\nValue withheld\nMISSING\nHARNESSLAB_ALIBABA_BAILIAN_API_KEY\nValue withheld\nMISSING\nHARNESSLAB_GPT56_RELAY_API_KEY\nValue withheld\nMISSING\nHARNESSLAB_OPENCODE_GO_API_KEY\nValue withheld\nMISSING\nBrowser secret editing\nINTENTIONALLY UNAVAILABLE\nPROVIDERS\nPlanning registration\nInspect operational state →\nRegistered or enabled means selectable for planning. Execution also requires a present credential, a healthy runtime, and successful preflight.\ngpt56-relay\nREGISTERED FOR PLANNING\nopencode-go\nREGISTERED FOR PLANNING\ndeepseek-official\nREGISTERED FOR PLANNING\nalibaba-bailian\nREGISTERED FOR PLANNING"
+  },
+  {
+    "environment": "http://127.0.0.1:15931",
+    "path": "/experiments/new",
+    "width": 1440,
+    "documentStatus": 200,
+    "logs": [],
+    "visibleText": "跳到主要内容\nSameScale\n运行证据工作台\n主要功能\n调查首页\n公开演示\n已保存调查\n评测与证据\n实验与运行\n失败诊断\n候选对比\n配置与工具\nAdvanced\n概览\n运行控制\nJudgeLab\n连接与配置\n模型注册\nProvider 注册\nHarness 注册\n兼容能力\n就绪检查\n设置\nSAMESCALE / EVIDENCE CONSOLE\n来源与状态按记录展示\n工作区\n/\nNew experiment plan\n中文\nEN\nExperiment Builder\n\nServer validated planning only. No Provider call or run creation occurs here.\n\nNOT_REPORTED\nA registered profile is selectable for planning; execution readiness also requires a credential, healthy runtime and successful preflight. Inspect Provider operational state before execution.\nReload planning configuration\nExperiment name\nEvaluation mode\nQUICK\nINFORMAL\nFORMAL_EXHAUSTIVE\nRepeat policy\nComparison type\nEND_TO_END_SYSTEM_COMPARISON\nMODEL_COMPARISON\nHARNESS_UPLIFT\nCONTROLLED_ABLATION\nSchedule seed\nMax parallel runs\nMax wall time / slot\nMax output tokens\nCells — explicit SUBJECT selections\nLeft treatment\nProvider model profile\nUnconfigured — select a SUBJECT model\ngpt56-relay-gpt56-responses\nopencode-go-qwen38-messages\nopencode-go-glm52-chat\ndeepseek-official-v4pro-chat\ndeepseek-official-v4flash-chat\ndeepseek-official-v4flash-responses\ndeepseek-official-v4flash-responses-smoke-v2\ndeepseek-official-v4flash-responses-smoke-v4\ndeepseek-official-v4flash-responses-smoke-v6\nalibaba-bailian-qwen3.8-max-chat\nalibaba-bailian-qwen3.8-max-responses\nalibaba-bailian-qwen3.8-max-messages\nalibaba-bailian-deepseek-v4-pro-chat\nalibaba-bailian-deepseek-v4-pro-responses\nalibaba-bailian-glm-5.2-chat\nHarness profile\nUnconfigured — select a Harness version\ndirect-gpt56-relay-gpt56-responses · evidence-schema-1\ndirect-opencode-go-qwen38-messages · evidence-schema-1\ndirect-opencode-go-glm52-chat · evidence-schema-1\ndirect-deepseek-official-v4pro-chat · evidence-schema-1\ndirect-deepseek-official-v4flash-chat · evidence-schema-1\ndirect-deepseek-official-v4flash"
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/demo",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c?candidate=public-demo-20261009-b13ae8d9b801-candidate&from=%2Fdemo",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/diagnosis?experiment=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate&run=run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/regression?baseline=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/experiments",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline?tab=overview",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline?tab=runs",
+    "width": 1366,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/demo",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c?candidate=public-demo-20261009-b13ae8d9b801-candidate&from=%2Fdemo",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/diagnosis?experiment=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate&run=run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/regression?baseline=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/experiments",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline?tab=overview",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline?tab=runs",
+    "width": 1440,
+    "logs": []
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/runs/grok-unknown-run",
+    "width": 1440,
+    "documentStatus": 403,
+    "logs": [
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/runs/grok-unknown-run",
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/experiments/public-demo-20261009-b13ae8d9b801-baseline?tab=runs"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 ()",
+        "location": {
+          "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/runs/grok-unknown-run",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/runs/grok-unknown-run"
+      }
+    ],
+    "visibleText": "{\"error\": {\"code\": \"PUBLIC_DEMO_READ_ONLY\", \"message\": \"Temporary UI review: bounded saved public evidence reads only.\"}}"
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/connections",
+    "width": 1440,
+    "documentStatus": 200,
+    "logs": [
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/registry/harnesses",
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/connections"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 ()",
+        "location": {
+          "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/registry/harnesses",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/connections"
+      },
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/registry/providers",
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/connections"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 ()",
+        "location": {
+          "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/registry/providers",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/connections"
+      },
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/registry/models",
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/connections"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 ()",
+        "location": {
+          "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/registry/models",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/connections"
+      },
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/local-configuration/status",
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/connections"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 ()",
+        "location": {
+          "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/local-configuration/status",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/connections"
+      }
+    ],
+    "visibleText": "跳到主要内容\nSameScale\n运行证据工作台\n主要功能\n调查首页\n公开演示\n已保存调查\n评测与证据\n实验与运行\n失败诊断\n候选对比\n配置与工具\nAdvanced\n概览\n运行控制\nJudgeLab\n连接与配置\n模型注册\nProvider 注册\nHarness 注册\n兼容能力\n就绪检查\n设置\nSAMESCALE / EVIDENCE CONSOLE\n来源与状态按记录展示\n工作区\n/\nConnections\n中文\nEN\nConnections and configuration\nReload configuration\nCould not load the following; their status remains unknown: Model profiles / Providers / Execution mode\nLocal model configurations\n\nCreate a configuration from a supported Direct template and choose a local connection with the same provider and protocol.\n\nEach save creates a new revision. Existing plans keep their original configuration. Agent runtime compatibility is not extended automatically.\n\nLocal editing status could not be loaded.\n\nReload"
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/settings",
+    "width": 1440,
+    "documentStatus": 200,
+    "logs": [
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/registry/settings",
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/settings"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 ()",
+        "location": {
+          "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/api/registry/settings",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/settings"
+      }
+    ],
+    "visibleText": "跳到主要内容\nSameScale\n运行证据工作台\n主要功能\n调查首页\n公开演示\n已保存调查\n评测与证据\n实验与运行\n失败诊断\n候选对比\n配置与工具\nAdvanced\n概览\n运行控制\nJudgeLab\n连接与配置\n模型注册\nProvider 注册\nHarness 注册\n兼容能力\n就绪检查\n设置\nSAMESCALE / EVIDENCE CONSOLE\n来源与状态按记录展示\n工作区\n/\n设置\n中文\nEN\nSettings\n\nNon-secret product defaults and presence-only environment references.\n\nSERVER MANAGED\n•••\nSecret-safe by construction\n\nSecret editing is intentionally unavailable. Credential values are never returned or persisted in browser state; only reference names and SET / MISSING presence are shown.\n\nSettings are unavailable.\n\n重新加载页面\n返回调查首页"
+  },
+  {
+    "environment": "https://twelve-terrorist-campbell-alias.trycloudflare.com",
+    "path": "/experiments/new",
+    "width": 1440,
+    "documentStatus": 403,
+    "logs": [
+      {
+        "kind": "network",
+        "status": 403,
+        "method": "GET",
+        "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/experiments/new",
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/settings"
+      },
+      {
+        "kind": "console",
+        "text": "Failed to load resource: the server responded with a status of 403 ()",
+        "location": {
+          "url": "https://twelve-terrorist-campbell-alias.trycloudflare.com/experiments/new",
+          "line": 0,
+          "column": 0,
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "trigger": "https://twelve-terrorist-campbell-alias.trycloudflare.com/experiments/new"
+      }
+    ],
+    "visibleText": "{\"error\": {\"code\": \"PUBLIC_DEMO_READ_ONLY\", \"message\": \"Temporary UI review: bounded saved public evidence reads only.\"}}"
+  }
+]

@@ -1,0 +1,4405 @@
+{
+  "checks": [
+    {
+      "name": "demo 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "demo 1366 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "run 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "run 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "run 1366 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "run 1366 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "run 1366 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "FILE_CHANGE event scope 1366",
+      "pass": true
+    },
+    {
+      "name": "FILE_CHANGE original enum retained 1366",
+      "pass": true
+    },
+    {
+      "name": "Trace original summary exact 1366",
+      "pass": true
+    },
+    {
+      "name": "Trace no obscuring badge tooltip 1366",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1366 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "failed task verdict 1366",
+      "pass": true
+    },
+    {
+      "name": "Verifier execution neutral 1366",
+      "pass": true
+    },
+    {
+      "name": "no duplicate current identity verdict 1366",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "regression 1366 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "NOT_COMPARABLE raw values collapsed 1366",
+      "pass": true
+    },
+    {
+      "name": "raw interpretation visible 1366",
+      "pass": true
+    },
+    {
+      "name": "full raw original rates 1366",
+      "pass": true
+    },
+    {
+      "name": "incomparable no improved direction 1366",
+      "pass": true
+    },
+    {
+      "name": "prefill exact original identities 1366",
+      "pass": true
+    },
+    {
+      "name": "prefill known names 1366",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "experiments 1366 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "list authoritative counts 1366",
+      "pass": true
+    },
+    {
+      "name": "list collection meaning 1366",
+      "pass": true
+    },
+    {
+      "name": "public plan mutation entry absent 1366",
+      "pass": true
+    },
+    {
+      "name": "overview 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "overview 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "overview 1366 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "overview 1366 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "overview 1366 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "overview matches list counts 1366",
+      "pass": true
+    },
+    {
+      "name": "overview not rate inferred 1366",
+      "pass": true
+    },
+    {
+      "name": "runs 1366 rendered",
+      "pass": true
+    },
+    {
+      "name": "runs 1366 no overflow",
+      "pass": true
+    },
+    {
+      "name": "runs 1366 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "runs 1366 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "runs 1366 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "Demo → exact Run 1366",
+      "pass": true
+    },
+    {
+      "name": "Run → exact Diagnosis 1366",
+      "pass": true
+    },
+    {
+      "name": "citation original run source 1366",
+      "pass": true
+    },
+    {
+      "name": "citation return focus 1366",
+      "pass": true
+    },
+    {
+      "name": "Diagnosis → exact Regression 1366",
+      "pass": true
+    },
+    {
+      "name": "history exact selected run 1366",
+      "pass": true
+    },
+    {
+      "name": "return filter and exact URL 1366",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "demo 1440 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "run 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "run 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "run 1440 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "run 1440 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "run 1440 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "FILE_CHANGE event scope 1440",
+      "pass": true
+    },
+    {
+      "name": "FILE_CHANGE original enum retained 1440",
+      "pass": true
+    },
+    {
+      "name": "Trace original summary exact 1440",
+      "pass": true
+    },
+    {
+      "name": "Trace no obscuring badge tooltip 1440",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "diagnosis 1440 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "failed task verdict 1440",
+      "pass": true
+    },
+    {
+      "name": "Verifier execution neutral 1440",
+      "pass": true
+    },
+    {
+      "name": "no duplicate current identity verdict 1440",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "regression 1440 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "NOT_COMPARABLE raw values collapsed 1440",
+      "pass": true
+    },
+    {
+      "name": "raw interpretation visible 1440",
+      "pass": true
+    },
+    {
+      "name": "full raw original rates 1440",
+      "pass": true
+    },
+    {
+      "name": "incomparable no improved direction 1440",
+      "pass": true
+    },
+    {
+      "name": "prefill exact original identities 1440",
+      "pass": true
+    },
+    {
+      "name": "prefill known names 1440",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "experiments 1440 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "list authoritative counts 1440",
+      "pass": true
+    },
+    {
+      "name": "list collection meaning 1440",
+      "pass": true
+    },
+    {
+      "name": "public plan mutation entry absent 1440",
+      "pass": true
+    },
+    {
+      "name": "overview 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "overview 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "overview 1440 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "overview 1440 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "overview 1440 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "overview matches list counts 1440",
+      "pass": true
+    },
+    {
+      "name": "overview not rate inferred 1440",
+      "pass": true
+    },
+    {
+      "name": "runs 1440 rendered",
+      "pass": true
+    },
+    {
+      "name": "runs 1440 no overflow",
+      "pass": true
+    },
+    {
+      "name": "runs 1440 no badge tab stops",
+      "pass": true
+    },
+    {
+      "name": "runs 1440 no bilingual aria/overlay",
+      "pass": true
+    },
+    {
+      "name": "runs 1440 stable navigation geometry",
+      "pass": true,
+      "detail": {
+        "before": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ],
+        "after": [
+          {
+            "href": "/diagnosis",
+            "y": 390.390625,
+            "height": 44
+          },
+          {
+            "href": "/regression",
+            "y": 439.390625,
+            "height": 44
+          },
+          {
+            "href": null,
+            "y": 508.390625,
+            "height": 53.390625
+          }
+        ]
+      }
+    },
+    {
+      "name": "Demo → exact Run 1440",
+      "pass": true
+    },
+    {
+      "name": "Run → exact Diagnosis 1440",
+      "pass": true
+    },
+    {
+      "name": "citation original run source 1440",
+      "pass": true
+    },
+    {
+      "name": "citation return focus 1440",
+      "pass": true
+    },
+    {
+      "name": "Diagnosis → exact Regression 1440",
+      "pass": true
+    },
+    {
+      "name": "history exact selected run 1440",
+      "pass": true
+    },
+    {
+      "name": "return filter and exact URL 1440",
+      "pass": true
+    },
+    {
+      "name": "full ID clipboard",
+      "pass": true
+    },
+    {
+      "name": "full SHA clipboard",
+      "pass": true
+    },
+    {
+      "name": "download raw identity",
+      "pass": true
+    },
+    {
+      "name": "normal path errors zero",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "unknown Run safe HTML 1366",
+      "pass": true
+    },
+    {
+      "name": "unknown Run permission not fake 404 1366",
+      "pass": true
+    },
+    {
+      "name": "unknown no secondary Trace probe 1366",
+      "pass": true
+    },
+    {
+      "name": "API unknown still403 1366",
+      "pass": true
+    },
+    {
+      "name": "unknown Run safe HTML 1440",
+      "pass": true
+    },
+    {
+      "name": "unknown Run permission not fake 404 1440",
+      "pass": true
+    },
+    {
+      "name": "unknown no secondary Trace probe 1440",
+      "pass": true
+    },
+    {
+      "name": "API unknown still403 1440",
+      "pass": true
+    },
+    {
+      "name": "actual 404 contract separate from permission",
+      "pass": true
+    },
+    {
+      "name": "slow prefill natural label",
+      "pass": true
+    },
+    {
+      "name": "slow prefill resolves exact name",
+      "pass": true
+    },
+    {
+      "name": "failed list resolves names from exact detail",
+      "pass": true
+    },
+    {
+      "name": "failed list no false empty selection",
+      "pass": true
+    },
+    {
+      "name": "PARTIALLY_COMPARABLE default visibility",
+      "pass": true
+    },
+    {
+      "name": "PARTIALLY_COMPARABLE no improvement promoted",
+      "pass": true
+    },
+    {
+      "name": "PARTIALLY_COMPARABLE original values/direction retained",
+      "pass": true
+    },
+    {
+      "name": "NOT_COMPARABLE default visibility",
+      "pass": true
+    },
+    {
+      "name": "NOT_COMPARABLE no improvement promoted",
+      "pass": true
+    },
+    {
+      "name": "NOT_COMPARABLE original values/direction retained",
+      "pass": true
+    },
+    {
+      "name": "COMPARABLE default visibility",
+      "pass": true
+    },
+    {
+      "name": "COMPARABLE preserves eligible descriptive direction",
+      "pass": true
+    },
+    {
+      "name": "COMPARABLE original values/direction retained",
+      "pass": true
+    },
+    {
+      "name": "count failures remain unreported",
+      "pass": true
+    },
+    {
+      "name": "security reject POST /api/workbench/analyst/sessions",
+      "pass": true
+    },
+    {
+      "name": "security reject POST /api/workbench/analyst/sessions/x/resume",
+      "pass": true
+    },
+    {
+      "name": "security reject PUT /api/local-configuration/models",
+      "pass": true
+    },
+    {
+      "name": "security reject POST /api/experiments/preflight",
+      "pass": true
+    },
+    {
+      "name": "security reject GET /api/local-configuration/credentials",
+      "pass": true
+    },
+    {
+      "name": "security reject GET /.env",
+      "pass": true
+    },
+    {
+      "name": "security reject GET /api/workbench/runs/private-run/trace",
+      "pass": true
+    },
+    {
+      "name": "Historical still source isolated",
+      "pass": true
+    },
+    {
+      "name": "offline fixed source",
+      "pass": true
+    }
+  ],
+  "passed": 156,
+  "total": 156,
+  "normalErrors": [],
+  "expectedErrors": [
+    {
+      "kind": "network",
+      "status": 403,
+      "url": "http://127.0.0.1:15941/api/workbench/runs/grok-unknown-run",
+      "path": "http://127.0.0.1:15941/runs/grok-unknown-run"
+    },
+    {
+      "kind": "console",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "location": {
+        "url": "http://127.0.0.1:15941/api/workbench/runs/grok-unknown-run",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "path": "http://127.0.0.1:15941/runs/grok-unknown-run"
+    },
+    {
+      "kind": "network",
+      "status": 403,
+      "url": "http://127.0.0.1:15941/api/workbench/runs/grok-unknown-run",
+      "path": "http://127.0.0.1:15941/runs/grok-unknown-run"
+    },
+    {
+      "kind": "console",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "location": {
+        "url": "http://127.0.0.1:15941/api/workbench/runs/grok-unknown-run",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "path": "http://127.0.0.1:15941/runs/grok-unknown-run"
+    },
+    {
+      "kind": "network",
+      "status": 404,
+      "url": "http://127.0.0.1:15941/api/workbench/runs/product-missing",
+      "path": "http://127.0.0.1:15941/runs/product-missing"
+    },
+    {
+      "kind": "console",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "location": {
+        "url": "http://127.0.0.1:15941/api/workbench/runs/product-missing",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "path": "http://127.0.0.1:15941/runs/product-missing"
+    },
+    {
+      "kind": "network",
+      "status": 503,
+      "url": "http://127.0.0.1:15941/api/workbench/experiments?limit=100",
+      "path": "http://127.0.0.1:15941/regression?baseline=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate"
+    },
+    {
+      "kind": "console",
+      "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+      "location": {
+        "url": "http://127.0.0.1:15941/api/workbench/experiments?limit=100",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "path": "http://127.0.0.1:15941/regression?baseline=public-demo-20261009-b13ae8d9b801-baseline&candidate=public-demo-20261009-b13ae8d9b801-candidate"
+    },
+    {
+      "kind": "network",
+      "status": 503,
+      "url": "http://127.0.0.1:15941/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs?outcome=capability_pass&limit=1",
+      "path": "http://127.0.0.1:15941/experiments"
+    },
+    {
+      "kind": "console",
+      "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+      "location": {
+        "url": "http://127.0.0.1:15941/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs?outcome=capability_pass&limit=1",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "path": "http://127.0.0.1:15941/experiments"
+    },
+    {
+      "kind": "network",
+      "status": 503,
+      "url": "http://127.0.0.1:15941/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs?outcome=capability_fail&limit=1",
+      "path": "http://127.0.0.1:15941/experiments"
+    },
+    {
+      "kind": "console",
+      "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+      "location": {
+        "url": "http://127.0.0.1:15941/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs?outcome=capability_fail&limit=1",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "path": "http://127.0.0.1:15941/experiments"
+    },
+    {
+      "kind": "network",
+      "status": 503,
+      "url": "http://127.0.0.1:15941/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs?outcome=capability_pass&limit=1",
+      "path": "http://127.0.0.1:15941/experiments"
+    },
+    {
+      "kind": "console",
+      "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+      "location": {
+        "url": "http://127.0.0.1:15941/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs?outcome=capability_pass&limit=1",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "path": "http://127.0.0.1:15941/experiments"
+    },
+    {
+      "kind": "network",
+      "status": 503,
+      "url": "http://127.0.0.1:15941/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs?outcome=capability_fail&limit=1",
+      "path": "http://127.0.0.1:15941/experiments"
+    },
+    {
+      "kind": "console",
+      "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+      "location": {
+        "url": "http://127.0.0.1:15941/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs?outcome=capability_fail&limit=1",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "path": "http://127.0.0.1:15941/experiments"
+    }
+  ],
+  "requests": [
+    {
+      "path": "/demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PublicDemoView-DGoKqYS8.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/DiagnosisView-Cpgi67RW.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/regression",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RegressionView-DxtDVwUz.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentsView-CDEjUfE8.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/experiments-BI1rnp4W.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/analyst-DWHoKTDR.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/analyst/capabilities",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/experiments-BI1rnp4W.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentDetailView-CYD2zm5T.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/experiments-BI1rnp4W.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentDetailView-CYD2zm5T.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PublicDemoView-DGoKqYS8.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/DiagnosisView-Cpgi67RW.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RegressionView-DxtDVwUz.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/experiments-BI1rnp4W.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentDetailView-CYD2zm5T.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PublicDemoView-DGoKqYS8.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/DiagnosisView-Cpgi67RW.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/regression",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RegressionView-DxtDVwUz.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentsView-CDEjUfE8.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/experiments-BI1rnp4W.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/analyst-DWHoKTDR.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/analyst/capabilities",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/experiments-BI1rnp4W.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentDetailView-CYD2zm5T.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/experiments-BI1rnp4W.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentDetailView-CYD2zm5T.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PublicDemoView-DGoKqYS8.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/DiagnosisView-Cpgi67RW.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RegressionView-DxtDVwUz.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/diagnosis",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/experiments-BI1rnp4W.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentDetailView-CYD2zm5T.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-d928dc651c7fc544348de3eca607728e63a043f9077559ffd1aa3007ced4e9da/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/matrix",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/trace",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/public-demo",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/run-3e753a7860eb04ed2c84050a3a91890ee0d0b4788cf8c7795ca39ea14d6cd75c/public-artifact",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/runs/grok-unknown-run",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/grok-unknown-run",
+      "method": "GET",
+      "status": 403
+    },
+    {
+      "path": "/runs/grok-unknown-run",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/grok-unknown-run",
+      "method": "GET",
+      "status": 403
+    },
+    {
+      "path": "/runs/product-missing",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RunDetailView-BB7Rj8LS.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/runs/product-missing",
+      "method": "GET",
+      "status": 404
+    },
+    {
+      "path": "/regression",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RegressionView-DxtDVwUz.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/regression",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RegressionView-DxtDVwUz.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 503
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/regression",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RegressionView-DxtDVwUz.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/regression",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RegressionView-DxtDVwUz.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/regression",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/RegressionView-DxtDVwUz.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentPicker-DpCKR3LY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceLabels-CK-LqSgZ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/EvidenceValue--58WyQ_2.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/visualEvidence-CaNa_x0F.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/regression/compare",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/analyst-DWHoKTDR.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/ExperimentsView-CDEjUfE8.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/experiments-BI1rnp4W.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/PageState-IrBhZ3EN.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/analyst/capabilities",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs",
+      "method": "GET",
+      "status": 503
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-candidate/runs",
+      "method": "GET",
+      "status": 503
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 503
+    },
+    {
+      "path": "/api/workbench/experiments/public-demo-20261009-b13ae8d9b801-baseline/runs",
+      "method": "GET",
+      "status": 503
+    },
+    {
+      "path": "/analyst",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/InvestigationReport-DdXYMwjM.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/AnalystHomeView-BtdB8o2_.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/InvestigationReport-DDoa2Lfj.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/analyst-DWHoKTDR.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/analyst/capabilities",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/analyst/examples/historical",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/analyst",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-CXzRbBgi.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/index-BADivbTY.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-lockup-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/brand/samescale-symbol-24px-cobalt.svg",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/InvestigationReport-DdXYMwjM.css",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/AnalystHomeView-BtdB8o2_.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/InvestigationReport-DDoa2Lfj.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/client-HOGN3zTf.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/displayIdentity-ID6_LUbQ.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/StatusBadge-DxdHMg-e.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/analyst-DWHoKTDR.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/assets/evidenceCopy-Q2SH71ot.js",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/analyst/capabilities",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/workbench/analyst/examples/offline",
+      "method": "POST",
+      "status": 200
+    }
+  ],
+  "browserVersion": "153.0.8010.12",
+  "url": "http://127.0.0.1:15941",
+  "source": {
+    "demo_id": "public-demo-20261009-b13ae8d9b801",
+    "manifest_digest": "sha256:cd96bbc1274fe1dea7815ca85d619d27fec4559a1255d46cc458af7d5318a0af"
+  }
+}

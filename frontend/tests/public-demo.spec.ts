@@ -18,18 +18,18 @@ describe('Public demo identity', () => {
     api.getPublicDemo.mockResolvedValue(demo)
     const wrapper = mount(PublicDemoView, options)
     await flushPromises()
-    expect(wrapper.text()).toContain('不会启动 Agent 或调用真实模型')
-    expect(wrapper.text()).toContain('FIXTURE_OFFLINE')
+    expect(wrapper.text()).toContain('不启动 Agent 或调用模型')
+    expect(wrapper.find('[data-status="FIXTURE_OFFLINE"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('no real Provider/model execution')
     expect(wrapper.get('#demo-step-1 [data-target]').attributes('data-target')).toContain('public-demo-new-baseline')
     expect(wrapper.text()).toContain('历史 QA 证据不可用')
     expect(wrapper.find('details').attributes('open')).toBeUndefined()
     const destinations = wrapper.findAll('[data-target]').map(link => JSON.parse(link.attributes('data-target')!))
     expect(destinations).toEqual([
-      { path: '/experiments/public-demo-new-baseline', query: { tab: 'runs', candidate: demo.candidate_id } },
-      { path: '/runs/new-run', query: { candidate: demo.candidate_id } },
+      { path: '/runs/new-run', query: { candidate: demo.candidate_id, from: '/demo' } },
       { path: '/diagnosis', query: { experiment: demo.baseline_id, candidate: demo.candidate_id, run: demo.failed_run_id } },
       { path: '/regression', query: { baseline: demo.baseline_id, candidate: demo.candidate_id, run: demo.failed_run_id } },
+      { path: '/experiments/public-demo-new-baseline', query: { tab: 'runs', candidate: demo.candidate_id } },
       '/experiments/phase-i-matrix-multi-task',
     ])
     expect(wrapper.get('a[target="_blank"]').attributes('href')).toBe('/api/workbench/runs/new-run/public-artifact')
