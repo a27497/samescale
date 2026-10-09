@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import os
 import shutil
@@ -38,7 +39,7 @@ from harnesslab.sandbox.artifacts import (
     make_tree_readable,
     make_tree_writable,
 )
-from harnesslab.sandbox.models import SandboxArtifactManifest
+from harnesslab.sandbox.models import SandboxArtifactManifest, VerifierLifecycleDiagnostics
 from harnesslab.sandbox.runner import DockerSandbox
 from harnesslab.tasks.package import TaskPackage, TaskPackageError, digest_tree, is_link_like
 
@@ -114,6 +115,7 @@ class CodexHarnessRunner:
         adapter: CodexHarnessAdapter | None = None,
         plan_profile_identity: str | None = None,
         plan_harness_config_identity: str | None = None,
+        local_worker_evidence: bool = False,
     ) -> None:
         base = Path(tempfile.gettempdir()) / "harnesslab-phase-e"
         self.artifact_root = (artifact_root or base / "artifacts").resolve()
@@ -124,6 +126,7 @@ class CodexHarnessRunner:
         self.adapter = adapter or CodexHarnessAdapter()
         self.plan_profile_identity = plan_profile_identity
         self.plan_harness_config_identity = plan_harness_config_identity
+        self.local_worker_evidence = local_worker_evidence
 
     async def run(
         self,
@@ -219,7 +222,12 @@ class CodexHarnessRunner:
                     summary=f"Codex backend execution failed during {backend_failure.phase.value}",
                     backend_failure=backend_failure,
                 )
-                return self._persist(evidence, collection, None, secret_values)
+                return self._persist(
+                    evidence,
+                    collection,
+                    materialized.workspace if self.local_worker_evidence else None,
+                    secret_values,
+                )
             output_digest = digest_tree(materialized.workspace)
             output_inventory = workspace_inventory(materialized.workspace)
             changed_paths = changed_path_evidence(input_inventory, output_inventory)
@@ -266,7 +274,9 @@ class CodexHarnessRunner:
                 if verifier.run.manifest.workspace_input_digest != output_digest:
                     raise CodexHarnessRunError("verifier workspace identity mismatch")
                 verifier_digest = digest_tree(verifier.run.artifact_directory)
-            except Exception as exc:
+            except (Exception, asyncio.CancelledError) as exc:
+                if isinstance(exc, asyncio.CancelledError) and not self.local_worker_evidence:
+                    raise
                 evidence = self._evidence(
                     effective_run_id,
                     package,
@@ -281,6 +291,9 @@ class CodexHarnessRunner:
                     collection=collection,
                     outcome=HarnessLaneOutcome.INFRA_ERROR,
                     summary=f"isolated Hidden Verifier failed: {type(exc).__name__}",
+                    verifier_lifecycle=(
+                        getattr(exc, "diagnostics", None) if self.local_worker_evidence else None
+                    ),
                 )
                 return self._persist(evidence, collection, materialized.workspace, secret_values)
             outcome = (
@@ -310,6 +323,7 @@ class CodexHarnessRunner:
                 verifier_artifact_digest=verifier_digest,
                 verifier_passed=verifier.passed,
                 verifier_score=verifier.score,
+                verifier_lifecycle=verifier.lifecycle if self.local_worker_evidence else None,
             )
             return self._persist(
                 evidence,
@@ -346,6 +360,7 @@ class CodexHarnessRunner:
         verifier_artifact_digest: str | None = None,
         verifier_passed: bool | None = None,
         verifier_score: float | None = None,
+        verifier_lifecycle: VerifierLifecycleDiagnostics | None = None,
     ) -> HarnessLaneEvidence:
         return HarnessLaneEvidence(
             run_id=run_id,
@@ -388,6 +403,7 @@ class CodexHarnessRunner:
             verifier_artifact_digest=verifier_artifact_digest,
             verifier_passed=verifier_passed,
             verifier_score=verifier_score,
+            verifier_lifecycle=verifier_lifecycle,
             outcome=outcome,
             summary=summary,
         )

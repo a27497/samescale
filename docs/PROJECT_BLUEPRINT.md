@@ -1,5 +1,33 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：产品化 MVP Phase 2 — 2026-10-09
+
+从已验收 `main@304c516e274d094888e3205666419cd3811d0912` 的独立 worktree 开发，完成
+不可变单配置计划 → 独立一次性授权/预算确认 → 单 slot 本地持久化队列 → 独立 Worker →
+Codex H-Lane 证据 → 独立隔离 Verifier → 不可变结果与私有 UI 读取。复用 Custom Task Store、
+TaskPackage、Registry、原 Runner/adapter、DockerSandbox、execution_lease 和 Episode reader；
+不用第二个 Cell，不改动旧双配置队列、历史记录、冻结 Demo 或官网。
+
+新 authorization/attempt/result 表追加记录，旧计划与 Episode 不变。API 只授权、入队、取消、查询；
+Docker 只属于独立 Worker。单计划授权唯一、幂等键、行锁/SKIP LOCKED、lease owner/TTL 与本地
+flock 管理互斥。attempt=1 后不得 requeue；失联后先清理该尝试自有容器，再读取封存、摘要绑定
+的结果或保留 INTERRUPTED。禁止因网络重试、Worker/服务重启或租约过期再次发起潜在付费执行。
+
+当前执行策略只允许固定、准入的隔离 `FAKE_CODEX` fixture。实际 Subject 容器产生 JSONL 与最终
+Workspace，原 H-Lane Runner 脱敏、记录实际改动，另一个无网络、只读 Workspace 的 Docker
+Verifier 独立判断。真实 Codex 没有费用/token 硬限制，REAL_CODEX 授权必须拒绝；参考预算不是
+硬上限。Fake 0 模型调用/$0 与 Subject 进程超时是真正边界；Verifier timeout 来自冻结任务契约。
+实际 Codex executable/version/protocol、真实任务准入及生产 Worker 运行不属于本次已验证事实。
+首次真实评测仍需独立授权、可强制预算/真实 dispatch gate、CLI/镜像/隔离/Provider 验证；
+[具体安装与剩余条件](LOCAL_EXECUTION.md)。这不是自动执行的后续计划。
+
+验收只使用新建可销毁 DB/测试服务、Fake subject 和隔离 Verifier；覆盖正负判定、超时、重复提交、
+并发领取、拒绝权限/身份/预算漂移、真实 Worker 进程崩溃、保全/重启读取、取消与证据篡改。
+保护原 UI-2 的 17 项修改、其他 worktree、冻结证据、历史数据库、官网及现有服务；不部署、升级
+Codex、修改生产配置、执行真实 Agent/Provider 或付费模型。允许本分支 commit、正常 push、
+面向 main 的 Draft PR 和 exact-SHA CI；禁止合并。Grok 保留 NOT_CONFIRMED。
+交付后 **STOP**，不自动执行真实 Codex 或启动 Phase 3。以下旧授权均保留历史范围。
+
 ## 当前授权：产品化 MVP Phase 1 — 2026-10-10
 
 从 `main@eb115417772bc36063afd6151c0d6da449ab7883` 的独立干净 worktree，完成可信本地任务接入、

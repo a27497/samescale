@@ -1,0 +1,5 @@
+{"event_type":"thread.started","file_changes":[],"ordinal":1,"reasoning_present":false,"thread_id":"fake-isolated-thread"}
+{"event_type":"turn.started","file_changes":[],"ordinal":2,"reasoning_present":false}
+{"event_type":"item.completed","file_changes":[],"item_id":"reasoning","item_type":"reasoning","ordinal":3,"reasoning_present":true}
+{"event_type":"item.completed","file_changes":[],"item_id":"claim","item_type":"agent_message","ordinal":4,"reasoning_present":false,"text":"Implemented; tests pass."}
+{"event_type":"turn.completed","file_changes":[],"ordinal":5,"reasoning_present":false}

@@ -71,7 +71,9 @@ class FrozenConfiguration(RegistryModel):
     image_identity: Sha256Digest
     application_version: str
     application_code_identity: Sha256Digest
-    runtime_probe: Literal["LOCAL_IMAGE_METADATA_ONLY"] = "LOCAL_IMAGE_METADATA_ONLY"
+    runtime_probe: Literal[
+        "LOCAL_IMAGE_METADATA_ONLY", "OPERATOR_IMAGE_ID_WORKER_RECHECK_REQUIRED"
+    ] = "LOCAL_IMAGE_METADATA_ONLY"
     provider_health: Literal["NOT_PROBED"] = "NOT_PROBED"
 
 

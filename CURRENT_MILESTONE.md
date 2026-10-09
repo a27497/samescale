@@ -1,5 +1,50 @@
 # SameScale Product — Current Milestone
 
+## Product MVP Phase 2 — keyless local acceptance — 2026-10-09
+
+Independent clean worktree/branch `codex/product-mvp-phase2-20261009`, based on
+`main@304c516e274d094888e3205666419cd3811d0912` (Phase-1 PR #7 integration). Exact base main
+Fast CI 37975224482 and Offline Regression 37975224490 rechecked SUCCESS. Current user
+permission supersedes the historical stopping points below for this phase only; commit, normal
+push and Draft PR are authorized, merge/deployment/real or paid execution are not.
+
+Implemented saved one-slot plan → separate exact plan/slot/frozen-budget authorization → durable
+single-attempt queue → independent local Worker → isolated Fake subject → actual final Workspace,
+change digests and sanitized Trace → separate hidden Docker Verifier → immutable result/Episode
+binding → private `/plans` result reads. Reuses Custom Task Store/TaskPackage, Codex H-Lane,
+Docker isolation, execution_lease/lease ownership and Episode reader. Three new append-only tables;
+original plans/Episodes/dual experiments remain unchanged. API performs authorization/query/cancel
+without Docker; a non-root readonly API container with no Docker socket and process denial sentinels
+was used in actual browser acceptance. Concurrent claims consume once; expired consumed attempts
+recover sealed evidence or become interrupted, never automatically redispatched. Cancellation and
+terminal receipts require scoped owned-container cleanup; evidence tampering fails closed.
+
+**Only operator-approved, trusted FAKE_CODEX clamp fixtures execute.** Real JSONL/Workspace and
+independent verifier checks are collected in Docker, but Codex executable/login quota, Provider,
+model and Judge are never called. Results remain CUSTOM/synthetic/NOT_ATTESTED. REAL_CODEX is
+explicitly rejected because enforceable token/USD limits and a separately authorized real boundary
+are unavailable; no environment toggle enables it. Subject timeout and separate verifier timeout
+are actual limits. Planning tokens/USD remain references; Fake has a hard zero-model-call/$0 boundary.
+
+Acceptance: 21 Phase-2 API/queue contracts; backend compatibility/CI checks; 9 actual keyless Docker
+E2E cases, including solve/failure, two timeouts, active cancellation and real Worker crashes after
+claim, during subject and after seal, plus forged recovery verdict rejection; 15 existing Codex
+boundary tests; 202 frontend tests; 39 actual Chromium browser checks. Ruff/mypy, Vue types/build,
+network-isolated offline regression (73 tests, two byte-identical replays, five outputs, zero
+external/model/Provider/Judge calls) and protection checks passed. Detailed final receipts/counts,
+source hashes, screenshots and test scopes: [Phase-2 acceptance](docs/qa/local-execution-phase2-20261009/README.md).
+Only new disposable DB/test services/data were used. No existing DB was queried or migrated.
+
+Original UI-2 17 dirty modifications / 1,494 hashes, all seven prior worktrees, fourteen prior
+services / 437 readonly mounted files and frozen evidence stay unchanged. No website or production
+configuration edits. Grok remains **NOT_CONFIRMED**. Real task admission, actual CLI/version/protocol,
+live Provider/credentials/egress, production Worker/DB roles/topology, token/USD hard cap, VM isolation
+and retention/disk quota remain unverified or unimplemented. [Operator setup and first-real gates](docs/LOCAL_EXECUTION.md).
+
+Candidate SHA/Draft PR and exact-SHA remote CI are **PENDING at this pre-publication snapshot**;
+report them separately at Git handoff. **STOP after Phase-2 handoff. No merge, deployment, real
+Codex evaluation or Phase 3.** The sections below retain their historical authorization/results.
+
 ## Product MVP Phase 1 — local acceptance — 2026-10-10
 
 Independent clean worktree/branch `codex/product-mvp-phase1-20261010`, based on

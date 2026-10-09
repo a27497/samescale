@@ -21,6 +21,7 @@ from harnesslab.experiment.cli import experiment_app, report_app, run_app
 from harnesslab.harness_lane.profile import canonical_codex_profile
 from harnesslab.harness_lane.runtime import CodexRuntime
 from harnesslab.judgelab.cli import judge_app
+from harnesslab.local_execution.cli import worker_app
 from harnesslab.model_lane.models import DirectModelOutcome, ProviderFailureCategory
 from harnesslab.model_lane.profiles import ModelProfileError, load_model_profile
 from harnesslab.model_lane.runner import DirectModelRunError, DirectModelRunner
@@ -115,6 +116,7 @@ release_v6_canary_app = typer.Typer(
 app.command("up")(up_command)
 app.command("down")(down_command)
 app.command("status")(status_command)
+app.add_typer(worker_app, name="local-worker")
 app.add_typer(task_app, name="task")
 app.add_typer(sandbox_app, name="sandbox")
 app.add_typer(model_app, name="model")

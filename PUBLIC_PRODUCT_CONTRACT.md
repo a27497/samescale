@@ -1,5 +1,33 @@
 # SameScale Product — Public Product Contract
 
+## Private local execution — MVP Phase 2 — 2026-10-09
+
+The private `/plans/:planId` journey extends saved plans with **separate one-attempt execution
+and budget authorization**, a durable local queue, independent Worker, real isolated Workspace/
+Trace capture and independent Docker Verifier. Authorization does not rewrite the plan's
+`execution_authorized=false` or any historical Episode. Exact plan/slot/configuration/application/
+task/image identities and expiry are rechecked. UUID/one-plan constraints, row locks, leases and
+local file locking prevent concurrent redispatch; consumed attempts are never automatically retried.
+Valid sealed results can recover into PostgreSQL after a crash; incomplete attempts remain
+`INTERRUPTED / NOT_VERIFIED`. Active cancellation confirms termination only after container cleanup.
+
+**Execution is keyless Fake only**, using fixed trusted code and operator-approved isolated clamp
+fixtures. The real H-Lane evidence/Verifier path runs, but no real Codex CLI, Provider, model,
+user login quota or Judge is consumed. New Episodes are `CUSTOM / synthetic / NOT_ATTESTED`.
+`REAL_CODEX` requests are rejected because enforceable live token/USD limits and a separately
+authorized provider boundary are unavailable. Zero model calls and $0 model cost are enforced
+for Fake; planning USD/tokens remain estimates. Subject process timeout and verifier timeout are
+separate limits. Actual live runtime/version/protocol, real task admission and production Worker
+operation remain unverified; this does not establish real model quality. Grok is **NOT_CONFIRMED**.
+
+The control API can run non-root/read-only without a Docker socket or process execution privilege;
+only the separate Worker needs Docker. Evidence reads check immutable result/Episode, Trace,
+Workspace and verifier bindings and reject tampering instead of replacing results. Legacy dual
+experiments, read-only Demo, historical identities and the plan-only `/execute` denial remain.
+No installation/deployment, existing DB migration, public execution endpoint, complete export or
+website publication is claimed. See [execution boundary/setup](docs/LOCAL_EXECUTION.md) and
+[actual acceptance](docs/qa/local-execution-phase2-20261009/README.md).
+
 ## Private local planning — Phase 1 — 2026-10-10
 
 `/plans` and `/plans/:planId` provide trusted local import/inspection → one compatible Codex
@@ -16,12 +44,14 @@ validation or source attestation** is claimed. Missing/invalid prior evidence bl
 
 Preflight binds task/source/Workspace, qualification, registry configuration, endpoint fingerprint,
 credential-reference availability, local image ID, application version/code identity, budgets and
-one planned attempt. Approved local image metadata is checked; actual CLI/version/protocol and
+one planned attempt. Phase-1-only mode checks local image metadata. With separate execution policy, the API uses an
+operator-pinned image ID requiring Worker reinspection; actual CLI/version/protocol and
 live Provider health are **NOT_PROBED**. Drift invalidates old preflight; blocked preflight cannot
 create a saved plan. Confirmed snapshots persist in PostgreSQL with append-only DB triggers,
 concurrent idempotence and restart-readable identities. Current drift does not rewrite originals.
 
-**Execution is disabled.** Saving creates zero Run/Episode, no queue/worker and no paid authorization.
+**Plan saving grants no execution.** It creates zero Run/Episode and no paid authorization.
+Phase 2 uses the separately authorized Fake queue above; the old plan `/execute` remains disabled.
 Existing Codex runner timeout support is recorded as a future Worker requirement; it is inactive
 here. Token and USD values are estimates/reference budgets, not hard caps or reserved quota.
 The Phase-1 confirm action cannot authorize a later execution. Real task/Provider/Verifier execution,
