@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "checks": {
+    "non_root": true,
+    "read_only_root": true,
+    "not_privileged": true,
+    "no_docker_socket": true,
+    "no_devices": true,
+    "capabilities_dropped": true,
+    "no_new_privileges": true,
+    "loopback_only_bind": true
+  },
+  "subprocess_denial_sentinels": true,
+  "scope": "Acceptance API only; not deployed production topology."
+}

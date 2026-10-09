@@ -22,6 +22,7 @@ from harnesslab.api.workbench_errors import (
 )
 from harnesslab.custom_eval.api import router as custom_eval_router
 from harnesslab.demo.integrity import DemoIntegrityError, load_bundle
+from harnesslab.local_execution.api import router as local_execution_router
 from harnesslab.local_plans.api import router as local_plans_router
 
 
@@ -89,6 +90,7 @@ def create_app(*, workbench_dist: Path | None = None) -> FastAPI:
 
     application.include_router(local_configuration_router, prefix="/api")
     application.include_router(local_plans_router, prefix="/api")
+    application.include_router(local_execution_router, prefix="/api")
     application.include_router(health_router, prefix="/api")
     application.include_router(analyst_router, prefix="/api")
     application.include_router(workbench_router, prefix="/api")

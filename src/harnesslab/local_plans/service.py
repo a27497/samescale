@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import subprocess
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
@@ -113,8 +114,17 @@ def assess(
         "PROVIDER_NOT_KNOWN_BLOCKED",
         provider.health_status.value not in {"UNAVAILABLE", "QUOTA_EXHAUSTED"},
     )
-    image = local_image_identity(harness.image_reference)
-    check("PINNED_LOCAL_IMAGE_PRESENT", image is not None)
+    worker_recheck = bool(os.environ.get("HARNESSLAB_LOCAL_EXECUTION_POLICY"))
+    # Execution-enabled API processes require no Docker socket or CLI privilege.
+    image = (
+        policy.runtime_images.get(harness.image_reference)
+        if worker_recheck
+        else local_image_identity(harness.image_reference)
+    )
+    check(
+        "OPERATOR_RUNTIME_IMAGE_ID_PRESENT" if worker_recheck else "PINNED_LOCAL_IMAGE_PRESENT",
+        image is not None,
+    )
     check(
         "LOCAL_RUNTIME_IMAGE_APPROVED",
         image is not None and policy.runtime_images.get(harness.image_reference) == image,
@@ -132,6 +142,11 @@ def assess(
     if not all(c.passed for c in checks) or image is None:
         return None, tuple(checks)
     configuration = FrozenConfiguration(
+        runtime_probe=(
+            "OPERATOR_IMAGE_ID_WORKER_RECHECK_REQUIRED"
+            if worker_recheck
+            else "LOCAL_IMAGE_METADATA_ONLY"
+        ),
         provider=FrozenProvider.model_validate(provider.model_dump(mode="json")),
         model=FrozenModelProfile.model_validate(model.model_dump(mode="json")),
         harness=harness,
@@ -184,7 +199,11 @@ def assess(
             "wall_time_seconds": "EXISTING_CODEX_RUNNER_TIMEOUT_SUPPORTED_WORKER_MUST_APPLY",
             "output_tokens_estimate": "ESTIMATE_ONLY_NOT_ENFORCED_BY_CODEX",
             "cost_budget_usd": "REFERENCE_ONLY_NO_HARD_COST_CAP_OR_RESERVATION",
-            "active_enforcement": "NONE_PHASE1_EXECUTION_DISABLED",
+            "active_enforcement": (
+                "NONE_PLAN_ONLY_SEPARATE_EXECUTION_AUTHORIZATION_REQUIRED"
+                if worker_recheck
+                else "NONE_PHASE1_EXECUTION_DISABLED"
+            ),
         },
         "workspace_policy": "ISOLATED_COPY_REQUIRED_HIDDEN_ASSETS_EXCLUDED",
     }

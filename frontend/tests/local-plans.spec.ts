@@ -6,6 +6,7 @@ import type { PlanDetail, PlanMaterial, PreflightReceipt, TaskInspection } from 
 import LocalPlansView from '@/views/LocalPlansView.vue'
 import { preferences } from '@/composables/preferences'
 
+vi.mock('@/api/localExecution', () => ({ localExecutionApi: { status: vi.fn().mockResolvedValue({ enabled: false }), state: vi.fn().mockResolvedValue({ status: 'NOT_AUTHORIZED', attempt: null, result: null }), authorize: vi.fn(), cancel: vi.fn() } }))
 vi.mock('@/api/localPlans', () => ({ localPlansApi: Object.fromEntries(['status', 'sources', 'tasks', 'importTask', 'inspect', 'configurations', 'preflight', 'save', 'plans', 'plan'].map(k => [k, vi.fn()])) }))
 const digest = 'sha256:'+'a'.repeat(64)
 const task: TaskInspection = { reference: 'local-task@1.0.0', task_owner: 'Developer', task_category: 'engineering', task_identity: digest, workspace_identity: digest, verifier_identity: digest, oracle_identity: digest, managed_snapshot_identity: digest, source_root_id: 'trusted', source_relative_path: 'local-task/1.0.0', source_identity: digest, structural_validation: 'PASS', behavioral_validation: 'TRUSTED_PRIOR_RESULT', qualification_identity: digest, eligible_for_planning: true, reason_codes: [], verifier_executed: false }
@@ -64,7 +65,7 @@ describe('Private Phase-1 local planning', () => {
     const { wrapper } = await unlocked(); await wrapper.get('[data-test="source"]').setValue('0')
     await wrapper.get('[data-test="import"]').trigger('click'); await flushPromises()
     expect(localPlansApi.importTask).toHaveBeenCalledWith('trusted', 'local-task/1.0.0', 'local-operator-placeholder')
-    expect(wrapper.text()).toContain('本轮未执行 Verifier'); expect(wrapper.text()).toContain('摘要不认证来源')
+    expect(wrapper.text()).toContain('任务检查不执行 Verifier'); expect(wrapper.text()).toContain('摘要不认证来源')
   })
   it('saves exactly one plan only after explicit confirmation and reads its persisted detail', async () => {
     const { wrapper, router } = await checked()
@@ -133,6 +134,6 @@ describe('Private Phase-1 local planning', () => {
   })
   it('retains the same plan-only boundary in English', async () => {
     preferences.language = 'en-US'; const { wrapper } = await unlocked('/plans/plan-1')
-    expect(wrapper.text()).toContain('execution not authorized'); expect(wrapper.text()).toContain('not a hard cap')
+    expect(wrapper.text()).toContain('execution authorization below'); expect(wrapper.text()).toContain('not a hard cap')
   })
 })

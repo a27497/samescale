@@ -12,7 +12,12 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from harnesslab.contracts.common import Identifier, NetworkPolicy, Sha256Digest
 from harnesslab.contracts.provider import ProviderProvenance
 from harnesslab.contracts.task import ResourceBudget
-from harnesslab.sandbox.models import ImageIdentity, SandboxArtifactManifest, SandboxStatus
+from harnesslab.sandbox.models import (
+    ImageIdentity,
+    SandboxArtifactManifest,
+    SandboxStatus,
+    VerifierLifecycleDiagnostics,
+)
 
 
 class HarnessFailureCategory(StrEnum):
@@ -447,6 +452,9 @@ class HarnessLaneEvidence(BaseModel):
     verifier_artifact_digest: Sha256Digest | None = None
     verifier_passed: bool | None = None
     verifier_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    verifier_lifecycle: VerifierLifecycleDiagnostics | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     outcome: HarnessLaneOutcome
     summary: str = Field(min_length=1, max_length=500)
 

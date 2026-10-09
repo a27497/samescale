@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "checks": {
+    "immutable_plan_same_after_DB_API_restart": true,
+    "authorization_same_after_restart": true,
+    "result_and_episode_identical_after_restart": true,
+    "terminal_single_attempt_not_redispatched": true
+  },
+  "plan_id": "plan-130451dbd5baea0b593d9bc996412350",
+  "result_digest": "sha256:e2a290679b3ebf9a716dcf3b02f2035664de1614120b5d57f88bbde24db5c47f",
+  "model_calls": 0,
+  "scope": "Only own disposable DB and socketless API restarted; no Worker invoked."
+}

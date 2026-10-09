@@ -15,6 +15,11 @@ from harnesslab.db.models.experiment import (
     ExperimentRunRecord,
 )
 from harnesslab.db.models.judgelab import JudgeCalibrationRecord, JudgeEvaluationRecord
+from harnesslab.db.models.local_execution import (
+    LocalExecutionAttemptRecord,
+    LocalExecutionAuthorizationRecord,
+    LocalExecutionResultRecord,
+)
 from harnesslab.db.models.local_plan import LocalPlanPreflightRecord, LocalTaskPlanRecord
 from harnesslab.db.models.registry import (
     LocalConnectionRecord,
@@ -44,6 +49,9 @@ __all__ = [
     "JudgeEvaluationRecord",
     "LocalConnectionRecord",
     "LocalCredentialRecord",
+    "LocalExecutionAttemptRecord",
+    "LocalExecutionAuthorizationRecord",
+    "LocalExecutionResultRecord",
     "LocalHarnessConfigurationRecord",
     "LocalModelConfigurationRecord",
     "LocalPlanPreflightRecord",

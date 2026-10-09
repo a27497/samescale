@@ -176,6 +176,9 @@ class DockerCodexBackend:
         )
         return tuple(arguments)
 
+    def container_name(self, plan: CodexExecutionPlan) -> str:
+        return f"harnesslab-codex-{uuid4().hex}"
+
     async def run(self, plan: CodexExecutionPlan) -> CodexProcessCapture:
         if not self.explicitly_enabled:
             raise HarnessAdapterError(
@@ -192,7 +195,7 @@ class DockerCodexBackend:
         except BaseException as exc:
             raise self._failure(CodexBackendFailurePhase.UNKNOWN, started=started) from exc
         cli = _DockerCLI(output_limit=1_000_000, environment=environment)
-        name = f"harnesslab-codex-{uuid4().hex}"
+        name = self.container_name(plan)
         container_environment = dict(self.credentials)
         for target, source in plan.environment_references:
             if source not in self.credentials:

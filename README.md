@@ -9,11 +9,21 @@ SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回
 
 **[打开只读 Recruiter Demo](https://getsamescale.com/demo/)** · [下载离线 HTML](docs/recruiter/demo/index.html) · [4 分钟讲解稿](docs/RECRUITER_DEMO.md)
 
+## 私有本地执行与验收（MVP Phase 2）
+
+从 `/plans/:planId` 单独确认一次执行与冻结预算，交给**独立本地 Worker**。当前仅允许零模型调用的
+隔离 Fake Codex：实际容器修改 Workspace、采集脱敏 Trace，再由独立 Docker Verifier 判断。
+结果、失败分类和证据摘要可读取；并发与重复请求不会多次领取，崩溃后保全/恢复而不自动重跑。
+
+**真实 Codex 默认关闭并拒绝授权**：token/费用尚无硬限制，计划参考预算不是执行上限。
+Fake 结果不能证明真实模型能力、真实任务准入或生产 Worker 可用；没有部署或修改现有数据库。
+[执行边界与本地 Worker](docs/LOCAL_EXECUTION.md) · [Phase 2 实际验收](docs/qa/local-execution-phase2-20261009/README.md)
+
 ## 私有本地任务计划（MVP Phase 1）
 
 在自己的本地工作区打开 **`/plans`**：可信本地任务导入/检查 → 一个 Codex 配置 → 预检 → 明确确认 → 保存、刷新或重启后查看不可变计划。导航的首个产品入口是“本地评测计划”；调查与只读 Demo 保留。
 
-本阶段只保存一次计划尝试，**不创建 Run/Episode，不执行 Agent、Provider 或 Verifier**。结构检查不等于行为验收；缺少可信历史 qualification/validation、固定镜像身份或预算时会阻塞。费用/token 仅供参考，确认计划不授权未来付费执行。
+Phase 1 的计划保存只记录一次计划尝试，**不创建 Run/Episode，不执行 Agent、Provider 或 Verifier**。结构检查不等于行为验收；缺少可信历史 qualification/validation、固定镜像身份或预算时会阻塞。费用/token 仅供参考，确认计划不授权未来付费执行。
 
 [配置可信任务与私有工作区](docs/LOCAL_PLANNING.md) · [Phase 1 验收与限制](docs/qa/local-plans-phase1-20261010/README.md)
 
