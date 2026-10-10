@@ -54,7 +54,8 @@ COPY --chown=10001:10001 profiles/ profiles/
 COPY --chown=10001:10001 release/ release/
 COPY --chown=10001:10001 scripts/ scripts/
 COPY --chown=10001:10001 tasks/ tasks/
-COPY --chown=10001:10001 alembic.ini pyproject.toml uv.lock README.md rules.md ./
+COPY --chown=10001:10001 alembic.ini pyproject.toml uv.lock README.md rules.md LICENSE LICENSE_SCOPE.md BRAND_ASSETS.md CONTRIBUTING.md THIRD_PARTY_NOTICES.md ./
+COPY --chown=10001:10001 licenses/ licenses/
 COPY --from=workbench-build --chown=10001:10001 /build/frontend/dist/ frontend/dist/
 COPY --chown=10001:10001 docker/product/healthcheck.py /opt/harnesslab/docker/product/healthcheck.py
 
