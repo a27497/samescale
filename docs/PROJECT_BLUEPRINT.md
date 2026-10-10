@@ -1,5 +1,21 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## Authorized source licensing — 2026-10-10
+
+Use current remote main@1061ddd7b13288f27e6d0545c8d6f6467278073b in an independent clean worktree;
+leave PR #10 and every existing worktree unchanged. Audit contribution history, original notices,
+dependencies, brand and archived content; define the Apache-2.0 project-source Work and explicit
+exceptions before publication. Preserve MIT/template/third-party notices and exact brand/evidence
+bytes. Add the unmodified ASF LICENSE, appropriate scope/brand/contribution/third-party materials
+and metadata/packaging without changing runtime behavior. Verify bytes, scope, links, notices,
+existing compatibility/CI and protection, then commit/push a new branch/Draft PR and check exact-SHA
+CI if no source-license conflict blocks publication. Unclear important material must not be
+relicensed; unsafe publication stops with concrete file/rights questions. Website license, live
+Agent/Provider/credentials, existing DB migration, deployment, main merge and Phase 3 are excluded.
+Live audit/results belong to CURRENT_MILESTONE; [license audit](licensing/AUDIT.md) owns supporting
+rights evidence, scope limits and separate binary-distribution gates. STOP after Draft PR/CI.
+The dated authorizations below retain their historical scope.
+
 ## 当前授权：Phase 2.5 订阅执行准备 — 2026-10-10
 
 从 `main@3cbefb6731d07c6eddb3463c895eeef60b2f0fd9` 新建独立干净 worktree，连续完成无推理的

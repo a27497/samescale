@@ -4,6 +4,12 @@
 
 *AI Coding Agent Evaluation & Diagnosis Workbench*
 
+主产品源码采用 **[Apache License 2.0](LICENSE)**，允许按其条款商业使用、修改与再分发。
+[授权文件范围](LICENSE_SCOPE.md) · [品牌资产边界](BRAND_ASSETS.md) ·
+[第三方许可与义务](THIRD_PARTY_NOTICES.md) · [贡献说明](CONTRIBUTING.md)。
+品牌名称、Logo、历史证据/归档及第三方材料不因根许可证而重新授权；官网仓库许可不变。
+添加许可证不代表已获得 OpenAI SIWC 资格、账号授权或真实执行许可。
+
 把 Coding Agent 的一次运行，转化为可检查、可诊断、可复核的工程证据。
 SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回答：实际发生了什么、哪些结果已验证、失败停在哪一层，以及保存的证据能否离线复核。它不把局部运行结果写成模型排行榜。
 

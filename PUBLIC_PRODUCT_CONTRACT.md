@@ -1,5 +1,17 @@
 # SameScale Product — Public Product Contract
 
+## Source licensing — 2026-10-10
+
+The original main product source identified by [LICENSE_SCOPE.md](LICENSE_SCOPE.md) is offered
+under the unmodified Apache License 2.0, allowing commercial use/modification/redistribution under
+its terms. This does not grant brand/artwork rights, relicense external dependencies or archived
+material, change `samescale-site` licensing, or transfer anyone else's copyright. Original third-party
+notices and excluded evidence/artwork remain preserved. Binary/asset rights are separate gates;
+see [brand policy](BRAND_ASSETS.md) and [third-party obligations](THIRD_PARTY_NOTICES.md).
+Licensing does not establish OpenAI SIWC eligibility, account access, OAuth consent or real runtime
+readiness. Real execution remains closed. No functionality/deployment/DB change is claimed.
+The dated records below retain their historical scope.
+
 ## ChatGPT subscription preparation — Phase 2.5 — 2026-10-10
 
 Real execution remains **closed by a code gate**. Subscription access requires neither an API key

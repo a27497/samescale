@@ -1,0 +1,38 @@
+{
+  "archive_path": "docs/evidence/s2-offline-replay-20260921/representative-bundles.zip",
+  "archive_sha256": "ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+  "entries": 513,
+  "preserved_licenses": [
+    {
+      "path": "bundles/claude/baseline/LICENSE",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2026 a27497",
+      "sha256": "883ac804c764105794d6f781d032ddea9ac3e6cbd21b1f8005f2f6a8ea465680"
+    },
+    {
+      "path": "bundles/claude/run/workspace/LICENSE",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2026 a27497",
+      "sha256": "883ac804c764105794d6f781d032ddea9ac3e6cbd21b1f8005f2f6a8ea465680"
+    },
+    {
+      "path": "bundles/codex/baseline/LICENSE",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2026 a27497",
+      "sha256": "883ac804c764105794d6f781d032ddea9ac3e6cbd21b1f8005f2f6a8ea465680"
+    },
+    {
+      "path": "bundles/codex/run/verifier/workspace/LICENSE",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2026 a27497",
+      "sha256": "883ac804c764105794d6f781d032ddea9ac3e6cbd21b1f8005f2f6a8ea465680"
+    },
+    {
+      "path": "bundles/codex/run/workspace/LICENSE",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2026 a27497",
+      "sha256": "883ac804c764105794d6f781d032ddea9ac3e6cbd21b1f8005f2f6a8ea465680"
+    }
+  ],
+  "root_apache_grant": false
+}

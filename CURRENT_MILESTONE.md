@@ -1,5 +1,42 @@
 # SameScale Product — Current Milestone
 
+## Apache-2.0 source licensing — 2026-10-10
+
+Independent clean worktree/branch `codex/apache2-license-20261010`, exact remote main base
+`1061ddd7b13288f27e6d0545c8d6f6467278073b`. Current authorization covers copyright/asset/dependency
+audit, source-license integration, offline acceptance and a new Draft PR/CI only. PR #10 remains
+an independent unmerged change and its worktree is untouched; no merge, site/license change,
+existing DB migration, deployment, real Agent/Provider, auth-file access or Phase 3 is authorized.
+
+Complete unmodified ASF Apache-2.0 text is attached to the explicitly defined original project
+source. Two Alembic template-derived files retain MIT; 14 exact brand files and 557 historical
+artifact files receive no new Apache grant. All original artwork/evidence bytes and inherited MIT
+archive notices are preserved. Git records 225 main commits under one author name; attribution
+is not an independent legal assignment. No company, employer permission or third-party ownership
+is invented. [Exact source and exclusion scope](LICENSE_SCOPE.md), [brand boundary](BRAND_ASSETS.md).
+
+All 282 npm and 72 external Python lock entries are inventoried. Applicable observed notices,
+including ECharts ASF NOTICE, are retained verbatim; no root NOTICE is created merely by choosing
+Apache-2.0. LGPL/MPL/native-wheel terms remain separate. Binary-specific source/relinking, optional
+platform/OS/tool and lodash-unified upstream-notice gates remain unverified; they do not grant
+SameScale rights over dependencies. No observed conflict blocks the bounded first-party source
+license. [Audit and outstanding distribution conditions](docs/licensing/AUDIT.md).
+
+License metadata, legal-file packaging and documentation change only; application source, APIs,
+tasks, model controls, dependency versions and product design remain unchanged. Actual acceptance: **32 existing distribution/lifecycle/CI contracts PASS**, **73 offline replay
+checks PASS**, 372 exact-byte notice references and complete ASF LICENSE verified. Ruff/format
+**820 files**, mypy **416 sources**, links/credential scan PASS. Wheel metadata/legal files verified;
+all **60 preexisting frontend build files byte-identical**, with only the static notice file added.
+**955 original program/task/configuration files**, dependency versions/edges/integrities and **419
+frozen files** stay unchanged. All **10 existing worktrees** including PR #10, UI-2 **17 entries /
+1,494 hashes**, **58 containers**, developer auth metadata and **364 website tracked files** are
+unchanged. No existing DB was accessed/migrated, and no deployment or real Agent/Provider ran.
+[Actual validation receipt](docs/licensing/validation.json) retains scope and initial helper
+corrections. Candidate SHA/Draft PR/exact-SHA CI are reported separately after publication. Source licensing does not establish
+OpenAI SIWC/account qualification or actual OAuth consent. REAL_CODEX remains closed.
+**STOP after license Draft PR/CI; no merge, real evaluation, deployment or Phase 3.**
+The dated records below retain their historical authorization and results.
+
 ## Phase 2.5 — ChatGPT subscription preparation — 2026-10-10
 
 Independent clean worktree/branch `codex/product-phase25-subscription-20261010`, based on
