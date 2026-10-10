@@ -1,5 +1,11 @@
 # SameScale
 
+Private saved Codex evidence: `/external-runs` accepts individually approved saved native hooks,
+H-Lane bundles or provided `exec --json` streams and final source snapshots. It exposes independent
+Workspace checks and deterministic diagnosis/export/replay without rerunning an Agent or taking over
+subscription login. Missing trusted task/verifier evidence stays `NOT_VERIFIED`; REAL_CODEX remains
+closed. [Setup, safety boundaries and limitations](docs/EXTERNAL_CODEX_EVIDENCE.md).
+
 **AI Coding Agent 运行验证与诊断工作台**
 
 *AI Coding Agent Evaluation & Diagnosis Workbench*
