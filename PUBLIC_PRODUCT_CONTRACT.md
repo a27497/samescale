@@ -1,5 +1,20 @@
 # SameScale Product — Public Product Contract
 
+## Phase 2.6 — SIWC offline preparation — 2026-10-10
+
+REAL_CODEX stays unconditionally closed. The public repository has no detected root license;
+license/copyright authority, SIWC integration/account/workspace eligibility and separate actual OAuth
+consent remain unconfirmed. Public source and development CLI login do not establish these gates.
+An operator-only controller models client/host/scope/credential lifecycle with synthetic OAuth,
+strict public Responses requirements and no live transport. Its HMAC fixture signature is not
+OpenAI JWKS validation. Safe synthetic auth receipts reuse the existing Fake execution/evidence path;
+canary isolation and offline Runtime compatibility do not certify real credential safety or model access.
+No real credential store read/import, OAuth/account/quota/model RPC or refresh is performed.
+No credit purchase, existing DB migration, deployment, main merge or Phase 3 is included.
+[Applicability, implemented boundary and independent first-real gates](docs/SIWC_AUTH_BOUNDARY.md).
+The dated records below retain their historical scope.
+
+
 ## ChatGPT subscription preparation — Phase 2.5 — 2026-10-10
 
 Real execution remains **closed by a code gate**. Subscription access requires neither an API key

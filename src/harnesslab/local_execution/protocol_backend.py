@@ -99,6 +99,12 @@ class OfflineProtocolCodexBackend(DockerCodexBackend):
         script = control / "broker.py"
         script.write_bytes(Path(__file__).with_name("subscription_protocol.py").read_bytes())
         script.chmod(0o644)
+        if self.policy.siwc_stub:
+            from harnesslab.local_execution.siwc_contract import host_id
+
+            module = control / "siwc_contract.py"
+            module.write_bytes(Path(__file__).with_name("siwc_contract.py").read_bytes())
+            module.chmod(0o644)
         limits = self.policy.protocol_limits
         assert limits is not None
         spec = {
@@ -109,6 +115,9 @@ class OfflineProtocolCodexBackend(DockerCodexBackend):
             "wall_time_seconds": min(plan.timeout_seconds, limits.wall_time_seconds),
             "scenario": self.policy.protocol_scenario,
         }
+        if self.policy.siwc_stub:
+            spec["siwc_stub"] = True
+            spec["siwc_host_id"] = host_id(self.policy.runtime_root / "siwc-host")
         (control / "policy.json").write_text(json.dumps(spec))
         (control / "policy.json").chmod(0o644)
         try:

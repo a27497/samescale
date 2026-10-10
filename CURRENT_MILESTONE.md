@@ -1,5 +1,60 @@
 # SameScale Product — Current Milestone
 
+## Phase 2.6 — SIWC applicability and offline auth — 2026-10-10
+
+Independent clean worktree/branch `codex/product-phase26-siwc-20261010`, base
+`main@1061ddd7b13288f27e6d0545c8d6f6467278073b` (Phase-2.5 merge, original commit preserved).
+Exact base Fast CI 38028817388 / Offline Regression 38028817372 rechecked SUCCESS.
+Current authorization permits official-document research, synthetic offline implementation/acceptance,
+commit/push and Draft PR only; no license selection, actual OAuth/account/quota/model RPC, credential
+read/copy/import, live refresh/inference, runtime upgrade, existing DB migration, deployment, merge or Phase 3.
+
+Current official SIWC OSS/local/self-hosted, client/host, account/session, app-server, token and preview
+contracts were fetched. Repository PUBLIC / GitHub detected license null / no root license candidates.
+Licensing/copyright authority, intended integration eligibility and account/workspace access remain
+NOT_CONFIRMED. Separate product OAuth consent and real credential access remain NOT_AUTHORIZED.
+Development CLI login is neither a product grant nor account eligibility. No license is added.
+[Official applicability and independent first-real gates](docs/SIWC_AUTH_BOUNDARY.md).
+
+Frozen **0.149.0 / 0.153.4** accepted SameScale clientInfo initialize/initialized under hardened
+network-none Docker and empty disposable CODEX_HOME. No auth/thread/turn/model RPC was sent; image
+IDs remain pinned. This is initialization compatibility only, not SIWC entitlement/routing proof.
+The documented env_key / external-token child-process recipes violate our current Subject boundary;
+neither is enabled. No development CLI auth store is read.
+
+The existing protocol controller now owns a synthetic OAuth issuer/session, stable app-defined UUID
+host, separate registration/client identity, state/nonce/PKCE, fixture-signature and granted-scope checks,
+explicit serialized token rotation and synthetic revocation/VM transfer semantics. HMAC fixture claims
+are **not OpenAI JWKS verification**. Evaluation pins auth through one physical attempt; renewal,
+switching, logout and replay are refused after consumption. Credentials stay in controller memory;
+Subject/tools/Verifier/Workspace/Trace/API get only bounded safe receipts. Reflection and unsafe host
+storage fail closed. No real credential loader, OAuth listener, outbound transport or new Worker exists.
+
+Strict SIWC store/stream/input/tool/unsupported-field controls and failed/incomplete streams reuse
+Phase-2.5 limits/Worker/Verifier and durable debit/cancel/recovery. Frozen CLI native client_metadata
+was initially rejected; the explicit adapter omits it and supplies trusted originator, without changing
+input/history, tools or budgets. All other unsupported/unknown fields deny. Malformed HTTP ingress is
+counted once even if parsing fails after controller entry. Optional SIWC policy defaults preserve old
+Fake policy identities and schema-1 receipts; new bounded schema-2 auth receipts reject tampering.
+Results remain **FAKE_CODEX / CUSTOM / synthetic / NOT_ATTESTED**, zero actual model/Provider calls.
+Token/quota are availability observations, not hard spending caps; no extra-credit purchase exists.
+
+Final local acceptance: **221 distinct backend cases** across a 218-pass broad batch and a final
+67-pass auth/ingress batch (64 repeated + 3 new cases); 22 protocol Docker cases include 13 SIWC.
+Full Ruff/format **817 files**, mypy **418 sources**, credential/boundary/link checks PASS. Offline
+replay **73 PASS**, two byte-identical passes/five outputs and zero external/model/Provider/Judge
+calls. Frozen guard **419 BEFORE == AFTER**. No local frontend/browser campaign is claimed.
+[Actual logs, source bindings, corrections and safe receipts](docs/qa/siwc-phase26-20261010/README.md).
+
+All **9 prior worktrees**, UI-2 **17 dirty entries / 1,494 hashes**, **58 prior containers** and
+developer auth metadata remain unchanged. Only a new tmpfs test PostgreSQL was migrated and removed;
+no existing database, deployment, service/site or development auth state changed. This is a
+pre-publication snapshot; candidate SHA/Draft PR/exact-SHA CI are reported separately at Git handoff.
+**REAL_CODEX CLOSED; live license/account/OAuth/JWKS/storage/route/quota/request-control gates remain.
+STOP after Phase-2.6 offline acceptance and Draft PR/CI; no real evaluation or Phase 3.**
+The dated records below retain their original authorization/results.
+
+
 ## Phase 2.5 — ChatGPT subscription preparation — 2026-10-10
 
 Independent clean worktree/branch `codex/product-phase25-subscription-20261010`, based on

@@ -1,5 +1,18 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## Phase 2.6 — SIWC applicability and offline trusted auth (authorized 2026-10-10)
+
+Base main@1061ddd7b13288f27e6d0545c8d6f6467278073b. Audit current official OSS, app-server,
+VM/lifecycle/preview contracts; retain license, account/workspace and real OAuth as independent gates.
+Extend the existing controller with synthetic client/host/scopes/lifecycle, strict Responses admission
+and bounded auth receipts; reuse Worker, Runner, Verifier, single-attempt queue and crash recovery.
+Verify isolated protocol doubles, legacy Fake/evidence compatibility and credential canary protection.
+Use only a disposable DB and pinned local images. No real auth/RPC/refresh/inference, CLI auth-file
+access, upgrade, license choice, deployment, existing DB migration, main merge or Phase 3.
+Publish a new branch/Draft PR and verify exact-SHA CI. Live state belongs to CURRENT_MILESTONE;
+[official applicability and first-real gates](SIWC_AUTH_BOUNDARY.md) define the bounded preparation.
+
+
 ## 当前授权：Phase 2.5 订阅执行准备 — 2026-10-10
 
 从 `main@3cbefb6731d07c6eddb3463c895eeef60b2f0fd9` 新建独立干净 worktree，连续完成无推理的

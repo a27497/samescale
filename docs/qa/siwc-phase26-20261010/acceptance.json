@@ -1,0 +1,51 @@
+{
+  "backend_distinct_cases": 221,
+  "base_sha": "1061ddd7b13288f27e6d0545c8d6f6467278073b",
+  "batches": {
+    "broad": {
+      "fake_docker": 9,
+      "local_execution": 21,
+      "local_plans": 75,
+      "passed": 218,
+      "protocol_docker": 22,
+      "seconds": 360.89,
+      "siwc_contract": 64,
+      "subscription_controls": 27
+    },
+    "final_auth_and_ingress": {
+      "new_malformed_ingress_cases": 3,
+      "overlap_with_broad": 64,
+      "passed": 67,
+      "seconds": 0.4
+    }
+  },
+  "format_files": 817,
+  "frontend_local": "NOT_RUN_NO_FRONTEND_CHANGES",
+  "mypy_sources": 418,
+  "offline_replay_passed": 73,
+  "openai_signature_verification": "NOT_IMPLEMENTED_SYNTHETIC_HMAC_ONLY",
+  "protocol_docker": {
+    "legacy": 9,
+    "real_model_calls": 0,
+    "runtime": "0.149.0",
+    "siwc": 13,
+    "total": 22
+  },
+  "real_oauth_account_quota_refresh_model_calls": 0,
+  "remote_ci": "PENDING_AT_PRE_PUBLICATION_SNAPSHOT",
+  "ruff": "PASS",
+  "schema_version": 1,
+  "source_digests": {
+    ".github/workflows/ci.yml": "sha256:eded2d2ea68a445d9b628b3d25ed979e20930c3364c0953ed67f1f85ae8fb0dc",
+    ".github/workflows/self-hosted-ci.yml": "sha256:b00d4be513423fc56a5a0132477497288e70c8bf41c356f30c5569a114e710d3",
+    "src/harnesslab/local_execution/evidence.py": "sha256:9f40321084d39f01ee9aa3e46941a2877575086317a028931b83eaa4030c77e9",
+    "src/harnesslab/local_execution/models.py": "sha256:25b272ad2f708543d8169e51cebe7d4fd845ae15bc6817e846cd7a3bc360bc50",
+    "src/harnesslab/local_execution/protocol_backend.py": "sha256:6cca3ab1faea8dfa57d6d28ef74a7bba728d74fd8b4f080fe24ebaa9ed598e66",
+    "src/harnesslab/local_execution/siwc_contract.py": "sha256:49c757134b6f28ead1f74b69d8a29f2f00461b6cd548cb8baefb4bf0ce664ce8",
+    "src/harnesslab/local_execution/subscription.py": "sha256:36de67b5a7c69dc6aec128f4cd957f2f76dbe597e9c97691c8c1a7a8c48bffd6",
+    "src/harnesslab/local_execution/subscription_protocol.py": "sha256:3bc0cb333e1ceb0d3a6bc1d1bc04d005af8fded8017171b66a1391ff3c3349aa",
+    "tests/test_siwc_contract.py": "sha256:c415dc6b7c89ef37f4f3b56f6c1b5245cdd07218fb3fb8099efde764705f1f34",
+    "tests/test_subscription_protocol_docker.py": "sha256:28812d73b9e0cf950e745063f0932b70d04e81aa6d1629798ad2361bfc76c2fd"
+  },
+  "status": "OFFLINE_PASS_REAL_EXECUTION_CLOSED"
+}

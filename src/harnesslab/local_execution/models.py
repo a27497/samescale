@@ -23,9 +23,18 @@ class ExecutionPolicy(RegistryModel):
     # Fake is trusted host code, not a user-provided script or an oracle reader.
     fixture_task_identities: tuple[Sha256Digest, ...] = Field(min_length=1, max_length=20)
     protocol_stub: bool = Field(default=False, strict=True)
+    siwc_stub: bool = Field(default=False, strict=True)
     protocol_limits: SubscriptionLimits | None = None
     protocol_scenario: Literal[
-        "solve", "auth_expired", "quota_exhausted", "upstream_failure", "hang"
+        "solve",
+        "auth_expired",
+        "quota_exhausted",
+        "upstream_failure",
+        "hang",
+        "siwc_scope_missing",
+        "siwc_wrong_client",
+        "siwc_stream_failed",
+        "siwc_stream_incomplete",
     ] = "solve"
     scenario: Literal["solve", "wrong_workspace", "timeout", "slow", "verifier_timeout"] = "solve"
     authorization_ttl_seconds: int = Field(default=300, ge=1, le=900, strict=True)
@@ -35,7 +44,18 @@ class ExecutionPolicy(RegistryModel):
     def offline_protocol_contract(self) -> ExecutionPolicy:
         if self.protocol_stub != (self.protocol_limits is not None):
             raise ValueError("Offline protocol execution requires explicit frozen limits")
+        if self.siwc_stub and not self.protocol_stub:
+            raise ValueError("SIWC double requires the existing isolated protocol controller")
+        if self.protocol_scenario.startswith("siwc_") and not self.siwc_stub:
+            raise ValueError("SIWC scenarios require explicit offline SIWC policy")
         return self
+
+    @model_serializer(mode="wrap")
+    def legacy_policy_identity(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        document: dict[str, Any] = handler(self)
+        if not self.siwc_stub:
+            document.pop("siwc_stub", None)
+        return document
 
     @property
     def identity(self) -> str:
