@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "status": "OFFLINE_INTEGRATION_PASS_REAL_CODEX_CLOSED",
+  "main_ci": {
+    "sha": "ffeee1b366baa61f303ebf546f0287aae3ac9be1",
+    "runs": [
+      {
+        "conclusion": "success",
+        "databaseId": 38035272260,
+        "event": "push",
+        "headSha": "ffeee1b366baa61f303ebf546f0287aae3ac9be1",
+        "name": "SameScale Offline Regression",
+        "status": "completed",
+        "url": "https://github.com/a27497/samescale/actions/runs/38035272260"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 38035272261,
+        "event": "push",
+        "headSha": "ffeee1b366baa61f303ebf546f0287aae3ac9be1",
+        "name": "HarnessLab Fast CI",
+        "status": "completed",
+        "url": "https://github.com/a27497/samescale/actions/runs/38035272261"
+      }
+    ]
+  },
+  "integrity": {
+    "main_sha": "ffeee1b366baa61f303ebf546f0287aae3ac9be1",
+    "original_pr10_head": "a3e66d55bd3c6e3fcc2389c073efb545213ecf34",
+    "canonical_license": "PASS",
+    "third_party_notice_references_verified": 372,
+    "retained_old_source_test_workflow_artifact_files": 1634,
+    "new_main_legal_packaging_files_byte_identical": 23,
+    "relative_documentation_links_verified": 136,
+    "credential_pattern_and_conflict_marker_scan": "PASS",
+    "application_runtime_controls_changed": false,
+    "historical_qa_and_audit_receipts_rewritten": false
+  },
+  "compatibility": {
+    "distinct_passed_cases": 126,
+    "first_batch_passed": 125,
+    "first_batch_setup_errors": 1,
+    "first_error": "DATABASE_URL_REQUIRED_BEFORE_DATABASE_ACCESS",
+    "corrected_case_passed": 1,
+    "correction": "NEW_ISOLATED_TMPFS_DATABASE_REMOVED",
+    "single_126_test_invocation": false
+  },
+  "offline_regression": {
+    "schema_version": 1,
+    "status": "PASS",
+    "network_namespace": {
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_routes": 0,
+      "loopback": "down"
+    },
+    "tests_passed": 73,
+    "archive_digest": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+    "inputs_digest": "sha256:d77d964fe60158da4e22ee7e60df0cfb54178a99c957298d861d977f925d0395",
+    "identical_outputs": {
+      "claude.json": "sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d",
+      "codex.json": "sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe",
+      "diagnosis.md": "sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1",
+      "offline-boundary.json": "sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097",
+      "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef"
+    },
+    "replayed_runs": 2,
+    "replay_passes": 2,
+    "external_calls": 0,
+    "provider_calls": 0,
+    "model_calls": 0,
+    "claude_calls": 0,
+    "judge_calls": 0,
+    "subject_executed": false,
+    "verifier_executed": false
+  },
+  "packaging": {
+    "license_expression": "Apache-2.0",
+    "license_file_entries": 10,
+    "canonical_license_and_scope_brand_third_party_siwc_source_byte_identical": true,
+    "wheel_sha256": "980886ed682afdd2c2e7858ce2af2f8c94fa9c281ee669c66b586b24ae0ac6b0",
+    "verification_scope": "SELECTED_LICENSE_METADATA_AND_SOURCE_FILES_NOT_FINAL_DOCUMENT_SNAPSHOT"
+  },
+  "protection": {
+    "previous_worktrees_unchanged": 11,
+    "ui2_dirty_entries": 17,
+    "ui2_file_hashes": 1494,
+    "old_pr10_worktree_head_unchanged": "a3e66d55bd3c6e3fcc2389c073efb545213ecf34",
+    "previous_containers_unchanged": 58,
+    "website_files_unchanged": 364,
+    "auth_metadata_unchanged": true,
+    "auth_content_access": false,
+    "existing_database_access_or_migration": false,
+    "deployments": 0,
+    "real_agent_provider_calls": 0,
+    "frozen_files_before_after": 419
+  },
+  "disposable_database": {
+    "test_exit_code": 0,
+    "new_disposable_container": "samescale-license-integration-20261010-test-pg",
+    "image_id": "sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+    "removed": true,
+    "storage": "tmpfs",
+    "existing_database_access": false,
+    "existing_database_migration": false,
+    "existing_container_mutation": false,
+    "real_agent_provider_execution": false
+  },
+  "helper_corrections": [
+    "WHEEL_CHECK_INITIALLY_ASSUMED_ROOT_PATHS_CORRECTED_TO_EXISTING_PYPROJECT_FORCE_INCLUDE_MAPPING_NO_PRODUCT_CHANGE"
+  ],
+  "publication": "NEW_HEAD_EXACT_SHA_CI_REPORTED_SEPARATELY_AFTER_NORMAL_PUSH",
+  "remaining_gates": [
+    "SIWC_INTEGRATION_ACCOUNT_WORKSPACE_ELIGIBILITY",
+    "SEPARATE_PRODUCT_OAUTH_CONSENT",
+    "REAL_JWKS_STORAGE_LIFECYCLE_TLS_ROUTE_QUOTA_REQUEST_RETRY_CANCELLATION",
+    "FIRST_REAL_TASK_AND_ONE_ATTEMPT_AUTHORIZATION",
+    "EXCLUDED_ARTWORK_AND_FUTURE_BINARY_DISTRIBUTION_RIGHTS"
+  ]
+}

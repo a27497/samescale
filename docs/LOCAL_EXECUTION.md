@@ -1,5 +1,9 @@
 # Private local execution — MVP Phase 2
 
+Phase 2.6 adds [official SIWC applicability and offline auth](SIWC_AUTH_BOUNDARY.md). Root licensing,
+account/integration eligibility and separate product OAuth/credential access remain independent gates;
+all real execution stays closed. Existing Fake policies and historical receipts remain readable.
+
 Phase 2.5 adds [ChatGPT subscription preparation](SUBSCRIPTION_EXECUTION.md), offline protocol
 acceptance and independent real-task admission. Real execution stays closed; subscription
 execution does not require an API key, API billing or a USD hard cap. Original Phase-2 Fake

@@ -88,9 +88,44 @@ def protocol_receipt(root: Path, auth: ExecutionAuthorization, run_id: str) -> d
         "state",
     }
     limits = auth.request.subscription_limits
+    siwc = receipt.get("siwc")
+    if siwc is not None:
+        expected.add("siwc")
+        if (
+            not isinstance(siwc, dict)
+            or set(siwc)
+            != {
+                "source",
+                "app_name",
+                "host_id_present",
+                "identity_validation",
+                "scope_validation",
+                "credential_location",
+                "authorization_code_exchanges",
+                "refreshes",
+                "revocations",
+                "live_oauth_calls",
+                "request_normalization",
+            }
+            or siwc["source"] != "OFFLINE_OAUTH_STUB"
+            or siwc["app_name"] != "SameScale"
+            or siwc["host_id_present"] is not True
+            or siwc["identity_validation"] != "SYNTHETIC_SIGNATURE_ONLY_NOT_OPENAI_JWKS"
+            or siwc["scope_validation"] not in {"SYNTHETIC_GRANTED", "NOT_VALIDATED"}
+            or siwc["credential_location"] != "CONTROLLER_MEMORY_ONLY"
+            or siwc["request_normalization"] != "OMIT_NATIVE_CLIENT_METADATA_USE_TRUSTED_ORIGINATOR"
+            or type(siwc["authorization_code_exchanges"]) is not int
+            or siwc["authorization_code_exchanges"] != 1
+            or any(
+                type(siwc[k]) is not int or siwc[k] != 0
+                for k in ("refreshes", "revocations", "live_oauth_calls")
+            )
+            or (receipt["state"] == "COMPLETED" and siwc["scope_validation"] != "SYNTHETIC_GRANTED")
+        ):
+            raise ValueError("SIWC safe receipt failed")
     if (
         set(receipt) != expected
-        or receipt["schema_version"] != 1
+        or receipt["schema_version"] != (2 if siwc is not None else 1)
         or receipt["source"] != "PROTOCOL_STUB_NO_MODEL"
         or receipt["run_id"] != run_id
         or receipt["authorization_digest"] != auth.digest
@@ -120,6 +155,15 @@ def protocol_receipt(root: Path, auth: ExecutionAuthorization, run_id: str) -> d
             "UNSUPPORTED_PROTOCOL_TOOLS",
             "REQUEST_ENVELOPE_DENIED",
             "MALFORMED_REQUEST",
+            "SIWC_AUTH_DENIED",
+            "SIWC_CONTRACT_DENIED",
+            "SIWC_RESPONSES_DENIED",
+            "SIWC_UNSUPPORTED_FIELDS",
+            "SIWC_TOOLS_DENIED",
+            "SIWC_INPUT_DENIED",
+            "AUTH_NOT_AVAILABLE",
+            "SIWC_STREAM_NOT_COMPLETED",
+            "SIWC_CREDENTIAL_REFLECTION_DENIED",
         }
     ):
         raise ValueError("Protocol receipt binding/control failure")

@@ -1,5 +1,145 @@
 # SameScale Product — Current Milestone
 
+## Current state — Phase 2.6 readiness consistent / REAL_CODEX closed — 2026-10-10
+
+Base main@ffeee1b366baa61f303ebf546f0287aae3ac9be1; original integration Head
+`a7fbaf49e19ad3b44004d20fbc76ff9b75ddedc2`. The merged root source license is Apache-2.0 under
+[the explicit scope](LICENSE_SCOPE.md). Brand/artwork, third-party terms and excluded historical
+material remain independent; the website license is unchanged. Licensing is not SIWC/account eligibility.
+
+`real_execution_readiness()` now declares integrated `project_source_license` with separate brand/
+third-party boundaries. `OSS_LICENSE_NOT_CONFIRMED` is removed and `siwc_applicability` reports
+`PENDING_ACCOUNT_AND_INTEGRATION_ELIGIBILITY`. REAL_CODEX remains unconditionally disabled, including
+when an enablement environment variable is set; no account/quota/token/credential reads or live
+transport are introduced. Existing auth/queue/Worker/Fake control behavior is unchanged.
+
+SIWC integration/account/workspace eligibility, separate product OAuth consent, real JWKS/storage/
+lifecycle, trusted credential isolation, actual route/quota and complete live request/retry/cancellation
+controls remain unverified. Token/quota are observations; no extra-credit purchase or API-key/USD
+prerequisite is introduced. First real task/model/image/route and one attempt require separate authorization.
+
+Targeted acceptance: **148 distinct cases PASS** across 147 passes in the initial batch and the
+one ledger-trigger case passed after migrating a new tmpfs test database; the two initial test-launch/
+DB-prerequisite corrections are recorded, not counted as passes. All new temporary containers are removed.
+**73 offline replay checks PASS**, two byte-identical passes and zero external/model/Provider/Judge calls.
+Focused Ruff/format (2 files), full mypy (418 sources), 123 relative document links and credential scan PASS.
+**1,650 original source/test/workflow/asset/legal/history files** retain bytes. The denial function and
+other subscription logic retain their AST; only readiness metadata and the related contract tests change.
+All **11 other worktrees**, UI-2 **17 entries / 1,494 hashes**, **58 prior containers**, **419 frozen files**,
+developer auth metadata and **364 website files/head/status** remain unchanged. No existing DB access/
+migration, credential content, real Agent/Provider or deployment. [Final readiness receipt](docs/licensing/readiness-final.json)
+retains the current source bindings and initial corrections; older receipts remain historical.
+Exact candidate/push/PR and final merge/main CI are separate Git handoff facts. This final authorization allows Ready/merge commit only after exact-SHA CI
+and review/conflict checks pass, then merged-tree/main-CI/protection verification. No real evaluation,
+existing DB migration, deployment, website or auth-state changes or Phase 3. STOP at Git handoff.
+
+## Historical Git integration and acceptance snapshots
+
+The following sections retain observations and permissions at their original bases. Their Draft/merge
+stopping points and pre-license facts are historical; they do not govern this final Git authorization.
+Frozen Phase-2.6 and license receipts remain unchanged. Only the current readiness implementation and
+its related tests are corrected; older source-bound receipts still describe their original source bytes.
+
+## Current state — Apache-2.0 merged / Phase 2.6 Draft integration — 2026-10-10
+
+PR #11 is merged using merge commit `ffeee1b366baa61f303ebf546f0287aae3ac9be1`, retaining
+`c967cbf9e5bf2f0fd7b9ef566a17e55d8308968e` and the original main parent. The merged tree is
+byte-identical to the reviewed license Head. Exact new-main [Fast CI](https://github.com/a27497/samescale/actions/runs/38035272261)
+and [Offline Regression](https://github.com/a27497/samescale/actions/runs/38035272260) are SUCCESS.
+GitHub now detects **Apache-2.0** and the complete LICENSE retains its canonical byte digest.
+Original project source is licensed under [Apache-2.0 and its defined scope](LICENSE_SCOPE.md);
+[brand artwork](BRAND_ASSETS.md), historical artifacts, MIT templates and third-party rights remain
+separate. The website license is unchanged. Brand ownership and future binary-distribution/notice
+conditions in [the original license audit](docs/licensing/AUDIT.md) are not certified by this merge.
+
+PR #10 remains **Draft / unmerged**. Its original commit
+`a3e66d55bd3c6e3fcc2389c073efb545213ecf34` is retained; new main is integrated by a merge in
+`codex/phase26-license-integration-20261010`, a separate clean worktree. The original Phase-2.6
+worktree remains at its original HEAD. Normal push only; no squash, rebase, force push or deployment.
+Phase-2.6 source/tests/workflows and its frozen acceptance receipts retain their original bytes.
+Its **221 distinct backend cases / 22 offline protocol Docker cases / 73 replay checks** remain
+historical observed results, not a new run or live OAuth/credential qualification.
+
+**REAL_CODEX stays unconditionally CLOSED.** The source-license decision is now recorded, but
+SIWC integration/account/workspace eligibility, separate product OAuth consent, real JWKS/storage/
+lifecycle, actual route/quota and complete live request/retry/cancellation controls remain unverified.
+No credential content, actual OAuth/account/quota/refresh/model RPC or real Agent/Provider is accessed.
+Token/quota stay observations; no extra-credit purchase or API-key/USD prerequisite is introduced.
+Integration acceptance: **126 distinct existing tests PASS** (125 passed in the first batch; one HTTP
+refusal case initially lacked DATABASE_URL and then passed against a new tmpfs PostgreSQL, removed).
+**73 offline replay checks PASS**, two byte-identical passes and zero external/model/Provider/Judge calls.
+**1,634 original source/test/workflow/artifact files**, **23 new-main legal/packaging files** and 372
+notice references retain exact bytes; 136 relative documentation links and credential/conflict scan PASS.
+Wheel Apache metadata, canonical license, exception/notice files and SIWC source verified. **419 frozen
+files**, all **11 previous worktrees**, UI-2 **17 entries / 1,494 hashes**, **58 containers**, auth metadata
+and **364 website files/head/status** unchanged. No existing DB access/migration or auth-content access.
+[Integration receipt](docs/licensing/phase26-integration.json) records actual batches, the initial setup
+error, helper correction and preservation. Exact new-Head CI is reported separately after normal push.
+Only this Git integration and offline compatibility acceptance are authorized. STOP after normal push
+and exact-SHA CI; no PR #10 merge, existing DB migration, site change, deployment or Phase 3.
+
+## Historical acceptance snapshots — preserved original facts
+
+The following Phase-2.6 and licensing snapshots describe their original base, authorization and
+observations. In particular, Phase-2.6's no-root-LICENSE observation was true at main@1061ddd;
+it is **not current status**. Original audit/QA receipts remain unchanged; these records do not
+supersede the current source license or grant real execution permission.
+
+## Phase 2.6 — SIWC applicability and offline auth — 2026-10-10
+
+Independent clean worktree/branch `codex/product-phase26-siwc-20261010`, base
+`main@1061ddd7b13288f27e6d0545c8d6f6467278073b` (Phase-2.5 merge, original commit preserved).
+Exact base Fast CI 38028817388 / Offline Regression 38028817372 rechecked SUCCESS.
+Current authorization permits official-document research, synthetic offline implementation/acceptance,
+commit/push and Draft PR only; no license selection, actual OAuth/account/quota/model RPC, credential
+read/copy/import, live refresh/inference, runtime upgrade, existing DB migration, deployment, merge or Phase 3.
+
+Current official SIWC OSS/local/self-hosted, client/host, account/session, app-server, token and preview
+contracts were fetched. Repository PUBLIC / GitHub detected license null / no root license candidates.
+Licensing/copyright authority, intended integration eligibility and account/workspace access remain
+NOT_CONFIRMED. Separate product OAuth consent and real credential access remain NOT_AUTHORIZED.
+Development CLI login is neither a product grant nor account eligibility. No license is added.
+[Official applicability and independent first-real gates](docs/SIWC_AUTH_BOUNDARY.md).
+
+Frozen **0.149.0 / 0.153.4** accepted SameScale clientInfo initialize/initialized under hardened
+network-none Docker and empty disposable CODEX_HOME. No auth/thread/turn/model RPC was sent; image
+IDs remain pinned. This is initialization compatibility only, not SIWC entitlement/routing proof.
+The documented env_key / external-token child-process recipes violate our current Subject boundary;
+neither is enabled. No development CLI auth store is read.
+
+The existing protocol controller now owns a synthetic OAuth issuer/session, stable app-defined UUID
+host, separate registration/client identity, state/nonce/PKCE, fixture-signature and granted-scope checks,
+explicit serialized token rotation and synthetic revocation/VM transfer semantics. HMAC fixture claims
+are **not OpenAI JWKS verification**. Evaluation pins auth through one physical attempt; renewal,
+switching, logout and replay are refused after consumption. Credentials stay in controller memory;
+Subject/tools/Verifier/Workspace/Trace/API get only bounded safe receipts. Reflection and unsafe host
+storage fail closed. No real credential loader, OAuth listener, outbound transport or new Worker exists.
+
+Strict SIWC store/stream/input/tool/unsupported-field controls and failed/incomplete streams reuse
+Phase-2.5 limits/Worker/Verifier and durable debit/cancel/recovery. Frozen CLI native client_metadata
+was initially rejected; the explicit adapter omits it and supplies trusted originator, without changing
+input/history, tools or budgets. All other unsupported/unknown fields deny. Malformed HTTP ingress is
+counted once even if parsing fails after controller entry. Optional SIWC policy defaults preserve old
+Fake policy identities and schema-1 receipts; new bounded schema-2 auth receipts reject tampering.
+Results remain **FAKE_CODEX / CUSTOM / synthetic / NOT_ATTESTED**, zero actual model/Provider calls.
+Token/quota are availability observations, not hard spending caps; no extra-credit purchase exists.
+
+Final local acceptance: **221 distinct backend cases** across a 218-pass broad batch and a final
+67-pass auth/ingress batch (64 repeated + 3 new cases); 22 protocol Docker cases include 13 SIWC.
+Full Ruff/format **817 files**, mypy **418 sources**, credential/boundary/link checks PASS. Offline
+replay **73 PASS**, two byte-identical passes/five outputs and zero external/model/Provider/Judge
+calls. Frozen guard **419 BEFORE == AFTER**. No local frontend/browser campaign is claimed.
+[Actual logs, source bindings, corrections and safe receipts](docs/qa/siwc-phase26-20261010/README.md).
+
+All **9 prior worktrees**, UI-2 **17 dirty entries / 1,494 hashes**, **58 prior containers** and
+developer auth metadata remain unchanged. Only a new tmpfs test PostgreSQL was migrated and removed;
+no existing database, deployment, service/site or development auth state changed. This is a
+pre-publication snapshot; candidate SHA/Draft PR/exact-SHA CI are reported separately at Git handoff.
+**REAL_CODEX CLOSED; live license/account/OAuth/JWKS/storage/route/quota/request-control gates remain.
+STOP after Phase-2.6 offline acceptance and Draft PR/CI; no real evaluation or Phase 3.**
+The dated records below retain their original authorization/results.
+
+
 ## Apache-2.0 source licensing — 2026-10-10
 
 Independent clean worktree/branch `codex/apache2-license-20261010`, exact remote main base

@@ -47,6 +47,36 @@ class OfflineSubscriptionController:
         fd = os.open(journal, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         os.close(fd)
         self._save()
+        self._siwc: Any = None
+        self._siwc_error: str | None = None
+        if policy.get("siwc_stub"):
+            if __package__:
+                from .siwc_contract import OfflineOAuthIssuer, OfflineSiwcSession, SiwcDenied
+            else:
+                from siwc_contract import (  # type: ignore[no-redef,import-not-found]
+                    OfflineOAuthIssuer,
+                    OfflineSiwcSession,
+                    SiwcDenied,
+                )
+
+            issuer = OfflineOAuthIssuer()
+            self._siwc = OfflineSiwcSession(policy["siwc_host_id"], issuer)
+            pending = self._siwc.begin()
+            callback = issuer.authorize(pending)
+            now = int(time.time())
+            grant = issuer.exchange(callback, pending, now)
+            if self.scenario == "siwc_scope_missing":
+                grant.scope = "openid profile email"
+            if self.scenario == "siwc_wrong_client":
+                callback["client_id"] = "oaiapp_offline_wrong"
+            try:
+                self._siwc.complete(callback, now, grant=grant)
+                self._siwc.pin(now, seconds=policy["wall_time_seconds"])
+            except SiwcDenied as exc:
+                self._siwc_error = str(exc)
+            self.state["schema_version"] = 2
+            self.state["siwc"] = self._siwc.safe_receipt()
+            self._save()
 
     def _save(self) -> None:
         with self.journal.open("w") as stream:
@@ -57,6 +87,8 @@ class OfflineSubscriptionController:
         self.journal.chmod(0o644)
 
     def _deny(self, code: str) -> tuple[int, dict[str, str]]:
+        if self._siwc is not None:
+            self._siwc.stop()
         self.state["requests_denied"] += 1
         self.state["state"] = code
         self._save()
@@ -71,6 +103,21 @@ class OfflineSubscriptionController:
             return self._deny("CONTROLLER_CLOSED")
         if request.get("model") != self.model or request.get("stream") is not True:
             return self._deny("ROUTE_OR_PROTOCOL_DENIED")
+        if self._siwc is not None:
+            if self._siwc_error:
+                return self._deny("SIWC_AUTH_DENIED")
+            if __package__:
+                from .siwc_contract import SiwcDenied, prepare_responses
+            else:
+                from siwc_contract import (  # type: ignore[no-redef]
+                    SiwcDenied,
+                    prepare_responses,
+                )
+            try:
+                request = prepare_responses(request, self.model)
+                self._siwc.headers_for_double(int(time.time()))
+            except SiwcDenied as exc:
+                return self._deny(str(exc))
         if self.scenario == "auth_expired":
             return self._deny("AUTH_EXPIRED")
         if self.scenario == "quota_exhausted":
@@ -82,6 +129,21 @@ class OfflineSubscriptionController:
         self.state["state"] = "ACTIVE"
         # Durable debit before transport. Failure cannot refund or trigger retry.
         self._save()
+        if self.scenario in {"siwc_stream_failed", "siwc_stream_incomplete"}:
+            status = "failed" if self.scenario == "siwc_stream_failed" else "incomplete"
+            self.state["state"] = "SIWC_STREAM_NOT_COMPLETED"
+            self._siwc.stop()
+            self._save()
+            return 200, {
+                "id": "offline-failed-response",
+                "object": "response",
+                "status": status,
+                "output": [],
+                "error": {
+                    "code": "subscription_sharing_usage_unavailable",
+                    "message": "Offline stream stopped.",
+                },
+            }
         if self.scenario == "upstream_failure":
             return self._deny("UPSTREAM_FAILED_NO_RETRY")
         if self.scenario == "hang":
@@ -103,7 +165,18 @@ class OfflineSubscriptionController:
             }
         # The only credential-bearing operation lives here. The double consumes it
         # internally and provides no raw response/header/exception reflection.
-        return self._offline_transport(item, self._private_credential)
+        credential = (
+            self._siwc.headers_for_double(int(time.time()))
+            if self._siwc is not None
+            else self._private_credential
+        )
+        result = self._offline_transport(item, credential)
+        if self._siwc is not None:
+            try:
+                self._siwc.reject_credential_reflection(result[1])
+            except ValueError:
+                return self._deny("SIWC_CREDENTIAL_REFLECTION_DENIED")
+        return result
 
     def _tool_item(self, request: dict[str, Any]) -> dict[str, Any] | None:
         tools: dict[str, str] = {}
@@ -176,8 +249,14 @@ class OfflineSubscriptionController:
         return None
 
     @staticmethod
-    def _offline_transport(item: dict[str, Any], credential: str) -> tuple[int, dict[str, Any]]:
-        assert credential.startswith("offline-controller-canary-")
+    def _offline_transport(
+        item: dict[str, Any], credential: str | dict[str, str]
+    ) -> tuple[int, dict[str, Any]]:
+        if isinstance(credential, dict):
+            assert credential["Authorization"].startswith("Bearer offline-siwc-access-")
+            assert credential["originator"] == "SameScale"
+        else:
+            assert credential.startswith("offline-controller-canary-")
         return 200, {
             "id": "offline-response",
             "object": "response",
@@ -198,20 +277,28 @@ class _Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         controller: OfflineSubscriptionController = self.server.controller  # type: ignore[attr-defined]
+        received_before = controller.state["requests_received"]
         try:
             length = int(self.headers.get("Content-Length", "0"))
             if (
                 self.path != "/v1/responses"
                 or not 0 < length <= MAX_REQUEST_BYTES
-                or self.headers.get("Authorization") is not None
+                or any(
+                    self.headers.get(h) is not None
+                    for h in ("Authorization", "Proxy-Authorization", "Cookie", "X-Api-Key")
+                )
             ):
                 controller.state["requests_received"] += 1
                 status, result = controller._deny("REQUEST_ENVELOPE_DENIED")
             else:
                 request = json.loads(self.rfile.read(length))
+                if not isinstance(request, dict):
+                    raise TypeError("MALFORMED_REQUEST")
                 status, result = controller.response(request)
         except (ValueError, TypeError, AttributeError):
-            controller.state["requests_received"] += 1
+            # An exception after response() debited ingress is still one HTTP request.
+            if controller.state["requests_received"] == received_before:
+                controller.state["requests_received"] += 1
             status, result = controller._deny("MALFORMED_REQUEST")
         if status != 200:
             body = json.dumps(result).encode()
@@ -220,16 +307,20 @@ class _Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
-        item = result["output"][0]
-        events = [
-            {
-                "type": "response.created",
-                "response": {**result, "output": [], "status": "in_progress"},
-            },
-            {"type": "response.output_item.added", "output_index": 0, "item": item},
-            {"type": "response.output_item.done", "output_index": 0, "item": item},
-            {"type": "response.completed", "response": result},
-        ]
+        events: list[dict[str, Any]]
+        if result["status"] != "completed":
+            events = [{"type": "response." + result["status"], "response": result}]
+        else:
+            item = result["output"][0]
+            events = [
+                {
+                    "type": "response.created",
+                    "response": {**result, "output": [], "status": "in_progress"},
+                },
+                {"type": "response.output_item.added", "output_index": 0, "item": item},
+                {"type": "response.output_item.done", "output_index": 0, "item": item},
+                {"type": "response.completed", "response": result},
+            ]
         body = "".join("data: " + json.dumps(event) + "\n\n" for event in events).encode()
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream")

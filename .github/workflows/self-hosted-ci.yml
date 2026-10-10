@@ -69,6 +69,7 @@ jobs:
           tests/test_local_plans.py
           tests/test_local_execution.py
           tests/test_subscription_controls.py
+          tests/test_siwc_contract.py
           tests/test_api_health.py
           tests/test_contracts.py
           tests/test_workbench_api.py::test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel

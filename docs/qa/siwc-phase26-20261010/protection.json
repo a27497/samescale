@@ -1,0 +1,12 @@
+{
+  "original_worktrees": 9,
+  "worktrees_unchanged": true,
+  "ui2_dirty_entries": 17,
+  "ui2_file_hashes": 1494,
+  "original_containers": 58,
+  "original_services_unchanged": true,
+  "auth_metadata_unchanged": true,
+  "credential_content_read": false,
+  "new_test_database_removed": true,
+  "new_test_containers_remaining": 0
+}

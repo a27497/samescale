@@ -80,6 +80,7 @@ def observe_stub_quota(payload: dict[str, Any], observed_at: datetime) -> QuotaO
 
 def real_execution_readiness() -> dict[str, Any]:
     # Code gate, not a configurable enablement flag. Even offline success grants no live access.
+    # Shipped source-license metadata is separate from SIWC/account/runtime admission.
     return {
         "real_execution_enabled": False,
         "billing_mode": "CHATGPT_SUBSCRIPTION",
@@ -88,12 +89,25 @@ def real_execution_readiness() -> dict[str, Any]:
         "credential_access": "NONE_PHASE25",
         "quota": "NOT_READ",
         "token_usage": "NOT_REPORTED",
+        "project_source_license": {
+            "spdx_id": "Apache-2.0",
+            "status": "INTEGRATED",
+            "scope": "ORIGINAL_PROJECT_SOURCE_WITH_EXCEPTIONS",
+            "scope_document": "LICENSE_SCOPE.md",
+            "brand_rights": "SEPARATE_NOT_GRANTED",
+            "third_party_rights": "RETAIN_UPSTREAM_TERMS",
+        },
+        "siwc_applicability": "PENDING_ACCOUNT_AND_INTEGRATION_ELIGIBILITY",
         "blockers": [
             "PHASE25_REAL_EXECUTION_CLOSED",
             "TRUSTED_SUBSCRIPTION_CREDENTIAL_BOUNDARY_NOT_LIVE_VERIFIED",
             "LIVE_ROUTE_AND_QUOTA_NOT_VERIFIED",
             "LIVE_REQUEST_INTERCEPTION_AND_NO_RETRY_NOT_VERIFIED",
             "SEPARATE_FIRST_REAL_AUTHORIZATION_REQUIRED",
+            "SIWC_ACCOUNT_WORKSPACE_ELIGIBILITY_NOT_CONFIRMED",
+            "SIWC_LOCAL_OR_SELF_HOSTED_INTEGRATION_NOT_CONFIRMED",
+            "SEPARATE_PRODUCT_OAUTH_NOT_AUTHORIZED",
+            "OPENAI_JWKS_AND_CREDENTIAL_LIFECYCLE_NOT_LIVE_VERIFIED",
         ],
     }
 

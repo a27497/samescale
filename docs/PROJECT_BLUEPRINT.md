@@ -1,5 +1,36 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## Current authorization — Phase 2.6 readiness consistency and final Git closeout — 2026-10-10
+
+Use main@ffeee1b366baa61f303ebf546f0287aae3ac9be1 and PR #10 Head@a7fbaf49e19ad3b44004d20fbc76ff9b75ddedc2.
+Verify Git/CI/review and protection state before editing the clean current integration worktree.
+Correct only source-license readiness and related contracts: declare integrated Apache-2.0 source with
+brand/third-party exceptions; remove the missing-license blocker and keep SIWC/account/OAuth/trusted
+runtime admission unverified. Preserve unconditional REAL_CODEX denial, immutable authorizations,
+legacy Fake behavior and every historical receipt. Do not add runtime/auth features or credential access.
+Run targeted tests and compatibility checks with only a new disposable test DB if required; preserve
+all other worktrees, UI-2, existing containers/databases, frozen evidence and website/auth state.
+Commit and normally push to PR #10. After exact-SHA push/PR CI and review/conflict checks pass, mark
+Ready and merge using a merge commit preserving original commits. Verify merged tree and new-main
+Fast CI/Offline Regression and protection. No squash/rebase/force push, real Agent/Provider, deployment,
+existing DB migration, real evaluation or Phase 3. STOP after Git handoff. Current results belong to
+[CURRENT_MILESTONE](../CURRENT_MILESTONE.md); older plans below retain their historical scope.
+
+## Current authorization — license Git closeout and Phase 2.6 integration — 2026-10-10
+
+Verify PR #11's exact Head/Base, 27-file scope, four CI runs, conflicts/reviews and license exceptions;
+mark Ready and merge using a merge commit, preserving original commits. Verify the resulting tree
+and exact new-main Fast CI/Offline Regression before any dependent PR #10 integration. Stop on blockers.
+In a new independent worktree, merge that main into PR #10 without changing its original worktree,
+rewriting history or force pushing. Reconcile README, milestone, public contract, blueprint and current
+operator guidance: Apache source licensing is merged; brand/third-party exclusions and REAL_CODEX
+closure remain; preserve original Phase-2.6 acceptance and frozen pre-license audit observations.
+Run bounded offline compatibility, notice/link and preservation checks; commit the merge, normally push
+to PR #10 and verify exact new-Head push/PR CI. Keep PR #10 Draft/unmerged. No credential access, real
+OAuth/Agent/Provider, existing DB migration, deployment, website change or Phase 3. STOP at handoff.
+Current results belong to [CURRENT_MILESTONE](../CURRENT_MILESTONE.md); the dated plans below retain
+their original authorization and do not describe current license status or grant new execution rights.
+
 ## Authorized source licensing — 2026-10-10
 
 Use current remote main@1061ddd7b13288f27e6d0545c8d6f6467278073b in an independent clean worktree;
@@ -15,6 +46,19 @@ Agent/Provider/credentials, existing DB migration, deployment, main merge and Ph
 Live audit/results belong to CURRENT_MILESTONE; [license audit](licensing/AUDIT.md) owns supporting
 rights evidence, scope limits and separate binary-distribution gates. STOP after Draft PR/CI.
 The dated authorizations below retain their historical scope.
+
+## Phase 2.6 — SIWC applicability and offline trusted auth (authorized 2026-10-10)
+
+Base main@1061ddd7b13288f27e6d0545c8d6f6467278073b. Audit current official OSS, app-server,
+VM/lifecycle/preview contracts; retain license, account/workspace and real OAuth as independent gates.
+Extend the existing controller with synthetic client/host/scopes/lifecycle, strict Responses admission
+and bounded auth receipts; reuse Worker, Runner, Verifier, single-attempt queue and crash recovery.
+Verify isolated protocol doubles, legacy Fake/evidence compatibility and credential canary protection.
+Use only a disposable DB and pinned local images. No real auth/RPC/refresh/inference, CLI auth-file
+access, upgrade, license choice, deployment, existing DB migration, main merge or Phase 3.
+Publish a new branch/Draft PR and verify exact-SHA CI. Live state belongs to CURRENT_MILESTONE;
+[official applicability and first-real gates](SIWC_AUTH_BOUNDARY.md) define the bounded preparation.
+
 
 ## 当前授权：Phase 2.5 订阅执行准备 — 2026-10-10
 

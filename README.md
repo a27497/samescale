@@ -9,6 +9,7 @@
 [第三方许可与义务](THIRD_PARTY_NOTICES.md) · [贡献说明](CONTRIBUTING.md)。
 品牌名称、Logo、历史证据/归档及第三方材料不因根许可证而重新授权；官网仓库许可不变。
 添加许可证不代表已获得 OpenAI SIWC 资格、账号授权或真实执行许可。
+源码许可证已通过 PR #11 合并；Phase 2.6 提供离线认证准备与明确拒绝门禁，REAL_CODEX 保持关闭。
 
 把 Coding Agent 的一次运行，转化为可检查、可诊断、可复核的工程证据。
 SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回答：实际发生了什么、哪些结果已验证、失败停在哪一层，以及保存的证据能否离线复核。它不把局部运行结果写成模型排行榜。
@@ -21,7 +22,8 @@ SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回
 隔离 Fake Codex：实际容器修改 Workspace、采集脱敏 Trace，再由独立 Docker Verifier 判断。
 结果、失败分类和证据摘要可读取；并发与重复请求不会多次领取，崩溃后保全/恢复而不自动重跑。
 
-**真实 Codex 默认关闭并拒绝授权**：token/费用尚无硬限制，计划参考预算不是执行上限。
+**真实 Codex 订阅执行保持关闭并拒绝授权**：SIWC 集成/账号资格、可信认证边界、实际路由与完整请求控制尚未验证。
+无需以 API Key 或美元硬上限作为订阅前提；Token 与额度只作可用性观察，计划参考预算不是执行上限。
 Fake 结果不能证明真实模型能力、真实任务准入或生产 Worker 可用；没有部署或修改现有数据库。
 [执行边界与本地 Worker](docs/LOCAL_EXECUTION.md) · [Phase 2 实际验收](docs/qa/local-execution-phase2-20261009/README.md)
 
@@ -108,6 +110,7 @@ Python · FastAPI · PostgreSQL · SQLAlchemy / Alembic · LangGraph · Vue 3 ·
 | [Current milestone](CURRENT_MILESTONE.md) | 已验收状态、未提交工作与阻碍 |
 | [Public product contract](PUBLIC_PRODUCT_CONTRACT.md) | 对外能力与声明边界 |
 | [Public Demo integrity](docs/evidence/public-demo-recovery-20260930/README.md) | New fixture identity, protected evidence, runtime verification and deployment gates |
+| [SIWC applicability and offline auth](docs/SIWC_AUTH_BOUNDARY.md) | Phase 2.6 synthetic auth boundary; source license integrated, SIWC/account/OAuth gates remain closed |
 | [Subscription execution preparation](docs/SUBSCRIPTION_EXECUTION.md) | Phase 2.5 offline controls, real-task admission and closed first-real gate |
 | [Developer setup](docs/PRODUCTIZATION.md) | 本地产品运行与分发细节 |
 

@@ -1,0 +1,52 @@
+[
+  {
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/codex-app-server",
+    "checked_date": "2026-10-10",
+    "content_sha256": "eeee9ebe330f236ee2c70b6026c17337af56cd328c8acb3540bc194f86072d7d"
+  },
+  {
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/errors-and-recovery",
+    "checked_date": "2026-10-10",
+    "content_sha256": "0b7f6d6a7a07ba4d81967858ca9f64264e2be017dfaed1e25297969a57a2c005"
+  },
+  {
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference",
+    "checked_date": "2026-10-10",
+    "content_sha256": "4cd568e57168de134717e5ed611d15d3505b88d30d6a45bd234b2a0a1ea96370"
+  },
+  {
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source",
+    "checked_date": "2026-10-10",
+    "content_sha256": "7c916a3136973625481fe21673c2f342e97fe5a70153bc71e068d5b11be83ebd"
+  },
+  {
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations",
+    "checked_date": "2026-10-10",
+    "content_sha256": "051ee06d537d746de9a5f1aa5019a44400fd9856b27ec37b4a9c9fec5874fa0c"
+  },
+  {
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/profiles-and-sessions",
+    "checked_date": "2026-10-10",
+    "content_sha256": "ab3eb6b64956e7ca22edbe4eb70f67ab2245cf9aea197902b16c639a6cf8dfc1"
+  },
+  {
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/self-hosted-vms",
+    "checked_date": "2026-10-10",
+    "content_sha256": "c4d541d0127073b8c7a0fa140bfe28742ea68b5569f4af56172932eb41ebd999"
+  },
+  {
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/sign-in",
+    "checked_date": "2026-10-10",
+    "content_sha256": "94e9158385ba3048ad3454785940c97c92d9d2dcf8dfda66b0f4418643d146a5"
+  },
+  {
+    "url": "https://developers.openai.com/siwc/token-sharing-open-source/token-reference",
+    "checked_date": "2026-10-10",
+    "content_sha256": "d48d4bee9f15062bf4cde08fe33fd32aab2a8df1a304dde70969eb528e07d0a1"
+  },
+  {
+    "url": "https://learn.chatgpt.com/docs/app-server",
+    "checked_date": "2026-10-10",
+    "observation": "EXTERNAL_TOKENS_EXPERIMENTAL_REFRESH_CAN_RETRY"
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "documentation_relative_links_checked": 120,
+  "missing_links": 0,
+  "credential_pattern_files_scanned": 2915,
+  "credential_matches": 0,
+  "scan_scope": "CHANGED_NEW_SOURCE_DOCS_AND_OWN_FINAL_PYTEST_17_19_ARTIFACTS_WORKSPACES_ONLY",
+  "real_auth_content_access": false,
+  "synthetic_random_credential_values_persisted": false,
+  "whitespace": "PASS"
+}

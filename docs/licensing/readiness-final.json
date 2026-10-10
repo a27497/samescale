@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "status": "READINESS_CONSISTENT_OFFLINE_PASS_REAL_CODEX_CLOSED",
+  "base_main": "ffeee1b366baa61f303ebf546f0287aae3ac9be1",
+  "original_integration_head": "a7fbaf49e19ad3b44004d20fbc76ff9b75ddedc2",
+  "targeted_tests": {
+    "distinct_passed": 148,
+    "first_batch_passed": 147,
+    "first_batch_failed": 1,
+    "corrected_migrated_ledger_case_passed": 1,
+    "single_148_pass_invocation": false,
+    "suites": [
+      "test_siwc_contract.py",
+      "test_subscription_controls.py",
+      "test_local_execution.py",
+      "test_product_distribution.py",
+      "test_product_lifecycle.py",
+      "test_ci_workflow_contracts.py"
+    ]
+  },
+  "ruff": "PASS",
+  "format_checked_files": 2,
+  "mypy_sources": 418,
+  "offline_regression": {
+    "schema_version": 1,
+    "status": "PASS",
+    "network_namespace": {
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_routes": 0,
+      "loopback": "down"
+    },
+    "tests_passed": 73,
+    "archive_digest": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+    "inputs_digest": "sha256:d77d964fe60158da4e22ee7e60df0cfb54178a99c957298d861d977f925d0395",
+    "identical_outputs": {
+      "claude.json": "sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d",
+      "codex.json": "sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe",
+      "diagnosis.md": "sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1",
+      "offline-boundary.json": "sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097",
+      "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef"
+    },
+    "replayed_runs": 2,
+    "replay_passes": 2,
+    "external_calls": 0,
+    "provider_calls": 0,
+    "model_calls": 0,
+    "claude_calls": 0,
+    "judge_calls": 0,
+    "subject_executed": false,
+    "verifier_executed": false
+  },
+  "integrity": {
+    "readiness": {
+      "real_execution_enabled": false,
+      "billing_mode": "CHATGPT_SUBSCRIPTION",
+      "api_key_required": false,
+      "usd_hard_cap_required": false,
+      "credential_access": "NONE_PHASE25",
+      "quota": "NOT_READ",
+      "token_usage": "NOT_REPORTED",
+      "project_source_license": {
+        "spdx_id": "Apache-2.0",
+        "status": "INTEGRATED",
+        "scope": "ORIGINAL_PROJECT_SOURCE_WITH_EXCEPTIONS",
+        "scope_document": "LICENSE_SCOPE.md",
+        "brand_rights": "SEPARATE_NOT_GRANTED",
+        "third_party_rights": "RETAIN_UPSTREAM_TERMS"
+      },
+      "siwc_applicability": "PENDING_ACCOUNT_AND_INTEGRATION_ELIGIBILITY",
+      "blockers": [
+        "PHASE25_REAL_EXECUTION_CLOSED",
+        "TRUSTED_SUBSCRIPTION_CREDENTIAL_BOUNDARY_NOT_LIVE_VERIFIED",
+        "LIVE_ROUTE_AND_QUOTA_NOT_VERIFIED",
+        "LIVE_REQUEST_INTERCEPTION_AND_NO_RETRY_NOT_VERIFIED",
+        "SEPARATE_FIRST_REAL_AUTHORIZATION_REQUIRED",
+        "SIWC_ACCOUNT_WORKSPACE_ELIGIBILITY_NOT_CONFIRMED",
+        "SIWC_LOCAL_OR_SELF_HOSTED_INTEGRATION_NOT_CONFIRMED",
+        "SEPARATE_PRODUCT_OAUTH_NOT_AUTHORIZED",
+        "OPENAI_JWKS_AND_CREDENTIAL_LIFECYCLE_NOT_LIVE_VERIFIED"
+      ]
+    },
+    "denial_and_other_subscription_logic_ast_unchanged": true,
+    "original_source_test_workflow_asset_legal_history_files_unchanged": 1650,
+    "other_worktrees_unchanged": 11,
+    "ui2_dirty_entries": 17,
+    "ui2_hashes": 1494,
+    "containers_unchanged": 58,
+    "frozen_files_unchanged": 419,
+    "website_files_head_status_unchanged": 364,
+    "auth_metadata_unchanged": true,
+    "auth_content_access": false,
+    "relative_links_verified": 123,
+    "credential_pattern_scan": "PASS",
+    "canonical_license": "PASS"
+  },
+  "initial_checks_and_corrections": {
+    "first_test_launch": "NOT_STARTED_WRONG_HELPER_WORKDIR",
+    "product_tests_failed": false,
+    "disposable_database_removed": true,
+    "correction": "FIXED_TEMPORARY_HELPER_WORKDIR_ONLY_NO_PRODUCT_CHANGE",
+    "first_test_batch": {
+      "passed": 147,
+      "failed": 1,
+      "failure": "MIGRATED_LEDGER_TEST_REQUIRES_MIGRATED_DISPOSABLE_DATABASE",
+      "database_removed": true
+    }
+  },
+  "disposable_database": {
+    "test_exit_code": 0,
+    "new_disposable_container": "samescale-phase26-final-20261010-ledger-pg",
+    "image_id": "sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+    "removed": true,
+    "storage": "tmpfs",
+    "existing_database_access": false,
+    "existing_database_migration": false,
+    "existing_container_mutation": false,
+    "real_agent_provider_execution": false
+  },
+  "existing_database_access_or_migration": false,
+  "real_oauth_account_quota_refresh_model_calls": 0,
+  "deployments": 0,
+  "source_digests": {
+    "src/harnesslab/local_execution/subscription.py": "sha256:d3f1c4228efd9d0f7291961ab3c001386f601849c512f5881a987612422a4343",
+    "tests/test_subscription_controls.py": "sha256:9bd0d52ba8f086c325ec9f8a88318d44015b66e9a9f2ceea4ad4c5c8902ca6d8"
+  },
+  "log_digests": {
+    "targeted-tests.txt": "sha256:0faf53076d6ef233170d67079dfb2d8f2b595fc68d9f329ceabfd54b7dcc41f3",
+    "ledger-test.txt": "sha256:15fc3f2757fa2a96b1b038426bcc9545428b30c51c31ca23f5133f5bc83222dc",
+    "mypy.txt": "sha256:15c787ff4dbc91b13b2e491b2b7ba4d972e635c881e6133f468660cc5360d649"
+  },
+  "publication": "EXACT_CANDIDATE_AND_MERGE_SHA_CI_REPORTED_AT_GIT_HANDOFF",
+  "remaining_gates": [
+    "SIWC_INTEGRATION_AND_ACCOUNT_WORKSPACE_ELIGIBILITY",
+    "SEPARATE_PRODUCT_OAUTH_CONSENT",
+    "REAL_JWKS_CREDENTIAL_STORAGE_LIFECYCLE_AND_TRUSTED_EXECUTION",
+    "ACTUAL_ROUTE_QUOTA_AND_COMPLETE_LIVE_REQUEST_RETRY_CANCELLATION",
+    "SEPARATE_FIRST_REAL_TASK_MODEL_IMAGE_ROUTE_ONE_ATTEMPT_AUTHORIZATION",
+    "EXCLUDED_BRAND_ASSETS_AND_THIRD_PARTY_DISTRIBUTION_RIGHTS"
+  ]
+}

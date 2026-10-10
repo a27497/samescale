@@ -19,12 +19,18 @@ from tests.test_registry_lite import isolated_registry_database
 
 
 def protocol_policy(
-    execution: Path, *, scenario: str = "solve", requests: int = 2, seconds: int = 20
+    execution: Path,
+    *,
+    scenario: str = "solve",
+    requests: int = 2,
+    seconds: int = 20,
+    siwc: bool = False,
 ) -> dict[str, Any]:
     policy = json.loads(execution.read_text())
     policy.update(
         {
             "protocol_stub": True,
+            "siwc_stub": siwc,
             "protocol_scenario": scenario,
             "protocol_limits": {"wall_time_seconds": seconds, "max_requests": requests},
             "subject_image_identity": local_image_identity("harnesslab-phase-e-codex:0.149.0"),
@@ -36,14 +42,24 @@ def protocol_policy(
 
 @pytest.mark.integration
 @pytest.mark.parametrize(
-    "scenario,requests,expected",
+    "scenario,requests,expected,siwc",
     [
-        ("solve", 2, "VERIFIED_PASS"),
-        ("solve", 1, "FAILED_INFRA"),
-        ("auth_expired", 2, "FAILED_INFRA"),
-        ("quota_exhausted", 2, "FAILED_INFRA"),
-        ("upstream_failure", 2, "FAILED_INFRA"),
-        ("hang", 2, "TIMEOUT"),
+        ("solve", 2, "VERIFIED_PASS", False),
+        ("solve", 1, "FAILED_INFRA", False),
+        ("auth_expired", 2, "FAILED_INFRA", False),
+        ("quota_exhausted", 2, "FAILED_INFRA", False),
+        ("upstream_failure", 2, "FAILED_INFRA", False),
+        ("hang", 2, "TIMEOUT", False),
+        ("solve", 2, "VERIFIED_PASS", True),
+        ("solve", 1, "FAILED_INFRA", True),
+        ("auth_expired", 2, "FAILED_INFRA", True),
+        ("quota_exhausted", 2, "FAILED_INFRA", True),
+        ("upstream_failure", 2, "FAILED_INFRA", True),
+        ("hang", 2, "TIMEOUT", True),
+        ("siwc_scope_missing", 2, "FAILED_INFRA", True),
+        ("siwc_wrong_client", 2, "FAILED_INFRA", True),
+        ("siwc_stream_failed", 2, "FAILED_INFRA", True),
+        ("siwc_stream_incomplete", 2, "FAILED_INFRA", True),
     ],
 )
 async def test_offline_protocol_worker_and_isolated_verifier(
@@ -52,10 +68,12 @@ async def test_offline_protocol_worker_and_isolated_verifier(
     scenario: str,
     requests: int,
     expected: str,
+    siwc: bool,
 ) -> None:
     policy = protocol_policy(
         docker_fixture[1],
         scenario=scenario,
+        siwc=siwc,
         requests=requests,
         seconds=3 if scenario == "hang" else 20,
     )
@@ -81,6 +99,10 @@ async def test_offline_protocol_worker_and_isolated_verifier(
         assert receipt["turns_consumed"] <= 1
         assert receipt["automatic_retries"] == receipt["real_model_requests"] == 0
         assert receipt["token_usage"] is None
+        if siwc:
+            assert receipt["schema_version"] == 2
+            assert receipt["siwc"]["authorization_code_exchanges"] == 1
+            assert receipt["siwc"]["refreshes"] == receipt["siwc"]["live_oauth_calls"] == 0
         assert result["model_calls"] == result["model_cost_usd"] == 0
         if expected == "VERIFIED_PASS":
             assert result["episode"]["source_kind"] == "synthetic"
@@ -90,17 +112,22 @@ async def test_offline_protocol_worker_and_isolated_verifier(
         for path in Path(policy["artifact_root"]).rglob("*"):
             if path.is_file():
                 assert b"offline-controller-canary-" not in path.read_bytes()
+                assert b"offline-siwc-access-" not in path.read_bytes()
+                assert b"offline-siwc-refresh-" not in path.read_bytes()
+                assert b"offline-siwc-id-" not in path.read_bytes()
         assert await worker.once() is None
 
 
 @pytest.mark.integration
+@pytest.mark.parametrize("siwc", [False, True])
 async def test_offline_protocol_active_cancel_no_dispatch_retry(
     database_url: str,
     docker_fixture: tuple[Path, Path, Path],
+    siwc: bool,
 ) -> None:
     from harnesslab.sandbox.docker_cli import _DockerCLI
 
-    policy = protocol_policy(docker_fixture[1], scenario="hang", seconds=20)
+    policy = protocol_policy(docker_fixture[1], scenario="hang", seconds=20, siwc=siwc)
     async with isolated_registry_database(database_url) as factory, local_client(factory) as client:
         plan = await plan_for(client)
         url = PREFIX + plan["plan_id"]
@@ -139,11 +166,13 @@ async def test_offline_protocol_active_cancel_no_dispatch_retry(
 
 
 @pytest.mark.integration
+@pytest.mark.parametrize("siwc", [False, True])
 @pytest.mark.parametrize("point", ["during_subject", "after_seal"])
 async def test_offline_protocol_process_crash_recovers_counts_without_redispatch(
     database_url: str,
     docker_fixture: tuple[Path, Path, Path],
     point: str,
+    siwc: bool,
 ) -> None:
     import os
     import sys
@@ -152,7 +181,7 @@ async def test_offline_protocol_process_crash_recovers_counts_without_redispatch
     from harnesslab.db.models.execution_lease import ExecutionLease
 
     policy = protocol_policy(
-        docker_fixture[1], scenario="hang" if point == "during_subject" else "solve"
+        docker_fixture[1], scenario="hang" if point == "during_subject" else "solve", siwc=siwc
     )
     async with isolated_registry_database(database_url) as factory, local_client(factory) as client:
         plan = await plan_for(client)
