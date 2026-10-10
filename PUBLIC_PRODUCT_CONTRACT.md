@@ -1,5 +1,32 @@
 # SameScale Product — Public Product Contract
 
+## Private external saved Codex evidence — 2026-10-11
+
+`/external-runs` accepts individually operator-approved/pinned saved `exec --json`, Native Hook
+or H-Lane records and reviewed UTF-8 final Workspace snapshots. It reuses Trace/Episode readers,
+TaskStore qualification, independent isolated Verifier and offline replay. No automatic session discovery,
+raw transcript/command-body persistence, subscription-login takeover, public upload/execution, Agent
+rerun or model call. All private reads/imports require the local operator/origin boundary; public Demo
+is denied. No existing DB migration or deployment.
+
+Hashes/classifications do not authenticate origin. Original acceptance/classification and missing fields
+remain distinct; partial evidence or missing trusted task/Verifier stays NOT_VERIFIED. The saved real
+Hook case's historical 5/5 is independent of its original NOT_VERIFIED Episode, not a new experiment.
+New Workspace checks require exact admitted TaskStore contracts, prior baseline-fail/oracle-pass,
+existing pinned network-disabled Verifier and separate operator CLI consent. API processes gain no Docker
+privilege. Timeout, zero checks, malformed output or failed cleanup cannot pass; consumed attempts cannot
+automatically retry. Synthetic fixtures remain synthetic; frozen evidence and original Episodes stay intact.
+
+Deterministic descriptive diagnosis links self-report presence, tool observations, file changes,
+Workspace checks and infrastructure failures. It does not establish causality, model quality or
+comparison eligibility. Safe export with a separately retained digest supports offline record/receipt
+replay without Agent or Verifier execution; hidden assets and raw logs are excluded. Manual review
+remains mandatory; pattern checks are not universal DLP. Binary/large repos, private rollout formats,
+remote/multi-user intake, asynchronous verifier UI and source attestation remain outside this MVP.
+**REAL_CODEX stays closed; SIWC remains unverified/out of scope.** Apache-2.0 source licensing with
+brand/upstream/historical exceptions is unchanged. [Scope/setup](docs/EXTERNAL_CODEX_EVIDENCE.md) ·
+[Observed acceptance](docs/qa/external-evidence-mvp-20261011/README.md).
+
 ## Source licensing — 2026-10-10
 
 The original main product source identified by [LICENSE_SCOPE.md](LICENSE_SCOPE.md) is offered

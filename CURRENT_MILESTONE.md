@@ -1,5 +1,43 @@
 # SameScale Product — Current Milestone
 
+## Current state — external saved Codex evidence MVP — 2026-10-11
+
+Base `main@5c363e245c25ebe3fbf6784f95952e32452c6878`; separate clean worktree/branch
+`codex/external-codex-evidence-20261011`. Private `/external-runs` and operator-only API accept
+individual approved/pinned saved Codex JSONL, Native Hook or H-Lane evidence plus final Workspace.
+Existing Trace/Episode readers, TaskStore qualification, isolated Verifier and offline guard are reused.
+No new Worker/Agent/authentication path, automatic private collection, DB schema change, public
+execution permission, merge or deployment. **REAL_CODEX remains CLOSED**; SIWC retains its unverified
+account/consent/auth/runtime gates and is outside this scope.
+
+Original Episode acceptance/classification stays distinct from separately bound Workspace acceptance.
+The approved real Hook history retains its `unverified / NOT_VERIFIED` Episode and historical independent
+**5/5**, with unknown tool exits, actual model/route/usage/cost and authenticity. Partial hooks and missing
+trusted task/Verifier stay NOT_VERIFIED; no Episode or verdict is invented. JSONL is processed in memory;
+only projected Trace metadata/command hashes persist. New Workspace checks require exact TaskStore
+qualification and separate operator CLI consent through the existing pinned isolated Verifier. One durable
+attempt, zero automatic retry; timeout, zero checks and incomplete cleanup cannot pass. New receipts
+never rewrite originals. The API remains data-only behind the local operator/origin boundary.
+
+**120 focused + 208 compatibility cases PASS**, **208 frontend tests PASS**, type/build PASS,
+**15 actual browser checks PASS**, **73 historical offline checks PASS** with two identical passes.
+New exports also replay twice under the network/process audit guard. Final Docker batch: five isolated
+Verifier invocations (actual baseline/oracle admission, supplied Workspace fail/pass and timeout), all
+supplied runs synthetic; **zero Agent/model/Provider calls**. Full Ruff/format and mypy (427 sources)
+pass. [Acceptance and initial corrections](docs/qa/external-evidence-mvp-20261011/README.md).
+Compatibility uses only a new migrated disposable tmpfs PostgreSQL, removed afterwards. Prior worktrees,
+UI-2 changes, frozen evidence, containers, auth metadata and website are checked at Git handoff.
+
+Envelope: reviewed UTF-8 source snapshots (500 files / 4 MB), explicit approved formats and external
+pins. No universal privacy/origin attestation, binary/large repo support, private rollouts, remote/
+multi-user intake, asynchronous verifier scheduling/cancellation UI, SIWC or Phase 3 claim.
+[Setup and limits](docs/EXTERNAL_CODEX_EVIDENCE.md). Stop after normal commit/push, Draft PR and
+exact-SHA Fast/Offline CI; **no merge or deployment**.
+
+## Historical Phase 2.6 and licensing snapshots
+
+The dated states and authorizations below are historical; they do not grant new execution or merge.
+
 ## Current state — Phase 2.6 readiness consistent / REAL_CODEX closed — 2026-10-10
 
 Base main@ffeee1b366baa61f303ebf546f0287aae3ac9be1; original integration Head

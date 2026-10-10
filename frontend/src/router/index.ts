@@ -35,6 +35,8 @@ const router = createRouter({
   },
   routes: [
     { path: '/', redirect: '/analyst' },
+    { path: '/external-runs', name: 'external-evidence', component: () => import('@/views/ExternalEvidenceView.vue'), meta: { title: '外部 Codex 运行证据', section: 'Evidence' } },
+    { path: '/external-runs/:identity', name: 'external-evidence-detail', component: () => import('@/views/ExternalEvidenceView.vue'), meta: { title: '已保存外部运行证据', section: 'Evidence' } },
     { path: '/plans', name: 'local-plans', component: () => import('@/views/LocalPlansView.vue'), meta: { title: '本地评测计划', section: 'Workspace' } },
     { path: '/plans/:planId', name: 'local-plan-detail', component: () => import('@/views/LocalPlansView.vue'), meta: { title: '已保存本地计划', section: 'Workspace' } },
     { path: '/demo', name: 'public-demo', component: () => import('@/views/PublicDemoView.vue'), meta: { title: '公开演示 · Public Demo', section: 'Evidence' } },

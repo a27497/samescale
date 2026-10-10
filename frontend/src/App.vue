@@ -9,6 +9,7 @@ import WorkbenchBrand from '@/components/WorkbenchBrand.vue'
 initializeLocale()
 const route = useRoute()
 const titles: Record<string, [string, string]> = {
+  'external-evidence': ['外部 Codex 运行证据', 'External Codex evidence'], 'external-evidence-detail': ['已保存外部运行证据', 'Saved external evidence'],
   'local-plans': ['本地评测计划', 'Local evaluation plans'], 'local-plan-detail': ['已保存本地计划', 'Saved local plan'],
   analyst: ['调查首页', 'Investigation home'], 'public-demo': ['公开演示', 'Public demo'],
   'run-detail': ['运行证据', 'Run evidence'], diagnosis: ['失败诊断', 'Failure diagnosis'],
@@ -41,6 +42,7 @@ function navigationKeydown(event: KeyboardEvent) {
 const navigation = computed(() => [
   { label: c('主要功能', 'Core'), items: [
     { to: '/plans', label: c('本地评测计划', 'Local evaluation plans'), icon: Files },
+    { to: '/external-runs', label: c('外部运行证据', 'External run evidence'), icon: Files },
     { to: '/analyst', label: c('调查首页', 'Investigation home'), icon: House },
     { to: '/demo', label: c('公开演示', 'Public demo'), icon: View },
     { to: '/analyst/sessions', label: c('已保存调查', 'Saved investigations'), icon: Document },

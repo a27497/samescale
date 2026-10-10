@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "checks": [
+    "No private discovery before unlock",
+    "Consent required",
+    "Saved real record opened",
+    "Independent historical 5/5",
+    "Original Episode retained",
+    "Missing fields and origin disclosed",
+    "Export excludes hidden assets",
+    "No credential in browser storage or export",
+    "Mobile page stays within viewport",
+    "Reload forgets operator token",
+    "Restart reads existing identity",
+    "Fixture and missing task remain synthetic/unverified",
+    "Tamper fails closed without replacement pass",
+    "Zero external requests",
+    "Zero browser exceptions"
+  ],
+  "errors": [],
+  "external": [],
+  "real_source": "saved-native-hook-20261007",
+  "synthetic_source": "controlled-native-hook-fixture",
+  "agent_runs": 0,
+  "model_calls": 0,
+  "export_digest": "sha256:4dde380df843d46df90ad8705368f7c6b577fd48d950310082aede9da84a7545"
+}

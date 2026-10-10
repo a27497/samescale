@@ -1,5 +1,28 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## Current authorization — external saved Codex evidence MVP — 2026-10-11
+
+Base main@5c363e245c25ebe3fbf6784f95952e32452c6878. Deliver private approved-source intake,
+final Workspace acceptance, deterministic diagnosis and safe export/offline replay. Reuse Native Hook,
+Trace, Episode readers, Managed TaskStore qualification and existing pinned isolated Verifier. Do not
+introduce another Worker/Agent runtime or subscription authentication path. A data-only private API
+has no Docker privilege; a separate operator CLI authorizes one isolated Verifier attempt. Treat source
+pins/classifications/bindings as operator assertions, not authenticity. Store content-addressed projected
+records separately from originals; independent acceptance never overwrites Episode status. Missing
+reliable task/verifier evidence stays NOT_VERIFIED.
+
+Use bounded no-follow acquisition, pre-write projection/privacy rejection, private atomic import,
+durable one-attempt verification and deterministic export/replay. Accept only explicitly supplied
+saved exec JSONL, content-free hooks or existing artifact bundles. No private collection/credential
+reads, real Agent/Provider/model calls, public execution, existing DB migration, deployment, SIWC work
+or Phase 3. Validate approved immutable real Hook history separately from synthetic exceptions; run
+affected compatibility and actual browser checks. Protect old worktrees/UI-2/services/site and frozen
+identities. Acceptance/live state belongs in [Current Milestone](../CURRENT_MILESTONE.md), with
+[operator contract](EXTERNAL_CODEX_EVIDENCE.md). Finish with normal commit/push, Draft PR and
+exact-SHA CI; do not merge. Historical plans below do not extend this authorization.
+
+## Historical authorizations
+
 ## Current authorization — Phase 2.6 readiness consistency and final Git closeout — 2026-10-10
 
 Use main@ffeee1b366baa61f303ebf546f0287aae3ac9be1 and PR #10 Head@a7fbaf49e19ad3b44004d20fbc76ff9b75ddedc2.
