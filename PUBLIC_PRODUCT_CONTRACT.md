@@ -18,13 +18,15 @@ REAL_CODEX stays unconditionally closed. The main product source now has the own
 Apache-2.0 license, merged in PR #11, with [explicit brand, historical and third-party exceptions](LICENSE_SCOPE.md).
 This resolves the missing root source-license observation; it does not establish SIWC integration/
 account/workspace eligibility, actual OAuth consent or ownership of excluded external material.
-Development CLI login grants no separate product permission. PR #10 remains Draft and unmerged.
+Development CLI login grants no separate product permission. Readiness explicitly reports the source
+license as integrated, with separate brand/upstream rights; it no longer treats the root license as missing.
 An operator-only controller models client/host/scope/credential lifecycle with synthetic OAuth,
 strict public Responses requirements and no live transport. Its HMAC fixture signature is not
 OpenAI JWKS validation. Safe synthetic auth receipts reuse the existing Fake execution/evidence path;
 canary isolation and offline Runtime compatibility do not certify real credential safety or model access.
 No real credential store read/import, OAuth/account/quota/model RPC or refresh is performed.
-No credit purchase, existing DB migration, deployment, main merge or Phase 3 is included.
+No credit purchase, existing DB migration, deployment or Phase 3 is included. The authorized Git
+integration/merge does not grant real execution, credential access or account qualification.
 [Applicability, implemented boundary and independent first-real gates](docs/SIWC_AUTH_BOUNDARY.md).
 The dated records below retain their historical scope.
 

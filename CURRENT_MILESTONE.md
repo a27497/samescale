@@ -1,5 +1,45 @@
 # SameScale Product — Current Milestone
 
+## Current state — Phase 2.6 readiness consistent / REAL_CODEX closed — 2026-10-10
+
+Base main@ffeee1b366baa61f303ebf546f0287aae3ac9be1; original integration Head
+`a7fbaf49e19ad3b44004d20fbc76ff9b75ddedc2`. The merged root source license is Apache-2.0 under
+[the explicit scope](LICENSE_SCOPE.md). Brand/artwork, third-party terms and excluded historical
+material remain independent; the website license is unchanged. Licensing is not SIWC/account eligibility.
+
+`real_execution_readiness()` now declares integrated `project_source_license` with separate brand/
+third-party boundaries. `OSS_LICENSE_NOT_CONFIRMED` is removed and `siwc_applicability` reports
+`PENDING_ACCOUNT_AND_INTEGRATION_ELIGIBILITY`. REAL_CODEX remains unconditionally disabled, including
+when an enablement environment variable is set; no account/quota/token/credential reads or live
+transport are introduced. Existing auth/queue/Worker/Fake control behavior is unchanged.
+
+SIWC integration/account/workspace eligibility, separate product OAuth consent, real JWKS/storage/
+lifecycle, trusted credential isolation, actual route/quota and complete live request/retry/cancellation
+controls remain unverified. Token/quota are observations; no extra-credit purchase or API-key/USD
+prerequisite is introduced. First real task/model/image/route and one attempt require separate authorization.
+
+Targeted acceptance: **148 distinct cases PASS** across 147 passes in the initial batch and the
+one ledger-trigger case passed after migrating a new tmpfs test database; the two initial test-launch/
+DB-prerequisite corrections are recorded, not counted as passes. All new temporary containers are removed.
+**73 offline replay checks PASS**, two byte-identical passes and zero external/model/Provider/Judge calls.
+Focused Ruff/format (2 files), full mypy (418 sources), 123 relative document links and credential scan PASS.
+**1,650 original source/test/workflow/asset/legal/history files** retain bytes. The denial function and
+other subscription logic retain their AST; only readiness metadata and the related contract tests change.
+All **11 other worktrees**, UI-2 **17 entries / 1,494 hashes**, **58 prior containers**, **419 frozen files**,
+developer auth metadata and **364 website files/head/status** remain unchanged. No existing DB access/
+migration, credential content, real Agent/Provider or deployment. [Final readiness receipt](docs/licensing/readiness-final.json)
+retains the current source bindings and initial corrections; older receipts remain historical.
+Exact candidate/push/PR and final merge/main CI are separate Git handoff facts. This final authorization allows Ready/merge commit only after exact-SHA CI
+and review/conflict checks pass, then merged-tree/main-CI/protection verification. No real evaluation,
+existing DB migration, deployment, website or auth-state changes or Phase 3. STOP at Git handoff.
+
+## Historical Git integration and acceptance snapshots
+
+The following sections retain observations and permissions at their original bases. Their Draft/merge
+stopping points and pre-license facts are historical; they do not govern this final Git authorization.
+Frozen Phase-2.6 and license receipts remain unchanged. Only the current readiness implementation and
+its related tests are corrected; older source-bound receipts still describe their original source bytes.
+
 ## Current state — Apache-2.0 merged / Phase 2.6 Draft integration — 2026-10-10
 
 PR #11 is merged using merge commit `ffeee1b366baa61f303ebf546f0287aae3ac9be1`, retaining

@@ -1,5 +1,21 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## Current authorization — Phase 2.6 readiness consistency and final Git closeout — 2026-10-10
+
+Use main@ffeee1b366baa61f303ebf546f0287aae3ac9be1 and PR #10 Head@a7fbaf49e19ad3b44004d20fbc76ff9b75ddedc2.
+Verify Git/CI/review and protection state before editing the clean current integration worktree.
+Correct only source-license readiness and related contracts: declare integrated Apache-2.0 source with
+brand/third-party exceptions; remove the missing-license blocker and keep SIWC/account/OAuth/trusted
+runtime admission unverified. Preserve unconditional REAL_CODEX denial, immutable authorizations,
+legacy Fake behavior and every historical receipt. Do not add runtime/auth features or credential access.
+Run targeted tests and compatibility checks with only a new disposable test DB if required; preserve
+all other worktrees, UI-2, existing containers/databases, frozen evidence and website/auth state.
+Commit and normally push to PR #10. After exact-SHA push/PR CI and review/conflict checks pass, mark
+Ready and merge using a merge commit preserving original commits. Verify merged tree and new-main
+Fast CI/Offline Regression and protection. No squash/rebase/force push, real Agent/Provider, deployment,
+existing DB migration, real evaluation or Phase 3. STOP after Git handoff. Current results belong to
+[CURRENT_MILESTONE](../CURRENT_MILESTONE.md); older plans below retain their historical scope.
+
 ## Current authorization — license Git closeout and Phase 2.6 integration — 2026-10-10
 
 Verify PR #11's exact Head/Base, 27-file scope, four CI runs, conflicts/reviews and license exceptions;

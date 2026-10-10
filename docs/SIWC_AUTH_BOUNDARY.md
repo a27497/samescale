@@ -2,9 +2,9 @@
 
 **OFFLINE ONLY / REAL_CODEX CLOSED.** Original Phase-2.6 acceptance used
 main@1061ddd7b13288f27e6d0545c8d6f6467278073b. PR #11 subsequently merged the bounded source
-license at main@ffeee1b366baa61f303ebf546f0287aae3ac9be1; it is now integrated into Draft PR #10.
-This Git closeout authorizes that license merge and offline integration, not PR #10 merge or actual
-OAuth/account/model/quota RPC, credential read/import, refresh, inference or deployment.
+license at main@ffeee1b366baa61f303ebf546f0287aae3ac9be1; it is integrated into Phase-2.6 source.
+Final Git closeout now authorizes a readiness correction and PR #10 merge after exact-SHA acceptance,
+not actual OAuth/account/model/quota RPC, credential read/import, refresh, inference or deployment.
 The actual subscription route and complete live controls remain unverified.
 
 ## Official applicability audit (checked 2026-10-10)
@@ -131,9 +131,12 @@ The bounded source-license decision is complete. The remaining live gates are un
 5. Separate authorization for the exact admitted task/model/image/route, one physical attempt, timeout,
    request/turn bounds and failure retention. No repair, second attempt, extra credits or Phase 3 is implied.
 
-The unchanged deny-only preflight retains conservative policy labels such as
-`OSS_LICENSE_NOT_CONFIRMED`; it does not scan Git licensing and is not the current source-license audit.
-This Git update does not clear or weaken runtime admission controls.
+Readiness reports `project_source_license` as integrated Apache-2.0 for original project source with
+exceptions, separate brand rights and unchanged upstream third-party terms. It removes the obsolete
+missing-license blocker; `siwc_applicability` remains `PENDING_ACCOUNT_AND_INTEGRATION_ELIGIBILITY`.
+These are shipped source-license declarations, not a dynamic rights audit or account/entitlement probe.
+All real account/OAuth/credential/runtime blockers and the unconditional execution denial remain.
 
 This PR cannot satisfy the remaining live gates through fixtures or a toggled environment variable. REAL_CODEX
-remains unconditionally denied before queue insertion. **STOP after offline acceptance, Draft PR and CI.**
+remains unconditionally denied before queue insertion. **STOP after authorized Git merge and exact-SHA
+main CI; no real evaluation, deployment or Phase 3.**

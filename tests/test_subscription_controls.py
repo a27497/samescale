@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import tomllib
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
@@ -98,6 +99,40 @@ def test_subscription_authorization_needs_no_api_key_or_dollar_budget() -> None:
     assert real_execution_readiness()["real_execution_enabled"] is False
     assert real_execution_readiness()["api_key_required"] is False
     assert real_execution_readiness()["usd_hard_cap_required"] is False
+
+
+def test_source_license_is_integrated_without_granting_real_subscription_access(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("HARNESSLAB_REAL_CODEX_ENABLED", "true")
+    root = Path(__file__).resolve().parents[1]
+    project = tomllib.loads((root / "pyproject.toml").read_text())["project"]
+    readiness = real_execution_readiness()
+    source_license = readiness["project_source_license"]
+    assert source_license["spdx_id"] == project["license"] == "Apache-2.0"
+    assert source_license["status"] == "INTEGRATED"
+    assert (root / source_license["scope_document"]).is_file()
+    assert source_license["scope"] == "ORIGINAL_PROJECT_SOURCE_WITH_EXCEPTIONS"
+    assert source_license["brand_rights"] == "SEPARATE_NOT_GRANTED"
+    assert source_license["third_party_rights"] == "RETAIN_UPSTREAM_TERMS"
+    assert readiness["siwc_applicability"] == "PENDING_ACCOUNT_AND_INTEGRATION_ELIGIBILITY"
+    assert "OSS_LICENSE_NOT_CONFIRMED" not in readiness["blockers"]
+    assert {
+        "TRUSTED_SUBSCRIPTION_CREDENTIAL_BOUNDARY_NOT_LIVE_VERIFIED",
+        "LIVE_ROUTE_AND_QUOTA_NOT_VERIFIED",
+        "LIVE_REQUEST_INTERCEPTION_AND_NO_RETRY_NOT_VERIFIED",
+        "SIWC_ACCOUNT_WORKSPACE_ELIGIBILITY_NOT_CONFIRMED",
+        "SIWC_LOCAL_OR_SELF_HOSTED_INTEGRATION_NOT_CONFIRMED",
+        "SEPARATE_PRODUCT_OAUTH_NOT_AUTHORIZED",
+        "OPENAI_JWKS_AND_CREDENTIAL_LIFECYCLE_NOT_LIVE_VERIFIED",
+        "SEPARATE_FIRST_REAL_AUTHORIZATION_REQUIRED",
+    } <= set(readiness["blockers"])
+    assert readiness["real_execution_enabled"] is False
+    assert readiness["credential_access"] == "NONE_PHASE25"
+    assert readiness["quota"] == "NOT_READ" and readiness["token_usage"] == "NOT_REPORTED"
+    with pytest.raises(WorkbenchAPIError) as denied:
+        deny_real_execution()
+    assert denied.value.code == "REAL_EXECUTION_BLOCKED" and denied.value.status_code == 403
 
 
 def test_subscription_planning_blocks_before_credentials_or_processes() -> None:
@@ -228,6 +263,8 @@ async def test_real_subscription_http_deny_and_readiness_without_api_or_usd(
         status = (await client.get("/api/local-execution/status")).json()
         assert status["real_execution_enabled"] is False
         assert status["subscription_readiness"]["api_key_required"] is False
+        assert status["subscription_readiness"] == real_execution_readiness()
+        assert "OSS_LICENSE_NOT_CONFIRMED" not in status["reason_codes"]
         body = {
             "mode": "REAL_CODEX",
             "plan_digest": "sha256:" + "1" * 64,
@@ -240,6 +277,11 @@ async def test_real_subscription_http_deny_and_readiness_without_api_or_usd(
         }
         r = await client.post("/api/local-execution/plans/uncreated/authorize", json=body)
         assert r.status_code == 403 and r.json()["error"]["code"] == "REAL_EXECUTION_BLOCKED"
+        with monkeypatch.context() as unavailable_policy:
+            unavailable_policy.delenv("HARNESSLAB_LOCAL_EXECUTION_POLICY")
+            disabled = (await client.get("/api/local-execution/status")).json()
+        assert disabled["enabled"] is False and disabled["real_execution_enabled"] is False
+        assert disabled["subscription_readiness"] == real_execution_readiness()
 
 
 def test_legacy_authorization_document_and_digest_remain_readable() -> None:
