@@ -1,0 +1,17 @@
+{
+  "head_sha": "3cbefb6731d07c6eddb3463c895eeef60b2f0fd9",
+  "runs": [
+    {
+      "name": "HarnessLab Fast CI",
+      "database_id": 37982125351,
+      "conclusion": "success",
+      "url": "https://github.com/a27497/samescale/actions/runs/37982125351"
+    },
+    {
+      "name": "SameScale Offline Regression",
+      "database_id": 37982125318,
+      "conclusion": "success",
+      "url": "https://github.com/a27497/samescale/actions/runs/37982125318"
+    }
+  ]
+}

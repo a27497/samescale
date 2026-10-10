@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import Field, model_validator
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from harnesslab.contracts.common import Sha256Digest
+from harnesslab.local_execution.subscription import SubscriptionLimits, SubscriptionPlanningBudget
 from harnesslab.local_plans.models import PlanningBudget
 from harnesslab.registry.models import RegistryModel, canonical_digest
 
@@ -21,9 +22,20 @@ class ExecutionPolicy(RegistryModel):
     verifier_image_identity: Sha256Digest
     # Fake is trusted host code, not a user-provided script or an oracle reader.
     fixture_task_identities: tuple[Sha256Digest, ...] = Field(min_length=1, max_length=20)
+    protocol_stub: bool = Field(default=False, strict=True)
+    protocol_limits: SubscriptionLimits | None = None
+    protocol_scenario: Literal[
+        "solve", "auth_expired", "quota_exhausted", "upstream_failure", "hang"
+    ] = "solve"
     scenario: Literal["solve", "wrong_workspace", "timeout", "slow", "verifier_timeout"] = "solve"
     authorization_ttl_seconds: int = Field(default=300, ge=1, le=900, strict=True)
     lease_seconds: int = Field(default=15, ge=5, le=120, strict=True)
+
+    @model_validator(mode="after")
+    def offline_protocol_contract(self) -> ExecutionPolicy:
+        if self.protocol_stub != (self.protocol_limits is not None):
+            raise ValueError("Offline protocol execution requires explicit frozen limits")
+        return self
 
     @property
     def identity(self) -> str:
@@ -35,10 +47,19 @@ class AuthorizationRequest(RegistryModel):
     run_slot_digest: Sha256Digest
     idempotency_key: UUID
     mode: Literal["FAKE_CODEX", "REAL_CODEX"]
-    confirmed_budget: PlanningBudget
-    max_model_cost_usd: float = Field(ge=0, le=1000, allow_inf_nan=False)
+    confirmed_budget: PlanningBudget | SubscriptionPlanningBudget
+    max_model_cost_usd: float | None = Field(default=None, ge=0, le=1000, allow_inf_nan=False)
+    subscription_limits: SubscriptionLimits | None = None
     confirm_one_attempt: bool = Field(strict=True)
     acknowledge_reference_budgets: bool = Field(strict=True)
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_document(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        document: dict[str, Any] = handler(self)
+        # New optional controls must not change old immutable authorization digests.
+        if self.subscription_limits is None:
+            document.pop("subscription_limits", None)
+        return document
 
     @model_validator(mode="after")
     def explicit_confirmation(self) -> AuthorizationRequest:

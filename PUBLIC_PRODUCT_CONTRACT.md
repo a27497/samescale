@@ -1,5 +1,29 @@
 # SameScale Product — Public Product Contract
 
+## ChatGPT subscription preparation — Phase 2.5 — 2026-10-10
+
+Real execution remains **closed by a code gate**. Subscription access requires neither an API key
+nor a USD hard cap. Subscription request/turn/time contracts are explicit; unforceable Token/quota
+ceilings remain observations. Data-only subscription preflight accepts a budget without USD fields
+and returns `SUBSCRIPTION_RUNTIME_NOT_ADMITTED`; it cannot save an API-billing plan or enqueue Real.
+Existing Fake planning/execution and historical evidence retain their own identities.
+
+An operator-only protocol double runs the actual frozen CLI in isolated Docker through the existing
+single-attempt queue/Worker/H-Lane. A separate network-none controller owns synthetic credentials,
+counts/debits requests before transport and refuses reset/retry; Subject receives only Workspace,
+and Verifier receives readonly Workspace/hidden assets. These are zero-model-call
+`FAKE_CODEX / CUSTOM / synthetic / NOT_ATTESTED` results. Offline protocol compatibility and credential
+canary isolation do not establish live subscription credential safety, quota or model access.
+
+A separate copied real engineering task has actual deterministic hidden baseline/oracle admission;
+protocol fixture results do not provide that qualification. No existing login state, services,
+databases, website or frozen evidence are changed. The trusted live subscription auth boundary,
+route/quota observation and all retry/interception paths remain unverified; missing critical controls
+must deny. No real account Token is read, live inference/refresh/login/logout performed, extra credits
+purchased, production deployment or Phase 3 started. See [scope and first-real requirements](docs/SUBSCRIPTION_EXECUTION.md).
+The Phase-1/2 records below retain their original acceptance scope; their older token/USD prerequisite
+wording does not govern subscription execution.
+
 ## Private local execution — MVP Phase 2 — 2026-10-09
 
 The private `/plans/:planId` journey extends saved plans with **separate one-attempt execution

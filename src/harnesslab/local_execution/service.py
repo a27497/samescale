@@ -17,6 +17,7 @@ from harnesslab.db.models.local_execution import (
 from harnesslab.db.models.local_plan import LocalTaskPlanRecord
 from harnesslab.local_execution.models import AuthorizationRequest, ExecutionAuthorization
 from harnesslab.local_execution.policy import load_execution_policy, operator_identity
+from harnesslab.local_execution.subscription import deny_real_execution, real_execution_readiness
 from harnesslab.local_plans import service as planning
 from harnesslab.local_plans.models import SavedPlan
 from harnesslab.local_plans.tasks import fail
@@ -85,17 +86,18 @@ async def authorize(
     credentials: frozenset[str],
 ) -> dict[str, Any]:
     if request.mode == "REAL_CODEX":
-        raise fail(
-            "REAL_EXECUTION_BLOCKED",
-            "Real execution is disabled: token/cost hard caps and a separately authorized "
-            "provider boundary are unavailable.",
-            403,
-        )
+        deny_real_execution()
     policy = load_execution_policy()
     if request.max_model_cost_usd != 0:
         raise fail(
             "ZERO_MODEL_BUDGET_REQUIRED",
             "Fake execution permits zero model cost and zero model calls.",
+        )
+    if request.subscription_limits != policy.protocol_limits:
+        raise fail(
+            "PROTOCOL_LIMITS_CONFIRMATION_REQUIRED",
+            "Confirm the exact offline request/turn limits.",
+            409,
         )
     plan = await saved_plan(session, plan_id, lock=True)
     material = plan.preflight.material
@@ -206,6 +208,7 @@ async def view(session: AsyncSession, plan_id: str) -> dict[str, Any]:
             "result": None,
             "mode": "FAKE_CODEX",
             "real_execution_enabled": False,
+            "subscription_readiness": real_execution_readiness(),
         }
     row = await session.get(LocalExecutionAuthorizationRecord, attempt.authorization_id)
     lease = await session.get(ExecutionLease, attempt.run_id)
@@ -232,6 +235,7 @@ async def view(session: AsyncSession, plan_id: str) -> dict[str, Any]:
         "result": result,
         "mode": "FAKE_CODEX",
         "real_execution_enabled": False,
+        "subscription_readiness": real_execution_readiness(),
     }
 
 

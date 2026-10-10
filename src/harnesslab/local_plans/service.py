@@ -15,6 +15,7 @@ from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.custom_eval.evaluation import build_custom_plan
 from harnesslab.custom_eval.models import CustomEvaluationPreset, CustomPlanRequest, CustomTarget
 from harnesslab.db.models.local_plan import LocalPlanPreflightRecord, LocalTaskPlanRecord
+from harnesslab.local_execution.subscription import SubscriptionPlanningBudget
 from harnesslab.local_plans.models import (
     FrozenConfiguration,
     FrozenModelProfile,
@@ -69,6 +70,10 @@ def application_code_identity() -> str:
 def assess(
     request: PlanRequest, catalog: RegistryCatalog, credentials: frozenset[str]
 ) -> tuple[PlanMaterial | None, tuple[PlanningCheck, ...]]:
+    if isinstance(request.budget, SubscriptionPlanningBudget):
+        # Never turn subscription planning into an API-key or USD requirement.
+        # A frozen subscription configuration is not admitted yet; no credential read/probe.
+        return None, (PlanningCheck(code="SUBSCRIPTION_RUNTIME_NOT_ADMITTED", passed=False),)
     checks: list[PlanningCheck] = []
 
     def check(code: str, passed: bool) -> None:

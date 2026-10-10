@@ -1,5 +1,61 @@
 # SameScale Product — Current Milestone
 
+## Phase 2.5 — ChatGPT subscription preparation — 2026-10-10
+
+Independent clean worktree/branch `codex/product-phase25-subscription-20261010`, based on
+`main@3cbefb6731d07c6eddb3463c895eeef60b2f0fd9`. Exact base Fast CI 37982125351 and Offline
+Regression 37982125318 rechecked SUCCESS. This authorization permits offline engineering/acceptance,
+commit, push and a Draft PR; no real subscription inference, actual Token extraction, login/logout,
+upgrade, existing DB migration, service/site deployment, merge or Phase 3.
+
+Development CLI **0.160.1 / ChatGPT local login / built-in OpenAI Responses**, no custom provider,
+profile, ChatGPT base-URL override or API-key/base-URL environment. Live route/entitlement and quota
+are **NOT_VERIFIED / NOT_READ**. Frozen product binaries **0.149.0 / 0.153.4** and local app-server
+schema declarations checked with network-none Docker; no auth/model/catalog RPC. Frozen versions,
+images and historical identities are unchanged. Subscription budgets/authorization need no API key
+or USD fields; inadmissible subscription preflight blocks before API credential/provider checks.
+Real dispatch remains unconditionally closed with explicit subscription/control blockers.
+
+Implemented operator-only network-none Responses HTTP/SSE double through the actual **0.149.0**
+CLI and existing plan/authorization/queue/Worker/H-Lane/Verifier/Episode path. Separate controller
+holds only synthetic in-memory credential canaries; Subject mounts only Workspace and tool probes
+verify credential/proc/hidden-asset/network isolation. Exact confirmed request/turn/time limits,
+fsynced debit-before-transport, no retry/refund/reset/purchase, scoped cancellation/cleanup and
+crash counter preservation are exercised. Safe receipts bind authorization/run/result and reject
+tampering. All protocol results remain **FAKE_CODEX / CUSTOM / synthetic / NOT_ATTESTED**, zero model
+calls, not real task qualification. Optional controls preserve old immutable authorization digests.
+
+A **separate real engineering task** `core-python-deduplicate@1.0.2` was copied and admitted using
+four actual deterministic hidden Docker observations: baseline-fail/oracle-pass twice, **5 checks
+each**, stable repeated report hashes, readonly network-none verifier and cleanup. Existing Phase-1
+import/qualification accepts it. Original package and Official qualification remain unchanged;
+no Subject/model was run for this task. [Operator boundary and first-real conditions](docs/SUBSCRIPTION_EXECUTION.md).
+
+Final local acceptance: **141/141 backend**, including 27 subscription controls, 9 frozen-protocol
+Docker cases, 21 authorization/queue, 9 original Fake Docker and 75 planning cases; **23/23 frontend**,
+Vue types/isolated build, Ruff/format **814 files**, mypy **416 files**, credential scan/whitespace PASS.
+Network-isolated replay **73 PASS**, two byte-identical replay passes/five outputs, zero external/
+Provider/model/Judge calls. **419 frozen files BEFORE == AFTER**. [Actual receipts and initial failures](docs/qa/subscription-phase25-20261010/README.md).
+
+All **8 original worktrees**, UI-2 **17 dirty entries / 1,494 hashes**, **58 existing containers**
+(including 23 running) and developer auth metadata stay unchanged. Docker mount-list ordering is
+compared semantically; no mount flags/identities changed. Only a new disposable tmpfs PostgreSQL
+was migrated; no existing DB query/migration or service/site change. Existing Fake-only and frozen
+results are preserved. No browser, production Worker topology or live-auth verification claim.
+
+**Live blockers:** current credential-in-Subject / TLS CONNECT boundary cannot provide safe
+subscription auth injection or per-request interception. The new controller intentionally has no
+live credential loader/refresh/upstream transport. Live route/quota and all request/retry paths
+remain unverified. Token/quota ceilings are observations, not hard limits; API billing/USD caps are
+not subscription prerequisites. First real evaluation requires a separately reviewed safe boundary
+and explicit user authorization for credential/account metadata access, exact task/model/image/route,
+one attempt, timeout/request/turn limits, cancellation and retention. No extra credits or repair retry.
+
+Candidate SHA/Draft PR and exact-SHA remote CI are **PENDING at this pre-publication snapshot**;
+report them separately at Git handoff. **Phase 2.5 offline preparation COMPLETE; real execution
+BLOCKED/CLOSED. STOP after PR/CI; no real evaluation, merge, deployment or Phase 3.**
+The sections below retain their original historical acceptance and authorization.
+
 ## Product MVP Phase 2 — keyless local acceptance — 2026-10-09
 
 Independent clean worktree/branch `codex/product-mvp-phase2-20261009`, based on

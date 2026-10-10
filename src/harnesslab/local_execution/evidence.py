@@ -66,6 +66,82 @@ def read_bound_episode(root: Path, auth: ExecutionAuthorization, run_id: str) ->
     return episode
 
 
+def protocol_receipt(root: Path, auth: ExecutionAuthorization, run_id: str) -> dict[str, Any]:
+    path = root / (run_id + ".protocol.json")
+    no_links(path)
+    if path.stat().st_size > 16_000:
+        raise ValueError("Oversized protocol receipt")
+    receipt = json.loads(path.read_bytes())
+    expected = {
+        "schema_version",
+        "source",
+        "run_id",
+        "authorization_digest",
+        "requests_consumed",
+        "turns_consumed",
+        "requests_received",
+        "requests_denied",
+        "automatic_retries",
+        "real_model_requests",
+        "token_usage",
+        "quota",
+        "state",
+    }
+    limits = auth.request.subscription_limits
+    if (
+        set(receipt) != expected
+        or receipt["schema_version"] != 1
+        or receipt["source"] != "PROTOCOL_STUB_NO_MODEL"
+        or receipt["run_id"] != run_id
+        or receipt["authorization_digest"] != auth.digest
+        or limits is None
+        or receipt["automatic_retries"] != 0
+        or receipt["real_model_requests"] != 0
+        or receipt["token_usage"] is not None
+        or any(
+            type(receipt[k]) is not int or receipt[k] < 0
+            for k in ("requests_consumed", "turns_consumed", "requests_denied", "requests_received")
+        )
+        or receipt["requests_consumed"] > limits.max_requests
+        or receipt["turns_consumed"] > limits.max_turns
+        or receipt["quota"] not in {"SYNTHETIC_AVAILABLE", "SYNTHETIC_EXHAUSTED"}
+        or receipt["state"]
+        not in {
+            "READY",
+            "ACTIVE",
+            "COMPLETED",
+            "TIMEOUT",
+            "CONTROLLER_CLOSED",
+            "ROUTE_OR_PROTOCOL_DENIED",
+            "AUTH_EXPIRED",
+            "QUOTA_EXHAUSTED_NO_CREDIT_FALLBACK",
+            "REQUEST_LIMIT",
+            "UPSTREAM_FAILED_NO_RETRY",
+            "UNSUPPORTED_PROTOCOL_TOOLS",
+            "REQUEST_ENVELOPE_DENIED",
+            "MALFORMED_REQUEST",
+        }
+    ):
+        raise ValueError("Protocol receipt binding/control failure")
+    return receipt  # type: ignore[no-any-return]
+
+
+def bind_protocol_result(result: dict[str, Any], auth: ExecutionAuthorization, root: Path) -> None:
+    path = root / (result["run_id"] + ".protocol.json")
+    if not path.exists():
+        if result["status"] in {"VERIFIED_PASS", "VERIFIED_FAIL"}:
+            raise ValueError("Protocol acceptance requires controller evidence")
+        return
+    receipt = protocol_receipt(root, auth, result["run_id"])
+    if receipt["state"] == "TIMEOUT" and result["status"] not in {"CANCELLED", "INTERRUPTED"}:
+        result["status"] = "TIMEOUT"
+        result["acceptance"] = "NOT_VERIFIED"
+        result["reason_code"] = "OFFLINE_CONTROLLER_DEADLINE"
+    result["offline_protocol"] = {"receipt_identity": canonical_digest(receipt), "receipt": receipt}
+    result["real_codex_runtime"] = "OFFLINE_PROTOCOL_ONLY_NO_REAL_INFERENCE"
+    result["digest"] = canonical_digest({k: v for k, v in result.items() if k != "digest"})
+
+
 def validate_result(
     row: LocalExecutionResultRecord, auth: ExecutionAuthorization
 ) -> dict[str, Any]:
@@ -81,6 +157,18 @@ def validate_result(
             or result["run_slot_digest"] != auth.run_slot_digest
         ):
             raise ValueError("result binding failed")
+        if "offline_protocol" in result:
+            receipt = protocol_receipt(load_execution_policy().artifact_root, auth, row.run_id)
+            if result["offline_protocol"] != {
+                "receipt_identity": canonical_digest(receipt),
+                "receipt": receipt,
+            }:
+                raise ValueError("Protocol receipt integrity failed")
+        elif auth.request.subscription_limits is not None and result["status"] in {
+            "VERIFIED_PASS",
+            "VERIFIED_FAIL",
+        }:
+            raise ValueError("Missing protocol control evidence")
         if result["episode"] is not None:
             root = load_execution_policy().artifact_root / row.run_id
             observed = read_bound_episode(root, auth, row.run_id)

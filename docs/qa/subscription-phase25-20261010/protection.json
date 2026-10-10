@@ -1,0 +1,287 @@
+{
+  "existing_worktrees": {
+    "/home/dev/.worktrees/samescale-brand-v1": {
+      "unchanged": true,
+      "file_count": 1528,
+      "dirty_entries": 0
+    },
+    "/home/dev/.worktrees/samescale-grok-qa-20261009": {
+      "unchanged": true,
+      "file_count": 1528,
+      "dirty_entries": 0
+    },
+    "/home/dev/.worktrees/samescale-main-baseline-20261009": {
+      "unchanged": true,
+      "file_count": 1528,
+      "dirty_entries": 0
+    },
+    "/home/dev/.worktrees/samescale-mvp-phase1-20261010": {
+      "unchanged": true,
+      "file_count": 1622,
+      "dirty_entries": 0
+    },
+    "/home/dev/.worktrees/samescale-mvp-phase2-20261009": {
+      "unchanged": true,
+      "file_count": 1666,
+      "dirty_entries": 0
+    },
+    "/home/dev/.worktrees/samescale-ui-closeout-v1-20261009": {
+      "unchanged": true,
+      "file_count": 1591,
+      "dirty_entries": 0
+    },
+    "/home/dev/.worktrees/samescale-visual-v1": {
+      "unchanged": true,
+      "file_count": 1497,
+      "dirty_entries": 0
+    },
+    "/home/dev/projects/samescale": {
+      "unchanged": true,
+      "file_count": 1494,
+      "dirty_entries": 17
+    }
+  },
+  "existing_services": {
+    "/grok-lecturelens-preview-20261009": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/harnesslab-first-application-demo-20260909": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/harnesslab-postgres-restore": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-acceptance-c7430cb-20261008-gateway-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-acceptance-c7430cb-20261008-minio-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-acceptance-c7430cb-20261008-minio-init-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-acceptance-c7430cb-20261008-mysql-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-acceptance-c7430cb-20261008-postgres-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-acceptance-c7430cb-20261008-redis-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-acceptance-c7430cb-20261008-rocketmq-broker-1": {
+      "unchanged": true,
+      "mount_order_only_difference": true
+    },
+    "/lecturelens-acceptance-c7430cb-20261008-rocketmq-namesrv-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-acceptance-c7430cb-20261008-rocketmq-store-init-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-agent-postgres-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-closeout-postgres-20261007": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-closeout-20261007-minio-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-closeout-20261007-minio-init-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-closeout-20261007-mysql-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-closeout-20261007-redis-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-closeout-20261007-rocketmq-broker-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-closeout-20261007-rocketmq-namesrv-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-closeout-20261007-rocketmq-store-init-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-l2-minio-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-l2-minio-init-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-l2-mysql-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-l2-redis-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-l2-rocketmq-broker-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-l2-rocketmq-namesrv-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-demo-l2-rocketmq-store-init-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-display-c7430cb-20261008-gateway-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-display-c7430cb-20261008-mysql-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-display-c7430cb-20261008-postgres-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-display-c7430cb-20261008-redis-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-live-gateway": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/lecturelens-loop-redis": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-grok-p0-final-gateway": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-grok-p0-final-tunnel": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-grok-qa-api": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-grok-qa-gateway": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-grok-qa-postgres": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-grok-qa-tunnel": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-grok-ui-v2-gateway": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-grok-ui-v2-tunnel": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-human-uat-20260922": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-live-postgres": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-manual-test-postgres": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-product-p0-preview": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-qa-postgres": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-s2-tests-20260915": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-s25-config-check-20260915": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-s25-connections-check-20260915": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-s25-execution-check-20260915": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-s25-model-harness-check-20260915": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-s25-session-check-20260916": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-s25-transport-check-20260915": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-uat-repair-tests-20260922": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-workspace-api-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-workspace-migrate-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    },
+    "/samescale-workspace-postgres-1": {
+      "unchanged": true,
+      "mount_order_only_difference": false
+    }
+  },
+  "development_auth_metadata_unchanged": true,
+  "auth_content_not_read": true,
+  "all_equal": true,
+  "new_disposable_database": "samescale-phase25-test-postgres-20261010",
+  "existing_database_queries_or_migrations": 0,
+  "website_deployment": false,
+  "existing_container_count": 58,
+  "existing_running_container_count": 23,
+  "comparison_note": "Mount lists are compared by destination/source, preserving flags and every identity. One Docker inspect mount-order difference is semantically unchanged."
+}

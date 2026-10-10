@@ -9,6 +9,7 @@ from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.local_execution import service
 from harnesslab.local_execution.models import AuthorizationRequest
 from harnesslab.local_execution.policy import load_execution_policy
+from harnesslab.local_execution.subscription import real_execution_readiness
 from harnesslab.local_plans.api import Catalog, Credentials, Private, Session
 
 router = APIRouter(prefix="/local-execution", tags=["private-local-execution"])
@@ -22,7 +23,8 @@ async def status() -> dict[str, object]:
             "enabled": True,
             "mode": "FAKE_CODEX",
             "real_execution_enabled": False,
-            "reason_codes": ["REAL_COST_TOKEN_CAP_UNAVAILABLE"],
+            "reason_codes": real_execution_readiness()["blockers"],
+            "subscription_readiness": real_execution_readiness(),
             "model_calls_allowed": 0,
         }
     except WorkbenchAPIError as exc:
@@ -31,6 +33,7 @@ async def status() -> dict[str, object]:
             "mode": "FAKE_CODEX",
             "real_execution_enabled": False,
             "reason_codes": [exc.code],
+            "subscription_readiness": real_execution_readiness(),
             "model_calls_allowed": 0,
         }
 
