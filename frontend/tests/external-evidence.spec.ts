@@ -27,6 +27,12 @@ async function unlocked(path?: string) {
   return result
 }
 describe('Private saved Codex evidence', () => {
+  it('does not invent an Episode for supplied JSONL or partial hooks', async () => {
+    vi.mocked(externalEvidenceApi.detail).mockResolvedValue({ ...detail, record: { ...detail.record, episode_identity: null }, diagnosis: { ...detail.diagnosis, workspace_acceptance: 'NOT_VERIFIED', independent_verification: { checks: 0, passed_checks: 0 } } })
+    const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
+    expect(wrapper.text()).toContain('未提供可导入的原 Episode')
+    expect(wrapper.text()).not.toContain('原 Episode 保留'); wrapper.unmount()
+  })
   it('requires operator access and explicit source consent; never stores credentials', async () => {
     const storage = vi.spyOn(Storage.prototype, 'setItem')
     const { wrapper } = await screen()

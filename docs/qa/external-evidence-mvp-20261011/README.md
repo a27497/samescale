@@ -44,6 +44,12 @@ existing first item broke its test. These are not counted as passes. The final s
 Original historical Episode `unverified` was initially mistaken for the declared archival classification;
 the importer now retains original classification independently and rejects known synthetic relabeling.
 
+Final display correction after initial Head `65cbb03f48de5bdb69e5549010d305c5021a6dad`: a provided
+JSONL/partial-hook record with no original Episode now explicitly says none was supplied, rather than
+using the retained-Episode caption. **209 frontend cases**, including the new absence case, and build
+pass. [Supplemental source-bound receipt](episode-absence.json). Initial acceptance/source hashes and
+browser observations above retain their original scope; backend evidence and stored verdicts are unchanged.
+
 [Machine-readable acceptance](acceptance.json) · [Browser receipt](browser.json) ·
 [Desktop](historical-real.png) · [Mobile](mobile.png) · [Unverified fixture](unverified.png).
 The [browser script](browser-check.cjs) requires a separately prepared disposable evidence store,

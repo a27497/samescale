@@ -19,7 +19,7 @@ qualification and separate operator CLI consent through the existing pinned isol
 attempt, zero automatic retry; timeout, zero checks and incomplete cleanup cannot pass. New receipts
 never rewrite originals. The API remains data-only behind the local operator/origin boundary.
 
-**120 focused + 208 compatibility cases PASS**, **208 frontend tests PASS**, type/build PASS,
+**120 focused + 208 compatibility cases PASS**, **209 frontend tests PASS**, type/build PASS,
 **15 actual browser checks PASS**, **73 historical offline checks PASS** with two identical passes.
 New exports also replay twice under the network/process audit guard. Final Docker batch: five isolated
 Verifier invocations (actual baseline/oracle admission, supplied Workspace fail/pass and timeout), all

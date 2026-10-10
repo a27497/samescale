@@ -1,0 +1,15 @@
+{
+  "backend_behavior_changed": false,
+  "correction": "No supplied original Episode is labelled absent; no original Episode is invented.",
+  "frontend_build": "PASS",
+  "frontend_cases": 209,
+  "model_calls": 0,
+  "previous_head": "65cbb03f48de5bdb69e5549010d305c5021a6dad",
+  "schema_version": 1,
+  "source_files": {
+    "frontend/src/views/ExternalEvidenceView.vue": "sha256:76d164342f60460aa555e24a8cb6af03e3d574cc3aaa4f2de5887055e4cb7e56",
+    "frontend/tests/external-evidence.spec.ts": "sha256:5d99a28aa08a615d855a7be4b6f5a6dd825dca097a40e775cc7f65c900f8a804"
+  },
+  "status": "PASS",
+  "stored_records_or_frozen_results_rewritten": false
+}

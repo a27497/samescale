@@ -78,7 +78,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
       <div v-if="detail" class="panel" data-test="detail">
         <h3>{{ detail.record.source.source_id }} · {{ detail.record.source.source_kind }}</h3>
         <p data-test="acceptance">{{ c('独立 Workspace 验收', 'Independent Workspace acceptance') }}：{{ detail.diagnosis.workspace_acceptance }} · {{ detail.diagnosis.independent_verification.passed_checks }}/{{ detail.diagnosis.independent_verification.checks }}</p>
-        <p>{{ c('原 Episode 保留', 'Original Episode retained') }}：{{ detail.diagnosis.original_episode_acceptance }}</p>
+        <p>{{ detail.record.episode_identity ? c('原 Episode 保留', 'Original Episode retained') : c('未提供可导入的原 Episode；验收状态', 'No importable original Episode supplied; acceptance') }}：{{ detail.diagnosis.original_episode_acceptance }}</p>
         <p v-if="detail.diagnosis.workspace_acceptance === 'NOT_VERIFIED'">{{ c('缺少可信任务或独立验收，保持未验证。新的验收须由操作员在隔离 Verifier 中单独授权，随后刷新读取。', 'Without a trusted task or independent result, acceptance stays unverified. New checks require separate operator authorization in the isolated Verifier; reload afterwards.') }}</p>
         <p>{{ detail.record.completeness.integrity }} · {{ detail.record.completeness.coverage }} · {{ detail.record.completeness.origin }}</p>
         <p>{{ c('缺失字段', 'Missing fields') }}：{{ detail.record.completeness.missing_fields.join(', ') }}</p>
