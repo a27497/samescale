@@ -1,5 +1,36 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## Current authorization — license Git closeout and Phase 2.6 integration — 2026-10-10
+
+Verify PR #11's exact Head/Base, 27-file scope, four CI runs, conflicts/reviews and license exceptions;
+mark Ready and merge using a merge commit, preserving original commits. Verify the resulting tree
+and exact new-main Fast CI/Offline Regression before any dependent PR #10 integration. Stop on blockers.
+In a new independent worktree, merge that main into PR #10 without changing its original worktree,
+rewriting history or force pushing. Reconcile README, milestone, public contract, blueprint and current
+operator guidance: Apache source licensing is merged; brand/third-party exclusions and REAL_CODEX
+closure remain; preserve original Phase-2.6 acceptance and frozen pre-license audit observations.
+Run bounded offline compatibility, notice/link and preservation checks; commit the merge, normally push
+to PR #10 and verify exact new-Head push/PR CI. Keep PR #10 Draft/unmerged. No credential access, real
+OAuth/Agent/Provider, existing DB migration, deployment, website change or Phase 3. STOP at handoff.
+Current results belong to [CURRENT_MILESTONE](../CURRENT_MILESTONE.md); the dated plans below retain
+their original authorization and do not describe current license status or grant new execution rights.
+
+## Authorized source licensing — 2026-10-10
+
+Use current remote main@1061ddd7b13288f27e6d0545c8d6f6467278073b in an independent clean worktree;
+leave PR #10 and every existing worktree unchanged. Audit contribution history, original notices,
+dependencies, brand and archived content; define the Apache-2.0 project-source Work and explicit
+exceptions before publication. Preserve MIT/template/third-party notices and exact brand/evidence
+bytes. Add the unmodified ASF LICENSE, appropriate scope/brand/contribution/third-party materials
+and metadata/packaging without changing runtime behavior. Verify bytes, scope, links, notices,
+existing compatibility/CI and protection, then commit/push a new branch/Draft PR and check exact-SHA
+CI if no source-license conflict blocks publication. Unclear important material must not be
+relicensed; unsafe publication stops with concrete file/rights questions. Website license, live
+Agent/Provider/credentials, existing DB migration, deployment, main merge and Phase 3 are excluded.
+Live audit/results belong to CURRENT_MILESTONE; [license audit](licensing/AUDIT.md) owns supporting
+rights evidence, scope limits and separate binary-distribution gates. STOP after Draft PR/CI.
+The dated authorizations below retain their historical scope.
+
 ## Phase 2.6 — SIWC applicability and offline trusted auth (authorized 2026-10-10)
 
 Base main@1061ddd7b13288f27e6d0545c8d6f6467278073b. Audit current official OSS, app-server,

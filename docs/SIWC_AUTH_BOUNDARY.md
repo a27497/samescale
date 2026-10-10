@@ -1,19 +1,24 @@
 # SIWC applicability and trusted auth preparation — Phase 2.6
 
-**OFFLINE ONLY / REAL_CODEX CLOSED.** Based on main@1061ddd7b13288f27e6d0545c8d6f6467278073b.
-The user authorized offline adaptation, acceptance, commit/push and a Draft PR. No actual OAuth,
-account/model/quota RPC, credential read/import, refresh, inference, deployment or main merge is included.
+**OFFLINE ONLY / REAL_CODEX CLOSED.** Original Phase-2.6 acceptance used
+main@1061ddd7b13288f27e6d0545c8d6f6467278073b. PR #11 subsequently merged the bounded source
+license at main@ffeee1b366baa61f303ebf546f0287aae3ac9be1; it is now integrated into Draft PR #10.
+This Git closeout authorizes that license merge and offline integration, not PR #10 merge or actual
+OAuth/account/model/quota RPC, credential read/import, refresh, inference or deployment.
 The actual subscription route and complete live controls remain unverified.
 
 ## Official applicability audit (checked 2026-10-10)
 
 [SIWC plan-usage overview](https://developers.openai.com/siwc/token-sharing-open-source)
 describes optional plan access for open-source/local apps, including an individually self-hosted VM.
-Paid or remotely hosted integrations follow a separate interest/approval path. SameScale is public,
-but no root LICENSE/LICENCE/COPYING is present and GitHub reports no detected license. Public source
-visibility does not establish an open-source license, copyright authority or SIWC integration eligibility.
-The user must choose/confirm licensing and the intended local/self-hosted versus hosted product use;
-this change neither chooses a license nor files a registration/interest request. Account/workspace,
+Paid or remotely hosted integrations follow a separate interest/approval path. The preserved
+[original repository snapshot](qa/siwc-phase26-20261010/repository-eligibility.json) observed public
+visibility and no root/detected license at main@1061ddd. PR #11 has since added the complete
+Apache-2.0 source license and [explicit scope/exceptions](../LICENSE_SCOPE.md); GitHub detects
+Apache-2.0 on the new main. This is an owner-authorized source decision, not an independent copyright
+assignment or license for excluded artwork/material. The missing source-license observation is resolved;
+intended local/self-hosted versus hosted use and SIWC eligibility still need confirmation. No registration
+or interest request is filed. The original snapshot remains historical and is not current status. Account/workspace,
 region/policy eligibility and applicable OpenAI approval remain NOT_CONFIRMED. CLI ChatGPT login is
 not consent to this separate product registration. The existing website remains an unchanged read-only
 surface; its presence does not authorize a hosted inference service.
@@ -113,10 +118,10 @@ and reject mutation. Incomplete attempts never redispatch; sealed evidence may r
 
 ## First real authorization — independent gates
 
-All of the following remain required and unfulfilled:
+The bounded source-license decision is complete. The remaining live gates are unfulfilled:
 
-1. User-confirmed license/copyright authority and applicable SIWC OSS/local/self-hosted eligibility;
-   account/workspace eligibility and any OpenAI approval required for the intended integration.
+1. Applicable SIWC OSS/local/self-hosted integration and account/workspace eligibility, including
+   any OpenAI approval required for the intended integration and rights to material outside the source scope.
 2. Explicit consent for a separate SameScale OAuth registration, real account/model/quota metadata reads,
    product credential handling and any secure VM import. Development CLI storage remains excluded.
 3. Reviewed OpenAI JWKS validation and production credential storage/renewal/revocation ownership,
@@ -126,5 +131,9 @@ All of the following remain required and unfulfilled:
 5. Separate authorization for the exact admitted task/model/image/route, one physical attempt, timeout,
    request/turn bounds and failure retention. No repair, second attempt, extra credits or Phase 3 is implied.
 
-This PR cannot satisfy these gates through fixtures or a toggled environment variable. REAL_CODEX
+The unchanged deny-only preflight retains conservative policy labels such as
+`OSS_LICENSE_NOT_CONFIRMED`; it does not scan Git licensing and is not the current source-license audit.
+This Git update does not clear or weaken runtime admission controls.
+
+This PR cannot satisfy the remaining live gates through fixtures or a toggled environment variable. REAL_CODEX
 remains unconditionally denied before queue insertion. **STOP after offline acceptance, Draft PR and CI.**

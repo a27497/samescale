@@ -1,0 +1,40 @@
+{
+  "base_sha": "1061ddd7b13288f27e6d0545c8d6f6467278073b",
+  "tracked_baseline_files": 1691,
+  "baseline_inventory_sha256": "42c75dc4ebd1729ff5d3998fa270ef4e2a8c7197d70c40a7d20d06e2f0b59e84",
+  "scope_counts": {
+    "PROJECT_SOURCE_AND_MAINTAINED_DOCS": 1118,
+    "ALEMBIC_TEMPLATE_MIT_RETAINED": 2,
+    "HISTORICAL_EXCLUDED_EXISTING_LICENSES_RETAINED": 557,
+    "BRAND_EXCLUDED": 14
+  },
+  "commits": 225,
+  "git_author_names": [
+    "a27497"
+  ],
+  "copyright_authority": "OWNER_AUTHORIZED_SOURCE_LICENSE_DECISION_GIT_ATTRIBUTION_NOT_LEGAL_ASSIGNMENT_PROOF",
+  "root_previous_license": "NO_LICENSE_PYPROJECT_PROPRIETARY",
+  "copyright_headers_in_tracked_text": "NONE_OUTSIDE_ARCHIVE",
+  "brand_files": 14,
+  "font_binaries": 0,
+  "baseline_raster_screenshots": 90,
+  "external_archive_entries": 513,
+  "embedded_mit_license_copies": 5,
+  "npm_locked_packages": 282,
+  "npm_installed_packages": 257,
+  "python_external_locked_packages": 72,
+  "python_installed_packages": 70,
+  "retained_notice_sections": 372,
+  "unique_verbatim_texts": 262,
+  "retained_notice_bytes": 984698,
+  "source_license_blockers": [],
+  "binary_distribution_gates": [
+    "LGPL_SOURCE_NOTICE_AND_REPLACEMENT_RELINKING",
+    "MPL_SOURCE_AVAILABILITY",
+    "BUNDLED_NATIVE_LIBRARY_OS_CLI_TOOL_LICENSES",
+    "OPTIONAL_PLATFORM_VARIANTS",
+    "LODASH_UNIFIED_SEPARATE_COPYRIGHT_NOTICE"
+  ],
+  "real_agent_provider_calls": 0,
+  "root_notice": "NOT_CREATED_UPSTREAM_ECHARTS_NOTICE_PRESERVED_SEPARATELY"
+}

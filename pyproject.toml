@@ -8,7 +8,8 @@ version = "0.1.0"
 description = "Reproducible Model x Harness x Judge evaluation and attribution platform"
 readme = "README.md"
 requires-python = "==3.12.14"
-license = { text = "Proprietary" }
+license = "Apache-2.0"
+license-files = ["LICENSE", "LICENSE_SCOPE.md", "BRAND_ASSETS.md", "THIRD_PARTY_NOTICES.md", "licenses/*", "frontend/public/legal/*"]
 authors = [{ name = "HarnessLab AI" }]
 dependencies = [
     "alembic>=1.16,<2",
@@ -43,6 +44,13 @@ dev = [
 packages = ["src/harnesslab"]
 
 [tool.hatch.build.targets.wheel.force-include]
+"LICENSE" = "harnesslab/productization/distribution/LICENSE"
+"LICENSE_SCOPE.md" = "harnesslab/productization/distribution/LICENSE_SCOPE.md"
+"BRAND_ASSETS.md" = "harnesslab/productization/distribution/BRAND_ASSETS.md"
+"CONTRIBUTING.md" = "harnesslab/productization/distribution/CONTRIBUTING.md"
+"THIRD_PARTY_NOTICES.md" = "harnesslab/productization/distribution/THIRD_PARTY_NOTICES.md"
+"licenses" = "harnesslab/productization/distribution/licenses"
+"frontend/public/legal" = "harnesslab/productization/distribution/frontend/public/legal"
 "AGENTS.md" = "harnesslab/productization/distribution/AGENTS.md"
 "CURRENT_MILESTONE.md" = "harnesslab/productization/distribution/CURRENT_MILESTONE.md"
 "PUBLIC_PRODUCT_CONTRACT.md" = "harnesslab/productization/distribution/PUBLIC_PRODUCT_CONTRACT.md"

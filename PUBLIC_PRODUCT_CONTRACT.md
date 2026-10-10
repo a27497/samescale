@@ -1,10 +1,24 @@
 # SameScale Product — Public Product Contract
 
+## Source licensing — 2026-10-10
+
+The original main product source identified by [LICENSE_SCOPE.md](LICENSE_SCOPE.md) is offered
+under the unmodified Apache License 2.0, allowing commercial use/modification/redistribution under
+its terms. This does not grant brand/artwork rights, relicense external dependencies or archived
+material, change `samescale-site` licensing, or transfer anyone else's copyright. Original third-party
+notices and excluded evidence/artwork remain preserved. Binary/asset rights are separate gates;
+see [brand policy](BRAND_ASSETS.md) and [third-party obligations](THIRD_PARTY_NOTICES.md).
+Licensing does not establish OpenAI SIWC eligibility, account access, OAuth consent or real runtime
+readiness. Real execution remains closed. No functionality/deployment/DB change is claimed.
+The dated records below retain their historical scope.
+
 ## Phase 2.6 — SIWC offline preparation — 2026-10-10
 
-REAL_CODEX stays unconditionally closed. The public repository has no detected root license;
-license/copyright authority, SIWC integration/account/workspace eligibility and separate actual OAuth
-consent remain unconfirmed. Public source and development CLI login do not establish these gates.
+REAL_CODEX stays unconditionally closed. The main product source now has the owner-selected
+Apache-2.0 license, merged in PR #11, with [explicit brand, historical and third-party exceptions](LICENSE_SCOPE.md).
+This resolves the missing root source-license observation; it does not establish SIWC integration/
+account/workspace eligibility, actual OAuth consent or ownership of excluded external material.
+Development CLI login grants no separate product permission. PR #10 remains Draft and unmerged.
 An operator-only controller models client/host/scope/credential lifecycle with synthetic OAuth,
 strict public Responses requirements and no live transport. Its HMAC fixture signature is not
 OpenAI JWKS validation. Safe synthetic auth receipts reuse the existing Fake execution/evidence path;

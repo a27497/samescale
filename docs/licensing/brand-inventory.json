@@ -1,0 +1,76 @@
+{
+  "repository": "a27497/samescale-site",
+  "sourceCommit": "73063c5a6f311de61970862d16311cb0e2ada814",
+  "assets": [
+    {
+      "source": "public/apple-touch-icon.png",
+      "target": "frontend/public/apple-touch-icon.png",
+      "sha256": "07b21cd5e6bdce5df962fb4a803c9335b0304083f1ccdcb1be342c88e63307f2"
+    },
+    {
+      "source": "public/brand/samescale-lockup-cobalt-on-dark.svg",
+      "target": "frontend/public/brand/samescale-lockup-cobalt-on-dark.svg",
+      "sha256": "c5525d48a37655e9971f4910596ababf9e8d503a68f4e7c5c496792127c00425"
+    },
+    {
+      "source": "public/brand/samescale-lockup-cobalt.svg",
+      "target": "frontend/public/brand/samescale-lockup-cobalt.svg",
+      "sha256": "b7eb9ec7cd525c4c089274be9438deee72cda3bbe7dcf9ed96bb8abcab076c58"
+    },
+    {
+      "source": "public/brand/samescale-symbol-16px-cobalt-dark.svg",
+      "target": "frontend/public/brand/samescale-symbol-16px-cobalt-dark.svg",
+      "sha256": "d4262c445bc701c4d11126b24bcc71f3af60b06637e956f3524d6a5eb594621a"
+    },
+    {
+      "source": "public/brand/samescale-symbol-16px-cobalt.svg",
+      "target": "frontend/public/brand/samescale-symbol-16px-cobalt.svg",
+      "sha256": "544d26dcf624e8417c1699d0fe9a227f19bc3d72581d17e869e8df12f040bcb9"
+    },
+    {
+      "source": "public/brand/samescale-symbol-24px-cobalt-dark.svg",
+      "target": "frontend/public/brand/samescale-symbol-24px-cobalt-dark.svg",
+      "sha256": "4864ade15c02fc7bdd8352cb8f811e5e56255b29997e01d3cbee58a189cb464e"
+    },
+    {
+      "source": "public/brand/samescale-symbol-24px-cobalt.svg",
+      "target": "frontend/public/brand/samescale-symbol-24px-cobalt.svg",
+      "sha256": "b187f80ead26442db12c06b0c8b36c45a5a58bb422608eb72a4ddf0f0b85335e"
+    },
+    {
+      "source": "public/brand/samescale-symbol-32px-cobalt-dark.svg",
+      "target": "frontend/public/brand/samescale-symbol-32px-cobalt-dark.svg",
+      "sha256": "696065be66713423209b4e176189dcc94d2599e39f9c6acf2f8b42d83b16171e"
+    },
+    {
+      "source": "public/brand/samescale-symbol-32px-cobalt.svg",
+      "target": "frontend/public/brand/samescale-symbol-32px-cobalt.svg",
+      "sha256": "1d2bbb5c0b479f0d18c46d39e1d3cdf644df02b94df460695b2ed418397ecfca"
+    },
+    {
+      "source": "public/brand/samescale-symbol-cobalt-dark.svg",
+      "target": "frontend/public/brand/samescale-symbol-cobalt-dark.svg",
+      "sha256": "fd14223718ed7351789483277d20523081a2a3c5507d2734168ac4313fdbc13b"
+    },
+    {
+      "source": "public/brand/samescale-symbol-cobalt.svg",
+      "target": "frontend/public/brand/samescale-symbol-cobalt.svg",
+      "sha256": "f9f4b2f09ae427389e27e47ef25bef5a8f7cb9c265653f4b987bfce96035a22b"
+    },
+    {
+      "source": "public/favicon-32x32.png",
+      "target": "frontend/public/favicon-32x32.png",
+      "sha256": "f4be82695c4edbfed84564cc78c7baf6e78a4910b93de0bdb625eaa364fd02c1"
+    },
+    {
+      "source": "public/favicon.ico",
+      "target": "frontend/public/favicon.ico",
+      "sha256": "61c279d214732065b781348d1925e3b03ae519fa234796c38e3b24a5e325ed48"
+    },
+    {
+      "source": "public/favicon.svg",
+      "target": "frontend/public/favicon.svg",
+      "sha256": "831263043cd23ef355490c9f0d1b11dd1cb7c1021ed7b76bdc5b227a0a5af546"
+    }
+  ]
+}

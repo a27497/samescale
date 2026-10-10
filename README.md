@@ -4,6 +4,13 @@
 
 *AI Coding Agent Evaluation & Diagnosis Workbench*
 
+主产品源码采用 **[Apache License 2.0](LICENSE)**，允许按其条款商业使用、修改与再分发。
+[授权文件范围](LICENSE_SCOPE.md) · [品牌资产边界](BRAND_ASSETS.md) ·
+[第三方许可与义务](THIRD_PARTY_NOTICES.md) · [贡献说明](CONTRIBUTING.md)。
+品牌名称、Logo、历史证据/归档及第三方材料不因根许可证而重新授权；官网仓库许可不变。
+添加许可证不代表已获得 OpenAI SIWC 资格、账号授权或真实执行许可。
+源码许可证已通过 PR #11 合并；Phase 2.6 PR #10 仍为离线准备的 Draft，REAL_CODEX 保持关闭。
+
 把 Coding Agent 的一次运行，转化为可检查、可诊断、可复核的工程证据。
 SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回答：实际发生了什么、哪些结果已验证、失败停在哪一层，以及保存的证据能否离线复核。它不把局部运行结果写成模型排行榜。
 
@@ -15,7 +22,7 @@ SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回
 隔离 Fake Codex：实际容器修改 Workspace、采集脱敏 Trace，再由独立 Docker Verifier 判断。
 结果、失败分类和证据摘要可读取；并发与重复请求不会多次领取，崩溃后保全/恢复而不自动重跑。
 
-**真实 Codex 订阅执行保持关闭并拒绝授权**：许可/账号资格、可信认证边界、实际路由与完整请求控制尚未验证。
+**真实 Codex 订阅执行保持关闭并拒绝授权**：SIWC 集成/账号资格、可信认证边界、实际路由与完整请求控制尚未验证。
 无需以 API Key 或美元硬上限作为订阅前提；Token 与额度只作可用性观察，计划参考预算不是执行上限。
 Fake 结果不能证明真实模型能力、真实任务准入或生产 Worker 可用；没有部署或修改现有数据库。
 [执行边界与本地 Worker](docs/LOCAL_EXECUTION.md) · [Phase 2 实际验收](docs/qa/local-execution-phase2-20261009/README.md)

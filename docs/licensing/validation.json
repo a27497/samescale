@@ -1,0 +1,105 @@
+{
+  "status": "PASS_SOURCE_LICENSE_ONLY_BINARY_DISTRIBUTION_NOT_CERTIFIED",
+  "base_sha": "1061ddd7b13288f27e6d0545c8d6f6467278073b",
+  "apache_license_verbatim_bytes": 11358,
+  "apache_license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+  "retained_notice_references": 372,
+  "unique_notice_texts": 262,
+  "existing_contract_tests": {
+    "passed": 32,
+    "seconds": 9.09,
+    "command": "uv run --locked pytest -q tests/test_product_distribution.py tests/test_product_lifecycle.py tests/test_ci_workflow_contracts.py"
+  },
+  "offline_regression": {
+    "schema_version": 1,
+    "status": "PASS",
+    "network_namespace": {
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_routes": 0,
+      "loopback": "down"
+    },
+    "tests_passed": 73,
+    "archive_digest": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+    "inputs_digest": "sha256:d77d964fe60158da4e22ee7e60df0cfb54178a99c957298d861d977f925d0395",
+    "identical_outputs": {
+      "claude.json": "sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d",
+      "codex.json": "sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe",
+      "diagnosis.md": "sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1",
+      "offline-boundary.json": "sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097",
+      "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef"
+    },
+    "replayed_runs": 2,
+    "replay_passes": 2,
+    "external_calls": 0,
+    "provider_calls": 0,
+    "model_calls": 0,
+    "claude_calls": 0,
+    "judge_calls": 0,
+    "subject_executed": false,
+    "verifier_executed": false
+  },
+  "wheel": {
+    "wheel_sha256": "11441c1a65ca82cbf119b2aa2924962c6d4d217d8042afb48e6ad87ef4516235",
+    "license_expression": "Apache-2.0",
+    "dist_info_license_byte_identical": true,
+    "context_legal_files_byte_identical": {
+      "LICENSE": true,
+      "LICENSE_SCOPE.md": true,
+      "BRAND_ASSETS.md": true,
+      "CONTRIBUTING.md": true,
+      "THIRD_PARTY_NOTICES.md": true
+    },
+    "third_party_aggregate_byte_identical": true,
+    "license_file_metadata_entries": 10,
+    "not_executed_or_deployed": true
+  },
+  "frontend_build": {
+    "baseline_compiled_and_brand_files": 60,
+    "all_existing_build_files_byte_identical": true,
+    "added_static_files": [
+      "legal/THIRD_PARTY_NOTICES.txt"
+    ],
+    "database_or_provider_calls": 0
+  },
+  "existing_program_and_task_files_byte_identical": 955,
+  "changed_baseline_files": [
+    ".gitattributes",
+    "CURRENT_MILESTONE.md",
+    "PUBLIC_PRODUCT_CONTRACT.md",
+    "README.md",
+    "docker/product/Dockerfile",
+    "docs/PROJECT_BLUEPRINT.md",
+    "frontend/package-lock.json",
+    "frontend/package.json",
+    "pyproject.toml"
+  ],
+  "dependency_versions_edges_integrities_unchanged": true,
+  "ruff": "PASS",
+  "ruff_format_files": 820,
+  "mypy_sources": 416,
+  "documentation_relative_links_checked": 132,
+  "missing_links": 0,
+  "changed_file_credential_scan_matches": 0,
+  "protection": {
+    "existing_worktrees_unchanged": 10,
+    "pr10_worktree_unchanged": true,
+    "ui2_dirty_entries": 17,
+    "ui2_file_hashes": 1494,
+    "existing_containers_unchanged": 58,
+    "website_tracked_files_unchanged": 364,
+    "website_head_status_unchanged": true,
+    "developer_auth_metadata_unchanged": true,
+    "auth_content_access": false,
+    "frozen_files_unchanged": 419,
+    "existing_database_access_or_migration": false,
+    "deployments": 0,
+    "real_agent_provider_calls": 0
+  },
+  "initial_helper_corrections": [
+    "Generate LICENSE before uv editable rebuild; initial helper failed without a required forced-include file.",
+    "Accept the frontend root directory entry in baseline archive safety check; corrected checker then passed byte comparison."
+  ],
+  "remote_ci": "PENDING_AT_PRE_PUBLICATION_SNAPSHOT"
+}

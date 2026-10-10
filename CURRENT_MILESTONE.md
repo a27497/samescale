@@ -1,5 +1,50 @@
 # SameScale Product — Current Milestone
 
+## Current state — Apache-2.0 merged / Phase 2.6 Draft integration — 2026-10-10
+
+PR #11 is merged using merge commit `ffeee1b366baa61f303ebf546f0287aae3ac9be1`, retaining
+`c967cbf9e5bf2f0fd7b9ef566a17e55d8308968e` and the original main parent. The merged tree is
+byte-identical to the reviewed license Head. Exact new-main [Fast CI](https://github.com/a27497/samescale/actions/runs/38035272261)
+and [Offline Regression](https://github.com/a27497/samescale/actions/runs/38035272260) are SUCCESS.
+GitHub now detects **Apache-2.0** and the complete LICENSE retains its canonical byte digest.
+Original project source is licensed under [Apache-2.0 and its defined scope](LICENSE_SCOPE.md);
+[brand artwork](BRAND_ASSETS.md), historical artifacts, MIT templates and third-party rights remain
+separate. The website license is unchanged. Brand ownership and future binary-distribution/notice
+conditions in [the original license audit](docs/licensing/AUDIT.md) are not certified by this merge.
+
+PR #10 remains **Draft / unmerged**. Its original commit
+`a3e66d55bd3c6e3fcc2389c073efb545213ecf34` is retained; new main is integrated by a merge in
+`codex/phase26-license-integration-20261010`, a separate clean worktree. The original Phase-2.6
+worktree remains at its original HEAD. Normal push only; no squash, rebase, force push or deployment.
+Phase-2.6 source/tests/workflows and its frozen acceptance receipts retain their original bytes.
+Its **221 distinct backend cases / 22 offline protocol Docker cases / 73 replay checks** remain
+historical observed results, not a new run or live OAuth/credential qualification.
+
+**REAL_CODEX stays unconditionally CLOSED.** The source-license decision is now recorded, but
+SIWC integration/account/workspace eligibility, separate product OAuth consent, real JWKS/storage/
+lifecycle, actual route/quota and complete live request/retry/cancellation controls remain unverified.
+No credential content, actual OAuth/account/quota/refresh/model RPC or real Agent/Provider is accessed.
+Token/quota stay observations; no extra-credit purchase or API-key/USD prerequisite is introduced.
+Integration acceptance: **126 distinct existing tests PASS** (125 passed in the first batch; one HTTP
+refusal case initially lacked DATABASE_URL and then passed against a new tmpfs PostgreSQL, removed).
+**73 offline replay checks PASS**, two byte-identical passes and zero external/model/Provider/Judge calls.
+**1,634 original source/test/workflow/artifact files**, **23 new-main legal/packaging files** and 372
+notice references retain exact bytes; 136 relative documentation links and credential/conflict scan PASS.
+Wheel Apache metadata, canonical license, exception/notice files and SIWC source verified. **419 frozen
+files**, all **11 previous worktrees**, UI-2 **17 entries / 1,494 hashes**, **58 containers**, auth metadata
+and **364 website files/head/status** unchanged. No existing DB access/migration or auth-content access.
+[Integration receipt](docs/licensing/phase26-integration.json) records actual batches, the initial setup
+error, helper correction and preservation. Exact new-Head CI is reported separately after normal push.
+Only this Git integration and offline compatibility acceptance are authorized. STOP after normal push
+and exact-SHA CI; no PR #10 merge, existing DB migration, site change, deployment or Phase 3.
+
+## Historical acceptance snapshots — preserved original facts
+
+The following Phase-2.6 and licensing snapshots describe their original base, authorization and
+observations. In particular, Phase-2.6's no-root-LICENSE observation was true at main@1061ddd;
+it is **not current status**. Original audit/QA receipts remain unchanged; these records do not
+supersede the current source license or grant real execution permission.
+
 ## Phase 2.6 — SIWC applicability and offline auth — 2026-10-10
 
 Independent clean worktree/branch `codex/product-phase26-siwc-20261010`, base
@@ -54,6 +99,43 @@ pre-publication snapshot; candidate SHA/Draft PR/exact-SHA CI are reported separ
 STOP after Phase-2.6 offline acceptance and Draft PR/CI; no real evaluation or Phase 3.**
 The dated records below retain their original authorization/results.
 
+
+## Apache-2.0 source licensing — 2026-10-10
+
+Independent clean worktree/branch `codex/apache2-license-20261010`, exact remote main base
+`1061ddd7b13288f27e6d0545c8d6f6467278073b`. Current authorization covers copyright/asset/dependency
+audit, source-license integration, offline acceptance and a new Draft PR/CI only. PR #10 remains
+an independent unmerged change and its worktree is untouched; no merge, site/license change,
+existing DB migration, deployment, real Agent/Provider, auth-file access or Phase 3 is authorized.
+
+Complete unmodified ASF Apache-2.0 text is attached to the explicitly defined original project
+source. Two Alembic template-derived files retain MIT; 14 exact brand files and 557 historical
+artifact files receive no new Apache grant. All original artwork/evidence bytes and inherited MIT
+archive notices are preserved. Git records 225 main commits under one author name; attribution
+is not an independent legal assignment. No company, employer permission or third-party ownership
+is invented. [Exact source and exclusion scope](LICENSE_SCOPE.md), [brand boundary](BRAND_ASSETS.md).
+
+All 282 npm and 72 external Python lock entries are inventoried. Applicable observed notices,
+including ECharts ASF NOTICE, are retained verbatim; no root NOTICE is created merely by choosing
+Apache-2.0. LGPL/MPL/native-wheel terms remain separate. Binary-specific source/relinking, optional
+platform/OS/tool and lodash-unified upstream-notice gates remain unverified; they do not grant
+SameScale rights over dependencies. No observed conflict blocks the bounded first-party source
+license. [Audit and outstanding distribution conditions](docs/licensing/AUDIT.md).
+
+License metadata, legal-file packaging and documentation change only; application source, APIs,
+tasks, model controls, dependency versions and product design remain unchanged. Actual acceptance: **32 existing distribution/lifecycle/CI contracts PASS**, **73 offline replay
+checks PASS**, 372 exact-byte notice references and complete ASF LICENSE verified. Ruff/format
+**820 files**, mypy **416 sources**, links/credential scan PASS. Wheel metadata/legal files verified;
+all **60 preexisting frontend build files byte-identical**, with only the static notice file added.
+**955 original program/task/configuration files**, dependency versions/edges/integrities and **419
+frozen files** stay unchanged. All **10 existing worktrees** including PR #10, UI-2 **17 entries /
+1,494 hashes**, **58 containers**, developer auth metadata and **364 website tracked files** are
+unchanged. No existing DB was accessed/migrated, and no deployment or real Agent/Provider ran.
+[Actual validation receipt](docs/licensing/validation.json) retains scope and initial helper
+corrections. Candidate SHA/Draft PR/exact-SHA CI are reported separately after publication. Source licensing does not establish
+OpenAI SIWC/account qualification or actual OAuth consent. REAL_CODEX remains closed.
+**STOP after license Draft PR/CI; no merge, real evaluation, deployment or Phase 3.**
+The dated records below retain their historical authorization and results.
 
 ## Phase 2.5 — ChatGPT subscription preparation — 2026-10-10
 
