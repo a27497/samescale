@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "quality": {
+    "schema_version": 1,
+    "task": {
+      "task_id": "core-python-deduplicate",
+      "task_version": "1.0.2",
+      "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "workspace_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+      "verifier_digest": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919"
+    },
+    "family": "CUSTOM",
+    "benchmark_tier": "UNASSIGNED",
+    "provenance": {
+      "source_kind": "CUSTOM",
+      "source_identity": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+      "source_revision": "3cbefb6731d07c6eddb3463c895eeef60b2f0fd9",
+      "parent_identities": []
+    }
+  },
+  "status": "QUALIFIED",
+  "qualification_id": "phase25-real-task-admission",
+  "evidence": [
+    {
+      "check": "BASELINE_FAILS",
+      "evidence_identity": "sha256:aebad99cc48f15436e0cca36c88fbfeee75146febda4a6f0ce4b82695bb886e3"
+    },
+    {
+      "check": "HIDDEN_ASSETS_ISOLATED",
+      "evidence_identity": "sha256:87a938c03ad3b5934dff2e313cd6350045ddb51c1619510ed3265fd0bba48095"
+    },
+    {
+      "check": "ORACLE_PASSES",
+      "evidence_identity": "sha256:f1622c1cbb0f58e5f435f649cb37b9dba48966bfce5a45eeca00478bb8743e76"
+    },
+    {
+      "check": "PACKAGE_VALID",
+      "evidence_identity": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5"
+    },
+    {
+      "check": "WORKSPACE_ISOLATION",
+      "evidence_identity": "sha256:40832e2fcc3303f1a57a5c25f03dd93d0158e2f9b32337cb5af63a6712e6d449"
+    }
+  ]
+}

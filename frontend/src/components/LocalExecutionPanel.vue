@@ -56,7 +56,7 @@ onBeforeUnmount(() => { alive = false; generation++; confirmed.value = false })
 <template>
   <section class="execution-panel" data-test="execution-panel" aria-label="Execution authorization and result">
     <h4>{{ c('独立执行与验收', 'Independent execution and acceptance') }}</h4>
-    <p>{{ c('计划确认不等于执行授权。当前仅开放无模型调用的隔离 Fake Codex；真实 Codex 默认关闭。', 'Plan confirmation does not authorize execution. Only isolated Fake Codex with zero model calls is available; real Codex is disabled.') }}</p>
+    <p>{{ c('计划确认不等于执行授权。当前仅开放无模型调用的隔离 Fake Codex；真实 Codex 订阅执行在本阶段关闭，不要求 API Key 或美元硬上限。', 'Plan confirmation does not authorize execution. Only isolated Fake Codex with zero model calls is available; real Codex subscription execution stays closed in this phase, with no API key or USD hard-cap requirement.') }}</p>
     <p v-if="error" role="alert" class="error-state" data-test="execution-error">{{ error }}</p>
     <p v-if="busy" role="status">{{ c('正在读取或提交…', 'Loading or submitting…') }}</p>
     <p v-if="state" data-test="execution-state"><strong>{{ label(state.status) }}</strong></p>

@@ -1,0 +1,21 @@
+{
+  "initial_protocol_runs": [
+    {
+      "result": "FAIL",
+      "correction": "Create empty private CODEX_HOME in the offline Subject tmpfs; frozen image and developer auth unchanged."
+    },
+    {
+      "result": "FAIL",
+      "correction": "Frozen CLI supplies namespaced tools in additional_tools input items; implement that offline wire shape."
+    },
+    {
+      "result": "FAIL",
+      "correction": "Isolation probe text contained the static canary prefix; compare split literals and never echo the canary."
+    },
+    {
+      "result": "31 PASS / 1 FAIL",
+      "correction": "Classify a controller deadline receipt as TIMEOUT instead of generic process failure."
+    }
+  ],
+  "real_model_requests": 0
+}

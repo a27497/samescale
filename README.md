@@ -102,6 +102,7 @@ Python · FastAPI · PostgreSQL · SQLAlchemy / Alembic · LangGraph · Vue 3 ·
 | [Current milestone](CURRENT_MILESTONE.md) | 已验收状态、未提交工作与阻碍 |
 | [Public product contract](PUBLIC_PRODUCT_CONTRACT.md) | 对外能力与声明边界 |
 | [Public Demo integrity](docs/evidence/public-demo-recovery-20260930/README.md) | New fixture identity, protected evidence, runtime verification and deployment gates |
+| [Subscription execution preparation](docs/SUBSCRIPTION_EXECUTION.md) | Phase 2.5 offline controls, real-task admission and closed first-real gate |
 | [Developer setup](docs/PRODUCTIZATION.md) | 本地产品运行与分发细节 |
 
 本仓库沿用 HarnessLab 的实现与历史；README 是入口，具体运行步骤、历史验收和开发记录保留在对应文档中。

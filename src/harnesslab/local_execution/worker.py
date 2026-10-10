@@ -32,6 +32,7 @@ from harnesslab.harness_lane.profile import SHELL_TOOL_ENVIRONMENT_POLICY, SUBJE
 from harnesslab.harness_lane.runner import CodexHarnessRunner
 from harnesslab.local_execution.backend import IsolatedFakeCodexBackend
 from harnesslab.local_execution.evidence import (
+    bind_protocol_result,
     persist_completion,
     read_bound_episode,
     result_document,
@@ -39,6 +40,7 @@ from harnesslab.local_execution.evidence import (
 )
 from harnesslab.local_execution.models import ExecutionAuthorization
 from harnesslab.local_execution.policy import load_execution_policy, operator_identity
+from harnesslab.local_execution.protocol_backend import OfflineProtocolCodexBackend
 from harnesslab.local_execution.sandbox import PinnedVerifierSandbox
 from harnesslab.local_execution.service import (
     ACTIVE,
@@ -167,6 +169,15 @@ class LocalWorker:
                     409,
                 )
             if (
+                self.policy.protocol_stub
+                and self.policy.subject_image_identity != frozen.image_identity
+            ):
+                raise fail(
+                    "PROTOCOL_RUNTIME_DRIFT",
+                    "Offline protocol must use the exact frozen Codex image.",
+                    409,
+                )
+            if (
                 task.task_identity not in self.policy.fixture_task_identities
                 or package.definition.id != "micro-python-clamp"
                 or package.manifest.context_path is not None
@@ -180,8 +191,16 @@ class LocalWorker:
                 codex_cli_version=frozen.harness.version,
                 requested_model=frozen.model.requested_model,
                 reasoning_effort=frozen.harness_profile.reasoning_effort,
-                provider_route="fake-isolated-no-provider",
-                built_in_behavior_profile="fake-codex-jsonl-v1",
+                provider_route=(
+                    "offline-subscription-protocol-double-no-provider"
+                    if self.policy.protocol_stub
+                    else "fake-isolated-no-provider"
+                ),
+                built_in_behavior_profile=(
+                    f"codex-cli-{frozen.harness.version}-offline-protocol-double-v1"
+                    if self.policy.protocol_stub
+                    else "fake-codex-jsonl-v1"
+                ),
                 execution_timeout_seconds=material.request.budget.wall_time_seconds,
                 codex_image=ImageIdentity(
                     reference=frozen.harness.image_reference, image_id=frozen.image_identity
@@ -266,8 +285,13 @@ class LocalWorker:
             entered_runner = False
             try:
                 auth, package, profile = await self._prepare(run_id)
-                backend = IsolatedFakeCodexBackend(self.policy)
-                backend.run_id = run_id
+                backend = (
+                    OfflineProtocolCodexBackend(self.policy, run_id, auth.digest)
+                    if self.policy.protocol_stub
+                    else IsolatedFakeCodexBackend(self.policy)
+                )
+                if isinstance(backend, IsolatedFakeCodexBackend):
+                    backend.run_id = run_id
                 sandbox = PinnedVerifierSandbox(
                     image_id=self.policy.verifier_image_identity,
                     run_id=run_id,
@@ -338,6 +362,8 @@ class LocalWorker:
                 package_root = self.policy.runtime_root / (run_id + "-package")
                 no_links(package_root)
                 shutil.rmtree(package_root)
+            if self.policy.protocol_stub:
+                bind_protocol_result(result, auth, self.policy.artifact_root)
             persist_completion(self.policy.artifact_root, result)
             await self._store(run_id, result)
 
@@ -381,6 +407,19 @@ class LocalWorker:
                     ):
                         continue
                     auth = await self._authorization(session, run_id)
+                    if auth.request.subscription_limits is not None:
+                        journal = (
+                            self.policy.runtime_root
+                            / (run_id + "-controller")
+                            / "receipts/controller.json"
+                        )
+                        target = self.policy.artifact_root / (run_id + ".protocol.json")
+                        if journal.is_file() and not target.exists():
+                            no_links(journal)
+                            no_links(target)
+                            if journal.stat().st_size <= 16_000:
+                                with target.open("xb") as stream:
+                                    stream.write(journal.read_bytes())
                     sealed = self.policy.artifact_root / (run_id + ".result.json")
                     result = result_document(
                         auth, run_id, "INTERRUPTED", "WORKER_LOST_NO_AUTOMATIC_RETRY"
@@ -399,6 +438,16 @@ class LocalWorker:
                             result = result_document(
                                 auth, run_id, "FAILED_INFRA", "RECOVERY_EVIDENCE_INVALID"
                             )
+                    if (
+                        auth.request.subscription_limits is not None
+                        and "offline_protocol" not in result
+                    ):
+                        try:
+                            bind_protocol_result(result, auth, self.policy.artifact_root)
+                        except (OSError, ValueError, KeyError):
+                            result = result_document(
+                                auth, run_id, "FAILED_INFRA", "RECOVERY_PROTOCOL_EVIDENCE_INVALID"
+                            )
                     session.add(
                         LocalExecutionResultRecord(
                             run_id=run_id, digest=result["digest"], document=result
@@ -414,7 +463,11 @@ class LocalWorker:
         async def cleanup() -> None:
             _, environment = await _docker_runtime_preflight()
             cli = _DockerCLI(environment=environment)
-            names = ("harnesslab-local-" + run_id, "harnesslab-verifier-" + run_id + "-verifier")
+            names = (
+                "harnesslab-local-" + run_id,
+                "harnesslab-verifier-" + run_id + "-verifier",
+                "harnesslab-subscription-stub-" + run_id,
+            )
             for name in names:
                 raw = await cli.run("inspect", name, check=False)
                 if raw.returncode != 0:
@@ -425,12 +478,16 @@ class LocalWorker:
                 labels = json.loads(raw.stdout)[0]["Config"]["Labels"]
                 expected = (
                     (name, "E", None)
-                    if name.startswith("harnesslab-local-")
+                    if name.startswith(("harnesslab-local-", "harnesslab-subscription-stub-"))
                     else (run_id + "-verifier", "C", "verifier")
                 )
                 if (
                     labels.get("com.harnesslab.run_id") != expected[0]
                     or labels.get("com.harnesslab.phase") != expected[1]
+                    or (
+                        name.startswith("harnesslab-subscription-stub-")
+                        and labels.get("com.harnesslab.role") != "offline-subscription-controller"
+                    )
                     or (
                         expected[2] is not None and labels.get("com.harnesslab.role") != expected[2]
                     )

@@ -1,0 +1,53 @@
+{
+  "source": "ACTUAL_DETERMINISTIC_DOCKER_TASK_ADMISSION",
+  "task_reference": "core-python-deduplicate@1.0.2",
+  "task_identity": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+  "workspace_identity": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+  "verifier_identity": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919",
+  "oracle_identity": "sha256:a550f6b2591996427b78233e3cb4a23c8f7f8bb9d83a67ac95f25b0583fecfca",
+  "qualification_identity": "sha256:7498cecd68605cb87e8a2d49fdf2df74be001f8dd3c8aca250ae5809bae34fd5",
+  "validation_identity": "sha256:0875372fc4e01cc276a6159fa52d7c9f5c42acb2d46bb31cf00604bd278ce5fe",
+  "image_identity": "sha256:3af8b725f30eace3438f7ff3220cbd6d85ebeb6f7de9fecda8de53eb9487949b",
+  "observations": [
+    {
+      "run_id": "phase25-admission-0",
+      "passed": false,
+      "checks": 5,
+      "stdout_digest": "sha256:dfeb7bb0b165c15f59b9789fc1647e0abd39eca635d89f584ae85463267ff38e",
+      "manifest_identity": "sha256:048afdbe3b302b14aeaf65823d1419394659a838abab1eacefdbd9336a869429",
+      "security_identity": "sha256:63891e30fb80430f96201764500bf2e724bc1fd65268145736e1cf8ccd0c3d51",
+      "cleanup_verified": true
+    },
+    {
+      "run_id": "phase25-admission-1",
+      "passed": true,
+      "checks": 5,
+      "stdout_digest": "sha256:1f76cead3fc5adea47443c8808941772a69833cebdc58d33ef91d85bf2ebf496",
+      "manifest_identity": "sha256:bb9f3c1cea6934d2b2057af481fcbc3c227fcd17d45e046e0e2b38d78fb561ca",
+      "security_identity": "sha256:63891e30fb80430f96201764500bf2e724bc1fd65268145736e1cf8ccd0c3d51",
+      "cleanup_verified": true
+    },
+    {
+      "run_id": "phase25-admission-2",
+      "passed": false,
+      "checks": 5,
+      "stdout_digest": "sha256:dfeb7bb0b165c15f59b9789fc1647e0abd39eca635d89f584ae85463267ff38e",
+      "manifest_identity": "sha256:40512d7d0ff85bae5fd852261b4fffc60dd8d37940f1a2d91a4c7a80b36fa583",
+      "security_identity": "sha256:63891e30fb80430f96201764500bf2e724bc1fd65268145736e1cf8ccd0c3d51",
+      "cleanup_verified": true
+    },
+    {
+      "run_id": "phase25-admission-3",
+      "passed": true,
+      "checks": 5,
+      "stdout_digest": "sha256:1f76cead3fc5adea47443c8808941772a69833cebdc58d33ef91d85bf2ebf496",
+      "manifest_identity": "sha256:67af3c333f8c60f5455581526baa1468ff00e1bb9d187e8d57a95a279e9cbef6",
+      "security_identity": "sha256:63891e30fb80430f96201764500bf2e724bc1fd65268145736e1cf8ccd0c3d51",
+      "cleanup_verified": true
+    }
+  ],
+  "eligible_for_planning": true,
+  "real_subject_execution": "NOT_RUN",
+  "model_requests": 0,
+  "official_qualification_changed": false
+}

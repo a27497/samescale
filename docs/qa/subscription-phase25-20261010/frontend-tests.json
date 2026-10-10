@@ -1,0 +1,4 @@
+{
+  "stdout": "\n> harnesslab-workbench@0.1.0 test\n> vitest run tests/local-execution.spec.ts tests/local-plans.spec.ts\n\n\n RUN  v4.1.11 /home/dev/.worktrees/samescale-phase25-20261010/frontend\n\n\n Test Files  2 passed (2)\n      Tests  23 passed (23)\n   Start at  05:17:56\n   Duration  2.09s (transform 653ms, setup 190ms, import 1.13s, tests 503ms, environment 1.70s)\n\n",
+  "stdout_sha256": "sha256:f9b571e601804b5d0354726c644d519e8159d689a067799cd5d459fc7d0b6882"
+}

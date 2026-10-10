@@ -1,5 +1,10 @@
 # Private local execution — MVP Phase 2
 
+Phase 2.5 adds [ChatGPT subscription preparation](SUBSCRIPTION_EXECUTION.md), offline protocol
+acceptance and independent real-task admission. Real execution stays closed; subscription
+execution does not require an API key, API billing or a USD hard cap. Original Phase-2 Fake
+evidence remains unchanged.
+
 Phase 1 saves an immutable plan. A separate local-operator action authorizes **one physical
 attempt**; it does not alter `SavedPlan.execution_authorized=false`. The new authorization,
 attempt association and result are separate append-only records. `harnesslab local-worker`
@@ -14,9 +19,9 @@ then the existing H-Lane orchestrator runs the task's hidden verifier in another
 No real Codex executable, user Codex login, Provider, model or Judge is called. These are
 `CUSTOM / synthetic / NOT_ATTESTED` Episodes, never real model results or Official qualification.
 
-A `REAL_CODEX` authorization request returns `403 / REAL_EXECUTION_BLOCKED`: the current Codex
-interface has no enforceable token/USD cap. A reference estimate is not a safety ceiling, and no
-environment toggle bypasses this denial. The real Docker Codex backend remains compatible but
+A `REAL_CODEX` authorization request returns `403 / REAL_EXECUTION_BLOCKED`: the trusted subscription credential boundary, live route/quota and request interception are
+not independently verified. The Phase-2.5 code gate has no environment bypass. Token/quota
+observations are not hard caps; USD hard caps are not subscription prerequisites. The real Docker Codex backend remains compatible but
 cannot be dispatched by this Worker. Live runtime/version/protocol, Provider egress/credentials,
 real task admission and production operation are **NOT_VERIFIED**. Grok remains **NOT_CONFIRMED**.
 
@@ -121,10 +126,12 @@ an already collected Episode retains its original recorded identity rather than 
 
 ## Before the first real Codex evaluation
 
-A separate user authorization must identify the exact eligible engineering task, frozen runtime/image/
-model/endpoint, credential source, one physical attempt, hard spending/request/token boundaries,
-provider egress, retention and cancellation policy. Code must first implement and verify an enforceable
-budget/real dispatch gate; a UI checkbox or reference USD value cannot substitute. Then independently
-validate the real CLI version/protocol, private Workspace mounts, real qualification baseline/oracle,
-credential/egress isolation and production Worker permissions. Current acceptance grants **none**
-of these live/paid permissions. Full evidence export, public showcase and Phase 3 are not included.
+A separate user authorization must identify the eligible engineering task and exact frozen image/
+model/subscription route, trusted credential source outside Subject, one physical attempt, actual
+wall timeout and request/turn limits, retention and cancellation. First admit and independently verify
+live credential isolation, subscription quota availability and all request/retry/refresh paths.
+No API key or USD/token hard cap is a subscription prerequisite; unforceable ceilings remain
+observations. Unknown or exhausted quota, invalid auth or unverifiable critical controls deny.
+See [Phase-2.5 first-real requirements](SUBSCRIPTION_EXECUTION.md#before-the-first-real-evaluation--separate-user-authorization).
+Current acceptance grants no live execution, credential access, extra credits, deployment or Phase-3
+permission. The real-task admission and offline CLI/protocol checks have their separately bound scope.

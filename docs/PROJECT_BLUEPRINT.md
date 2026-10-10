@@ -1,5 +1,29 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：Phase 2.5 订阅执行准备 — 2026-10-10
+
+从 `main@3cbefb6731d07c6eddb3463c895eeef60b2f0fd9` 新建独立干净 worktree，连续完成无推理的
+开发 CLI / 冻结 Runtime / 协议核验、订阅控制契约、安全隔离的无付费协议替身、独立真实工程
+任务准入，以及 Phase-1/2 授权/Worker/证据/取消/崩溃恢复兼容性验收。开发 CLI 的 ChatGPT 登录
+仅用于核实方式；不得读取实际 Token、发送模型/额度/账户 RPC、登录/登出、自动刷新、消费
+订阅、升级冻结版本、挂载开发登录目录，或将凭据注入 Subject/Verifier/Workspace/日志/API。
+
+真实 `REAL_CODEX` 本阶段无条件拒绝。订阅模式不要求 API Key、API 按量计费或美元硬上限；
+Token 和额度信息仅按真实可观测能力报告，不可强制的限制不得写成硬上限。一次明确授权、
+一个物理尝试、实际超时/请求/轮次限制、禁止自动重试、取消清理、失败保全与安全门禁沿用
+现有队列。冻结 Runner 的 Subject 内认证与 TLS CONNECT passthrough 不满足凭据隔离/请求计数；
+采用独立受信任控制器的 **offline double** 验证架构，保持真实 credential loader/transport 不存在。
+未来真实接入须另行审查受信任 HTTP 认证边界、订阅 route/额度/全部重试路径；缺失即拒绝。
+
+真实任务采用独立复制的 `core-python-deduplicate@1.0.2`，实际 network-none 隐藏 Verifier 完成
+baseline-fail/oracle-pass，证据绑定到 Custom 准入，不更改 Official 资格。协议替身使用既有 clamp
+fixture，结果维持 synthetic；不得把它当作真实任务资格或模型表现。保护 UI-2 全部 17 项改动、
+所有既有 worktree、服务、数据库、官网及冻结证据。仅创建可销毁验收数据库并对其迁移。
+允许提交、正常 push 新分支、Draft PR、exact-SHA CI；不 merge/deploy/迁移既有 DB。
+验收/阻塞写 CURRENT_MILESTONE。首次真实推理及必要的产品凭据/账号元数据访问需用户单独
+授权；额度购买、自动修复、第二次尝试和 Phase 3 均不属于此授权。交付后 **STOP**。
+以下记录保留各自历史范围，不构成额外执行权限。
+
 ## 当前授权：产品化 MVP Phase 2 — 2026-10-09
 
 从已验收 `main@304c516e274d094888e3205666419cd3811d0912` 的独立 worktree 开发，完成

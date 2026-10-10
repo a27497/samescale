@@ -1,0 +1,68 @@
+{
+  "source": "LOCAL_NO_MODEL_CHECKS",
+  "development_cli_version": "0.160.1",
+  "development_login_method": "CHATGPT",
+  "development_login_status_exit_code": 0,
+  "development_provider": "BUILTIN_OPENAI",
+  "development_wire_api": "RESPONSES",
+  "custom_provider_selected": false,
+  "custom_profile_selected": false,
+  "api_key_environment_present": false,
+  "development_auth_store_bytes_read_by_check": false,
+  "authentication_state_changed": false,
+  "live_route_health": "NOT_VERIFIED",
+  "account_entitlement": "NOT_VERIFIED",
+  "quota": "NOT_READ",
+  "token_usage": "NOT_REPORTED",
+  "runtime_schemas": [
+    {
+      "version": "0.160.1",
+      "schema_files": 314,
+      "client_request_digest": "sha256:1c7fec8758deb95ffe967060130e8d1ddb7a0a5a437ee9b64086dddbed8f5831",
+      "external_chatgpt_auth_tokens_declared": true,
+      "account_rate_limits_read_declared": true,
+      "turn_start_declared": true,
+      "turn_interrupt_declared": true,
+      "schema_only_no_auth_or_inference_rpc": true
+    },
+    {
+      "version": "0.149.0",
+      "schema_files": 401,
+      "client_request_digest": "sha256:51cb1b3c21b123ce591b54ffbdf2d9032b6dfee7f8d5595579ba584f5285b274",
+      "external_chatgpt_auth_tokens_declared": true,
+      "account_rate_limits_read_declared": true,
+      "turn_start_declared": true,
+      "turn_interrupt_declared": true,
+      "schema_only_no_auth_or_inference_rpc": true
+    },
+    {
+      "version": "0.153.4",
+      "schema_files": 416,
+      "client_request_digest": "sha256:05c82ead1a820c765c23d3a1d262e4ae54889785276ee1acf7c494141fd94d70",
+      "external_chatgpt_auth_tokens_declared": true,
+      "account_rate_limits_read_declared": true,
+      "turn_start_declared": true,
+      "turn_interrupt_declared": true,
+      "schema_only_no_auth_or_inference_rpc": true
+    }
+  ],
+  "frozen_images": {
+    "0.149.0": "sha256:a1dcc819a4b7d7b6b01a1e91bf0a2ecabc068911e949d9db6da51beac2d5ef53",
+    "0.153.4": "sha256:7e40a979030d7b1cee7ecda485c1881f076585e3bb72dd794e7f6e153b709610"
+  },
+  "model_requests": 0,
+  "official_docs": [
+    "https://learn.chatgpt.com/docs/auth",
+    "https://learn.chatgpt.com/docs/app-server",
+    "https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations"
+  ],
+  "routing_metadata": {
+    "selected_provider_is_builtin_openai": true,
+    "chatgpt_base_url_override_present": false,
+    "openai_base_url_environment_override_present": false,
+    "forced_login_method_is_chatgpt": false,
+    "auth_storage_mode_is_configured": false,
+    "actual_served_endpoint": "NOT_VERIFIED_NO_INFERENCE",
+    "secrets_read": false
+  }
+}

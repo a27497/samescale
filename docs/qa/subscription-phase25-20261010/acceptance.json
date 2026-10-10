@@ -1,0 +1,60 @@
+{
+  "baseline_sha": "3cbefb6731d07c6eddb3463c895eeef60b2f0fd9",
+  "scope": "OFFLINE_SUBSCRIPTION_PREPARATION_ONLY",
+  "backend": {
+    "passed": 141,
+    "selected_suites": {
+      "tests/test_subscription_controls.py": 27,
+      "tests/test_subscription_protocol_docker.py": 9,
+      "tests/test_local_execution.py": 21,
+      "tests/test_local_execution_docker.py": 9,
+      "tests/test_local_plans.py": 75
+    },
+    "log_digest": "sha256:f216ec07d71e0b394a99dad274e0963d802746a061f28a6d916a89c2b4711089"
+  },
+  "frontend": {
+    "passed": 23,
+    "typecheck": "PASS",
+    "isolated_build": "PASS",
+    "browser": "NOT_RUN_COPY_ONLY_CHANGE"
+  },
+  "python": {
+    "ruff": "PASS",
+    "format": "PASS_814_FILES",
+    "mypy": "PASS_416_FILES"
+  },
+  "task_admission": {
+    "actual_deterministic_verifier_runs": 4,
+    "checks_per_run": 5,
+    "real_subject": "NOT_RUN"
+  },
+  "real_execution_enabled": false,
+  "actual_credential_token_extraction": false,
+  "model_requests": 0,
+  "live_quota_read": "NOT_RUN",
+  "token_usage": "NOT_REPORTED",
+  "source_files": {
+    "scripts/prepare_subscription_task.py": "sha256:cbe43662df0ff15251dd1031c7b6e4c57ffef1f8ec5dde51965aa055246eca84",
+    "src/harnesslab/local_execution/__init__.py": "sha256:80e02efc8dc81538b0272913cb59e88e22d4b8ba44ecb44c7652a4f91754503a",
+    "src/harnesslab/local_execution/api.py": "sha256:1be827251df2b88a9926cf4f6f6634ff84eb497578caecf11cf7afdb378a4a52",
+    "src/harnesslab/local_execution/backend.py": "sha256:d43dd14c781caafff640f6cefe5fb0767906b3e5ba19325835e98056ee6745d9",
+    "src/harnesslab/local_execution/cli.py": "sha256:af463c13a4a9547bb466e55a3824cc08b8919802834e6b118fab1f7397039643",
+    "src/harnesslab/local_execution/evidence.py": "sha256:3ad53579cf37af090316247c47387e736bdf6a6b80355ab54bd077b1fb13505f",
+    "src/harnesslab/local_execution/models.py": "sha256:adb10e42496cb2975335d0b55ba433a3118d5e1a42f6e39f600ca27a5d3a4eb5",
+    "src/harnesslab/local_execution/policy.py": "sha256:730d42300be4f12bae325b453328e910459c736b5acbd71478df37370012864f",
+    "src/harnesslab/local_execution/protocol_backend.py": "sha256:55729610a73f4d81df287519250502adc9e7680d67caedfa3833b6c3678afa5d",
+    "src/harnesslab/local_execution/sandbox.py": "sha256:09d8ff7d19c2605b17d974176afc35ca4e1cb92e918dcd8af2747f514396b889",
+    "src/harnesslab/local_execution/service.py": "sha256:adb54deba20de4f7d28ee5666fdac5b81d0b9a7a6804c8d9a5ceb3650ca42324",
+    "src/harnesslab/local_execution/subscription.py": "sha256:6fee34bf6e54f77602ec73628d984221fb8d5ba7e6d4a56bff37f41e1c0e3a06",
+    "src/harnesslab/local_execution/subscription_protocol.py": "sha256:84838892a9719ff4599082e1c883ea1b468fc54137390f20ac8d3096d50541c8",
+    "src/harnesslab/local_execution/worker.py": "sha256:6db8cf77ae000d2f0508b23485c1775bba6462addaf22b674079fddfc9384bcd",
+    "src/harnesslab/local_plans/__init__.py": "sha256:5f4a18fa4401e755a447a754d47b2cc6f6289e8801c85e733fad28945314cadd",
+    "src/harnesslab/local_plans/api.py": "sha256:a9abab09387f82fc0fef6789a35e9c1eda06561fcb25608115a9537c37361c45",
+    "src/harnesslab/local_plans/models.py": "sha256:98ca9da735e03fbda48b66c7f7e841785f4362eb7216fe0d3936c8dfd472d00b",
+    "src/harnesslab/local_plans/service.py": "sha256:d4b503bf3beb7eda647bbcb364b46cee0d8680b47f9dc0d1051375cf54fe7266",
+    "src/harnesslab/local_plans/tasks.py": "sha256:1c2c12cfe5049b878079489d600aa5269ea18c5e601b872652415b5f3ec299cd",
+    "tests/test_subscription_controls.py": "sha256:a6091e82bc3afdd28021e01254dd2b495b4376916bdf00a74e3f1f26fb1fbf44",
+    "tests/test_subscription_protocol_docker.py": "sha256:c04e2922174ada6d8478e4aad2541bfff877ace9c36274fd0bddd5b3765f35e5"
+  },
+  "remote_ci": "VERIFY_EXACT_PUSHED_SHA_AT_GIT_HANDOFF"
+}

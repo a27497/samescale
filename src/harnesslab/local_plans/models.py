@@ -8,6 +8,7 @@ from pydantic import Field, field_validator, model_validator
 
 from harnesslab.contracts.common import Identifier, Sha256Digest
 from harnesslab.custom_eval.models import CustomEvaluationPlan
+from harnesslab.local_execution.subscription import SubscriptionPlanningBudget
 from harnesslab.registry.models import (
     HarnessDefinition,
     HarnessProfileDefinition,
@@ -29,7 +30,7 @@ class PlanRequest(RegistryModel):
     task_reference: str = Field(pattern=r"^[a-zA-Z0-9._-]+@[0-9]+\.[0-9]+\.[0-9]+$", max_length=160)
     provider_profile_id: Identifier
     harness_profile_id: Identifier
-    budget: PlanningBudget | None = None
+    budget: PlanningBudget | SubscriptionPlanningBudget | None = None
 
 
 class TaskInspection(RegistryModel):

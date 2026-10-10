@@ -1,0 +1,121 @@
+{
+  "valid": true,
+  "task_id": "core-python-deduplicate",
+  "task_version": "1.0.2",
+  "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+  "baseline": {
+    "schema_version": 1,
+    "task_id": "core-python-deduplicate",
+    "task_version": "1.0.2",
+    "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+    "workspace_digest": "sha256:8ca095fdbe9471c557df4b1c4c9e3914bfaec46fdacd0529183e36795a61c60d",
+    "verifier": {
+      "kind": "hidden_verifier",
+      "path": "verifier/verify.py",
+      "digest": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919"
+    },
+    "result": {
+      "passed": false,
+      "score": 0.2,
+      "checks": [
+        {
+          "name": "first-records",
+          "passed": true,
+          "score": 1.0,
+          "detail": null
+        },
+        {
+          "name": "identical-retry-idempotent",
+          "passed": false,
+          "score": 0.0,
+          "detail": null
+        },
+        {
+          "name": "conflict-rejected",
+          "passed": false,
+          "score": 0.0,
+          "detail": null
+        },
+        {
+          "name": "conflict-preserves-original",
+          "passed": false,
+          "score": 0.0,
+          "detail": null
+        },
+        {
+          "name": "empty-key-rejected",
+          "passed": false,
+          "score": 0.0,
+          "detail": null
+        }
+      ],
+      "summary": "idempotent retry-ledger cases",
+      "category": "subject_result",
+      "exit_code": 0,
+      "duration_ms": 2239,
+      "stdout_digest": "sha256:dfeb7bb0b165c15f59b9789fc1647e0abd39eca635d89f584ae85463267ff38e",
+      "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_truncated": false,
+      "stderr_truncated": false
+    },
+    "run_kind": "baseline"
+  },
+  "oracle": {
+    "schema_version": 1,
+    "task_id": "core-python-deduplicate",
+    "task_version": "1.0.2",
+    "task_digest": "sha256:86401e1c7fd13eae7c8b631952e4f9035a0a2af79f981bd4e586714c9a3ca5f5",
+    "workspace_digest": "sha256:5ad980a711649619b7c3c48ce8dd5c95f368771487d0d3438082f9674a681d2f",
+    "verifier": {
+      "kind": "hidden_verifier",
+      "path": "verifier/verify.py",
+      "digest": "sha256:ad88807492c8114412ff610b5aa1b488544411a011f50bdcf5c9748ca508c919"
+    },
+    "result": {
+      "passed": true,
+      "score": 1.0,
+      "checks": [
+        {
+          "name": "first-records",
+          "passed": true,
+          "score": 1.0,
+          "detail": null
+        },
+        {
+          "name": "identical-retry-idempotent",
+          "passed": true,
+          "score": 1.0,
+          "detail": null
+        },
+        {
+          "name": "conflict-rejected",
+          "passed": true,
+          "score": 1.0,
+          "detail": null
+        },
+        {
+          "name": "conflict-preserves-original",
+          "passed": true,
+          "score": 1.0,
+          "detail": null
+        },
+        {
+          "name": "empty-key-rejected",
+          "passed": true,
+          "score": 1.0,
+          "detail": null
+        }
+      ],
+      "summary": "idempotent retry-ledger cases",
+      "category": "subject_result",
+      "exit_code": 0,
+      "duration_ms": 2312,
+      "stdout_digest": "sha256:1f76cead3fc5adea47443c8808941772a69833cebdc58d33ef91d85bf2ebf496",
+      "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_truncated": false,
+      "stderr_truncated": false
+    },
+    "run_kind": "oracle"
+  },
+  "errors": []
+}
