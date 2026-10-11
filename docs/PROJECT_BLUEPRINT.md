@@ -1,6 +1,20 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## Current authorization — bounded external evidence P1 repairs — 2026-10-11
+## Current authorization — tool-neutral acceptance intake minimum — 2026-10-12
+
+Work from `feat/acceptance-workbench-v2@6affea4cb8287ef0434856fe9437127c4ebb89a1` in an independent
+clean worktree. Make saved evidence agent-neutral while preserving old Codex identities and all
+approval, permission, pinning, privacy and unattested-source gates. Required inputs are a final
+Workspace and separate task conditions; run logs are optional. Reuse the existing four Codex readers,
+NormalizedTrace and Claude stream parser; no new framework, schema migration or execution capability.
+Update the import entry/tool selector, truthful coverage and private no-example surface. Keep the
+explicit website demo/historical route compatible. Synthetic input, corrupt/refusal, legacy identity,
+independent Verifier and browser checks establish the bounded result. No real Agent/Provider/model,
+local-session scanning, frozen edits, PR, merge or deploy. The user authorizes normal commit/push only
+on this feature branch; stop after the report. Results belong in [Current Milestone](../CURRENT_MILESTONE.md).
+
+
+## Historical authorization — bounded external evidence P1 repairs — 2026-10-11
 
 Base main@de55277b8cb0f931c9b57184aa5b68dadec0263c; independent clean worktree. Isolate corrupt
 record reads without hiding global security failures; remove concurrent UI list/detail coupling.

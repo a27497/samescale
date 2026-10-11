@@ -33,9 +33,10 @@ export function externalAcceptanceRows(detail: EvidenceDetail): AcceptanceRow[] 
   const unknown = [...detail.record.completeness.missing_fields]
   if (d.workspace_acceptance === 'NOT_VERIFIED') unknown.unshift(c('工作区验收', 'workspace acceptance'))
   if (v.checks > v.passed_checks && d.workspace_acceptance !== 'NOT_VERIFIED') unknown.push(`${v.checks - v.passed_checks} ${c('项检查未通过', 'checks did not pass')}`)
+  const noRun = detail.record.completeness.coverage === 'NO_RUN_RECORD'
   const corrupt = /FAIL|CORRUPT|MISMATCH/.test(detail.record.completeness.integrity)
   return [
-    { key: 'original', label: l.original, status: d.original_episode_acceptance, detail: `${c('原运行验收', 'Original acceptance')}：${d.original_episode_acceptance} · ${c('Agent 自报事件', 'Agent report events')}：${d.agent_self_reports.length ? d.agent_self_reports.join(', ') : c('无', 'none')}` },
+    { key: 'original', label: l.original, status: noRun ? 'NOT_REPORTED' : d.original_episode_acceptance, detail: noRun ? c('无运行记录；未提供 Agent 自述或运行状态。代码验收单独记录。', 'No run record; agent claims and run state were not supplied. Code acceptance is recorded separately.') : `${c('原运行验收', 'Original acceptance')}：${d.original_episode_acceptance} · ${c('Agent 自报事件', 'Agent report events')}：${d.agent_self_reports.length ? d.agent_self_reports.join(', ') : c('无', 'none')}` },
     { key: 'checked', label: l.checked, status: d.workspace_acceptance, detail: v.checks > 0 ? `${c('独立检查', 'Independent checks')} ${v.passed_checks}/${v.checks} ${c('通过', 'passed')}` : `${c('未执行独立检查（0 项）', 'No independent checks run (0)')}${v.reason ? ` · ${v.reason}` : ''}` },
     { key: 'unverified', label: l.unverified, status: unknown.length ? 'NOT_VERIFIED' : 'NOT_REPORTED', detail: unknown.length ? unknown.join('、') : c('记录未标出其他未验证项。', 'No other unverified items flagged.') },
     { key: 'replay', label: l.replay, status: corrupt ? 'CORRUPT' : 'AVAILABLE', detail: corrupt ? `${c('完整性', 'Integrity')}：${detail.record.completeness.integrity}；${c('不可作为复核依据', 'not usable for re-review')}` : c('可导出脱敏证据与工作区，按摘要离线复核。', 'Export sanitized evidence and workspace; replay offline against the digest.') },

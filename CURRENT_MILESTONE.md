@@ -1,5 +1,38 @@
 # SameScale Product — Current Milestone
 
+## Current state — tool-neutral acceptance intake minimum — 2026-10-12
+
+Base `feat/acceptance-workbench-v2@6affea4cb8287ef0434856fe9437127c4ebb89a1`; independent clean
+worktree. SameScale is an **AI Coding task acceptance and evidence workbench**. Required inputs are
+final code Workspace and separately bound acceptance conditions; run evidence is optional. New records
+use generic types/formats and harness/version/coverage. Four existing Codex formats and exact old record
+addresses remain readable; Claude Code stream-json reuses the existing NormalizedTrace/parser.
+Code-only imports show `NO_RUN_RECORD`, unknown original run state and no invented Episode.
+
+All tools share existing human approval, consent, pins, operator/origin permissions, sensitive-input
+checks and `NOT_ATTESTED` provenance. Missing/zero-check acceptance stays `NOT_VERIFIED`; no self-report
+or completion event establishes pass. New Workspace verification remains a separately authorized
+TaskStore-qualified isolated Verifier CLI. No new Agent/runtime/backend execution capability.
+
+The “导入运行记录” entry chooses auto/Codex/Claude/code-only, then approved Workspace/conditions/optional
+record bindings. Consent resets on input changes. Private product navigation and investigation entry
+contain no built-in examples; explicit public website demo mode remains compatible. README positioning
+is aligned. No session-directory scan, real model/Agent call, frozen evidence edit or existing DB change.
+
+Related backend compatibility **177 PASS**; after final boundary tightening, affected overlapping batch
+**78 PASS** (182 distinct cases exercised). Actual Docker pass/fail/timeout/consumed-attempt checks cover
+Codex, Claude and code-only synthetic inputs. Complete frontend **232 PASS**, types/build PASS, focused
+Ruff/format/mypy PASS, actual 1440px Chromium **26 PASS**, zero page errors. Old frozen protection guard
+passed. [Detailed commands, observations and limits](docs/qa/agent-neutral-intake-20261012/README.md).
+
+Minimum scope: approved-file policy selection and UTF-8 final Workspace; no arbitrary upload or diff
+application. Cursor/DeepSeek native log adapters, genuine fresh sessions, tool-call linking and full
+PostgreSQL lifecycle/remote CI are untested or undelivered. Manual privacy review remains necessary.
+Only normal commit/push on this feature branch is authorized; no PR/merge/deploy. Stop after handoff.
+
+## Historical P1 acceptance snapshot
+
+
 ## Current state — external evidence P1 repaired / private first intake — 2026-10-11
 
 Baseline main@de55277b8cb0f931c9b57184aa5b68dadec0263c; separate clean branch

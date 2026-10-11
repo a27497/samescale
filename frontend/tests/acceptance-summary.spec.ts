@@ -36,7 +36,7 @@ describe('acceptance summary', () => {
     const wrapper = mount(RunsHomeView, { global: { plugins: [router] } }); await flushPromises()
     expect(workbenchApi.getRuns).not.toHaveBeenCalled()
     expect(wrapper.find('[data-test="runs-empty"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('导入一次 Codex 运行')
+    expect(wrapper.text()).toContain('导入运行记录')
     expect(wrapper.text()).not.toContain('演示')
   })
   it('backend unreachable is not reported as corruption', async () => {

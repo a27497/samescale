@@ -166,3 +166,49 @@ describe('P1 isolation and onboarding', () => {
     expect(wrapper.get('[role=alert]').text()).toContain('EVIDENCE_INTEGRITY_ERROR'); wrapper.unmount()
   })
 })
+
+describe('tool-neutral intake', () => {
+  const claude = { ...source, source_id: 'saved-claude', format: 'stream-json-v1', harness: { name: 'claude-code', version: 'synthetic-fixture' }, task_reference: 'custom:task/1', task_digest: 'sha256:task' }
+  const code = { ...source, source_id: 'saved-code', format: 'code-only-v1', digest: null, task_reference: 'custom:task/1', task_digest: 'sha256:task' }
+  it('filters approved inputs by tool and resets consent on a tool change', async () => {
+    vi.mocked(externalEvidenceApi.sources).mockResolvedValue({ items: [source, claude, code] })
+    const { wrapper } = await unlocked()
+    expect(wrapper.get('h2').text()).toBe('导入运行记录')
+    await wrapper.get('[data-test=tool]').setValue('claude-code')
+    expect(wrapper.get('[data-test=source]').text()).toContain('saved-claude')
+    expect(wrapper.get('[data-test=source]').text()).not.toContain('saved-real')
+    await wrapper.get('[data-test=source]').setValue('saved-claude')
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain('sha256:b')
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain('custom:task/1')
+    await wrapper.get('[data-test=consent]').setValue(true)
+    await wrapper.get('[data-test=tool]').setValue('code-only')
+    expect((wrapper.get('[data-test=consent]').element as HTMLInputElement).checked).toBe(false)
+    expect(wrapper.get('[data-test=import]').attributes('disabled')).toBeDefined()
+    await wrapper.get('[data-test=source]').setValue('saved-code')
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain('无运行记录')
+    await wrapper.get('[data-test=consent]').setValue(true)
+    vi.mocked(externalEvidenceApi.ingest).mockRejectedValue({ response: { data: { error: { code: 'EVIDENCE_PIN_MISMATCH' } } } })
+    await wrapper.get('form').trigger('submit'); await flushPromises()
+    expect(externalEvidenceApi.ingest).toHaveBeenCalledWith('saved-code', 'operator-placeholder-only')
+    expect(wrapper.find('[data-test=detail]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+  it.each([
+    ['codex', 'SUPPLIED_EXEC_JSONL_ONLY', 'Codex'],
+    ['claude-code', 'SUPPLIED_STREAM_JSON_ONLY', 'Claude Code'],
+    ['code-only', 'NO_RUN_RECORD', '仅代码改动'],
+  ])('shows truthful %s metadata without accepting a completion claim', async (name, coverage, label) => {
+    const input = name === 'code-only' ? code : name === 'claude-code' ? claude : source
+    vi.mocked(externalEvidenceApi.detail).mockResolvedValue({ ...detail, record: { ...detail.record, source: input, harness: name === 'code-only' ? null : { name, version: null }, episode_identity: null, completeness: { ...detail.record.completeness, coverage }, trace: [] }, diagnosis: { ...detail.diagnosis, workspace_acceptance: 'NOT_VERIFIED', independent_verification: { checks: 0, passed_checks: 0 }, agent_self_reports: [] } })
+    const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
+    expect(wrapper.get('[data-test=harness]').text()).toContain(label)
+    expect(wrapper.get('[data-test=acceptance]').text()).toContain('NOT_VERIFIED')
+    expect(wrapper.get('[data-test=acceptance]').text()).toContain('0/0')
+    expect(wrapper.get('[data-test=detail]').text()).not.toContain('VERIFIED_PASS')
+    if (name === 'code-only') {
+      expect(wrapper.get('.acceptance-summary').text()).toContain('无运行记录')
+      expect(wrapper.get('[data-test=acceptance-original] .status-pill').attributes('data-status')).toBe('NOT_REPORTED')
+    }
+    wrapper.unmount()
+  })
+})

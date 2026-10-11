@@ -36,7 +36,7 @@ const router = createRouter({
   routes: [
     { path: '/', redirect: '/runs' },
     { path: '/runs', name: 'runs', component: () => import('@/views/RunsHomeView.vue'), meta: { title: '我的运行', section: 'Workbench' } },
-    { path: '/external-runs', name: 'external-evidence', component: () => import('@/views/ExternalEvidenceView.vue'), meta: { title: '外部 Codex 运行证据', section: 'Evidence' } },
+    { path: '/external-runs', name: 'external-evidence', component: () => import('@/views/ExternalEvidenceView.vue'), meta: { title: '导入运行记录', section: 'Evidence' } },
     { path: '/external-runs/:identity', name: 'external-evidence-detail', component: () => import('@/views/ExternalEvidenceView.vue'), meta: { title: '已保存外部运行证据', section: 'Evidence' } },
     { path: '/plans', name: 'local-plans', component: () => import('@/views/LocalPlansView.vue'), meta: { title: '本地评测计划', section: 'Workspace' } },
     { path: '/plans/:planId', name: 'local-plan-detail', component: () => import('@/views/LocalPlansView.vue'), meta: { title: '已保存本地计划', section: 'Workspace' } },

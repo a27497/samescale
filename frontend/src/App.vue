@@ -9,7 +9,7 @@ import WorkbenchBrand from '@/components/WorkbenchBrand.vue'
 initializeLocale()
 const route = useRoute()
 const titles: Record<string, [string, string]> = {
-  runs: ['我的运行', 'My runs'], 'external-evidence': ['导入运行', 'Import a run'], 'external-evidence-detail': ['已保存外部运行证据', 'Saved external evidence'],
+  runs: ['我的运行', 'My runs'], 'external-evidence': ['导入运行记录', 'Import run evidence'], 'external-evidence-detail': ['已保存外部运行证据', 'Saved external evidence'],
   'local-plans': ['验收任务', 'Acceptance tasks'], 'local-plan-detail': ['已保存本地计划', 'Saved local plan'],
   analyst: ['调查首页', 'Investigation home'], 'public-demo': ['公开演示', 'Public demo'],
   'run-detail': ['运行证据', 'Run evidence'], diagnosis: ['失败诊断', 'Failure diagnosis'],
@@ -42,7 +42,7 @@ function navigationKeydown(event: KeyboardEvent) {
 const navigation = computed(() => [
   { label: c('工作台', 'Workbench'), items: [
     { to: '/runs', label: c('我的运行', 'My runs'), icon: House },
-    { to: '/external-runs', label: c('导入运行', 'Import a run'), icon: Files },
+    { to: '/external-runs', label: c('导入运行记录', 'Import run evidence'), icon: Files },
     { to: '/plans', label: c('验收任务', 'Acceptance tasks'), icon: Document },
     { to: '/settings', label: c('设置', 'Settings'), icon: Setting },
   ] },
@@ -53,7 +53,6 @@ const advanced = computed(() => [
   { to: '/regression', label: c('候选对比', 'Regression comparison'), icon: TrendCharts },
   { to: '/analyst', label: c('工程问题调查', 'Investigation'), icon: View },
   { to: '/analyst/sessions', label: c('已保存调查', 'Saved investigations'), icon: Document },
-  { to: '/demo', label: c('公开演示', 'Public demo'), icon: View },
   { to: '/overview', label: c('概览', 'Overview'), icon: Grid },
   { to: '/run-control', label: c('运行控制', 'Run control'), icon: Operation },
   { to: '/judgelab', label: 'JudgeLab', icon: Collection },
@@ -77,7 +76,7 @@ watch(title, value => { document.title = `${value} · SameScale` }, { immediate:
     <button v-if="mobileNavOpen" class="nav-scrim" :aria-label="c('关闭导航', 'Close navigation')" tabindex="-1" @click="closeNavigation" />
     <aside id="workbench-navigation" ref="navigationPanel" class="sidebar" :aria-label="c('产品导航', 'Product navigation')" @keydown="navigationKeydown">
       <button class="secondary-button nav-close-button" @click="closeNavigation"><Close class="ui-icon" />{{ c('关闭导航', 'Close navigation') }}</button>
-      <RouterLink class="brand" to="/runs"><div><WorkbenchBrand /><small>{{ c('任务验收与证据工作台', 'Task acceptance & evidence workbench') }}</small></div></RouterLink>
+      <RouterLink class="brand" to="/runs"><div><WorkbenchBrand /><small>{{ c('AI Coding 任务验收与证据工作台', 'AI Coding task acceptance & evidence workbench') }}</small></div></RouterLink>
       <nav :aria-label="c('产品功能', 'Product features')">
         <div v-for="group in navigation" :key="group.label" class="nav-group">
           <span class="nav-group-label">{{ group.label }}</span>

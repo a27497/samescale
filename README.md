@@ -1,16 +1,21 @@
 # SameScale
 
-First private intake: [isolated host Quickstart](docs/EXTERNAL_EVIDENCE_QUICKSTART.md).
+**AI Coding 任务验收与证据工作台**
 
-Private saved Codex evidence: `/external-runs` accepts individually approved saved native hooks,
-H-Lane bundles or provided `exec --json` streams and final source snapshots. It exposes independent
-Workspace checks and deterministic diagnosis/export/replay without rerunning an Agent or taking over
-subscription login. Missing trusted task/verifier evidence stays `NOT_VERIFIED`; REAL_CODEX remains
-closed. [Setup, safety boundaries and limitations](docs/EXTERNAL_CODEX_EVIDENCE.md).
+*AI Coding Task Acceptance & Evidence Workbench*
 
-**AI Coding Agent 运行验证与诊断工作台**
+提供最终代码 Workspace 与任务验收条件，即可导入并独立验收。运行记录是可选的增强证据：
+本轮支持 Codex 的四种既有格式、Claude Code stream-json，以及任意 Coding Agent 的仅代码
+改动导入。无日志时覆盖度显示“无运行记录”；Agent 自述和完成事件不作为验收结论。
 
-*AI Coding Agent Evaluation & Diagnosis Workbench*
+`/external-runs` 的“导入运行记录”入口按工具选择操作员批准的代码、条件与可选日志。
+同一套批准策略、摘要绑定、权限和敏感信息检查适用于所有工具；来源保持 `NOT_ATTESTED`。
+已有 Codex 记录与身份继续可读，缺少可信任务或独立 Verifier 结果保持 `NOT_VERIFIED`。
+产品内不展示示例数据；示例入口仅在[官网在线演示](https://getsamescale.com/demo/)。
+不重新运行 Agent、不接管订阅登录，REAL_CODEX 保持关闭。
+
+[首次私有接入 Quickstart](docs/EXTERNAL_EVIDENCE_QUICKSTART.md) ·
+[通用输入、转换器与限制](docs/EXTERNAL_RUN_EVIDENCE.md)。
 
 主产品源码采用 **[Apache License 2.0](LICENSE)**，允许按其条款商业使用、修改与再分发。
 [授权文件范围](LICENSE_SCOPE.md) · [品牌资产边界](BRAND_ASSETS.md) ·
@@ -19,8 +24,8 @@ closed. [Setup, safety boundaries and limitations](docs/EXTERNAL_CODEX_EVIDENCE.
 添加许可证不代表已获得 OpenAI SIWC 资格、账号授权或真实执行许可。
 源码许可证已通过 PR #11 合并；Phase 2.6 提供离线认证准备与明确拒绝门禁，REAL_CODEX 保持关闭。
 
-把 Coding Agent 的一次运行，转化为可检查、可诊断、可复核的工程证据。
-SameScale 关联 Trace、Episode、workspace changes 和独立验收，帮助回答：实际发生了什么、哪些结果已验证、失败停在哪一层，以及保存的证据能否离线复核。它不把局部运行结果写成模型排行榜。
+把 AI Coding 的最终代码改动与验收条件，转化为可检查、可诊断、可复核的工程证据。
+SameScale 关联最终 Workspace、任务条件、可选 Trace / Episode 和独立验收，帮助回答：实际发生了什么、哪些结果已验证、失败停在哪一层，以及保存的证据能否离线复核。它不把局部运行结果写成模型排行榜。
 
 **[打开只读 Recruiter Demo](https://getsamescale.com/demo/)** · [下载离线 HTML](docs/recruiter/demo/index.html) · [4 分钟讲解稿](docs/RECRUITER_DEMO.md)
 
@@ -37,7 +42,7 @@ Fake 结果不能证明真实模型能力、真实任务准入或生产 Worker �
 
 ## 私有本地任务计划（MVP Phase 1）
 
-在自己的本地工作区打开 **`/plans`**：可信本地任务导入/检查 → 一个 Codex 配置 → 预检 → 明确确认 → 保存、刷新或重启后查看不可变计划。导航的首个产品入口是“本地评测计划”；调查与只读 Demo 保留。
+在自己的本地工作区打开 **`/plans`**：可信本地任务导入/检查 → 一个 Codex 配置 → 预检 → 明确确认 → 保存、刷新或重启后查看不可变计划。当前产品首页为“我的运行”，主入口为“导入运行记录”；计划与调查保留在工作台，示例仅在官网演示。
 
 Phase 1 的计划保存只记录一次计划尝试，**不创建 Run/Episode，不执行 Agent、Provider 或 Verifier**。结构检查不等于行为验收；缺少可信历史 qualification/validation、固定镜像身份或预算时会阻塞。费用/token 仅供参考，确认计划不授权未来付费执行。
 
