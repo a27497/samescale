@@ -69,6 +69,7 @@ jobs:
           tests/test_local_plans.py
           tests/test_local_execution.py
           tests/test_external_evidence.py
+          tests/test_external_evidence_p1.py
           tests/test_subscription_controls.py
           tests/test_siwc_contract.py
           tests/test_api_health.py

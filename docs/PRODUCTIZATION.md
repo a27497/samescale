@@ -7,6 +7,10 @@ Docker Compose v2; it does not need Node.js, Java, Python tooling, `uv`, Alembic
 This distribution is keyless by default. Startup, status, and doctor operations do not receive
 provider credentials and do not make provider or Judge calls.
 
+Private saved-evidence intake currently uses the [isolated host Quickstart](EXTERNAL_EVIDENCE_QUICKSTART.md).
+The standard Compose API does not forward its operator/policy settings or mount approved sources;
+normal product startup alone does not enable this optional private path.
+
 ## Start and stop
 
 From a HarnessLab distribution checkout, start the complete local product:

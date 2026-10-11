@@ -1,5 +1,12 @@
 # SameScale Product — Public Product Contract
 
+Individual corrupt saved records now remain visibly `CORRUPT` without a verdict; healthy siblings
+remain listable/readable/exportable. Corrupt detail, export and verification refuse; global
+policy/storage/permission errors still reject access. Read-only configuration diagnostics and the
+[first private intake Quickstart](docs/EXTERNAL_EVIDENCE_QUICKSTART.md) guide isolated host setup,
+manual review, pinning and guarded replay. Standard Compose alone does not enable this path.
+`FRESH_CASE_PENDING` remains; historical 5/5 is only regression evidence.
+
 ## Private external saved Codex evidence — 2026-10-11
 
 `/external-runs` accepts individually operator-approved/pinned saved `exec --json`, Native Hook

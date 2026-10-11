@@ -1,0 +1,94 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "case": "unset",
+      "exit_code": 2,
+      "output": {
+        "issues": [
+          "EXTERNAL_EVIDENCE_DISABLED"
+        ],
+        "operator_configured": true,
+        "pins_verified": false,
+        "real_execution_enabled": false,
+        "record_integrity_checked": false,
+        "source_contents_checked": false,
+        "sources": [],
+        "status": "NOT_CONFIGURED",
+        "subject_executed": false,
+        "verifier_executed": false
+      }
+    },
+    {
+      "case": "empty",
+      "exit_code": 0,
+      "output": {
+        "issues": [],
+        "operator_configured": true,
+        "pins_verified": false,
+        "real_execution_enabled": false,
+        "record_integrity_checked": false,
+        "source_contents_checked": false,
+        "sources": [],
+        "status": "NO_APPROVED_SOURCES",
+        "subject_executed": false,
+        "verifier_executed": false
+      }
+    },
+    {
+      "case": "permissions",
+      "exit_code": 2,
+      "output": {
+        "issues": [
+          "EVIDENCE_POLICY_PERMISSION"
+        ],
+        "operator_configured": true,
+        "pins_verified": false,
+        "real_execution_enabled": false,
+        "record_integrity_checked": false,
+        "source_contents_checked": false,
+        "sources": [],
+        "status": "NOT_CONFIGURED",
+        "subject_executed": false,
+        "verifier_executed": false
+      }
+    },
+    {
+      "case": "configured-with-corrupt-records",
+      "exit_code": 0,
+      "output": {
+        "issues": [],
+        "operator_configured": true,
+        "pins_verified": false,
+        "real_execution_enabled": false,
+        "record_integrity_checked": false,
+        "source_contents_checked": false,
+        "sources": [
+          {
+            "source_id": "approved-historical-real",
+            "status": "LOCATION_PRESENT"
+          },
+          {
+            "source_id": "synthetic-incomplete",
+            "status": "LOCATION_PRESENT"
+          },
+          {
+            "source_id": "synthetic-unsupported-format",
+            "status": "LOCATION_PRESENT"
+          },
+          {
+            "source_id": "synthetic-pin-mismatch",
+            "status": "LOCATION_PRESENT"
+          },
+          {
+            "source_id": "synthetic-sensitive",
+            "status": "LOCATION_PRESENT"
+          }
+        ],
+        "status": "CONFIGURED",
+        "subject_executed": false,
+        "verifier_executed": false
+      }
+    }
+  ]
+}

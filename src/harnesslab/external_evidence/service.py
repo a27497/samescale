@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from harnesslab.analyst.offline_replay import decode, require
+from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.episodes.hooks import _write_once, derive_episode, encode, normalized, read_events
 from harnesslab.episodes.service import read_codex_episode
 from harnesslab.episodes.verified_hooks import read_verified_hook_bundle
@@ -45,6 +46,19 @@ SECRET = re.compile(
 )
 
 
+class EvidenceInputError(ValueError):
+    """A fixed public reason code; private input/exception text never crosses the boundary."""
+
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(message)
+        self.code = code
+
+
+def input_require(condition: bool, code: str, message: str) -> None:
+    if not condition:
+        raise EvidenceInputError(code, message)
+
+
 def safe_name(name: str) -> None:
     validate_relative_path(name)
     parts = Path(name).parts
@@ -56,14 +70,21 @@ def safe_name(name: str) -> None:
         or len(name) > 240
         or SECRET.search(name.encode())
     ):
-        raise ValueError("private or unsafe snapshot name")
+        raise EvidenceInputError("EVIDENCE_SENSITIVE_INPUT", "private or unsafe snapshot name")
 
 
 def safe_content(data: bytes) -> None:
     # MVP accepts reviewed UTF-8 source snapshots only; it does not claim universal DLP.
-    data.decode("utf-8")
-    if b"\x00" in data or SECRET.search(data):
-        raise ValueError("private or unsupported snapshot content")
+    try:
+        data.decode("utf-8")
+    except UnicodeDecodeError:
+        raise EvidenceInputError(
+            "EVIDENCE_INPUT_UNSUPPORTED", "unsupported snapshot content"
+        ) from None
+    if SECRET.search(data):
+        raise EvidenceInputError("EVIDENCE_SENSITIVE_INPUT", "private snapshot content")
+    if b"\x00" in data:
+        raise EvidenceInputError("EVIDENCE_INPUT_UNSUPPORTED", "unsupported snapshot content")
 
 
 def safe_root(path: Path) -> None:
@@ -71,7 +92,9 @@ def safe_root(path: Path) -> None:
     if (
         path == Path("/")
         or path == Path.home()
-        or any(p.lower() in PRIVATE_PARTS | PRIVATE_NAMES for p in path.parts)
+        or any(
+            p.lower() in PRIVATE_PARTS | PRIVATE_NAMES or p.startswith(".env") for p in path.parts
+        )
     ):
         raise ValueError("credential/session roots are forbidden")
 
@@ -81,8 +104,20 @@ def overlap(left: Path, right: Path) -> bool:
 
 
 def load_policy() -> EvidencePolicy:
+    configured = os.environ.get("HARNESSLAB_EXTERNAL_EVIDENCE_POLICY")
+    if not configured:
+        raise fail("EXTERNAL_EVIDENCE_DISABLED", "Set the private evidence policy.", 403)
+    path = Path(configured)
     try:
-        path = Path(os.environ["HARNESSLAB_EXTERNAL_EVIDENCE_POLICY"])
+        safe_root(path)
+        info = path.stat()
+        if (
+            not stat.S_ISREG(info.st_mode)
+            or info.st_nlink != 1
+            or info.st_uid != os.getuid()
+            or info.st_mode & 0o077
+        ):
+            raise fail("EVIDENCE_POLICY_PERMISSION", "Use an owned private policy (0600).", 403)
         policy = EvidencePolicy.model_validate(read_owned_json(path))
         safe_root(policy.store)
         if overlap(policy.store, distribution_root()) or overlap(policy.store, path):
@@ -104,16 +139,134 @@ def load_policy() -> EvidencePolicy:
             if (source.task_reference is None) != (source.task_digest is None):
                 raise ValueError("incomplete task mapping")
         # Reject links/special files before reading stored content on every request.
+        validate_store(policy)
+        return policy
+    except PermissionError:
+        raise fail(
+            "EVIDENCE_POLICY_PERMISSION", "Private configuration is not readable.", 403
+        ) from None
+    except WorkbenchAPIError as exc:
+        if exc.code in {"EVIDENCE_POLICY_PERMISSION", "EVIDENCE_STORAGE_UNSAFE"}:
+            raise
+        raise fail(
+            "EVIDENCE_POLICY_INVALID", "Check canonical paths and policy structure.", 403
+        ) from None
+    except (OSError, ValueError):
+        raise fail(
+            "EVIDENCE_POLICY_INVALID", "Check the configured policy and paths.", 403
+        ) from None
+
+
+def validate_store(policy: EvidencePolicy) -> None:
+    # Global structure/ownership failures must never become per-record warnings.
+    try:
+        safe_root(policy.store)
         if policy.store.exists():
             info = policy.store.stat()
-            if info.st_uid != os.getuid() or info.st_mode & 0o077:
-                raise ValueError("evidence store must be private and owned")
+            require(stat.S_ISDIR(info.st_mode), "store is not a directory")
+            require(
+                info.st_uid == os.getuid()
+                and not info.st_mode & 0o077
+                and info.st_mode & 0o700 == 0o700,
+                "unsafe store rights",
+            )
             bounded_files(policy.store, max_files=20_000, max_bytes=128_000_000)
-        return policy
-    except (KeyError, OSError, ValueError):
-        raise fail(
-            "EXTERNAL_EVIDENCE_DISABLED", "Configure a separate owned evidence policy.", 403
-        ) from None
+
+            def unreadable(error: OSError) -> None:
+                raise error
+
+            for current, directories, files in os.walk(policy.store, onerror=unreadable):
+                for name in (*directories, *files):
+                    node = (Path(current) / name).lstat()
+                    rights = 0o500 if stat.S_ISDIR(node.st_mode) else 0o400
+                    require(
+                        node.st_uid == os.getuid() and node.st_mode & rights == rights,
+                        "untrusted or unreadable stored node",
+                    )
+    except (OSError, ValueError, WorkbenchAPIError):
+        raise fail("EVIDENCE_STORAGE_UNSAFE", "Private storage safety check failed.", 403) from None
+
+
+def configuration_check() -> dict[str, Any]:
+    """Read policy and approved-path metadata only: no source content, writes or execution."""
+    result: dict[str, Any] = {
+        "status": "NOT_CONFIGURED",
+        "issues": [],
+        "sources": [],
+        "operator_configured": len(os.environ.get("HARNESSLAB_LOCAL_CONFIGURATION_TOKEN", ""))
+        >= 32,
+        "source_contents_checked": False,
+        "pins_verified": False,
+        "record_integrity_checked": False,
+        "subject_executed": False,
+        "verifier_executed": False,
+        "real_execution_enabled": False,
+    }
+    try:
+        policy = load_policy()
+    except WorkbenchAPIError as exc:
+        result["issues"] = [exc.code]
+        return result
+    for source in policy.sources:
+        try:
+            available = source.path.is_dir() and source.workspace.is_dir()
+        except OSError:
+            available = False
+        result["sources"].append(
+            {
+                "source_id": source.source_id,
+                "status": "LOCATION_PRESENT" if available else "SOURCE_LOCATION_UNAVAILABLE",
+            }
+        )
+    if not result["operator_configured"]:
+        result["issues"].append("LOCAL_CONFIGURATION_DISABLED")
+    if any(s["status"] == "SOURCE_LOCATION_UNAVAILABLE" for s in result["sources"]):
+        result["issues"].append("SOURCE_LOCATION_UNAVAILABLE")
+    result["status"] = (
+        "NEEDS_ATTENTION"
+        if result["issues"]
+        else ("CONFIGURED" if policy.sources else "NO_APPROVED_SOURCES")
+    )
+    return result
+
+
+def list_records(policy: EvidencePolicy) -> list[dict[str, Any]]:
+    validate_store(policy)
+    if not policy.store.exists():
+        return []
+    paths = sorted(p for p in policy.store.iterdir() if not p.name.startswith("."))
+    if len(paths) > 1000 or any(
+        not re.fullmatch(r"[a-f0-9]{64}", p.name) or not p.is_dir() for p in paths
+    ):
+        raise fail("EVIDENCE_STORAGE_UNSAFE", "Unexpected private store structure.", 403)
+    result: list[dict[str, Any]] = []
+    for path in paths:
+        try:
+            item = view(policy, path.name)
+            record = item["record"]
+            result.append(
+                {
+                    "identity": path.name,
+                    "status": "AVAILABLE",
+                    "source_id": record["source"]["source_id"],
+                    "source_kind": record["source"]["source_kind"],
+                    "acceptance": item["diagnosis"]["workspace_acceptance"],
+                }
+            )
+        except PermissionError:
+            raise fail("EVIDENCE_STORAGE_UNSAFE", "Private storage is not readable.", 403) from None
+        except (FileNotFoundError, ValueError, KeyError, TypeError, AttributeError):
+            # Never trust damaged metadata for labels or an acceptance verdict.
+            result.append(
+                {
+                    "identity": path.name,
+                    "status": "CORRUPT",
+                    "error_code": "EVIDENCE_RECORD_CORRUPT",
+                    "reason": "Stored record, Workspace or receipt failed integrity validation.",
+                }
+            )
+        # Other OS / structural safety errors stay global, not silently skipped.
+    return result
 
 
 def workspace_files(root: Path) -> dict[str, bytes]:
@@ -236,7 +389,11 @@ def snapshot(root: Path, destination: Path, *, max_bytes: int = 32_000_000) -> N
                             and after.st_size == opened.st_size,
                             "source changed during capture",
                         )
-                        require(not SECRET.search(data), "credential-shaped source content")
+                        input_require(
+                            not SECRET.search(data),
+                            "EVIDENCE_SENSITIVE_INPUT",
+                            "credential-shaped source content",
+                        )
                         _write_once(target / name, data)
                 finally:
                     os.close(child)
@@ -266,10 +423,11 @@ def read_jsonl(source: ApprovedSource) -> NormalizedTrace:
             with os.fdopen(os.dup(stream_fd), "rb") as stream:
                 data = stream.read(info.st_size + 1)
             after = os.fstat(stream_fd)
-            require(
+            input_require(
                 len(data) == info.st_size
                 and after.st_mtime_ns == info.st_mtime_ns
                 and content_digest({"events.jsonl": data}) == source.digest,
+                "EVIDENCE_PIN_MISMATCH",
                 "saved JSONL pin or capture mismatch",
             )
         finally:
@@ -282,7 +440,7 @@ def read_jsonl(source: ApprovedSource) -> NormalizedTrace:
     for ordinal, line in enumerate(lines, 1):
         require(len(line) <= 1_000_000, "JSONL line limit")
         raw = decode(line)
-        require(
+        input_require(
             raw.get("type")
             in {
                 "thread.started",
@@ -294,6 +452,7 @@ def read_jsonl(source: ApprovedSource) -> NormalizedTrace:
                 "item.completed",
                 "error",
             },
+            "EVIDENCE_INPUT_UNSUPPORTED",
             "unsupported saved exec protocol",
         )
         item = raw.get("item", {})
@@ -332,7 +491,11 @@ def _project_snapshot(
     if native_trace is None:
         bounded_files(source.path, max_files=4000, max_bytes=32_000_000)
     files = workspace_files(source.workspace)
-    require(content_digest(files) == source.workspace_digest, "workspace pin mismatch")
+    input_require(
+        content_digest(files) == source.workspace_digest,
+        "EVIDENCE_PIN_MISMATCH",
+        "workspace pin mismatch",
+    )
     verification = unknown_verification()
     changes: dict[str, Any] = {"status": "BASELINE_MISSING", "paths": []}
     infrastructure: dict[str, Any] = {"status": "UNKNOWN", "root_cause": None}
@@ -360,6 +523,11 @@ def _project_snapshot(
         if any(e.type in {TraceEventType.ERROR, TraceEventType.TURN_FAILED} for e in trace.events):
             infrastructure = {"status": "RECORDED_TURN_OR_STREAM_FAILURE", "root_cause": None}
     elif source.format == "verified-hook-v1":
+        input_require(
+            sha256_bytes((source.path / "bundle.json").read_bytes()) == source.digest,
+            "EVIDENCE_PIN_MISMATCH",
+            "source pin mismatch",
+        )
         verification = read_verified_hook_bundle(source.path, source.digest)
         require(
             verification["workspace_digest"] == source.workspace_digest,
@@ -394,7 +562,9 @@ def _project_snapshot(
         coverage = "PAIRED_HOOKS_ONLY"
     elif source.format == "native-hook-v1":
         original_kind = source.source_kind
-        require(digest_tree(source.path) == source.digest, "hook pin mismatch")
+        input_require(
+            digest_tree(source.path) == source.digest, "EVIDENCE_PIN_MISMATCH", "hook pin mismatch"
+        )
         events = read_events(source.path)
         require(len({(e.source, e.session) for e in events}) == 1, "mixed hook sessions")
         try:
@@ -422,6 +592,11 @@ def _project_snapshot(
         original = "NOT_VERIFIED"
     else:
         original_kind = source.source_kind
+        input_require(
+            digest_tree(source.path) == source.digest,
+            "EVIDENCE_PIN_MISMATCH",
+            "H-Lane pin mismatch",
+        )
         episode_record = read_codex_episode(source.path, source_kind=source.source_kind)
         require(episode_record.source_bundle_digest == source.digest, "H-Lane pin mismatch")
         require(
@@ -504,7 +679,7 @@ def record_root(policy: EvidencePolicy, identity: str) -> Path:
 
 def ingest(policy: EvidencePolicy, source_id: str) -> dict[str, Any]:
     source = next((s for s in policy.sources if s.source_id == source_id), None)
-    require(source is not None, "source not approved")
+    input_require(source is not None, "EVIDENCE_SOURCE_NOT_APPROVED", "source not approved")
     assert source is not None
     record, files = project(source)
     policy.store.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -545,6 +720,7 @@ def verification_receipt(policy: EvidencePolicy, identity: str) -> dict[str, Any
     if not path.exists():
         return None
     raw = decode(path.read_bytes())
+    require(isinstance(raw, dict), "invalid verification receipt")
     require(
         raw.get("receipt_digest")
         == canonical_digest({k: v for k, v in raw.items() if k != "receipt_digest"}),
@@ -577,7 +753,9 @@ def validate_verification(result: dict[str, Any]) -> None:
     if "check_results" in result:
         items = result["check_results"]
         require(
-            len(items) == checks and all(type(c.get("passed")) is bool for c in items),
+            isinstance(items, list)
+            and len(items) == checks
+            and all(isinstance(c, dict) and type(c.get("passed")) is bool for c in items),
             "malformed independent check results",
         )
         require(sum(c["passed"] for c in items) == passed, "independent check count drift")

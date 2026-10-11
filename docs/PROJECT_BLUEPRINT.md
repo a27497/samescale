@@ -1,6 +1,22 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## Current authorization — external saved Codex evidence MVP — 2026-10-11
+## Current authorization — bounded external evidence P1 repairs — 2026-10-11
+
+Base main@de55277b8cb0f931c9b57184aa5b68dadec0263c; independent clean worktree. Isolate corrupt
+record reads without hiding global security failures; remove concurrent UI list/detail coupling.
+Add a practical private host Quickstart, read-only metadata check and targeted setup/error guidance.
+Reuse existing intake, Episode/Trace, verification and replay machinery. No new execution or
+Verifier run, automatic source approval, credential/session discovery, subscription work, deployment,
+existing database migration or public write permission. REAL_CODEX remains closed.
+
+Validate mixed/all-corrupt records, global policy/permission safety, restart, privacy rejection and
+actual Chromium first-use intake/export/two replays. Use the approved saved 2026-10-07 Hook 5/5
+only as regression; keep original NOT_VERIFIED and FRESH_CASE_PENDING. Protect all prior worktrees,
+UI-2, 58 containers, frozen artifacts, auth metadata and website. Report actual acceptance in
+[Current Milestone](../CURRENT_MILESTONE.md). Finish normal commit/push, Draft PR and exact-SHA
+Fast/Offline CI; no merge. Prior plans are historical scope, not new execution authorization.
+
+## Historical external evidence MVP authorization — external saved Codex evidence MVP — 2026-10-11
 
 Base main@5c363e245c25ebe3fbf6784f95952e32452c6878. Deliver private approved-source intake,
 final Workspace acceptance, deterministic diagnosis and safe export/offline replay. Reuse Native Hook,

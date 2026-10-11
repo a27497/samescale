@@ -1,0 +1,221 @@
+{
+  "status": "PASS",
+  "baseline": "de55277b8cb0f931c9b57184aa5b68dadec0263c",
+  "checks": [
+    "No evidence request before explicit operator unlock",
+    "First-use page explains host setup, manual review, CLI check and Compose limit",
+    "Missing policy has targeted configuration guidance",
+    "Wrong operator remains denied",
+    "Empty approved list is distinct and intake disabled",
+    "Policy permissions explain 0600 and block access",
+    "Configured metadata check makes no pin/acceptance claim",
+    "No operator and untrusted origin remain refused",
+    "Pin mismatch has review guidance and no substitute result",
+    "Synthetic sensitive content is refused before store write",
+    "Historical real keeps original NOT_VERIFIED and separate retained 5/5",
+    "Unknown usage/route/tool-exit and NOT_ATTESTED stay explicit",
+    "Export excludes credentials, raw sessions, hidden assets and private paths",
+    "Two identical guarded replays run no Agent or Verifier",
+    "Intake remains idempotent",
+    "Partial fixture remains synthetic NOT_VERIFIED without invented Episode",
+    "Mixed list reports one healthy and one corrupt identity",
+    "Healthy detail stays usable beside explicit corrupt row",
+    "Healthy sibling still exports unchanged bytes",
+    "Corrupt detail and export fail closed without acceptance panel",
+    "Actual API restart retains both states and ignores staging",
+    "Global unsafe storage blocks the entire view",
+    "All-corrupt UI unlocks to two damaged rows, never empty/pass",
+    "All-corrupt rows and Quickstart fit mobile viewport",
+    "Operator not retained in browser storage",
+    "No browser error, external request or execution route"
+  ],
+  "http": [
+    {
+      "path": "/api/workbench/analyst/capabilities",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/configuration-check",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/configuration-check",
+      "status": 403,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/configuration-check",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/sources",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/configuration-check",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/configuration-check",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/sources",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 409,
+      "method": "POST"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 409,
+      "method": "POST"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "POST"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records/5fab5476679b658e513b1ad2b4d28f12f45b032f97029b77ce12188a45f2520a",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records/5fab5476679b658e513b1ad2b4d28f12f45b032f97029b77ce12188a45f2520a",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records/5fab5476679b658e513b1ad2b4d28f12f45b032f97029b77ce12188a45f2520a/export",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "POST"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records/5fab5476679b658e513b1ad2b4d28f12f45b032f97029b77ce12188a45f2520a",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "POST"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/configuration-check",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/sources",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records/5fab5476679b658e513b1ad2b4d28f12f45b032f97029b77ce12188a45f2520a",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records/71b457ab2352885fbe5715cd173650f4785446883c199d55db475709c9d6972b",
+      "status": 409,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/configuration-check",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/sources",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/configuration-check",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/configuration-check",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/sources",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/external-evidence/records",
+      "status": 200,
+      "method": "GET"
+    }
+  ],
+  "exceptions": [],
+  "blockedExternal": [],
+  "historical_case": "APPROVED_SAVED_REAL_20261007",
+  "fresh_case": "FRESH_CASE_PENDING",
+  "synthetic_cases": [
+    "incomplete-hook",
+    "pin-mismatch",
+    "sensitive",
+    "corrupt-stored-copies",
+    "uncommitted-staging"
+  ],
+  "real_record_identity": "5fab5476679b658e513b1ad2b4d28f12f45b032f97029b77ce12188a45f2520a",
+  "partial_record_identity": "71b457ab2352885fbe5715cd173650f4785446883c199d55db475709c9d6972b",
+  "export_digest": "sha256:4dde380df843d46df90ad8705368f7c6b577fd48d950310082aede9da84a7545",
+  "new_agent_runs": 0,
+  "new_verifier_runs": 0,
+  "live_quota_calls": 0
+}

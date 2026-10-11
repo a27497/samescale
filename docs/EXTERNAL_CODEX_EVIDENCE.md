@@ -4,6 +4,10 @@ SameScale accepts an explicitly reviewed saved run and final source snapshot. It
 Codex, reruns an Agent, reads development login/session directories, or takes over subscription
 authentication. REAL_CODEX remains unconditionally closed; SIWC is outside this workflow.
 
+Follow the [first private intake Quickstart](EXTERNAL_EVIDENCE_QUICKSTART.md) for actual isolated
+startup, permissions, manual review, pin commands, UI intake and two guarded replays. Standard
+Compose does not forward the required operator/policy settings or mount these sources.
+
 ## Operator boundary and sources
 
 Enable the existing loopback/operator/origin boundary described in [local planning](LOCAL_PLANNING.md).
@@ -63,9 +67,16 @@ partial import from being listed as complete. Changed/corrupt saved records are 
 
 All `/api/external-evidence/*` endpoints require the existing private boundary, including reads:
 
+- `GET /configuration-check`: read-only policy/path metadata and fixed reason codes; no source
+  contents, pin/record validation, writes or execution. CLI: `harnesslab external-evidence check`.
 - `GET /sources`: explicit source bindings, no server paths.
 - `POST /records`: `{ "source_id": "…", "consent": "IMPORT_APPROVED_SAVED_EVIDENCE" }`.
-- `GET /records` and `GET /records/{identity}`: source/completeness, sanitized Trace and diagnosis.
+- `GET /records`: each identity is `AVAILABLE` (source summary/acceptance) or `CORRUPT`
+  (`EVIDENCE_RECORD_CORRUPT` plus a fixed safe reason, no source label or verdict from damaged data).
+  All-corrupt stores remain visible rather than becoming empty.
+- `GET /records/{identity}`: source/completeness, sanitized Trace and diagnosis.
+  Corrupt detail/export/independent admission remain refused. Global policy, permissions, links,
+  ownership, structural or capacity errors still reject the request; they are never row warnings.
 - `GET /records/{identity}/export`: reviewed source snapshot and projected evidence; SHA in
   `X-Evidence-SHA256`, `Cache-Control: no-store`. Public Demo cannot read or import.
 

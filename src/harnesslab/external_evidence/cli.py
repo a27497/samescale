@@ -16,6 +16,15 @@ external_evidence_app = typer.Typer(
 )
 
 
+@external_evidence_app.command("check")
+def check() -> None:
+    """Read-only private configuration check; never imports, executes or verifies a task."""
+    result = service.configuration_check()
+    typer.echo(encode(result).decode(), nl=False)
+    if result["status"] not in {"CONFIGURED", "NO_APPROVED_SOURCES"}:
+        raise typer.Exit(2)
+
+
 @external_evidence_app.command("verify-workspace")
 def verify(
     identity: str, confirm: Annotated[bool, typer.Option("--confirm-independent-verifier")] = False

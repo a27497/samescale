@@ -1,5 +1,7 @@
 # SameScale
 
+First private intake: [isolated host Quickstart](docs/EXTERNAL_EVIDENCE_QUICKSTART.md).
+
 Private saved Codex evidence: `/external-runs` accepts individually approved saved native hooks,
 H-Lane bundles or provided `exec --json` streams and final source snapshots. It exposes independent
 Workspace checks and deterministic diagnosis/export/replay without rerunning an Agent or taking over

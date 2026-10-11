@@ -1,5 +1,36 @@
 # SameScale Product — Current Milestone
 
+## Current state — external evidence P1 repaired / private first intake — 2026-10-11
+
+Baseline main@de55277b8cb0f931c9b57184aa5b68dadec0263c; separate clean branch
+`codex/external-evidence-p1-20261011`. P1-A isolates malformed stored records as explicit CORRUPT
+rows with fixed safe reasons, never a verdict or empty fallback. Healthy siblings still list/open/export;
+all-corrupt stores remain visible. Corrupt detail/export/Verifier admission refuse. Global policy,
+authentication, permissions/ownership, links, structure and capacity errors still fail closed.
+Concurrent UI list reads no longer strand a known healthy detail after a transient list failure.
+
+P1-B provides the [actual host Quickstart](docs/EXTERNAL_EVIDENCE_QUICKSTART.md), readonly
+`external-evidence check` / authenticated metadata-check API, and targeted page guidance for setup,
+permissions, empty approved list, pin mismatch and corrupt records. Standard Compose does not forward
+operator/evidence settings or mount sources; no automatic distribution support is claimed. Human
+privacy/IP/pairing review, explicit source approval, retained pins and own private permissions remain
+necessary. Removed original sources do not block healthy saved records.
+
+**162 backend compatibility + 223 frontend cases PASS**; types/build and full Ruff/format PASS,
+mypy PASS (428 sources). **26 actual Chromium workflow checks PASS** including first use, known-sensitive
+rejection, mixed/all-corrupt stores, actual restart, global permission refusal and mobile. **73 historical
+offline checks PASS**, two identical replays; new export also replayed twice identically under guard.
+Only a new isolated PostgreSQL was initialized/migrated and removed. Zero new Agent/Provider/Verifier
+runs, OAuth/account/quota access or deployment. Approved saved Hook history remains original
+**unverified / NOT_VERIFIED** and separately retained **5/5**; **FRESH_CASE_PENDING** stays.
+
+All 14 prior worktrees, UI-2 17 dirty entries, 58 containers, 419 frozen files, auth metadata and
+364 website files/head/status/listeners unchanged. [Acceptance and protection](docs/qa/external-evidence-p1-20261011/README.md).
+REAL_CODEX remains unconditionally CLOSED; subscription/SIWC work is outside scope. Normal commit,
+push, Draft PR and exact-SHA Fast/Offline CI are the Git handoff; no merge/deploy/Phase 3.
+
+## Historical external evidence MVP acceptance snapshot
+
 ## Current state — external saved Codex evidence MVP — 2026-10-11
 
 Base `main@5c363e245c25ebe3fbf6784f95952e32452c6878`; separate clean worktree/branch
