@@ -15,11 +15,20 @@ The pipeline does not depend on ATIF or OpenTelemetry. Existing `external-codex-
 records retain original identities, task bindings and receipts. No migration rewrites frozen evidence.
 
 Only explicitly operator-supplied, reviewed and pinned files are accepted. UI tool selection filters
-approved inputs; it grants no arbitrary path/file upload, automatic approval or session discovery.
+approved inputs after unlock. “All sources” is a filter, not a detection mode. Approved `auto-v1`
+files are identified by the backend during intake; unidentified auto sources remain selectable under
+both Codex and Claude filters. Only metadata-free legacy `codex-*`, `native-hook-v1` and
+`verified-hook-v1` imply Codex; other formats show “Not reported” until metadata is supplied or a
+converter resolves the imported bytes. The selector grants no arbitrary path/file upload, automatic approval or session discovery.
 All tools share the existing operator/origin, consent, pin, bounded acquisition and privacy gates.
 New formats require a separately bound task reference/digest. That mapping alone is not qualification
 or acceptance. New Workspace checks still require the existing admitted TaskStore and separately
-authorized isolated Verifier CLI. Import/result completion/replay integrity never means task pass.
+authorized isolated Verifier CLI. Unverified detail pages include the record-bound CLI command,
+trusted task/image/policy prerequisites and reload instructions, including code-only records.
+This is operator guidance, not a browser execution/authorization API. Acceptance fields are localized;
+raw codes, original statuses and diagnostics remain under collapsed technical details.
+The acceptance-tasks page describes multi-tool intake separately from the Codex-only local planning
+configuration and closed real-Codex execution. Import/result completion/replay integrity never means task pass.
 `NOT_VERIFIED`, `NOT_RUN`, `CORRUPT`, zero-check refusal and `NOT_ATTESTED` retain their meanings.
 
 This minimum version accepts final UTF-8 Workspaces; baseline+diff application and arbitrary binaries

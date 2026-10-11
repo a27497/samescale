@@ -24,12 +24,15 @@ describe('acceptance summary', () => {
     expect(JSON.stringify(rows)).not.toContain('VERIFIED_PASS')
   })
   it('reports zero-check external runs as not verified and corrupt integrity as corrupt', () => {
-    const detail = { identity: 'x', record: { source: {} as never, episode_identity: null, original_acceptance: 'NOT_VERIFIED', workspace_digest: 'd', workspace_files: {}, completeness: { status: 'PARTIAL', coverage: 'c', missing_fields: ['usage'], integrity: 'RECORD_CORRUPT', origin: 'NOT_ATTESTED' }, trace: [] }, diagnosis: { original_episode_acceptance: 'NOT_RUN', workspace_acceptance: 'NOT_VERIFIED', independent_verification: { checks: 0, passed_checks: 0 }, agent_self_reports: [], observed_failed_tools: [], file_changes: { status: 's', paths: [] }, infrastructure: { status: 'UNKNOWN', root_cause: null }, limits: [] } } as EvidenceDetail
+    const detail = { identity: 'x', record: { source: {} as never, episode_identity: null, original_acceptance: 'NOT_VERIFIED', workspace_digest: 'd', workspace_files: {}, completeness: { status: 'PARTIAL', coverage: 'c', missing_fields: ['run_record', 'actual_model', 'usage', 'future_field'], integrity: 'RECORD_CORRUPT', origin: 'NOT_ATTESTED' }, trace: [] }, diagnosis: { original_episode_acceptance: 'NOT_RUN', workspace_acceptance: 'NOT_VERIFIED', independent_verification: { checks: 0, passed_checks: 0, reason: 'TRUSTED_TASK_OR_VERIFIER_MISSING' }, agent_self_reports: [], observed_failed_tools: [], file_changes: { status: 's', paths: [] }, infrastructure: { status: 'UNKNOWN', root_cause: null }, limits: [] } } as EvidenceDetail
     const rows = externalAcceptanceRows(detail)
     expect(rows[0]!.status).toBe('NOT_RUN'); expect(rows[1]!.status).toBe('NOT_VERIFIED'); expect(rows[3]!.status).toBe('CORRUPT')
     const wrapper = mount(AcceptanceSummary, { props: { rows } })
     expect(wrapper.findAll('.acceptance-row')).toHaveLength(4)
     expect(wrapper.text()).toContain('验收摘要')
+    expect(wrapper.text()).toContain('运行记录、实际使用的模型、用量记录、其他未报告信息（见技术细节）')
+    expect(wrapper.text()).toContain('缺少可信任务绑定或独立验收结果')
+    expect(wrapper.text()).not.toMatch(/run_record|actual_model|usage|future_field|TRUSTED_TASK_OR_VERIFIER_MISSING/)
   })
   it('home empty state guides to import, not demo, and hides fixtures', async () => {
     vi.mocked(workbenchApi.listExperiments).mockResolvedValue({ items: [{ experiment_id: 'f', provenance: 'FIXTURE_OFFLINE' }], total: 1, limit: 20, offset: 0 } as never)

@@ -1,5 +1,35 @@
 # SameScale Product — Current Milestone
 
+## Current state — multi-tool intake UX corrections — 2026-10-11
+
+Continued `feat/acceptance-workbench-v2@f3c25fba18011cf02c37b57a4a172ac3291602df` in the
+independent task worktree. “全部来源” truthfully filters approved sources after unlock;
+`auto-v1` is identified by the existing backend at intake, with unidentified sources retained under
+both supported log-adapter filters. Only metadata-free legacy Codex formats imply Codex; other
+formats show “未报告”. No converter, evidence identity, backend authority or safety gate was changed.
+
+Unverified records, including code-only, now show independent-verification prerequisites, the exact
+record-bound operator CLI command, one-attempt/no-retry semantics and reload instructions. The page
+has no verification execution/authorization endpoint. Missing fields and reasons use Chinese
+explanations; raw acceptance/status/field/trace details remain in collapsed “技术细节”. The acceptance
+tasks heading and route agree, with supported Codex/Claude/code-only import and Codex-only local
+planning/closed real execution described separately. README and Quickstart describe the actual order.
+
+Actual related backend **81 PASS**, including all **3** parameterized Docker Verifier tests
+(Codex hooks / Claude stream / code-only): real isolated baseline failure, oracle success,
+timeout remaining unverified and refusal to rerun an interrupted attempt. Existing cached images
+`harnesslab-phase-c:0.3.1` and `harnesslab-phase-e-codex:0.149.0` were present; no pull/build or Agent
+execution. Complete frontend **243 PASS / 19 files**, types/build PASS, focused Ruff/format PASS
+(11 files) and mypy PASS (7 sources). Actual private API / production-build Chromium **48 PASS** at
+1440×1000, zero page runtime errors; screenshots visually inspected. Frozen evidence guard and
+original dirty-worktree diff preservation passed. [Commands, image IDs, evidence and limits](docs/qa/agent-neutral-ux-20261011/README.md).
+
+No full PostgreSQL planning/execution lifecycle, real model/Agent, Cursor/DeepSeek native adapters,
+new production task qualification, public-site deployment or remote CI verdict is established here.
+Only normal feature-branch commit/push is authorized; no PR/merge/deployment. Stop after handoff.
+
+## Historical tool-neutral intake snapshot
+
 ## Current state — tool-neutral acceptance intake minimum — 2026-10-12
 
 Base `feat/acceptance-workbench-v2@6affea4cb8287ef0434856fe9437127c4ebb89a1`; independent clean

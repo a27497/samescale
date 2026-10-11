@@ -156,9 +156,20 @@ uv run --locked harnesslab serve --host 127.0.0.1 --port "$SS_API_PORT"
 
 CLI/API 仅使用这个显式策略；不自动发现来源。浏览器访问
 `http://127.0.0.1:58690/external-runs`（按实际端口调整），输入新的本地操作员口令 →
-先选择工具 → 解锁 → 选择已批准的 Workspace / 条件 / 可选记录 → 勾选同意 → 导入。口令仅在页面内存，关闭页面清除，不是 Codex Token。
+解锁 → 按工具筛选（或“全部来源”） → 选择已批准的 Workspace / 条件 / 可选记录 → 勾选同意 → 导入。口令仅在页面内存，关闭页面清除，不是 Codex Token。
 检查原 Episode、独立 Workspace 验收、来源类别、PARTIAL/缺失字段、UNKNOWN 工具退出、
 NOT_ATTESTED 来源声明。导入成功/工具成功不意味着任务通过。
+
+“全部来源”只筛选操作员已批准的来源，不读取文件或预先识别工具。`auto-v1` 在点击导入后
+由后端解析主动提供的文件，识别 Codex / Claude Code；尚无工具声明的 auto 来源在这两种筛选中
+都会保留，不出现在仅代码筛选中。只有旧的 `codex-*`、`native-hook-v1`、`verified-hook-v1`
+格式缺少工具信息时默认标为 Codex；其他格式没有工具信息显示“未报告”。
+
+未验证的记录（包括仅代码改动）会显示“下一步：独立验收代码改动”、带该记录身份的 CLI
+命令与前置条件。网页不执行或授权 Verifier。操作员必须使用原批准证据策略、可信 TaskStore
+任务策略及固定的本地 Verifier 镜像，按[独立验收契约](EXTERNAL_CODEX_EVIDENCE.md#separate-independent-workspace-verification)
+单独确认一次检查，完成后点击“刷新独立验收”。缺少准入、检查或有效结果仍保持未验证。
+摘要使用中文说明；原始状态、字段代码和诊断保留在默认折叠的“技术细节”。
 
 ## 5. 导出，两次离线复核
 

@@ -10,7 +10,7 @@ initializeLocale()
 const route = useRoute()
 const titles: Record<string, [string, string]> = {
   runs: ['我的运行', 'My runs'], 'external-evidence': ['导入运行记录', 'Import run evidence'], 'external-evidence-detail': ['已保存外部运行证据', 'Saved external evidence'],
-  'local-plans': ['验收任务', 'Acceptance tasks'], 'local-plan-detail': ['已保存本地计划', 'Saved local plan'],
+  'local-plans': ['验收任务', 'Acceptance tasks'], 'local-plan-detail': ['已保存验收任务计划', 'Saved acceptance task plan'],
   analyst: ['调查首页', 'Investigation home'], 'public-demo': ['公开演示', 'Public demo'],
   'run-detail': ['运行证据', 'Run evidence'], diagnosis: ['失败诊断', 'Failure diagnosis'],
   regression: ['候选对比', 'Regression comparison'], 'analyst-sessions': ['已保存调查', 'Saved investigations'],

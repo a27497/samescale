@@ -1,6 +1,21 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## Current authorization — tool-neutral acceptance intake minimum — 2026-10-12
+## Current authorization — multi-tool intake UX corrections — 2026-10-11
+
+Continue `feat/acceptance-workbench-v2@f3c25fba18011cf02c37b57a4a172ac3291602df` in the
+existing independent task worktree. Align the source filter name/behavior and keep unidentified
+auto sources selectable; restrict metadata-free Codex attribution to legacy formats. Give unverified
+code-only records explicit independent-verification prerequisites and the existing operator CLI
+command without adding execution authority. Localize summary fields, collapse raw technical details,
+unify acceptance-task headings while accurately documenting Codex-only planning and supported import
+adapters, and hide tool selection until unlock. Preserve all shared safety, consent, pins, privacy,
+unknown/corrupt semantics and frozen evidence. Verify related backend/frontend tests, types/build,
+actual 1440px browser intake and summaries; report the cached Docker-image prerequisites and actual
+three-parameter isolated Verifier results. No real Agent/model, PR, merge or deployment. Only normal
+commit/push to this feature branch is authorized; stop after the report. Live results belong in
+[Current Milestone](../CURRENT_MILESTONE.md).
+
+## Historical authorization — tool-neutral acceptance intake minimum — 2026-10-12
 
 Work from `feat/acceptance-workbench-v2@6affea4cb8287ef0434856fe9437127c4ebb89a1` in an independent
 clean worktree. Make saved evidence agent-neutral while preserving old Codex identities and all

@@ -38,6 +38,7 @@ describe('Private saved Codex evidence', () => {
     const storage = vi.spyOn(Storage.prototype, 'setItem')
     const { wrapper } = await screen()
     expect(externalEvidenceApi.sources).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-test=tool]').exists()).toBe(false)
     await wrapper.get('[data-test=operator]').setValue('operator-placeholder-only')
     await wrapper.get('form').trigger('submit'); await flushPromises()
     await wrapper.get('[data-test=source]').setValue('saved-real')
@@ -59,7 +60,7 @@ describe('Private saved Codex evidence', () => {
     vi.mocked(externalEvidenceApi.detail).mockResolvedValue({ ...detail, diagnosis: { ...detail.diagnosis, workspace_acceptance: 'NOT_VERIFIED', independent_verification: { checks: 0, passed_checks: 0 } } })
     const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
     expect(wrapper.get('[data-test=acceptance]').text()).toContain('NOT_VERIFIED')
-    expect(wrapper.text()).toContain('保持未验证'); wrapper.unmount()
+    expect(wrapper.get('[data-test=verification-next-step]').text()).toContain('仍为未验证'); wrapper.unmount()
   })
   it('shows permission and integrity errors without inventing records', async () => {
     vi.mocked(externalEvidenceApi.sources).mockRejectedValue({ response: { data: { error: { code: 'LOCAL_CONFIGURATION_DISABLED' } } } })
@@ -205,10 +206,60 @@ describe('tool-neutral intake', () => {
     expect(wrapper.get('[data-test=acceptance]').text()).toContain('NOT_VERIFIED')
     expect(wrapper.get('[data-test=acceptance]').text()).toContain('0/0')
     expect(wrapper.get('[data-test=detail]').text()).not.toContain('VERIFIED_PASS')
+    expect(wrapper.get('[data-test=technical-details]').attributes('open')).toBeUndefined()
+    expect(wrapper.find('[data-test=technical-details] [data-test=acceptance]').exists()).toBe(true)
     if (name === 'code-only') {
       expect(wrapper.get('.acceptance-summary').text()).toContain('无运行记录')
+      expect(wrapper.get('[data-test=verifier-command]').text()).toBe(`uv run --locked harnesslab external-evidence verify-workspace ${detail.identity} --confirm-independent-verifier`)
+      expect(wrapper.get('[data-test=verification-next-step]').text()).toContain('HARNESSLAB_LOCAL_TASK_POLICY')
+      expect(wrapper.get('[data-test=verification-next-step]').text()).toContain('网页不能授权执行 Verifier')
       expect(wrapper.get('[data-test=acceptance-original] .status-pill').attributes('data-status')).toBe('NOT_REPORTED')
     }
+    wrapper.unmount()
+  })
+})
+
+describe('source filtering and honest harness attribution', () => {
+  it('labels the selector as all sources and retains unidentified auto inputs under both adapters', async () => {
+    const auto = { ...source, source_id: 'auto-unidentified', format: 'auto-v1' }
+    const declared = { ...auto, source_id: 'auto-declared-claude', harness: { name: 'claude-code', version: null } }
+    vi.mocked(externalEvidenceApi.sources).mockResolvedValue({ items: [source, auto, declared] })
+    const { wrapper } = await unlocked()
+    expect(wrapper.get('[data-test=tool] option[value=all]').text()).toBe('全部来源')
+    expect(wrapper.get('[data-test=source-filter]').text()).toContain('在点击导入后由后端识别')
+    await wrapper.get('[data-test=tool]').setValue('codex')
+    expect(wrapper.get('[data-test=source]').text()).toContain('auto-unidentified')
+    expect(wrapper.get('[data-test=source]').text()).not.toContain('auto-declared-claude')
+    await wrapper.get('[data-test=tool]').setValue('claude-code')
+    expect(wrapper.get('[data-test=source]').text()).toContain('auto-unidentified')
+    expect(wrapper.get('[data-test=source]').text()).toContain('auto-declared-claude')
+    await wrapper.get('[data-test=source]').setValue('auto-unidentified')
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain('未报告')
+    await wrapper.get('[data-test=consent]').setValue(true)
+    await wrapper.get('form').trigger('submit'); await flushPromises()
+    expect(externalEvidenceApi.ingest).toHaveBeenCalledWith('auto-unidentified', 'operator-placeholder-only')
+    wrapper.unmount()
+  })
+  it.each([
+    ['codex-jsonl-v1', 'Codex'], ['codex-h-lane-v1', 'Codex'],
+    ['native-hook-v1', 'Codex'], ['verified-hook-v1', 'Codex'],
+    ['auto-v1', '未报告'], ['hook-v1', '未报告'],
+    ['h-lane-v1', '未报告'], ['stream-json-v1', '未报告'], ['future-v1', '未报告'],
+  ])('attributes metadata-free %s honestly in input and saved detail', async (format, label) => {
+    const input = { ...source, format }
+    vi.mocked(externalEvidenceApi.sources).mockResolvedValue({ items: [input] })
+    vi.mocked(externalEvidenceApi.detail).mockResolvedValue({ ...detail, record: { ...detail.record, source: input, harness: null } })
+    const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
+    await wrapper.get('[data-test=source]').setValue(source.source_id)
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain(`${format} · ${label}`)
+    expect(wrapper.get('[data-test=harness]').text()).toBe(`工具：${label} · 版本：未报告`)
+    expect(wrapper.find('[data-test=verification-next-step]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+  it('prefers reported record harness over legacy inference', async () => {
+    vi.mocked(externalEvidenceApi.detail).mockResolvedValue({ ...detail, record: { ...detail.record, harness: { name: 'claude-code', version: 'fixture-only' } } })
+    const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
+    expect(wrapper.get('[data-test=harness]').text()).toBe('工具：Claude Code · 版本：fixture-only')
     wrapper.unmount()
   })
 })
