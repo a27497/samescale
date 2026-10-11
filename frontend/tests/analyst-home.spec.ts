@@ -22,8 +22,8 @@ beforeEach(async () => {
   api.historical.mockResolvedValue({ kind: 'historical_real', provenance: 'Historical real / read only', report, metadata: { decision_limit: 4 }, next_steps: ['Review historical plan'], proposal: null })
 })
 describe('Agent product entry', () => {
-  it('lands at Analyst and preserves advanced routes without starting anything', async () => {
-    expect(router.getRoutes().find(route => route.path === '/')?.redirect).toBe('/analyst')
+  it('lands at My runs and preserves advanced routes without starting anything', async () => {
+    expect(router.getRoutes().find(route => route.path === '/')?.redirect).toBe('/runs')
     for (const path of ['/overview', '/experiments', '/judgelab', '/analyst/sessions']) expect(router.getRoutes().some(route => route.path === path)).toBe(true)
     const wrapper = mountHome(); await flushPromises()
     expect(wrapper.text()).toContain('不调用模型')

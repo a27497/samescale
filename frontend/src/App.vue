@@ -9,8 +9,8 @@ import WorkbenchBrand from '@/components/WorkbenchBrand.vue'
 initializeLocale()
 const route = useRoute()
 const titles: Record<string, [string, string]> = {
-  'external-evidence': ['外部 Codex 运行证据', 'External Codex evidence'], 'external-evidence-detail': ['已保存外部运行证据', 'Saved external evidence'],
-  'local-plans': ['本地评测计划', 'Local evaluation plans'], 'local-plan-detail': ['已保存本地计划', 'Saved local plan'],
+  runs: ['我的运行', 'My runs'], 'external-evidence': ['导入运行', 'Import a run'], 'external-evidence-detail': ['已保存外部运行证据', 'Saved external evidence'],
+  'local-plans': ['验收任务', 'Acceptance tasks'], 'local-plan-detail': ['已保存本地计划', 'Saved local plan'],
   analyst: ['调查首页', 'Investigation home'], 'public-demo': ['公开演示', 'Public demo'],
   'run-detail': ['运行证据', 'Run evidence'], diagnosis: ['失败诊断', 'Failure diagnosis'],
   regression: ['候选对比', 'Regression comparison'], 'analyst-sessions': ['已保存调查', 'Saved investigations'],
@@ -18,7 +18,7 @@ const titles: Record<string, [string, string]> = {
   'experiment-detail': ['实验详情', 'Experiment details'], overview: ['概览', 'Overview'], settings: ['设置', 'Settings'],
 }
 const title = computed(() => { const pair = titles[String(route.name)]; return pair ? c(...pair) : String(route.meta.title ?? route.name ?? 'Workbench') })
-const coreRoute = computed(() => ['analyst', 'public-demo', 'run-detail', 'diagnosis', 'regression'].includes(String(route.name)))
+const coreRoute = computed(() => ['runs', 'external-evidence', 'external-evidence-detail', 'run-detail', 'settings'].includes(String(route.name)))
 const mobileNavOpen = ref(false)
 const menuButton = ref<HTMLButtonElement | null>(null)
 const navigationPanel = ref<HTMLElement | null>(null)
@@ -40,20 +40,20 @@ function navigationKeydown(event: KeyboardEvent) {
   }
 }
 const navigation = computed(() => [
-  { label: c('主要功能', 'Core'), items: [
-    { to: '/plans', label: c('本地评测计划', 'Local evaluation plans'), icon: Files },
-    { to: '/external-runs', label: c('外部运行证据', 'External run evidence'), icon: Files },
-    { to: '/analyst', label: c('调查首页', 'Investigation home'), icon: House },
-    { to: '/demo', label: c('公开演示', 'Public demo'), icon: View },
-    { to: '/analyst/sessions', label: c('已保存调查', 'Saved investigations'), icon: Document },
-  ] },
-  { label: c('评测与证据', 'Evaluation & evidence'), items: [
-    { to: '/experiments', label: c('实验与运行', 'Experiments & runs'), icon: Files },
-    { to: '/diagnosis', label: c('失败诊断', 'Diagnosis'), icon: DataAnalysis },
-    { to: '/regression', label: c('候选对比', 'Regression comparison'), icon: TrendCharts },
+  { label: c('工作台', 'Workbench'), items: [
+    { to: '/runs', label: c('我的运行', 'My runs'), icon: House },
+    { to: '/external-runs', label: c('导入运行', 'Import a run'), icon: Files },
+    { to: '/plans', label: c('验收任务', 'Acceptance tasks'), icon: Document },
+    { to: '/settings', label: c('设置', 'Settings'), icon: Setting },
   ] },
 ])
 const advanced = computed(() => [
+  { to: '/experiments', label: c('实验与运行', 'Experiments & runs'), icon: Files },
+  { to: '/diagnosis', label: c('失败诊断', 'Diagnosis'), icon: DataAnalysis },
+  { to: '/regression', label: c('候选对比', 'Regression comparison'), icon: TrendCharts },
+  { to: '/analyst', label: c('工程问题调查', 'Investigation'), icon: View },
+  { to: '/analyst/sessions', label: c('已保存调查', 'Saved investigations'), icon: Document },
+  { to: '/demo', label: c('公开演示', 'Public demo'), icon: View },
   { to: '/overview', label: c('概览', 'Overview'), icon: Grid },
   { to: '/run-control', label: c('运行控制', 'Run control'), icon: Operation },
   { to: '/judgelab', label: 'JudgeLab', icon: Collection },
@@ -63,11 +63,10 @@ const advanced = computed(() => [
   { to: '/harnesses', label: c('Harness 注册', 'Harnesses'), icon: Tools },
   { to: '/capabilities', label: c('兼容能力', 'Capabilities'), icon: CircleCheck },
   { to: '/core-readiness', label: c('就绪检查', 'Core readiness'), icon: CircleCheck },
-  { to: '/settings', label: c('设置', 'Settings'), icon: Setting },
 ])
 watch(() => route.fullPath, () => {
   if (mobileNavOpen.value) closeNavigation()
-  advancedOpen.value = !coreRoute.value && !['experiments', 'experiment-detail', 'analyst-sessions', 'local-plans', 'local-plan-detail'].includes(String(route.name))
+  advancedOpen.value = !coreRoute.value && !['local-plans', 'local-plan-detail'].includes(String(route.name))
 }, { immediate: true })
 watch(title, value => { document.title = `${value} · SameScale` }, { immediate: true })
 </script>
@@ -78,23 +77,23 @@ watch(title, value => { document.title = `${value} · SameScale` }, { immediate:
     <button v-if="mobileNavOpen" class="nav-scrim" :aria-label="c('关闭导航', 'Close navigation')" tabindex="-1" @click="closeNavigation" />
     <aside id="workbench-navigation" ref="navigationPanel" class="sidebar" :aria-label="c('产品导航', 'Product navigation')" @keydown="navigationKeydown">
       <button class="secondary-button nav-close-button" @click="closeNavigation"><Close class="ui-icon" />{{ c('关闭导航', 'Close navigation') }}</button>
-      <RouterLink class="brand" to="/analyst"><div><WorkbenchBrand /><small>{{ c('运行证据工作台', 'Evidence console') }}</small></div></RouterLink>
+      <RouterLink class="brand" to="/runs"><div><WorkbenchBrand /><small>{{ c('任务验收与证据工作台', 'Task acceptance & evidence workbench') }}</small></div></RouterLink>
       <nav :aria-label="c('产品功能', 'Product features')">
         <div v-for="group in navigation" :key="group.label" class="nav-group">
           <span class="nav-group-label">{{ group.label }}</span>
           <RouterLink v-for="item in group.items" :key="item.to" :to="item.to" class="nav-link" exact-active-class="nav-current" active-class="nav-parent"><component :is="item.icon" class="ui-icon" aria-hidden="true" /><span>{{ item.label }}</span></RouterLink>
         </div>
         <details :open="advancedOpen" class="advanced-nav" @toggle="advancedOpen = ($event.target as HTMLDetailsElement).open">
-          <summary>{{ c('配置与工具', 'Tools & configuration') }}<small>Advanced</small></summary>
+          <summary>{{ c('高级', 'Advanced') }}<small>{{ c('评测 · 诊断 · 注册', 'Evaluation · diagnosis · registry') }}</small></summary>
           <div class="nav-group"><RouterLink v-for="item in advanced" :key="item.to" :to="item.to" class="nav-link" exact-active-class="nav-current"><component :is="item.icon" class="ui-icon" aria-hidden="true" /><span>{{ item.label }}</span></RouterLink></div>
         </details>
       </nav>
-      <div class="sidebar-foot"><small>SAMESCALE / EVIDENCE CONSOLE</small><strong>{{ c('来源与状态按记录展示', 'Provenance shown per record') }}</strong></div>
+      <div class="sidebar-foot"><small>SAMESCALE</small><strong>{{ c('来源与状态按记录展示', 'Provenance shown per record') }}</strong></div>
     </aside>
     <main id="main-content" class="main-panel" tabindex="-1">
       <header class="topbar"><div class="topbar-heading">
         <button ref="menuButton" class="mobile-menu-button" :aria-label="c('打开导航', 'Open navigation')" aria-controls="workbench-navigation" :aria-expanded="mobileNavOpen" @click="openNavigation"><Menu class="ui-icon" /></button>
-        <RouterLink to="/analyst" class="breadcrumb-workspace">{{ c('工作区', 'Workspace') }}</RouterLink><span class="breadcrumb-divider">/</span><h1>{{ title }}</h1>
+        <RouterLink to="/runs" class="breadcrumb-workspace">{{ c('工作区', 'Workspace') }}</RouterLink><span class="breadcrumb-divider">/</span><h1>{{ title }}</h1>
       </div><div class="locale-switch" role="group" :aria-label="c('切换界面语言', 'Change interface language')"><button :aria-pressed="!['en', 'en-US'].includes(preferences.language)" @click="setLocale('zh-CN')">中文</button><button :aria-pressed="['en', 'en-US'].includes(preferences.language)" @click="setLocale('en-US')">EN</button></div></header>
       <div class="page-container"><RouterView /></div>
 

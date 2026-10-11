@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { copy as c } from '@/composables/visualLocale'
 const props = withDefaults(defineProps<{ value: string; localized?: boolean; context?: 'generic' | 'run' | 'event' | 'verifier' | 'experiment' }>(), { localized: false, context: 'generic' })
 const labels: Record<string, [string, string]> = {
+  AVAILABLE: ['可复核', 'Available'], CORRUPT: ['记录损坏', 'Corrupt'],
   failed_subject: ['主体运行失败', 'Subject run failed'], completed: ['已结束', 'Completed'],
   queued: ['等待运行', 'Queued'], running: ['运行中', 'Running'], failed: ['运行失败', 'Run failed'], cancelled: ['已取消', 'Cancelled'],
   HISTORICAL_REAL: ['历史真实调查', 'Historical real investigation'], CURRENT_SESSIONS: ['当前调查会话', 'Current sessions'],

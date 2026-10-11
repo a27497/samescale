@@ -3,6 +3,8 @@ import { onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { externalEvidenceApi, type ApprovedEvidenceSource, type EvidenceDetail, type EvidenceSummary } from '@/api/externalEvidence'
 import { copy as c } from '@/composables/visualLocale'
+import AcceptanceSummary from '@/components/AcceptanceSummary.vue'
+import { externalAcceptanceRows } from '@/utils/acceptanceSummary'
 
 const route = useRoute(); const router = useRouter()
 const token = ref(''); const unlocked = ref(false); const busy = ref(false); const error = ref('')
@@ -97,7 +99,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
 
 <template>
   <section class="external-evidence-page">
-    <div class="page-heading"><div><h2>{{ c('外部 Codex 运行证据', 'Saved external Codex evidence') }}</h2><p>{{ c('导入已保存记录与最终工程快照，读取独立验收与诊断。', 'Import saved records and final workspaces; read independent verification and diagnosis.') }}</p></div></div>
+    <div class="page-heading"><div><h2>{{ c('导入一次 Codex 运行', 'Import a Codex run') }}</h2><p>{{ c('导入已保存记录与最终工程快照，读取独立验收与诊断。', 'Import saved records and final workspaces; read independent verification and diagnosis.') }}</p></div></div>
     <p>{{ c('不会重新运行 Agent 或接管订阅登录。只接入操作员明确批准的脱敏来源；摘要验证完整性，不认证来源。', 'No Agent rerun or subscription login takeover. Only explicitly approved sanitized sources; hashes verify integrity, not origin.') }}</p>
     <p v-if="error" class="error-state" role="alert">{{ error }}</p>
     <details class="panel" data-test="quickstart">
@@ -138,6 +140,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
       </div>
       <div v-if="detail" class="panel" data-test="detail">
         <h3>{{ detail.record.source.source_id }} · {{ detail.record.source.source_kind }}</h3>
+        <AcceptanceSummary :rows="externalAcceptanceRows(detail)" />
         <p data-test="acceptance">{{ c('独立 Workspace 验收', 'Independent Workspace acceptance') }}：{{ detail.diagnosis.workspace_acceptance }} · {{ detail.diagnosis.independent_verification.passed_checks }}/{{ detail.diagnosis.independent_verification.checks }}</p>
         <p>{{ detail.record.episode_identity ? c('原 Episode 保留', 'Original Episode retained') : c('未提供可导入的原 Episode；验收状态', 'No importable original Episode supplied; acceptance') }}：{{ detail.diagnosis.original_episode_acceptance }}</p>
         <p v-if="detail.diagnosis.workspace_acceptance === 'NOT_VERIFIED'">{{ c('缺少可信任务或独立验收，保持未验证。新的验收须由操作员在隔离 Verifier 中单独授权，随后刷新读取。', 'Without a trusted task or independent result, acceptance stays unverified. New checks require separate operator authorization in the isolated Verifier; reload afterwards.') }}</p>
