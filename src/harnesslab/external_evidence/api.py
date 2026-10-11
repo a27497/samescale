@@ -5,6 +5,7 @@ from typing import Any
 
 from fastapi import APIRouter, Response
 
+from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.external_evidence import service
 from harnesslab.external_evidence.models import ImportRequest
 from harnesslab.local_plans.api import Private
@@ -23,6 +24,11 @@ def status() -> dict[str, object]:
     }
 
 
+@router.get("/configuration-check", dependencies=Private)
+def configuration_check() -> dict[str, Any]:
+    return service.configuration_check()
+
+
 @router.get("/sources", dependencies=Private)
 def sources() -> dict[str, object]:
     policy = service.load_policy()
@@ -34,6 +40,8 @@ def sources() -> dict[str, object]:
 def ingest(request: ImportRequest) -> dict[str, Any]:
     try:
         return service.ingest(service.load_policy(), request.source_id)
+    except service.EvidenceInputError as exc:
+        raise fail(exc.code, "Review the approved source, format and retained pins.", 409) from None
     except (OSError, ValueError):
         raise fail(
             "EVIDENCE_IMPORT_REJECTED", "Approved evidence failed safety or integrity checks.", 409
@@ -43,36 +51,19 @@ def ingest(request: ImportRequest) -> dict[str, Any]:
 @router.get("/records", dependencies=Private)
 def records() -> dict[str, object]:
     policy = service.load_policy()
-    result = []
     try:
-        if policy.store.exists():
-            for path in sorted(policy.store.iterdir()):
-                if path.name.startswith("."):
-                    continue  # An interrupted staging directory is never a completed record.
-                item = service.view(policy, path.name)
-                record = item["record"]
-                result.append(
-                    {
-                        "identity": path.name,
-                        "source_id": record["source"]["source_id"],
-                        "source_kind": record["source"]["source_kind"],
-                        "acceptance": item["diagnosis"]["workspace_acceptance"],
-                    }
-                )
-                if len(result) > 1000:
-                    raise ValueError("store limit")
-        return {"items": result}
-    except (OSError, ValueError):
-        raise fail(
-            "EVIDENCE_INTEGRITY_ERROR", "Stored evidence is unavailable or changed.", 409
-        ) from None
+        return {"items": service.list_records(policy)}
+    except (OSError, ValueError, WorkbenchAPIError):
+        raise fail("EVIDENCE_STORAGE_UNSAFE", "Private storage is unavailable.", 403) from None
 
 
 @router.get("/records/{identity}", dependencies=Private)
 def detail(identity: str) -> dict[str, Any]:
     try:
         return service.view(service.load_policy(), identity)
-    except (OSError, ValueError):
+    except PermissionError:
+        raise fail("EVIDENCE_STORAGE_UNSAFE", "Private storage is not readable.", 403) from None
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
         raise fail(
             "EVIDENCE_INTEGRITY_ERROR", "Stored evidence is unavailable or changed.", 409
         ) from None
@@ -91,7 +82,9 @@ def export(identity: str) -> Response:
                 "Content-Disposition": 'attachment; filename="saved-evidence.json"',
             },
         )
-    except (OSError, ValueError):
+    except PermissionError:
+        raise fail("EVIDENCE_STORAGE_UNSAFE", "Private storage is not readable.", 403) from None
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
         raise fail(
             "EVIDENCE_INTEGRITY_ERROR", "Unsafe or changed evidence cannot be exported.", 409
         ) from None

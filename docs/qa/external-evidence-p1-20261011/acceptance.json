@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "baseline": "de55277b8cb0f931c9b57184aa5b68dadec0263c",
+  "scope": [
+    "P1-A individual corrupt record isolation",
+    "P1-B isolated private first intake Quickstart/check/guidance"
+  ],
+  "backend_compatibility_tests_passed": 162,
+  "frontend_tests_passed": 223,
+  "chromium_checks_passed": 26,
+  "chromium_build": "1243",
+  "playwright": "1.58.2",
+  "frontend_type_build": "PASS",
+  "ruff_check_format": "PASS",
+  "mypy_checked_sources": 428,
+  "guarded_historical_offline_checks_passed": 73,
+  "historical_offline_replays": 2,
+  "export_replays_byte_identical": true,
+  "configuration_cli_cases_passed": 4,
+  "historical_hook": "APPROVED_SAVED_REAL_20261007",
+  "original_episode_acceptance": "NOT_VERIFIED",
+  "historical_independent_checks": {
+    "passed": 5,
+    "total": 5,
+    "rerun": false
+  },
+  "fresh_case": "FRESH_CASE_PENDING",
+  "synthetic_faults": [
+    "missing/invalid stored record",
+    "changed/sensitive stored Workspace",
+    "invalid verification receipt",
+    "all-corrupt records",
+    "policy/schema/permission and storage/link failures",
+    "pin mismatch",
+    "sensitive input",
+    "uncommitted staging"
+  ],
+  "real_credentials_read": false,
+  "real_codex": "CLOSED",
+  "new_agent_provider_verifier_runs": 0,
+  "network_guard_rejections": 0,
+  "manual_gates": [
+    "Source identity/pairing and privacy/IP review",
+    "Explicit source approval and independent retained pins",
+    "Own private policy/store permissions",
+    "Separate export pin and terminal replay"
+  ],
+  "unchanged_controls": [
+    "src/harnesslab/external_evidence/verification.py",
+    "src/harnesslab/local_execution/subscription.py",
+    "src/harnesslab/local_execution/worker.py",
+    "docker-compose.yml"
+  ],
+  "tested_file_sha256": {
+    ".github/workflows/ci.yml": "9a64c32f0a1f495b139ae526ce0c0d82767c1ab43d7b4e30009ad2a23833171b",
+    ".github/workflows/self-hosted-ci.yml": "21c430ef49326ae8f69ace9341742980151ef9a7c0468cf094348ab43c916c32",
+    "frontend/src/api/externalEvidence.ts": "29b72636badc83ef88ae0e048c11343a116e659ed418ab527e82458912a39a21",
+    "frontend/src/views/ExternalEvidenceView.vue": "ff00f77055f0a08961d4e0aa914e254672347fa47a10d9e9762c60c5a24799f6",
+    "frontend/tests/external-evidence.spec.ts": "eeb53b2c0ae928141f2d092d292516dcc0d4d3a8c60311436aeebd06c255dff2",
+    "src/harnesslab/external_evidence/api.py": "276e0d128c2378930c77b0feedcb65fbc7d92620c809b7f93a335a5039ab779f",
+    "src/harnesslab/external_evidence/cli.py": "de87d417848624b819e3f0287c54d77a95d6e3a1e5b146cfd85953f46c83dc29",
+    "src/harnesslab/external_evidence/service.py": "a3fdf909867f28efb97550c4adb95e7a5aa76e0c4a8e388c0473e5adbf2541f8",
+    "tests/test_external_evidence.py": "676ea7dc4ad0784490a8765ffe82e4b04cfed9db39695dfb27b31d006a857fe3",
+    "tests/test_external_evidence_p1.py": "c3f1c1d43ff7758227d0a2b877ef90e276899581caab1fa84d5f7d0bf527f6f5"
+  },
+  "initial_corrections": [
+    "Typed input helper and policy-code test expectation corrected during focused tests; no result counted from failing run.",
+    "Test DTO literal typing and test tempfile import corrected before final type/build.",
+    "Acceptance host API was initially started before frontend build; failed safely; restarted after build.",
+    "One DB-dependent regression initially lacked disposable DATABASE_URL; rerun on this task\u2019s migrated isolated database.",
+    "Initial Chromium mobile check found long corrupt identity overflow; wrapped rows and repeated the workflow from a fresh test store."
+  ]
+}

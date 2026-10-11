@@ -20,10 +20,18 @@ export interface EvidenceDetail {
     infrastructure: { status: string; root_cause: null }; limits: string[]
   }
 }
-export interface EvidenceSummary { identity: string; source_id: string; source_kind: string; acceptance: string }
+export type EvidenceSummary =
+  | { identity: string; status: 'AVAILABLE'; source_id: string; source_kind: string; acceptance: string }
+  | { identity: string; status: 'CORRUPT'; error_code: 'EVIDENCE_RECORD_CORRUPT'; reason: string }
+export interface EvidenceConfigurationCheck {
+  status: 'CONFIGURED' | 'NO_APPROVED_SOURCES' | 'NOT_CONFIGURED' | 'NEEDS_ATTENTION'
+  issues: string[]; operator_configured: boolean
+  source_contents_checked: false; pins_verified: false; record_integrity_checked: false
+}
 const client = axios.create({ baseURL: '/api/external-evidence', timeout: 30000 })
 const auth = (token: string) => ({ headers: { Authorization: `Bearer ${token}` } })
 export const externalEvidenceApi = {
+  check: async (token: string) => (await client.get<EvidenceConfigurationCheck>('/configuration-check', auth(token))).data,
   sources: async (token: string) => (await client.get<{ items: ApprovedEvidenceSource[] }>('/sources', auth(token))).data,
   records: async (token: string) => (await client.get<{ items: EvidenceSummary[] }>('/records', auth(token))).data,
   ingest: async (source_id: string, token: string) => (await client.post<EvidenceDetail>('/records', { source_id, consent: 'IMPORT_APPROVED_SAVED_EVIDENCE' }, auth(token))).data,

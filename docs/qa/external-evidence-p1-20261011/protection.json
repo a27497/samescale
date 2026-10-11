@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "existing_worktrees_unchanged": 14,
+  "ui2_uncommitted_entries_preserved": 17,
+  "existing_containers_unchanged": 58,
+  "frozen_files_unchanged": 419,
+  "auth_metadata_unchanged": true,
+  "auth_contents_read": false,
+  "website_head_status_unchanged": true,
+  "website_files_unchanged": 364,
+  "existing_listeners_unchanged": true,
+  "existing_database_access_or_migration": false,
+  "temporary_api_stopped": true,
+  "new_isolated_database_container_volume_network_removed": true,
+  "agent_provider_verifier_executions": 0,
+  "real_codex": "CLOSED"
+}

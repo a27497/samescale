@@ -337,8 +337,9 @@ def test_policy_rejects_credential_roots_without_reading_them(
     raw = json.loads(configured.read_bytes())
     raw["sources"][0]["path"] = str(tmp_path / ".codex")
     configured.write_bytes(encode(raw))
-    with pytest.raises(WorkbenchAPIError, match="separate owned evidence policy"):
+    with pytest.raises(WorkbenchAPIError) as rejected:
         service.load_policy()
+    assert rejected.value.code == "EVIDENCE_POLICY_INVALID"
 
 
 async def test_no_trusted_task_refuses_verifier_before_process_launch(configured: Path) -> None:
