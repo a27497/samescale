@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { externalEvidenceApi, type ApprovedEvidenceSource, type EvidenceDetail, type EvidenceSummary } from '@/api/externalEvidence'
 import { copy as c } from '@/composables/visualLocale'
 import AcceptanceSummary from '@/components/AcceptanceSummary.vue'
+import StatusBadge from '@/components/StatusBadge.vue'
 import { externalAcceptanceRows } from '@/utils/acceptanceSummary'
 import { matchesSourceFilter, sourceHarness } from '@/utils/evidencePresentation'
 
@@ -150,8 +151,13 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
         <p v-if="listError" role="status" data-test="list-error">{{ listError }}</p>
         <p v-else-if="!records.length">{{ c('暂无记录', 'No records') }}</p>
         <ul><li v-for="record in records" :key="record.identity" :data-test="record.status === 'CORRUPT' ? 'corrupt-record' : 'healthy-record'">
-          <template v-if="record.status === 'AVAILABLE'"><RouterLink :to="`/external-runs/${record.identity}`">{{ record.source_id }}</RouterLink> · {{ record.source_kind }} · {{ record.acceptance }}</template>
-          <template v-else><RouterLink :to="`/external-runs/${record.identity}`">{{ c('损坏记录', 'Corrupt record') }} {{ record.identity }}</RouterLink> · {{ record.error_code }}<p>{{ guidance.EVIDENCE_RECORD_CORRUPT }}</p></template>
+          <template v-if="record.status === 'AVAILABLE'"><RouterLink :to="`/external-runs/${record.identity}`">{{ record.source_id }}</RouterLink> · {{ record.source_kind }} · <StatusBadge :value="record.acceptance" localized /></template>
+          <template v-else><RouterLink :to="`/external-runs/${record.identity}`">{{ c('损坏记录', 'Corrupt record') }} {{ record.identity }}</RouterLink> · <StatusBadge :value="record.status" localized /><p>{{ guidance.EVIDENCE_RECORD_CORRUPT }}</p></template>
+          <details data-test="record-technical-details"><summary>{{ c('技术细节', 'Technical details') }}</summary>
+            <p>{{ c('记录状态', 'Record state') }}：<code>{{ record.status }}</code></p>
+            <p v-if="record.status === 'AVAILABLE'">{{ c('验收状态原始值', 'Raw acceptance state') }}：<code>{{ record.acceptance }}</code></p>
+            <p v-else>{{ c('错误代码', 'Error code') }}：<code>{{ record.error_code }}</code></p>
+          </details>
         </li></ul>
       </div>
       <div v-if="detail" class="panel" data-test="detail">
@@ -161,16 +167,23 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
         <p>{{ c('证据覆盖度', 'Evidence coverage') }}：{{ coverageName(detail.record.completeness.coverage) }} · {{ c('来源未证实；摘要只核对完整性', 'Origin is unattested; digests check integrity only') }}</p>
         <div v-if="detail.diagnosis.workspace_acceptance === 'NOT_VERIFIED'" class="verification-next-step" data-test="verification-next-step">
           <h4>{{ c('下一步：独立验收代码改动', 'Next: independently verify the code changes') }}</h4>
-          <p>{{ c('导入只检查证据完整性，尚未取得独立验收结论。网页不能授权执行 Verifier；请由操作员在私有 API 所在主机上完成以下步骤。', 'Intake checks evidence integrity; no independent verdict is available yet. This page cannot authorize a Verifier. An operator must follow these steps on the private API host.') }}</p>
+          <p>{{ c('导入只确认保存的代码和证据完整性，还没有独立验收结果。请由本地操作员单独授权检查；网页不能直接执行验收。', 'Import only confirms the integrity of the saved code and evidence; there is no independent verdict yet. A local operator must separately authorize the check; this page cannot run it directly.') }}</p>
           <ol>
-            <li>{{ c('核对任务包已进入可信 TaskStore，已有独立 baseline 失败 / oracle 通过的准入记录；任务身份须匹配此来源的验收条件，最终 Workspace 须匹配批准的摘要。缺少条件时先完成任务准入，不能跳过。', 'Check that the task is admitted to the trusted TaskStore with independent baseline-fail / oracle-pass evidence; task identity must match this source’s conditions and the final workspace must match its approved pin. Missing prerequisites must be admitted first, never skipped.') }}</li>
-            <li>{{ c('使用导入时的原批准策略和可信任务策略；证据策略须固定本地 Verifier 镜像身份及独立运行 / 产物目录。不要盲目重算摘要或改动已批准绑定。', 'Use the original approved evidence policy and trusted task policy. Pin the local Verifier image and separate runtime/artifact directories. Do not blindly replace digests or approved bindings.') }} <code>HARNESSLAB_EXTERNAL_EVIDENCE_POLICY</code> · <code>HARNESSLAB_LOCAL_TASK_POLICY</code></li>
-            <li>{{ c('人工核对后，在仓库 checkout 终端明确授权一次隔离 Verifier 检查（不会重跑 Agent；不会自动重试）。', 'After manual review, explicitly authorize one isolated Verifier check in the repository checkout terminal (no Agent rerun or automatic retry).') }}<pre class="verifier-command" data-test="verifier-command">uv run --locked harnesslab external-evidence verify-workspace {{ detail.identity }} --confirm-independent-verifier</pre></li>
-            <li>{{ c('命令完成后点击“刷新独立验收”读取新结果。缺少可信任务、镜像或有效检查时仍为未验证；0 项检查不算通过。已消耗或中断的检查不会被这条命令重新运行，应保留结果并由操作员审查。完整配置见随版本附带的 docs/EXTERNAL_CODEX_EVIDENCE.md 的 Separate independent Workspace verification 章节。', 'When the command completes, click Reload independent verification. Missing trusted tasks, images or valid checks stay unverified; zero checks never pass. Consumed or interrupted attempts cannot be rerun with this command; retain the result for operator review. See the independent-verification section in the bundled docs/EXTERNAL_CODEX_EVIDENCE.md for setup.') }}</li>
+            <li>{{ c('先确认任务验收条件可信：已有检查记录证明，这些条件能发现原始代码的问题，也能认可已知正确的修复。检查记录须与当前任务对应，最终代码须与批准导入的副本一致；缺少条件时不能跳过。', 'First confirm the task acceptance conditions are trusted: existing check records must show that they detect the original code’s problems and accept a known correct fix. Those records must match this task, and the final code must match the approved copy. Missing conditions cannot be skipped.') }}</li>
+            <li>{{ c('让操作员使用导入时已批准的配置，确认验收环境固定且与代码副本隔离。缺少条件或环境时，先完成配置，不要直接改写已批准的文件校验值。', 'Have the operator use the configuration approved at import and confirm that the verification environment is pinned and isolated from the code copy. Complete missing prerequisites first; do not simply replace approved file checksums.') }}</li>
+            <li>{{ c('操作员在本地终端按下方“技术细节”中的命令，明确确认执行一次独立检查。只检查保存的代码，不重新运行 Coding Agent，也不会自动重试。', 'In a local terminal, the operator explicitly confirms one independent check using the command under Technical details below. It checks only the saved code, without rerunning the Coding Agent or automatically retrying.') }}</li>
+            <li>{{ c('完成后点击“刷新独立验收”查看结果。缺少可信条件或有效检查时仍为未验证；0 项检查不算通过。已执行或中断的尝试不能重跑，应保留结果供操作员审查。', 'When finished, click Reload independent verification. Missing trusted conditions or valid checks stay unverified; zero checks never pass. Consumed or interrupted attempts cannot be rerun; retain the result for operator review.') }}</li>
           </ol>
           <RouterLink to="/plans">{{ c('查看验收任务与本地计划', 'View acceptance tasks and local plans') }}</RouterLink>
         </div>
         <details data-test="technical-details"><summary>{{ c('技术细节', 'Technical details') }}</summary>
+          <div v-if="detail.diagnosis.workspace_acceptance === 'NOT_VERIFIED'" data-test="verifier-technical-guidance">
+            <h4>{{ c('独立验收命令与配置', 'Independent verification command and configuration') }}</h4>
+            <p>{{ c('可信 TaskStore 任务包须已有 baseline 失败 / oracle 通过的独立准入记录；任务身份须匹配批准来源的 task_reference / task_digest，最终 Workspace 须匹配批准的摘要。使用原批准证据策略与可信任务策略；固定本地 Verifier 镜像身份及独立 runtime / artifact 目录，不要改动已批准绑定。', 'The trusted TaskStore package must have independent baseline-fail / oracle-pass admission records. Task identity must match the approved source’s task_reference / task_digest, and the final Workspace must match its approved digest. Use the original approved evidence and trusted-task policies, with a pinned local Verifier image and separate runtime/artifact directories; do not alter approved bindings.') }}</p>
+            <p><code>HARNESSLAB_EXTERNAL_EVIDENCE_POLICY</code> · <code>HARNESSLAB_LOCAL_TASK_POLICY</code></p>
+            <pre class="verifier-command" data-test="verifier-command">uv run --locked harnesslab external-evidence verify-workspace {{ detail.identity }} --confirm-independent-verifier</pre>
+            <p>{{ c('在私有 API 所在主机的仓库 checkout 终端人工核对并确认。该命令仅授权一次隔离 Verifier 检查，不重跑 Agent、不自动重试。完整配置见随版本附带的 docs/EXTERNAL_CODEX_EVIDENCE.md 的 Separate independent Workspace verification 章节。', 'Manually review and confirm in the repository checkout terminal on the private API host. This command authorizes one isolated Verifier check only, with no Agent rerun or automatic retry. See the independent-verification section in the bundled docs/EXTERNAL_CODEX_EVIDENCE.md for complete setup.') }}</p>
+          </div>
           <p data-test="acceptance">{{ c('独立 Workspace 验收', 'Independent Workspace acceptance') }}：{{ detail.diagnosis.workspace_acceptance }} · {{ detail.diagnosis.independent_verification.passed_checks }}/{{ detail.diagnosis.independent_verification.checks }}</p>
           <p>{{ detail.record.episode_identity ? c('原 Episode 保留', 'Original Episode retained') : c('未提供可导入的原 Episode；验收状态', 'No importable original Episode supplied; acceptance') }}：{{ detail.diagnosis.original_episode_acceptance }}</p>
           <p>{{ detail.record.completeness.integrity }} · {{ detail.record.completeness.coverage }} · {{ detail.record.completeness.origin }}</p>

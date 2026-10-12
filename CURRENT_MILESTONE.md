@@ -1,5 +1,30 @@
 # SameScale Product — Current Milestone
 
+## Current state — final product copy closeout — 2026-10-13 (Asia/Shanghai)
+
+Continued `feat/acceptance-workbench-v2@113a58949603bdd5ef53d83bc92b1e8ac7c67714` in the
+existing clean independent worktree. Static HTML title/description and route-driven browser titles
+now use “AI Coding 任务验收与证据工作台”, retaining the current route name. Next-step instructions
+use ordinary developer language; TaskStore, baseline/oracle, pinned Verifier policies and the exact
+record-bound command remain under technical details. Saved-record state labels reuse the acceptance
+summary's localized StatusBadge, with exact raw states/error codes retained in collapsed details.
+Other primary-positioning strings were inspected; evaluation/diagnosis capability names remain valid.
+No data model, API, intake/consent/execution behavior or internal identifier changed.
+
+Complete frontend **243 PASS / 19 files**; types/build PASS. Actual production-build Chromium at
+1440×1000 **28 checks PASS**, zero page errors; screenshots visually inspected. Browser title/meta,
+empty home, actual code-only import, plain-language next step, localized list, raw-value disclosure,
+locale switching and read-only reload checked. Empty-home API response is an explicit browser network
+fixture to avoid all database access; imports use real private FastAPI and a new supplied synthetic
+Workspace. No real model/Agent/Verifier, frozen evidence, credentials or original dirty-worktree edit.
+[Detailed observations and local screenshots](docs/qa/product-copy-closeout-20261013/README.md).
+
+Backend/Docker/full PostgreSQL, live production records, deployed site and remote CI were not rerun
+or verified this round. Normal feature-branch commit/push only; no PR, merge or deployment. Stop after
+handoff. Historical test counts below describe their original runs, not new results.
+
+## Historical multi-tool UX correction snapshot
+
 ## Current state — multi-tool intake UX corrections — 2026-10-11
 
 Continued `feat/acceptance-workbench-v2@f3c25fba18011cf02c37b57a4a172ac3291602df` in the

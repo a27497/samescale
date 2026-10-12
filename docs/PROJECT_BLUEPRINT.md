@@ -1,6 +1,20 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## Current authorization — multi-tool intake UX corrections — 2026-10-11
+## Current authorization — final product copy closeout — 2026-10-13 (Asia/Shanghai)
+
+Continue `feat/acceptance-workbench-v2@113a58949603bdd5ef53d83bc92b1e8ac7c67714` in the
+existing independent worktree. Only adjust user-facing positioning and explanatory copy: Chinese
+browser title/meta including route-driven title overrides, ordinary developer-language next steps
+with precise terms/commands under technical details, and localized saved-record states with raw
+values retained. Inspect other primary-positioning strings without globally renaming capability
+names, code identifiers, API fields or historical evidence. No feature, model, API or import behavior
+change. Do not touch frozen evidence, dirty worktrees, database or credentials; no real model/Agent.
+Verify frontend tests/types/build and actual 1440px title, empty home, code-only next step and saved
+list. Browser-fixture empty responses avoid database access; private intake uses supplied synthetic
+files. Only normal commit/push to this branch is authorized; no PR/merge/deploy. Results belong in
+[Current Milestone](../CURRENT_MILESTONE.md); stop after the report.
+
+## Historical authorization — multi-tool intake UX corrections — 2026-10-11
 
 Continue `feat/acceptance-workbench-v2@f3c25fba18011cf02c37b57a4a172ac3291602df` in the
 existing independent task worktree. Align the source filter name/behavior and keep unidentified

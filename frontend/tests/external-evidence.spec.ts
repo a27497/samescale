@@ -103,8 +103,12 @@ describe('P1 isolation and onboarding', () => {
   it('unlocks mixed records and refuses corrupt detail without borrowing a verdict', async () => {
     vi.mocked(externalEvidenceApi.records).mockResolvedValue({ items: [available, corrupt] })
     const { wrapper, router } = await unlocked(`/external-runs/${detail.identity}`)
-    expect(wrapper.get('[data-test=healthy-record]').text()).toContain('VERIFIED_PASS')
-    expect(wrapper.get('[data-test=corrupt-record]').text()).toContain('EVIDENCE_RECORD_CORRUPT')
+    expect(wrapper.get('[data-test=healthy-record] .status-pill').text()).toBe('独立验收通过')
+    expect(wrapper.get('[data-test=healthy-record] [data-test=record-technical-details]').text()).toContain('VERIFIED_PASS')
+    expect(wrapper.get('[data-test=healthy-record] [data-test=record-technical-details]').attributes('open')).toBeUndefined()
+    expect(wrapper.get('[data-test=corrupt-record] .status-pill').text()).toBe('记录损坏')
+    expect(wrapper.get('[data-test=corrupt-record] [data-test=record-technical-details]').text()).toContain('CORRUPT')
+    expect(wrapper.get('[data-test=corrupt-record] [data-test=record-technical-details]').text()).toContain('EVIDENCE_RECORD_CORRUPT')
     expect(wrapper.get('[data-test=corrupt-record]').text()).not.toContain('VERIFIED_PASS')
     expect(wrapper.get('[data-test=detail]').text()).toContain('NOT_VERIFIED')
     vi.mocked(externalEvidenceApi.detail).mockRejectedValue(reject('EVIDENCE_INTEGRITY_ERROR'))
@@ -211,8 +215,10 @@ describe('tool-neutral intake', () => {
     if (name === 'code-only') {
       expect(wrapper.get('.acceptance-summary').text()).toContain('无运行记录')
       expect(wrapper.get('[data-test=verifier-command]').text()).toBe(`uv run --locked harnesslab external-evidence verify-workspace ${detail.identity} --confirm-independent-verifier`)
-      expect(wrapper.get('[data-test=verification-next-step]').text()).toContain('HARNESSLAB_LOCAL_TASK_POLICY')
-      expect(wrapper.get('[data-test=verification-next-step]').text()).toContain('网页不能授权执行 Verifier')
+      expect(wrapper.find('[data-test=technical-details] [data-test=verifier-command]').exists()).toBe(true)
+      expect(wrapper.get('[data-test=verifier-technical-guidance]').text()).toContain('HARNESSLAB_LOCAL_TASK_POLICY')
+      expect(wrapper.get('[data-test=verification-next-step]').text()).not.toMatch(/TaskStore|oracle|baseline|HARNESSLAB_|Verifier|Workspace/)
+      expect(wrapper.get('[data-test=verification-next-step]').text()).toContain('网页不能直接执行验收')
       expect(wrapper.get('[data-test=acceptance-original] .status-pill').attributes('data-status')).toBe('NOT_REPORTED')
     }
     wrapper.unmount()

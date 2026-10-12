@@ -67,7 +67,7 @@ watch(() => route.fullPath, () => {
   if (mobileNavOpen.value) closeNavigation()
   advancedOpen.value = !coreRoute.value && !['local-plans', 'local-plan-detail'].includes(String(route.name))
 }, { immediate: true })
-watch(title, value => { document.title = `${value} · SameScale` }, { immediate: true })
+watch(title, value => { document.title = `${value} · SameScale — AI Coding 任务验收与证据工作台` }, { immediate: true })
 </script>
 
 <template>
