@@ -1,6 +1,21 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## Current authorization — bounded external evidence P1 repairs — 2026-10-11
+## Current authorization — daily CI feedback optimization — 2026-10-13 (Asia/Shanghai)
+
+Start from main@5bfb6745d62ac9747b13690093ab4f361999bc39 in an independent clean worktree,
+branch `codex/ci-feedback-20261013`. Inspect existing workflows/logs and profile the unchanged bounded
+core before optimizing. Keep every existing core selector/test/assertion and guarded offline replay.
+Run full checks on every PR, main push, backend/CI/shared/unknown change; use cumulative branch scope
+for frontend/docs push feedback. Parallelize modules without duplicating expensive shared fixtures,
+retain pinned tools/locked dependencies and fail closed for missing history/tests/skips/job failures.
+Keep lightweight feedback distinct from full `gates` acceptance. Product code/API/data, frozen evidence,
+existing dirty worktrees, feat/acceptance-workbench-v2 and PR #14 are outside the write scope.
+No real Agent/model/provider calls. Existing main has no branch protection/rulesets; do not change
+repository settings. Report that required checks are necessary for enforced pre-merge protection.
+Verify local CI contracts and actual remote jobs/timings; only commit/push this new branch, no PR/merge.
+Live results belong in [Current Milestone](../CURRENT_MILESTONE.md); stop after handoff.
+
+## Historical authorization — bounded external evidence P1 repairs — 2026-10-11
 
 Base main@de55277b8cb0f931c9b57184aa5b68dadec0263c; independent clean worktree. Isolate corrupt
 record reads without hiding global security failures; remove concurrent UI list/detail coupling.

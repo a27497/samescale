@@ -1,5 +1,32 @@
 # SameScale Product — Current Milestone
 
+## Current state — CI feedback optimization candidate — 2026-10-13 (Asia/Shanghai)
+
+Base main@5bfb6745d62ac9747b13690093ab4f361999bc39; independent worktree/branch
+`codex/ci-feedback-20261013`. Remote baseline gates 339s / bounded core 261s; offline job 63s.
+Unmodified local bounded suite **587 PASS in 260.55s**, with major fixture costs attributed via JUnit:
+release reconciliation setup 122.01s, DTO module 33.95s, Tier-B module 28.29s.
+
+All original 29 selectors preserved, partitioned into 4 disjoint module groups with isolated job DBs;
+Python static/frontend run concurrently. Full frontend suite/build replaces the old selected subset,
+with npm download cache and unchanged locked tools/dependencies. S3 workflow/goldens/replay guards
+remain unconditional and untouched. Every PR/main push and backend/CI/shared/unknown branch change
+requires full checks. Cumulative branch diff prevents hiding an earlier cancelled backend check with
+a later docs push. Frontend/docs pushes defer unrelated checks to PR; partial feedback uses a separate
+push-feedback context, never full gates. Missing collection/tests, skips and failed/cancelled jobs fail.
+[Policy, boundaries and timing composition](docs/CI_FEEDBACK.md).
+
+Focused local CI/workflow/offline mutation contracts **46 PASS**; routing unittest **10 PASS**, focused
+Ruff/format/mypy PASS. Remote candidate runs remain pending until push; no remote pass is anticipated.
+main has **no configured branch protection/ruleset**: workflow runs full PR checks, but repository
+required-check settings are needed for enforced pre-merge blocking and are outside this authorization.
+
+Product/API/data and frozen evidence unchanged; original dirty worktree, feat/acceptance-workbench-v2
+and PR #14 not modified. No real model/Agent/provider call. Manual Full Release/self-hosted CI unchanged
+and not executed in this round. Normal commit/push on this new branch only; no PR/merge/deploy.
+
+## Historical external evidence P1 snapshot
+
 ## Current state — external evidence P1 repaired / private first intake — 2026-10-11
 
 Baseline main@de55277b8cb0f931c9b57184aa5b68dadec0263c; separate clean branch
