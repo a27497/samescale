@@ -12,10 +12,81 @@ permissions:
   contents: read
 
 jobs:
-  gates:
-    name: gates
+  scope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      full: ${{ steps.scope.outputs.full }}
+      frontend: ${{ steps.scope.outputs.frontend }}
+      matrix: ${{ steps.scope.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check routing, complete inventory, and fail-closed summaries
+        run: |
+          python3 -m unittest -v tests.test_ci_routing
+          git diff --check
+      - name: Classify cumulative branch changes
+        id: scope
+        run: python3 scripts/ci_scope.py
+
+  python-checks:
+    needs: scope
+    if: ${{ needs.scope.outputs.full == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: 0.12.5
+          enable-cache: true
+      - name: Install pinned Python
+        run: uv python install 3.12.14
+      - name: Sync locked dependencies
+        run: uv sync --locked
+      - name: Lint, format, type, and whitespace checks
+        run: |
+          uv run --locked ruff check .
+          uv run --locked ruff format --check .
+          uv run --locked mypy src tests scripts
+          git diff --check
+
+  frontend:
+    needs: scope
+    if: ${{ needs.scope.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Check frontend contracts
+        working-directory: frontend
+        run: |
+          npm ci --no-audit --no-fund
+          npm run test
+          npm run build
+
+  backend:
+    needs: scope
+    if: ${{ needs.scope.outputs.full == 'true' || needs.scope.outputs.frontend == 'true' }}
+    name: core (${{ matrix.mode }} ${{ matrix.index }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.scope.outputs.matrix) }}
     services:
       postgres:
         image: postgres:18
@@ -35,14 +106,15 @@ jobs:
       DATABASE_URL: postgresql+psycopg://harnesslab:harnesslab_ci_only@127.0.0.1:5432/harnesslab
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - name: Install pinned uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           version: 0.12.5
           enable-cache: true
       - name: Install pinned Python
         run: uv python install 3.12.14
-      - name: Install Node 24
+      - name: Install Node 24 for deterministic task verifiers
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: "24"
@@ -51,47 +123,27 @@ jobs:
         run: uv sync --locked
       - name: Upgrade test database
         run: uv run --locked alembic upgrade head
-      - name: Lint, format, type, and whitespace checks
-        run: |
-          uv run --locked ruff check .
-          uv run --locked ruff format --check .
-          uv run --locked mypy src tests scripts
-          git diff --check
-      - name: Check frontend contracts
-        working-directory: frontend
-        run: |
-          npm ci --no-audit --no-fund
-          npm run type-check
-          npm run test -- tests/workbench.spec.ts tests/registry.spec.ts tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts tests/local-plans.spec.ts tests/local-execution.spec.ts tests/external-evidence.spec.ts
       - name: Run bounded deterministic core regressions
         run: >-
-          uv run --locked pytest -q
-          tests/test_analyst_sessions.py
-          tests/test_analyst_contracts.py
-          tests/test_analyst_showcase.py
-          tests/test_local_plans.py
-          tests/test_local_execution.py
-          tests/test_external_evidence.py
-          tests/test_external_evidence_p1.py
-          tests/test_subscription_controls.py
-          tests/test_siwc_contract.py
-          tests/test_api_health.py
-          tests/test_contracts.py
-          tests/test_workbench_api.py::test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel
-          tests/test_experiment_executor_safety.py
-          tests/test_experiment_queue.py
-          tests/test_experiment_tool_metrics.py
-          tests/test_model_comparison_analysis.py
-          tests/test_model_chat_plan_v3.py
-          tests/test_model_chat_plan_v3r1.py
-          tests/test_ci_workflow_contracts.py
-          tests/test_tier_b_repo_engineering.py
-          tests/test_tier_b_smoke_plan.py
-          tests/test_kb3_v6_canary.py
-          tests/test_kb3_v6_integration.py
-          tests/test_kb3_v6_throughput_r2.py
-          tests/test_kc_release_reconciliation.py
-          tests/test_kb4_timeout_sensitivity.py
-          tests/test_kb4_discordant_pairs.py
-          tests/test_kb4_badcase_freeze.py
-          tests/test_kb4_final_attribution.py
+          uv run --locked python scripts/run_ci_regressions.py
+          --mode ${{ matrix.mode }} --index ${{ matrix.index }} --count ${{ matrix.count }}
+          --junit "$RUNNER_TEMP/core-${{ matrix.index }}.xml"
+
+  gates:
+    # Never publish a lightweight push as the existing full-regression check context.
+    name: ${{ needs.scope.outputs.full == 'true' && 'gates' || 'push-feedback' }}
+    needs: [scope, python-checks, frontend, backend]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Require every applicable job to succeed
+        env:
+          CI_VERIFY_RESULTS: "1"
+          CI_NEEDS: ${{ toJSON(needs) }}
+          CI_FULL: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || needs.scope.outputs.full == 'true' }}
+          CI_FRONTEND: ${{ needs.scope.outputs.frontend }}
+        run: python3 scripts/ci_scope.py

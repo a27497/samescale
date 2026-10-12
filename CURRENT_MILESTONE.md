@@ -1,6 +1,54 @@
 # SameScale Product — Current Milestone
 
-## Current state — final product copy closeout — 2026-10-13 (Asia/Shanghai)
+## Current state — CI branch synchronized with main — 2026-10-13 (Asia/Shanghai)
+
+Merge main@adaa083bedb5ceb8aa167a3e9bfc6d704b200468 (PR #14) into
+`codex/ci-feedback-20261013`, preserving both histories without rebase or force push. Only the two
+live project documents conflicted; both CI receipts and product positioning/intake/copy records are
+retained below. Product sources, frontend, README and public contract match the merged main exactly;
+CI scheduling, guarded offline replay, original selector inventory and all assertions are retained.
+
+The four groups remain module-based: splitting the reconciliation snapshot would repeat its shared
+qualification fixture (125.53s setup in the earlier optimized remote run). No test or fixture is
+changed to hide that cost. Fresh local CI/workflow/offline contracts **46 PASS**, imported multi-tool
+compatibility **26 PASS**, whole-repo Ruff/format **PASS** (849 files), strict mypy **PASS** (433 sources).
+[Merge preservation, commands and limits](docs/qa/ci-main-sync-20261013/README.md). Exact pushed-SHA
+remote Fast CI / Offline Regression and PR #15 mergeability are checked at handoff and recorded
+separately; historical counts/timings below describe their original runs, not this new candidate.
+Only this branch may be committed/pushed. No repository-setting change, main/PR merge, deployment,
+real model/Agent call, frozen evidence edit or original dirty-worktree modification.
+
+## Historical state — CI feedback optimization verified implementation — 2026-10-13 (Asia/Shanghai)
+
+Base main@5bfb6745d62ac9747b13690093ab4f361999bc39; independent worktree/branch
+`codex/ci-feedback-20261013`. Remote baseline gates 339s / bounded core 261s; offline job 63s.
+Unmodified local bounded suite **587 PASS in 260.55s**, with major fixture costs attributed via JUnit:
+release reconciliation setup 122.01s, DTO module 33.95s, Tier-B module 28.29s.
+
+All original 29 selectors preserved, partitioned into 4 disjoint module groups with isolated job DBs;
+Python static/frontend run concurrently. Full frontend suite/build replaces the old selected subset,
+with npm download cache and unchanged locked tools/dependencies. S3 workflow/goldens/replay guards
+remain unconditional and untouched. Every PR/main push and backend/CI/shared/unknown branch change
+requires full checks. Cumulative branch diff prevents hiding an earlier cancelled backend check with
+a later docs push. Frontend/docs pushes defer unrelated checks to PR; partial feedback uses a separate
+push-feedback context, never full gates. Missing collection/tests, skips and failed/cancelled jobs fail.
+[Policy, boundaries and timing composition](docs/CI_FEEDBACK.md).
+
+Focused local CI/workflow/offline mutation contracts **46 PASS**; routing unittest **10 PASS**, focused
+Ruff/format/mypy PASS. Exact implementation commit `f19e7c599c222fcd4e822242fa52ed8fec9d5ade` remote full Fast CI and
+S3 **PASS**: **597** backend cases (all original 587 + 10 guards), **223** frontend cases and build/types,
+431-source mypy, 73 guarded offline tests/two replays. Fast elapsed **199s**, versus recent old 342s
+and same-main-base old 355s (~42–44% shorter). Four group jobs: 176/113/71/70s; frontend/static 39s
+in parallel; scope 10s / aggregator 6s; offline 69s. [Remote links, receipt counts and limits](docs/qa/ci-feedback-20261013/README.md).
+Receipt-only follow-up SHA is verified separately; no future CI result is anticipated.
+main has **no configured branch protection/ruleset**: workflow runs full PR checks, but repository
+required-check settings are needed for enforced pre-merge blocking and are outside this authorization.
+
+Product/API/data and frozen evidence unchanged; original dirty worktree, feat/acceptance-workbench-v2
+and PR #14 not modified. No real model/Agent/provider call. Manual Full Release/self-hosted CI unchanged
+and not executed in this round. Normal commit/push on this new branch only; no PR/merge/deploy.
+
+## Historical state — final product copy closeout — 2026-10-13 (Asia/Shanghai)
 
 Continued `feat/acceptance-workbench-v2@113a58949603bdd5ef53d83bc92b1e8ac7c67714` in the
 existing clean independent worktree. Static HTML title/description and route-driven browser titles
@@ -25,7 +73,7 @@ handoff. Historical test counts below describe their original runs, not new resu
 
 ## Historical multi-tool UX correction snapshot
 
-## Current state — multi-tool intake UX corrections — 2026-10-11
+## Historical state — multi-tool intake UX corrections — 2026-10-11
 
 Continued `feat/acceptance-workbench-v2@f3c25fba18011cf02c37b57a4a172ac3291602df` in the
 independent task worktree. “全部来源” truthfully filters approved sources after unlock;
@@ -55,7 +103,7 @@ Only normal feature-branch commit/push is authorized; no PR/merge/deployment. St
 
 ## Historical tool-neutral intake snapshot
 
-## Current state — tool-neutral acceptance intake minimum — 2026-10-12
+## Historical state — tool-neutral acceptance intake minimum — 2026-10-12
 
 Base `feat/acceptance-workbench-v2@6affea4cb8287ef0434856fe9437127c4ebb89a1`; independent clean
 worktree. SameScale is an **AI Coding task acceptance and evidence workbench**. Required inputs are
@@ -86,7 +134,6 @@ PostgreSQL lifecycle/remote CI are untested or undelivered. Manual privacy revie
 Only normal commit/push on this feature branch is authorized; no PR/merge/deploy. Stop after handoff.
 
 ## Historical P1 acceptance snapshot
-
 
 ## Current state — external evidence P1 repaired / private first intake — 2026-10-11
 

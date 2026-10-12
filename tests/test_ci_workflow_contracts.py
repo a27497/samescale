@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import ast
 import importlib.util
+import json
+import shlex
 import sys
 from pathlib import Path
 from typing import Any
@@ -156,7 +158,10 @@ def test_full_workflow_runs_isolated_parallel_gates_without_nested_regressions()
 
 
 def test_v6_canary_control_runs_in_fast_and_full_release_ci() -> None:
-    fast_text = FAST_WORKFLOW.read_text(encoding="utf-8")
+    fast_text = (
+        FAST_WORKFLOW.read_text(encoding="utf-8")
+        + (ROOT / ".github/ci-core-selectors.json").read_text()
+    )
     full = _workflow(FULL_WORKFLOW)
     qualifications = full["jobs"]["qualification"]["strategy"]["matrix"]["include"]
     v6 = next(item for item in qualifications if item["id"] == "v6-canary-control")
@@ -182,7 +187,11 @@ def test_full_workflow_is_keyless_and_fast_ci_preserves_legacy_gate_status() -> 
     fast = _workflow(FAST_WORKFLOW)
     full_text = FULL_WORKFLOW.read_text(encoding="utf-8")
 
-    assert fast["jobs"]["gates"]["name"] == "gates"
+    assert fast["jobs"]["gates"]["name"] == (
+        "${{ needs.scope.outputs.full == 'true' && 'gates' || 'push-feedback' }}"
+    )
+    assert fast["jobs"]["gates"]["if"] == "${{ always() }}"
+    assert set(fast["jobs"]["gates"]["needs"]) == {"scope", "python-checks", "frontend", "backend"}
     assert "verify_tier_a_verifier_robustness_v2.py" in full_text
     assert "freeze_model_chat_v3.py" in full_text
     assert "freeze_model_chat_v3r1.py" in full_text
@@ -226,9 +235,14 @@ def test_self_hosted_full_release_preserves_matrix_contract_and_caps_parallelism
 
 
 def test_self_hosted_fast_ci_preserves_hosted_fast_commands_without_fixed_port() -> None:
-    hosted = _workflow(FAST_WORKFLOW)["jobs"]["gates"]
+    hosted = _workflow(FAST_WORKFLOW)["jobs"]
     self_hosted = _workflow(SELF_HOSTED_FAST_WORKFLOW)["jobs"]["gates"]
-    hosted_runs = {step.get("name"): step.get("run") for step in hosted["steps"] if "run" in step}
+    hosted_runs = {
+        step.get("name"): step.get("run")
+        for name in ("python-checks", "backend")
+        for step in hosted[name]["steps"]
+        if "run" in step
+    }
     self_hosted_runs = {
         step.get("name"): step.get("run") for step in self_hosted["steps"] if "run" in step
     }
@@ -237,9 +251,14 @@ def test_self_hosted_fast_ci_preserves_hosted_fast_commands_without_fixed_port()
         "Sync locked dependencies",
         "Upgrade test database",
         "Lint, format, type, and whitespace checks",
-        "Run bounded deterministic core regressions",
     ):
         assert self_hosted_runs[name] == hosted_runs[name]
+    assert shlex.split(self_hosted_runs["Run bounded deterministic core regressions"])[5:] == (
+        json.loads((ROOT / ".github/ci-core-selectors.json").read_text())
+    )
+    assert (
+        "scripts/run_ci_regressions.py" in hosted_runs["Run bounded deterministic core regressions"]
+    )
     assert "services" not in self_hosted
     assert any(
         step.get("name") == "Install Java 21"
@@ -298,34 +317,59 @@ def test_registered_full_release_workflow_bootstraps_same_ref_tokyo_workflows() 
 
 
 def test_fast_ci_checks_frontend_and_dto_without_full_release_gates() -> None:
-    for path in (FAST_WORKFLOW, SELF_HOSTED_FAST_WORKFLOW):
-        job = _workflow(path)["jobs"]["gates"]
-        steps = job["steps"]
-        frontend = next(
-            (step for step in steps if step.get("name") == "Check frontend contracts"), None
-        )
-        assert frontend is not None, "Fast CI leaves frontend/DTO changes unchecked"
-        assert frontend["working-directory"] == "frontend"
-        assert "if" not in frontend  # Includes frontend, backend DTO, and shared contract changes.
-        assert frontend["run"].splitlines() == [
-            "npm ci --no-audit --no-fund",
-            "npm run type-check",
-            "npm run test -- tests/workbench.spec.ts tests/registry.spec.ts "
-            "tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts "
-            "tests/local-plans.spec.ts tests/local-execution.spec.ts "
-            "tests/external-evidence.spec.ts",
-        ]
-        assert "continue-on-error" not in frontend
-        assert any("actions/setup-node@" in step.get("uses", "") for step in steps)
-        commands = "\n".join(step.get("run", "") for step in steps)
-        assert "verify_gate_" not in commands
-        assert "tests/test_experiment_queue.py" in commands
-        assert "tests/test_experiment_tool_metrics.py" in commands
-        assert "tests/test_analyst_sessions.py" in commands
-        assert "tests/test_analyst_showcase.py" in commands
-        assert "tests/test_local_plans.py" in commands
-        assert "tests/test_local_execution.py" in commands
-        assert (
-            "tests/test_workbench_api.py::"
-            "test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel"
-        ) in commands
+    # Hosted job boundaries changed; all existing self-hosted checks remain unconditional.
+    fast = _workflow(FAST_WORKFLOW)
+    frontend_job = fast["jobs"]["frontend"]
+    assert frontend_job["if"] == "${{ needs.scope.outputs.frontend == 'true' }}"
+    frontend = next(s for s in frontend_job["steps"] if s.get("name") == "Check frontend contracts")
+    assert frontend["working-directory"] == "frontend"
+    assert "if" not in frontend and "continue-on-error" not in frontend
+    assert frontend["run"].splitlines() == [
+        "npm ci --no-audit --no-fund",
+        "npm run test",
+        "npm run build",
+    ]
+    # Full Vitest includes every previously selected frontend contract; build includes types.
+    package = json.loads((ROOT / "frontend/package.json").read_text())
+    assert package["scripts"]["test"] == "vitest run"
+    assert "type-check" in package["scripts"]["build"]
+    assert any("actions/setup-node@" in s.get("uses", "") for s in frontend_job["steps"])
+    backend = fast["jobs"]["backend"]
+    assert backend["strategy"]["fail-fast"] == "false"
+    assert backend["strategy"]["matrix"] == "${{ fromJSON(needs.scope.outputs.matrix) }}"
+    assert backend["services"]["postgres"]
+    assert backend["if"] == (
+        "${{ needs.scope.outputs.full == 'true' || needs.scope.outputs.frontend == 'true' }}"
+    )
+    selectors = (ROOT / ".github/ci-core-selectors.json").read_text()
+    assert "verify_gate_" not in selectors
+    for selector in (
+        "tests/test_experiment_queue.py",
+        "tests/test_experiment_tool_metrics.py",
+        "tests/test_analyst_sessions.py",
+        "tests/test_analyst_showcase.py",
+        "tests/test_local_plans.py",
+        "tests/test_local_execution.py",
+        "tests/test_workbench_api.py::"
+        "test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel",
+    ):
+        assert selector in selectors
+
+    job = _workflow(SELF_HOSTED_FAST_WORKFLOW)["jobs"]["gates"]
+    steps = job["steps"]
+    frontend = next(s for s in steps if s.get("name") == "Check frontend contracts")
+    assert frontend["working-directory"] == "frontend"
+    assert "if" not in frontend
+    assert frontend["run"].splitlines() == [
+        "npm ci --no-audit --no-fund",
+        "npm run type-check",
+        "npm run test -- tests/workbench.spec.ts tests/registry.spec.ts "
+        "tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts "
+        "tests/local-plans.spec.ts tests/local-execution.spec.ts "
+        "tests/external-evidence.spec.ts",
+    ]
+    assert "continue-on-error" not in frontend
+    assert any("actions/setup-node@" in step.get("uses", "") for step in steps)
+    commands = "\n".join(step.get("run", "") for step in steps)
+    assert "verify_gate_" not in commands
+    assert all(selector in commands for selector in json.loads(selectors))

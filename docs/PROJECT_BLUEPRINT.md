@@ -1,6 +1,33 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## Current authorization — final product copy closeout — 2026-10-13 (Asia/Shanghai)
+## Current authorization — synchronize CI branch with merged main — 2026-10-13 (Asia/Shanghai)
+
+Merge main@adaa083bedb5ceb8aa167a3e9bfc6d704b200468 into existing
+`codex/ci-feedback-20261013@f8a7897`; preserve the product positioning/copy/intake changes from PR #14
+and every CI optimization/regression. Resolve both project-document conflicts by retaining effective
+content and keeping past observations historical. Preserve shared-fixture grouping if moving tests
+would duplicate the dominant setup cost. Do not change product logic, API/data, frozen evidence,
+repository settings/protection, original dirty worktree, main or PR #14. No real model/Agent call.
+Verify related local CI contracts, final exact-SHA remote Fast CI and Offline Regression, and PR #15
+mergeability. Only normal merge/commit/push to this existing branch; no force push, PR merge or deploy.
+Record actual checks and limitations in [Current Milestone](../CURRENT_MILESTONE.md); report and stop.
+
+## Historical authorization — daily CI feedback optimization — 2026-10-13 (Asia/Shanghai)
+
+Start from main@5bfb6745d62ac9747b13690093ab4f361999bc39 in an independent clean worktree,
+branch `codex/ci-feedback-20261013`. Inspect existing workflows/logs and profile the unchanged bounded
+core before optimizing. Keep every existing core selector/test/assertion and guarded offline replay.
+Run full checks on every PR, main push, backend/CI/shared/unknown change; use cumulative branch scope
+for frontend/docs push feedback. Parallelize modules without duplicating expensive shared fixtures,
+retain pinned tools/locked dependencies and fail closed for missing history/tests/skips/job failures.
+Keep lightweight feedback distinct from full `gates` acceptance. Product code/API/data, frozen evidence,
+existing dirty worktrees, feat/acceptance-workbench-v2 and PR #14 are outside the write scope.
+No real Agent/model/provider calls. Existing main has no branch protection/rulesets; do not change
+repository settings. Report that required checks are necessary for enforced pre-merge protection.
+Verify local CI contracts and actual remote jobs/timings; only commit/push this new branch, no PR/merge.
+Live results belong in [Current Milestone](../CURRENT_MILESTONE.md); stop after handoff.
+
+## Historical authorization — final product copy closeout — 2026-10-13 (Asia/Shanghai)
 
 Continue `feat/acceptance-workbench-v2@113a58949603bdd5ef53d83bc92b1e8ac7c67714` in the
 existing independent worktree. Only adjust user-facing positioning and explanatory copy: Chinese
@@ -41,7 +68,6 @@ explicit website demo/historical route compatible. Synthetic input, corrupt/refu
 independent Verifier and browser checks establish the bounded result. No real Agent/Provider/model,
 local-session scanning, frozen edits, PR, merge or deploy. The user authorizes normal commit/push only
 on this feature branch; stop after the report. Results belong in [Current Milestone](../CURRENT_MILESTONE.md).
-
 
 ## Historical authorization — bounded external evidence P1 repairs — 2026-10-11
 
