@@ -11,8 +11,7 @@ Verifier，不访问开发登录目录，不接管订阅。REAL_CODEX 保持关�
 不要在有未提交修改的 checkout 操作，也不要沿用正式服务的 `.env`、数据库或端口。
 以下 Bash 命令从新 checkout 的仓库根执行。先用 `ss -ltn` 确认示例端口未占用；若被占用，
 换两个端口。选择全新 Compose 项目名，先用 `docker compose ls` 确认未存在。
-这些命令需要本轮版本，clone 后先
-`git switch feat/acceptance-workbench-v2`（跟踪同名远端分支）；尚未宣称 main 已具备本轮行为。
+通用导入已包含在冻结的 `main@50ac4cf` 中；以下使用新的 main checkout，不需要切换历史功能分支。
 
 ```bash
 git clone https://github.com/a27497/samescale.git samescale-private
