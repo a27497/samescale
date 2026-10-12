@@ -51,6 +51,9 @@ describe('Private Phase-1 local planning', () => {
   it('requires operator access, never persists the token, and disables public workflow', async () => {
     const write = vi.spyOn(Storage.prototype, 'setItem')
     const { wrapper } = await screen()
+    expect(wrapper.get('h2').text()).toBe('验收任务')
+    expect(wrapper.get('[data-test=supported-tools]').text()).toContain('Claude Code stream-json')
+    expect(wrapper.get('[data-test=supported-tools]').text()).toContain('真实 Codex 执行入口仍关闭')
     expect(localPlansApi.sources).not.toHaveBeenCalled()
     await wrapper.get('[data-test="operator"]').setValue('local-operator-placeholder')
     await wrapper.get('form').trigger('submit'); await flushPromises()

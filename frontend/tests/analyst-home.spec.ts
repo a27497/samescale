@@ -22,12 +22,13 @@ beforeEach(async () => {
   api.historical.mockResolvedValue({ kind: 'historical_real', provenance: 'Historical real / read only', report, metadata: { decision_limit: 4 }, next_steps: ['Review historical plan'], proposal: null })
 })
 describe('Agent product entry', () => {
-  it('lands at Analyst and preserves advanced routes without starting anything', async () => {
-    expect(router.getRoutes().find(route => route.path === '/')?.redirect).toBe('/analyst')
+  it('lands at My runs and preserves advanced routes without starting anything', async () => {
+    expect(router.getRoutes().find(route => route.path === '/')?.redirect).toBe('/runs')
     for (const path of ['/overview', '/experiments', '/judgelab', '/analyst/sessions']) expect(router.getRoutes().some(route => route.path === path)).toBe(true)
     const wrapper = mountHome(); await flushPromises()
-    expect(wrapper.text()).toContain('不调用模型')
-    const workspace = wrapper.findAll('.entry-cards article')[2]!
+    expect(wrapper.text()).not.toContain('固定合成案例')
+    expect(wrapper.findAll('.entry-cards article')).toHaveLength(1)
+    const workspace = wrapper.findAll('.entry-cards article').at(-1)!
     expect(workspace.get('h3').text()).toBe('已保存调查')
     expect(workspace.get('.status-pill').attributes('data-status')).toBe('CURRENT_SESSIONS')
     expect(workspace.get('.status-pill > span').text()).toBe('当前调查会话')
@@ -36,8 +37,10 @@ describe('Agent product entry', () => {
     expect(api.historical).not.toHaveBeenCalled()
   })
   it('keeps Fake, frozen real and current sessions visibly distinct', async () => {
-    const wrapper = mountHome()
-    await button(wrapper, '体验离线调查').trigger('click'); await flushPromises()
+    api.capabilities.mockResolvedValue({ public_demo_read_only: true, persistent_sessions_allowed: false })
+    const wrapper = mountHome(); await flushPromises()
+    await flushPromises()
+  await button(wrapper, '体验离线调查').trigger('click'); await flushPromises()
     expect(wrapper.get('[aria-label="调查案例"]').text()).toContain('Fake / synthetic')
     expect(api.historical).not.toHaveBeenCalled()
     await button(wrapper, '阅读历史报告').trigger('click'); await flushPromises()
@@ -46,8 +49,10 @@ describe('Agent product entry', () => {
     expect(wrapper.findAll('button').some(button => /Resume|Approve/.test(button.text()))).toBe(false)
   })
   it('removes stale results on failure and allows an explicit retry without fallback', async () => {
-    const wrapper = mountHome()
-    await button(wrapper, '体验离线调查').trigger('click'); await flushPromises()
+    api.capabilities.mockResolvedValue({ public_demo_read_only: true, persistent_sessions_allowed: false })
+    const wrapper = mountHome(); await flushPromises()
+    await flushPromises()
+  await button(wrapper, '体验离线调查').trigger('click'); await flushPromises()
     api.historical.mockRejectedValueOnce(new Error('Invalid digest'))
     await button(wrapper, '阅读历史报告').trigger('click'); await flushPromises()
     expect(wrapper.find('[aria-label="调查案例"]').exists()).toBe(false)
@@ -80,7 +85,9 @@ describe('Agent product entry', () => {
 })
 
 it('focuses the loaded result after keyboard activation', async () => {
+  api.capabilities.mockResolvedValue({ public_demo_read_only: true, persistent_sessions_allowed: false })
   const wrapper = mount(AnalystHomeView, { attachTo: document.body, global: { plugins: [router], stubs: { RouterLink: true } } })
+  await flushPromises()
   await button(wrapper, '体验离线调查').trigger('click'); await flushPromises()
   expect(document.activeElement).toBe(wrapper.get('[aria-label="调查案例"]').element)
   wrapper.unmount()
@@ -101,6 +108,7 @@ it('public entry offers read-only alternatives without persistence promises', as
 })
 
 it('read-only alternative links open the requested example, including same-page navigation', async () => {
+  api.capabilities.mockResolvedValue({ public_demo_read_only: true, persistent_sessions_allowed: false })
   await router.push('/analyst?example=offline')
   const wrapper = mountHome(); await flushPromises()
   expect(api.offline).toHaveBeenCalledOnce()
@@ -113,9 +121,11 @@ it('read-only alternative links open the requested example, including same-page 
 
 
 it('scopes synthetic validation guidance to offline reports and preserves historical evidence', async () => {
+  api.capabilities.mockResolvedValue({ public_demo_read_only: true, persistent_sessions_allowed: false })
   const historicalReport = { ...report, limitations: ['ORIGINAL_HISTORICAL_LIMITATION'] }
   api.historical.mockResolvedValueOnce({ kind: 'historical_real', provenance: 'Historical real', report: historicalReport, metadata: {}, next_steps: [], proposal: null })
   const wrapper = mountHome(); await flushPromises()
+  await flushPromises()
   await button(wrapper, '体验离线调查').trigger('click'); await flushPromises()
   expect(wrapper.get('.investigation-report').text()).toContain('事实校验仅针对固定合成输入')
   await button(wrapper, '阅读历史报告').trigger('click'); await flushPromises()
@@ -127,5 +137,14 @@ it('scopes synthetic validation guidance to offline reports and preserves histor
   expect(result.text()).toContain('ORIGINAL_HISTORICAL_LIMITATION')
   expect(result.text()).toContain('inspect_failure')
   expect(result.text()).toContain('digest')
+  wrapper.unmount()
+})
+
+it('never loads examples through a private deep link', async () => {
+  await router.push('/analyst?example=offline')
+  const wrapper = mountHome(); await flushPromises()
+  expect(api.offline).not.toHaveBeenCalled()
+  expect(wrapper.find('[aria-label="调查案例"]').exists()).toBe(false)
+  expect(wrapper.text()).not.toContain('体验离线调查')
   wrapper.unmount()
 })

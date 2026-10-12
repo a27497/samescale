@@ -1,5 +1,93 @@
 # SameScale Product — Current Milestone
 
+## Current state — final product copy closeout — 2026-10-13 (Asia/Shanghai)
+
+Continued `feat/acceptance-workbench-v2@113a58949603bdd5ef53d83bc92b1e8ac7c67714` in the
+existing clean independent worktree. Static HTML title/description and route-driven browser titles
+now use “AI Coding 任务验收与证据工作台”, retaining the current route name. Next-step instructions
+use ordinary developer language; TaskStore, baseline/oracle, pinned Verifier policies and the exact
+record-bound command remain under technical details. Saved-record state labels reuse the acceptance
+summary's localized StatusBadge, with exact raw states/error codes retained in collapsed details.
+Other primary-positioning strings were inspected; evaluation/diagnosis capability names remain valid.
+No data model, API, intake/consent/execution behavior or internal identifier changed.
+
+Complete frontend **243 PASS / 19 files**; types/build PASS. Actual production-build Chromium at
+1440×1000 **28 checks PASS**, zero page errors; screenshots visually inspected. Browser title/meta,
+empty home, actual code-only import, plain-language next step, localized list, raw-value disclosure,
+locale switching and read-only reload checked. Empty-home API response is an explicit browser network
+fixture to avoid all database access; imports use real private FastAPI and a new supplied synthetic
+Workspace. No real model/Agent/Verifier, frozen evidence, credentials or original dirty-worktree edit.
+[Detailed observations and local screenshots](docs/qa/product-copy-closeout-20261013/README.md).
+
+Backend/Docker/full PostgreSQL, live production records, deployed site and remote CI were not rerun
+or verified this round. Normal feature-branch commit/push only; no PR, merge or deployment. Stop after
+handoff. Historical test counts below describe their original runs, not new results.
+
+## Historical multi-tool UX correction snapshot
+
+## Current state — multi-tool intake UX corrections — 2026-10-11
+
+Continued `feat/acceptance-workbench-v2@f3c25fba18011cf02c37b57a4a172ac3291602df` in the
+independent task worktree. “全部来源” truthfully filters approved sources after unlock;
+`auto-v1` is identified by the existing backend at intake, with unidentified sources retained under
+both supported log-adapter filters. Only metadata-free legacy Codex formats imply Codex; other
+formats show “未报告”. No converter, evidence identity, backend authority or safety gate was changed.
+
+Unverified records, including code-only, now show independent-verification prerequisites, the exact
+record-bound operator CLI command, one-attempt/no-retry semantics and reload instructions. The page
+has no verification execution/authorization endpoint. Missing fields and reasons use Chinese
+explanations; raw acceptance/status/field/trace details remain in collapsed “技术细节”. The acceptance
+tasks heading and route agree, with supported Codex/Claude/code-only import and Codex-only local
+planning/closed real execution described separately. README and Quickstart describe the actual order.
+
+Actual related backend **81 PASS**, including all **3** parameterized Docker Verifier tests
+(Codex hooks / Claude stream / code-only): real isolated baseline failure, oracle success,
+timeout remaining unverified and refusal to rerun an interrupted attempt. Existing cached images
+`harnesslab-phase-c:0.3.1` and `harnesslab-phase-e-codex:0.149.0` were present; no pull/build or Agent
+execution. Complete frontend **243 PASS / 19 files**, types/build PASS, focused Ruff/format PASS
+(11 files) and mypy PASS (7 sources). Actual private API / production-build Chromium **48 PASS** at
+1440×1000, zero page runtime errors; screenshots visually inspected. Frozen evidence guard and
+original dirty-worktree diff preservation passed. [Commands, image IDs, evidence and limits](docs/qa/agent-neutral-ux-20261011/README.md).
+
+No full PostgreSQL planning/execution lifecycle, real model/Agent, Cursor/DeepSeek native adapters,
+new production task qualification, public-site deployment or remote CI verdict is established here.
+Only normal feature-branch commit/push is authorized; no PR/merge/deployment. Stop after handoff.
+
+## Historical tool-neutral intake snapshot
+
+## Current state — tool-neutral acceptance intake minimum — 2026-10-12
+
+Base `feat/acceptance-workbench-v2@6affea4cb8287ef0434856fe9437127c4ebb89a1`; independent clean
+worktree. SameScale is an **AI Coding task acceptance and evidence workbench**. Required inputs are
+final code Workspace and separately bound acceptance conditions; run evidence is optional. New records
+use generic types/formats and harness/version/coverage. Four existing Codex formats and exact old record
+addresses remain readable; Claude Code stream-json reuses the existing NormalizedTrace/parser.
+Code-only imports show `NO_RUN_RECORD`, unknown original run state and no invented Episode.
+
+All tools share existing human approval, consent, pins, operator/origin permissions, sensitive-input
+checks and `NOT_ATTESTED` provenance. Missing/zero-check acceptance stays `NOT_VERIFIED`; no self-report
+or completion event establishes pass. New Workspace verification remains a separately authorized
+TaskStore-qualified isolated Verifier CLI. No new Agent/runtime/backend execution capability.
+
+The “导入运行记录” entry chooses auto/Codex/Claude/code-only, then approved Workspace/conditions/optional
+record bindings. Consent resets on input changes. Private product navigation and investigation entry
+contain no built-in examples; explicit public website demo mode remains compatible. README positioning
+is aligned. No session-directory scan, real model/Agent call, frozen evidence edit or existing DB change.
+
+Related backend compatibility **177 PASS**; after final boundary tightening, affected overlapping batch
+**78 PASS** (182 distinct cases exercised). Actual Docker pass/fail/timeout/consumed-attempt checks cover
+Codex, Claude and code-only synthetic inputs. Complete frontend **232 PASS**, types/build PASS, focused
+Ruff/format/mypy PASS, actual 1440px Chromium **26 PASS**, zero page errors. Old frozen protection guard
+passed. [Detailed commands, observations and limits](docs/qa/agent-neutral-intake-20261012/README.md).
+
+Minimum scope: approved-file policy selection and UTF-8 final Workspace; no arbitrary upload or diff
+application. Cursor/DeepSeek native log adapters, genuine fresh sessions, tool-call linking and full
+PostgreSQL lifecycle/remote CI are untested or undelivered. Manual privacy review remains necessary.
+Only normal commit/push on this feature branch is authorized; no PR/merge/deploy. Stop after handoff.
+
+## Historical P1 acceptance snapshot
+
+
 ## Current state — external evidence P1 repaired / private first intake — 2026-10-11
 
 Baseline main@de55277b8cb0f931c9b57184aa5b68dadec0263c; separate clean branch

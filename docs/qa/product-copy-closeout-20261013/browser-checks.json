@@ -1,0 +1,146 @@
+{
+  "status": "PASS",
+  "viewport": "1440x1000",
+  "count": 28,
+  "checks": [
+    "1440px viewport",
+    "actual Chinese browser title",
+    "route name retained in browser title",
+    "actual Chinese meta description matches positioning",
+    "document remains Chinese",
+    "empty state gives code-only and import guidance",
+    "brand carries confirmed product positioning",
+    "visible core UI has no old primary positioning",
+    "actual private API approved source loaded",
+    "unchanged consent gate",
+    "title retained after actual import",
+    "summary verdict stays unverified",
+    "code-only does not invent original run state",
+    "next step uses developer-facing conditions",
+    "internal terms absent from visible next step",
+    "zero checks and separate authority remain clear",
+    "command and raw verdict hidden in technical details",
+    "saved list status matches summary Chinese label",
+    "saved list hides raw status by default",
+    "saved list technical details retain exact raw value",
+    "technical details retain precise task and environment prerequisites",
+    "unchanged exact record-bound operator command",
+    "list localization follows existing locale",
+    "English next-step copy has no internal jargon",
+    "Chinese document title remains confirmed positioning under EN",
+    "reload remains read-only",
+    "no execution or authorization API called",
+    "no browser runtime errors"
+  ],
+  "pageErrors": [],
+  "homeEmptyState": "Explicit browser network fixture for empty experiments; no database access",
+  "import": "Actual private FastAPI with one supplied synthetic code-only source; no Agent/model/Verifier",
+  "title": "已保存外部运行证据 · SameScale — AI Coding 任务验收与证据工作台",
+  "description": "SameScale — AI Coding 任务验收与证据工作台。关联最终代码改动、任务验收条件与可选运行记录，查看独立验收结果并离线复核证据。",
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/runs"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/index-BJLTCWuG.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/index-CXzRbBgi.css"
+    },
+    {
+      "method": "GET",
+      "path": "/brand/samescale-lockup-cobalt.svg"
+    },
+    {
+      "method": "GET",
+      "path": "/brand/samescale-symbol-24px-cobalt.svg"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/RunsHomeView-BUVQ3UMp.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/client-BepNnz-m.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/axios-D-Fx-DOu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/StatusBadge-BD9lISuf.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/PageState-CIkqubzN.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/RunsHomeView-QCFuLJ0B.css"
+    },
+    {
+      "method": "GET",
+      "path": "/api/workbench/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ExternalEvidenceView-BZIyRVbY.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/acceptanceSummary-B_O0iCDW.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/acceptanceSummary-Dfgj5Nw_.css"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ExternalEvidenceView-DdByHVwD.css"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/configuration-check"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/sources"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "POST",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/cfc2433458b16b3c8c42f61994cdb161bcdfb3dbddd38a8089b04730c0cdec1c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/cfc2433458b16b3c8c42f61994cdb161bcdfb3dbddd38a8089b04730c0cdec1c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/cfc2433458b16b3c8c42f61994cdb161bcdfb3dbddd38a8089b04730c0cdec1c"
+    }
+  ]
+}

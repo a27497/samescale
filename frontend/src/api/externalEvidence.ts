@@ -1,12 +1,15 @@
 import axios from 'axios'
 
+export interface HarnessIdentity { name: string; version: string | null; extensions?: Record<string, string> }
 export interface ApprovedEvidenceSource {
   source_id: string; format: string; source_kind: 'historical' | 'synthetic' | 'unverified'
-  digest: string; workspace_digest: string; task_reference: string | null; task_digest: string | null
+  harness?: HarnessIdentity | null
+  digest: string | null; workspace_digest: string; task_reference: string | null; task_digest: string | null
 }
 export interface EvidenceDetail {
   identity: string
   record: {
+    kind?: string; harness?: HarnessIdentity | null
     source: ApprovedEvidenceSource; episode_identity: string | null; original_acceptance: string
     workspace_digest: string; workspace_files: Record<string, string>
     completeness: { status: string; coverage: string; missing_fields: string[]; integrity: string; origin: string }

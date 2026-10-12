@@ -1,0 +1,255 @@
+{
+  "status": "PASS",
+  "viewport": "1440x1000",
+  "count": 48,
+  "checks": [
+    "1440px viewport",
+    "tool selector hidden before unlock",
+    "no source API read before unlock",
+    "all sources label matches filtering",
+    "detection timing explained",
+    "actual private API returns six approved sources",
+    "codex filter retains both unidentified auto-v1 sources",
+    "claude-code filter retains both unidentified auto-v1 sources",
+    "auto metadata not guessed before import",
+    "generic hook without metadata not guessed as Codex",
+    "code-only filter excludes auto sources",
+    "code-only has mandatory Workspace and conditions",
+    "import requires explicit consent",
+    "synthetic-code-only: actual adapter identity",
+    "synthetic-code-only: zero-check summary never passes",
+    "synthetic-code-only: Chinese fields and reason",
+    "synthetic-code-only: raw technical lines collapsed",
+    "synthetic-code-only: exact separate-approval command",
+    "code-only no invented original Episode",
+    "code-only next step includes prerequisites and reload",
+    "synthetic-claude-code: actual adapter identity",
+    "synthetic-claude-code: zero-check summary never passes",
+    "synthetic-claude-code: Chinese fields and reason",
+    "synthetic-claude-code: raw technical lines collapsed",
+    "synthetic-claude-code: exact separate-approval command",
+    "technical details retain raw state and failed tools",
+    "synthetic-codex: actual adapter identity",
+    "synthetic-codex: zero-check summary never passes",
+    "synthetic-codex: Chinese fields and reason",
+    "synthetic-codex: raw technical lines collapsed",
+    "synthetic-codex: exact separate-approval command",
+    "synthetic-auto-codex: actual adapter identity",
+    "synthetic-auto-codex: zero-check summary never passes",
+    "synthetic-auto-codex: Chinese fields and reason",
+    "synthetic-auto-codex: raw technical lines collapsed",
+    "synthetic-auto-codex: exact separate-approval command",
+    "synthetic-auto-claude-code: actual adapter identity",
+    "synthetic-auto-claude-code: zero-check summary never passes",
+    "synthetic-auto-claude-code: Chinese fields and reason",
+    "synthetic-auto-claude-code: raw technical lines collapsed",
+    "synthetic-auto-claude-code: exact separate-approval command",
+    "English labels reactive",
+    "filter change resets consent and selected source",
+    "safe export drops raw synthetic canaries",
+    "UI never requests verification/authorization API",
+    "route title and page heading aligned",
+    "tasks page truthfully lists adapters and execution boundary",
+    "no page runtime errors"
+  ],
+  "pageErrors": [],
+  "fixtures": "Synthetic provided files; actual private API and production build; no database/model/Agent",
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/external-runs"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/index-IofW2jGV.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/index-CXzRbBgi.css"
+    },
+    {
+      "method": "GET",
+      "path": "/brand/samescale-lockup-cobalt.svg"
+    },
+    {
+      "method": "GET",
+      "path": "/brand/samescale-symbol-24px-cobalt.svg"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ExternalEvidenceView-DNkHMXOY.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/axios-D-Fx-DOu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/acceptanceSummary-CzXDKxFJ.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/StatusBadge-ZnS_pPuv.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/acceptanceSummary-Dfgj5Nw_.css"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/ExternalEvidenceView-DlkuMPZ9.css"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/configuration-check"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/sources"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "POST",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/cfc2433458b16b3c8c42f61994cdb161bcdfb3dbddd38a8089b04730c0cdec1c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/cfc2433458b16b3c8c42f61994cdb161bcdfb3dbddd38a8089b04730c0cdec1c"
+    },
+    {
+      "method": "POST",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/ef5cc5bf1a7d1fb52013846bb04d2cf8f0cf055b0b8e9ae94d10590f8f4f0b8e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/ef5cc5bf1a7d1fb52013846bb04d2cf8f0cf055b0b8e9ae94d10590f8f4f0b8e"
+    },
+    {
+      "method": "POST",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/a65b745023b286b22ee853eb90c2799e31aba982072af6d8dacfd630ae0c0da4"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/a65b745023b286b22ee853eb90c2799e31aba982072af6d8dacfd630ae0c0da4"
+    },
+    {
+      "method": "POST",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/4547af01696819c06ad5605dacce15afa6c9f2c2faf988b1c910e420af4879d1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/4547af01696819c06ad5605dacce15afa6c9f2c2faf988b1c910e420af4879d1"
+    },
+    {
+      "method": "POST",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/216f51fa15f616edde429cbc55ef823b61da4ccb4a43030f64f457075a49cca5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/216f51fa15f616edde429cbc55ef823b61da4ccb4a43030f64f457075a49cca5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/external-evidence/records/216f51fa15f616edde429cbc55ef823b61da4ccb4a43030f64f457075a49cca5/export"
+    },
+    {
+      "method": "GET",
+      "path": "/plans"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/index-IofW2jGV.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/runtime-core.esm-bundler-D7Lq8KTP.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/index-CXzRbBgi.css"
+    },
+    {
+      "method": "GET",
+      "path": "/brand/samescale-lockup-cobalt.svg"
+    },
+    {
+      "method": "GET",
+      "path": "/brand/samescale-symbol-24px-cobalt.svg"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/LocalPlansView-DG_Z0ozp.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/axios-D-Fx-DOu.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/rolldown-runtime-DK3Fl9T5.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/TechnicalDetails-DI3Ufkr_.js"
+    },
+    {
+      "method": "GET",
+      "path": "/assets/LocalPlansView-BZ2KscXe.css"
+    },
+    {
+      "method": "GET",
+      "path": "/api/local-plans/status"
+    }
+  ]
+}
