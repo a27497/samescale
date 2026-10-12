@@ -1,6 +1,6 @@
 # SameScale Product — Current Milestone
 
-## Current state — CI feedback optimization candidate — 2026-10-13 (Asia/Shanghai)
+## Current state — CI feedback optimization verified implementation — 2026-10-13 (Asia/Shanghai)
 
 Base main@5bfb6745d62ac9747b13690093ab4f361999bc39; independent worktree/branch
 `codex/ci-feedback-20261013`. Remote baseline gates 339s / bounded core 261s; offline job 63s.
@@ -17,7 +17,12 @@ push-feedback context, never full gates. Missing collection/tests, skips and fai
 [Policy, boundaries and timing composition](docs/CI_FEEDBACK.md).
 
 Focused local CI/workflow/offline mutation contracts **46 PASS**; routing unittest **10 PASS**, focused
-Ruff/format/mypy PASS. Remote candidate runs remain pending until push; no remote pass is anticipated.
+Ruff/format/mypy PASS. Exact implementation commit `f19e7c599c222fcd4e822242fa52ed8fec9d5ade` remote full Fast CI and
+S3 **PASS**: **597** backend cases (all original 587 + 10 guards), **223** frontend cases and build/types,
+431-source mypy, 73 guarded offline tests/two replays. Fast elapsed **199s**, versus recent old 342s
+and same-main-base old 355s (~42–44% shorter). Four group jobs: 176/113/71/70s; frontend/static 39s
+in parallel; scope 10s / aggregator 6s; offline 69s. [Remote links, receipt counts and limits](docs/qa/ci-feedback-20261013/README.md).
+Receipt-only follow-up SHA is verified separately; no future CI result is anticipated.
 main has **no configured branch protection/ruleset**: workflow runs full PR checks, but repository
 required-check settings are needed for enforced pre-merge blocking and are outside this authorization.
 

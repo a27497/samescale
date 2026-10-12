@@ -1,0 +1,58 @@
+{
+  "status": "PASS",
+  "original_tests": 587,
+  "added_policy_tests": 10,
+  "total": 597,
+  "collection_receipts": [
+    {
+      "collection_sha256": "732f7b710af5b58811fe0b05d16c1baa885c523c15e5ba4f105f345e514c9588",
+      "collection_total": 597,
+      "count": 4,
+      "index": 2,
+      "mode": "full",
+      "selected_count": 164
+    },
+    {
+      "collection_sha256": "732f7b710af5b58811fe0b05d16c1baa885c523c15e5ba4f105f345e514c9588",
+      "collection_total": 597,
+      "count": 4,
+      "index": 0,
+      "mode": "full",
+      "selected_count": 26
+    },
+    {
+      "collection_sha256": "732f7b710af5b58811fe0b05d16c1baa885c523c15e5ba4f105f345e514c9588",
+      "collection_total": 597,
+      "count": 4,
+      "index": 3,
+      "mode": "full",
+      "selected_count": 400
+    },
+    {
+      "collection_sha256": "732f7b710af5b58811fe0b05d16c1baa885c523c15e5ba4f105f345e514c9588",
+      "collection_total": 597,
+      "count": 4,
+      "index": 1,
+      "mode": "full",
+      "selected_count": 7
+    }
+  ],
+  "passed_receipts": [
+    {
+      "index": 2,
+      "tests": 164
+    },
+    {
+      "index": 0,
+      "tests": 26
+    },
+    {
+      "index": 3,
+      "tests": 400
+    },
+    {
+      "index": 1,
+      "tests": 7
+    }
+  ]
+}
