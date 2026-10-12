@@ -1,6 +1,18 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## Current authorization — daily CI feedback optimization — 2026-10-13 (Asia/Shanghai)
+## Current authorization — synchronize CI branch with merged main — 2026-10-13 (Asia/Shanghai)
+
+Merge main@adaa083bedb5ceb8aa167a3e9bfc6d704b200468 into existing
+`codex/ci-feedback-20261013@f8a7897`; preserve the product positioning/copy/intake changes from PR #14
+and every CI optimization/regression. Resolve both project-document conflicts by retaining effective
+content and keeping past observations historical. Preserve shared-fixture grouping if moving tests
+would duplicate the dominant setup cost. Do not change product logic, API/data, frozen evidence,
+repository settings/protection, original dirty worktree, main or PR #14. No real model/Agent call.
+Verify related local CI contracts, final exact-SHA remote Fast CI and Offline Regression, and PR #15
+mergeability. Only normal merge/commit/push to this existing branch; no force push, PR merge or deploy.
+Record actual checks and limitations in [Current Milestone](../CURRENT_MILESTONE.md); report and stop.
+
+## Historical authorization — daily CI feedback optimization — 2026-10-13 (Asia/Shanghai)
 
 Start from main@5bfb6745d62ac9747b13690093ab4f361999bc39 in an independent clean worktree,
 branch `codex/ci-feedback-20261013`. Inspect existing workflows/logs and profile the unchanged bounded
@@ -14,6 +26,48 @@ No real Agent/model/provider calls. Existing main has no branch protection/rules
 repository settings. Report that required checks are necessary for enforced pre-merge protection.
 Verify local CI contracts and actual remote jobs/timings; only commit/push this new branch, no PR/merge.
 Live results belong in [Current Milestone](../CURRENT_MILESTONE.md); stop after handoff.
+
+## Historical authorization — final product copy closeout — 2026-10-13 (Asia/Shanghai)
+
+Continue `feat/acceptance-workbench-v2@113a58949603bdd5ef53d83bc92b1e8ac7c67714` in the
+existing independent worktree. Only adjust user-facing positioning and explanatory copy: Chinese
+browser title/meta including route-driven title overrides, ordinary developer-language next steps
+with precise terms/commands under technical details, and localized saved-record states with raw
+values retained. Inspect other primary-positioning strings without globally renaming capability
+names, code identifiers, API fields or historical evidence. No feature, model, API or import behavior
+change. Do not touch frozen evidence, dirty worktrees, database or credentials; no real model/Agent.
+Verify frontend tests/types/build and actual 1440px title, empty home, code-only next step and saved
+list. Browser-fixture empty responses avoid database access; private intake uses supplied synthetic
+files. Only normal commit/push to this branch is authorized; no PR/merge/deploy. Results belong in
+[Current Milestone](../CURRENT_MILESTONE.md); stop after the report.
+
+## Historical authorization — multi-tool intake UX corrections — 2026-10-11
+
+Continue `feat/acceptance-workbench-v2@f3c25fba18011cf02c37b57a4a172ac3291602df` in the
+existing independent task worktree. Align the source filter name/behavior and keep unidentified
+auto sources selectable; restrict metadata-free Codex attribution to legacy formats. Give unverified
+code-only records explicit independent-verification prerequisites and the existing operator CLI
+command without adding execution authority. Localize summary fields, collapse raw technical details,
+unify acceptance-task headings while accurately documenting Codex-only planning and supported import
+adapters, and hide tool selection until unlock. Preserve all shared safety, consent, pins, privacy,
+unknown/corrupt semantics and frozen evidence. Verify related backend/frontend tests, types/build,
+actual 1440px browser intake and summaries; report the cached Docker-image prerequisites and actual
+three-parameter isolated Verifier results. No real Agent/model, PR, merge or deployment. Only normal
+commit/push to this feature branch is authorized; stop after the report. Live results belong in
+[Current Milestone](../CURRENT_MILESTONE.md).
+
+## Historical authorization — tool-neutral acceptance intake minimum — 2026-10-12
+
+Work from `feat/acceptance-workbench-v2@6affea4cb8287ef0434856fe9437127c4ebb89a1` in an independent
+clean worktree. Make saved evidence agent-neutral while preserving old Codex identities and all
+approval, permission, pinning, privacy and unattested-source gates. Required inputs are a final
+Workspace and separate task conditions; run logs are optional. Reuse the existing four Codex readers,
+NormalizedTrace and Claude stream parser; no new framework, schema migration or execution capability.
+Update the import entry/tool selector, truthful coverage and private no-example surface. Keep the
+explicit website demo/historical route compatible. Synthetic input, corrupt/refusal, legacy identity,
+independent Verifier and browser checks establish the bounded result. No real Agent/Provider/model,
+local-session scanning, frozen edits, PR, merge or deploy. The user authorizes normal commit/push only
+on this feature branch; stop after the report. Results belong in [Current Milestone](../CURRENT_MILESTONE.md).
 
 ## Historical authorization — bounded external evidence P1 repairs — 2026-10-11
 

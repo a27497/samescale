@@ -18,17 +18,14 @@ from typing import Any
 
 from harnesslab.analyst.offline_replay import decode, require
 from harnesslab.api.workbench_errors import WorkbenchAPIError
-from harnesslab.episodes.hooks import _write_once, derive_episode, encode, normalized, read_events
-from harnesslab.episodes.service import read_codex_episode
+from harnesslab.episodes.hooks import _write_once, encode
 from harnesslab.episodes.verified_hooks import read_verified_hook_bundle
+from harnesslab.external_evidence.converters import Conversion, codex_artifacts, stream_json
 from harnesslab.external_evidence.models import ApprovedSource, EvidencePolicy, ExternalRecord
 from harnesslab.harness_lane.models import (
-    HarnessLaneEvidence,
     NormalizedTrace,
-    NormalizedTraceEvent,
     TraceEventType,
 )
-from harnesslab.harness_lane.trace import _normalized_trace, _sanitize_event
 from harnesslab.local_plans.tasks import bounded_files, fail, no_links, read_owned_json
 from harnesslab.productization.assets import distribution_root
 from harnesslab.registry.models import canonical_digest
@@ -36,7 +33,17 @@ from harnesslab.tasks.models import validate_relative_path
 from harnesslab.tasks.package import digest_tree, sha256_bytes
 
 MAX_EXPORT = 12_000_000
-PRIVATE_PARTS = {".codex", ".ssh", ".git", ".aws", ".config", "oracle", "verifier"}
+PRIVATE_PARTS = {
+    ".claude",
+    ".cursor",
+    ".codex",
+    ".ssh",
+    ".git",
+    ".aws",
+    ".config",
+    "oracle",
+    "verifier",
+}
 PRIVATE_NAMES = {"auth.json", "credentials.json", "id_rsa", "id_ed25519"}
 SECRET = re.compile(
     rb"-----BEGIN [A-Z ]*PRIVATE KEY-----|\b(?:sk-|ghp_|github_pat_)[A-Za-z0-9_-]{16,}"
@@ -132,7 +139,10 @@ def load_policy() -> EvidencePolicy:
                     raise ValueError("overlapping verifier storage")
                 roots.append(root)
         for source in policy.sources:
+            safe_content(encode(source.binding))
             for root in (source.path, source.workspace):
+                if root is None:
+                    continue
                 safe_root(root)
                 if any(overlap(root, r) for r in roots) or overlap(root, path):
                     raise ValueError("source/storage/policy overlap")
@@ -209,7 +219,7 @@ def configuration_check() -> dict[str, Any]:
         return result
     for source in policy.sources:
         try:
-            available = source.path.is_dir() and source.workspace.is_dir()
+            available = (source.path is None or source.path.is_dir()) and source.workspace.is_dir()
         except OSError:
             available = False
         result["sources"].append(
@@ -303,6 +313,14 @@ def trace_projection(trace: NormalizedTrace) -> tuple[dict[str, Any], ...]:
         # Deliberately drop free text, reasoning, raw output, IDs and command strings.
         paths = []
         for change in event.file_changes:
+            input_require(
+                not any(
+                    p.lower() in PRIVATE_PARTS | PRIVATE_NAMES or p.startswith(".env")
+                    for p in Path(change.path).parts
+                ),
+                "EVIDENCE_SENSITIVE_INPUT",
+                "private trace file path",
+            )
             try:
                 safe_name(change.path)
                 paths.append(change.path)
@@ -403,8 +421,9 @@ def snapshot(root: Path, destination: Path, *, max_bytes: int = 32_000_000) -> N
         os.close(fd)
 
 
-def read_jsonl(source: ApprovedSource) -> NormalizedTrace:
-    """Explicitly supplied exec --json stream; no rollout/session discovery or raw writes."""
+def read_stream(source: ApprovedSource) -> bytes:
+    """Explicitly supplied pinned JSONL stream; no rollout/session discovery or raw writes."""
+    assert source.path is not None
     safe_root(source.path)
     fd = os.open("/", os.O_RDONLY | os.O_DIRECTORY)
     try:
@@ -434,61 +453,37 @@ def read_jsonl(source: ApprovedSource) -> NormalizedTrace:
             os.close(stream_fd)
     finally:
         os.close(fd)
-    lines = data.splitlines()
-    require(0 < len(lines) <= 4096, "JSONL event limit")
-    events = []
-    for ordinal, line in enumerate(lines, 1):
-        require(len(line) <= 1_000_000, "JSONL line limit")
-        raw = decode(line)
-        input_require(
-            raw.get("type")
-            in {
-                "thread.started",
-                "turn.started",
-                "turn.completed",
-                "turn.failed",
-                "item.started",
-                "item.updated",
-                "item.completed",
-                "error",
-            },
-            "EVIDENCE_INPUT_UNSUPPORTED",
-            "unsupported saved exec protocol",
-        )
-        item = raw.get("item", {})
-        require(isinstance(item, dict), "invalid item envelope")
-        # Drop free text/output/usage/diagnostics before any write, reuse existing normalization.
-        safe = {
-            "type": raw["type"],
-            "item": {
-                k: v
-                for k, v in item.items()
-                if k in {"type", "id", "status", "command", "exit_code", "changes"}
-            },
-        }
-        events.append(_sanitize_event(safe, ordinal, ()))
-    return _normalized_trace(tuple(events))
+    safe_content(data)  # Shared credential rejection before any projection or persistence.
+    return data
 
 
 def project(source: ApprovedSource) -> tuple[ExternalRecord, dict[str, bytes]]:
+    safe_content(encode(source.binding))
     # Freeze bounded bytes first; legacy validators never traverse a live untrusted tree.
     with tempfile.TemporaryDirectory(prefix="samescale-evidence-read-") as temporary:
         private = Path(temporary)
-        native_trace = read_jsonl(source) if source.format == "codex-jsonl-v1" else None
-        if native_trace is None:
+        stream_conversion = (
+            stream_json(source, read_stream(source))
+            if source.format in {"codex-jsonl-v1", "stream-json-v1", "auto-v1"}
+            else None
+        )
+        if stream_conversion is None and source.path is not None:
             snapshot(source.path, private / "source")
         snapshot(source.workspace, private / "workspace", max_bytes=4_000_000)
         copy = source.model_copy(
-            update={"path": private / "source", "workspace": private / "workspace"}
+            update={
+                "path": private / "source" if source.path else None,
+                "workspace": private / "workspace",
+            }
         )
-        return _project_snapshot(copy, native_trace)
+        return _project_snapshot(copy, stream_conversion)
 
 
 def _project_snapshot(
-    source: ApprovedSource, native_trace: NormalizedTrace | None = None
+    source: ApprovedSource, stream_conversion: Conversion | None = None
 ) -> tuple[ExternalRecord, dict[str, bytes]]:
     # Validate structural safety before legacy readers hash or parse any approved artifact.
-    if native_trace is None:
+    if stream_conversion is None and source.path is not None:
         bounded_files(source.path, max_files=4000, max_bytes=32_000_000)
     files = workspace_files(source.workspace)
     input_require(
@@ -496,142 +491,31 @@ def _project_snapshot(
         "EVIDENCE_PIN_MISMATCH",
         "workspace pin mismatch",
     )
-    verification = unknown_verification()
-    changes: dict[str, Any] = {"status": "BASELINE_MISSING", "paths": []}
-    infrastructure: dict[str, Any] = {"status": "UNKNOWN", "root_cause": None}
-    missing = [
-        "actual_model",
-        "provider_route",
-        "request_count",
-        "usage",
-        "cost",
-        "wall_clock_order",
-    ]
-    if source.format == "codex-jsonl-v1":
-        assert native_trace is not None
-        trace = native_trace
-        original_kind = source.source_kind
-        original = "NOT_VERIFIED"
-        episode_id = None
-        coverage = "SUPPLIED_EXEC_JSONL_ONLY"
-        missing.extend(["process_exit_code", "trusted_task_contract", "independent_verifier"])
-        if not any(
-            e.type in {TraceEventType.TURN_COMPLETED, TraceEventType.TURN_FAILED}
-            for e in trace.events
-        ):
-            missing.append("native_completion")
-        if any(e.type in {TraceEventType.ERROR, TraceEventType.TURN_FAILED} for e in trace.events):
-            infrastructure = {"status": "RECORDED_TURN_OR_STREAM_FAILURE", "root_cause": None}
-    elif source.format == "verified-hook-v1":
-        input_require(
-            sha256_bytes((source.path / "bundle.json").read_bytes()) == source.digest,
-            "EVIDENCE_PIN_MISMATCH",
-            "source pin mismatch",
+    if source.format == "code-only-v1":
+        converted = Conversion(
+            NormalizedTrace(events=()),
+            source.source_kind,
+            "NOT_VERIFIED",
+            None,
+            "NO_RUN_RECORD",
+            [
+                "run_record",
+                "actual_model",
+                "provider_route",
+                "usage",
+                "cost",
+                "independent_verifier",
+            ],
+            {"status": "BASELINE_MISSING", "paths": []},
+            unknown_verification(),
+            {"status": "UNKNOWN", "root_cause": None},
+            None,
         )
-        verification = read_verified_hook_bundle(source.path, source.digest)
-        require(
-            verification["workspace_digest"] == source.workspace_digest,
-            "verifier workspace mismatch",
-        )
-        # Free-form hidden check names never leave the trusted verifier reader.
-        verification = {
-            **verification,
-            "failed_checks": [canonical_digest(name) for name in verification["failed_checks"]],
-        }
-        events = read_events(source.path / "hooks")
-        raw = decode((source.path / "episode.json").read_bytes())
-        original_kind = raw["source_kind"]
-        require(
-            original_kind != "synthetic" or source.source_kind == "synthetic", "fixture relabeling"
-        )
-        episode = derive_episode(events, original_kind)
-        trace = normalized(events)
-        task = decode((source.path / "task.json").read_bytes())
-        baseline = source.path / "task-package" / task["id"] / task["version"] / "workspace"
-        baseline_files = workspace_files(baseline)
-        changes = {
-            "status": "DIGEST_BOUND_BASELINE",
-            "paths": sorted(
-                p
-                for p in files.keys() | baseline_files.keys()
-                if files.get(p) != baseline_files.get(p)
-            ),
-        }
-        original = "NOT_VERIFIED"
-        episode_id = episode.identity
-        coverage = "PAIRED_HOOKS_ONLY"
-    elif source.format == "native-hook-v1":
-        original_kind = source.source_kind
-        input_require(
-            digest_tree(source.path) == source.digest, "EVIDENCE_PIN_MISMATCH", "hook pin mismatch"
-        )
-        events = read_events(source.path)
-        require(len({(e.source, e.session) for e in events}) == 1, "mixed hook sessions")
-        try:
-            episode = derive_episode(events, source.source_kind)
-            trace = normalized(events)
-            episode_id = episode.identity
-            coverage = "PAIRED_HOOKS_ONLY"
-        except ValueError:
-            # Keep partial observations, without fabricating a valid original Episode.
-            episode_id = None
-            coverage = "INCOMPLETE_HOOKS"
-            missing.append("paired_hook_lifecycle")
-            trace = NormalizedTrace(
-                events=tuple(
-                    NormalizedTraceEvent(
-                        ordinal=i,
-                        type=TraceEventType.UNKNOWN,
-                        native_event_type="hook." + e.event,
-                        exit_code=e.exit_code,
-                        status="failed" if e.failure else "observed",
-                    )
-                    for i, e in enumerate(sorted(events, key=lambda e: e.key), 1)
-                )
-            )
-        original = "NOT_VERIFIED"
     else:
-        original_kind = source.source_kind
-        input_require(
-            digest_tree(source.path) == source.digest,
-            "EVIDENCE_PIN_MISMATCH",
-            "H-Lane pin mismatch",
-        )
-        episode_record = read_codex_episode(source.path, source_kind=source.source_kind)
-        require(episode_record.source_bundle_digest == source.digest, "H-Lane pin mismatch")
-        require(
-            episode_record.workspace_output_digest == source.workspace_digest,
-            "H-Lane workspace mismatch",
-        )
-        trace = NormalizedTrace.model_validate(
-            decode((source.path / "trace/normalized.json").read_bytes())
-        )
-        evidence = HarnessLaneEvidence.model_validate(
-            decode((source.path / "manifest.json").read_bytes())
-        )
-        original = episode_record.acceptance
-        require(
-            original == "NOT_VERIFIED" or episode_record.verifier_check_count > 0,
-            "zero collected verifier checks",
-        )
-        episode_id = episode_record.identity
-        coverage = "RECORDED_H_LANE"
-        changes = {"status": "SOURCE_REPORTED_NOT_DIFF_RECONSTRUCTED", "paths": []}
-        for name in evidence.changed_paths:
-            safe_name(name.path)
-            changes["paths"].append(name.path)
-        infrastructure = {
-            "status": evidence.harness_failure.value
-            if evidence.harness_failure
-            else "NO_RECORDED_FAILURE",
-            "timed_out": evidence.timed_out,
-            "root_cause": None,
-        }
-        # A legacy report is kept separate; do not elevate it to the strict hook reader's L0.
-        verification = unknown_verification(
-            "RECORDED_RESULT_ONLY_REQUIRES_TRUSTED_INDEPENDENT_ADMISSION"
-        )
-        verification["task_digest"] = episode_record.task_digest
+        converted = stream_conversion or codex_artifacts(source, files)
+    trace = converted.trace
+    missing = list(converted.missing)
+    verification = converted.verification
     projected = trace_projection(trace)
     missing.extend(
         ["tool_exit_codes"]
@@ -639,31 +523,34 @@ def _project_snapshot(
         else []
     )
     record = ExternalRecord(
+        kind="external-run-evidence-v1",
+        harness=converted.harness,
         source=source.binding,
-        original_source_kind=original_kind,
-        episode_identity=episode_id,
-        original_acceptance=original,
+        original_source_kind=converted.original_kind,
+        episode_identity=converted.episode_id,
+        original_acceptance=converted.original,
         workspace_digest=source.workspace_digest,
         workspace_files={p: sha256_bytes(data) for p, data in files.items()},
         trace=projected,
         completeness={
             "status": "PARTIAL",
-            "coverage": coverage,
+            "coverage": converted.coverage,
             "missing_fields": missing,
             "integrity": "PINNED_BYTES_VERIFIED",
             "origin": "NOT_ATTESTED",
         },
-        file_changes=changes,
+        file_changes=converted.changes,
         recorded_verification=verification,
-        infrastructure=infrastructure,
+        infrastructure=converted.infrastructure,
     )
     # Refuse moving sources before committing the projected snapshot.
     require(workspace_files(source.workspace) == files, "workspace changed during import")
-    if source.format == "codex-jsonl-v1":
+    if stream_conversion is not None or source.path is None:
         pass  # Raw stream was pinned in memory; no raw snapshot exists.
     elif source.format != "verified-hook-v1":
         require(digest_tree(source.path) == source.digest, "source changed during import")
     else:
+        assert source.digest is not None
         repeated = read_verified_hook_bundle(source.path, source.digest)
         repeated["failed_checks"] = [canonical_digest(name) for name in repeated["failed_checks"]]
         require(repeated == verification, "source changed during import")

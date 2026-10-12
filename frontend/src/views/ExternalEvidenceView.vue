@@ -1,12 +1,22 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { externalEvidenceApi, type ApprovedEvidenceSource, type EvidenceDetail, type EvidenceSummary } from '@/api/externalEvidence'
 import { copy as c } from '@/composables/visualLocale'
+import AcceptanceSummary from '@/components/AcceptanceSummary.vue'
+import StatusBadge from '@/components/StatusBadge.vue'
+import { externalAcceptanceRows } from '@/utils/acceptanceSummary'
+import { matchesSourceFilter, sourceHarness } from '@/utils/evidencePresentation'
 
 const route = useRoute(); const router = useRouter()
 const token = ref(''); const unlocked = ref(false); const busy = ref(false); const error = ref('')
 const sources = ref<ApprovedEvidenceSource[]>([]); const records = ref<EvidenceSummary[]>([])
+const tool = ref('all')
+const filteredSources = computed(() => sources.value.filter(source => matchesSourceFilter(source, tool.value)))
+const selectedSource = computed(() => filteredSources.value.find(source => source.source_id === selected.value))
+const harnessName = (name?: string) => name === 'codex' ? 'Codex' : name === 'claude-code' ? 'Claude Code' : name ?? c('未报告', 'Not reported')
+const coverageLabels = computed<Record<string, string>>(() => ({ NO_RUN_RECORD: c('无运行记录', 'No run record'), SUPPLIED_EXEC_JSONL_ONLY: c('仅提供的 Codex JSONL · 部分覆盖', 'Supplied Codex JSONL only · partial coverage'), SUPPLIED_STREAM_JSON_ONLY: c('仅提供的 Claude stream-json · 部分覆盖', 'Supplied Claude stream-json only · partial coverage'), PAIRED_HOOKS_ONLY: c('仅配对 Hook · 部分覆盖', 'Paired hooks only · partial coverage'), INCOMPLETE_HOOKS: c('不完整 Hook · 部分覆盖', 'Incomplete hooks · partial coverage'), RECORDED_H_LANE: c('已保存 H-Lane · 部分覆盖', 'Saved H-Lane · partial coverage') }))
+const coverageName = (coverage: string) => coverageLabels.value[coverage] ?? coverage
 const selected = ref(''); const consent = ref(false); const detail = ref<EvidenceDetail | null>(null)
 const listError = ref(''); const checkStatus = ref(''); const configurationNotice = ref('')
 const exportDigest = ref(''); let generation = 0; let alive = true
@@ -68,7 +78,7 @@ async function unlock() {
   finally { if (alive) busy.value = false }
 }
 async function ingest() {
-  if (!consent.value || !selected.value || busy.value) return
+  if (!consent.value || !selectedSource.value || busy.value) return
   busy.value = true; error.value = ''
   try {
     const data = await externalEvidenceApi.ingest(selected.value, token.value)
@@ -90,6 +100,7 @@ async function download() {
     URL.revokeObjectURL(url); exportDigest.value = result.digest
   } catch (e) { if (alive) { if (errorCode(e) === 'EVIDENCE_INTEGRITY_ERROR') detail.value = null; report(e) } } finally { if (alive) busy.value = false }
 }
+watch(tool, () => { selected.value = ''; consent.value = false })
 watch(selected, () => { consent.value = false })
 watch(() => route.params.identity, () => { if (unlocked.value) loadDetail() })
 onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.value = null })
@@ -97,21 +108,23 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
 
 <template>
   <section class="external-evidence-page">
-    <div class="page-heading"><div><h2>{{ c('外部 Codex 运行证据', 'Saved external Codex evidence') }}</h2><p>{{ c('导入已保存记录与最终工程快照，读取独立验收与诊断。', 'Import saved records and final workspaces; read independent verification and diagnosis.') }}</p></div></div>
+    <div class="page-heading"><div><h2>{{ c('导入运行记录', 'Import run evidence') }}</h2><p>{{ c('提供最终代码 Workspace 与任务验收条件；运行记录可选。', 'Provide the final code workspace and task acceptance conditions; run records are optional.') }}</p></div></div>
     <p>{{ c('不会重新运行 Agent 或接管订阅登录。只接入操作员明确批准的脱敏来源；摘要验证完整性，不认证来源。', 'No Agent rerun or subscription login takeover. Only explicitly approved sanitized sources; hashes verify integrity, not origin.') }}</p>
+    <p>{{ c('支持多种 Coding Agent 的证据接入。本轮支持 Codex、Claude Code stream-json 和仅代码改动；没有运行记录也能验收，覆盖度标为“无运行记录”。', 'Intake supports multiple Coding Agents. This version supports Codex, Claude Code stream-json and code-only intake; acceptance without logs is labelled “No run record”.') }}</p>
+    <div v-if="unlocked" class="panel builder-form" data-test="source-filter"><label>{{ c('1 · 按工具筛选来源', '1 · Filter sources by tool') }}<select v-model="tool" data-test="tool"><option value="all">{{ c('全部来源', 'All sources') }}</option><option value="codex">Codex</option><option value="claude-code">Claude Code</option><option value="code-only">{{ c('仅代码改动', 'Code changes only') }}</option></select></label><p>{{ c('此处只筛选已批准来源。auto-v1 在点击导入后由后端识别 Codex 或 Claude Code；未识别来源在这两种工具筛选下均保留。只解析主动提供的文件，不扫描会话目录。', 'This selector filters approved sources only. The backend identifies auto-v1 as Codex or Claude Code when you click Import; unidentified sources remain under both filters. Only supplied files are parsed; session directories are never scanned.') }}</p></div>
     <p v-if="error" class="error-state" role="alert">{{ error }}</p>
     <details class="panel" data-test="quickstart">
       <summary>{{ c('首次私有接入 Quickstart（不执行 Agent / Verifier）', 'First private intake Quickstart (no Agent / Verifier execution)') }}</summary>
       <ol>
         <li>{{ c('在独立 checkout 安装锁定依赖并构建 UI；只使用新隔离数据库和未占用 loopback 端口。', 'Install locked dependencies/build the UI in a separate checkout; use a new isolated database and unused loopback port.') }}</li>
-        <li>{{ c('人工审查单条已保存记录和最终 UTF-8 Workspace，移除敏感材料，再独立保存 source / Workspace 摘要。不会扫描私人会话。', 'Review one supplied saved record and final UTF-8 Workspace, remove sensitive material and retain source/Workspace pins independently. No private-session discovery.') }}</li>
+        <li>{{ c('人工审查最终 UTF-8 Workspace 与验收条件，以及可选运行记录，移除敏感材料并独立保存摘要。不会扫描私人会话。', 'Review the final UTF-8 workspace, acceptance conditions and optional run records; remove sensitive material and retain independent pins. No session discovery.') }}</li>
         <li>{{ c('在仓库外创建 0600 策略与独立 0700 存储目录；策略逐项列出批准来源。', 'Create an owned 0600 policy and separate 0700 store outside the checkout; explicitly list each approved source.') }} <code>HARNESSLAB_EXTERNAL_EVIDENCE_POLICY</code></li>
         <li>{{ c('设置独立本地操作员凭据（至少 32 字符），运行只读检查；它不证明 pin 或任务通过。', 'Set a separate local operator credential (at least 32 characters) and run the read-only check; it does not validate pins or task acceptance.') }} <code>uv run --locked harnesslab external-evidence check</code></li>
         <li>{{ c('按仓库 docs/EXTERNAL_EVIDENCE_QUICKSTART.md 的完整命令启动 host API；解锁、选来源并明确同意接入。', 'Start the host API with the complete commands in docs/EXTERNAL_EVIDENCE_QUICKSTART.md; unlock, select a source and explicitly approve intake.') }}</li>
         <li>{{ c('下载脱敏导出，单独保存显示的摘要，在终端执行两次离线复核；不会重跑 Agent 或历史 Verifier。', 'Download the sanitized export, retain the displayed pin separately and replay twice in a terminal; no Agent or historical Verifier rerun.') }}</li>
       </ol>
       <p>{{ c('标准 Compose 目前不自动传递操作员/证据策略或挂载来源；本路径使用私有 host API，不宣称开箱即用。', 'Standard Compose does not forward operator/evidence policy settings or mount sources. This path uses a private host API; it is not automatic distribution setup.') }}</p>
-      <p>{{ c('支持的 exec JSONL / Hook / H-Lane 输入、摘要命令与完整步骤见随版本附带的 Quickstart。没有新增获批真实记录：FRESH_CASE_PENDING。', 'Use supported exec JSONL / Hook / H-Lane inputs; see the bundled Quickstart for pin commands and full steps. No fresh approved real record: FRESH_CASE_PENDING.') }}</p>
+      <p>{{ c('格式、摘要命令、仅代码改动和可信验收条件的配置步骤见随版本附带的 Quickstart。', 'See the bundled Quickstart for formats, pins, code-only intake and trusted acceptance-condition mapping.') }}</p>
     </details>
     <form v-if="!unlocked" class="panel builder-form" @submit.prevent="unlock">
       <label>{{ c('本地操作员凭据', 'Local operator credential') }}<input v-model="token" data-test="operator" type="password" autocomplete="off" required /></label>
@@ -122,33 +135,67 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
       <p data-test="configuration-check">{{ c('只读配置检查', 'Read-only configuration check') }}：{{ checkStatus }} · {{ c('未读取来源内容、未验证摘要或执行任务。', 'Source contents/pins/task acceptance were not checked; no execution.') }}</p>
       <p v-if="configurationNotice" role="status">{{ configurationNotice }} {{ c('已保存的健康记录仍可读取。', 'Healthy saved records remain readable.') }}</p>
       <form class="panel builder-form" @submit.prevent="ingest">
-        <h3>{{ c('接入已批准来源', 'Import an approved source') }}</h3>
-        <label>{{ c('来源', 'Source') }}<select v-model="selected" data-test="source"><option value="">{{ c('选择来源', 'Choose a source') }}</option><option v-for="source in sources" :key="source.source_id" :value="source.source_id">{{ source.source_id }} · {{ source.source_kind }} · {{ source.format }}</option></select></label>
-        <p v-if="!sources.length">{{ c('暂无批准来源。请由操作员逐项审查、脱敏并固定摘要；不会扫描私人会话。', 'No approved sources. The operator must review, sanitize and pin individual items; private sessions are never scanned.') }}</p>
-        <label><input v-model="consent" data-test="consent" type="checkbox" />{{ c('我批准接入所选保存证据和工程快照；这不授权运行 Agent。', 'I approve intake of this saved evidence and workspace; this does not authorize Agent execution.') }}</label>
-        <button class="primary-button" data-test="import" :disabled="busy || !selected || !consent">{{ c('导入并检查完整性', 'Import and check integrity') }}</button>
+        <h3>{{ c('2 · 提供代码改动与验收条件', '2 · Provide code changes and acceptance conditions') }}</h3>
+        <label>{{ c('来源', 'Source') }}<select v-model="selected" data-test="source"><option value="">{{ c('选择来源', 'Choose a source') }}</option><option v-for="source in filteredSources" :key="source.source_id" :value="source.source_id">{{ source.source_id }} · {{ source.source_kind }} · {{ source.format }}</option></select></label>
+        <div v-if="selectedSource" class="approved-inputs" data-test="approved-inputs">
+          <p><strong>{{ c('最终代码 Workspace（必需）', 'Final code workspace (required)') }}</strong><br /><code>{{ selectedSource.workspace_digest }}</code></p>
+          <p><strong>{{ c('任务验收条件（必需）', 'Task acceptance conditions (required)') }}</strong><br />{{ selectedSource.task_reference ?? c('旧来源未绑定可信任务；可保存，不能据此判为通过。', 'Legacy source has no trusted task mapping; saved intake cannot establish a pass.') }}<br /><code v-if="selectedSource.task_digest">{{ selectedSource.task_digest }}</code></p>
+          <p><strong>{{ c('3 · 运行记录（可选）', '3 · Run record (optional)') }}</strong><br />{{ selectedSource.digest ? `${selectedSource.format} · ${harnessName(sourceHarness(selectedSource))}` : c('无运行记录 · 仍可独立验收代码改动', 'No run record · code can still be independently checked') }}<br /><code v-if="selectedSource.digest">{{ selectedSource.digest }}</code></p>
+          <p>{{ c('输入由操作员在私有策略中逐项批准并绑定；更换文件或验收条件须重新审查摘要。', 'The operator approves and binds each input in the private policy; changed files or conditions require review of their pins.') }}</p>
+        </div>
+        <p v-if="!filteredSources.length">{{ c('暂无批准来源。支持多种 Coding Agent；也可只提供代码 Workspace 与验收条件。由操作员审查、脱敏并固定摘要；不会扫描私人会话。', 'No approved sources. Use different Coding Agents, or provide only a code workspace and acceptance conditions. Operator review and pins are required; no session discovery.') }}</p>
+        <label><input v-model="consent" data-test="consent" type="checkbox" />{{ c('我批准接入所选代码、验收条件与可选运行记录；这不授权运行 Agent。', 'I approve intake of the selected code, conditions and optional run records; this does not authorize Agent execution.') }}</label>
+        <button class="primary-button" data-test="import" :disabled="busy || !selectedSource || !consent">{{ c('导入并检查完整性', 'Import and check integrity') }}</button>
       </form>
       <div class="panel"><h3>{{ c('已接入记录', 'Saved records') }}</h3>
         <p v-if="listError" role="status" data-test="list-error">{{ listError }}</p>
         <p v-else-if="!records.length">{{ c('暂无记录', 'No records') }}</p>
         <ul><li v-for="record in records" :key="record.identity" :data-test="record.status === 'CORRUPT' ? 'corrupt-record' : 'healthy-record'">
-          <template v-if="record.status === 'AVAILABLE'"><RouterLink :to="`/external-runs/${record.identity}`">{{ record.source_id }}</RouterLink> · {{ record.source_kind }} · {{ record.acceptance }}</template>
-          <template v-else><RouterLink :to="`/external-runs/${record.identity}`">{{ c('损坏记录', 'Corrupt record') }} {{ record.identity }}</RouterLink> · {{ record.error_code }}<p>{{ guidance.EVIDENCE_RECORD_CORRUPT }}</p></template>
+          <template v-if="record.status === 'AVAILABLE'"><RouterLink :to="`/external-runs/${record.identity}`">{{ record.source_id }}</RouterLink> · {{ record.source_kind }} · <StatusBadge :value="record.acceptance" localized /></template>
+          <template v-else><RouterLink :to="`/external-runs/${record.identity}`">{{ c('损坏记录', 'Corrupt record') }} {{ record.identity }}</RouterLink> · <StatusBadge :value="record.status" localized /><p>{{ guidance.EVIDENCE_RECORD_CORRUPT }}</p></template>
+          <details data-test="record-technical-details"><summary>{{ c('技术细节', 'Technical details') }}</summary>
+            <p>{{ c('记录状态', 'Record state') }}：<code>{{ record.status }}</code></p>
+            <p v-if="record.status === 'AVAILABLE'">{{ c('验收状态原始值', 'Raw acceptance state') }}：<code>{{ record.acceptance }}</code></p>
+            <p v-else>{{ c('错误代码', 'Error code') }}：<code>{{ record.error_code }}</code></p>
+          </details>
         </li></ul>
       </div>
       <div v-if="detail" class="panel" data-test="detail">
         <h3>{{ detail.record.source.source_id }} · {{ detail.record.source.source_kind }}</h3>
-        <p data-test="acceptance">{{ c('独立 Workspace 验收', 'Independent Workspace acceptance') }}：{{ detail.diagnosis.workspace_acceptance }} · {{ detail.diagnosis.independent_verification.passed_checks }}/{{ detail.diagnosis.independent_verification.checks }}</p>
-        <p>{{ detail.record.episode_identity ? c('原 Episode 保留', 'Original Episode retained') : c('未提供可导入的原 Episode；验收状态', 'No importable original Episode supplied; acceptance') }}：{{ detail.diagnosis.original_episode_acceptance }}</p>
-        <p v-if="detail.diagnosis.workspace_acceptance === 'NOT_VERIFIED'">{{ c('缺少可信任务或独立验收，保持未验证。新的验收须由操作员在隔离 Verifier 中单独授权，随后刷新读取。', 'Without a trusted task or independent result, acceptance stays unverified. New checks require separate operator authorization in the isolated Verifier; reload afterwards.') }}</p>
-        <p>{{ detail.record.completeness.integrity }} · {{ detail.record.completeness.coverage }} · {{ detail.record.completeness.origin }}</p>
-        <p>{{ c('缺失字段', 'Missing fields') }}：{{ detail.record.completeness.missing_fields.join(', ') }}</p>
-        <h4>{{ c('诊断观察', 'Diagnostic observations') }}</h4>
-        <p>{{ c('Agent 自报事件', 'Agent report events') }}：{{ detail.diagnosis.agent_self_reports.join(', ') || '—' }} · {{ c('工具失败事件', 'Failed tool events') }}：{{ detail.diagnosis.observed_failed_tools.join(', ') || '—' }}</p>
-        <p>{{ c('基础设施状态', 'Infrastructure status') }}：{{ detail.diagnosis.infrastructure.status }} · {{ c('根因未确立', 'Root cause not established') }}</p>
-        <p>{{ c('文件变化', 'File changes') }}：{{ detail.diagnosis.file_changes.status }} · {{ detail.diagnosis.file_changes.paths.join(', ') || '—' }}</p>
-        <div class="table-scroll"><table><caption>{{ c('脱敏 Trace；工具成功不等于任务通过', 'Sanitized Trace; tool success is not task acceptance') }}</caption><thead><tr><th>#</th><th>{{ c('事件', 'Event') }}</th><th>{{ c('状态', 'Status') }}</th><th>Exit</th></tr></thead><tbody><tr v-for="event in detail.record.trace" :key="event.ordinal"><td>{{ event.ordinal }}</td><td>{{ event.type }}</td><td>{{ event.status }}</td><td>{{ event.exit_code ?? 'UNKNOWN' }}</td></tr></tbody></table></div>
-        <ul><li v-for="limit in detail.diagnosis.limits" :key="limit">{{ limit }}</li></ul>
+        <p data-test="harness">{{ c('工具', 'Harness') }}：{{ detail.record.completeness.coverage === 'NO_RUN_RECORD' ? c('仅代码改动', 'Code changes only') : harnessName(detail.record.harness?.name ?? sourceHarness(detail.record.source)) }} · {{ c('版本', 'Version') }}：{{ detail.record.harness?.version ?? detail.record.source.harness?.version ?? c('未报告', 'Not reported') }}</p>
+        <AcceptanceSummary :rows="externalAcceptanceRows(detail)" />
+        <p>{{ c('证据覆盖度', 'Evidence coverage') }}：{{ coverageName(detail.record.completeness.coverage) }} · {{ c('来源未证实；摘要只核对完整性', 'Origin is unattested; digests check integrity only') }}</p>
+        <div v-if="detail.diagnosis.workspace_acceptance === 'NOT_VERIFIED'" class="verification-next-step" data-test="verification-next-step">
+          <h4>{{ c('下一步：独立验收代码改动', 'Next: independently verify the code changes') }}</h4>
+          <p>{{ c('导入只确认保存的代码和证据完整性，还没有独立验收结果。请由本地操作员单独授权检查；网页不能直接执行验收。', 'Import only confirms the integrity of the saved code and evidence; there is no independent verdict yet. A local operator must separately authorize the check; this page cannot run it directly.') }}</p>
+          <ol>
+            <li>{{ c('先确认任务验收条件可信：已有检查记录证明，这些条件能发现原始代码的问题，也能认可已知正确的修复。检查记录须与当前任务对应，最终代码须与批准导入的副本一致；缺少条件时不能跳过。', 'First confirm the task acceptance conditions are trusted: existing check records must show that they detect the original code’s problems and accept a known correct fix. Those records must match this task, and the final code must match the approved copy. Missing conditions cannot be skipped.') }}</li>
+            <li>{{ c('让操作员使用导入时已批准的配置，确认验收环境固定且与代码副本隔离。缺少条件或环境时，先完成配置，不要直接改写已批准的文件校验值。', 'Have the operator use the configuration approved at import and confirm that the verification environment is pinned and isolated from the code copy. Complete missing prerequisites first; do not simply replace approved file checksums.') }}</li>
+            <li>{{ c('操作员在本地终端按下方“技术细节”中的命令，明确确认执行一次独立检查。只检查保存的代码，不重新运行 Coding Agent，也不会自动重试。', 'In a local terminal, the operator explicitly confirms one independent check using the command under Technical details below. It checks only the saved code, without rerunning the Coding Agent or automatically retrying.') }}</li>
+            <li>{{ c('完成后点击“刷新独立验收”查看结果。缺少可信条件或有效检查时仍为未验证；0 项检查不算通过。已执行或中断的尝试不能重跑，应保留结果供操作员审查。', 'When finished, click Reload independent verification. Missing trusted conditions or valid checks stay unverified; zero checks never pass. Consumed or interrupted attempts cannot be rerun; retain the result for operator review.') }}</li>
+          </ol>
+          <RouterLink to="/plans">{{ c('查看验收任务与本地计划', 'View acceptance tasks and local plans') }}</RouterLink>
+        </div>
+        <details data-test="technical-details"><summary>{{ c('技术细节', 'Technical details') }}</summary>
+          <div v-if="detail.diagnosis.workspace_acceptance === 'NOT_VERIFIED'" data-test="verifier-technical-guidance">
+            <h4>{{ c('独立验收命令与配置', 'Independent verification command and configuration') }}</h4>
+            <p>{{ c('可信 TaskStore 任务包须已有 baseline 失败 / oracle 通过的独立准入记录；任务身份须匹配批准来源的 task_reference / task_digest，最终 Workspace 须匹配批准的摘要。使用原批准证据策略与可信任务策略；固定本地 Verifier 镜像身份及独立 runtime / artifact 目录，不要改动已批准绑定。', 'The trusted TaskStore package must have independent baseline-fail / oracle-pass admission records. Task identity must match the approved source’s task_reference / task_digest, and the final Workspace must match its approved digest. Use the original approved evidence and trusted-task policies, with a pinned local Verifier image and separate runtime/artifact directories; do not alter approved bindings.') }}</p>
+            <p><code>HARNESSLAB_EXTERNAL_EVIDENCE_POLICY</code> · <code>HARNESSLAB_LOCAL_TASK_POLICY</code></p>
+            <pre class="verifier-command" data-test="verifier-command">uv run --locked harnesslab external-evidence verify-workspace {{ detail.identity }} --confirm-independent-verifier</pre>
+            <p>{{ c('在私有 API 所在主机的仓库 checkout 终端人工核对并确认。该命令仅授权一次隔离 Verifier 检查，不重跑 Agent、不自动重试。完整配置见随版本附带的 docs/EXTERNAL_CODEX_EVIDENCE.md 的 Separate independent Workspace verification 章节。', 'Manually review and confirm in the repository checkout terminal on the private API host. This command authorizes one isolated Verifier check only, with no Agent rerun or automatic retry. See the independent-verification section in the bundled docs/EXTERNAL_CODEX_EVIDENCE.md for complete setup.') }}</p>
+          </div>
+          <p data-test="acceptance">{{ c('独立 Workspace 验收', 'Independent Workspace acceptance') }}：{{ detail.diagnosis.workspace_acceptance }} · {{ detail.diagnosis.independent_verification.passed_checks }}/{{ detail.diagnosis.independent_verification.checks }}</p>
+          <p>{{ detail.record.episode_identity ? c('原 Episode 保留', 'Original Episode retained') : c('未提供可导入的原 Episode；验收状态', 'No importable original Episode supplied; acceptance') }}：{{ detail.diagnosis.original_episode_acceptance }}</p>
+          <p>{{ detail.record.completeness.integrity }} · {{ detail.record.completeness.coverage }} · {{ detail.record.completeness.origin }}</p>
+          <p>{{ c('缺失字段代码', 'Missing field codes') }}：{{ detail.record.completeness.missing_fields.join(', ') }}</p>
+          <p v-if="detail.diagnosis.independent_verification.reason">{{ c('验收原因代码', 'Verification reason code') }}：{{ detail.diagnosis.independent_verification.reason }}</p>
+          <h4>{{ c('诊断观察', 'Diagnostic observations') }}</h4>
+          <p>{{ c('Agent 自报事件', 'Agent report events') }}：{{ detail.diagnosis.agent_self_reports.join(', ') || '—' }} · {{ c('工具失败事件', 'Failed tool events') }}：{{ detail.diagnosis.observed_failed_tools.join(', ') || '—' }}</p>
+          <p>{{ c('基础设施状态', 'Infrastructure status') }}：{{ detail.diagnosis.infrastructure.status }} · {{ c('根因未确立', 'Root cause not established') }}</p>
+          <p>{{ c('文件变化', 'File changes') }}：{{ detail.diagnosis.file_changes.status }} · {{ detail.diagnosis.file_changes.paths.join(', ') || '—' }}</p>
+          <div class="table-scroll"><table><caption>{{ c('脱敏 Trace；工具成功不等于任务通过', 'Sanitized Trace; tool success is not task acceptance') }}</caption><thead><tr><th>#</th><th>{{ c('事件', 'Event') }}</th><th>{{ c('状态', 'Status') }}</th><th>Exit</th></tr></thead><tbody><tr v-for="event in detail.record.trace" :key="event.ordinal"><td>{{ event.ordinal }}</td><td>{{ event.type }}</td><td>{{ event.status }}</td><td>{{ event.exit_code ?? 'UNKNOWN' }}</td></tr></tbody></table></div>
+          <ul><li v-for="limit in detail.diagnosis.limits" :key="limit">{{ limit }}</li></ul>
+        </details>
         <button class="secondary-button" type="button" :disabled="busy" @click="loadDetail">{{ c('刷新独立验收', 'Reload independent verification') }}</button>
         <button class="secondary-button" data-test="export" type="button" :disabled="busy" @click="download">{{ c('导出脱敏证据与 Workspace', 'Export sanitized evidence and workspace') }}</button>
         <p v-if="exportDigest">{{ c('单独保存可信导出摘要供离线核验', 'Retain this trusted digest separately for offline replay') }}：<code>{{ exportDigest }}</code></p>
@@ -161,9 +208,12 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
 <style scoped>
 .external-evidence-page .builder-form label:has(input[type="checkbox"]) { display: flex; align-items: flex-start; gap: .6rem; }
 .external-evidence-page input[type="checkbox"] { width: auto; min-height: 0; flex-shrink: 0; margin-top: .25rem; }
+.verification-next-step { margin-block: 1rem; padding: 1rem; background: var(--color-surface-alt, #f5f7fa); border-radius: .6rem; }
+.verifier-command { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .85rem; }
 .table-scroll { max-width: 100%; overflow-x: auto; }
 th, td { text-align: left; padding: .35rem; white-space: nowrap; }
 caption { white-space: normal; }
+.approved-inputs { padding: 0 1rem; border-left: 3px solid var(--color-border, #d7dde5); }
 .external-evidence-page code { overflow-wrap: anywhere; }
 .external-evidence-page li { overflow-wrap: anywhere; }
 </style>

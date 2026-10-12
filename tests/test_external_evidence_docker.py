@@ -15,10 +15,12 @@ from harnesslab.local_plans.tasks import LocalImport, import_task, load_policy
 from harnesslab.tasks.package import TaskPackage, digest_tree
 from tests.local_execution_helpers import prepare_execution_fixture
 from tests.test_external_evidence import native_source
+from tests.test_external_evidence_generic import generic_source
 
 
+@pytest.mark.parametrize("harness", ["codex-hooks", "claude-code", "code-only"])
 async def test_independent_saved_workspace_pass_fail_timeout_and_consumed_attempt(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, harness: str
 ) -> None:
     # Two actual isolated baseline/oracle observations, not fabricated admission receipts.
     task_policy, execution_path, package_path = await prepare_execution_fixture(
@@ -37,7 +39,11 @@ async def test_independent_saved_workspace_pass_fail_timeout_and_consumed_attemp
     original = PinnedVerifierSandbox.__init__
     for scenario in ("baseline", "oracle", "timeout", "interrupted"):
         case_root = tmp_path / ("case-" + scenario)
-        source = native_source(case_root)
+        source = (
+            native_source(case_root)
+            if harness == "codex-hooks"
+            else generic_source(case_root, harness)
+        )
         shutil.rmtree(source.workspace)
         shutil.copytree(package_path / "workspace", source.workspace)
         if scenario != "baseline":

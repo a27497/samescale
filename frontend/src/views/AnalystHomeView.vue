@@ -13,9 +13,10 @@ const { access, loadAccess } = useAnalystAccess()
 const route = useRoute()
 const router = useRouter()
 function openRequestedExample() {
+  if (access.value !== 'public') return
   if (route.query.example === 'offline' || route.query.example === 'historical') void open(route.query.example, false)
 }
-onMounted(() => { void loadAccess(); openRequestedExample() })
+onMounted(async () => { await loadAccess(); openRequestedExample() })
 watch(() => route.query.example, value => { if ((value === 'offline' && example.value?.kind === 'offline_fake') || (value === 'historical' && example.value?.kind === 'historical_real')) return; openRequestedExample() })
 const example = ref<InvestigationExample | null>(null)
 const busy = ref(false)
@@ -25,6 +26,7 @@ const requestedKind = ref<'offline' | 'historical'>('offline')
 let sequence = 0
 onUnmounted(() => { sequence++ })
 async function open(kind: 'offline' | 'historical', focus = true) {
+  if (access.value !== 'public') return
   const request = ++sequence
   requestedKind.value = kind
   busy.value = true; error.value = ''; example.value = null
@@ -45,8 +47,8 @@ async function open(kind: 'offline' | 'historical', focus = true) {
     <div class="home-hero"><span class="guide-badge">{{ c('从保存的证据开始', 'START WITH SAVED EVIDENCE') }}</span><h2>{{ c('从运行证据，看清 Agent 交付结果', 'Understand agent outcomes through evidence') }}</h2><p>{{ c('对照 Agent 的完成声明与独立验收记录，追踪失败线索，明确结论能够证明什么。', 'Compare agent claims with independent verification, investigate failure signals, and understand what the evidence supports.') }}</p>
       </div>
     <div class="entry-cards">
-      <article><div class="entry-top"><CircleCheck class="entry-icon" /><StatusBadge value="FIXTURE_OFFLINE" localized /></div><h3>{{ c('固定离线调查', 'Offline investigation') }}</h3><p>{{ c('用固定合成案例体验调查流程和事实校验。不调用模型，也不保存为当前会话。', 'Explore the investigation flow with a fixed synthetic case. No model calls or saved session.') }}</p><button class="primary-button entry-link" :disabled="busy" @click="open('offline')"><span>{{ c('体验离线调查', 'Try offline investigation') }}</span><ArrowRight class="ui-icon" /></button></article>
-      <article><div class="entry-top"><Clock class="entry-icon" /><StatusBadge value="HISTORICAL_REAL" localized /></div><h3>{{ c('历史真实调查', 'Historical real investigation') }}</h3><p>{{ c('阅读一份已冻结的真实模型调查报告。原会话不会在此恢复或继续执行。', 'Read a frozen report from a bounded real-model investigation. The original session is not resumed here.') }}</p><button class="entry-link" :disabled="busy" @click="open('historical')"><span>{{ c('阅读历史报告', 'Read historical report') }}</span><ArrowRight class="ui-icon" /></button></article>
+      <article v-if="access === 'public'"><div class="entry-top"><CircleCheck class="entry-icon" /><StatusBadge value="FIXTURE_OFFLINE" localized /></div><h3>{{ c('固定离线调查', 'Offline investigation') }}</h3><p>{{ c('用固定合成案例体验调查流程和事实校验。不调用模型，也不保存为当前会话。', 'Explore the investigation flow with a fixed synthetic case. No model calls or saved session.') }}</p><button class="primary-button entry-link" :disabled="busy" @click="open('offline')"><span>{{ c('体验离线调查', 'Try offline investigation') }}</span><ArrowRight class="ui-icon" /></button></article>
+      <article v-if="access === 'public'"><div class="entry-top"><Clock class="entry-icon" /><StatusBadge value="HISTORICAL_REAL" localized /></div><h3>{{ c('历史真实调查', 'Historical real investigation') }}</h3><p>{{ c('阅读一份已冻结的真实模型调查报告。原会话不会在此恢复或继续执行。', 'Read a frozen report from a bounded real-model investigation. The original session is not resumed here.') }}</p><button class="entry-link" :disabled="busy" @click="open('historical')"><span>{{ c('阅读历史报告', 'Read historical report') }}</span><ArrowRight class="ui-icon" /></button></article>
       <article><div class="entry-top"><Lock class="entry-icon" /><StatusBadge :value="access === 'public' ? 'READ_ONLY' : 'CURRENT_SESSIONS'" localized /></div>
         <h3>{{ access === 'public' ? c('公开演示 · 只读', 'Public demo · Read-only') : c('已保存调查', 'Saved investigations') }}</h3>
         <template v-if="access === 'public'"><p>{{ c('沿一组已保存的离线样例查看运行、独立验收、失败诊断与候选对比。持久化会话仅限本地 / 私有工作区。', 'Follow a saved offline fixture through runs, verification, diagnosis, and comparison. Persistent sessions are limited to local / private workspaces.') }}</p><RouterLink class="entry-link" to="/demo"><span>{{ c('浏览公开证据', 'Explore public evidence') }}</span><ArrowRight class="ui-icon" /></RouterLink></template>

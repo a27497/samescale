@@ -1,5 +1,47 @@
 # SameScale Product — Public Product Contract
 
+## Tool-neutral private intake — 2026-10-12
+
+SameScale is an **AI Coding task acceptance and evidence workbench**. The minimum inputs are a
+reviewed final Workspace and separate task acceptance conditions. A saved run log is optional;
+code-only intake has `NO_RUN_RECORD`, no inferred run state, no invented Episode and no self-report.
+Product navigation and private investigation entry contain no built-in examples; the explicitly
+configured read-only public/website demonstration retains its existing historical routes and assets.
+
+New records use `external-run-evidence-v1` and generic format IDs, with harness name, nullable version
+(unknown is never guessed), converter-owned extensions and partial coverage. The four Codex readers
+remain the first converter; Claude Code stream-json reuses `multi_harness` NormalizedTrace parsing.
+The pipeline does not depend on ATIF or OpenTelemetry. Existing `external-codex-evidence-v1` stored
+records retain original identities, task bindings and receipts. No migration rewrites frozen evidence.
+
+Only explicitly operator-supplied, reviewed and pinned files are accepted. UI tool selection filters
+approved inputs after unlock. “All sources” is a filter, not a detection mode. Approved `auto-v1`
+files are identified by the backend during intake; unidentified auto sources remain selectable under
+both Codex and Claude filters. Only metadata-free legacy `codex-*`, `native-hook-v1` and
+`verified-hook-v1` imply Codex; other formats show “Not reported” until metadata is supplied or a
+converter resolves the imported bytes. The selector grants no arbitrary path/file upload, automatic approval or session discovery.
+All tools share the existing operator/origin, consent, pin, bounded acquisition and privacy gates.
+New formats require a separately bound task reference/digest. That mapping alone is not qualification
+or acceptance. New Workspace checks still require the existing admitted TaskStore and separately
+authorized isolated Verifier CLI. Unverified detail pages include the record-bound CLI command,
+trusted task/image/policy prerequisites and reload instructions, including code-only records.
+This is operator guidance, not a browser execution/authorization API. Acceptance fields are localized;
+raw codes, original statuses and diagnostics remain under collapsed technical details.
+The acceptance-tasks page describes multi-tool intake separately from the Codex-only local planning
+configuration and closed real-Codex execution. Import/result completion/replay integrity never means task pass.
+`NOT_VERIFIED`, `NOT_RUN`, `CORRUPT`, zero-check refusal and `NOT_ATTESTED` retain their meanings.
+
+This minimum version accepts final UTF-8 Workspaces; baseline+diff application and arbitrary binaries
+remain unsupported. Cursor/DeepSeek/other tools can supply code-only inputs; native log converters
+for them are not implemented. Auto-detection is limited to supplied Codex/Claude JSONL stream envelopes;
+ambiguous, mixed and malformed streams refuse. Partial Claude events may remain `UNKNOWN`;
+process exit, usage/cost, tool-call links and source authenticity remain unknown where absent.
+No real model/Agent call, backend execution capability, provider/account access, PR, merge or deployment.
+[Input contract and limits](docs/EXTERNAL_RUN_EVIDENCE.md) ·
+[Setup](docs/EXTERNAL_EVIDENCE_QUICKSTART.md).
+
+The dated sections below retain their historical scope.
+
 Individual corrupt saved records now remain visibly `CORRUPT` without a verdict; healthy siblings
 remain listable/readable/exportable. Corrupt detail, export and verification refuse; global
 policy/storage/permission errors still reject access. Read-only configuration diagnostics and the

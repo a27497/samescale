@@ -57,8 +57,9 @@ async function load() {
     else demo.value = result
   } catch (failure) {
     if (request !== sequence) return
-    const code = (failure as { response?: { data?: { error?: { code?: string } } } })?.response?.data?.error?.code
-    error.value = code === 'DEMO_NOT_CONFIGURED' ? 'configuration' : 'integrity'
+    const response = (failure as { response?: { status?: number; data?: { error?: { code?: string } } } })?.response
+    const code = response?.data?.error?.code
+    error.value = code === 'DEMO_NOT_CONFIGURED' ? 'configuration' : !response || (!code && (response.status ?? 0) >= 500) ? 'unavailable' : 'integrity'
   } finally { if (request === sequence) loading.value = false }
   if (demo.value) void loadDetails(request)
 }
@@ -68,7 +69,7 @@ onMounted(load)
   <section class="public-demo visual-demo" :aria-busy="loading || supplementLoading">
     <div class="demo-intro"><span class="guide-badge">{{ c('只读证据导览', 'READ-ONLY EVIDENCE WALKTHROUGH') }}</span><h2>{{ c('Agent 说完成了，独立验收怎么说？', "The agent says it's done. What does verification show?") }}</h2><p>{{ c('从交付结果出发，沿证据、诊断和候选对比继续调查。', 'Start with the outcome, then follow evidence, diagnosis and comparison.') }}</p></div>
     <PageState v-if="loading" kind="loading">{{ c('正在核对演示证据完整性…', 'Checking demo evidence integrity…') }}</PageState>
-    <PageState v-else-if="error" kind="error">{{ error === 'configuration' ? c('此工作区尚未配置公开演示。', 'No public demo is configured for this workspace.') : c('演示证据暂不可用，完整性校验未通过。未展示替代结果。', 'Demo evidence is unavailable: integrity checks failed. No substitute results were shown.') }}<button class="secondary-button" @click="load">{{ c('重试', 'Retry') }}</button><RouterLink class="table-link" to="/analyst?example=offline">{{ c('查看离线调查案例', 'View offline investigation') }}</RouterLink></PageState>
+    <PageState v-else-if="error" kind="error">{{ error === 'configuration' ? c('此工作区尚未配置公开演示。', 'No public demo is configured for this workspace.') : error === 'unavailable' ? c('未连接到后端服务或尚未配置；这不表示证据损坏。', 'The backend is not reachable or not configured; this does not indicate corrupted evidence.') : c('演示证据暂不可用，完整性校验未通过。未展示替代结果。', 'Demo evidence is unavailable: integrity checks failed. No substitute results were shown.') }}<button class="secondary-button" @click="load">{{ c('重试', 'Retry') }}</button><RouterLink class="table-link" to="/analyst?example=offline">{{ c('查看离线调查案例', 'View offline investigation') }}</RouterLink></PageState>
     <template v-else-if="demo">
       <div class="demo-context"><StatusBadge :value="demo.provenance" localized /><span>{{ c('不启动 Agent 或调用模型', 'No agent starts or model calls') }}</span><span>{{ run ? runName(run) : c('公开演示 · 已保存运行', 'Public demo · Saved run') }}</span></div>
       <p v-if="supplementLoading" role="status" class="muted">{{ c('正在读取保存证据…', 'Loading saved evidence…') }}</p>

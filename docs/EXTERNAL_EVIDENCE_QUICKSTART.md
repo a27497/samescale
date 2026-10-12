@@ -1,8 +1,8 @@
-# 首次私有接入：已保存 Codex 证据
+# 首次私有接入：通用 AI Coding 证据
 
-本路径只读取**人工批准的单条记录和最终 Workspace**。不启动 Codex、Agent 或
+本路径只读取**人工批准的最终 Workspace、任务验收条件和可选运行记录**。不启动 Codex、Agent 或
 Verifier，不访问开发登录目录，不接管订阅。REAL_CODEX 保持关闭。
-支持格式、权利/隐私边界和容量见 [接口契约](EXTERNAL_CODEX_EVIDENCE.md)。
+支持格式、权利/隐私边界和容量见 [当前输入契约](EXTERNAL_RUN_EVIDENCE.md)。
 本轮历史 Hook 5/5 是功能回归；没有新获批开发记录，`FRESH_CASE_PENDING` 保留。
 
 ## 1. 独立安装和隔离启动条件
@@ -11,8 +11,8 @@ Verifier，不访问开发登录目录，不接管订阅。REAL_CODEX 保持关�
 不要在有未提交修改的 checkout 操作，也不要沿用正式服务的 `.env`、数据库或端口。
 以下 Bash 命令从新 checkout 的仓库根执行。先用 `ss -ltn` 确认示例端口未占用；若被占用，
 换两个端口。选择全新 Compose 项目名，先用 `docker compose ls` 确认未存在。
-这些命令需要包含 P1 修复的版本：PR 尚未合并时，clone 后先
-`git switch codex/external-evidence-p1-20261011`（跟踪同名远端分支）；合并后使用已验收 main。
+这些命令需要本轮版本，clone 后先
+`git switch feat/acceptance-workbench-v2`（跟踪同名远端分支）；尚未宣称 main 已具备本轮行为。
 
 ```bash
 git clone https://github.com/a27497/samescale.git samescale-private
@@ -71,13 +71,20 @@ uv run --locked harnesslab external-evidence check
 ## 3. 人工审查并固定摘要
 
 逐项核对来源身份、保存方式和最终 Workspace 的配对。由人审查文本及文件名中的私人信息、
-凭据、原始会话、隐藏 verifier/oracle 和第三方权利。不要扫描 `~/.codex`，不要把私有 rollout
+凭据、原始会话、隐藏 verifier/oracle 和第三方权利。不要扫描 `~/.codex`、`~/.claude` 或 Cursor 会话目录，不要把私有 rollout
 当作公开 `exec --json`。自动敏感模式拒绝**不能代替人工审查**。已经获准的专用目录可用：
 
-- `codex-jsonl-v1`：目录只含用户已经保存的 `events.jsonl`，不是交互会话目录；
-- `native-hook-v1`：已保存的内容为空/已脱敏 Hook spool；
-- `verified-hook-v1`：既有完整且脱敏的严格绑定 Hook bundle；
-- `codex-h-lane-v1`：既有完整 H-Lane 材料。
+- `stream-json-v1`：目录只含用户主动提供的 `events.jsonl`，另指定 `harness.name` 为
+  `codex` 或 `claude-code`，`harness.version` 为经审查版本或 `null`；
+- `auto-v1`：同样仅含 `events.jsonl`，只自动识别 Codex / Claude stream-json；混合或歧义输入拒绝；
+- `code-only-v1`：不提供 `path`、`digest` 或 `harness`，只绑定 Workspace 和验收条件；
+- `hook-v1` / `h-lane-v1`：现有 Codex Hook / H-Lane 转换器；
+- 兼容旧格式 `codex-jsonl-v1`、`native-hook-v1`、`verified-hook-v1`、`codex-h-lane-v1`。
+
+新通用格式必须提供 `task_reference` 与 `task_digest`，来自独立审查的任务验收条件。
+任务包的结构、隐藏 Verifier 与行为准入仍由[现有 TaskStore](LOCAL_PLANNING.md)负责；
+不是把 Agent 自报、日志内命令或自由文本作为可信验收。旧来源未绑定任务仍可读，但不会因此通过。
+仅代码路径的完整策略写法见[输入契约](EXTERNAL_RUN_EVIDENCE.md)。
 
 最终 Workspace 只支持非空 UTF-8 普通源文件，最多 500 文件/4 MB，无 `.git`、`.env*`、
 认证文件、verifier/oracle 或二进制。必须明确缺失内容；不要为了导入成功删掉工程再声称完整。
@@ -92,9 +99,10 @@ export SS_FORMAT=codex-jsonl-v1
 import os
 from pathlib import Path
 from harnesslab.tasks.package import digest_tree, sha256_bytes
-source = Path(os.environ['SS_SOURCE'])
-print('source:', sha256_bytes((source / 'bundle.json').read_bytes())
-      if os.environ['SS_FORMAT'] == 'verified-hook-v1' else digest_tree(source))
+if os.environ['SS_FORMAT'] != 'code-only-v1':
+    source = Path(os.environ['SS_SOURCE'])
+    print('source:', sha256_bytes((source / 'bundle.json').read_bytes())
+          if os.environ['SS_FORMAT'] == 'verified-hook-v1' else digest_tree(source))
 print('workspace:', digest_tree(Path(os.environ['SS_WORKSPACE'])))
 PY
 ```
@@ -127,12 +135,19 @@ import json, os
 from pathlib import Path
 p = Path(os.environ['HARNESSLAB_EXTERNAL_EVIDENCE_POLICY'])
 policy = json.loads(p.read_text())
-policy['sources'] = [{
+source_binding = {
     'source_id': os.environ['SS_SOURCE_ID'], 'format': os.environ['SS_FORMAT'],
-    'source_kind': os.environ['SS_KIND'], 'path': os.environ['SS_SOURCE'],
-    'digest': os.environ['SS_SOURCE_PIN'], 'workspace': os.environ['SS_WORKSPACE'],
+    'source_kind': os.environ['SS_KIND'], 'workspace': os.environ['SS_WORKSPACE'],
     'workspace_digest': os.environ['SS_WORKSPACE_PIN'],
-}]
+}
+if os.environ['SS_FORMAT'] != 'code-only-v1':
+    source_binding.update(path=os.environ['SS_SOURCE'], digest=os.environ['SS_SOURCE_PIN'])
+# 通用格式还需设置 SS_TASK_REFERENCE / SS_TASK_DIGEST；stream-json-v1 需 SS_HARNESS。
+if os.environ['SS_FORMAT'] in {'stream-json-v1', 'auto-v1', 'hook-v1', 'h-lane-v1', 'code-only-v1'}:
+    source_binding.update(task_reference=os.environ['SS_TASK_REFERENCE'], task_digest=os.environ['SS_TASK_DIGEST'])
+if os.environ['SS_FORMAT'] == 'stream-json-v1':
+    source_binding['harness'] = {'name': os.environ['SS_HARNESS'], 'version': os.environ.get('SS_HARNESS_VERSION')}
+policy['sources'] = [source_binding]
 p.write_text(json.dumps(policy, indent=2)); p.chmod(0o600)
 PY
 uv run --locked harnesslab external-evidence check
@@ -141,9 +156,20 @@ uv run --locked harnesslab serve --host 127.0.0.1 --port "$SS_API_PORT"
 
 CLI/API 仅使用这个显式策略；不自动发现来源。浏览器访问
 `http://127.0.0.1:58690/external-runs`（按实际端口调整），输入新的本地操作员口令 →
-解锁 → 选择来源 → 勾选接入同意 → 导入。口令仅在页面内存，关闭页面清除，不是 Codex Token。
+解锁 → 按工具筛选（或“全部来源”） → 选择已批准的 Workspace / 条件 / 可选记录 → 勾选同意 → 导入。口令仅在页面内存，关闭页面清除，不是 Codex Token。
 检查原 Episode、独立 Workspace 验收、来源类别、PARTIAL/缺失字段、UNKNOWN 工具退出、
 NOT_ATTESTED 来源声明。导入成功/工具成功不意味着任务通过。
+
+“全部来源”只筛选操作员已批准的来源，不读取文件或预先识别工具。`auto-v1` 在点击导入后
+由后端解析主动提供的文件，识别 Codex / Claude Code；尚无工具声明的 auto 来源在这两种筛选中
+都会保留，不出现在仅代码筛选中。只有旧的 `codex-*`、`native-hook-v1`、`verified-hook-v1`
+格式缺少工具信息时默认标为 Codex；其他格式没有工具信息显示“未报告”。
+
+未验证的记录（包括仅代码改动）会显示“下一步：独立验收代码改动”、带该记录身份的 CLI
+命令与前置条件。网页不执行或授权 Verifier。操作员必须使用原批准证据策略、可信 TaskStore
+任务策略及固定的本地 Verifier 镜像，按[独立验收契约](EXTERNAL_CODEX_EVIDENCE.md#separate-independent-workspace-verification)
+单独确认一次检查，完成后点击“刷新独立验收”。缺少准入、检查或有效结果仍保持未验证。
+摘要使用中文说明；原始状态、字段代码和诊断保留在默认折叠的“技术细节”。
 
 ## 5. 导出，两次离线复核
 

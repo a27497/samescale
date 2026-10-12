@@ -38,6 +38,7 @@ describe('Private saved Codex evidence', () => {
     const storage = vi.spyOn(Storage.prototype, 'setItem')
     const { wrapper } = await screen()
     expect(externalEvidenceApi.sources).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-test=tool]').exists()).toBe(false)
     await wrapper.get('[data-test=operator]').setValue('operator-placeholder-only')
     await wrapper.get('form').trigger('submit'); await flushPromises()
     await wrapper.get('[data-test=source]').setValue('saved-real')
@@ -59,7 +60,7 @@ describe('Private saved Codex evidence', () => {
     vi.mocked(externalEvidenceApi.detail).mockResolvedValue({ ...detail, diagnosis: { ...detail.diagnosis, workspace_acceptance: 'NOT_VERIFIED', independent_verification: { checks: 0, passed_checks: 0 } } })
     const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
     expect(wrapper.get('[data-test=acceptance]').text()).toContain('NOT_VERIFIED')
-    expect(wrapper.text()).toContain('保持未验证'); wrapper.unmount()
+    expect(wrapper.get('[data-test=verification-next-step]').text()).toContain('仍为未验证'); wrapper.unmount()
   })
   it('shows permission and integrity errors without inventing records', async () => {
     vi.mocked(externalEvidenceApi.sources).mockRejectedValue({ response: { data: { error: { code: 'LOCAL_CONFIGURATION_DISABLED' } } } })
@@ -102,8 +103,12 @@ describe('P1 isolation and onboarding', () => {
   it('unlocks mixed records and refuses corrupt detail without borrowing a verdict', async () => {
     vi.mocked(externalEvidenceApi.records).mockResolvedValue({ items: [available, corrupt] })
     const { wrapper, router } = await unlocked(`/external-runs/${detail.identity}`)
-    expect(wrapper.get('[data-test=healthy-record]').text()).toContain('VERIFIED_PASS')
-    expect(wrapper.get('[data-test=corrupt-record]').text()).toContain('EVIDENCE_RECORD_CORRUPT')
+    expect(wrapper.get('[data-test=healthy-record] .status-pill').text()).toBe('独立验收通过')
+    expect(wrapper.get('[data-test=healthy-record] [data-test=record-technical-details]').text()).toContain('VERIFIED_PASS')
+    expect(wrapper.get('[data-test=healthy-record] [data-test=record-technical-details]').attributes('open')).toBeUndefined()
+    expect(wrapper.get('[data-test=corrupt-record] .status-pill').text()).toBe('记录损坏')
+    expect(wrapper.get('[data-test=corrupt-record] [data-test=record-technical-details]').text()).toContain('CORRUPT')
+    expect(wrapper.get('[data-test=corrupt-record] [data-test=record-technical-details]').text()).toContain('EVIDENCE_RECORD_CORRUPT')
     expect(wrapper.get('[data-test=corrupt-record]').text()).not.toContain('VERIFIED_PASS')
     expect(wrapper.get('[data-test=detail]').text()).toContain('NOT_VERIFIED')
     vi.mocked(externalEvidenceApi.detail).mockRejectedValue(reject('EVIDENCE_INTEGRITY_ERROR'))
@@ -164,5 +169,103 @@ describe('P1 isolation and onboarding', () => {
     await wrapper.get('[data-test=export]').trigger('click'); await flushPromises()
     expect(wrapper.find('[data-test=detail]').exists()).toBe(false)
     expect(wrapper.get('[role=alert]').text()).toContain('EVIDENCE_INTEGRITY_ERROR'); wrapper.unmount()
+  })
+})
+
+describe('tool-neutral intake', () => {
+  const claude = { ...source, source_id: 'saved-claude', format: 'stream-json-v1', harness: { name: 'claude-code', version: 'synthetic-fixture' }, task_reference: 'custom:task/1', task_digest: 'sha256:task' }
+  const code = { ...source, source_id: 'saved-code', format: 'code-only-v1', digest: null, task_reference: 'custom:task/1', task_digest: 'sha256:task' }
+  it('filters approved inputs by tool and resets consent on a tool change', async () => {
+    vi.mocked(externalEvidenceApi.sources).mockResolvedValue({ items: [source, claude, code] })
+    const { wrapper } = await unlocked()
+    expect(wrapper.get('h2').text()).toBe('导入运行记录')
+    await wrapper.get('[data-test=tool]').setValue('claude-code')
+    expect(wrapper.get('[data-test=source]').text()).toContain('saved-claude')
+    expect(wrapper.get('[data-test=source]').text()).not.toContain('saved-real')
+    await wrapper.get('[data-test=source]').setValue('saved-claude')
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain('sha256:b')
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain('custom:task/1')
+    await wrapper.get('[data-test=consent]').setValue(true)
+    await wrapper.get('[data-test=tool]').setValue('code-only')
+    expect((wrapper.get('[data-test=consent]').element as HTMLInputElement).checked).toBe(false)
+    expect(wrapper.get('[data-test=import]').attributes('disabled')).toBeDefined()
+    await wrapper.get('[data-test=source]').setValue('saved-code')
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain('无运行记录')
+    await wrapper.get('[data-test=consent]').setValue(true)
+    vi.mocked(externalEvidenceApi.ingest).mockRejectedValue({ response: { data: { error: { code: 'EVIDENCE_PIN_MISMATCH' } } } })
+    await wrapper.get('form').trigger('submit'); await flushPromises()
+    expect(externalEvidenceApi.ingest).toHaveBeenCalledWith('saved-code', 'operator-placeholder-only')
+    expect(wrapper.find('[data-test=detail]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+  it.each([
+    ['codex', 'SUPPLIED_EXEC_JSONL_ONLY', 'Codex'],
+    ['claude-code', 'SUPPLIED_STREAM_JSON_ONLY', 'Claude Code'],
+    ['code-only', 'NO_RUN_RECORD', '仅代码改动'],
+  ])('shows truthful %s metadata without accepting a completion claim', async (name, coverage, label) => {
+    const input = name === 'code-only' ? code : name === 'claude-code' ? claude : source
+    vi.mocked(externalEvidenceApi.detail).mockResolvedValue({ ...detail, record: { ...detail.record, source: input, harness: name === 'code-only' ? null : { name, version: null }, episode_identity: null, completeness: { ...detail.record.completeness, coverage }, trace: [] }, diagnosis: { ...detail.diagnosis, workspace_acceptance: 'NOT_VERIFIED', independent_verification: { checks: 0, passed_checks: 0 }, agent_self_reports: [] } })
+    const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
+    expect(wrapper.get('[data-test=harness]').text()).toContain(label)
+    expect(wrapper.get('[data-test=acceptance]').text()).toContain('NOT_VERIFIED')
+    expect(wrapper.get('[data-test=acceptance]').text()).toContain('0/0')
+    expect(wrapper.get('[data-test=detail]').text()).not.toContain('VERIFIED_PASS')
+    expect(wrapper.get('[data-test=technical-details]').attributes('open')).toBeUndefined()
+    expect(wrapper.find('[data-test=technical-details] [data-test=acceptance]').exists()).toBe(true)
+    if (name === 'code-only') {
+      expect(wrapper.get('.acceptance-summary').text()).toContain('无运行记录')
+      expect(wrapper.get('[data-test=verifier-command]').text()).toBe(`uv run --locked harnesslab external-evidence verify-workspace ${detail.identity} --confirm-independent-verifier`)
+      expect(wrapper.find('[data-test=technical-details] [data-test=verifier-command]').exists()).toBe(true)
+      expect(wrapper.get('[data-test=verifier-technical-guidance]').text()).toContain('HARNESSLAB_LOCAL_TASK_POLICY')
+      expect(wrapper.get('[data-test=verification-next-step]').text()).not.toMatch(/TaskStore|oracle|baseline|HARNESSLAB_|Verifier|Workspace/)
+      expect(wrapper.get('[data-test=verification-next-step]').text()).toContain('网页不能直接执行验收')
+      expect(wrapper.get('[data-test=acceptance-original] .status-pill').attributes('data-status')).toBe('NOT_REPORTED')
+    }
+    wrapper.unmount()
+  })
+})
+
+describe('source filtering and honest harness attribution', () => {
+  it('labels the selector as all sources and retains unidentified auto inputs under both adapters', async () => {
+    const auto = { ...source, source_id: 'auto-unidentified', format: 'auto-v1' }
+    const declared = { ...auto, source_id: 'auto-declared-claude', harness: { name: 'claude-code', version: null } }
+    vi.mocked(externalEvidenceApi.sources).mockResolvedValue({ items: [source, auto, declared] })
+    const { wrapper } = await unlocked()
+    expect(wrapper.get('[data-test=tool] option[value=all]').text()).toBe('全部来源')
+    expect(wrapper.get('[data-test=source-filter]').text()).toContain('在点击导入后由后端识别')
+    await wrapper.get('[data-test=tool]').setValue('codex')
+    expect(wrapper.get('[data-test=source]').text()).toContain('auto-unidentified')
+    expect(wrapper.get('[data-test=source]').text()).not.toContain('auto-declared-claude')
+    await wrapper.get('[data-test=tool]').setValue('claude-code')
+    expect(wrapper.get('[data-test=source]').text()).toContain('auto-unidentified')
+    expect(wrapper.get('[data-test=source]').text()).toContain('auto-declared-claude')
+    await wrapper.get('[data-test=source]').setValue('auto-unidentified')
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain('未报告')
+    await wrapper.get('[data-test=consent]').setValue(true)
+    await wrapper.get('form').trigger('submit'); await flushPromises()
+    expect(externalEvidenceApi.ingest).toHaveBeenCalledWith('auto-unidentified', 'operator-placeholder-only')
+    wrapper.unmount()
+  })
+  it.each([
+    ['codex-jsonl-v1', 'Codex'], ['codex-h-lane-v1', 'Codex'],
+    ['native-hook-v1', 'Codex'], ['verified-hook-v1', 'Codex'],
+    ['auto-v1', '未报告'], ['hook-v1', '未报告'],
+    ['h-lane-v1', '未报告'], ['stream-json-v1', '未报告'], ['future-v1', '未报告'],
+  ])('attributes metadata-free %s honestly in input and saved detail', async (format, label) => {
+    const input = { ...source, format }
+    vi.mocked(externalEvidenceApi.sources).mockResolvedValue({ items: [input] })
+    vi.mocked(externalEvidenceApi.detail).mockResolvedValue({ ...detail, record: { ...detail.record, source: input, harness: null } })
+    const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
+    await wrapper.get('[data-test=source]').setValue(source.source_id)
+    expect(wrapper.get('[data-test=approved-inputs]').text()).toContain(`${format} · ${label}`)
+    expect(wrapper.get('[data-test=harness]').text()).toBe(`工具：${label} · 版本：未报告`)
+    expect(wrapper.find('[data-test=verification-next-step]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+  it('prefers reported record harness over legacy inference', async () => {
+    vi.mocked(externalEvidenceApi.detail).mockResolvedValue({ ...detail, record: { ...detail.record, harness: { name: 'claude-code', version: 'fixture-only' } } })
+    const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
+    expect(wrapper.get('[data-test=harness]').text()).toBe('工具：Claude Code · 版本：fixture-only')
+    wrapper.unmount()
   })
 })

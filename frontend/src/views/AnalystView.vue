@@ -135,7 +135,7 @@ onMounted(async () => {
     <h2>Analyst sessions</h2>
     <PublicAnalystNotice v-if="access === 'public'" />
     <p v-else-if="access === 'loading'" role="status">Checking workspace permissions…</p>
-    <p v-else role="alert">Workspace permissions are unavailable. Reload the page to retry. <RouterLink to="/analyst">Open offline examples →</RouterLink></p>
+    <p v-else role="alert">Workspace permissions are unavailable. Reload the page to retry. <RouterLink to="/analyst">Open investigation workspace →</RouterLink></p>
   </section>
   <section v-else class="sessions-workspace">
     <div class="page-heading"><div><span class="eyebrow">SAMESCALE / INVESTIGATIONS</span><h2>继续追踪一个工程问题</h2><p>选择已有证据，继续调查，或审阅下一步回归方案。</p></div></div>
