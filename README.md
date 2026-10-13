@@ -75,6 +75,7 @@ uv run --locked harnesslab down --project-name "$SS_PROJECT"
 - **权限与执行隔离。** 只读取用户主动提供且人工批准的文件，不扫描本地会话目录。Verifier 与代码工作区隔离，隐藏验收材料不交给被验代码；API 容器不挂载 Docker socket。
 - **副作用受控。** 本地任务计划的确认不等于执行授权；独立 Worker 的执行另行确认。已有 Fake 路径使用隔离容器，不调用模型；中断后保留证据，不自动重跑已消耗的尝试。
 - **回归可以脱离模型。** 自动 CI 检查证据读取、安全边界和前端契约；每个 PR 跑完整自动回归，离线回归隔离网络、核对固定输出并重复复核。[CI 范围与调度](docs/CI_FEEDBACK.md)记录具体保护和限制。
+  [GCP QA 自动部署与手动回滚](docs/GCP_DEPLOYMENT.md)说明 main CI 门禁、受限 SSH 与镜像回滚。
 
 技术栈：**Python / FastAPI / PostgreSQL / SQLAlchemy / Alembic / LangGraph / Vue 3 / TypeScript / Docker / GitHub Actions**。
 沿用 `src/harnesslab`、`harnesslab` CLI 和 `HARNESSLAB_*` 配置名，保留实现与历史兼容性。

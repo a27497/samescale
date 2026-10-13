@@ -1,6 +1,21 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## Current authorization — synchronize CI branch with merged main — 2026-10-13 (Asia/Shanghai)
+## Current authorization — restricted GCP QA deployment automation — 2026-10-13 (Asia/Shanghai)
+
+From main@a0ab9e8 in an independent branch/worktree, add GitHub workflow_run deployment only after
+both exact-current-main automatic CI workflows and their required jobs succeed. Use the named
+samescale-grok-qa environment, non-cancelling concurrency and a server lock. Provision one restricted
+deploy user/dedicated key: forced SSH command, exact SHA sudo rule, no Docker/general sudo/file access.
+Build SOURCE_REVISION-bound main images on the existing GCP host. Forward one-off migrations precede
+API replacement; migration failure leaves the old API running. Only api/migrate may be changed;
+protect PostgreSQL/gateway/tunnel, other projects, credentials, data volumes and old images.
+Rehearse current-main deployment and an injected HTTP health failure with automatic image rollback,
+finish healthy at a0ab9e8 or newer, and verify old container identities outside the allowed services.
+Do not merge main or manually trigger GitHub/production deployment. User configures environment
+Secrets/variable later; private key material is never printed or committed. Add offline contracts,
+run existing PR CI, create/attach a reviewable PR and report actual scope/risks, then stop.
+
+## Historical authorization — synchronize CI branch with merged main — 2026-10-13 (Asia/Shanghai)
 
 Merge main@adaa083bedb5ceb8aa167a3e9bfc6d704b200468 into existing
 `codex/ci-feedback-20261013@f8a7897`; preserve the product positioning/copy/intake changes from PR #14

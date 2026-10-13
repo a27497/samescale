@@ -1,6 +1,30 @@
 # SameScale Product — Current Milestone
 
-## Current state — CI branch synchronized with main — 2026-10-13 (Asia/Shanghai)
+## Current state — GCP QA deployment candidate rehearsed — 2026-10-13 (Asia/Shanghai)
+
+Base main@a0ab9e8; independent `codex/gcp-auto-deploy-20261013`. Added a workflow_run barrier requiring
+both exact-current-main Fast/Offline push attempts and all critical jobs, named environment and
+non-cancelling concurrency, plus a root-owned restricted server controller and server deployment lock.
+Dedicated deploy SSH account/key has forced-command/exact-SHA sudo only; no Docker/dev/general sudo
+or secret-file access. Main images build on the server with bound SOURCE_REVISION; only one-off
+forward migrate and api replacement are allowed. Migrations precede API stop; failed candidates
+restore the prior immutable image and remain failed. No schema downgrade or image/volume deletion.
+
+Actual restricted SSH current-main deployment PASS; actual injected gateway probe **403** triggered
+rollback PASS to a healthy **a0ab9e8** image. Same API address retained; **57 protected containers**
+unchanged. Account/SSH/input/concurrency/idempotence checks PASS. Root-only private key/logs and
+server api.env/password remain off GitHub. Offline deployment **17 cases PASS**; related deployment/
+CI/S3 **63 PASS / 34 subtests**, whole Ruff/format **857 files PASS**, mypy **438 sources PASS**.
+[Actual commands/results/limits](docs/qa/gcp-auto-deploy-20261013/README.md).
+
+No product logic, frozen evidence or original dirty worktree changed; no real model/Agent, main
+merge, GitHub production dispatch, gateway/PostgreSQL/tunnel/firewall/other-project changes.
+User configures environment/Secrets/variable; GitHub runner-to-server auto path is not yet executed.
+Migration was already at head; failing live SQL, incompatible-schema rollback and host crashes are
+unverified. Exact final pushed SHA/PR CI are checked at handoff, without anticipating future results.
+Only commit/push and an unmerged review PR are authorized; stop after the final report.
+
+## Historical state — CI branch synchronized with main — 2026-10-13 (Asia/Shanghai)
 
 Merge main@adaa083bedb5ceb8aa167a3e9bfc6d704b200468 (PR #14) into
 `codex/ci-feedback-20261013`, preserving both histories without rebase or force push. Only the two

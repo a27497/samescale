@@ -1,0 +1,4 @@
+#!/bin/sh
+# Avoid caller-controlled Python paths, imports, Git settings or Docker destinations.
+exec /usr/bin/env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin HOME=/root LANG=C.UTF-8 \
+    /usr/bin/python3 -I -c 'import sys; sys.path.insert(0,"/usr/local/lib/samescale-deploy"); from ops.gcp.host import main; raise SystemExit(main())' "$@"

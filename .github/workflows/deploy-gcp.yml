@@ -1,0 +1,105 @@
+name: SameScale GCP Deployment
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/deploy-gcp.yml'
+      - 'ops/gcp/**'
+      - 'tests/test_gcp_deploy.py'
+  workflow_run:
+    workflows: ['HarnessLab Fast CI', 'SameScale Offline Regression']
+    branches: [main]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+
+# Never cancel an in-flight API replacement. The server also holds an exclusive deployment lock.
+concurrency:
+  group: ${{ github.event_name == 'workflow_run' && 'deploy-samescale-grok-qa' || format('deploy-contracts-{0}', github.ref) }}
+  cancel-in-progress: false
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Check deployment safety without SSH or Docker
+        run: |
+          python3 -m unittest -v tests.test_gcp_deploy
+          sh -n ops/gcp/ssh-entry.sh ops/gcp/samescale-deploy
+
+  gate:
+    needs: contracts
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.repository == 'a27497/samescale' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ready: ${{ steps.ci.outputs.ready }}
+      sha: ${{ steps.ci.outputs.sha }}
+    steps:
+      # Default-branch workflow code only; no trigger artifacts/cache/PR code enters this job.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - id: ci
+        name: Require both successful exact-head main CI attempts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m ops.gcp.ci_gate
+
+  deploy:
+    needs: gate
+    if: needs.gate.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: samescale-grok-qa
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - id: recheck
+        name: Recheck main and CI after any environment approval wait
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m ops.gcp.ci_gate
+      - name: Deploy only the approved commit over the restricted SSH entry
+        if: steps.recheck.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOY_SHA: ${{ steps.recheck.outputs.sha }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          DEPLOY_SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$DEPLOY_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$DEPLOY_HOST" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*$ ]]
+          test -n "$DEPLOY_SSH_PRIVATE_KEY"
+          test -n "$DEPLOY_SSH_KNOWN_HOSTS"
+          umask 077
+          key="$RUNNER_TEMP/samescale-deploy-key"
+          hosts="$RUNNER_TEMP/samescale-deploy-hosts"
+          trap 'rm -f "$key" "$hosts"' EXIT
+          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > "$key"
+          printf '%s\n' "$DEPLOY_SSH_KNOWN_HOSTS" > "$hosts"
+          # The short-lived read-only job token is sent over stdin, never as an SSH argument.
+          printf '%s\n' "$GH_TOKEN" | ssh -F /dev/null -i "$key" -o IdentitiesOnly=yes -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$hosts" \
+            -o GlobalKnownHostsFile=/dev/null -o ForwardAgent=no \
+            -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=4 \
+            -T "deploy@$DEPLOY_HOST" "deploy $DEPLOY_SHA"
