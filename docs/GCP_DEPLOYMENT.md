@@ -23,8 +23,8 @@
 6. 单次运行 `migrate` 的 `alembic upgrade head`，带 `--no-deps`；此时旧 API 仍运行。
    迁移失败不替换 API 或正式 Compose 配置，不执行数据库 downgrade。
 7. 仅停止/删除旧 **api 容器**并用新镜像启动 `api --no-deps`。其他容器不重启。
-   当前 nginx 固定解析 API 地址，因此先释放原 API 地址，再检查新 API 是否使用相同地址；
-   地址或镜像不一致立即回滚，不通过修改 gateway 掩盖问题。
+   gateway 通过 Docker 内置 DNS 动态解析 `api`；新 API 可以获得不同的 IP。
+   检查镜像、现有隔离网络和 `api` 别名，部署与回滚都不要求复用原 IP。
 8. 经现有 gateway 检查 HTTP/JSON：`status=ok` 且 `database=ok` 才记录成功，并保存上一镜像。
    检查失败恢复上一镜像、确认其健康；本次部署仍返回失败，不能把回滚成功算作部署成功。
 
@@ -56,6 +56,26 @@ deploy 不加入 Docker、dev 或普通 sudo 组，不能读取 api.env/数据�
 安装器拒绝覆盖不属于本工具的既有 deploy 账户。更改部署控制器后需管理员重新审查并安装。
 SSH 服务/防火墙不用修改。
 
+### 首次配置 gateway 的动态解析
+
+管理员在审查过的 checkout 安装后，执行一次（deploy 密钥没有此权限）：
+
+```bash
+sudo python3 -I -c 'import sys; sys.path.insert(0,"/usr/local/lib/samescale-deploy"); from ops.gcp.gateway import main; raise SystemExit(main())'
+```
+
+此工具只替换既有 `proxy_pass http://api:8000` 为固定变量代理，并配置
+`resolver 127.0.0.11 valid=5s ipv6=off`、2 秒解析超时和 3 秒连接超时。
+变量不带 URI 后缀，保留原请求路径和查询参数；现有白名单、权限判断和头部规则逐字保留。
+参考 [nginx 变量代理规则](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass)
+和 [Docker 内置 DNS](https://docs.docker.com/engine/network/#dns-services)。
+
+与部署共用服务器锁，备份原配置到 root-only 运行目录；原地写入以保留现有 bind mount 的
+inode，运行 `nginx -t` 后 graceful reload，不重建或重启 gateway 容器。
+验证/reload/健康检查失败时恢复原配置并重新验证和 reload。重复执行不重复 reload。
+正常部署脚本仍只操作 api/migrate。DNS 最多缓存 5 秒，切换时可能短暂返回 502；
+健康检查按原来的 45 次、每次间隔 2 秒重试，不承诺零停机。
+
 ## 你需要配置的 GitHub environment
 
 在仓库 Settings → Environments 创建 **`samescale-grok-qa`**：
@@ -81,7 +101,17 @@ gh secret set DEPLOY_SSH_PRIVATE_KEY --repo a27497/samescale --env samescale-gro
 gh secret set DEPLOY_SSH_KNOWN_HOSTS --repo a27497/samescale --env samescale-grok-qa < ./samescale-deploy-hosts
 ```
 
-命令通过文件 stdin 读值，不把私钥放入参数或终端日志。文件留存/删除由你决定，不提交。
+命令通过文件 stdin 读值，不把私钥放入参数或终端日志，不提交。
+**确认私钥已成功导入 GitHub Secret 后，必须删除服务器上暂存的私钥，只保留部署公钥**：
+
+```bash
+gh secret list --repo a27497/samescale --env samescale-grok-qa
+ssh samescale 'rm -- /home/dev/.local/state/samescale-deploy-20261013/github_ed25519'
+```
+
+Secret 列表只显示名称/更新时间，不显示值；先核对 `DEPLOY_SSH_PRIVATE_KEY` 已建立，再删除。
+保留 `.pub`、`authorized_keys` 以及公开的 `github_known_hosts`，不要删除 SSH 主机密钥或
+其他凭据。本地下载副本也应安全保管或按凭据留存策略清理。
 `api.env`、数据库密码与 Compose 私有配置只留在服务器，不进入 GitHub Secrets 或构建上下文。
 SSH 私钥只用于 runner 临时文件，结束时删除；严格检查服务端 host key，不启用 Agent 转发。
 服务器复核 CI 使用 job 自带的**临时只读 GitHub token**，经 SSH stdin 传入，只在内存中使用；
@@ -109,7 +139,10 @@ sudo /usr/local/sbin/samescale-deploy rollback < /dev/null
 curl --fail http://127.0.0.1:18580/api/health
 ```
 
-该命令只替换 api/migrate 的镜像配置并启动 API，**不运行反向迁移**。失败时尝试恢复回滚前的
+该命令只替换 api/migrate 的镜像配置并启动 API，**不运行反向迁移，数据库结构仍是向前迁移后
+的版本**。因此每个新迁移都必须兼容上一版本的代码，否则镜像恢复也不能保证服务可用。
+采用先扩展、后收缩的变更方式，破坏旧代码的删除/重命名不能和新镜像一同直接上线。
+自动健康失败回滚也遵守这一限制。失败时尝试恢复回滚前的
 API；如果恢复也失败，命令报错并保留中断收据，需管理员处理。不要使用 `compose down`、
 `down --volumes` 或全项目 restart 来回滚。
 
@@ -130,7 +163,8 @@ sudo /usr/local/sbin/samescale-deploy --rehearse-health-failure FULL_MAIN_SHA < 
   非事务迁移失败可能已有部分变更，不能仅靠保留旧容器保证业务兼容。
 - 健康检查验证 HTTP 与数据库连接，不覆盖全部业务 UAT。未验证破坏性 schema 变更、主机断电/
   SIGKILL、磁盘耗尽或 Docker daemon 故障；回滚也可能失败，必须保留人工修复途径。
-- 会短暂中断 API。相同 API 地址未能回收时会失败/回滚；不自动修改 nginx 或网络配置。
+- 会短暂中断 API；动态 DNS 已解除 IP 复用要求，但 Docker DNS 故障仍可能导致健康检查和
+  回滚失败。部署不自动修改 nginx 或网络配置，首次动态解析配置需管理员提前完成。
 - 不删除旧镜像、数据卷或私有构建记录，需要管理员按留存策略检查磁盘容量。
 - 真正 GitHub-hosted runner 到服务器的自动路径，需要 environment/Secrets 配置且 PR 合并后
   才能验证。服务器演练和 PR CI 不等于该路径已经执行成功。

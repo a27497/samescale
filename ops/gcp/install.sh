@@ -25,6 +25,7 @@ install -o root -g root -m 644 "$root/ops/__init__.py" /usr/local/lib/samescale-
 install -o root -g root -m 644 "$root/ops/gcp/__init__.py" /usr/local/lib/samescale-deploy/ops/gcp/__init__.py
 install -o root -g root -m 644 "$root/ops/gcp/ci_gate.py" /usr/local/lib/samescale-deploy/ops/gcp/ci_gate.py
 install -o root -g root -m 644 "$root/ops/gcp/host.py" /usr/local/lib/samescale-deploy/ops/gcp/host.py
+install -o root -g root -m 644 "$root/ops/gcp/gateway.py" /usr/local/lib/samescale-deploy/ops/gcp/gateway.py
 install -o root -g root -m 755 "$root/ops/gcp/ssh-entry.sh" /usr/local/lib/samescale-deploy/ssh-entry.sh
 install -o root -g root -m 755 "$root/ops/gcp/samescale-deploy" /usr/local/sbin/samescale-deploy
 # Root owns the key file/home: deploy cannot add an unrestricted second login key.

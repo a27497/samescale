@@ -319,8 +319,8 @@ class Host:
         self.emit("FORWARD_MIGRATION_PASSED")
 
     def activate(self, version: Version) -> None:
-        # Remove ONLY the API endpoint before recreation so nginx's cached IP can be reused.
-        # Explicitly check the result; do not reload/restart nginx to conceal an address change.
+        # Only replace the API. The gateway resolves the api alias through Docker DNS;
+        # the endpoint address is an observation, never a deployment/rollback prerequisite.
         self.compose(LIVE, "stop", "--timeout", "20", "api")
         self.compose(LIVE, "rm", "--force", "api")
         write_private(LIVE, version.compose)
@@ -339,12 +339,17 @@ class Host:
                 capture=True,
             )
         )
+        endpoint = actual["networks"].get(NETWORK, {})
         if (
             actual["image"] != version.image
-            or actual["networks"][NETWORK]["IPAddress"] != version.ip
+            or not endpoint.get("IPAddress")
+            or "api" not in (endpoint.get("Aliases") or [])
         ):
-            raise DeployError("API image/address mismatch; refusing to change the gateway")
-        self.emit(f"API_STARTED revision={version.sha} image={version.image} ip={version.ip}")
+            raise DeployError("API image/network/alias mismatch")
+        self.emit(
+            f"API_STARTED revision={version.sha} image={version.image} "
+            f"ip={endpoint['IPAddress']} previous_ip={version.ip}"
+        )
 
     def healthy(self, *, rehearse: bool = False) -> bool:
         url = HEALTH if not rehearse else "http://127.0.0.1:18580/api/deploy-rehearsal-unhealthy"
@@ -485,7 +490,7 @@ def main() -> int:
             if pending.exists() and prior is not None:
                 try:
                     actual = host.current()
-                    if actual.image == prior.image and actual.ip == prior.ip and host.healthy():
+                    if actual.image == prior.image and host.healthy():
                         pending.unlink()
                 except Exception:
                     host.emit("INTERRUPTED_RECEIPT_RETAINED")

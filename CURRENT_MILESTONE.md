@@ -1,6 +1,25 @@
 # SameScale Product — Current Milestone
 
-## Current state — GCP QA deployment candidate rehearsed — 2026-10-13 (Asia/Shanghai)
+## Current state — PR #17 API address-change deployment/rollback — 2026-10-13 (Asia/Shanghai)
+
+Continued the existing deployment branch/PR. Gateway now resolves the fixed api alias via Docker
+DNS (5s cache), with a one-time administrator nginx validation/graceful reload; no container restart.
+API promotion/recovery check image/network/alias and gateway health, without requiring the old IP.
+Approved CI gates, forced SSH command and sudoers are unchanged. Docs require migrations compatible
+with previous code (image rollback never downgrades schema) and removal of the server's temporary
+private key after successful Secret import; no GitHub environment/Secrets configured in this round.
+
+Actual current-main deployment **.4 → .5 PASS**; injected 403 failure **.5 → .4**, then restored the
+previous image at **.6 PASS**, healthy main@a0ab9e8. Temporary address reservations removed;
+**57 protected containers** and approved entry hashes unchanged. The initial rehearsal helper read IP
+after stopping API and failed; saved-receipt recovery restored health before corrected rehearsals.
+Local deployment/routing **32 tests PASS**; Ruff/format **858 files PASS**, mypy **439 sources PASS**.
+Actual receipt/limits: [IP-change QA](docs/qa/gcp-ip-change-20261013/README.md).
+Final exact-SHA PR CI is verified at handoff, without anticipating its results. No product logic,
+frozen evidence, original dirty worktree, main merge, real model/Agent or automatic deployment change.
+GitHub runner-to-host path, incompatible schema changes and infrastructure failures remain untested.
+
+## Historical state — GCP QA deployment candidate rehearsed — 2026-10-13 (Asia/Shanghai)
 
 Base main@a0ab9e8; independent `codex/gcp-auto-deploy-20261013`. Added a workflow_run barrier requiring
 both exact-current-main Fast/Offline push attempts and all critical jobs, named environment and

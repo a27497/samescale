@@ -1,6 +1,18 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## Current authorization — restricted GCP QA deployment automation — 2026-10-13 (Asia/Shanghai)
+## Current authorization — PR #17 API address-change availability — 2026-10-13 (Asia/Shanghai)
+
+Continue the existing PR/branch. Remove dependence on API endpoint IP reuse for deployment and
+rollback through one-time administrator Docker DNS gateway setup, preserving request policy and
+minimizing interruption. Keep existing CI gates, sudoers and forced SSH entry design unchanged.
+Add offline IP-change/policy/recovery tests; rehearse actual current-main promotion and failed-health
+rollback with deliberately changed IPs. Finish QA healthy at main, keep unrelated containers, data,
+images, frozen evidence and original dirty worktree unchanged. Clarify image-only rollback requires
+backward-compatible migrations and server private-key deletion after Secret import. Update the same
+PR and verify its final CI; no merge or automatic-deployment enablement. Record actual results in
+[Current Milestone](../CURRENT_MILESTONE.md), report remaining limits, then stop.
+
+## Historical authorization — restricted GCP QA deployment automation — 2026-10-13 (Asia/Shanghai)
 
 From main@a0ab9e8 in an independent branch/worktree, add GitHub workflow_run deployment only after
 both exact-current-main automatic CI workflows and their required jobs succeed. Use the named

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import io
 import json
 import os
 import subprocess
@@ -13,7 +14,8 @@ from typing import Any
 from unittest.mock import patch
 
 from ops.gcp.ci_gate import REPOSITORY, REQUIRED, NotReady, event_sha, require_ci, valid_sha
-from ops.gcp.host import NETWORK, DeployError, Host, Version, images_only, rollout
+from ops.gcp.gateway import DYNAMIC, STATIC, apply_config, dynamic_config
+from ops.gcp.host import NETWORK, DeployError, Host, Version, images_only, main, rollout
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA = "a" * 40
@@ -305,7 +307,10 @@ class DeploymentTests(unittest.TestCase):
                 self.commands.append(list(args))
                 if list(args[:2]) == ["docker", "inspect"]:
                     return json.dumps(
-                        {"image": NEW_IMAGE, "networks": {NETWORK: {"IPAddress": "172.24.0.4"}}}
+                        {
+                            "image": NEW_IMAGE,
+                            "networks": {NETWORK: {"IPAddress": "172.24.0.4", "Aliases": ["api"]}},
+                        }
                     )
                 return ""
 
@@ -342,6 +347,186 @@ class DeploymentTests(unittest.TestCase):
         self.assertNotIn("workflow_dispatch", text)
         self.assertNotIn("pull_request_target", text)
         self.assertNotIn("set -x", text)
+
+    def test_ip_changes_on_promotion_and_failed_health_rollback(self) -> None:
+        class MovingHost(Host):
+            def __init__(self, directory: Path, fail: bool) -> None:
+                self.original_stat = (directory / "compose.yml").stat()
+                self.image = OLD_IMAGE
+                self.ip = "172.24.0.4"
+                self.next_ips = iter(["172.24.0.5", "172.24.0.6"])
+                self.fail = fail
+                self.messages: list[str] = []
+                self.committed = False
+
+            def run(self, args: Any, *, capture: bool = False, timeout: int = 180) -> str:
+                return json.dumps(
+                    {
+                        "image": self.image,
+                        "networks": {NETWORK: {"IPAddress": self.ip, "Aliases": ["api"]}},
+                    }
+                )
+
+            def compose(self, file: Path, *args: str, timeout: int = 180) -> str:
+                if args[0] == "up":
+                    self.image = NEW_IMAGE if NEW_IMAGE in file.read_text() else OLD_IMAGE
+                    self.ip = next(self.next_ips)
+                return ""
+
+            def emit(self, message: str) -> None:
+                self.messages.append(message)
+
+            def migrate(self, candidate: Version) -> None:
+                pass
+
+            def healthy(self, *, rehearse: bool = False) -> bool:
+                return not (self.fail and self.image == NEW_IMAGE)
+
+            def commit(self, candidate: Version, prior: Version) -> None:
+                self.committed = True
+
+        for fail in (False, True):
+            with self.subTest(fail=fail), tempfile.TemporaryDirectory() as temp:
+                live = Path(temp) / "compose.yml"
+                live.write_text(COMPOSE)
+                host = MovingHost(Path(temp), fail)
+                with patch("ops.gcp.host.LIVE", live):
+                    if fail:
+                        with self.assertRaises(DeployError):
+                            rollout(host, self.candidate, self.prior)
+                    else:
+                        rollout(host, self.candidate, self.prior)
+                self.assertEqual(host.image, OLD_IMAGE if fail else NEW_IMAGE)
+                self.assertEqual(host.ip, "172.24.0.6" if fail else "172.24.0.5")
+                self.assertEqual(host.committed, not fail)
+                self.assertTrue(any("ip=172.24.0.5 " in msg for msg in host.messages))
+                if fail:
+                    self.assertTrue(
+                        any(msg.startswith("ROLLBACK_HEALTHY") for msg in host.messages)
+                    )
+
+    def test_gateway_change_preserves_policy_headers_and_uri_and_is_idempotent(self) -> None:
+        text = "http {\n  if ($qa_allowed = 0) { return 403; }\n" + STATIC + "\n}"
+        candidate = dynamic_config(text)
+        self.assertEqual(candidate.replace(DYNAMIC, STATIC), text)
+        self.assertIn("resolver 127.0.0.11 valid=5s ipv6=off;", candidate)
+        self.assertIn("proxy_pass http://$qa_api_backend;", candidate)
+        self.assertNotIn("proxy_pass http://$qa_api_backend/", candidate)
+        self.assertEqual(dynamic_config(candidate), candidate)
+        for bad in (
+            text.replace(STATIC, "proxy_pass http://other;"),
+            text + STATIC,
+            "resolver 1.1.1.1;\n" + text,
+        ):
+            with self.assertRaises(DeployError):
+                dynamic_config(bad)
+
+    def test_failed_deploy_clears_recovered_receipt_even_when_rollback_ip_changes(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            candidate = self.candidate
+            prior = self.prior
+
+            class Controller(FakeOperations):
+                def __init__(self) -> None:
+                    super().__init__("health")
+                    self.run_id = "synthetic-contract"
+                    self.candidate_file = directory / "candidate.yml"
+
+                def recover(self) -> None:
+                    pass
+
+                def current(self) -> Version:
+                    ip = "172.24.0.6" if "activate-old" in self.events else prior.ip
+                    return Version(prior.sha, self.image, prior.compose, ip)
+
+                def prepare(self, sha: str, version: Version, *, rehearse: bool) -> Version:
+                    return candidate
+
+                def begin(self, version: Version) -> None:
+                    (directory / "pending.json").write_text("synthetic pending receipt")
+
+            controller = Controller()
+            directory.chmod(0o700)
+            with (
+                patch("ops.gcp.host.STATE") as state,
+                patch("ops.gcp.host.Host", return_value=controller),
+                patch("ops.gcp.host.os.geteuid", return_value=0),
+                patch("ops.gcp.host.signal.signal"),
+                patch("sys.stdin", io.StringIO("")),
+                patch("sys.argv", ["controller", SHA]),
+            ):
+                state.stat.return_value.st_uid = 0
+                state.stat.return_value.st_mode = 0o700
+                state.__truediv__.side_effect = lambda name: directory / name
+                self.assertEqual(main(), 1)
+            self.assertEqual(controller.current().ip, "172.24.0.6")
+            self.assertEqual(controller.image, OLD_IMAGE)
+            self.assertFalse((directory / "pending.json").exists())
+
+    def test_ip_independence_still_rejects_wrong_image_network_or_missing_alias(self) -> None:
+        for damage in ("image", "network", "alias", "address"):
+            with self.subTest(damage=damage), tempfile.TemporaryDirectory() as temp:
+                live = Path(temp) / "compose.yml"
+                live.write_text(COMPOSE)
+                host = object.__new__(Host)
+                host.original_stat = live.stat()
+                actual: dict[str, Any] = {
+                    "image": NEW_IMAGE,
+                    "networks": {NETWORK: {"IPAddress": "172.24.0.5", "Aliases": ["api"]}},
+                }
+                if damage == "image":
+                    actual["image"] = OLD_IMAGE
+                elif damage == "network":
+                    actual["networks"] = {}
+                elif damage == "alias":
+                    actual["networks"][NETWORK]["Aliases"] = None
+                else:
+                    actual["networks"][NETWORK]["IPAddress"] = ""
+                with (
+                    patch("ops.gcp.host.LIVE", live),
+                    patch.object(host, "compose", return_value=""),
+                    patch.object(host, "run", return_value=json.dumps(actual)),
+                    patch.object(host, "emit"),
+                    self.assertRaises(DeployError),
+                ):
+                    host.activate(self.candidate)
+
+    def test_gateway_reload_preserves_bind_inode_and_restores_on_failure(self) -> None:
+        for failure in ("", "validation", "reload", "health"):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temp:
+                path = Path(temp) / "nginx.conf"
+                path.write_text(STATIC)
+                inode = path.stat().st_ino
+                events: list[str] = []
+
+                def stage(
+                    name: str, events: list[str] = events, failure: str = failure, path: Path = path
+                ) -> None:
+                    events.append(name)
+                    if failure == name and path.read_text() != STATIC:
+                        raise DeployError("synthetic setup failure")
+
+                def healthy(
+                    events: list[str] = events, failure: str = failure, path: Path = path
+                ) -> bool:
+                    events.append("health")
+                    return failure != "health" or path.read_text() == STATIC
+
+                if failure:
+                    with self.assertRaises(DeployError):
+                        apply_config(
+                            path, lambda: stage("validation"), lambda: stage("reload"), healthy
+                        )
+                    self.assertEqual(path.read_text(), STATIC)
+                    self.assertEqual(events[-3:], ["validation", "reload", "health"])
+                else:
+                    apply_config(
+                        path, lambda: stage("validation"), lambda: stage("reload"), healthy
+                    )
+                    self.assertEqual(path.read_text(), DYNAMIC)
+                    self.assertEqual(events, ["validation", "reload", "health"])
+                self.assertEqual(path.stat().st_ino, inode)
 
 
 if __name__ == "__main__":
