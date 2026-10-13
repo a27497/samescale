@@ -1,5 +1,16 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：工作台中文展示与状态可读性（2026-10-13）
+
+基于 main@a0ab9e8，在独立分支完成所有前端路由的中文标题、导航、文案、空状态和
+错误说明；状态名称、颜色与上下文统一维护。原始机器状态只进入悬停提示或默认收起的
+证据详情。保留 API、数据结构、验收逻辑、证据身份与原始下载；不修改部署或锁定依赖。
+“我的运行”继续区分个人运行与离线样例，首屏提供已有示例和原实验入口。
+使用已有 `seed_public_demo.py` 生成的公开演示数据逐页浏览器检查，补充明确标注的
+缺失/错误响应替身，提供主要页面前后截图。完成前端全量测试、类型与隔离构建检查，
+在新分支提交、推送、开 PR 并核对准确提交的既有 CI。用户要求不合并，不部署，
+不启动真实模型、Judge 或 Harness 执行。完成本轮范围即停止。
+
 ## Current authorization — synchronize CI branch with merged main — 2026-10-13 (Asia/Shanghai)
 
 Merge main@adaa083bedb5ceb8aa167a3e9bfc6d704b200468 into existing

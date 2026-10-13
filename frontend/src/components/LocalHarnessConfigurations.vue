@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { metadataLabel } from '@/utils/statusLabels'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { localConfigurationApi as api, type ConfigurationOptions, type LocalHarnessConfiguration } from '@/api/localConfiguration'
 import type { ProviderModelProfile } from '@/types/registry'
@@ -55,7 +56,7 @@ onMounted(load); onBeforeUnmount(() => generation++)
       <label>{{ t('运行配置 ID') }}<input v-model="form.id" :disabled="form.revision > 0" pattern="[a-z][a-z0-9-]{0,39}" maxlength="40" required></label>
       <label>{{ t('运行配置名称') }}<input v-model="form.name" maxlength="100" required></label>
       <label>{{ t('运行预设') }}<select v-model="form.template" :aria-label="t('运行预设')" @change="form.bindings = []"><option v-for="p in options.harness_templates" :key="p.profile_id" :value="p.profile_id">{{ p.profile_id }} · {{ p.version }}</option></select></label>
-      <p v-if="preset">{{ t('预设工具') }}：{{ preset.tool_surface.join(', ') || t('无工具') }} · {{ t('推理强度') }}：{{ preset.reasoning_effort ?? t('沿用模型') }}</p>
+      <p v-if="preset">{{ t('预设工具') }}：{{ preset.tool_surface.map(metadataLabel).join('、') || t('无工具') }} · {{ t('推理强度') }}：{{ preset.reasoning_effort ? metadataLabel(preset.reasoning_effort) : t('沿用模型') }}</p>
       <fieldset class="bindings"><legend>{{ t('绑定模型版本') }}</legend><label v-for="id in preset?.supported_provider_profile_ids" :key="id"><input v-model="form.bindings" type="checkbox" :value="id">{{ id }}</label><label v-for="id in staleBindings" :key="id"><input v-model="form.bindings" type="checkbox" :value="id">{{ t('失效绑定') }}：{{ id }}</label></fieldset>
       <p v-if="form.bindings.some(id => !preset?.supported_provider_profile_ids.includes(id))" role="alert">{{ t('绑定已失效，请重新选择当前模型版本。') }}</p>
       <label class="checkbox"><input v-model="form.enabled" type="checkbox">{{ t('启用运行配置') }}</label>

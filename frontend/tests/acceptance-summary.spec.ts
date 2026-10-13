@@ -8,7 +8,7 @@ import { workbenchApi } from '@/api/client'
 import type { RunDetail } from '@/types/workbench'
 import type { EvidenceDetail } from '@/api/externalEvidence'
 
-vi.mock('@/api/client', () => ({ workbenchApi: { listExperiments: vi.fn(), getRuns: vi.fn() } }))
+vi.mock('@/api/client', () => ({ workbenchApi: { listExperiments: vi.fn(), getRuns: vi.fn(), getRun: vi.fn() } }))
 const missing = { value: null, status: 'NOT_REPORTED' } as unknown as RunDetail['verifier_score']
 const run = { run_id: 'r1', experiment_id: 'e1', cell_id: 'c', task_id: 't', task_version: '1', lane: 'H', repeat_index: 0, status: 'failed', provenance: 'UNVERIFIED_SOURCE', normalized_outcome: null, attempt: 1, duration_ms: missing, slot_id: 's', source_outcome: null, requested_model: null, observed_model: null, provider_route: null, harness: null, harness_version: null, trace_coverage: null, evidence_digest: null, artifact_name: null, verifier_passed: null, verifier_score: missing, summary: null, input_tokens: missing, output_tokens: missing, explicit_cost: missing, comparability: null, comparability_reason_codes: [] } as RunDetail
 const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/:p(.*)*', component: { template: '<div />' } }] })
@@ -34,13 +34,16 @@ describe('acceptance summary', () => {
     expect(wrapper.text()).toContain('缺少可信任务绑定或独立验收结果')
     expect(wrapper.text()).not.toMatch(/run_record|actual_model|usage|future_field|TRUSTED_TASK_OR_VERIFIER_MISSING/)
   })
-  it('home empty state guides to import, not demo, and hides fixtures', async () => {
-    vi.mocked(workbenchApi.listExperiments).mockResolvedValue({ items: [{ experiment_id: 'f', provenance: 'FIXTURE_OFFLINE' }], total: 1, limit: 20, offset: 0 } as never)
+  it('home separates personal empty state from explicitly labelled fixture entries', async () => {
+    vi.mocked(workbenchApi.listExperiments).mockResolvedValue({ items: [{ experiment_id: 'f', name: 'Public Demo — offline fixture baseline', planned_run_count: 6, provenance: 'FIXTURE_OFFLINE' }], total: 1, limit: 20, offset: 0 } as never)
+    vi.mocked(workbenchApi.getRuns).mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 })
     const wrapper = mount(RunsHomeView, { global: { plugins: [router] } }); await flushPromises()
-    expect(workbenchApi.getRuns).not.toHaveBeenCalled()
+    expect(workbenchApi.getRuns).toHaveBeenCalledExactlyOnceWith('f', { limit: 50 })
     expect(wrapper.find('[data-test="runs-empty"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('导入运行记录')
-    expect(wrapper.text()).not.toContain('演示')
+    expect(wrapper.get('[data-test=example-entry]').text()).toContain('公开演示 · 基线')
+    expect(wrapper.get('[data-test=example-entry] a').attributes('href')).toBe('/demo')
+    expect(wrapper.find('[data-test=runs-table]').exists()).toBe(false)
   })
   it('backend unreachable is not reported as corruption', async () => {
     vi.mocked(workbenchApi.listExperiments).mockRejectedValue(new Error('network'))

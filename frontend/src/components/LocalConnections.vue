@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { metadataLabel } from '@/utils/statusLabels'
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { localConfigurationApi as api, type ConnectionMetadata, type CredentialMetadata } from '@/api/localConfiguration'
 import type { ProviderDefinition } from '@/types/registry'
@@ -96,7 +97,7 @@ onMounted(load); onBeforeUnmount(() => { generation++; key.value = ''; connectio
           <label>{{ t('连接 ID') }}<input v-model="connection.id" :disabled="connection.revision > 0" maxlength="32" pattern="[a-z][a-z0-9-]{0,31}" required></label>
           <label>{{ t('连接名称') }}<input v-model="connection.name" maxlength="100" required></label>
           <label>{{ t('服务商模板') }}<select v-model="connection.provider" :aria-label="t('服务商模板')" @change="connection.protocol = protocols[0] ?? ''"><option v-for="p in providers" :key="p.provider_id" :value="p.provider_id">{{ p.display_name }}</option></select></label>
-          <label>{{ t('协议') }}<select v-model="connection.protocol" :aria-label="t('协议')"><option v-for="protocol in protocols" :key="protocol" :value="protocol">{{ protocol }}</option></select></label>
+          <label>{{ t('协议') }}<select v-model="connection.protocol" :aria-label="t('协议')"><option v-for="protocol in protocols" :key="protocol" :value="protocol">{{ metadataLabel(protocol) }}</option></select></label>
           <label>{{ t('新的服务地址') }}<input v-model="connection.url" type="url" autocomplete="off" placeholder="https://provider.example/v1" maxlength="500" :required="connection.revision === 0"></label>
           <label>{{ t('凭据来源') }}<select v-model="connection.credential" :aria-label="t('凭据来源')"><option value="">{{ t('沿用模板环境变量') }} · {{ provider?.credential_ref }}</option><option v-for="item in credentials" :key="item.credential_id" :value="item.credential_id">{{ item.name }} · v{{ item.revision }} · {{ t(item.enabled ? '已启用' : '已停用') }}</option></select></label>
           <label class="check-row"><input v-model="connection.enabled" type="checkbox">{{ t('启用连接') }}</label>

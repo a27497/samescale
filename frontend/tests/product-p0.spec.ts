@@ -40,7 +40,7 @@ describe('State scope and accessible evidence', () => {
     const badge = mount(StatusBadge, { props: { value, context, localized: true } })
     expect(badge.text()).toBe(expected); expect(badge.classes()).toContain('neutral')
     expect(badge.attributes('data-status')).toBe(value)
-    expect(badge.attributes('tabindex')).toBeUndefined(); expect(badge.attributes('title')).toBeUndefined()
+    expect(badge.attributes('tabindex')).toBeUndefined(); expect(badge.attributes('title')).toBe(value)
     expect(badge.attributes('aria-label')).toBeUndefined(); expect(badge.find('code').exists()).toBe(false)
   })
   it('does not interpret a failed event as a failed run or task verdict', () => {
@@ -56,7 +56,7 @@ describe('State scope and accessible evidence', () => {
     expect(wrapper.get('.technical-fields').text()).toContain('FILE_CHANGE')
     expect(wrapper.get('.technical-fields').text()).toContain('completed')
     expect(wrapper.find('.status-pill[tabindex]').exists()).toBe(false)
-    expect(wrapper.find('.status-pill[title]').exists()).toBe(false)
+    expect(wrapper.get('.status-pill[data-status=FILE_CHANGE]').attributes('title')).toBe('FILE_CHANGE')
   })
   it('keeps the same sidebar links when entering or leaving Run Detail', async () => {
     const wrapper = mount(App, { global: { plugins: [router], stubs: { RouterView: true } } })

@@ -1,3 +1,4 @@
+import { sourceCopy } from '@/utils/sourceCopy'
 import { copy as c } from '@/composables/visualLocale'
 import type { RunDetail, TraceResponse } from '@/types/workbench'
 import type { EvidenceDetail } from '@/api/externalEvidence'
@@ -22,8 +23,8 @@ export function runAcceptanceRows(run: RunDetail, trace: TraceResponse | null): 
   if (!claim) unknown.push(c('Agent 自报', 'agent self-report'))
   if (!run.evidence_digest) unknown.push(c('证据摘要', 'evidence digest'))
   return [
-    { key: 'original', label: l.original, status: run.status, detail: `${c('终态', 'Terminal state')}：${run.status} · ${c('Agent 自报', 'Agent self-report')}：${claim ?? c('未报告', 'not reported')}` },
-    { key: 'checked', label: l.checked, status: verdict, detail: run.verifier_passed === null ? c('没有已保存的独立验收结论；不视为通过。', 'No saved independent verdict; not treated as a pass.') : `${c('独立 Verifier', 'Independent verifier')}：${run.summary ?? c('未报告摘要', 'no summary reported')}` },
+    { key: 'original', label: l.original, status: run.status, detail: claim ? c('已保存 Agent 自报；请在下方核对消息与独立验收，运行结束不代表任务通过。', 'Agent claim saved; inspect it against verification below. A terminal state does not establish a pass.') : c('未报告 Agent 自报；运行状态与独立验收分开记录。', 'No Agent claim reported; lifecycle and verification are separate.') },
+    { key: 'checked', label: l.checked, status: verdict, detail: run.verifier_passed === null ? c('没有已保存的独立验收结论；不视为通过。', 'No saved independent verdict; not treated as a pass.') : `${c('独立 Verifier', 'Independent verifier')}：${run.summary ? sourceCopy(run.summary) : c('未报告摘要', 'no summary reported')}` },
     { key: 'unverified', label: l.unverified, status: unknown.length ? 'NOT_VERIFIED' : 'NOT_REPORTED', detail: unknown.length ? unknown.join('、') : c('记录未标出其他未验证项；未覆盖的要求仍可能存在。', 'No other unverified items flagged; uncovered requirements may still exist.') },
     { key: 'replay', label: l.replay, status: run.evidence_digest ? 'AVAILABLE' : 'NOT_REPORTED', detail: run.evidence_digest ? c('可下载安全证据 JSON，并按摘要离线核对。', 'Download safe evidence JSON and check it offline against the digest.') : c('缺少证据摘要，离线复核无法确认完整性。', 'No evidence digest; offline integrity cannot be confirmed.') },
   ]

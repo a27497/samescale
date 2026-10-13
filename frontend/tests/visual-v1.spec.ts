@@ -48,7 +48,7 @@ describe('Visual v1 evidence and locale contracts', () => {
     expect(absent.find('[data-status="NOT_REPORTED"]').exists()).toBe(true); expect(absent.text()).not.toContain('0.00'); expect(zero.text()).toBe('0.00')
     expect(mount(StatusBadge, { props: { value: 'VERIFIED_PASS', localized: true } }).classes()).toContain('good')
     expect(mount(StatusBadge, { props: { value: 'NOT_COMPARABLE', localized: true } }).classes()).toContain('warn')
-    expect(mount(StatusBadge, { props: { value: 'NOT_RUN', localized: true } }).classes()).toContain('neutral')
+    expect(mount(StatusBadge, { props: { value: 'NOT_RUN', localized: true } }).classes()).toContain('warn')
     const unknown = mount(StatusBadge, { props: { value: 'UNKNOWN_STATUS_V1', localized: true } })
     expect(unknown.get('.status-pill > span').text()).toBe(locale === 'zh-CN' ? '未识别状态' : 'Unknown status'); expect(unknown.attributes('data-status')).toBe('UNKNOWN_STATUS_V1'); expect(unknown.classes()).toContain('neutral')
   })
@@ -149,7 +149,7 @@ describe('Visual v1 evidence and locale contracts', () => {
     expect(badge.attributes('data-status')).toBe('failed_subject')
     expect(badge.text()).not.toMatch(/验收|verification/i)
     expect(badge.classes()).toContain('bad')
-    expect(mount(StatusBadge, { props: { value: 'failed_subject' } }).text()).toBe('Subject run failed')
+    expect(mount(StatusBadge, { props: { value: 'failed_subject' } }).text()).toBe(locale === 'zh-CN' ? '主体运行失败' : 'Subject run failed')
   })
   it.each([
     ['zh-CN', true, 'VERIFIED_PASS', '查看实验诊断'],

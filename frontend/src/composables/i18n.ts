@@ -10,7 +10,7 @@ export function t<T>(message: T): T | string {
 }
 
 const interfaceLanguage: InjectionKey<string> = Symbol('interfaceLanguage')
-// Advanced Connections uses English like the surrounding Registry pages.
+// Nested editors inherit the selected interface language.
 export function useTranslation(language?: string) {
   const inherited = inject(interfaceLanguage, undefined)
   if (language) provide(interfaceLanguage, language)
