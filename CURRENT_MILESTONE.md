@@ -13,7 +13,7 @@ Actual current-main deployment **.4 → .5 PASS**; injected 403 failure **.5 →
 previous image at **.6 PASS**, healthy main@a0ab9e8. Temporary address reservations removed;
 **57 protected containers** and approved entry hashes unchanged. The initial rehearsal helper read IP
 after stopping API and failed; saved-receipt recovery restored health before corrected rehearsals.
-Local deployment/routing **32 tests PASS**; Ruff/format **858 files PASS**, mypy **439 sources PASS**.
+Local deployment/routing **32 tests PASS**; whole Ruff/format PASS, mypy **439 sources PASS**.
 Actual receipt/limits: [IP-change QA](docs/qa/gcp-ip-change-20261013/README.md).
 Final exact-SHA PR CI is verified at handoff, without anticipating its results. No product logic,
 frozen evidence, original dirty worktree, main merge, real model/Agent or automatic deployment change.

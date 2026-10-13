@@ -49,7 +49,7 @@ HEAD health 为既有 404，直接请求 API 同为 404，未改产品路由行�
 - `python3 -m unittest tests.test_gcp_deploy tests.test_ci_routing`：32 个测试通过
   （部署 22 + CI 路由 10），包含不同 IP 的真实 Host 激活/回滚、恢复收据清理、错误镜像/
   网络/别名拒绝、bind inode 保留、配置验证/reload/健康失败恢复及白名单字节保留。
-- Ruff/format 全仓通过（858 files），`mypy src tests scripts ops` 通过（439 sources）。
+- Ruff/format 全仓通过，`mypy src tests scripts ops` 通过（439 sources）。
 - 同一 PR 的最终 SHA 远端 Fast CI、Offline Regression 与 Deployment contracts
   在最终交付时另行核对；此记录不预报 CI 结果。
 
