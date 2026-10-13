@@ -1,5 +1,21 @@
 # SameScale Product — Current Milestone
 
+## 对外展示更新 · 2026-10-13
+
+本轮从 main@9f634dc 在独立分支更新 README 与展示文档，不改产品代码或验收逻辑。
+README 首屏说明产品价值、Mermaid 主流程、真实中文验收摘要及折叠的 75 秒录屏；
+本地启动信息原样保留。媒体仅在官网仓库，主仓库通过公开素材 Release 附件引用，不新增二进制文件；官网仓库私有，不能作为匿名素材源。
+材料来自 main 前后端和既有公开离线 seed 数据；导入入口受限、候选不可比均明确标注。
+[素材、边界与验证](docs/PUBLIC_SHOWCASE.md)；官网 PR #6 不代表部署。
+
+官网构建与 115 + 10 项浏览器检查通过；README GitHub 渲染和公开素材附件链接推送后核对，
+远端 CI 以此分支准确 SHA 为准。本次各仓库分别开 PR，不合并、不部署或刷新缓存。
+停止于展示交付，不推进 roadmap，不新增 Agent/模型/Verifier 执行。
+
+## 历史任务记录
+
+# SameScale Product — Current Milestone
+
 ## Current state — Chinese workbench presentation — 2026-10-13 (Asia/Shanghai)
 
 User-authorized frontend polish on `codex/workbench-chinese-20261013`, based on

@@ -2,17 +2,42 @@
 
 **AI Coding 任务验收与证据工作台** · *AI Coding Task Acceptance & Evidence Workbench*
 
-## Agent 说完成了，验收依据在哪里？
+## Agent 自报完成，不等于任务通过
 
-![SameScale 验收摘要：原运行未报告、独立检查尚未进行，未知项与离线复核分开展示](docs/images/acceptance-summary-1440.png)
+SameScale 帮助开发者回答：**哪些任务要求已检查、哪些失败、哪些仍然未知？**
+导入 Coding Agent 的运行证据或最终代码，把 Agent 自报与独立验收分开，再追溯失败、检查候选可比性。
+这是可本地运行的个人工程项目；官网只展示截图、录屏与保存案例，不提供在线服务。
 
-*真实产品界面（1440px），使用合成的仅代码输入；没有运行记录，独立检查尚未进行，结果保持未验证。*
+```mermaid
+flowchart LR
+    A[导入运行证据或最终代码] --> B[独立验收]
+    B --> C[失败诊断]
+    C --> D[候选对比]
+    A -. 运行日志可选 .-> E[保留来源与缺失项]
+    B -. 单独授权隔离检查 .-> F[自报不等于通过]
+    D -. 可比条件不足 .-> G[暂不判断方向]
+```
 
-AI Coding Agent 的“完成了”是一条声明。验收依据需要来自最终代码、明确的任务条件和独立检查。
-SameScale 把这些材料关联起来，让开发者看到**哪些要求已检查、哪些失败、哪些仍然未知**，并保存可离线复核的证据。
+[官网与真实界面](https://getsamescale.com/) · [静态历史证据案例](https://getsamescale.com/demo/) · [本地启动](#本地启动) · [能力契约](PUBLIC_PRODUCT_CONTRACT.md)
 
-这是一个个人工程项目，当前产品基线冻结于 `main@50ac4cf`。
-[官网与案例说明](https://getsamescale.com/) · [只读在线演示](https://getsamescale.com/demo/) · [能力契约](PUBLIC_PRODUCT_CONTRACT.md)
+![SameScale main 当前中文界面：验收摘要分开呈现原运行、独立检查、未知项与离线复核](https://github.com/a27497/samescale/releases/download/showcase-media-20261013/run-detail.webp)
+
+*从产品 main@9f634dc 在本地读取公开离线示例截取。保存的独立验收未通过；Agent 自报不会改写结论。*
+
+<details>
+<summary>播放 75 秒真实界面录屏：Runs → 导入入口 → 验收摘要 → 诊断 → 对比</summary>
+
+![75 秒中文工作台录屏：公开离线示例与受限导入入口，不执行新的模型或验收](https://github.com/a27497/samescale/releases/download/showcase-media-20261013/walkthrough-75s.gif)
+
+0–10 秒 Runs 首页；10–20 秒导入入口；20–40 秒运行证据与验收摘要；40–55 秒失败诊断；55–75 秒候选对比。
+公开演示不开放私有导入，导入画面展示真实入口与本地批准边界；没有演示成功导入。
+日志可选、独立验收需另行授权；样例可比条件不足，不判断改进方向。
+
+</details>
+
+当前界面已统一中文和可读状态；Runs 首页分开显示个人记录与已有离线示例，是否有验收结论按保存数据判断。
+多工具接入支持 Codex、Claude Code 记录与任意工具的仅代码输入；缺失信息保持未知。
+素材版本与边界见[展示素材说明](docs/PUBLIC_SHOWCASE.md)。
 
 ## 核心能力
 
@@ -28,7 +53,7 @@ SameScale 把这些材料关联起来，让开发者看到**哪些要求已检�
 典型流程：**准备代码与条件 → 人工审查并批准 → 导入 → 查看摘要 → 准备好检查条件后单独授权验收 → 导出复核**。
 导入成功、进程退出成功和 Agent 的完成声明，都不能代替任务验收通过。
 
-产品内不预置示例数据。案例 A 等历史证据复盘见[官网](https://getsamescale.com/)；官网演示使用单独的只读材料，不能当作新导入或新验收的结果。
+标准本地启动不预置示例数据。显式配置公开离线示例后，Runs 首页会另列已有示例入口，与个人记录分开。官网历史案例和本次界面素材使用单独的只读材料，不能当作新导入或新验收的结果。
 
 ## 本地启动
 
