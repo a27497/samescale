@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+import { statusLabel } from '@/utils/statusLabels'
 import { configName, taskName } from '@/utils/displayIdentity'
 import { copy as c } from '@/composables/visualLocale'
 import { init, type ECharts } from '@/charts/echarts'
@@ -14,7 +15,7 @@ let chart: ECharts | null = null
 const textualSummary = computed(() =>
   props.matrix.points.map((point) => {
     const evidence = point.metrics[props.metric]
-    const value = evidence.status === 'REPORTED' ? String(evidence.value) : 'NOT_REPORTED'
+    const value = evidence.status === 'REPORTED' ? String(evidence.value) : statusLabel('NOT_REPORTED')
     return props.localized
       ? `${point.task_id} / ${point.cell_id}: ${c('数值', 'value')}=${value}; ${c('样本量', 'n')}=${point.n}; ${c('证据层级', 'tier')}=${point.tier}; ${c('可比性', 'comparability')}=${point.comparability}`
       : `${point.task_id} / ${point.cell_id}: ${value}; n=${point.n}; ${point.tier}; ${point.comparability}`
@@ -39,9 +40,9 @@ function renderChart() {
         const evidence = point.metrics[props.metric]
         return [
           `<strong>${escapeTooltipText(point.cell_id)}</strong> × ${escapeTooltipText(point.task_id)}`,
-          `${escapeTooltipText(props.metric)}: ${evidence.status === 'REPORTED' ? evidence.value : 'NOT_REPORTED'}`,
-          `n=${point.n} · tier=${escapeTooltipText(point.tier)}`,
-          `comparability=${escapeTooltipText(point.comparability)}`,
+          `${escapeTooltipText(props.metric)}: ${evidence.status === 'REPORTED' ? evidence.value : statusLabel('NOT_REPORTED')}`,
+          `${c('样本量', 'n')}=${point.n} · ${c('证据层级', 'tier')}=${escapeTooltipText(statusLabel(point.tier))}`,
+          `${c('可比性', 'comparability')}=${escapeTooltipText(statusLabel(point.comparability))}`,
         ].join('<br/>')
       },
     },
@@ -72,7 +73,7 @@ function renderChart() {
             const evidence = props.matrix.points[params.dataIndex]?.metrics[props.metric]
             return evidence?.status === 'REPORTED' && evidence.value !== null
               ? evidence.value.toFixed(2)
-              : 'N/R'
+              : c('未报告', 'Not reported')
           },
         },
       },

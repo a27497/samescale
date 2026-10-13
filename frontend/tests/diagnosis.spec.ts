@@ -173,7 +173,7 @@ it('explains FILE_CHANGE separately from a digest-only final workspace without i
   expect(facts.text()).toContain('最终工作区无修改')
   expect(facts.text()).toContain('仅有摘要对照')
   expect(facts.text()).not.toContain('0 条路径记录')
-  expect(facts.text()).toContain('FILE_CHANGE 是事件记录')
+  expect(facts.text()).toContain('文件变化是事件记录')
   expect(facts.text()).toContain('进程执行完成也不代表任务验收通过')
   expect(wrapper.get('.raw-evidence').text()).toContain('"pattern": "no-modification"')
   expect(wrapper.get('.raw-evidence').text()).toContain('"type": "FILE_CHANGE"')

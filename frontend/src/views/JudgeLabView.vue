@@ -18,14 +18,14 @@ onMounted(async () => {
 
 <template>
   <section>
-    <div class="page-heading"><div><h2>JudgeLab calibrations</h2><p>Current JudgeLab registry — suite-scoped qualification from saved reports.</p></div><StatusBadge v-if="registry" :value="`REAL_JUDGE_SMOKE=${registry.real_judge_smoke}`" /></div>
-    <div class="notice">The release snapshot and the current JudgeLab registry are different evidence scopes. <RouterLink class="table-link" to="/core-readiness">View frozen release snapshot →</RouterLink></div>
-    <div class="notice">The phase-i-judge-keyless calibration is an offline fixture. A persisted report does not establish a real Judge model call.</div>
+    <div class="page-heading"><div><h2>JudgeLab 校准</h2><p>查看当前保存的 Judge 校准报告。校准结论只适用于对应任务套件。</p></div><span v-if="registry">真实 Judge 烟测 <StatusBadge :value="registry.real_judge_smoke" /></span></div>
+    <div class="notice">冻结发布快照与当前 JudgeLab 注册表属于不同证据范围。 <RouterLink class="table-link" to="/core-readiness">查看冻结发布快照 →</RouterLink></div>
+    <div class="notice">离线校准样例不代表真实 Judge 模型调用；保存报告也不等于执行过模型。</div>
     <div class="panel">
-      <PageState v-if="loading" kind="loading">Loading persisted Judge reports…</PageState>
-      <PageState v-else-if="error" kind="error" reload>Judge calibration evidence is unavailable.</PageState>
-      <PageState v-else-if="!items.length" kind="empty">No Judge calibration is reported.</PageState>
-      <div v-else class="responsive-table" role="region" aria-label="Judge calibrations" tabindex="0"><table class="data-table"><thead><tr><th>Calibration</th><th>Suite</th><th>Status</th><th>Report evidence</th><th>Cells</th><th>Qualification</th></tr></thead><tbody><tr v-for="item in items" :key="item.calibration_id"><td><RouterLink class="table-link technical" :to="`/judgelab/${item.calibration_id}`">{{ item.calibration_id }}</RouterLink><div class="technical muted">{{ item.plan_digest.slice(0, 20) }}…</div></td><td>{{ item.suite_id }}@{{ item.suite_version }}</td><td><StatusBadge :value="item.status" /></td><td><StatusBadge :value="item.report_evidence_status" /></td><td>{{ item.judge_cell_count }}</td><td><StatusBadge v-for="value in item.qualifications" :key="value" :value="value" style="margin-right: 4px" /></td></tr></tbody></table></div>
+      <PageState v-if="loading" kind="loading">正在读取已保存 Judge 报告…</PageState>
+      <PageState v-else-if="error" kind="error" reload>Judge 校准证据暂时无法读取。请检查后端服务或报告完整性后重试。</PageState>
+      <PageState v-else-if="!items.length" kind="empty">当前工作区暂无 Judge 校准报告。可先查看冻结发布快照；新增真实校准需由操作员单独授权。</PageState>
+      <div v-else class="responsive-table" role="region" aria-label="Judge 校准列表" tabindex="0"><table class="data-table"><thead><tr><th>校准记录</th><th>任务套件</th><th>状态</th><th>报告证据</th><th>配置数</th><th>校准结论</th></tr></thead><tbody><tr v-for="item in items" :key="item.calibration_id"><td><RouterLink class="table-link technical" :to="`/judgelab/${item.calibration_id}`">{{ item.calibration_id }}</RouterLink><div class="technical muted">{{ item.plan_digest.slice(0, 20) }}…</div></td><td>{{ item.suite_id }}@{{ item.suite_version }}</td><td><StatusBadge :value="item.status" /></td><td><StatusBadge :value="item.report_evidence_status" /></td><td>{{ item.judge_cell_count }}</td><td><StatusBadge v-for="value in item.qualifications" :key="value" :value="value" style="margin-right: 4px" /></td></tr></tbody></table></div>
     </div>
   </section>
 </template>

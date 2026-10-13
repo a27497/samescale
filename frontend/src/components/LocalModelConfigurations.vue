@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { metadataLabel } from '@/utils/statusLabels'
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { localConfigurationApi, type LocalModelConfiguration, type ConnectionMetadata, type ConfigurationOptions } from '@/api/localConfiguration'
 import type { ProviderModelProfile, HarnessDefinition, ProviderDefinition } from '@/types/registry'
@@ -102,8 +103,8 @@ onMounted(checkStatus); onBeforeUnmount(lock)
             <label>{{ t('模型用途') }}<select v-model="form.purpose" :aria-label="t('模型用途')"><option value="SUBJECT">{{ t('被测模型') }}</option><option value="ANALYST">{{ t('Analyst 模型') }}</option><option value="JUDGE">{{ t('Judge 模型') }}</option></select></label>
             <small>{{ t('仅被测模型可用于评测计划。保存用途不会切换当前 Analyst 或 Judge。') }}</small>
             <label>{{ t('配置输出 Token 上限') }}<input v-model.number="form.maxOutput" :aria-label="t('配置输出 Token 上限')" type="number" min="1" :max="controls?.max_output_tokens" step="1"><small>{{ t('计划预算不得超过此上限；留空不额外限制。') }}</small></label>
-            <label>{{ t('推理强度') }}<select v-model="form.effort" :aria-label="t('推理强度')" :disabled="!controls?.reasoning_efforts.length"><option value="">{{ t('沿用模板') }}</option><option v-for="effort in controls?.reasoning_efforts" :key="effort" :value="effort">{{ effort }}</option></select></label>
-            <label v-if="controls?.temperature_supported">temperature<input v-model.number="form.temperature" aria-label="temperature" type="number" min="0" max="2" step="0.1"></label>
+            <label>{{ t('推理强度') }}<select v-model="form.effort" :aria-label="t('推理强度')" :disabled="!controls?.reasoning_efforts.length"><option value="">{{ t('沿用模板') }}</option><option v-for="effort in controls?.reasoning_efforts" :key="effort" :value="effort">{{ metadataLabel(effort) }}</option></select></label>
+            <label v-if="controls?.temperature_supported">采样温度<input v-model.number="form.temperature" aria-label="采样温度" type="number" min="0" max="2" step="0.1"></label>
             <small v-else>{{ t('此模板未声明 temperature 支持。') }}</small>
             <label>{{ t('单次请求超时（秒）') }}<input v-model.number="form.timeout" type="number" min="1" max="600" step="1" required></label>
             <label class="local-checkbox"><input v-model="form.enabled" type="checkbox">{{ t('启用此配置') }}</label>

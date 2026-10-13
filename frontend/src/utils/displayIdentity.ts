@@ -51,3 +51,8 @@ export function referenceName(reference: string, index: number): string {
   const pair = labels[prefix ?? '']
   return `${pair ? c(...pair) : c('证据引用', 'Evidence reference')} ${index + 1}`
 }
+
+// Known product labels only; the original registry name and runtime identity remain inspectable.
+export function harnessDisplayName(item: { harness_id: string; display_name: string }): string {
+  return item.harness_id === 'direct-model' ? c('直接模型适配器', 'Direct model adapter') : item.display_name
+}

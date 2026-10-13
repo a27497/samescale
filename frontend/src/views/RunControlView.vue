@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { statusLabel } from '@/utils/statusLabels'
 import PageState from '@/components/PageState.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { workbenchApi } from '@/api/client'
 import StatusBadge from '@/components/StatusBadge.vue'
+import { experimentOption, runName, taskName } from '@/utils/displayIdentity'
 import type { ExperimentStatus, ExperimentSummary, RunSummary } from '@/types/workbench'
 
 type OutcomeClass = 'CAPABILITY_TERMINAL' | 'INFRASTRUCTURE' | 'LIFECYCLE'
@@ -42,9 +44,9 @@ const selectedIsListed = computed(() =>
 
 function controlLabel(run: RunSummary) {
   const classification = outcomeClass(run)
-  if (classification === 'INFRASTRUCTURE') return 'RECOVERY REVIEW'
-  if (classification === 'CAPABILITY_TERMINAL') return 'TERMINAL'
-  return 'OBSERVE'
+  if (classification === 'INFRASTRUCTURE') return '恢复待审查'
+  if (classification === 'CAPABILITY_TERMINAL') return '已结束'
+  return '查看状态'
 }
 
 async function loadSelected(syncRoute = true) {
@@ -66,7 +68,7 @@ async function loadSelected(syncRoute = true) {
       await router.replace({ query: { ...route.query, experiment: selectedExperimentId.value } })
     }
   } catch {
-    error.value = 'Authoritative run state could not be loaded.'
+    error.value = '运行状态暂时无法读取。请检查服务或记录完整性后重试。'
   } finally {
     refreshing.value = false
   }
@@ -80,7 +82,7 @@ onMounted(async () => {
     selectedExperimentId.value = requested || response.items[0]?.experiment_id || ''
     await loadSelected(Boolean(selectedExperimentId.value))
   } catch {
-    error.value = 'Experiment lifecycle evidence is unavailable.'
+    error.value = '实验运行记录暂时无法读取。请检查服务连接后重试。'
   } finally {
     loading.value = false
   }
@@ -91,84 +93,84 @@ onMounted(async () => {
   <section>
     <div class="page-heading">
       <div>
-        <h2>Run Control</h2>
-        <p>Observe durable lifecycle state and apply explicit recovery boundaries. This surface never retries a capability result.</p>
+        <h2>运行控制</h2>
+        <p>查看已保存的运行状态与恢复边界。任务结果保留原样，不自动重试。</p>
       </div>
       <StatusBadge :value="status?.terminal ? 'DURABLE TERMINAL' : status?.status ?? 'NOT_REPORTED'" />
     </div>
 
     <div class="control-banner">
-      <span class="control-banner-mark">RC</span>
-      <div><strong>Saved lifecycle state</strong><p>Refresh reads persisted backend state. No provider request is triggered by opening or refreshing this page.</p></div>
-      <span class="status-pill neutral">NO RETRY-ALL</span>
+      <span class="control-banner-mark">↻</span>
+      <div><strong>已保存的运行状态</strong><p>打开或刷新只读取后端已保存状态，不发起模型服务请求。</p></div>
+      <span class="status-pill neutral">不自动重试</span>
     </div>
 
-    <PageState v-if="loading" kind="loading">Loading experiment lifecycle state…</PageState>
+    <PageState v-if="loading" kind="loading">正在读取实验运行状态…</PageState>
     <template v-else>
       <div class="run-control-toolbar panel">
         <label>
-          <span>Experiment</span>
-          <select v-model="selectedExperimentId" aria-label="Run Control experiment" @change="loadSelected()">
-            <option v-if="!experiments.length" value="">No experiments reported</option>
-            <option v-else-if="selectedExperimentId && !selectedIsListed" :value="selectedExperimentId">{{ selectedExperimentId }} · direct link</option>
+          <span>实验</span>
+          <select v-model="selectedExperimentId" aria-label="选择运行控制实验" @change="loadSelected()">
+            <option v-if="!experiments.length" value="">暂无实验</option>
+            <option v-else-if="selectedExperimentId && !selectedIsListed" :value="selectedExperimentId">{{ selectedExperimentId }} · 直接打开的记录</option>
             <option v-for="item in experiments" :key="item.experiment_id" :value="item.experiment_id">
-              {{ item.name }} · {{ item.experiment_id }} · {{ item.provenance ?? 'UNVERIFIED_SOURCE' }}
+              {{ experimentOption(item, experiments) }} · {{ statusLabel(item.provenance ?? 'UNVERIFIED_SOURCE') }}
             </option>
           </select>
         </label>
         <button class="secondary-button" :disabled="refreshing || !selectedExperimentId" @click="loadSelected(false)">
-          {{ refreshing ? 'Refreshing…' : 'Refresh saved state' }}
+          {{ refreshing ? '正在刷新…' : '刷新已保存状态' }}
         </button>
-        <RouterLink v-if="selectedExperimentId" class="table-link" :to="`/experiments/${selectedExperimentId}`">Open experiment evidence →</RouterLink>
+        <RouterLink v-if="selectedExperimentId" class="table-link" :to="`/experiments/${selectedExperimentId}`">查看实验详情 →</RouterLink>
       </div>
 
       <PageState v-if="error" kind="error">{{ error }}</PageState>
       <template v-else-if="selectedExperimentId">
-        <div class="notice">Provider registration alone does not mean ready to execute. Check credential presence, runtime health and preflight in Settings and Providers. Saved fixture runs are labeled by source below.</div>
+        <div class="notice">服务商已登记不代表可以执行。请在“设置”和“服务商注册表”中检查凭据、运行环境及预检；离线示例的来源在下方单独标注。</div>
         <div class="metric-grid">
-          <div class="metric-card accent"><div class="label">Lifecycle</div><div class="value compact-value">{{ status?.status ?? 'NOT_REPORTED' }}</div><div class="detail">{{ status?.terminal ? 'Durable terminal state' : 'May still change' }}</div></div>
-          <div class="metric-card"><div class="label">Reported runs</div><div class="value">{{ runs.length }}</div><div class="detail">First 100 persisted logical runs</div></div>
-          <div class="metric-card"><div class="label">Capability terminal</div><div class="value">{{ capabilityCount }}</div><div class="detail">Never eligible for semantic retry</div></div>
-          <div class="metric-card"><div class="label">Infrastructure</div><div class="value">{{ infrastructureCount }}</div><div class="detail">Requires scoped recovery review</div></div>
+          <div class="metric-card accent"><div class="label">运行状态</div><div class="value compact-value"><StatusBadge :value="status?.status ?? 'NOT_REPORTED'" context="experiment" /></div><div class="detail">{{ status?.terminal ? '已保存终态' : '状态仍可能变化' }}</div></div>
+          <div class="metric-card"><div class="label">已记录运行</div><div class="value">{{ runs.length }}</div><div class="detail">当前读取前 100 条运行</div></div>
+          <div class="metric-card"><div class="label">任务结果已确定</div><div class="value">{{ capabilityCount }}</div><div class="detail">不能通过重试替换任务结果</div></div>
+          <div class="metric-card"><div class="label">基础设施</div><div class="value">{{ infrastructureCount }}</div><div class="detail">需按范围审查恢复条件</div></div>
         </div>
 
         <div class="recovery-policy-grid">
           <article class="policy-card terminal-policy">
             <span class="policy-icon">✓</span>
-            <div><span class="panel-kicker">TERMINAL OUTCOME</span><h3>Capability results stay final</h3><p>A verifier or capability failure is evidence. Do not rerun it to improve a score or replace its provider, model, route, or harness.</p></div>
+            <div><span class="panel-kicker">任务结果</span><h3>保留原始验收结果</h3><p>验收失败与任务失败都是证据。不能为提高分数而重跑或替换服务商、模型、路由与 Harness。</p></div>
           </article>
           <article class="policy-card recovery-policy">
             <span class="policy-icon">↻</span>
-            <div><span class="panel-kicker">EXPLICIT RECOVERY</span><h3>Infrastructure is reviewed by slot</h3><p>Recovery must preserve the frozen methodology and treatment identity. It needs an operator-approved acquisition path; this keyless shell does not invent one.</p></div>
+            <div><span class="panel-kicker">恢复审查</span><h3>按运行单元审查基础设施恢复</h3><p>恢复必须保留冻结的评测方法与配置身份，并采用操作员批准的执行路径。此页面只读取记录。</p></div>
           </article>
         </div>
 
         <div class="panel">
           <div class="panel-title run-list-heading">
-            <div><span class="panel-kicker">LOGICAL RUNS</span><h3>Lifecycle inventory</h3></div>
-            <div class="segmented-control" aria-label="Run classification filter">
-              <button v-for="value in ['ALL', 'CAPABILITY_TERMINAL', 'INFRASTRUCTURE', 'LIFECYCLE'] as const" :key="value" :class="{ active: filter === value }" @click="filter = value">{{ value.replace('_TERMINAL', '') }}</button>
+            <div><span class="panel-kicker">已记录运行</span><h3>运行状态列表</h3></div>
+            <div class="segmented-control" aria-label="筛选运行类别">
+              <button v-for="value in ['ALL', 'CAPABILITY_TERMINAL', 'INFRASTRUCTURE', 'LIFECYCLE'] as const" :key="value" :class="{ active: filter === value }" @click="filter = value">{{ statusLabel(value) }}</button>
             </div>
           </div>
-          <PageState v-if="!visibleRuns.length" kind="empty">No runs match this lifecycle class.</PageState>
-          <div v-else class="responsive-table" role="region" aria-label="Run lifecycle" tabindex="0">
+          <PageState v-if="!visibleRuns.length" kind="empty">此类别暂无运行。可以切换“全部”查看其他记录。</PageState>
+          <div v-else class="responsive-table" role="region" aria-label="运行状态" tabindex="0">
             <table class="data-table run-control-table">
-              <thead><tr><th>Run identity</th><th>Slot</th><th>Source</th><th>Status / outcome</th><th>Control boundary</th><th>Evidence</th></tr></thead>
+              <thead><tr><th>运行身份</th><th>运行单元</th><th>来源</th><th>状态 / 结果</th><th>操作边界</th><th>证据</th></tr></thead>
               <tbody>
                 <tr v-for="run in visibleRuns" :key="run.run_id">
-                  <td><strong class="technical">{{ run.run_id }}</strong><div class="muted">attempt {{ run.attempt }}</div></td>
-                  <td>{{ run.cell_id }} · {{ run.task_id }}<div class="technical muted">repeat={{ run.repeat_index }} · lane={{ run.lane }}</div></td>
+                  <td><strong class="technical">{{ runName(run, runs.map(item => item.run_id)) }}</strong><div class="muted">尝试 {{ run.attempt }}</div></td>
+                  <td>{{ run.cell_id }} · {{ taskName(run.task_id) }}<div class="technical muted">第 {{ run.repeat_index + 1 }} 次 · 通道 {{ run.lane }}</div></td>
                   <td><StatusBadge :value="run.provenance ?? 'UNVERIFIED_SOURCE'" /></td>
                   <td><StatusBadge :value="run.status" /> <StatusBadge :value="run.normalized_outcome ?? 'NOT_REPORTED'" /></td>
-                  <td><span class="status-pill" :class="outcomeClass(run) === 'INFRASTRUCTURE' ? 'warn' : 'neutral'">{{ controlLabel(run) }}</span><div class="boundary-note">{{ outcomeClass(run) === 'INFRASTRUCTURE' ? 'Preserve exact treatment; review explicit recovery.' : outcomeClass(run) === 'CAPABILITY_TERMINAL' ? 'Recorded evidence; no semantic retry.' : 'Observe backend lifecycle state.' }}</div></td>
-                  <td><RouterLink class="table-link" :to="`/runs/${run.run_id}`">Diagnosis & trace →</RouterLink></td>
+                  <td><span class="status-pill" :class="outcomeClass(run) === 'INFRASTRUCTURE' ? 'warn' : 'neutral'">{{ controlLabel(run) }}</span><div class="boundary-note">{{ outcomeClass(run) === 'INFRASTRUCTURE' ? '保留原配置，审查恢复条件。' : outcomeClass(run) === 'CAPABILITY_TERMINAL' ? '保留已记录结果，不重试替换。' : '查看后端已保存状态。' }}</div></td>
+                  <td><RouterLink class="table-link" :to="`/runs/${run.run_id}`">诊断与事件记录 →</RouterLink></td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
       </template>
-      <PageState v-else kind="empty">No persisted experiment is available for run control.</PageState>
+      <PageState v-else kind="empty">暂无可查看的实验。请先打开“实验与运行”，或进入公开演示查看示例。</PageState>
     </template>
   </section>
 </template>

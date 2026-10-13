@@ -53,7 +53,7 @@ describe('Private saved Codex evidence', () => {
     const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
     expect(wrapper.get('[data-test=acceptance]').text()).toContain('VERIFIED_PASS')
     expect(wrapper.text()).toContain('NOT_VERIFIED'); expect(wrapper.text()).toContain('UNKNOWN')
-    expect(wrapper.text()).toContain('tool_exit_codes'); expect(wrapper.text()).toContain('historical')
+    expect(wrapper.text()).toContain('tool_exit_codes'); expect(wrapper.text()).toContain('历史记录')
     wrapper.unmount()
   })
   it('keeps missing reliable task evidence unverified', async () => {
@@ -65,7 +65,7 @@ describe('Private saved Codex evidence', () => {
   it('shows permission and integrity errors without inventing records', async () => {
     vi.mocked(externalEvidenceApi.sources).mockRejectedValue({ response: { data: { error: { code: 'LOCAL_CONFIGURATION_DISABLED' } } } })
     const { wrapper } = await unlocked()
-    expect(wrapper.get('[role=alert]').text()).toContain('LOCAL_CONFIGURATION_DISABLED')
+    expect(wrapper.get('[role=alert]').attributes('title')).toBe('LOCAL_CONFIGURATION_DISABLED')
     expect(wrapper.find('[data-test=detail]').exists()).toBe(false); wrapper.unmount()
   })
   it('exports only on user request and displays the separately retained digest', async () => {
@@ -113,7 +113,7 @@ describe('P1 isolation and onboarding', () => {
     expect(wrapper.get('[data-test=detail]').text()).toContain('NOT_VERIFIED')
     vi.mocked(externalEvidenceApi.detail).mockRejectedValue(reject('EVIDENCE_INTEGRITY_ERROR'))
     await router.push(`/external-runs/${corrupt.identity}`); await flushPromises()
-    expect(wrapper.get('[role=alert]').text()).toContain('EVIDENCE_INTEGRITY_ERROR')
+    expect(wrapper.get('[role=alert]').attributes('title')).toBe('EVIDENCE_INTEGRITY_ERROR')
     expect(wrapper.find('[data-test=detail]').exists()).toBe(false)
     expect(wrapper.find('[data-test=healthy-record]').exists()).toBe(true); wrapper.unmount()
   })
@@ -134,14 +134,14 @@ describe('P1 isolation and onboarding', () => {
   it.each(['EVIDENCE_STORAGE_UNSAFE', 'EVIDENCE_POLICY_PERMISSION', 'LOCAL_OPERATOR_REQUIRED'])('keeps global %s failures closed', async code => {
     vi.mocked(externalEvidenceApi.records).mockRejectedValue(reject(code, 403))
     const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
-    expect(wrapper.get('[role=alert]').text()).toContain(code)
+    expect(wrapper.get('[role=alert]').attributes('title')).toBe(code)
     expect(wrapper.find('[data-test=source]').exists()).toBe(false)
     expect(externalEvidenceApi.detail).not.toHaveBeenCalled(); wrapper.unmount()
   })
   it.each(['EXTERNAL_EVIDENCE_DISABLED', 'EVIDENCE_POLICY_PERMISSION', 'EVIDENCE_POLICY_INVALID'])('explains configuration failure %s', async code => {
     vi.mocked(externalEvidenceApi.check).mockResolvedValue({ status: 'NOT_CONFIGURED', issues: [code], operator_configured: true, source_contents_checked: false, pins_verified: false, record_integrity_checked: false })
     const { wrapper } = await unlocked()
-    expect(wrapper.get('[role=alert]').text()).toContain(code)
+    expect(wrapper.get('[role=alert]').attributes('title')).toBe(code)
     expect(wrapper.get('[data-test=quickstart]').text()).toContain('external-evidence check')
     expect(externalEvidenceApi.sources).not.toHaveBeenCalled(); wrapper.unmount()
   })
@@ -150,7 +150,7 @@ describe('P1 isolation and onboarding', () => {
     vi.mocked(externalEvidenceApi.check).mockResolvedValue({ status: 'NO_APPROVED_SOURCES', issues: [], operator_configured: true, source_contents_checked: false, pins_verified: false, record_integrity_checked: false })
     const { wrapper } = await unlocked()
     expect(wrapper.text()).toContain('暂无批准来源')
-    expect(wrapper.get('[data-test=configuration-check]').text()).toContain('NO_APPROVED_SOURCES')
+    expect(wrapper.get('[data-test=configuration-check]').text()).toContain('暂无批准来源')
     expect(wrapper.get('[data-test=import]').attributes('disabled')).toBeDefined(); wrapper.unmount()
   })
   it.each(['EVIDENCE_PIN_MISMATCH', 'EVIDENCE_SENSITIVE_INPUT'])('explains rejected import %s without a fake result', async code => {
@@ -159,7 +159,7 @@ describe('P1 isolation and onboarding', () => {
     await wrapper.get('[data-test=source]').setValue(source.source_id)
     await wrapper.get('[data-test=consent]').setValue(true)
     await wrapper.get('form').trigger('submit'); await flushPromises()
-    expect(wrapper.get('[role=alert]').text()).toContain(code)
+    expect(wrapper.get('[role=alert]').attributes('title')).toBe(code)
     expect(wrapper.text()).not.toContain('PRIVATE_EXCEPTION')
     expect(wrapper.find('[data-test=detail]').exists()).toBe(false); wrapper.unmount()
   })
@@ -168,7 +168,7 @@ describe('P1 isolation and onboarding', () => {
     const { wrapper } = await unlocked(`/external-runs/${detail.identity}`)
     await wrapper.get('[data-test=export]').trigger('click'); await flushPromises()
     expect(wrapper.find('[data-test=detail]').exists()).toBe(false)
-    expect(wrapper.get('[role=alert]').text()).toContain('EVIDENCE_INTEGRITY_ERROR'); wrapper.unmount()
+    expect(wrapper.get('[role=alert]').attributes('title')).toBe('EVIDENCE_INTEGRITY_ERROR'); wrapper.unmount()
   })
 })
 

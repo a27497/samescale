@@ -2,7 +2,7 @@
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { registryApi } from '@/api/client'
 import { useTranslation } from '@/composables/i18n'
-const t = useTranslation('en')
+const t = useTranslation()
 import LocalModelConfigurations from '@/components/LocalModelConfigurations.vue'
 import type { ProviderModelProfile, ProviderDefinition, HarnessDefinition } from '@/types/registry'
 

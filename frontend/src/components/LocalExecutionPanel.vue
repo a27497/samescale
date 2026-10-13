@@ -3,6 +3,8 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import type { SavedPlan } from '@/api/localPlans'
 import { localExecutionApi } from '@/api/localExecution'
 import type { ExecutionState, ExecutionStatus } from '@/api/localExecution'
+import StatusBadge from '@/components/StatusBadge.vue'
+import { statusLabel } from '@/utils/statusLabels'
 import { copy as c } from '@/composables/visualLocale'
 import TechnicalDetails from './TechnicalDetails.vue'
 
@@ -12,12 +14,10 @@ const confirmed = ref(false), busy = ref(false), error = ref(''), key = ref('')
 let generation = 0, alive = true
 const terminal = ['VERIFIED_PASS', 'VERIFIED_FAIL', 'TIMEOUT', 'FAILED_INFRA', 'BLOCKED', 'INTERRUPTED', 'CANCELLED']
 const active = computed(() => !!state.value?.attempt && !terminal.includes(state.value.status))
-const names: Record<string, [string, string]> = {
-  NOT_AUTHORIZED: ['未授权执行', 'Execution not authorized'], QUEUED: ['等待独立 Worker', 'Waiting for independent Worker'], CLAIMED: ['Worker 已领取', 'Claimed by Worker'], RUNNING: ['正在执行与独立验收', 'Running and independently verifying'],
-  VERIFIED_PASS: ['独立验收通过 · Fake', 'Independent acceptance passed · Fake'], VERIFIED_FAIL: ['独立验收失败 · Fake', 'Independent acceptance failed · Fake'], TIMEOUT: ['运行超时 · 未验证', 'Timed out · not verified'], FAILED_INFRA: ['基础设施或证据失败 · 未验证', 'Infrastructure or evidence failure · not verified'], BLOCKED: ['执行前检查阻塞', 'Execution precheck blocked'], INTERRUPTED: ['Worker 中断 · 不会自动重跑', 'Worker interrupted · no automatic retry'], CANCELLED: ['已取消 · 不会自动重跑', 'Cancelled · no automatic retry'],
+function message(e: unknown) {
+  const code = (e as { response?: { data?: { error?: { code?: string } } } }).response?.data?.error?.code
+  return code ? statusLabel(code) : c('读取失败，请刷新后检查状态再重试。', 'Read failed; reload the saved state before retrying.')
 }
-const label = (value: string) => names[value] ? c(...names[value]) : value
-function message(e: unknown) { return (e as { response?: { data?: { error?: { code?: string } } } }).response?.data?.error?.code ?? c('读取失败，请刷新重试', 'Read failed; refresh to retry') }
 async function load() {
   const current = ++generation
   confirmed.value = false; error.value = ''; busy.value = true; state.value = null; status.value = null
@@ -54,12 +54,12 @@ onBeforeUnmount(() => { alive = false; generation++; confirmed.value = false })
 </script>
 
 <template>
-  <section class="execution-panel" data-test="execution-panel" aria-label="Execution authorization and result">
+  <section class="execution-panel" data-test="execution-panel" :aria-label="c('执行授权与结果', 'Execution authorization and result')">
     <h4>{{ c('独立执行与验收', 'Independent execution and acceptance') }}</h4>
     <p>{{ c('计划确认不等于执行授权。当前仅开放无模型调用的隔离 Fake Codex；真实 Codex 订阅执行在本阶段关闭，不要求 API Key 或美元硬上限。', 'Plan confirmation does not authorize execution. Only isolated Fake Codex with zero model calls is available; real Codex subscription execution stays closed in this phase, with no API key or USD hard-cap requirement.') }}</p>
     <p v-if="error" role="alert" class="error-state" data-test="execution-error">{{ error }}</p>
     <p v-if="busy" role="status">{{ c('正在读取或提交…', 'Loading or submitting…') }}</p>
-    <p v-if="state" data-test="execution-state"><strong>{{ label(state.status) }}</strong></p>
+    <p v-if="state" data-test="execution-state"><StatusBadge :value="state.status" context="execution" /></p>
     <p v-if="state?.attempt?.cancellation_requested && active">{{ c('取消已请求；Worker 完成隔离清理后才确认终止。', 'Cancellation requested; termination is confirmed after Worker cleanup.') }}</p>
     <p v-if="!status?.enabled">{{ c('执行未启用，请检查独立 Worker 与操作员策略。', 'Execution is not enabled; check independent Worker and operator policy.') }}</p>
     <template v-if="status?.enabled && state?.status === 'NOT_AUTHORIZED'">
@@ -69,8 +69,8 @@ onBeforeUnmount(() => { alive = false; generation++; confirmed.value = false })
       <button type="button" class="primary-button" data-test="authorize" :disabled="busy || stale || !confirmed" @click="authorize">{{ c('授权并提交给 Worker', 'Authorize and queue for Worker') }}</button>
     </template>
     <div v-if="state?.result" data-test="execution-result">
-      <p>{{ c('失败分类 / 结果来源', 'Failure category / result source') }}: {{ state.result.reason_code }}</p>
-      <p>{{ c('独立验收', 'Independent acceptance') }}: {{ state.result.acceptance }}</p>
+      <p>{{ c('失败分类 / 结果来源', 'Failure category / result source') }}: {{ statusLabel(state.result.reason_code) }}</p>
+      <p>{{ c('独立验收', 'Independent acceptance') }}: <StatusBadge :value="state.result.acceptance" /></p>
       <p v-if="state.result.episode">{{ c('脱敏 Trace 事件', 'Sanitized trace events') }}: {{ state.result.episode.event_count }} · {{ c('实际修改文件', 'Actual changed files') }}: {{ state.result.episode.changed_file_count }} · {{ c('独立检查', 'Independent checks') }}: {{ state.result.episode.verifier_check_count }}</p>
       <p>{{ c('Fake 结果不能证明真实模型能力、真实任务准入或生产 Worker 已验证。', 'Fake results do not establish real model capability, real task admission or production Worker readiness.') }}</p>
       <TechnicalDetails :summary="c('结果与证据身份', 'Result and evidence identities')" :fields="[{ label: 'Run ID', value: state.result.run_id }, { label: 'Result SHA', value: state.result.digest }, { label: 'Episode SHA', value: state.result.episode_id }]"><pre>{{ JSON.stringify(state.result, null, 2) }}</pre></TechnicalDetails>

@@ -1,5 +1,20 @@
 # SameScale Product — Public Product Contract
 
+## Chinese workbench presentation — 2026-10-13
+
+The workbench defaults to Chinese across core and advanced pages. State labels and colors are
+presentation only: lifecycle completion, metadata presence, readiness and independent task
+acceptance remain separate. Unknown states have a neutral label; original codes remain in tooltips
+or closed evidence details. Source text and downloaded evidence retain their original values.
+Exact known fixture guidance has a Chinese reading aid; unknown source text is disclosed without
+inventing a translated verdict. Core Readiness keeps frozen release and current-workspace scopes
+separate, including unavailable-evidence recovery guidance.
+
+The home page keeps personal runs separate from explicitly labelled offline fixtures and links to
+existing fixture experiments and the configured public demo. This bounded presentation request
+supersedes the dated navigation/no-example statement below for these home links only; it adds no
+built-in record, persistence, model execution, intake permission or public API capability.
+
 ## Tool-neutral private intake — 2026-10-12
 
 SameScale is an **AI Coding task acceptance and evidence workbench**. The minimum inputs are a

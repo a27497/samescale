@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { externalEvidenceApi, type ApprovedEvidenceSource, type EvidenceDetail, type EvidenceSummary } from '@/api/externalEvidence'
+import { statusLabel, metadataLabel } from '@/utils/statusLabels'
 import { copy as c } from '@/composables/visualLocale'
 import AcceptanceSummary from '@/components/AcceptanceSummary.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
@@ -15,18 +16,18 @@ const tool = ref('all')
 const filteredSources = computed(() => sources.value.filter(source => matchesSourceFilter(source, tool.value)))
 const selectedSource = computed(() => filteredSources.value.find(source => source.source_id === selected.value))
 const harnessName = (name?: string) => name === 'codex' ? 'Codex' : name === 'claude-code' ? 'Claude Code' : name ?? c('未报告', 'Not reported')
-const coverageLabels = computed<Record<string, string>>(() => ({ NO_RUN_RECORD: c('无运行记录', 'No run record'), SUPPLIED_EXEC_JSONL_ONLY: c('仅提供的 Codex JSONL · 部分覆盖', 'Supplied Codex JSONL only · partial coverage'), SUPPLIED_STREAM_JSON_ONLY: c('仅提供的 Claude stream-json · 部分覆盖', 'Supplied Claude stream-json only · partial coverage'), PAIRED_HOOKS_ONLY: c('仅配对 Hook · 部分覆盖', 'Paired hooks only · partial coverage'), INCOMPLETE_HOOKS: c('不完整 Hook · 部分覆盖', 'Incomplete hooks · partial coverage'), RECORDED_H_LANE: c('已保存 H-Lane · 部分覆盖', 'Saved H-Lane · partial coverage') }))
-const coverageName = (coverage: string) => coverageLabels.value[coverage] ?? coverage
+const coverageName = statusLabel
 const selected = ref(''); const consent = ref(false); const detail = ref<EvidenceDetail | null>(null)
 const listError = ref(''); const checkStatus = ref(''); const configurationNotice = ref('')
 const exportDigest = ref(''); let generation = 0; let alive = true
 const globalCodes = ['EXTERNAL_EVIDENCE_DISABLED', 'EVIDENCE_POLICY_PERMISSION', 'EVIDENCE_POLICY_INVALID', 'EVIDENCE_STORAGE_UNSAFE', 'LOCAL_CONFIGURATION_DISABLED', 'LOCAL_OPERATOR_REQUIRED', 'LOCAL_ORIGIN_REQUIRED']
+const failureCode = ref('')
 const guidance: Record<string, string> = {
-  EXTERNAL_EVIDENCE_DISABLED: c('尚未配置证据策略。按下方 Quickstart 设置策略后重启私有 API。', 'Evidence policy is unset. Follow the Quickstart and restart the private API.'),
+  EXTERNAL_EVIDENCE_DISABLED: c('尚未配置证据策略。按下方接入指南设置策略后重启私有 API。', 'Evidence policy is unset. Follow the Quickstart and restart the private API.'),
   EVIDENCE_POLICY_PERMISSION: c('策略权限错误。检查文件归属与 0600 权限；不要读取认证文件。', 'Check policy ownership and mode 0600; never use authentication files.'),
   EVIDENCE_POLICY_INVALID: c('策略或路径无效。运行只读配置检查，检查格式、独立目录和路径。', 'Run the read-only configuration check; review policy schema and separate canonical paths.'),
   EVIDENCE_STORAGE_UNSAFE: c('全局存储安全检查失败；拒绝整个请求。由操作员检查目录权限、链接与容量。', 'Global storage safety failed; access is refused. Review permissions, links and limits.'),
-  LOCAL_CONFIGURATION_DISABLED: c('未配置私有操作员权限。按 Quickstart 配置独立本地凭据。', 'Configure private local operator access using the Quickstart.'),
+  LOCAL_CONFIGURATION_DISABLED: c('未配置私有操作员权限。按接入指南配置独立本地凭据。', 'Configure private local operator access using the Quickstart.'),
   LOCAL_OPERATOR_REQUIRED: c('操作员凭据不正确；请重新输入。', 'The operator credential is incorrect; enter it again.'),
   LOCAL_ORIGIN_REQUIRED: c('请从同源 loopback 私有产品地址访问。', 'Use the same-origin private loopback address.'),
   SOURCE_LOCATION_UNAVAILABLE: c('批准来源或 Workspace 不可访问；操作员应检查配置位置。', 'An approved source or Workspace location is unavailable.'),
@@ -44,7 +45,8 @@ function errorCode(e: unknown) {
 }
 function report(e: unknown) {
   const code = errorCode(e)
-  error.value = `${guidance[code] ?? c('读取暂时失败，请重试；没有补造结果。', 'Read temporarily failed; retry. No result was invented.')} ${code}`
+  failureCode.value = code
+  error.value = `${guidance[code] ?? c('读取暂时失败，请重试；没有补造结果。', 'Read temporarily failed; retry. No result was invented.')}`
   if (globalCodes.includes(code) || (e as { response?: { status?: number } }).response?.status === 403) {
     unlocked.value = false; detail.value = null; records.value = []; sources.value = []
   }
@@ -112,9 +114,9 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
     <p>{{ c('不会重新运行 Agent 或接管订阅登录。只接入操作员明确批准的脱敏来源；摘要验证完整性，不认证来源。', 'No Agent rerun or subscription login takeover. Only explicitly approved sanitized sources; hashes verify integrity, not origin.') }}</p>
     <p>{{ c('支持多种 Coding Agent 的证据接入。本轮支持 Codex、Claude Code stream-json 和仅代码改动；没有运行记录也能验收，覆盖度标为“无运行记录”。', 'Intake supports multiple Coding Agents. This version supports Codex, Claude Code stream-json and code-only intake; acceptance without logs is labelled “No run record”.') }}</p>
     <div v-if="unlocked" class="panel builder-form" data-test="source-filter"><label>{{ c('1 · 按工具筛选来源', '1 · Filter sources by tool') }}<select v-model="tool" data-test="tool"><option value="all">{{ c('全部来源', 'All sources') }}</option><option value="codex">Codex</option><option value="claude-code">Claude Code</option><option value="code-only">{{ c('仅代码改动', 'Code changes only') }}</option></select></label><p>{{ c('此处只筛选已批准来源。auto-v1 在点击导入后由后端识别 Codex 或 Claude Code；未识别来源在这两种工具筛选下均保留。只解析主动提供的文件，不扫描会话目录。', 'This selector filters approved sources only. The backend identifies auto-v1 as Codex or Claude Code when you click Import; unidentified sources remain under both filters. Only supplied files are parsed; session directories are never scanned.') }}</p></div>
-    <p v-if="error" class="error-state" role="alert">{{ error }}</p>
+    <p v-if="error" class="error-state" role="alert" :title="failureCode">{{ error }}</p>
     <details class="panel" data-test="quickstart">
-      <summary>{{ c('首次私有接入 Quickstart（不执行 Agent / Verifier）', 'First private intake Quickstart (no Agent / Verifier execution)') }}</summary>
+      <summary>{{ c('首次私有接入指南（不执行 Agent / Verifier）', 'First private intake Quickstart (no Agent / Verifier execution)') }}</summary>
       <ol>
         <li>{{ c('在独立 checkout 安装锁定依赖并构建 UI；只使用新隔离数据库和未占用 loopback 端口。', 'Install locked dependencies/build the UI in a separate checkout; use a new isolated database and unused loopback port.') }}</li>
         <li>{{ c('人工审查最终 UTF-8 Workspace 与验收条件，以及可选运行记录，移除敏感材料并独立保存摘要。不会扫描私人会话。', 'Review the final UTF-8 workspace, acceptance conditions and optional run records; remove sensitive material and retain independent pins. No session discovery.') }}</li>
@@ -124,7 +126,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
         <li>{{ c('下载脱敏导出，单独保存显示的摘要，在终端执行两次离线复核；不会重跑 Agent 或历史 Verifier。', 'Download the sanitized export, retain the displayed pin separately and replay twice in a terminal; no Agent or historical Verifier rerun.') }}</li>
       </ol>
       <p>{{ c('标准 Compose 目前不自动传递操作员/证据策略或挂载来源；本路径使用私有 host API，不宣称开箱即用。', 'Standard Compose does not forward operator/evidence policy settings or mount sources. This path uses a private host API; it is not automatic distribution setup.') }}</p>
-      <p>{{ c('格式、摘要命令、仅代码改动和可信验收条件的配置步骤见随版本附带的 Quickstart。', 'See the bundled Quickstart for formats, pins, code-only intake and trusted acceptance-condition mapping.') }}</p>
+      <p>{{ c('格式、摘要命令、仅代码改动和可信验收条件的配置步骤见随版本附带的接入指南。', 'See the bundled Quickstart for formats, pins, code-only intake and trusted acceptance-condition mapping.') }}</p>
     </details>
     <form v-if="!unlocked" class="panel builder-form" @submit.prevent="unlock">
       <label>{{ c('本地操作员凭据', 'Local operator credential') }}<input v-model="token" data-test="operator" type="password" autocomplete="off" required /></label>
@@ -132,11 +134,11 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
       <button class="primary-button" :disabled="busy || !token">{{ c('解锁并读取', 'Unlock and load') }}</button>
     </form>
     <template v-else>
-      <p data-test="configuration-check">{{ c('只读配置检查', 'Read-only configuration check') }}：{{ checkStatus }} · {{ c('未读取来源内容、未验证摘要或执行任务。', 'Source contents/pins/task acceptance were not checked; no execution.') }}</p>
+      <p data-test="configuration-check">{{ c('只读配置检查', 'Read-only configuration check') }}：<StatusBadge :value="checkStatus" /> · {{ c('未读取来源内容、未验证摘要或执行任务。', 'Source contents/pins/task acceptance were not checked; no execution.') }}</p>
       <p v-if="configurationNotice" role="status">{{ configurationNotice }} {{ c('已保存的健康记录仍可读取。', 'Healthy saved records remain readable.') }}</p>
       <form class="panel builder-form" @submit.prevent="ingest">
         <h3>{{ c('2 · 提供代码改动与验收条件', '2 · Provide code changes and acceptance conditions') }}</h3>
-        <label>{{ c('来源', 'Source') }}<select v-model="selected" data-test="source"><option value="">{{ c('选择来源', 'Choose a source') }}</option><option v-for="source in filteredSources" :key="source.source_id" :value="source.source_id">{{ source.source_id }} · {{ source.source_kind }} · {{ source.format }}</option></select></label>
+        <label>{{ c('来源', 'Source') }}<select v-model="selected" data-test="source"><option value="">{{ c('选择来源', 'Choose a source') }}</option><option v-for="source in filteredSources" :key="source.source_id" :value="source.source_id">{{ source.source_id }} · {{ metadataLabel(source.source_kind) }} · {{ source.format }}</option></select></label>
         <div v-if="selectedSource" class="approved-inputs" data-test="approved-inputs">
           <p><strong>{{ c('最终代码 Workspace（必需）', 'Final code workspace (required)') }}</strong><br /><code>{{ selectedSource.workspace_digest }}</code></p>
           <p><strong>{{ c('任务验收条件（必需）', 'Task acceptance conditions (required)') }}</strong><br />{{ selectedSource.task_reference ?? c('旧来源未绑定可信任务；可保存，不能据此判为通过。', 'Legacy source has no trusted task mapping; saved intake cannot establish a pass.') }}<br /><code v-if="selectedSource.task_digest">{{ selectedSource.task_digest }}</code></p>
@@ -151,7 +153,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
         <p v-if="listError" role="status" data-test="list-error">{{ listError }}</p>
         <p v-else-if="!records.length">{{ c('暂无记录', 'No records') }}</p>
         <ul><li v-for="record in records" :key="record.identity" :data-test="record.status === 'CORRUPT' ? 'corrupt-record' : 'healthy-record'">
-          <template v-if="record.status === 'AVAILABLE'"><RouterLink :to="`/external-runs/${record.identity}`">{{ record.source_id }}</RouterLink> · {{ record.source_kind }} · <StatusBadge :value="record.acceptance" localized /></template>
+          <template v-if="record.status === 'AVAILABLE'"><RouterLink :to="`/external-runs/${record.identity}`">{{ record.source_id }}</RouterLink> · {{ metadataLabel(record.source_kind) }} · <StatusBadge :value="record.acceptance" localized /></template>
           <template v-else><RouterLink :to="`/external-runs/${record.identity}`">{{ c('损坏记录', 'Corrupt record') }} {{ record.identity }}</RouterLink> · <StatusBadge :value="record.status" localized /><p>{{ guidance.EVIDENCE_RECORD_CORRUPT }}</p></template>
           <details data-test="record-technical-details"><summary>{{ c('技术细节', 'Technical details') }}</summary>
             <p>{{ c('记录状态', 'Record state') }}：<code>{{ record.status }}</code></p>
@@ -161,7 +163,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
         </li></ul>
       </div>
       <div v-if="detail" class="panel" data-test="detail">
-        <h3>{{ detail.record.source.source_id }} · {{ detail.record.source.source_kind }}</h3>
+        <h3>{{ detail.record.source.source_id }} · {{ metadataLabel(detail.record.source.source_kind) }}</h3>
         <p data-test="harness">{{ c('工具', 'Harness') }}：{{ detail.record.completeness.coverage === 'NO_RUN_RECORD' ? c('仅代码改动', 'Code changes only') : harnessName(detail.record.harness?.name ?? sourceHarness(detail.record.source)) }} · {{ c('版本', 'Version') }}：{{ detail.record.harness?.version ?? detail.record.source.harness?.version ?? c('未报告', 'Not reported') }}</p>
         <AcceptanceSummary :rows="externalAcceptanceRows(detail)" />
         <p>{{ c('证据覆盖度', 'Evidence coverage') }}：{{ coverageName(detail.record.completeness.coverage) }} · {{ c('来源未证实；摘要只核对完整性', 'Origin is unattested; digests check integrity only') }}</p>
@@ -193,7 +195,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
           <p>{{ c('Agent 自报事件', 'Agent report events') }}：{{ detail.diagnosis.agent_self_reports.join(', ') || '—' }} · {{ c('工具失败事件', 'Failed tool events') }}：{{ detail.diagnosis.observed_failed_tools.join(', ') || '—' }}</p>
           <p>{{ c('基础设施状态', 'Infrastructure status') }}：{{ detail.diagnosis.infrastructure.status }} · {{ c('根因未确立', 'Root cause not established') }}</p>
           <p>{{ c('文件变化', 'File changes') }}：{{ detail.diagnosis.file_changes.status }} · {{ detail.diagnosis.file_changes.paths.join(', ') || '—' }}</p>
-          <div class="table-scroll"><table><caption>{{ c('脱敏 Trace；工具成功不等于任务通过', 'Sanitized Trace; tool success is not task acceptance') }}</caption><thead><tr><th>#</th><th>{{ c('事件', 'Event') }}</th><th>{{ c('状态', 'Status') }}</th><th>Exit</th></tr></thead><tbody><tr v-for="event in detail.record.trace" :key="event.ordinal"><td>{{ event.ordinal }}</td><td>{{ event.type }}</td><td>{{ event.status }}</td><td>{{ event.exit_code ?? 'UNKNOWN' }}</td></tr></tbody></table></div>
+          <div class="table-scroll"><table><caption>{{ c('脱敏 Trace；工具成功不等于任务通过', 'Sanitized Trace; tool success is not task acceptance') }}</caption><thead><tr><th>#</th><th>{{ c('事件', 'Event') }}</th><th>{{ c('状态', 'Status') }}</th><th>退出码</th></tr></thead><tbody><tr v-for="event in detail.record.trace" :key="event.ordinal"><td>{{ event.ordinal }}</td><td>{{ event.type }}</td><td>{{ event.status }}</td><td>{{ event.exit_code ?? 'UNKNOWN' }}</td></tr></tbody></table></div>
           <ul><li v-for="limit in detail.diagnosis.limits" :key="limit">{{ limit }}</li></ul>
         </details>
         <button class="secondary-button" type="button" :disabled="busy" @click="loadDetail">{{ c('刷新独立验收', 'Reload independent verification') }}</button>

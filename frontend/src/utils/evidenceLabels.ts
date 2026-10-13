@@ -1,3 +1,4 @@
+import { statusLabels, statusLabel } from '@/utils/statusLabels'
 import { copy as c } from '@/composables/visualLocale'
 
 // Exact code/enum mappings only. Evidence strings and unknown values stay unchanged.
@@ -19,9 +20,6 @@ const labels: Record<string, [string, string]> = {
   'no-modification': ['最终工作区无修改', 'No persisted workspace modification'],
   'content-changed;paths-not-reported': ['内容摘要有变化，未报告路径', 'Content changed; paths not reported'],
   'not-reported': ['未报告', 'Not reported'],
-  FULL_STREAM: ['完整事件流', 'Full event stream'], FINAL_OUTPUT_ONLY: ['仅最终输出', 'Final output only'], NOT_REPORTED: ['未报告', 'Not reported'],
-  succeeded: ['执行完成', 'Execution completed'], completed: ['执行完成', 'Execution completed'],
-  failed: ['执行失败', 'Execution failed'], cancelled: ['已取消', 'Cancelled'], timeout: ['执行超时', 'Execution timed out'],
   'OBSERVED_MODEL_MISSING': ['未报告实际观察模型', 'Observed model missing'],
   'RESOURCE_ENVELOPE_MISSING': ['缺少资源约束记录', 'Resource envelope missing'],
   'MISSING_CONTROL_MANIFEST': ['缺少控制条件清单', 'Control manifest missing'],
@@ -31,6 +29,7 @@ const labels: Record<string, [string, string]> = {
 }
 export function evidenceLabel(value: string | null | undefined): string {
   if (!value) return c('未报告', 'Not reported')
+  if (Object.hasOwn(statusLabels, value)) return statusLabel(value)
   const pair = labels[value]
   return pair ? c(...pair) : value
 }

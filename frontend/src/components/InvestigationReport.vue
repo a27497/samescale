@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SourceText from '@/components/SourceText.vue'
 import { computed, nextTick, ref, useId, watch } from 'vue'
 import { factOverview, historicalOverview } from '@/utils/reportOverview'
 import { referenceName } from '@/utils/displayIdentity'
@@ -52,7 +53,7 @@ watch(() => props.evidence, () => {
     </nav>
     <div class="report-body">
     <h3 :id="`${reportId}-0`" data-report-section="0" tabindex="-1">{{ c('1 · 结论', '1 · Conclusion') }}</h3>
-    <template v-if="sourceKind === 'historical_real'"><p class="conclusion">{{ overview ?? c(`报告包含 ${report.verified_facts.length} 项已核验事实。查看事实及引用，结论以保存原文为准。`, `The report contains ${report.verified_facts.length} checked facts. Inspect the facts and citations; conclusions remain bound to the source report.`) }}</p><details><summary>{{ c('完整结论 · 原文', 'Full conclusion · source') }}</summary><p>{{ report.summary }}</p></details></template><p v-else class="conclusion">{{ report.summary }}</p>
+    <template v-if="sourceKind === 'historical_real'"><p class="conclusion">{{ overview ?? c(`报告包含 ${report.verified_facts.length} 项已核验事实。查看事实及引用，结论以保存原文为准。`, `The report contains ${report.verified_facts.length} checked facts. Inspect the facts and citations; conclusions remain bound to the source report.`) }}</p><details><summary>{{ c('完整结论 · 原文', 'Full conclusion · source') }}</summary><p>{{ report.summary }}</p></details></template><SourceText v-else class="conclusion" :text="report.summary" />
     <h3 :id="`${reportId}-1`" data-report-section="1" tabindex="-1">{{ c('2 · 证据', '2 · Evidence') }}</h3>
     <p>{{ c('事实已按工具数据与引用校验，可沿引用查看依据。摘要绑定用于核对内容一致性，不认证来源。', 'Facts were checked against tool data and citations. Follow each citation to inspect the evidence. Digest bindings check content consistency, not source authenticity.') }}</p>
     <p v-if="sourceKind === 'offline_fake'" class="muted">{{ c('此处的事实校验仅针对固定合成输入。', 'Fact validation here applies only to the fixed synthetic inputs.') }}</p>
@@ -78,7 +79,7 @@ watch(() => props.evidence, () => {
     </details>
     <h3 :id="`${reportId}-2`" data-report-section="2" tabindex="-1">{{ c('3 · 限制与待验证假设', '3 · Limits & hypotheses') }}</h3>
     <p v-if="!report.limitations.length">{{ c('报告未列出限制；这不代表根因已被证实。', 'The report lists no limitations; this does not establish root cause.') }}</p>
-<p v-if="sourceKind === 'historical_real'">{{ c('证据限制与假设保留在原文中；相关性不构成因果结论。', 'Limits and hypotheses remain in the source. Correlation does not establish causality.') }}</p><details :open="!sourceKind"><summary>{{ c('限制与假设 · 原文', 'Limits & hypotheses · source') }}</summary><ul><li v-for="limit in report.limitations" :key="limit">{{ limit }}</li></ul>
+<p v-if="sourceKind === 'historical_real'">{{ c('证据限制与假设保留在原文中；相关性不构成因果结论。', 'Limits and hypotheses remain in the source. Correlation does not establish causality.') }}</p><details ><summary>{{ c('限制与假设 · 原文', 'Limits & hypotheses · source') }}</summary><ul><li v-for="limit in report.limitations" :key="limit">{{ limit }}</li></ul>
     <article v-for="hypothesis in report.hypotheses" :key="hypothesis.statement" class="fact">
       <strong>{{ c('假设 · 未证实', 'Hypothesis · unverified') }}</strong><p>{{ hypothesis.statement }}</p>
       <p>{{ c('需要补充：', 'Additional evidence needed: ') }}{{ hypothesis.additional_evidence_needed }}</p>
@@ -89,7 +90,7 @@ watch(() => props.evidence, () => {
     </article>
     </details>
     <h3 :id="`${reportId}-3`" data-report-section="3" tabindex="-1">{{ c('4 · 下一步', '4 · Next steps') }}</h3>
-    <p v-if="sourceKind">{{ c('根据证据准备验证方案；执行需另行授权。', 'Prepare validation from the evidence; execution needs separate authorization.') }}</p><details :open="!sourceKind"><summary>{{ c('下一步建议 · 原文', 'Suggested next steps · source') }}</summary><slot name="next"><p>{{ c('根据证据和限制准备回归方案，人工审阅后另行授权验证。保存或审批不执行实验。', 'Prepare a regression proposal from the evidence and limits. Validation requires separate authorization after review. Saving or approving does not execute an experiment.') }}</p></slot></details>
+    <p v-if="sourceKind">{{ c('根据证据准备验证方案；执行需另行授权。', 'Prepare validation from the evidence; execution needs separate authorization.') }}</p><details ><summary>{{ c('下一步建议 · 原文', 'Suggested next steps · source') }}</summary><slot name="next"><p>{{ c('根据证据和限制准备回归方案，人工审阅后另行授权验证。保存或审批不执行实验。', 'Prepare a regression proposal from the evidence and limits. Validation requires separate authorization after review. Saving or approving does not execute an experiment.') }}</p></slot></details>
     </div>
   </section>
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { statusLabel, metadataLabel } from '@/utils/statusLabels'
 import PageState from '@/components/PageState.vue'
 import { onMounted, ref } from 'vue'
 
@@ -29,27 +30,27 @@ onMounted(async () => {
 
 <template>
   <section>
-    <div class="page-heading"><div><h2>Provider Registry</h2><p>Safe route identity, credential presence and runtime state. Secret values and private URLs stay server side.</p></div></div>
-    <PageState v-if="loading" kind="loading">Loading provider registry…</PageState>
-    <PageState v-else-if="error" kind="error" reload>Provider registry is unavailable.</PageState>
-    <PageState v-else-if="!items.length" kind="empty">No provider definitions are reported.</PageState>
+    <div class="page-heading"><div><h2>服务商注册表</h2><p>查看路由身份、凭据配置与运行环境状态。密钥与私有地址只保存在服务端。</p></div></div>
+    <PageState v-if="loading" kind="loading">正在读取服务商注册表…</PageState>
+    <PageState v-else-if="error" kind="error" reload>服务商注册表暂时无法读取。请检查后端服务后重新加载。</PageState>
+    <PageState v-else-if="!items.length" kind="empty">暂无服务商定义。请在“连接与配置”中查看本地连接，或由操作员配置服务端注册表。</PageState>
     <div v-else class="registry-card-grid">
       <article v-for="item in items" :key="item.provider_id" class="panel registry-card">
         <div class="panel-title"><h3>{{ item.display_name }}</h3><StatusBadge :value="operationalState(item)" /></div>
         <dl class="definition-list">
-          <dt>Provider ID</dt><dd class="technical">{{ item.provider_id }}</dd>
-          <dt>Registration</dt><dd>{{ item.enabled ? 'Registered for planning' : 'Disabled' }}</dd>
-          <dt>Credential</dt><dd>{{ settings?.credentials.find(value => value.credential_ref === item.credential_ref)?.status ?? 'UNKNOWN' }}</dd>
-          <dt>Runtime health</dt><dd>{{ item.health_status }}</dd>
-          <dt>Region</dt><dd>{{ item.region }}</dd>
-          <dt>Endpoint class</dt><dd>{{ item.endpoint_class }}</dd>
-          <dt>Protocols</dt><dd>{{ item.protocols.join(', ') }}</dd>
-          <dt>Billing</dt><dd>{{ item.billing_mode }}</dd>
-          <dt>Credential ref</dt><dd class="technical">{{ item.credential_ref }}</dd>
-          <dt>Runtime ref</dt><dd class="technical">{{ item.base_url_reference ?? 'PUBLIC_REGISTERED_ROUTE' }}</dd>
-          <dt>Automation</dt><dd>{{ item.automation_allowed ? 'ALLOWED' : 'BLOCKED' }}</dd>
+          <dt>服务商 ID</dt><dd class="technical">{{ item.provider_id }}</dd>
+          <dt>登记状态</dt><dd>{{ item.enabled ? '已登记 · 可规划' : '已停用' }}</dd>
+          <dt>凭据</dt><dd><StatusBadge :value="settings?.credentials.find(value => value.credential_ref === item.credential_ref)?.status ?? 'UNKNOWN'" /></dd>
+          <dt>运行环境状态</dt><dd><StatusBadge :value="item.health_status" context="provider" /></dd>
+          <dt>区域</dt><dd>{{ metadataLabel(item.region) }}</dd>
+          <dt>服务地址类型</dt><dd><StatusBadge :value="item.endpoint_class" /></dd>
+          <dt>协议</dt><dd>{{ item.protocols.map(metadataLabel).join('、') }}</dd>
+          <dt>计费方式</dt><dd><StatusBadge :value="item.billing_mode" /></dd>
+          <dt>凭据引用</dt><dd class="technical">{{ item.credential_ref }}</dd>
+          <dt>服务地址引用</dt><dd class="technical">{{ item.base_url_reference ?? statusLabel('PUBLIC_REGISTERED_ROUTE') }}</dd>
+          <dt>自动执行</dt><dd><StatusBadge :value="item.automation_allowed ? 'ALLOWED' : 'BLOCKED'" /></dd>
         </dl>
-        <div v-if="item.configuration_reason_codes.length" class="notice technical">{{ item.configuration_reason_codes.join(' · ') }}</div>
+        <div v-if="item.configuration_reason_codes.length" class="notice"><p v-for="reason in item.configuration_reason_codes" :key="reason" :title="reason">{{ statusLabel(reason) }}。请由操作员检查服务端配置。</p><RouterLink class="table-link" to="/connections">查看连接与配置 →</RouterLink></div>
       </article>
     </div>
   </section>

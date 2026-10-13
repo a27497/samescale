@@ -1,6 +1,28 @@
 # SameScale Product — Current Milestone
 
-## Current state — CI branch synchronized with main — 2026-10-13 (Asia/Shanghai)
+## Current state — Chinese workbench presentation — 2026-10-13 (Asia/Shanghai)
+
+User-authorized frontend polish on `codex/workbench-chinese-20261013`, based on
+main@a0ab9e8d5170d99703781046e7b853063c8e6891 in an independent worktree. All route titles,
+advanced navigation/copy, state labels and empty/error guidance default to Chinese. The home page
+keeps personal runs distinct and offers existing labelled fixture entry points on the first screen.
+A shared mapping owns state labels, contextual meanings and colors; raw states/source text stay
+in hover or closed evidence details. Readiness preserves frozen/current scopes and has recovery
+steps; partial overview read failures remain failures, not empty lists or zero counts.
+
+Local full frontend **261/261 PASS (20 files)**; explicit typecheck and isolated production build
+**PASS**. Chrome 153, 1440×1000: **174 main + 21 extended checks PASS**, all route instances,
+actual saved public examples, report/source reading, exact run download, and labelled response
+fixtures for unavailable/private/populated states. **8 API projections unchanged** (readiness's
+request timestamp excluded); backend, locked dependencies, frozen assets and deployment have no
+diff. The existing original dirty UI-2 worktree remains untouched. [QA, scope, status table and
+9 screenshot pairs](docs/qa/workbench-chinese-20261013/README.md).
+
+Commit/push and PR are authorized for this branch; exact-SHA existing CI is verified separately
+at publication. No merge, deployment, new seed, paid campaign or real model/Agent/Judge execution.
+No technical blocker. Stop after PR and remote-check verification; historical scope remains below.
+
+## Historical state — CI branch synchronized with main — 2026-10-13 (Asia/Shanghai)
 
 Merge main@adaa083bedb5ceb8aa167a3e9bfc6d704b200468 (PR #14) into
 `codex/ci-feedback-20261013`, preserving both histories without rebase or force push. Only the two

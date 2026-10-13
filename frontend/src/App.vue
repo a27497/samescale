@@ -15,7 +15,7 @@ const titles: Record<string, [string, string]> = {
   'run-detail': ['运行证据', 'Run evidence'], diagnosis: ['失败诊断', 'Failure diagnosis'],
   regression: ['候选对比', 'Regression comparison'], 'analyst-sessions': ['已保存调查', 'Saved investigations'],
   'run-control': ['运行控制', 'Run control'], experiments: ['实验与运行', 'Experiments & runs'],
-  'experiment-detail': ['实验详情', 'Experiment details'], overview: ['概览', 'Overview'], settings: ['设置', 'Settings'],
+  'experiment-detail': ['实验详情', 'Experiment details'], overview: ['总览', 'Overview'], settings: ['设置', 'Settings'],
 }
 const title = computed(() => { const pair = titles[String(route.name)]; return pair ? c(...pair) : String(route.meta.title ?? route.name ?? 'Workbench') })
 const coreRoute = computed(() => ['runs', 'external-evidence', 'external-evidence-detail', 'run-detail', 'settings'].includes(String(route.name)))
@@ -53,15 +53,15 @@ const advanced = computed(() => [
   { to: '/regression', label: c('候选对比', 'Regression comparison'), icon: TrendCharts },
   { to: '/analyst', label: c('工程问题调查', 'Investigation'), icon: View },
   { to: '/analyst/sessions', label: c('已保存调查', 'Saved investigations'), icon: Document },
-  { to: '/overview', label: c('概览', 'Overview'), icon: Grid },
+  { to: '/overview', label: c('总览', 'Overview'), icon: Grid },
   { to: '/run-control', label: c('运行控制', 'Run control'), icon: Operation },
-  { to: '/judgelab', label: 'JudgeLab', icon: Collection },
+  { to: '/judgelab', label: c('JudgeLab 校准', 'JudgeLab'), icon: Collection },
   { to: '/connections', label: c('连接与配置', 'Connections'), icon: Connection },
-  { to: '/models', label: c('模型注册', 'Models'), icon: Cpu },
-  { to: '/providers', label: c('Provider 注册', 'Providers'), icon: Box },
-  { to: '/harnesses', label: c('Harness 注册', 'Harnesses'), icon: Tools },
+  { to: '/models', label: c('模型注册表', 'Models'), icon: Cpu },
+  { to: '/providers', label: c('服务商注册表', 'Providers'), icon: Box },
+  { to: '/harnesses', label: c('Harness 注册表', 'Harnesses'), icon: Tools },
   { to: '/capabilities', label: c('兼容能力', 'Capabilities'), icon: CircleCheck },
-  { to: '/core-readiness', label: c('就绪检查', 'Core readiness'), icon: CircleCheck },
+  { to: '/core-readiness', label: c('核心就绪度', 'Core readiness'), icon: CircleCheck },
 ])
 watch(() => route.fullPath, () => {
   if (mobileNavOpen.value) closeNavigation()
@@ -93,7 +93,7 @@ watch(title, value => { document.title = `${value} · SameScale — AI Coding �
       <header class="topbar"><div class="topbar-heading">
         <button ref="menuButton" class="mobile-menu-button" :aria-label="c('打开导航', 'Open navigation')" aria-controls="workbench-navigation" :aria-expanded="mobileNavOpen" @click="openNavigation"><Menu class="ui-icon" /></button>
         <RouterLink to="/runs" class="breadcrumb-workspace">{{ c('工作区', 'Workspace') }}</RouterLink><span class="breadcrumb-divider">/</span><h1>{{ title }}</h1>
-      </div><div class="locale-switch" role="group" :aria-label="c('切换界面语言', 'Change interface language')"><button :aria-pressed="!['en', 'en-US'].includes(preferences.language)" @click="setLocale('zh-CN')">中文</button><button :aria-pressed="['en', 'en-US'].includes(preferences.language)" @click="setLocale('en-US')">EN</button></div></header>
+      </div><div class="locale-switch" role="group" :aria-label="c('切换界面语言', 'Change interface language')"><button :aria-pressed="!['en', 'en-US'].includes(preferences.language)" @click="setLocale('zh-CN')">中文</button><button :aria-pressed="['en', 'en-US'].includes(preferences.language)" @click="setLocale('en-US')">English</button></div></header>
       <div class="page-container"><RouterView /></div>
 
     </main>

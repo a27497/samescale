@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { localPlansApi } from '@/api/localPlans'
 import type { CodexConfiguration, PlanDetail, PlanRequest, PlanSummary, PreflightReceipt, TaskInspection } from '@/api/localPlans'
+import { statusLabel } from '@/utils/statusLabels'
 import { copy as c } from '@/composables/visualLocale'
 import TechnicalDetails from '@/components/TechnicalDetails.vue'
 import LocalExecutionPanel from '@/components/LocalExecutionPanel.vue'
@@ -19,33 +20,7 @@ let revision = 0, alive = true, loadGeneration = 0
 const selectedTask = computed(() => tasks.value.find(t => t.reference === taskReference.value))
 const selectedConfiguration = computed(() => configurations.value[Number(configurationIndex.value)])
 const canPreflight = computed(() => unlocked.value && !!selectedTask.value && !!configurationIndex.value && name.value.trim() && [wallTime.value, outputTokens.value, costBudget.value].every(n => Number.isFinite(n) && n > 0))
-const checkLabels: Record<string, [string, string]> = {
-  TASK_INTEGRITY_AND_SOURCE: ['任务与来源完整性', 'Task and source integrity'],
-  TRUSTED_PRIOR_QUALIFICATION: ['可信历史行为验收与准入', 'Trusted prior validation and admission'],
-  ONE_CODEX_SUBJECT_CONFIGURATION: ['单 Codex 主体配置', 'One Codex subject configuration'],
-  MODEL_HARNESS_COMPATIBLE: ['模型与 Harness 兼容性', 'Model and Harness compatibility'],
-  CREDENTIAL_REFERENCE_PRESENT: ['本地凭据引用已配置', 'Local credential reference configured'],
-  PROVIDER_ROUTE_VALID: ['Provider 路由配置有效', 'Provider route configuration valid'],
-  PROVIDER_NOT_KNOWN_BLOCKED: ['无已知服务阻塞', 'No known service block'],
-  OPERATOR_RUNTIME_IMAGE_ID_PRESENT: ['操作员固定镜像身份已配置；Worker 将核验本地镜像', 'Operator-pinned image ID configured; Worker will inspect the local image'],
-  PINNED_LOCAL_IMAGE_PRESENT: ['固定版本本地镜像存在', 'Pinned local image exists'],
-  LOCAL_RUNTIME_IMAGE_APPROVED: ['本地运行镜像身份经操作员准入', 'Local runtime image identity approved by operator'],
-  EXPLICIT_BUDGET_REQUIRED: ['已填写计划预算', 'Planning budget provided'],
-  TASK_WALL_TIME_LIMIT: ['时间限制符合任务契约', 'Wall time fits task contract'],
-  OUTPUT_ESTIMATE_WITHIN_PROFILE: ['输出估计符合配置范围', 'Output estimate fits profile'],
-}
-const reasonLabels: Record<string, [string, string]> = {
-  TRUSTED_PRIOR_QUALIFICATION_REQUIRED: ['缺少可信历史行为验收与准入记录', 'Trusted prior admission evidence is missing'],
-  TRUSTED_PRIOR_QUALIFICATION_INVALID: ['准入记录与任务身份不一致或无效', 'Admission evidence is invalid or has drifted'],
-  HARNESS_LANE_REQUIRED: ['该任务不支持 Harness 工作区', 'Task does not support the Harness lane'],
-  PREFLIGHT_STALE: ['任务、配置、运行版本或准入已变化，请重新预检', 'Task, configuration, runtime or admission changed; preflight again'],
-  PREFLIGHT_EXPIRED: ['预检已过期，请重新预检', 'Preflight expired; preflight again'],
-  TASK_SOURCE_DRIFT: ['源任务已变化，旧预检已失效', 'Source task changed; previous preflight is stale'],
-  PHASE1_EXECUTION_DISABLED: ['本阶段执行入口关闭', 'Execution is disabled in this phase'],
-  LOCAL_OPERATOR_REQUIRED: ['请检查本地操作员凭据', 'Check the local operator credential'],
-  LOCAL_TASK_POLICY_INVALID: ['本地任务准入配置缺失或无效', 'Trusted local task policy is missing or invalid'],
-}
-function label(code: string) { const pair = checkLabels[code] ?? reasonLabels[code]; return pair ? c(...pair) : code }
+const label = statusLabel
 function reportError(e: unknown) {
   const response = (e as { response?: { data?: { error?: { code?: string; message?: string } } } }).response
   const code = response?.data?.error?.code

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import StatusBadge from '@/components/StatusBadge.vue'
+import { statusLabel } from '@/utils/statusLabels'
+import { experimentOption } from '@/utils/displayIdentity'
 import { computed, onMounted, ref } from 'vue'
 import PublicAnalystNotice from '@/components/PublicAnalystNotice.vue'
 import { useAnalystAccess } from '@/composables/analystAccess'
@@ -16,7 +19,7 @@ const profiles = ref<ProviderModelProfile[]>([])
 const experimentId = ref('')
 const backend = ref<'fake' | 'real'>(new URLSearchParams(window.location.search).get('backend') === 'real' ? 'real' : 'fake')
 const profileId = ref('')
-const goal = ref('Explain the observed failures and propose a bounded regression check.')
+const goal = ref('解释已观察到的失败，并提出范围受限的回归检查。')
 const decisionLimit = ref(8)
 const toolLimit = ref(12)
 const requestCeiling = ref(3)
@@ -52,7 +55,7 @@ function display(value: AnalystSession) {
   const index = sessions.value.findIndex(item => item.session_id === value.session_id)
   if (index >= 0) sessions.value[index] = value
   objective.value = value.proposed_plan?.objective ?? value.request.question
-  criteria.value = value.proposed_plan?.acceptance_criteria.join('\n') ?? 'Verify the selected cases using deterministic evidence.'
+  criteria.value = value.proposed_plan?.acceptance_criteria.join('\n') ?? '使用确定性证据核验所选案例。'
   const cited = [...new Set(value.report?.verified_facts.flatMap(fact => fact.evidence_refs) ?? [])]
   proposalEvidence.value = value.proposed_plan?.evidence_refs.slice()
     ?? (cited.length ? cited : value.evidence.map(item => item.ref.id)).slice(0, 100)
@@ -61,7 +64,7 @@ function display(value: AnalystSession) {
 async function action(work: () => Promise<void>) {
   busy.value = true; error.value = ''
   try { await work() }
-  catch { error.value = 'The Analyst request failed. Refresh the persisted session before retrying; limits are retained.' }
+  catch { error.value = '调查请求失败。请先刷新已保存会话，再尝试继续；预算限制仍保留。' }
   finally { busy.value = false }
 }
 async function loadSessions() {
@@ -125,96 +128,96 @@ onMounted(async () => {
   } else {
     error.value = '当前实验无法加载，数据库或历史计划校验可能不可用。可返回首页运行独立的离线演示。'
   }
-  if (models.status === 'rejected') error.value += ' Registry 加载失败；Real 暂不可用，Fake 仍可使用。'
+  if (models.status === 'rejected') error.value += ' 注册表读取失败；真实模型调查暂不可用，离线 Fake 仍可使用。'
   busy.value = false
 })
 </script>
 
 <template>
   <section v-if="access !== 'private'" class="sessions-workspace">
-    <h2>Analyst sessions</h2>
+    <h2>已保存调查</h2>
     <PublicAnalystNotice v-if="access === 'public'" />
-    <p v-else-if="access === 'loading'" role="status">Checking workspace permissions…</p>
-    <p v-else role="alert">Workspace permissions are unavailable. Reload the page to retry. <RouterLink to="/analyst">Open investigation workspace →</RouterLink></p>
+    <p v-else-if="access === 'loading'" role="status">正在检查工作区权限…</p>
+    <p v-else role="alert">工作区权限暂时无法读取，请重新加载页面后重试。 <RouterLink to="/analyst">打开调查工作区 →</RouterLink></p>
   </section>
   <section v-else class="sessions-workspace">
-    <div class="page-heading"><div><span class="eyebrow">SAMESCALE / INVESTIGATIONS</span><h2>继续追踪一个工程问题</h2><p>选择已有证据，继续调查，或审阅下一步回归方案。</p></div></div>
+    <div class="page-heading"><div><span class="eyebrow">调查工作区</span><h2>继续追踪一个工程问题</h2><p>选择已有证据，继续调查，或审阅下一步回归方案。</p></div></div>
     <p><a href="/analyst">← 开始调查：离线演示 / 历史真实记录</a></p>
     <p v-if="!busy && !experiments.length">当前没有可用实验。离线演示无需导入历史数据库；Real 调查需要先提供可验证的实验记录。</p>
     <p>当前数据库会话会保存调查进度。Fake 使用固定决策；Real 需要启用模型与逐步确认。审批方案只记录审阅结果。</p>
     <p v-if="error" role="alert">{{ error }}</p>
     <fieldset :disabled="busy"><legend>1 · 选择调查范围与会话</legend>
-      <label>Experiment <select v-model="experimentId" aria-label="Analyst experiment" @change="action(loadSessions)"><option v-for="item in experiments" :key="item.experiment_id" :value="item.experiment_id">{{ item.name }}</option></select></label>
-      <label>已保存调查<select v-model="selectedId" aria-label="Saved investigation" @change="selectSaved"><option v-for="value in sessions" :key="value.session_id" :value="value.session_id">{{ value.backend.toUpperCase() }} · {{ value.status }} · {{ value.request.question }} · {{ value.session_id }}</option></select></label>
-      <button :disabled="!selectedId" @click="action(async () => display(await analystApi.get(selectedId)))">Refresh session</button>
+      <label>实验 <select v-model="experimentId" aria-label="调查实验" @change="action(loadSessions)"><option v-for="item in experiments" :key="item.experiment_id" :value="item.experiment_id">{{ experimentOption(item, experiments) }}</option></select></label>
+      <label>已保存调查<select v-model="selectedId" aria-label="已保存调查" @change="selectSaved"><option v-for="value in sessions" :key="value.session_id" :value="value.session_id">{{ value.backend.toUpperCase() }} · {{ statusLabel(value.status, 'session') }} · {{ value.request.question }} · {{ value.session_id }}</option></select></label>
+      <button :disabled="!selectedId" @click="action(async () => display(await analystApi.get(selectedId)))">刷新会话</button>
       <p v-if="!busy && experimentId && !sessions.length">此实验还没有已保存调查。展开下方表单开始。</p>
     </fieldset>
     <details :open="setupOpen" class="setup-panel" @toggle="setupOpen = ($event.target as HTMLDetailsElement).open">
       <summary>新建调查 <span>选择问题、模式与预算</span></summary>
     <fieldset :disabled="busy">
-      <legend>New investigation</legend>
-      <label>Goal <textarea v-model="goal" aria-label="Investigation goal" maxlength="2000" /></label>
-      <label>Backend <select v-model="backend" aria-label="Analyst backend"><option value="fake">Fake — keyless</option><option value="real">Real — model driven</option></select></label>
-      <label v-if="backend === 'real'">Registry profile <select v-model="profileId" aria-label="Analyst profile"><option v-for="profile in profiles" :key="profile.profile_id" :value="profile.profile_id">{{ profile.profile_id }}</option></select></label>
-      <label>Decision limit <input v-model.number="decisionLimit" aria-label="Decision limit" type="number" min="1" max="8" /></label>
-      <label>Tool limit <input v-model.number="toolLimit" aria-label="Tool limit" type="number" min="1" max="12" /></label>
+      <legend>新建调查</legend>
+      <label>调查问题 <textarea v-model="goal" aria-label="调查问题" maxlength="2000" /></label>
+      <label>调查模式 <select v-model="backend" aria-label="调查模式"><option value="fake">Fake · 无需密钥</option><option value="real">真实模型驱动</option></select></label>
+      <label v-if="backend === 'real'">注册表配置 <select v-model="profileId" aria-label="调查模型配置"><option v-for="profile in profiles" :key="profile.profile_id" :value="profile.profile_id">{{ profile.profile_id }}</option></select></label>
+      <label>最大决策次数 <input v-model.number="decisionLimit" aria-label="最大决策次数" type="number" min="1" max="8" /></label>
+      <label>最大工具调用次数 <input v-model.number="toolLimit" aria-label="最大工具调用次数" type="number" min="1" max="12" /></label>
       <template v-if="backend === 'real'">
-        <label>Provider request ceiling <input v-model.number="requestCeiling" aria-label="Provider request ceiling" type="number" min="1" :max="decisionLimit" /></label>
-        <label>Output tokens/request <input v-model.number="outputCeiling" aria-label="Output token ceiling" type="number" min="1" /></label>
-        <label>Input bytes/request <input v-model.number="inputCeiling" aria-label="Input byte ceiling" type="number" min="1" max="256000" /></label>
-        <label>Cumulative tokens <input v-model.number="tokenCeiling" aria-label="Cumulative token ceiling" type="number" min="1" /></label>
-        <label>Timeout seconds/request <input v-model.number="timeoutCeiling" aria-label="Timeout ceiling" type="number" min="1" max="600" /></label>
-        <label>Optional USD ceiling <input v-model="usdCeiling" aria-label="USD ceiling" type="number" min="0.000001" step="any" /></label>
-        <p>Enter an explicit cumulative token budget. Preflight reserves the KNOWN Registry context bound plus output cap for the next request. A USD ceiling requires KNOWN route-matched pricing.</p>
+        <label>最大模型请求次数 <input v-model.number="requestCeiling" aria-label="最大模型请求次数" type="number" min="1" :max="decisionLimit" /></label>
+        <label>单次请求输出 token 上限 <input v-model.number="outputCeiling" aria-label="输出 token 上限" type="number" min="1" /></label>
+        <label>单次请求输入字节上限 <input v-model.number="inputCeiling" aria-label="输入字节上限" type="number" min="1" max="256000" /></label>
+        <label>累计 token 上限 <input v-model.number="tokenCeiling" aria-label="累计 token 上限" type="number" min="1" /></label>
+        <label>单次请求超时（秒） <input v-model.number="timeoutCeiling" aria-label="超时上限" type="number" min="1" max="600" /></label>
+        <label>可选费用上限（美元） <input v-model="usdCeiling" aria-label="费用上限" type="number" min="0.000001" step="any" /></label>
+        <p>请明确填写累计 token 预算。预检为下一次请求预留已知上下文上限与输出上限；费用上限需要已知且匹配路由的价格依据。</p>
       </template>
-      <button :disabled="!experimentId || !goal.trim() || (backend === 'real' && (!profileId || tokenCeiling <= 0 || requestCeiling > decisionLimit))" @click="create">Create investigation</button>
+      <button :disabled="!experimentId || !goal.trim() || (backend === 'real' && (!profileId || tokenCeiling <= 0 || requestCeiling > decisionLimit))" @click="create">创建调查</button>
     </fieldset>
     </details>
     <p v-if="busy" role="status">正在读取或保存调查状态…</p>
-    <article v-if="current" class="session-detail" aria-label="Investigation details">
+    <article v-if="current" class="session-detail" aria-label="调查详情">
       <span class="eyebrow">2 · 调查进度与结果</span>
       <p class="session-origin">{{ current.backend === 'fake' ? 'FAKE · 当前数据库会话 · 固定决策，不调用真实模型' : 'REAL · 当前数据库会话 · 模型调用需要逐步确认' }}</p>
       <h3>{{ current.request.question }}</h3>
-      <p><span class="status-pill" :class="current.status === 'COMPLETED' ? 'good' : current.status === 'FAILED' ? 'bad' : 'neutral'">{{ current.status }}</span></p>
+      <p><StatusBadge :value="current.status" context="session" /></p>
       <p class="session-guidance">{{ current.report ? '报告已生成。核对引用与限制后，审阅回归方案。' : current.status === 'FAILED' ? '调查失败。先刷新已保存状态，再按剩余预算决定是否继续。' : ['PAUSED', 'RUNNING'].includes(current.status) ? '调查尚未完成。每次继续一步，状态与已消耗预算都会保存。' : '调查已停止，当前没有可用报告。请检查状态与限制。' }}</p>
-      <p>Decisions {{ current.decision_iterations }}/{{ current.decision_limit }} · Tools {{ current.tool_calls }}/{{ current.tool_limit }} · Provider invocations {{ current.request_count ?? 'Unknown' }} · Request budget used {{ current.request_budget_used }}</p>
-      <p v-if="current.error" role="alert">{{ current.error }}</p>
-      <label v-if="current.backend === 'real'"><input v-model="confirmReal" type="checkbox" aria-label="Confirm one real model decision" />Allow one real model decision with this profile and remaining limits ({{ current.max_output_tokens_per_request }} output tokens/request; {{ current.request_timeout_seconds }} seconds).</label>
-      <button :disabled="busy || !canResume" @click="resumeCurrent">Resume one step</button>
+      <p>决策次数 {{ current.decision_iterations }}/{{ current.decision_limit }} · 工具调用次数 {{ current.tool_calls }}/{{ current.tool_limit }} · 模型请求次数 {{ current.request_count ?? '未知' }} · 已消耗请求预算 {{ current.request_budget_used }}</p>
+      <div v-if="current.error" role="alert"><p>调查发生错误。请先刷新保存状态，再检查配置与剩余预算。</p><details><summary>查看原始错误</summary><p>{{ current.error }}</p></details></div>
+      <label v-if="current.backend === 'real'"><input v-model="confirmReal" type="checkbox" aria-label="确认一次真实模型决策" />我允许使用此配置与剩余预算执行一次真实模型决策 ({{ current.max_output_tokens_per_request }} 输出 token / 请求；{{ current.request_timeout_seconds }} 秒）。</label>
+      <button :disabled="busy || !canResume" @click="resumeCurrent">继续一步</button>
       <template v-if="current.backend === 'real'">
-        <p>Frozen spend limits</p><pre>{{ current.spend_limits ?? 'Missing: this session cannot invoke a provider.' }}</pre>
-        <button :disabled="busy" @click="action(async () => { preflight = await analystApi.preflight(current!.session_id) })">Check smoke preflight</button>
-        <div v-if="preflight" aria-label="Smoke preflight"><strong>{{ preflight.status }}</strong><pre>{{ preflight }}</pre><p>Keyless snapshot only. READY is not execution authorization.</p></div>
+        <details><summary>固定费用与用量限制</summary><pre>{{ current.spend_limits ?? '缺少预算记录，此会话不能调用模型服务。' }}</pre></details>
+        <button :disabled="busy" @click="action(async () => { preflight = await analystApi.preflight(current!.session_id) })">检查烟测预检</button>
+        <div v-if="preflight" aria-label="烟测预检"><StatusBadge :value="preflight.status" /><details><summary>查看原始预检记录</summary><pre>{{ preflight }}</pre></details><p>仅为无需密钥的检查快照；就绪不代表已授权执行。</p></div>
       </template>
       <details class="session-metadata"><summary>会话来源与用量</summary>
       <p>{{ current.session_id }} · {{ current.backend }}</p>
-      <p>{{ current.provider ?? (current.backend === 'fake' ? 'Fake' : 'Unknown provider') }} / {{ current.model ?? (current.backend === 'fake' ? 'Deterministic' : 'Unknown model') }} · {{ current.profile_id ?? 'No provider profile' }}</p><p v-if="current.route">Route: {{ current.route }}</p>
-      <p>Input tokens {{ current.totals.input_tokens ?? 'Unknown' }} · Output tokens {{ current.totals.output_tokens ?? 'Unknown' }} · Cost USD {{ current.totals.cost_usd ?? 'Unknown' }} · Latency {{ current.totals.latency_ms ?? 'Unknown' }} ms</p>
+      <p>{{ current.provider ?? (current.backend === 'fake' ? 'Fake' : '服务商未知') }} / {{ current.model ?? (current.backend === 'fake' ? '固定决策' : '模型未知') }} · {{ current.profile_id ?? '未配置服务商模型' }}</p><p v-if="current.route">路由：{{ current.route }}</p>
+      <p>输入 token {{ current.totals.input_tokens ?? '未知' }} · 输出 token {{ current.totals.output_tokens ?? '未知' }} · 费用（美元） {{ current.totals.cost_usd ?? '未知' }} · 延迟 {{ current.totals.latency_ms ?? '未知' }} ms</p>
       </details>
-      <details><summary>调查过程与已完成工具（{{ current.completed_calls.length }}）</summary><ul><li v-for="call in current.completed_calls" :key="call.key">{{ call.call.name }} · {{ call.status }}</li></ul></details>
+      <details><summary>调查过程与已完成工具（{{ current.completed_calls.length }}）</summary><ul><li v-for="call in current.completed_calls" :key="call.key">{{ call.call.name }} · {{ statusLabel(call.status) }}</li></ul></details>
       <InvestigationReport v-if="current.report" :key="current.session_id" :report="current.report" :evidence="current.evidence" />
       <p v-else>尚未形成结论。恢复一步以查询证据；失败后先刷新状态，已消耗预算不会重置。</p>
       <details class="proposal-panel">
         <summary>3 · 审阅回归方案 <span>{{ current.approval ? '已有审阅记录' : current.proposed_plan ? '待审阅' : '准备下一步' }}</span></summary>
         <p>先核对报告证据，再保存方案和审阅记录。实验执行需要另行授权。</p>
-      <fieldset :disabled="busy || !current.evidence.length"><legend>Review-only regression proposal</legend>
-        <label>Objective <textarea v-model="objective" aria-label="Regression objective" maxlength="2000" /></label>
-        <label>Acceptance criteria, one per line <textarea v-model="criteria" aria-label="Regression acceptance criteria" /></label>
-        <p>Tasks: {{ (current.proposed_plan?.task_ids ?? current.scope.task_ids).join(', ') }} · Cells: {{ (current.proposed_plan?.cell_ids ?? current.scope.cell_ids).join(', ') }}</p>
-        <label>Evidence references ({{ proposalEvidence.length }}/100)
-          <select v-model="proposalEvidence" multiple aria-label="Proposal evidence references">
+      <fieldset :disabled="busy || !current.evidence.length"><legend>仅审阅回归方案</legend>
+        <label>目标 <textarea v-model="objective" aria-label="回归目标" maxlength="2000" /></label>
+        <label>验收条件（每行一项） <textarea v-model="criteria" aria-label="回归验收条件" /></label>
+        <p>任务：{{ (current.proposed_plan?.task_ids ?? current.scope.task_ids).join(', ') }} · 配置：{{ (current.proposed_plan?.cell_ids ?? current.scope.cell_ids).join(', ') }}</p>
+        <label>证据引用 ({{ proposalEvidence.length }}/100)
+          <select v-model="proposalEvidence" multiple aria-label="方案证据引用">
             <option v-for="entry in current.evidence" :key="entry.ref.id" :value="entry.ref.id"
               :disabled="proposalEvidence.length >= 100 && !proposalEvidence.includes(entry.ref.id)">{{ entry.ref.id }}</option>
           </select>
         </label>
-        <button :disabled="!proposalEvidence.length || proposalEvidence.length > 100" @click="saveProposal">Save proposal</button>
-        <p>Proposal digest: {{ current.proposal_digest ?? 'Not proposed' }}</p>
-        <p>Reviewer label 是本地审阅标签，不是已认证身份。审批仅保存方案，不授权执行。</p>
-        <label>Reviewer label <input v-model="reviewedBy" aria-label="Reviewer label" maxlength="100" :aria-invalid="reviewedBy.length > 0 && !reviewerValid" aria-describedby="reviewer-format" /></label>
+        <button :disabled="!proposalEvidence.length || proposalEvidence.length > 100" @click="saveProposal">保存方案</button>
+        <p>方案摘要： {{ current.proposal_digest ?? '尚未提出方案' }}</p>
+        <p>审阅标签 是本地审阅标签，不是已认证身份。审批仅保存方案，不授权执行。</p>
+        <label>审阅标签 <input v-model="reviewedBy" aria-label="审阅标签" maxlength="100" :aria-invalid="reviewedBy.length > 0 && !reviewerValid" aria-describedby="reviewer-format" /></label>
         <p id="reviewer-format">审阅标签支持英文字母、数字、空格及 . _ @ -；例如 local-reviewer。</p>
-        <button :disabled="!current.proposal_digest || proposalDirty || !reviewerValid" @click="action(async () => display(await analystApi.approve(current!.session_id, { scope_digest: current!.scope_digest, proposal_digest: current!.proposal_digest!, reviewed_by: reviewedBy })))">Approve proposal only</button>
-        <p v-if="current.approval">Approved by {{ current.approval.reviewed_by }} · {{ current.approval.approved_at }}. Execution is not authorized.</p>
-        <p v-else>Awaiting approval. Saving changed content invalidates previous approval.</p>
+        <button :disabled="!current.proposal_digest || proposalDirty || !reviewerValid" @click="action(async () => display(await analystApi.approve(current!.session_id, { scope_digest: current!.scope_digest, proposal_digest: current!.proposal_digest!, reviewed_by: reviewedBy })))">仅批准方案</button>
+        <p v-if="current.approval">审阅人 {{ current.approval.reviewed_by }} · {{ current.approval.approved_at }}. 尚未授权执行。</p>
+        <p v-else>等待审阅。修改后保存会使此前审批失效。</p>
       </fieldset>
       </details>
     </article>
