@@ -40,7 +40,8 @@ public-demo-20261009-b13ae8d9b801（12 条运行、108 产物）。没有重新�
 
 官网 npm ci/build 通过；原有 CSP 下 320/390/768/1440px 共 115 项浏览器检查，
 及无 JavaScript/外链 10 项补查通过。GIF 时长、解码、播放/停止、图片与链接有效。
-README 的 GitHub 实际渲染、Mermaid 和公开素材附件链接在推送后核对，结果附 PR；
+README 已在 GitHub 实际页面核对 Mermaid、静态图、GIF、折叠展示和本地启动标题；
+最终准确提交的复核与 CI 结果附 PR。
 本地构建不建立已部署状态，也不建立真实面试官理解度。
 
 官网在其功能分支 npm ci 后执行 npm run dev 预览；npm run build 产物为 dist/。

@@ -13,9 +13,6 @@ flowchart LR
     A[导入运行证据或最终代码] --> B[独立验收]
     B --> C[失败诊断]
     C --> D[候选对比]
-    A -. 运行日志可选 .-> E[保留来源与缺失项]
-    B -. 单独授权隔离检查 .-> F[自报不等于通过]
-    D -. 可比条件不足 .-> G[暂不判断方向]
 ```
 
 [官网与真实界面](https://getsamescale.com/) · [静态历史证据案例](https://getsamescale.com/demo/) · [本地启动](#本地启动) · [能力契约](PUBLIC_PRODUCT_CONTRACT.md)

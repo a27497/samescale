@@ -8,7 +8,7 @@ README 首屏说明产品价值、Mermaid 主流程、真实中文验收摘要�
 材料来自 main 前后端和既有公开离线 seed 数据；导入入口受限、候选不可比均明确标注。
 [素材、边界与验证](docs/PUBLIC_SHOWCASE.md)；官网 PR #6 不代表部署。
 
-官网构建与 115 + 10 项浏览器检查通过；README GitHub 渲染和公开素材附件链接推送后核对，
+官网构建与 115 + 10 项浏览器检查通过；README 已在 GitHub 实际核对 Mermaid、图片、GIF 和启动标题，
 远端 CI 以此分支准确 SHA 为准。本次各仓库分别开 PR，不合并、不部署或刷新缓存。
 停止于展示交付，不推进 roadmap，不新增 Agent/模型/Verifier 执行。
 
