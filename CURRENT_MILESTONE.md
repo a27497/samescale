@@ -1,5 +1,22 @@
 # SameScale Product — Current Milestone
 
+## Current state — README publishes effective-run evaluation — 2026-10-14
+
+User authorized PR#20 README first-screen metrics from the completed PR#21 report. Primary:
+25 effective runs, self25/25 (100%), independent23/25 (92%), false completion2/25 (8%).
+Only5 final pre-Agent environment failures excluded; the fixed30 selected view (25/30 self,
+23/30 independent) and failure detail remain linked. Conditions: UTC2026-10-14, external Codex
+CLI0.162.1, requested gpt-6.1-sol/high, fixed25 SWE Verified +5 HumanEval, effective20 SWE +5 HE.
+The report URL pins PR#21 publication head `6854e528769920a255ae3574095acf0c47f3baeb`.
+This condition-dependent small sample is not a general model ranking; false completion does not
+infer intent. Product REAL_CODEX stays closed; README distinguishes external execution from the
+product gate and corrects the prior blanket statement about untested new Codex runs.
+
+Documentation only: no new campaign, Agent/Verifier/model call, runtime, hidden-test exposure,
+frozen evidence edit, merge or deployment. Local existing documentation contract1 PASS; first-screen metrics, conditions, all relative links
+and diff whitespace PASS. Both PRs must pass all applicable exact-head CI before user handoff. Previous
+records below retain their original scope, including the original placeholder and CI observations.
+
 ## Current state — recruiter-facing README positioning — 2026-10-14 (Asia/Shanghai)
 
 User-authorized documentation-only work on `codex/readme-agent-evaluation-20261014`, based on
