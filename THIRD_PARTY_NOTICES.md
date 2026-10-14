@@ -35,6 +35,13 @@ source license and scope documents are included in wheels/build contexts.
 
 ## Retention and limits
 
+The optional failure-diagnosis schema validator adds locked jsonschema 4.25.1 and
+attrs 26.1.0, jsonschema-specifications 2025.9.1, referencing 0.37.0 and rpds-py 2026.9.1.
+Their installed distributions identify MIT terms; exact bundled LICENSE bytes are retained in
+[`licenses/failure-diagnosis`](licenses/failure-diagnosis) and included by the existing wheel license
+packaging. No previously locked dependency version changes. The older notice inventory remains
+a dated audit, not a claim that it already audited these newly added distributions.
+
 Apache-2.0 section 4 requires retaining applicable upstream notices, including
 NOTICE text when supplied. No inherited project-wide NOTICE requiring a new
 root NOTICE was found. The actual ECharts NOTICE is preserved in the third-party

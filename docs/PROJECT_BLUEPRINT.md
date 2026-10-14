@@ -1,5 +1,16 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：独立 LLM 失败诊断
+
+从 main@3f0d0c6 新功能分支实现操作员 CLI 的独立辅助产物、可替换模型后端、schema/引用
+校验、规则降级及不调用模型的离线回放。验收逻辑不依赖诊断，原验收/证据只读。
+只使用审阅过的公开任务、最终 diff、失败观察与自报；隐藏断言源码和已知答案不得进入输入。
+真实观察固定 SymPy-20916/Sphinx-7748，以外部只读无工具 Codex CLI 走用户 ChatGPT 订阅；
+不使用 API Key/ANTHROPIC_AUTH_TOKEN，不估算费用或不可得 token，保留失败尝试与实际次数。
+默认测试/CI fake，增加实际隔离 Verifier 结果不变测试。文档/README准确描述范围与局限。
+仅新分支 commit/push、draft PR，等准确 head 的全部 CI 通过；不合并、不部署、不改官网或设置。
+实际结果由 CURRENT_MILESTONE 维护。以下旧授权属于历史范围，不启动后续工作。
+
 ## 当前授权：评测报告口径与 README 首屏发布
 
 仅调整 PR #21 的公开主口径为排除环境失败的有效运行，保留原固定30题副口径和全部环境失败明细；
