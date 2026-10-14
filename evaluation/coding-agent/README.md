@@ -1,5 +1,10 @@
 # Coding Agent self-report / independent acceptance pilot
 
+## Mixed SWE-bench successor — 2026-10-14
+
+The current user canceled the HumanEval-only full stage. See [the fixed 25 + 5 mixed protocol](MIXED_PROTOCOL.md). New paid entrypoints now enforce the existing closed REAL_CODEX gate; the historical commands below grant no new execution permission. Original three-task evidence remains unchanged and replayable.
+
+
 This is an explicitly authorized, standalone evaluation script using native Codex CLI and
 SameScale's existing provider-scoped Docker egress boundary. It changes no product runtime,
 historical profile, database, demo, dependency lock, frozen evidence or model identity. Claude Code

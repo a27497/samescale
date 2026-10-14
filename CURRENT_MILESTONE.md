@@ -1,5 +1,23 @@
 # SameScale Product — Current Milestone
 
+## Current state — mixed SWE benchmark preparation / REAL_CODEX blocked — 2026-10-14
+
+User cancels the unexecuted HumanEval-only full stage and requests 25 SWE-bench Verified + five
+HumanEval controls, retaining the original three. Fixed hashed per-repository selection and three
+cross-repository pilot identities are bound in [mixed-config](evaluation/coding-agent/mixed-config.json)
+and [protocol](evaluation/coding-agent/MIXED_PROTOCOL.md), to be published before Docker controls.
+All 25 published Linux amd64 image manifests and base-commit license texts were acquired; local
+admission remains NOT_RUN until baseline/gold controls. Original three HumanEval observations
+and their archive remain unchanged; they do not establish product-gate compliance.
+
+Existing REAL_CODEX is unconditionally BLOCKED/403 (`REAL_EXECUTION_BLOCKED`). New mixed commands
+and the historical paid script enforce that exact gate before credential/root acquisition; enabling
+environment variables cannot override it. No product gate/runtime/admission/database or provider
+change is authorized. SWE real pilot and mixed full stage NOT_RUN; actual SWE Agent time/token/cost,
+pass rates/gap and full mixed estimates UNKNOWN. Keyless Docker environment preflight for the
+three fixed SWE identities is the independent authorized work; actual outcomes are recorded below
+when completed. Commit/push and update Draft PR #21 only; no merge/deployment/new paid call.
+
 ## Current state — real Coding Agent pilot — 2026-10-14 (Asia/Shanghai)
 
 User-authorized independent branch `codex/coding-agent-pilot-20261014`, based on main

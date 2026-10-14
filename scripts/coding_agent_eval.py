@@ -20,6 +20,7 @@ from typing import Any
 from uuid import uuid4
 
 from harnesslab.egress import EgressProxyRuntime, boundary_for_provider_url
+from harnesslab.local_execution.subscription import deny_real_execution
 from harnesslab.sandbox.docker_cli import _DockerCLI, docker_environment
 
 REPO = Path(__file__).resolve().parents[1]
@@ -600,6 +601,10 @@ def calibrate(root: Path, vendor: Path) -> None:
 
 
 async def run(root: Path, vendor: Path, auth: Path, *, full_confirmation: str | None) -> None:
+    # The current user requires the product REAL_CODEX gate for all new paid attempts.
+    # Preserve archived pilot receipts; do not use this historical standalone entrypoint
+    # to dispatch around the closed subscription/credential/request-control gate.
+    deny_real_execution()
     check_protocol(root)
     config = load(root / "config.json")
     calibration = load(root / "calibration.json")

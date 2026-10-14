@@ -1,5 +1,20 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：固定 SWE-bench 25 + HumanEval 5 与门禁预检（2026-10-14）
+
+用户取消未执行的 HumanEval-only 全量。保留既有三个真实 HumanEval 原记录，按已固定哈希顺序
+再选两题作为简单对照；SWE-bench Verified 固定版本中取五个许可允许的 Python 项目，各按
+`samescale-swe-mixed-v1` 哈希顺序选五题，共25题。扫描固定顺序取三个不同项目作为试跑题。
+30个ID、镜像摘要、许可来源和规则须先写入PR，然后才做Docker预检；任何失败不更换题目。
+
+当前用户明确禁止绕过 REAL_CODEX。复用原门禁，不改为环境开关或调用独立CLI绕行；原独立
+paid入口也先经过门禁。既有真实凭据隔离、SIWC/账户、请求控制等未验证条件不能通过本次
+费用授权或keyless控制变成通过。门禁关闭时仅做原版Verifier的baseline-fail/gold-pass环境
+校准并报告首次搭建失败数/3；实际Agent结果、耗时、费用及混合全量估算保持NOT_RUN/unknown。
+若之后满足既有门禁和单次授权条件，才可运行三个SWE-bench真实尝试，报告结果并再次STOP
+等待全量确认。原始数据/控制日志存Git外。只更新本分支和PR，不合并、不部署，不改产品栈。
+[固定混合协议](../evaluation/coding-agent/MIXED_PROTOCOL.md)；以下先前范围保留为历史。
+
 ## 当前授权：真实 Coding Agent 小评测试跑（2026-10-14，Asia/Shanghai）
 
 用户授权在新分支 / PR 上准备可复现的 20-40 题评测，并先跑 2-3 题 Codex。采用

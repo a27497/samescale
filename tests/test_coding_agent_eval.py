@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import importlib.util
 import json
 import sys
@@ -153,3 +154,23 @@ def test_verifier_and_subject_mounts_are_disjoint(campaign: ModuleType) -> None:
     assert command[command.index("--network") + 1] == "none"
     assert "--read-only" in command
     assert all("credential" not in value and "docker.sock" not in value for value in command)
+
+
+def test_historical_paid_entrypoint_obeys_closed_gate_before_inputs(
+    campaign: ModuleType, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from harnesslab.api.workbench_errors import WorkbenchAPIError
+
+    monkeypatch.setenv("HARNESSLAB_ENABLE_REAL_CODEX", "1")
+    monkeypatch.setenv("HARNESSLAB_REAL_CODEX_ENABLED", "true")
+    with pytest.raises(WorkbenchAPIError) as denied:
+        asyncio.run(
+            campaign.run(
+                tmp_path / "missing",
+                tmp_path / "missing-vendor",
+                tmp_path / "missing-auth",
+                full_confirmation=None,
+            )
+        )
+    assert denied.value.code == "REAL_EXECUTION_BLOCKED"
+    assert denied.value.status_code == 403

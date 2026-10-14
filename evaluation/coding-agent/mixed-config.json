@@ -1,0 +1,421 @@
+{
+  "schema_version": 1,
+  "campaign": "swe-mixed-20261014",
+  "dataset": "princeton-nlp/SWE-bench_Verified",
+  "dataset_revision": "c104f840cc67f8b6eec6f759ebc8b2693d585d4a",
+  "dataset_parquet_sha256": "a45b1fe4e2f0c8390b2b2938ac83e92ed5979000856808f3679c07812e9e6dcd",
+  "dataset_json_sha256": "aaa64fc679f6d75c9f4fc68800bb60c541534fa7715de46bfcf5ec2a90857332",
+  "harness_repository": "https://github.com/SWE-bench/SWE-bench",
+  "harness_revision": "726c5461e2ef52d83cf1ea2107870a8bb3328d57",
+  "harness_version": "4.1.0",
+  "selection_seed": "samescale-swe-mixed-v1",
+  "repositories": [
+    "astropy/astropy",
+    "sphinx-doc/sphinx",
+    "sympy/sympy",
+    "psf/requests",
+    "pytest-dev/pytest"
+  ],
+  "per_repository": 5,
+  "swe_count": 25,
+  "pilot_count": 3,
+  "pilot_task_ids": [
+    "astropy__astropy-8872",
+    "sphinx-doc__sphinx-8120",
+    "sympy__sympy-20916"
+  ],
+  "tasks": [
+    {
+      "instance_id": "astropy__astropy-8872",
+      "repo": "astropy/astropy",
+      "base_commit": "b750a0e6ee76fb6b8a099a4d16ec51977be46bf6",
+      "version": "3.1",
+      "image": "docker.io/swebench/sweb.eval.x86_64.astropy_1776_astropy-8872@sha256:0576032159a5cc54ea7baa75e08467c006463df512587865213885ec4fc6e75d",
+      "compressed_image_bytes": 1177284524,
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "source_url": "https://github.com/astropy/astropy/blob/b750a0e6ee76fb6b8a099a4d16ec51977be46bf6/LICENSE.rst",
+        "sha256": "03712f43fede530155b72e3d4497bedcf6ac1c4d81b9f6e4d95e0876fec912da",
+        "reviewed_primary_license": "BSD-3-Clause",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8120",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "795747bdb6b8fb7d717d5bbfc2c3316869e66a73",
+      "version": "3.3",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8120@sha256:1a40447f75c5833ce370d51be4b22d4ef7501e800600834131a3c69fba60cb3f",
+      "compressed_image_bytes": 1098443074,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sphinx-doc/sphinx/blob/795747bdb6b8fb7d717d5bbfc2c3316869e66a73/LICENSE",
+        "sha256": "f275b949f651f373e41cdd163ffa89b419497f89990e1a86753ac64a33829404",
+        "reviewed_primary_license": "BSD-2-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-8638",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "4b452338f914d4f6b54704222d70ae8a746e3db5",
+      "version": "4.0",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-8638@sha256:3f2d3335613ab578fc026ddf8cda2a835e8f0f24ba6c0605e53241ec518bf78a",
+      "compressed_image_bytes": 1097567085,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sphinx-doc/sphinx/blob/4b452338f914d4f6b54704222d70ae8a746e3db5/LICENSE",
+        "sha256": "058abe6d05d2fd185ed5cbc89d473a4722e43131582c93a040f78c4581f32943",
+        "reviewed_primary_license": "BSD-2-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-7748",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "9988d5ce267bf0df4791770b469431b1fb00dcdd",
+      "version": "3.1",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-7748@sha256:135d6c1cbce932b6897e0e625564f32c39abd3c42e061854a5857bd8321cffea",
+      "compressed_image_bytes": 1097726821,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sphinx-doc/sphinx/blob/9988d5ce267bf0df4791770b469431b1fb00dcdd/LICENSE",
+        "sha256": "5004de7c0e86d9f3b7fa059807719c62b06ee5a30b8358081433f28c3b9ac9c9",
+        "reviewed_primary_license": "BSD-2-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "astropy__astropy-13977",
+      "repo": "astropy/astropy",
+      "base_commit": "5250b2442501e6c671c6b380536f1edb352602d1",
+      "version": "5.1",
+      "image": "docker.io/swebench/sweb.eval.x86_64.astropy_1776_astropy-13977@sha256:bd003a6a247d33fc29c4df16c9288f6d2b75ff4ed94e1fdc6ff161f1db94496f",
+      "compressed_image_bytes": 1136946721,
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "source_url": "https://github.com/astropy/astropy/blob/5250b2442501e6c671c6b380536f1edb352602d1/LICENSE.rst",
+        "sha256": "a86d75ead6df0886dcbc04230ffcd971c66a4a6746ca559ddf768865370637f5",
+        "reviewed_primary_license": "BSD-3-Clause",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-20916",
+      "repo": "sympy/sympy",
+      "base_commit": "82298df6a51491bfaad0c6d1980e7e3ca808ae93",
+      "version": "1.8",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-20916@sha256:792007a030035b455f7a3ae1b9abe02bf19109b7dea43521df4175fc9c8c1a10",
+      "compressed_image_bytes": 1089336156,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sympy/sympy/blob/82298df6a51491bfaad0c6d1980e7e3ca808ae93/LICENSE",
+        "sha256": "a7212a73709d040d7b932440f84c71e2334c045faaae589e9905ec1e9fbfd443",
+        "reviewed_primary_license": "BSD-3-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-21612",
+      "repo": "sympy/sympy",
+      "base_commit": "b4777fdcef467b7132c055f8ac2c9a5059e6a145",
+      "version": "1.9",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-21612@sha256:689024e8a43de562fa754cc1766e73dc4f4abb39b5e11dd01ce177addec4eb47",
+      "compressed_image_bytes": 1091157805,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sympy/sympy/blob/b4777fdcef467b7132c055f8ac2c9a5059e6a145/LICENSE",
+        "sha256": "e988879ec689669c58c251f6b3da8d7d7db3e64d0e2f16283c198792edb0464b",
+        "reviewed_primary_license": "BSD-3-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-9658",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "232dbe41c5250eb7d559d40438c4743483e95f15",
+      "version": "4.3",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-9658@sha256:3ebc590069ea1a3566c30edeb686fd2c28d73719d9fcb379afcf2e0bd01ebf83",
+      "compressed_image_bytes": 1101646707,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sphinx-doc/sphinx/blob/232dbe41c5250eb7d559d40438c4743483e95f15/LICENSE",
+        "sha256": "058abe6d05d2fd185ed5cbc89d473a4722e43131582c93a040f78c4581f32943",
+        "reviewed_primary_license": "BSD-2-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-7910",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "27ac10de04697e2372d31db5548e56a7c6d9265d",
+      "version": "3.2",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sphinx-doc_1776_sphinx-7910@sha256:db46b5daeddfbb1b80724b4dbd8c32ad86124373ac80987e74c2d1491ad9774f",
+      "compressed_image_bytes": 1097935704,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sphinx-doc/sphinx/blob/27ac10de04697e2372d31db5548e56a7c6d9265d/LICENSE",
+        "sha256": "f275b949f651f373e41cdd163ffa89b419497f89990e1a86753ac64a33829404",
+        "reviewed_primary_license": "BSD-2-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-16597",
+      "repo": "sympy/sympy",
+      "base_commit": "6fd65310fa3167b9626c38a5487e171ca407d988",
+      "version": "1.5",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-16597@sha256:166853c298d0dc29ad6cb0468b996714d2682dae62fc7103fcc7bd85bdbc1916",
+      "compressed_image_bytes": 1077366468,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sympy/sympy/blob/6fd65310fa3167b9626c38a5487e171ca407d988/LICENSE",
+        "sha256": "f8254a405fae8fc9b2a13b9c3202e6fdfce7fa4c0886deb691dd7d72f1e09286",
+        "reviewed_primary_license": "BSD-3-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-16766",
+      "repo": "sympy/sympy",
+      "base_commit": "b8fe457a02cc24b3470ff678d0099c350b7fef43",
+      "version": "1.5",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-16766@sha256:70dcf2c5f915ffc3e74ff92720d0318df561ec4bb86a8101bd04fc472e23ad1d",
+      "compressed_image_bytes": 1077644944,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sympy/sympy/blob/b8fe457a02cc24b3470ff678d0099c350b7fef43/LICENSE",
+        "sha256": "f8254a405fae8fc9b2a13b9c3202e6fdfce7fa4c0886deb691dd7d72f1e09286",
+        "reviewed_primary_license": "BSD-3-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "sympy__sympy-13757",
+      "repo": "sympy/sympy",
+      "base_commit": "a5e6a101869e027e7930e694f8b1cfb082603453",
+      "version": "1.1",
+      "image": "docker.io/swebench/sweb.eval.x86_64.sympy_1776_sympy-13757@sha256:94071e1e9ef6ed6fb9d6e557fede3b3104f78a0f500e048325edb3445cbc98a2",
+      "compressed_image_bytes": 1068318748,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/sympy/sympy/blob/a5e6a101869e027e7930e694f8b1cfb082603453/LICENSE",
+        "sha256": "e6d5cc1bce88c52ec90cb34802a1b9fca23d01caee535431395aca3ba743123a",
+        "reviewed_primary_license": "BSD-3-Clause with retained bundled-software notices",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "astropy__astropy-7671",
+      "repo": "astropy/astropy",
+      "base_commit": "a7141cd90019b62688d507ae056298507678c058",
+      "version": "1.3",
+      "image": "docker.io/swebench/sweb.eval.x86_64.astropy_1776_astropy-7671@sha256:e4a644271876ead58b4e1cd05780e0ddb17ca421bf7b2f6f5dca9269d574e201",
+      "compressed_image_bytes": 1114214600,
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "source_url": "https://github.com/astropy/astropy/blob/a7141cd90019b62688d507ae056298507678c058/LICENSE.rst",
+        "sha256": "03712f43fede530155b72e3d4497bedcf6ac1c4d81b9f6e4d95e0876fec912da",
+        "reviewed_primary_license": "BSD-3-Clause",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "psf__requests-1921",
+      "repo": "psf/requests",
+      "base_commit": "3c88e520da24ae6f736929a750876e7654accc3d",
+      "version": "2.3",
+      "image": "docker.io/swebench/sweb.eval.x86_64.psf_1776_requests-1921@sha256:72b679c2808373de18df1a8a48404370c03a2c929fd63361b08f0872d01174b2",
+      "compressed_image_bytes": 1014577539,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/psf/requests/blob/3c88e520da24ae6f736929a750876e7654accc3d/LICENSE",
+        "sha256": "89478f1915fbb6b6585a685d071bf006ba5649d2615fab787f66e9693c622ae4",
+        "reviewed_primary_license": "Apache-2.0",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "astropy__astropy-7336",
+      "repo": "astropy/astropy",
+      "base_commit": "732d89c2940156bdc0e200bb36dc38b5e424bcba",
+      "version": "1.3",
+      "image": "docker.io/swebench/sweb.eval.x86_64.astropy_1776_astropy-7336@sha256:481ebd12ef496853db01765b1dd57d9aebdedd056c22656b9f483fc1c8379da9",
+      "compressed_image_bytes": 1113006597,
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "source_url": "https://github.com/astropy/astropy/blob/732d89c2940156bdc0e200bb36dc38b5e424bcba/LICENSE.rst",
+        "sha256": "03712f43fede530155b72e3d4497bedcf6ac1c4d81b9f6e4d95e0876fec912da",
+        "reviewed_primary_license": "BSD-3-Clause",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "astropy__astropy-14309",
+      "repo": "astropy/astropy",
+      "base_commit": "cdb66059a2feb44ee49021874605ba90801f9986",
+      "version": "5.1",
+      "image": "docker.io/swebench/sweb.eval.x86_64.astropy_1776_astropy-14309@sha256:1a682f9156ceb9e939cde549c6a01828998e06a653d901c3dc72c5b6b2556eff",
+      "compressed_image_bytes": 1136537447,
+      "license": {
+        "spdx": "BSD-3-Clause",
+        "source_url": "https://github.com/astropy/astropy/blob/cdb66059a2feb44ee49021874605ba90801f9986/LICENSE.rst",
+        "sha256": "a86d75ead6df0886dcbc04230ffcd971c66a4a6746ca559ddf768865370637f5",
+        "reviewed_primary_license": "BSD-3-Clause",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "psf__requests-5414",
+      "repo": "psf/requests",
+      "base_commit": "39d0fdd9096f7dceccbc8f82e1eda7dd64717a8e",
+      "version": "2.26",
+      "image": "docker.io/swebench/sweb.eval.x86_64.psf_1776_requests-5414@sha256:8fadbdc7cf0281a50f88fdb78e6ac7242b499f207ec2d940250aef0abc4b3f4f",
+      "compressed_image_bytes": 1025884983,
+      "license": {
+        "spdx": "Apache-2.0",
+        "source_url": "https://github.com/psf/requests/blob/39d0fdd9096f7dceccbc8f82e1eda7dd64717a8e/LICENSE",
+        "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b",
+        "reviewed_primary_license": "Apache-2.0",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "psf__requests-2317",
+      "repo": "psf/requests",
+      "base_commit": "091991be0da19de9108dbe5e3752917fea3d7fdc",
+      "version": "2.4",
+      "image": "docker.io/swebench/sweb.eval.x86_64.psf_1776_requests-2317@sha256:a0ce096d4dfa27ca8ea80ae4b38103e970d17b19066d886a550936394827c9fb",
+      "compressed_image_bytes": 1015309228,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/psf/requests/blob/091991be0da19de9108dbe5e3752917fea3d7fdc/LICENSE",
+        "sha256": "89478f1915fbb6b6585a685d071bf006ba5649d2615fab787f66e9693c622ae4",
+        "reviewed_primary_license": "Apache-2.0",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5787",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "955e54221008aba577ecbaefa15679f6777d3bf8",
+      "version": "5.1",
+      "image": "docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-5787@sha256:d1abda88ac4d8effc52e3fde7711a19be44e4e6c7c9c262facdbca784c815c7a",
+      "compressed_image_bytes": 1024438220,
+      "license": {
+        "spdx": "MIT",
+        "source_url": "https://github.com/pytest-dev/pytest/blob/955e54221008aba577ecbaefa15679f6777d3bf8/LICENSE",
+        "sha256": "4be38574daf05665b6194e4fd84c5ef6ce7c3a2810308a5222d5cdffc2d04d18",
+        "reviewed_primary_license": "MIT",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-10081",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "da9a2b584eb7a6c7e924b2621ed0ddaeca0a7bea",
+      "version": "7.2",
+      "image": "docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-10081@sha256:eab7447ecdad975bb6d48acaa02ee21b53764618b28da742e95c8531686a9c98",
+      "compressed_image_bytes": 1029043916,
+      "license": {
+        "spdx": "MIT",
+        "source_url": "https://github.com/pytest-dev/pytest/blob/da9a2b584eb7a6c7e924b2621ed0ddaeca0a7bea/LICENSE",
+        "sha256": "ca836a5f9ecca3b2f350230faa20a48fb8b145653b5568d784862df864706b9b",
+        "reviewed_primary_license": "MIT",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7571",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "422685d0bdc110547535036c1ff398b5e1c44145",
+      "version": "6.0",
+      "image": "docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-7571@sha256:a4cdd92a11a554106948342c614cbcaa9a7fc7f42b261859c9deef149a673cfe",
+      "compressed_image_bytes": 1026626175,
+      "license": {
+        "spdx": "MIT",
+        "source_url": "https://github.com/pytest-dev/pytest/blob/422685d0bdc110547535036c1ff398b5e1c44145/LICENSE",
+        "sha256": "7898b9b164d4f93fd9a562fd0f592935518b48c4745303964110eb7f7fe64faf",
+        "reviewed_primary_license": "MIT",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-8399",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "6e7dc8bac831cd8cf7a53b08efa366bd84f0c0fe",
+      "version": "6.3",
+      "image": "docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-8399@sha256:b9a5d37ff455b7ecc581bc9432bab3f7e2c73ed429539a7230cee50a4b79beb4",
+      "compressed_image_bytes": 1027612964,
+      "license": {
+        "spdx": "MIT",
+        "source_url": "https://github.com/pytest-dev/pytest/blob/6e7dc8bac831cd8cf7a53b08efa366bd84f0c0fe/LICENSE",
+        "sha256": "7898b9b164d4f93fd9a562fd0f592935518b48c4745303964110eb7f7fe64faf",
+        "reviewed_primary_license": "MIT",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "pytest-dev__pytest-7236",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "c98bc4cd3d687fe9b392d8eecd905627191d4f06",
+      "version": "5.4",
+      "image": "docker.io/swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-7236@sha256:edcc72fd067a1b88f55fc9676cd2fa8ad6f0e624a3ae7d92eae232b7f39efadf",
+      "compressed_image_bytes": 1026092991,
+      "license": {
+        "spdx": "MIT",
+        "source_url": "https://github.com/pytest-dev/pytest/blob/c98bc4cd3d687fe9b392d8eecd905627191d4f06/LICENSE",
+        "sha256": "7898b9b164d4f93fd9a562fd0f592935518b48c4745303964110eb7f7fe64faf",
+        "reviewed_primary_license": "MIT",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "psf__requests-2931",
+      "repo": "psf/requests",
+      "base_commit": "5f7a3a74aab1625c2bb65f643197ee885e3da576",
+      "version": "2.9",
+      "image": "docker.io/swebench/sweb.eval.x86_64.psf_1776_requests-2931@sha256:852d3d1ddb3c859675e5bb7d9269cb27c1bf8a6e95965108ad8a38b3495fc1d0",
+      "compressed_image_bytes": 1015369405,
+      "license": {
+        "spdx": "NOASSERTION",
+        "source_url": "https://github.com/psf/requests/blob/5f7a3a74aab1625c2bb65f643197ee885e3da576/LICENSE",
+        "sha256": "c031540c6951209351ce0b9bcf1cdf689abb277bcb07780d74f448f882a4a869",
+        "reviewed_primary_license": "Apache-2.0",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    },
+    {
+      "instance_id": "psf__requests-6028",
+      "repo": "psf/requests",
+      "base_commit": "0192aac24123735b3eaf9b08df46429bb770c283",
+      "version": "2.27",
+      "image": "docker.io/swebench/sweb.eval.x86_64.psf_1776_requests-6028@sha256:515bfc8e8e0ab4ab176c69960958abde78797ee9de59192d305f6de92bed9e30",
+      "compressed_image_bytes": 1025907654,
+      "license": {
+        "spdx": "Apache-2.0",
+        "source_url": "https://github.com/psf/requests/blob/0192aac24123735b3eaf9b08df46429bb770c283/LICENSE",
+        "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b",
+        "reviewed_primary_license": "Apache-2.0",
+        "review_basis": "pinned base-commit license text; GitHub NOASSERTION is retained separately"
+      }
+    }
+  ],
+  "humaneval_task_ids": [
+    "HumanEval/122",
+    "HumanEval/33",
+    "HumanEval/153",
+    "HumanEval/121",
+    "HumanEval/25"
+  ],
+  "retained_humaneval_summary_sha256": "fe14209cb3760190da9119d2b9a66a27f0fe0a3ab3d2f97002e2be6183a992ee",
+  "execution_mode": "REAL_CODEX",
+  "real_execution_gate": "harnesslab.local_execution.subscription.deny_real_execution",
+  "environment_control_timeout_seconds": 600,
+  "pull_timeout_seconds": 600,
+  "environment_controls": "base hidden tests fail-to-pass fail; pass-to-pass pass; gold all required tests pass",
+  "claude_code": {
+    "enabled": false,
+    "format": "stream-json"
+  }
+}
