@@ -1,0 +1,160 @@
+{
+  "conditions": {
+    "codex_cli_version": "0.162.1",
+    "date_utc": "2026-10-14",
+    "execution_route": "EXTERNAL_CODEX_CLI",
+    "product_REAL_CODEX": "UNCHANGED_CLOSED",
+    "reasoning_effort": "high",
+    "requested_model": "gpt-6.1-sol",
+    "selected_humaneval": 5,
+    "selected_swe": 25
+  },
+  "excluded_count": 5,
+  "excluded_task_ids": [
+    "sympy__sympy-16597",
+    "psf__requests-1921",
+    "psf__requests-5414",
+    "psf__requests-2317",
+    "psf__requests-2931"
+  ],
+  "exclusion_rule": "environment == FAIL (pre-Agent failure, physical_agent_attempts == 0)",
+  "presentation": "EFFECTIVE_RUNS_PRIMARY",
+  "primary": {
+    "All": {
+      "denominator": 25,
+      "false_completion_rate": 0.08,
+      "false_completions": 2,
+      "gap_percentage_points": 8.0,
+      "independent_pass_rate": 0.92,
+      "independent_passes": 23,
+      "self_report_pass_rate": 1.0,
+      "self_report_passes": 25
+    },
+    "HumanEval": {
+      "denominator": 5,
+      "false_completion_rate": 0.0,
+      "false_completions": 0,
+      "gap_percentage_points": 0.0,
+      "independent_pass_rate": 1.0,
+      "independent_passes": 5,
+      "self_report_pass_rate": 1.0,
+      "self_report_passes": 5
+    },
+    "SWE-bench": {
+      "denominator": 20,
+      "false_completion_rate": 0.1,
+      "false_completions": 2,
+      "gap_percentage_points": 10.0,
+      "independent_pass_rate": 0.9,
+      "independent_passes": 18,
+      "self_report_pass_rate": 1.0,
+      "self_report_passes": 20
+    }
+  },
+  "schema_version": 1,
+  "secondary_selected": {
+    "All": {
+      "agent_attempts": 25,
+      "agent_seconds": 3225.544,
+      "api_equivalent_usd": 3.772424,
+      "environment_failures": 5,
+      "executed_independent_pass_rate": 0.92,
+      "failure_distribution": {
+        "ENVIRONMENT_FAILURE": 5,
+        "HIDDEN_TEST_FAILURE": 2,
+        "NONE": 23
+      },
+      "false_completions": 2,
+      "gap_percentage_points": 6.666666666666667,
+      "independent_distribution": {
+        "FAIL": 2,
+        "NOT_RUN": 5,
+        "PASS": 23
+      },
+      "independent_pass_rate": 0.7666666666666667,
+      "independent_passes": 23,
+      "selected": 30,
+      "self_report_distribution": {
+        "NOT_RUN": 5,
+        "PASS": 25
+      },
+      "self_report_pass_rate": 0.8333333333333334,
+      "self_report_passes": 25,
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 5947520,
+        "input_tokens": 7155461,
+        "output_tokens": 76179
+      },
+      "verifier_seconds": 158.277
+    },
+    "HumanEval": {
+      "agent_attempts": 5,
+      "agent_seconds": 189.489,
+      "api_equivalent_usd": 0.2323948,
+      "environment_failures": 0,
+      "executed_independent_pass_rate": 1.0,
+      "failure_distribution": {
+        "NONE": 5
+      },
+      "false_completions": 0,
+      "gap_percentage_points": 0.0,
+      "independent_distribution": {
+        "PASS": 5
+      },
+      "independent_pass_rate": 1.0,
+      "independent_passes": 5,
+      "selected": 5,
+      "self_report_distribution": {
+        "PASS": 5
+      },
+      "self_report_pass_rate": 1.0,
+      "self_report_passes": 5,
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 162688,
+        "input_tokens": 254276,
+        "output_tokens": 3295
+      },
+      "verifier_seconds": 3.123
+    },
+    "SWE-bench": {
+      "agent_attempts": 20,
+      "agent_seconds": 3036.055,
+      "api_equivalent_usd": 3.5400292,
+      "environment_failures": 5,
+      "executed_independent_pass_rate": 0.9,
+      "failure_distribution": {
+        "ENVIRONMENT_FAILURE": 5,
+        "HIDDEN_TEST_FAILURE": 2,
+        "NONE": 18
+      },
+      "false_completions": 2,
+      "gap_percentage_points": 8.0,
+      "independent_distribution": {
+        "FAIL": 2,
+        "NOT_RUN": 5,
+        "PASS": 18
+      },
+      "independent_pass_rate": 0.72,
+      "independent_passes": 18,
+      "selected": 25,
+      "self_report_distribution": {
+        "NOT_RUN": 5,
+        "PASS": 20
+      },
+      "self_report_pass_rate": 0.8,
+      "self_report_passes": 20,
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 5784832,
+        "input_tokens": 6901185,
+        "output_tokens": 72884
+      },
+      "verifier_seconds": 155.154
+    }
+  },
+  "selection_changed": false,
+  "source_report": "report.json",
+  "source_report_sha256": "d8250bf05625ac0c605f87108f67c6027be788f8a6094cf48813b591c9aa428b"
+}

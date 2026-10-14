@@ -49,8 +49,12 @@ Use the [fixed failure rules](README.md#measurement-and-classification). Explici
 `SAMESCALE_SELF_REPORT=PASS` is self PASS; missing/conflicting claims are UNKNOWN. False completion
 requires self PASS and independent FAIL and is an additional flag, not an assertion of deception.
 Per user instruction, final pre-Agent setup/admission failures are ENVIRONMENT_FAILURE even when
-the underlying control failed by timeout. All rates use the fixed selected denominators: 30 overall, 25 SWE, 5 HumanEval. NOT_RUN and
-NOT_VERIFIED never count as passes. Report both environment failure counts and actual execution
+the underlying control failed by timeout. The frozen execution report keeps selected denominators: 30 overall, 25 SWE, 5 HumanEval.
+The user subsequently requested a public reporting primary of effective runs, excluding only the
+5 final pre-Agent environment failures: 25 overall, 20 SWE, 5 HumanEval. Both hidden-test failures
+remain effective runs. Preserve the selected-denominator view as secondary and all30 rows unchanged.
+The presentation-only effective-run-summary.json is derived from those rows and binds their source
+report hash. NOT_RUN and NOT_VERIFIED never count as passes. Report both environment failure counts and actual execution
 counts. Agent and independent-verification seconds come from actual process/manifests. Initial
 setup timing is separate; engineering/correction effort is not included in Agent time. A negative
 resume-derived setup measurement is projected as unknown while keeping its original evidence.

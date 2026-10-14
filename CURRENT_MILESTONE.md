@@ -4,8 +4,11 @@
 
 Fixed 25 SWE Verified + 5 HumanEval selection unchanged. Original six observations retained;
 19 new physical Agents completed once, 5 final pre-Agent environment failures remain selected.
-**All30: self PASS25/30 (83.33%), independent PASS23/30 (76.67%), gap6.67pp.**
-SWE25:20/25 self (80%),18/25 independent (72%), gap8pp,5 environment failures.
+**Primary effective runs: self25/25 (100%), independent23/25 (92%), gap8pp, false completion2/25 (8%).**
+Only5 pre-Agent environment failures excluded from this presentation denominator; selection/rows
+remain unchanged. Secondary all30: self25/30 (83.33%), independent23/30 (76.67%), gap6.67pp.
+Primary SWE20 effective:20/20 self,18/20 independent (90%), gap10pp, false completion2/20 (10%).
+Secondary SWE25:20/25 self (80%),18/25 independent (72%), gap8pp,5 environment failures.
 HumanEval5:5/5 self and independent (100%), gap0. Two false completions: retained SymPy20916
 Unicode-digit subscript and new Sphinx7748 overloaded signature formatting. No inference of intent.
 Primary distribution23 NONE /2 HIDDEN_TEST_FAILURE /5 ENVIRONMENT_FAILURE; UNKNOWN0.
@@ -28,7 +31,9 @@ code-only intake after stream privacy refusal; raw stream preserved. No import/p
 limits relaxed. Current code consolidates pre-Agent path/reporting/offline dependency fixes;
 source snapshots and every failed control remain outside Git. Negative resume setup timing stays
 unknown in derived report, original kept. [Full results/reproduction/limitations](docs/evidence/swe-full-20261014/README.md).
-Only original authorized branch and Draft PR#21 updated; remote CI is reported separately.
+User authorized this reporting-only primary/secondary change and PR#20 README publication.
+Original report JSON/CSV/raw archives stay immutable; effective-run-summary.json derives the view.
+Both exact-head CI suites must pass before handoff; no new Agent/Verifier execution.
 **STOP: paid campaign complete. No further execution, merge, deployment or database change.**
 Following entries are historical scopes/observations, superseded by the completed full result.
 

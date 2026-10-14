@@ -1,5 +1,12 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：评测报告口径与 README 首屏发布
+
+仅调整 PR #21 的公开主口径为排除环境失败的有效运行，保留原固定30题副口径和全部环境失败明细；
+不改原始结果、选题、归档或验收收据。PR #20 分支 README 首屏采用同一主口径，列明模型、题集、
+日期与报告链接。各自分支 commit/push 后等待准确 head 的全部适用 CI 通过再汇报。
+不再运行 Agent、Verifier 或付费评测；不合并、不部署。实际状态只在 CURRENT_MILESTONE 维护。
+
 ## 已完成授权范围：固定 30 题全量，API 等价 $20 停止阈值（2026-10-14 确认）
 
 
