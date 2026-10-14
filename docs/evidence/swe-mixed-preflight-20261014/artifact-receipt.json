@@ -1,0 +1,20 @@
+{
+  "archive_bytes": 3458471,
+  "archive_path": "/home/dev/.local/state/samescale-eval/swe-mixed-preflight-20261014.tar.gz",
+  "archive_sha256": "d0d3ce6cf532b554a785825a7196a41956f32de53c2543ac07b8998ae5c608e1",
+  "config_sha256": "0f91d8dbea1e8ae27ea1c34d5dbb17f2d984139488946806a1393f65e6b27669",
+  "inventory_sha256": "14ef32bdb7d9b60216aef0251bb6d02263099fc2f13074f38057a647915d5fb6",
+  "new_model_calls": 0,
+  "offline_phase_replays": "EACH_PHASE_REPLAYED_TWICE_IDENTICALLY",
+  "previous_humaneval_archive_unchanged": true,
+  "raw_git_history": "NOT_INCLUDED",
+  "selection_commit": "61b56e7fb4ad5932cbd27a49e9b5b351549a7193",
+  "source_hashes": {
+    "capture.py": "8c20c6ce207099f182ae29cd01c42160114ed46b35e86e6364fd6a9db3362e5c",
+    "runner-corrected.py": "427da91f9555e041d05ccc5632b3ac341d6bbfd76fa23a707523f01dc13bc614",
+    "runner-merged.py": "43d71d325f79e417b2e87d5d6d7798e72f42361644f4d9b74794628647e7f1f1",
+    "runner-sphinx-reported.py": "0a498628822d9b1eaf6c304af0167fd545b925559b5ea23821fdf54a8dd842c6",
+    "swe_bridge.py": "871ac43375ee92b9b6c6e19991e033e3810fc273de30c554b4f6a74ca86a2b41"
+  },
+  "storage": "SEPARATE_LOCAL_STORAGE"
+}

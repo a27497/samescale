@@ -1,0 +1,32 @@
+{
+  "acceptance_physical_attempts": 3,
+  "agent_physical_attempts": 3,
+  "archive_bytes": 99192913,
+  "archive_path": "/home/dev/.local/state/samescale-eval/swe-external-pilot-20261014-evidence.tar.gz",
+  "archive_sha256": "80fe184d9bf6d4c792aef31f1716941129df35c59821bcc6e9ecbbd71cd476b7",
+  "credential_scan_files": 18614,
+  "excludes": [
+    "Git object databases",
+    "tooling caches",
+    "OCI image layers",
+    "credential file"
+  ],
+  "model_or_verifier_rerun_during_review": false,
+  "original_humaneval_archive_unchanged": true,
+  "pilot_summary_sha256": "9b46f2e9b738440ab9a80b4833934e8041dc1f104bddb011194bbc467319d6d2",
+  "roots": [
+    "/home/dev/.local/state/samescale-eval/swe-external-pilot-20261014",
+    "/home/dev/.local/state/samescale-eval/swe-external-protocol-20261014",
+    "/home/dev/.local/state/samescale-eval/swe-mixed-20261014",
+    "/home/dev/.local/state/samescale-eval/pilot-20261014-v3",
+    "/home/dev/.local/state/samescale-eval/swe-external-verifiers-20261014",
+    "/home/dev/.local/state/samescale-eval/swe-external-verifiers-20261014-v2",
+    "/home/dev/.local/state/samescale-eval/swe-external-verifiers-20261014-v3",
+    "/home/dev/.local/state/samescale-eval/swe-external-verifiers-20261014-v4",
+    "/home/dev/.local/state/samescale-eval/swe-external-verifiers-20261014-v5",
+    "/home/dev/.local/state/samescale-eval/swe-external-verifiers-20261014-v6",
+    "/home/dev/.local/state/samescale-eval/swe-external-verifiers-20261014-v7",
+    "/home/dev/.local/state/samescale-eval/swe-external-verifiers-20261014-v8"
+  ],
+  "storage": "local separate storage outside Git; no public release"
+}
