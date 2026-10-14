@@ -1,0 +1,11 @@
+{
+  "archive_bytes": 3511283,
+  "archive_path": "/home/dev/.local/state/samescale-eval/swe-mixed-preflight-20261014-v2.tar.gz",
+  "archive_sha256": "31f5c9eb181bc1b870e6b0c4301f605d606bf6ebeb1c74d15b09cf1ba2b52fa5",
+  "inventory_sha256": "1312a7aa34ebfb6e68e14766fe12324bf2e7e185aefeaa58877332e25bcba916",
+  "latest_environment_failure_rate": 0.0,
+  "new_model_calls": 0,
+  "previous_archive_unchanged_sha256": "d0d3ce6cf532b554a785825a7196a41956f32de53c2543ac07b8998ae5c608e1",
+  "source_and_selection_commit": "61b56e7fb4ad5932cbd27a49e9b5b351549a7193",
+  "source_sha256": "2fab11fd5de6409de1059a34e95f4ffe8ebfd2ca7c71707ea7779bc38e302ac8"
+}

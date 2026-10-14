@@ -89,7 +89,9 @@ def test_cli_preserves_venv_interpreter_symlink(
     binary.symlink_to(sys.executable)
     captured: list[Path] = []
     monkeypatch.setattr(
-        mixed, "preflight", lambda root, python, label, instance_id: captured.append(python)
+        mixed,
+        "preflight",
+        lambda root, python, label, instance_id, reporting: captured.append(python),
     )
     monkeypatch.setattr(
         sys,

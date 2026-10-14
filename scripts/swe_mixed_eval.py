@@ -188,6 +188,7 @@ def preflight(
     upstream_python: Path,
     label: str = "preflight",
     instance_id_filter: str | None = None,
+    direct_pytest_reporting: bool = False,
 ) -> None:
     if not re.fullmatch(r"[a-zA-Z0-9_-]{1,60}", label):
         raise ValueError("unsafe preflight receipt label")
@@ -233,6 +234,21 @@ def preflight(
             row_path = root / "hidden" / (instance_id + ".json")
             row = load(row_path)
             spec = bridge(upstream_python, "spec", str(row_path))
+            if direct_pytest_reporting or task["repo"] == "sphinx-doc/sphinx":
+                amended, count = re.subn(
+                    r"(?m)^tox (.+?) -- (.+)$", r"tox \1 -- -rA --color=no \2", spec["eval_script"]
+                )
+                if count != 1:
+                    raise ValueError("expected exactly one tox command for reporting correction")
+                save(
+                    case / "reporting-correction.json",
+                    {
+                        "kind": "PYTEST_REPORTING_ONLY",
+                        "upstream_eval_script": spec["eval_script"],
+                        "test_oracle_or_membership_changed": False,
+                    },
+                )
+                spec["eval_script"] = amended
             (case / "eval.sh").write_text(spec["eval_script"])
             (case / "gold.patch").write_text(row["patch"])
             controls = {}
@@ -342,6 +358,7 @@ def main() -> None:
     parser.add_argument("--retained-humaneval-summary", type=Path)
     parser.add_argument("--preflight-label", default="preflight")
     parser.add_argument("--instance-id")
+    parser.add_argument("--direct-pytest-reporting", action="store_true")
     args = parser.parse_args()
     if args.command in {"pilot", "full"}:
         print(json.dumps(gate(), indent=2))
@@ -372,6 +389,7 @@ def main() -> None:
             args.upstream_python.absolute(),
             args.preflight_label,
             args.instance_id,
+            args.direct_pytest_reporting,
         )
 
 

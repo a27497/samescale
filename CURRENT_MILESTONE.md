@@ -1,5 +1,31 @@
 # SameScale Product — Current Milestone
 
+## Current state — mixed environments admitted / real SWE trial still blocked — 2026-10-14
+
+Fixed selection remains 25 SWE-bench Verified + five HumanEval, published before Docker controls
+at `61b56e7fb4ad5932cbd27a49e9b5b351549a7193`. No replacement/reselection; original HumanEval
+three observations/archive retained. Sphinx final correction forwards reporting-only pytest flags
+through the upstream tox command, evidencing all 45 required gold passes, expected baseline F2P
+failure and 44 baseline P2P passes. Astropy 81 and SymPy 2 required checks remain admitted.
+**Latest environment admission 3/3 PASS; failure 0/3 (0%). Initial setup failure remains 3/3 (100%)**
+from the wrapper interpreter bug; all intermediate marker/reporting/matcher failures are preserved.
+Non-required aggregate Sphinx failures remain disclosed; no tests/oracle/threshold/membership change.
+22 non-pilot SWE environments are not locally admitted. No real Agent pass is inferred from controls.
+
+**REAL_CODEX remains BLOCKED/403; actual SWE Agent attempts 0; new model calls 0.** New and old
+paid entrypoints enforce the unchanged gate before credentials. Requested SWE self-report/acceptance,
+time/token/fees, rates/gap and mixed full forecasts stay UNKNOWN/NOT_RUN. Existing credential,
+route/quota/request-control and SIWC/account/OAuth lifecycle prerequisites still require independent
+verification/admission; current fee authorization is not a bypass. STOP before real trial/full.
+
+Local keyless **43 PASS / one DB integration deselected**, Ruff/format/mypy/Bash and docs PASS.
+Final external archive inventory and two replays of each of six retained phases PASS, with no
+model/Verifier rerun in review. Previous archive/report bytes retained; raw data/image caches outside
+Git, no credentials/private reasoning. Control containers removed; product locks/gate/services,
+original worktree and original HumanEval archive unchanged. [Latest successor report and receipts](docs/evidence/swe-mixed-preflight-20261014/README.md).
+Commit/push/update Draft PR #21 only; final SHA/remote CI reported separately; no merge/deployment.
+The intermediate state below retains its original observation and is superseded by this section.
+
 ## Current state — mixed SWE benchmark / environment partial / REAL_CODEX blocked — 2026-10-14
 
 Fixed 25 SWE-bench Verified + five HumanEval selected and published in Draft PR #21 before Docker

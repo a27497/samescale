@@ -1,6 +1,24 @@
 # SWE-bench mixed-set preparation — 2026-10-14 (Asia/Shanghai)
 
 **Fixed selection published; environment admission partial; real SWE Agent pilot BLOCKED.**
+
+**Successor update: latest environment admission is now 3/3 PASS (0/3 failure).**
+Sphinx's final correction passes reporting arguments directly through `tox ... --` to pytest,
+adding only `-rA --color=no`. Its baseline evidences the expected F2P failure and all 44 P2P passes;
+gold evidences all 45 required passes. No oracle/test/membership or acceptance threshold changed.
+Four non-required aggregate failures remain; admission never claimed the entire suite passed.
+Initial setup failure **3/3 (100%)** and every intervening failure remain preserved; the first
+strict direct-command matcher refused before tests because the upstream command includes tox flags,
+then the corrected one-command matcher ran actual controls. No result/marker was fabricated.
+[Latest generated report](report-v2.json) · [latest external artifact receipt](artifact-receipt-v2.json).
+The intermediate 2/3 report below retains its dated observation and is superseded by this update.
+
+Latest raw archive: `/home/dev/.local/state/samescale-eval/swe-mixed-preflight-20261014-v2.tar.gz`, SHA-256 `31f5c9eb181bc1b870e6b0c4301f605d606bf6ebeb1c74d15b09cf1ba2b52fa5`.
+The prior archive/receipts remain byte-identical. Full new inventory and six retained phase offline
+replays PASS; 0 model/Docker/credential calls during review. Use replay label
+`preflight-sphinx-direct-fixed` for the latest Sphinx evidence. REAL_CODEX remains unchanged/closed;
+actual SWE Agent trial, rates/time/token/cost and mixed full estimates remain unknown/NOT_RUN.
+
 The user canceled the unexecuted HumanEval-only full stage. The replacement contains 25 SWE-bench
 Verified tasks plus HumanEval 122, 33, 153, 121 and 25. Original first-three HumanEval observations
 remain unchanged and retain their standalone/native capture scope, not product-gate compliance.

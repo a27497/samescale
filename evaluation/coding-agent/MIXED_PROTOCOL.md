@@ -120,3 +120,13 @@ never introduce a replacement. Reporting-only `PYTEST_ADDOPTS=-rA --color=no` is
 containers, but tox does not forward it for the observed Sphinx image, which remains not admitted.
 Model/hidden-test semantics and membership stay fixed. Saved `replay --preflight-label NAME` verifies
 inputs/case inventories and qualification without Docker/upstream tooling/models/credentials.
+
+
+Final reporting correction: Sphinx's generated command has `tox --current-env -epy39 -v -- ...`.
+The adapter validates exactly one such command and adds **only** `-rA --color=no` after its argument
+separator so pytest receives the reporting flags. The upstream eval script is retained alongside
+the projection; hidden tests, instance IDs and required-check rubric are unchanged. This is now
+automatic for the Sphinx repository, making the one-command keyless reproduction cover the latest
+reporting contract. CLI `--direct-pytest-reporting` supports a labeled same-ID diagnostic, never a
+replacement task. Latest Sphinx receipt is `preflight-sphinx-direct-fixed`; all prior receipts and
+the first compressed archive remain unchanged. Required control checks now pass for all three.
