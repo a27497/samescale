@@ -26,6 +26,21 @@ def main() -> None:
             )
         )
         return
+    if mode == "parse":
+        from swebench.harness.log_parsers import MAP_REPO_TO_PARSER
+
+        statuses = MAP_REPO_TO_PARSER[row["repo"]](Path(sys.argv[3]).read_text(), spec)
+        required = json.loads(row["FAIL_TO_PASS"]) + json.loads(row["PASS_TO_PASS"])
+        print(
+            json.dumps(
+                {
+                    "required_statuses": {name: statuses.get(name) for name in required},
+                    "parsed_tests": len(statuses),
+                    "missing_required_tests": [name for name in required if name not in statuses],
+                }
+            )
+        )
+        return
     log, variant = sys.argv[3:5]
     statuses, found = get_logs_eval(spec, log)
     prediction = {

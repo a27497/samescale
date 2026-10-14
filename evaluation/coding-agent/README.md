@@ -2,7 +2,7 @@
 
 ## Mixed SWE-bench successor — 2026-10-14
 
-The current user canceled the HumanEval-only full stage. See [the fixed 25 + 5 mixed protocol](MIXED_PROTOCOL.md). New paid entrypoints now enforce the existing closed REAL_CODEX gate; the historical commands below grant no new execution permission. Original three-task evidence remains unchanged and replayable.
+The current user canceled the HumanEval-only full stage. See [the fixed 25 + 5 mixed protocol](MIXED_PROTOCOL.md). The clarified route runs the three fixed SWE pilots through external Codex CLI, then existing intake/independent verification; the product REAL_CODEX gate stays closed. Historical HumanEval-only commands grant no full-stage permission. Original three-task evidence remains unchanged and replayable.
 
 
 This is an explicitly authorized, standalone evaluation script using native Codex CLI and

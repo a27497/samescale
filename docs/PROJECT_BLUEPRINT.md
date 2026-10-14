@@ -1,19 +1,19 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
-## 当前授权：固定 SWE-bench 25 + HumanEval 5 与门禁预检（2026-10-14）
+## 当前授权：外部 Codex CLI 三题 SWE 试跑（2026-10-14 澄清）
 
-用户取消未执行的 HumanEval-only 全量。保留既有三个真实 HumanEval 原记录，按已固定哈希顺序
-再选两题作为简单对照；SWE-bench Verified 固定版本中取五个许可允许的 Python 项目，各按
-`samescale-swe-mixed-v1` 哈希顺序选五题，共25题。扫描固定顺序取三个不同项目作为试跑题。
-30个ID、镜像摘要、许可来源和规则须先写入PR，然后才做Docker预检；任何失败不更换题目。
+用户明确要求产品 REAL_CODEX 门禁保持关闭且不修改。本次被测 Agent 在 SameScale 外直接
+运行既有 Codex CLI，沿用 HumanEval 方式；已固定的 Astropy-8872、Sphinx-8120、SymPy-20916
+各执行一次，隐藏测试与参考补丁不交给 Agent。完整代码和运行记录保存在 Git 外。
+既有导入路径接收本次专用交付目录，由独立 Verifier 验收；完整仓库超过产品 UTF-8 导入
+大小限制，所以交付使用显式任务专用补丁包，补丁应用在可信 campaign Verifier 中完成，
+不扩大产品通用 baseline+diff 契约。保持实际资源限制，不通过改产品规则来取得通过。
 
-当前用户明确禁止绕过 REAL_CODEX。复用原门禁，不改为环境开关或调用独立CLI绕行；原独立
-paid入口也先经过门禁。既有真实凭据隔离、SIWC/账户、请求控制等未验证条件不能通过本次
-费用授权或keyless控制变成通过。门禁关闭时仅做原版Verifier的baseline-fail/gold-pass环境
-校准并报告首次搭建失败数/3；实际Agent结果、耗时、费用及混合全量估算保持NOT_RUN/unknown。
-若之后满足既有门禁和单次授权条件，才可运行三个SWE-bench真实尝试，报告结果并再次STOP
-等待全量确认。原始数据/控制日志存Git外。只更新本分支和PR，不合并、不部署，不改产品栈。
-[固定混合协议](../evaluation/coding-agent/MIXED_PROTOCOL.md)；以下先前范围保留为历史。
+选题仍为先前发布的固定 25 SWE-bench Verified + 5 HumanEval；不得按结果增删。汇报三题
+自报、独立验收、耗时、token/API 等价费用、环境搭建失败率和混合 30 题预估，然后 STOP
+等待全量确认。此澄清取代先前将外部 CLI 也要求经过产品门禁的解释。保留所有历史控制
+失败与原始 HumanEval 观察，允许本分支/PR 更新，不合并、不部署，不修改依赖锁或产品门禁。
+[固定混合协议](../evaluation/coding-agent/MIXED_PROTOCOL.md)。
 
 ## 当前授权：真实 Coding Agent 小评测试跑（2026-10-14，Asia/Shanghai）
 

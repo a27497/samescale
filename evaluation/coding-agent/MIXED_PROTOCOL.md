@@ -1,12 +1,12 @@
 # Frozen mixed evaluation: SWE-bench Verified 25 + HumanEval 5
 
-This successor protocol supersedes the **unexecuted** 30-task HumanEval full stage. Original
-three-task HumanEval bytes, results and archive are retained. The current user explicitly requires
-the product REAL_CODEX gate: it is unconditionally closed. Both new mixed `pilot/full` commands
-and the historical standalone paid entrypoint reject before reading credentials or starting a
-subject. No environment switch, direct CLI, alternate provider, auth-directory mount or worker
-bypass is permitted. New real attempts require the existing gate's actual prerequisites and a
-separately admitted task/runtime/route/one-attempt authorization; this PR does not open that gate.
+This successor protocol supersedes the unexecuted 30-task HumanEval full stage. The user's
+clarification explicitly authorizes three **external Codex CLI** attempts, following the original
+HumanEval route. SameScale's product REAL_CODEX gate remains closed and unchanged; this campaign
+is not product runtime enablement. Saved outputs enter the existing bounded external intake and
+separately authorized independent Verifier. Existing product-gated entrypoints remain denied.
+Original selection and original HumanEval evidence stay fixed. Full execution is NOT authorized
+until the three new SWE observations and mixed forecast have been reported and confirmed.
 
 ## Selection fixed before execution
 
@@ -52,8 +52,8 @@ where the text itself states redistribution/use permission. Do not relicense emb
 issue-text contributions, data, binaries or base images as SameScale-owned material.
 
 Raw dataset, gold/test patches, logs, copied license notices and tooling stay outside Git. Git
-contains only source, config/IDs/digests and small receipts. No developer auth file or private
-reasoning is read by this stage. HumanEval's original MIT notice stays in its original archive.
+contains only source, config/IDs/digests and small receipts. The external CLI reads only the existing credential reference in its disposable runtime;
+credentials and private reasoning are never persisted in campaign evidence. HumanEval's original MIT notice stays in its original archive.
 
 ## Keyless environment admission and failure rate
 
@@ -79,11 +79,11 @@ duration separately from Agent and verifier timing. A later concrete correction 
 new receipt, retain the first failure and never change membership or erase the initial rate.
 If preparation itself prevents an attempt, report attempted/planned and NOT_RUN separately.
 
-Since REAL_CODEX is closed, SWE Agent claim/acceptance, Agent time, tokens, cost and gap are
-**NOT_RUN / unknown**, never 0%/100% or inferred from the gold controls. New-stage model calls are
-zero. Do not extrapolate small HumanEval cost to 25 repository tasks. Mixed total token/fee/time
-estimates remain unknown until genuine gated SWE observations exist. Report the old HumanEval
-control results separately from SWE, retaining their original scopes.
+SWE self-report, independent acceptance and costs come only from the real external attempts.
+Reference controls do not establish Agent results. The 30-task forecast uses separate SWE and
+HumanEval sample means, with cached and uncached API-equivalent scenarios and explicit remaining
+setup uncertainty. Requested model identity is preserved; serving identity and actual subscription
+billing remain unverified. Stop after the three SWE results, awaiting full-stage confirmation.
 
 ## Reproduction
 
@@ -102,14 +102,25 @@ external toolchain; all membership is recomputed and compared with the committed
 closed rather than selecting replacements. Keyless preparation does not authorize `pilot/full`.
 Those commands report `REAL_EXECUTION_BLOCKED` and exit 3, even with enablement environment vars.
 
-Before any future Subject dispatch, export only issue text and a fresh base-commit working tree,
-reinitialize its Git history and remove oracle/evaluation files: do not expose gold/test patches,
-future Git objects, upstream eval scripts or accepted control logs through an instance image.
-Independent verification applies the frozen final patch in a separate no-network container.
-No such real dispatcher is implemented/admitted by this keyless preparation. Real pilot and full
-campaign remain separate permission boundaries; after three admitted SWE attempts, report actual
-per-task results/time/usage/cost and setup failures, then **STOP for user confirmation**.
+External execution uses `scripts.swe_external_pilot`: only the issue and a fresh exported
+base-commit tree with reinitialized Git enter the Subject. A derived runtime removes upstream
+checkout/history/setup scripts, retaining dependencies; hidden patches and accepted control logs
+are never mounted. Each attempt has a 900s timeout, 4 GiB/2 CPU bound, no automatic retry, and a
+provider-only egress proxy. CLI/model/effort match the HumanEval profile.
 
+Campaign acceptance uses `scripts.swe_external_acceptance`: prepare a fixed trusted patch-task
+wrapper, warm baseline dependencies/compiled extensions in a separate pinned image, and actually
+observe baseline-fail/gold-pass under the **unchanged** existing 128 MiB/0.5 CPU/30s Verifier.
+The UTF-8 delivery is `solution.patch`; the full final repository is retained separately. The
+campaign-specific trusted verifier applies it to the immutable baseline, restores hidden tests,
+executes every frozen required ID (Astropy explicit pytest IDs; Sphinx original file/collection
+order with short traceback/no captured-output reporting; SymPy original test script with its path
+helper materialized in the candidate tree), using upstream 4.1 parser
+semantics. Required membership/thresholds are unchanged; unrelated aggregate failures remain
+in the original control logs. This bounded resource adaptation receives fresh baseline/gold controls. Non-required failures remain in logs.
+This is a CUSTOM task adapter, not general patch import or Official benchmark authentication.
+Exact TaskStore admission, existing `service.ingest`, `verify_workspace`, export and offline
+replay are used, without a browser execution API, gate modification, new runtime or Agent rerun.
 
 ## Observed preflight and offline review
 
@@ -130,3 +141,10 @@ automatic for the Sphinx repository, making the one-command keyless reproduction
 reporting contract. CLI `--direct-pytest-reporting` supports a labeled same-ID diagnostic, never a
 replacement task. Latest Sphinx receipt is `preflight-sphinx-direct-fixed`; all prior receipts and
 the first compressed archive remain unchanged. Required control checks now pass for all three.
+
+## Real external pilot completed
+
+[New real observations, costs, forecasts and artifact receipts](../../docs/evidence/swe-external-pilot-20261014/README.md)
+supersede the historical blocked interpretation. Product REAL_CODEX remains unchanged/closed.
+The new API-equivalent total is $0.4314104; self-report 3/3, independent acceptance 2/3.
+Full stage remains NOT_RUN pending user confirmation.

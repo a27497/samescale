@@ -1,5 +1,38 @@
 # SameScale Product — Current Milestone
 
+## Current state — external SWE pilot complete / full stage awaits confirmation — 2026-10-14
+
+User clarified that the campaign uses **external direct Codex CLI**, following the original HumanEval
+trial. Product REAL_CODEX stays closed/403 and unchanged. The fixed 25 SWE Verified + five HumanEval
+selection from `61b56e7fb4ad5932cbd27a49e9b5b351549a7193` remains identical. Three external SWE attempts:
+Astropy-8872 self PASS / independent PASS 81/81; Sphinx-8120 PASS / PASS 45/45; SymPy-20916 PASS /
+FAIL 1/2. **Self-report 100%; independent pass 66.7%; gap 33.3pp; false completion 1/3**. Primary
+failure: one hidden-test failure; no inference about intent or general population rate.
+
+New observed Agent **433.826s**, input **891,569** (cached **757,504**), output **8,753**;
+API-equivalent **$0.4314104**, actual billing unknown. Stratified 30-task projection: **63.75 Agent
+minutes / $3.7267** with observed caching, **$16.0926** if all input uncached; estimated steady-state
+sequential wall **1.5–2.5h**, excluding downloads/new environment faults/engineering corrections.
+Remaining 24: **54.42 Agent minutes / $3.2163**. $25 planning allowance is not a cap or permission.
+
+Existing bounded intake, exact admitted CUSTOM TaskStore, isolated pinned Verifier, export and
+replay completed for all three, each with one actual acceptance attempt and no Agent rerun. Full
+final repos/native logs stay outside Git; intake uses an explicit campaign-specific UTF-8 patch-task
+adapter rather than extending general import limits. Under unchanged 128 MiB/0.5CPU/30s Verifier:
+final baseline/gold controls **3/3 admitted**, required-check membership/threshold unchanged;
+Sphinx original test order retained, Astropy required IDs selected to avoid non-required resource
+peaks, SymPy runner/helper materialized to test candidate code. Setup/metadata/reporting/resource
+failures and first erroneous mode/symlink snapshot retained separately, without editing verdicts.
+Latest upstream/setup failure **0/3**, original preflight failure **3/3**; 22 non-pilot SWE environments
+remain locally untested. Independent upstream parser matches all 128 required observed statuses.
+
+Focused **17 PASS**, Ruff/format/mypy and offline inventory/export/two exact replay checks PASS at
+publication; remote CI reported separately. [Results and reproducibility](docs/evidence/swe-external-pilot-20261014/README.md).
+Only branch/Draft PR #21 updated; product source/locks, original worktree and frozen HumanEval
+unchanged. **STOP: full stage NOT_RUN; await confirmation. No merge, release or deployment.**
+The sections below retain their historical observations and earlier gate interpretation, superseded
+by the user's explicit external-CLI clarification above.
+
 ## Current state — mixed environments admitted / real SWE trial still blocked — 2026-10-14
 
 Fixed selection remains 25 SWE-bench Verified + five HumanEval, published before Docker controls

@@ -409,13 +409,13 @@
     "HumanEval/25"
   ],
   "retained_humaneval_summary_sha256": "fe14209cb3760190da9119d2b9a66a27f0fe0a3ab3d2f97002e2be6183a992ee",
-  "execution_mode": "REAL_CODEX",
-  "real_execution_gate": "harnesslab.local_execution.subscription.deny_real_execution",
+  "execution_mode": "EXTERNAL_CODEX_CLI",
   "environment_control_timeout_seconds": 600,
   "pull_timeout_seconds": 600,
   "environment_controls": "base hidden tests fail-to-pass fail; pass-to-pass pass; gold all required tests pass",
   "claude_code": {
     "enabled": false,
     "format": "stream-json"
-  }
+  },
+  "product_real_execution_gate": "UNCHANGED_CLOSED"
 }
