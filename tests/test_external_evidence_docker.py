@@ -101,6 +101,37 @@ async def test_independent_saved_workspace_pass_fail_timeout_and_consumed_attemp
                 == "NOT_VERIFIED"
             )
         packet = service.export_record(policy, item["identity"])
+        if scenario == "baseline" and harness == "codex-hooks":
+            # Real isolated FAIL already exists. Arbitrary diagnosis outputs/errors/timeouts
+            # cannot change its receipt, imported Episode/record or subsequent export/replay.
+            import json
+
+            from harnesslab.failure_diagnosis.service import canonical, diagnose, sha256
+            from harnesslab.failure_diagnosis.storage import load_input
+            from tests.test_failure_diagnosis import Fake, answer
+            from tests.test_failure_diagnosis import packet as public_packet
+
+            snapshot = {p: p.read_bytes() for p in policy.store.rglob("*") if p.is_file()}
+            failed_ordinal = next(r["ordinal"] for r in receipt["check_results"] if not r["passed"])
+            excerpts = public_packet()
+            excerpts["excerpts"][2]["reference"] = f"check:{failed_ordinal}"
+            public_path = case_root / "public-packet.json"
+            public_path.write_bytes(canonical(excerpts))
+            receipt_path = policy.store / item["identity"] / "verification.json"
+            diagnostic_input = load_input(
+                receipt_path, sha256(receipt_path.read_bytes()), public_path
+            )
+            for backend in (
+                Fake(json.dumps(answer())),
+                Fake('{"verdict":"PASS"}'),
+                Fake(error=RuntimeError("failed")),
+                Fake(delay=True),
+            ):
+                diagnosed = await diagnose(diagnostic_input, backend, timeout_seconds=0.02)
+                assert diagnosed.input.acceptance.status == "VERIFIED_FAIL"
+                assert {p: p.read_bytes() for p in snapshot} == snapshot
+                assert await verify_workspace(policy, item["identity"]) == receipt
+                assert service.export_record(policy, item["identity"]) == packet
         from harnesslab.tasks.package import sha256_bytes
 
         assert (

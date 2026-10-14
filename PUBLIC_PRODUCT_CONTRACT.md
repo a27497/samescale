@@ -1,5 +1,19 @@
 # SameScale Product — Public Product Contract
 
+## Advisory failure diagnosis — 2026-10-14
+
+Operator CLI only, opt-in and downstream of an existing independent VERIFIED_FAIL receipt.
+Reviewed task/diff/public failed observations/self-report excerpts may produce schema-validated
+advisory JSON through a replaceable backend. Default rules and CI fakes make no model calls.
+An explicitly authorized external readonly, tool-free Codex CLI uses ChatGPT subscription login,
+not API keys; this grants no product REAL_CODEX execution. Hidden source/oracle, raw tracebacks
+and known answers are excluded. Receipt pins and failed-check references bind inputs; operator
+review is still required and does not establish model correctness. Diagnosis never modifies
+verdicts, receipts or Episodes, and acceptance code never consumes it. Model failures/timeouts
+or invalid output return deterministic coarse/unavailable results. Separate immutable exports
+replay consistency only without a model. No UI, automatic diagnosis or causal guarantee is added.
+[Input boundary, categories, fallback and observed limitations](docs/FAILURE_DIAGNOSIS.md).
+
 ## Chinese workbench presentation — 2026-10-13
 
 The workbench defaults to Chinese across core and advanced pages. State labels and colors are

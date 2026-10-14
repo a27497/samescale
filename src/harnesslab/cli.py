@@ -19,6 +19,7 @@ from harnesslab.egress import EgressNetworkIsolationUnavailable
 from harnesslab.episodes.cli import episode_app
 from harnesslab.experiment.cli import experiment_app, report_app, run_app
 from harnesslab.external_evidence.cli import external_evidence_app
+from harnesslab.failure_diagnosis.cli import diagnosis_app
 from harnesslab.harness_lane.profile import canonical_codex_profile
 from harnesslab.harness_lane.runtime import CodexRuntime
 from harnesslab.judgelab.cli import judge_app
@@ -115,6 +116,7 @@ release_v6_canary_app = typer.Typer(
     help="Preflight, authorize, or execute only the bounded V6 Alibaba canary.",
 )
 app.command("up")(up_command)
+app.add_typer(diagnosis_app, name="failure-diagnosis")
 app.command("down")(down_command)
 app.command("status")(status_command)
 app.add_typer(worker_app, name="local-worker")

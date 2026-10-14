@@ -1,5 +1,45 @@
 # SameScale Product — Current Milestone
 
+## Current state — advisory LLM failure diagnosis — 2026-10-14 UTC
+
+User authorized new feature branch `codex/llm-failure-diagnosis-20261014` from main@3f0d0c6,
+commit/push and draft PR only. Operator CLI binds an existing L0 VERIFIED_FAIL receipt by file SHA
+and self digest, reads reviewed public task/diff/failure/self-report excerpts, and writes a separate
+append-only diagnosis/export outside Git and original storage. JSON schema and evidence-reference
+validation precede acceptance of advisory output; deterministic coarse/unavailable fallback records
+safe reasons. Acceptance code does not import/consume diagnosis; no receipt, verdict or Episode
+write. Offline replay checks consistency without a model. No UI or automatic diagnosis added.
+
+External Codex CLI0.162.1, configured gpt-6.1-sol/low, uses user's ChatGPT subscription credential
+reference inside readonly Docker with an empty readonly workspace, no tools, and existing provider
+egress isolation. No API keys or ANTHROPIC_AUTH_TOKEN read/forwarded. REAL_CODEX stays unchanged.
+Four physical CLI calls: first two retained rule fallbacks from a parser that misclassified native
+nonfatal error items; protocol correction followed by one additional call per fixed case, with both
+generations immutable. Final SymPy0.58 “logic/algorithm” did not identify the known Unicode-digit
+omission; final Sphinx0.88 “output formatting” identifies the extra trailing backslash, consistent
+with observed known failure. Neither explanation is a new verdict or controlled causal proof.
+
+Final calls18.653s/18.503s including bootstrap/cleanup. Native input1535/2623, output336/346,
+reasoning34/25, cached/cache-write0 each; first-call token counts unavailable, no total inferred.
+Billing: **ChatGPT 订阅额度，无单独计费**. All original receipts, final diffs, run records and original
+exports retain their pinned bytes. Git contains summaries only; private artifacts and four replayable
+exports remain `/home/dev/.local/state/samescale-eval/llm-failure-diagnosis-20261014/`.
+Archive15464bytes, SHA256 `4264722a9907825cb868d50ef1823a6f3c4ab35654d8099362d000c67a070610`.
+
+Local30 fake/rules/schema/backend/replay tests PASS; actual Docker isolation1 PASS after preparing
+existing pinned test images (no real coding Agent). That test injects valid/arbitrary PASS/error/timeout
+diagnoses into an already-failed verifier observation and proves stored receipt/record/export bytes
+and subsequent verifier result remain unchanged. CI routing10 PASS; pre-final-additions isolated S3
+99 PASS, zero external/model calls and unchanged historical golden outputs. Full Ruff/format/mypy PASS.
+New tests join Fast CI and offline S3; legacy29 selectors retain their independent fingerprint.
+jsonschema plus4 transitive dependencies added without upgrading any existing locked package;
+exact installed MIT licenses retained. [Boundaries, categories, commands and limitations](docs/FAILURE_DIAGNOSIS.md).
+Draft PR#22 created. First publication e1b0897 offline CI103 PASS with zero model/external calls;
+Fast CI workflow contracts caught the omitted new selector in the self-hosted configuration.
+Append that selector to preserve hosted/self-hosted inventory parity; no gate or trigger weakened.
+Publication must verify the corrected exact pushed SHA and all applicable CI separately. STOP after draft PR/CI
+handoff; no further model call, merge, deployment, website/settings or frozen-evidence change.
+
 ## Current state — PR20 synchronized with merged evaluation main — 2026-10-14
 
 User authorized merging main into `codex/readme-agent-evaluation-20261014`, updating repository
