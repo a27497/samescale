@@ -1,6 +1,18 @@
 # SameScale
 
-**AI Coding 任务验收与证据工作台** · *AI Coding Task Acceptance & Evidence Workbench*
+**AI Coding Agent 评测与验收平台** · *AI Coding Agent Evaluation & Acceptance Platform*
+
+面向 AI Coding Agent 的工程评测与任务验收：按任务条件独立检查最终代码，区分 Agent 的完成声明与实际检查结果，并保留可追溯、可离线复核的证据。
+
+- **[评测框架](docs/EVAL_METHODOLOGY_V2.md)**：组织任务、运行配置与验收条件，按明确的任务契约评估代码结果。
+- **[隔离执行](docs/LOCAL_EXECUTION.md)**：用 Docker 隔离模拟运行与独立代码检查，分开被测代码和隐藏验收材料。
+- **[结果校验](docs/EXTERNAL_RUN_EVIDENCE.md)**：由独立 Verifier 检查最终代码；未检查、零检查或缺少前置条件时保持“未验证”。
+- **[证据追溯](docs/EXTERNAL_CODEX_EVIDENCE.md)**：关联运行记录、代码快照与检查结果，以摘要校验文件一致性；摘要不证明来源真实。
+- **[离线回放](scripts/replay_external_evidence.py)**：校验导出证据的一致性，不重跑 Agent 或 Verifier，不构成新的验收。
+
+**当前边界：真实 Codex 执行默认关闭（当前由代码门禁禁用）；网页没有一键验收，独立检查需操作员在本地终端单独授权；不支持 Cursor / DeepSeek 原生运行记录格式，可仅导入最终代码与任务条件。**
+
+评测数据：`[待评测集完成后填写：任务数、通过率与评测条件]`。
 
 ## Agent 说完成了，验收依据在哪里？
 

@@ -1,5 +1,24 @@
 # SameScale Product — Current Milestone
 
+## Current state — recruiter-facing README positioning — 2026-10-14 (Asia/Shanghai)
+
+User-authorized documentation-only work on `codex/readme-agent-evaluation-20261014`, based on
+`origin/main@9f634dce7b39cec8eacc2d3ad646b4cb2d1f7efd`. README opens with “AI Coding Agent
+评测与验收平台” and explains the implemented evaluation framework, isolated execution, result
+validation, evidence traceability and offline replay with repository links. The first screen keeps
+real Codex execution closed by its current code gate, operator-only CLI verification, unsupported
+Cursor/DeepSeek native logs and evaluation-metric placeholders explicit. No code, frozen evidence,
+application UI, website, repository description or topics are changed.
+
+Local existing documentation contract **1 PASS**; all **24 README relative link targets PASS**;
+source/claim mapping and `git diff --check` **PASS**. Verification is documentation-scoped: no
+new benchmark, Agent/model/Verifier execution, database or deployment acceptance is established.
+The PR description carries full before/after first-screen copy, each capability's implementation
+mapping, and proposed repository description/topics. Feature-branch commit/push and PR creation
+are authorized; exact remote head and CI are checked separately at publication. The original dirty
+UI-2 worktree and other existing worktrees remain untouched. No technical blocker; stop after PR
+handoff without merge or deployment. Dated records below retain their original scope.
+
 ## Current state — Chinese workbench presentation — 2026-10-13 (Asia/Shanghai)
 
 User-authorized frontend polish on `codex/workbench-chinese-20261013`, based on
