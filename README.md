@@ -26,7 +26,7 @@
 AI Coding Agent 的“完成了”是一条声明。验收依据需要来自最终代码、明确的任务条件和独立检查。
 SameScale 把这些材料关联起来，让开发者看到**哪些要求已检查、哪些失败、哪些仍然未知**，并保存可离线复核的证据。
 
-这是一个个人工程项目，当前产品基线冻结于 `main@50ac4cf`。
+这是一个个人工程项目。
 [官网与案例说明](https://getsamescale.com/) · [只读在线演示](https://getsamescale.com/demo/) · [能力契约](PUBLIC_PRODUCT_CONTRACT.md)
 
 ## 核心能力

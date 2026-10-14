@@ -1,0 +1,130 @@
+{
+  "actual_billed_usd": null,
+  "agent_seconds": 433.826,
+  "api_equivalent_usd": 0.4314104,
+  "environment": {
+    "fixed_pilot_count": 3,
+    "latest_adapter_admission_failed": 0,
+    "latest_failure_rate": 0,
+    "latest_upstream_preflight_failed": 0,
+    "nonpilot_swe_count": 22,
+    "nonpilot_swe_locally_admitted": 0,
+    "original_preflight_failed": 3,
+    "original_preflight_failure_rate": 1
+  },
+  "failure_distribution": {
+    "HIDDEN_TEST_FAILURE": 1,
+    "NONE": 2
+  },
+  "false_completions": 1,
+  "forecast_30": {
+    "actual_billing_unknown": true,
+    "agent_seconds": 3825.291666666667,
+    "api_equivalent_usd": 3.726697333333333,
+    "hard_cost_cap": false,
+    "method": "25*SWE mean + 5*retained HumanEval mean; sequential one attempt",
+    "planning_allowance_usd": 25,
+    "remaining_agent_seconds": 3265.420666666667,
+    "remaining_api_equivalent_usd": 3.216320533333333,
+    "remaining_tasks": 24,
+    "steady_state_wall_hours_range": [
+      1.5,
+      2.5
+    ],
+    "uncached_api_equivalent_usd": 16.092606666666665,
+    "usage": {
+      "cached_input_tokens": 6508373.333333333,
+      "input_tokens": 7664820.0,
+      "output_tokens": 76296.66666666667
+    },
+    "wall_range_excludes": [
+      "uncached image downloads",
+      "new environment failures",
+      "engineering corrections"
+    ]
+  },
+  "full_stage": "NOT_RUN_AWAITING_USER_CONFIRMATION",
+  "gap_percentage_points": 33.333333333333336,
+  "product_REAL_CODEX": "UNCHANGED_CLOSED",
+  "retained_humaneval_summary_sha256": "fe14209cb3760190da9119d2b9a66a27f0fe0a3ab3d2f97002e2be6183a992ee",
+  "route": "EXTERNAL_CODEX_CLI_THEN_EXISTING_INTAKE_VERIFIER",
+  "rows": [
+    {
+      "actual_billed_usd": null,
+      "agent_seconds": 167.517,
+      "api_equivalent_usd": 0.1478648,
+      "checks": 81,
+      "failure_type": "NONE",
+      "false_completion": false,
+      "passed_checks": 81,
+      "physical_agent_attempts": 1,
+      "physical_verifier_attempts": 1,
+      "receipt_digest": "sha256:ec2ed9788d4cafa565ddf806756fa6eb15ee40291ed8bdddb076fe6546c8fd6b",
+      "record_identity": "sha256:97b3feb0547126f584bbf1b8437b518f324a2badbc402b05037cbca39cf0649c",
+      "self_report": "PASS",
+      "task_id": "astropy__astropy-8872",
+      "usage": {
+        "cached_input_tokens": 348288,
+        "input_tokens": 387321,
+        "output_tokens": 3497
+      },
+      "verifier": "PASS",
+      "verifier_seconds": 5.791
+    },
+    {
+      "actual_billed_usd": null,
+      "agent_seconds": 164.748,
+      "api_equivalent_usd": 0.1571096,
+      "checks": 45,
+      "failure_type": "NONE",
+      "false_completion": false,
+      "passed_checks": 45,
+      "physical_agent_attempts": 1,
+      "physical_verifier_attempts": 1,
+      "receipt_digest": "sha256:c93c5e49aab8b910064acb0e7d0794aee53eb9ed42a0590be2218ed6a88caa5d",
+      "record_identity": "sha256:c28f60093f6c396e5e5f3ec7e1550fdf2d31ea4c0336ac1b6bed744b70733ae9",
+      "self_report": "PASS",
+      "task_id": "sphinx-doc__sphinx-8120",
+      "usage": {
+        "cached_input_tokens": 283776,
+        "input_tokens": 332297,
+        "output_tokens": 3169
+      },
+      "verifier": "PASS",
+      "verifier_seconds": 13.848
+    },
+    {
+      "actual_billed_usd": null,
+      "agent_seconds": 101.561,
+      "api_equivalent_usd": 0.126436,
+      "checks": 2,
+      "failure_type": "HIDDEN_TEST_FAILURE",
+      "false_completion": true,
+      "passed_checks": 1,
+      "physical_agent_attempts": 1,
+      "physical_verifier_attempts": 1,
+      "receipt_digest": "sha256:f8d98564c179609c124a0a94c5b0cdd7c3aba69e99b67a2c459550ed0d59a127",
+      "record_identity": "sha256:191fddec0003499a9e58312feaaf00806a9e393221c48a181f9b9be1d3e8727c",
+      "self_report": "PASS",
+      "task_id": "sympy__sympy-20916",
+      "usage": {
+        "cached_input_tokens": 125440,
+        "input_tokens": 171951,
+        "output_tokens": 2087
+      },
+      "verifier": "FAIL",
+      "verifier_seconds": 6.343
+    }
+  ],
+  "schema_version": 1,
+  "self_report_pass_rate": 1.0,
+  "self_report_passes": 3,
+  "swe_attempts": 3,
+  "usage": {
+    "cached_input_tokens": 757504,
+    "input_tokens": 891569,
+    "output_tokens": 8753
+  },
+  "verified_pass_rate": 0.6666666666666666,
+  "verified_passes": 2
+}

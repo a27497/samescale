@@ -1,5 +1,22 @@
 # SameScale Product — Current Milestone
 
+## Current state — PR20 synchronized with merged evaluation main — 2026-10-14
+
+User authorized merging main into `codex/readme-agent-evaluation-20261014`, updating repository
+metadata, and ordinary PR#20 merge only after all applicable exact-head CI succeeds. Incoming main
+is `b326e56c482813538e80adc28c8708d355d3e899` (PR#21 merge). Only CURRENT_MILESTONE.md conflicted:
+both sides added dated records at the top. Preserve every PR#20 README publication/positioning record
+and every PR#21 evaluation/pilot observation; new authorization supersedes earlier no-merge scope
+only for PR#20. README merged without conflict and retains effective25 metrics matching the report;
+remove the obsolete `main@50ac4cf` frozen-product statement.
+
+Repository description and the complete15-topic set now match the user's exact text, verified by
+`gh repo view`. Local documentation contract1 PASS; both milestone histories, metrics/links and
+unchanged code/evidence relative to main PASS. Exact-head CI must pass before ordinary PR merge.
+No product code, original evidence, screenshots, deployment, website or credential-file access is
+part of this follow-up. Incoming main history is retained by merge; resolution changes only README
+and this milestone. The dated entries below keep their original facts and authorizations.
+
 ## Current state — README publishes effective-run evaluation — 2026-10-14
 
 User authorized PR#20 README first-screen metrics from the completed PR#21 report. Primary:
@@ -35,6 +52,158 @@ mapping, and proposed repository description/topics. Feature-branch commit/push 
 are authorized; exact remote head and CI are checked separately at publication. The original dirty
 UI-2 worktree and other existing worktrees remain untouched. No technical blocker; stop after PR
 handoff without merge or deployment. Dated records below retain their original scope.
+
+## Current state — fixed 30-task mixed campaign complete — 2026-10-14
+
+Fixed 25 SWE Verified + 5 HumanEval selection unchanged. Original six observations retained;
+19 new physical Agents completed once, 5 final pre-Agent environment failures remain selected.
+**Primary effective runs: self25/25 (100%), independent23/25 (92%), gap8pp, false completion2/25 (8%).**
+Only5 pre-Agent environment failures excluded from this presentation denominator; selection/rows
+remain unchanged. Secondary all30: self25/30 (83.33%), independent23/30 (76.67%), gap6.67pp.
+Primary SWE20 effective:20/20 self,18/20 independent (90%), gap10pp, false completion2/20 (10%).
+Secondary SWE25:20/25 self (80%),18/25 independent (72%), gap8pp,5 environment failures.
+HumanEval5:5/5 self and independent (100%), gap0. Two false completions: retained SymPy20916
+Unicode-digit subscript and new Sphinx7748 overloaded signature formatting. No inference of intent.
+Primary distribution23 NONE /2 HIDDEN_TEST_FAILURE /5 ENVIRONMENT_FAILURE; UNKNOWN0.
+
+API-equivalent **$3.772424/$20**, including original six $0.5103768; no budget stop, actual bill
+unknown. Agent3225.544s (53.76min), independent158.277s. New-stage pull-to-last-result wall
+UTC10:52:47–12:41:58 (~1h49m), including setup/corrections/engineering gaps; not Agent time.
+Original six turn-based fees preserved; new response-only numeric telemetry includes startup
+responses. 9 initially pre-Agent-failed cases recovered with digest-linked successors; no paid
+Agent rerun. First new SWE controls failed14/22; final5/22, retained SWE3 admitted. Raw evidence
+outside Git `/home/dev/.local/state/samescale-eval/swe-full-20261014`; archive387239882bytes,
+SHA256 `173003c2b56768c0c32a63be2cc4e8f7dad33687f098977379ad1734d08e8197`.
+
+23 focused tests, full Ruff/format/mypy pass. Existing receipts/exports and all30 raw projections
+replay exactly; relocated archive/content/mode/symlink checks reported with final artifact receipt.
+Known-credential scan67042files pass. Product gate still BLOCKED/403 and code unchanged;19 new
+Subject mount inspections exclude hidden/oracle assets. Original HumanEval3 keep standalone
+Verifier observations; new2 use existing admitted product route. Requests6028 uses existing
+code-only intake after stream privacy refusal; raw stream preserved. No import/privacy/resource
+limits relaxed. Current code consolidates pre-Agent path/reporting/offline dependency fixes;
+source snapshots and every failed control remain outside Git. Negative resume setup timing stays
+unknown in derived report, original kept. [Full results/reproduction/limitations](docs/evidence/swe-full-20261014/README.md).
+User authorized this reporting-only primary/secondary change and PR#20 README publication.
+Original report JSON/CSV/raw archives stay immutable; effective-run-summary.json derives the view.
+Both exact-head CI suites must pass before handoff; no new Agent/Verifier execution.
+**STOP: paid campaign complete. No further execution, merge, deployment or database change.**
+Following entries are historical scopes/observations, superseded by the completed full result.
+
+## Current state — external SWE pilot complete / full stage awaits confirmation — 2026-10-14
+
+User clarified that the campaign uses **external direct Codex CLI**, following the original HumanEval
+trial. Product REAL_CODEX stays closed/403 and unchanged. The fixed 25 SWE Verified + five HumanEval
+selection from `61b56e7fb4ad5932cbd27a49e9b5b351549a7193` remains identical. Three external SWE attempts:
+Astropy-8872 self PASS / independent PASS 81/81; Sphinx-8120 PASS / PASS 45/45; SymPy-20916 PASS /
+FAIL 1/2. **Self-report 100%; independent pass 66.7%; gap 33.3pp; false completion 1/3**. Primary
+failure: one hidden-test failure; no inference about intent or general population rate.
+
+New observed Agent **433.826s**, input **891,569** (cached **757,504**), output **8,753**;
+API-equivalent **$0.4314104**, actual billing unknown. Stratified 30-task projection: **63.75 Agent
+minutes / $3.7267** with observed caching, **$16.0926** if all input uncached; estimated steady-state
+sequential wall **1.5–2.5h**, excluding downloads/new environment faults/engineering corrections.
+Remaining 24: **54.42 Agent minutes / $3.2163**. $25 planning allowance is not a cap or permission.
+
+Existing bounded intake, exact admitted CUSTOM TaskStore, isolated pinned Verifier, export and
+replay completed for all three, each with one actual acceptance attempt and no Agent rerun. Full
+final repos/native logs stay outside Git; intake uses an explicit campaign-specific UTF-8 patch-task
+adapter rather than extending general import limits. Under unchanged 128 MiB/0.5CPU/30s Verifier:
+final baseline/gold controls **3/3 admitted**, required-check membership/threshold unchanged;
+Sphinx original test order retained, Astropy required IDs selected to avoid non-required resource
+peaks, SymPy runner/helper materialized to test candidate code. Setup/metadata/reporting/resource
+failures and first erroneous mode/symlink snapshot retained separately, without editing verdicts.
+Latest upstream/setup failure **0/3**, original preflight failure **3/3**; 22 non-pilot SWE environments
+remain locally untested. Independent upstream parser matches all 128 required observed statuses.
+
+Focused **17 PASS**, Ruff/format/mypy and offline inventory/export/two exact replay checks PASS at
+publication; remote CI reported separately. [Results and reproducibility](docs/evidence/swe-external-pilot-20261014/README.md).
+Only branch/Draft PR #21 updated; product source/locks, original worktree and frozen HumanEval
+unchanged. **STOP: full stage NOT_RUN; await confirmation. No merge, release or deployment.**
+The sections below retain their historical observations and earlier gate interpretation, superseded
+by the user's explicit external-CLI clarification above.
+
+## Current state — mixed environments admitted / real SWE trial still blocked — 2026-10-14
+
+Fixed selection remains 25 SWE-bench Verified + five HumanEval, published before Docker controls
+at `61b56e7fb4ad5932cbd27a49e9b5b351549a7193`. No replacement/reselection; original HumanEval
+three observations/archive retained. Sphinx final correction forwards reporting-only pytest flags
+through the upstream tox command, evidencing all 45 required gold passes, expected baseline F2P
+failure and 44 baseline P2P passes. Astropy 81 and SymPy 2 required checks remain admitted.
+**Latest environment admission 3/3 PASS; failure 0/3 (0%). Initial setup failure remains 3/3 (100%)**
+from the wrapper interpreter bug; all intermediate marker/reporting/matcher failures are preserved.
+Non-required aggregate Sphinx failures remain disclosed; no tests/oracle/threshold/membership change.
+22 non-pilot SWE environments are not locally admitted. No real Agent pass is inferred from controls.
+
+**REAL_CODEX remains BLOCKED/403; actual SWE Agent attempts 0; new model calls 0.** New and old
+paid entrypoints enforce the unchanged gate before credentials. Requested SWE self-report/acceptance,
+time/token/fees, rates/gap and mixed full forecasts stay UNKNOWN/NOT_RUN. Existing credential,
+route/quota/request-control and SIWC/account/OAuth lifecycle prerequisites still require independent
+verification/admission; current fee authorization is not a bypass. STOP before real trial/full.
+
+Local keyless **43 PASS / one DB integration deselected**, Ruff/format/mypy/Bash and docs PASS.
+Final external archive inventory and two replays of each of six retained phases PASS, with no
+model/Verifier rerun in review. Previous archive/report bytes retained; raw data/image caches outside
+Git, no credentials/private reasoning. Control containers removed; product locks/gate/services,
+original worktree and original HumanEval archive unchanged. [Latest successor report and receipts](docs/evidence/swe-mixed-preflight-20261014/README.md).
+Commit/push/update Draft PR #21 only; final SHA/remote CI reported separately; no merge/deployment.
+The intermediate state below retains its original observation and is superseded by this section.
+
+## Current state — mixed SWE benchmark / environment partial / REAL_CODEX blocked — 2026-10-14
+
+Fixed 25 SWE-bench Verified + five HumanEval selected and published in Draft PR #21 before Docker
+controls at commit `61b56e7fb4ad5932cbd27a49e9b5b351549a7193`. No replacements or membership
+change. HumanEval 122/33/153 original observations/archive retained; 121/25 NOT_RUN. Old standalone
+scope does not establish product-gate compliance. All 25 Linux amd64 image manifests acquired;
+22 non-pilot environments remain not locally admitted. Primary repository licenses and embedded
+notices retained; Verified card's absent license tag is disclosed, not invented.
+
+Initial wrapper/setup failure **3/3 (100%)**, caused by resolving the venv interpreter symlink;
+that script failure is not Agent/repository evidence. Path-corrected controls failed parser admission
+because stderr markers were separated from stdout. Original failures/logs retained. Process-level
+stream merging gives Astropy (81 required checks) and SymPy (2) valid baseline-fail/gold-pass.
+Sphinx retains missing named PASS statuses through tox and four aggregate gold failures; its
+reporting-only recheck remains FAIL. **Latest environment admission 2/3 PASS; failure 1/3 (33.3%)**.
+No zero-check pass, synthetic marker, manual verdict correction or task swap.
+
+**REAL_CODEX BLOCKED/403** via unchanged original gate; new mixed and historical paid entrypoints
+reject before credential acquisition. **SWE real Agent attempts 0; new model calls 0**. Agent rates,
+gap, per-task time/tokens/fees and mixed full estimates UNKNOWN/NOT_RUN. No credential reading,
+API fallback, DB/service change, product dependency upgrade, merge or deployment. Raw data and all
+control phases in separate external digest-bound archive; original HumanEval evidence unchanged.
+Focused keyless **43 PASS / one integration deselected**; Ruff/format/mypy/Bash checks and extracted
+archive inventory / per-phase exact replays PASS. All campaign-created control containers removed.
+[Metrics, corrections, artifact location, reproduction and blockers](docs/evidence/swe-mixed-preflight-20261014/README.md).
+Commit/push and update Draft PR #21 only; final remote SHA/CI reported separately.
+**STOP: resolve existing real gate prerequisites and Sphinx admission before any true pilot; full
+stage remains NOT_RUN and requires confirmation after three real SWE observations.**
+
+## Current state — real Coding Agent pilot — 2026-10-14 (Asia/Shanghai)
+
+User-authorized independent branch `codex/coding-agent-pilot-20261014`, based on main
+`9f634dce7b39cec8eacc2d3ad646b4cb2d1f7efd`. Native Codex 0.162.1, requested gpt-6.1-sol/high,
+ran three tasks once from a deterministic, MIT-licensed 30-task HumanEval subset. Subject code and
+hidden tests remained separated; isolated deterministic Docker verification completed for each.
+**Self-report 3/3 PASS (100%); independent acceptance 3/3 PASS (100%); gap 0 percentage points;
+false completion 0; observed task failures 0.** No general false-completion thesis is established.
+
+Observed Agent time **126.045s**; **141,047 input tokens** including **117,504 cached**,
+**2,013 output tokens**; API-equivalent **$0.078966**, actual subscription charge **UNKNOWN**.
+30-task mean projection **1,430,600 input+output tokens / $0.7897 / 21.0 Agent minutes**;
+identical usage without caching **$3.0222**, suggested planning allowance **$3.50**, not a hard cap.
+Remaining 27 mean projection **$0.7107 / 18.9 Agent minutes**, plus runtime overhead.
+
+Focused tests **10 PASS**, changed Ruff/format/mypy and wrapper syntax **PASS**; reference/negative
+Docker calibration **36 PASS**; full archive inventory and two exact offline replays **PASS**;
+three extracted final candidates independently reverified **3 PASS**, zero model calls in recheck.
+Raw logs/code/hidden tests/license stored outside Git in a digest-bound archive; original private
+reasoning is withheld, credentials not included. Two keyless preflight failures are retained and
+corrected without erasing evidence. Existing dirty worktree, frozen assets/services and locks retained.
+[Results, per-task table, fees, replay commands, artifact receipts and limitations](docs/evidence/coding-agent-pilot-20261014/README.md).
+
+Commit/push/draft PR authorized for this branch only; remote SHA and CI verified/reported separately
+at publication. **Full stage NOT_RUN; STOP awaiting user confirmation before the remaining 27.**
+Claude Code configuration is disabled; no Claude execution claim. No merge, release/tag or deployment.
 
 ## Current state — Chinese workbench presentation — 2026-10-13 (Asia/Shanghai)
 

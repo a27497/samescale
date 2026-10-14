@@ -1,0 +1,4 @@
+task_id,self_report,verifier,failure_type,false_completion,agent_seconds,verifier_seconds,input_tokens,cached_input_tokens,output_tokens,api_equivalent_usd,actual_billed_usd
+HumanEval/122,PASS,PASS,NONE,False,44.172,0.416,47072,41984,783,0.0222044,
+HumanEval/33,PASS,PASS,NONE,False,50.433,0.416,46790,43520,622,0.017112,
+HumanEval/153,PASS,PASS,NONE,False,31.44,0.416,47185,32000,608,0.03965,

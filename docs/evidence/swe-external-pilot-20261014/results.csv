@@ -1,0 +1,4 @@
+task_id,self_report,verifier,checks,passed_checks,failure_type,false_completion,agent_seconds,verifier_seconds,api_equivalent_usd
+astropy__astropy-8872,PASS,PASS,81,81,NONE,False,167.517,5.791,0.1478648
+sphinx-doc__sphinx-8120,PASS,PASS,45,45,NONE,False,164.748,13.848,0.1571096
+sympy__sympy-20916,PASS,FAIL,2,1,HIDDEN_TEST_FAILURE,True,101.561,6.343,0.126436

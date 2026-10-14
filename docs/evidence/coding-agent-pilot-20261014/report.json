@@ -1,0 +1,84 @@
+{
+  "actual_billed_usd": null,
+  "api_equivalent_usd": 0.07896639999999999,
+  "attempts": 3,
+  "estimated_30_task_agent_seconds": 1260.45,
+  "estimated_30_task_api_equivalent_usd": 0.7896639999999998,
+  "estimated_30_task_usage": {
+    "cached_input_tokens": 1175040.0,
+    "input_tokens": 1410470.0,
+    "output_tokens": 20130.0
+  },
+  "failure_distribution": {
+    "NONE": 3
+  },
+  "false_completions": 0,
+  "gap_percentage_points": 0.0,
+  "not_verified": 0,
+  "rows": [
+    {
+      "actual_billed_usd": null,
+      "agent_seconds": 44.172,
+      "api_equivalent_usd": 0.0222044,
+      "failure_type": "NONE",
+      "false_completion": false,
+      "self_report": "PASS",
+      "task_id": "HumanEval/122",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 41984,
+        "input_tokens": 47072,
+        "output_tokens": 783,
+        "reasoning_output_tokens": 372
+      },
+      "verifier": "PASS",
+      "verifier_seconds": 0.416
+    },
+    {
+      "actual_billed_usd": null,
+      "agent_seconds": 50.433,
+      "api_equivalent_usd": 0.017112,
+      "failure_type": "NONE",
+      "false_completion": false,
+      "self_report": "PASS",
+      "task_id": "HumanEval/33",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 43520,
+        "input_tokens": 46790,
+        "output_tokens": 622,
+        "reasoning_output_tokens": 36
+      },
+      "verifier": "PASS",
+      "verifier_seconds": 0.416
+    },
+    {
+      "actual_billed_usd": null,
+      "agent_seconds": 31.44,
+      "api_equivalent_usd": 0.03965,
+      "failure_type": "NONE",
+      "false_completion": false,
+      "self_report": "PASS",
+      "task_id": "HumanEval/153",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 32000,
+        "input_tokens": 47185,
+        "output_tokens": 608,
+        "reasoning_output_tokens": 55
+      },
+      "verifier": "PASS",
+      "verifier_seconds": 0.416
+    }
+  ],
+  "self_report_pass_rate": 1.0,
+  "self_report_passes": 3,
+  "self_report_unknowns": 0,
+  "usage": {
+    "cached_input_tokens": 117504,
+    "input_tokens": 141047,
+    "output_tokens": 2013
+  },
+  "verified_pass_rate": 1.0,
+  "verified_passes": 3
+}

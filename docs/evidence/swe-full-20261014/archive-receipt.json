@@ -1,0 +1,21 @@
+{
+  "archive": "/home/dev/.local/state/samescale-eval/swe-full-20261014-evidence.tar.gz",
+  "bytes": 387239882,
+  "excluded": [
+    ".git",
+    "swe-mixed-20261014/tooling",
+    "native binary and credentials",
+    "Docker image layers"
+  ],
+  "inventory_sha256": "5c1083dbf44de341abcfa501282cfb54ffb09f3fd112a6ee6ea5734d1a1e45c4",
+  "known_credential_scan_files": 67042,
+  "root_names": [
+    "swe-full-20261014",
+    "swe-external-pilot-20261014",
+    "pilot-20261014-v3",
+    "swe-external-verifiers-20261014-v8",
+    "swe-mixed-20261014"
+  ],
+  "sha256": "173003c2b56768c0c32a63be2cc4e8f7dad33687f098977379ad1734d08e8197",
+  "summary_sha256": "d8250bf05625ac0c605f87108f67c6027be788f8a6094cf48813b591c9aa428b"
+}

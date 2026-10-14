@@ -1,0 +1,12 @@
+{
+  "archive_sha256": "173003c2b56768c0c32a63be2cc4e8f7dad33687f098977379ad1734d08e8197",
+  "docker_calls": 0,
+  "extracted_root": "/home/dev/.local/state/samescale-eval/swe-full-offline-review-20261014",
+  "full_rows": 30,
+  "input_inventory": "PASS",
+  "inventory_content_mode_symlink": "PASS",
+  "provider_calls": 0,
+  "relocated_exact_replays": 2,
+  "retained_humaneval_raw_replay": "PASS",
+  "summary_sha256": "d8250bf05625ac0c605f87108f67c6027be788f8a6094cf48813b591c9aa428b"
+}

@@ -1,5 +1,63 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：评测报告口径与 README 首屏发布
+
+仅调整 PR #21 的公开主口径为排除环境失败的有效运行，保留原固定30题副口径和全部环境失败明细；
+不改原始结果、选题、归档或验收收据。PR #20 分支 README 首屏采用同一主口径，列明模型、题集、
+日期与报告链接。各自分支 commit/push 后等待准确 head 的全部适用 CI 通过再汇报。
+不再运行 Agent、Verifier 或付费评测；不合并、不部署。实际状态只在 CURRENT_MILESTONE 维护。
+
+## 已完成授权范围：固定 30 题全量，API 等价 $20 停止阈值（2026-10-14 确认）
+
+
+全量工作已完成；实际数字、失败及停止点只由 [CURRENT_MILESTONE](../CURRENT_MILESTONE.md) 与
+[固定全量结果](evidence/swe-full-20261014/README.md) 维护。本节保留授权/实施约束，不授权后续运行。
+用户已确认运行固定 25 SWE-bench Verified + 5 HumanEval，原六个观察保留，只运行余下24题。
+累计 API 等价预算 $20，含保留六题原估算；通过独立 token-only OTLP 收集器逐响应观察费用，
+达到阈值立即终止当前外部 CLI 并停止后续付费任务；无法确认用量也停止后续付费执行。CLI
+整题统计可能不含零输出启动预热，预算计入所有已报告响应；保留两套计数，不重写历史价格。
+环境最终失败的固定题计入分母，Agent NOT_RUN，不换题/剔除。分类沿用现有规则，不明为未知。
+
+外部原生 Codex / 既有导入 / 独立 Verifier 路径延续，产品 REAL_CODEX 关闭且代码不改。
+隐藏测试只在控制和 Verifier 中，全部原始材料存 Git 外。全量脚本按固定 TestSpec 适配剩余
+项目；Sphinx 保留文件顺序、Astropy 固定 required IDs、SymPy 物化启动 helper；仅压缩真实
+日志避免已有 64KB 输出截断，不删测试或变阈值。每题实际 baseline/gold 校准后才运行 Agent。
+
+完成/预算停止后更新 PR #21 的30行结果、总体及 SWE/HumanEval 分组率、差距、失败分布，
+选择最多两个确有自报PASS/验收FAIL的典型案例和证据位置（不足两个时如实说明），写明偏差、
+源文件与证据摘要、复现命令、费用与停止状态。仅 commit/push 更新原分支与 Draft PR；不合并、
+不部署，不触碰原工作区/服务/数据库。以下先前三题授权保留为历史范围。
+
+## 当前授权：外部 Codex CLI 三题 SWE 试跑（2026-10-14 澄清）
+
+用户明确要求产品 REAL_CODEX 门禁保持关闭且不修改。本次被测 Agent 在 SameScale 外直接
+运行既有 Codex CLI，沿用 HumanEval 方式；已固定的 Astropy-8872、Sphinx-8120、SymPy-20916
+各执行一次，隐藏测试与参考补丁不交给 Agent。完整代码和运行记录保存在 Git 外。
+既有导入路径接收本次专用交付目录，由独立 Verifier 验收；完整仓库超过产品 UTF-8 导入
+大小限制，所以交付使用显式任务专用补丁包，补丁应用在可信 campaign Verifier 中完成，
+不扩大产品通用 baseline+diff 契约。保持实际资源限制，不通过改产品规则来取得通过。
+
+选题仍为先前发布的固定 25 SWE-bench Verified + 5 HumanEval；不得按结果增删。汇报三题
+自报、独立验收、耗时、token/API 等价费用、环境搭建失败率和混合 30 题预估，然后 STOP
+等待全量确认。此澄清取代先前将外部 CLI 也要求经过产品门禁的解释。保留所有历史控制
+失败与原始 HumanEval 观察，允许本分支/PR 更新，不合并、不部署，不修改依赖锁或产品门禁。
+[固定混合协议](../evaluation/coding-agent/MIXED_PROTOCOL.md)。
+
+## 当前授权：真实 Coding Agent 小评测试跑（2026-10-14，Asia/Shanghai）
+
+用户授权在新分支 / PR 上准备可复现的 20-40 题评测，并先跑 2-3 题 Codex。采用
+MIT 许可、固定上游版本的 HumanEval；按预先固定的哈希顺序选 30 题，前 3 题试跑。
+使用既有 Codex 原生 CLI 和 SameScale provider-scoped Docker egress；Agent 只接触题面，
+独立 Verifier 在无网络、无凭据容器中运行隐藏测试。固定配置、原始事件（隐去凭据和私有
+推理）、最终代码、验收日志、token、耗时与摘要均离线可复核；原始包存于仓库外，不进 Git。
+Claude Code 保留关闭的配置项，本轮不执行，也不声称已实现其评测执行器。
+
+先完成 Verifier 正反校准，再运行 3 个真实尝试，汇报每题自报、独立验收、明确规则分类、
+耗时、API 等价估算和 30 题外推。试跑完成必须 STOP，等待用户确认后才可运行其余 27 题。
+不得根据结果换题、重写原尝试、把未知费用当作零、推断欺骗意图，或把函数题外推到真实
+仓库修复能力。允许本分支 commit/push 和 draft PR；不 merge、deploy 或修改既有产品运行时、
+数据、历史模型配置与冻结 evidence。[固定评测协议与复现命令](../evaluation/coding-agent/README.md)。
+
 ## 当前授权：工作台中文展示与状态可读性（2026-10-13）
 
 基于 main@a0ab9e8，在独立分支完成所有前端路由的中文标题、导航、文案、空状态和
