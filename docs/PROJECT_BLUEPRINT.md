@@ -1,5 +1,26 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 已完成授权范围：固定 30 题全量，API 等价 $20 停止阈值（2026-10-14 确认）
+
+
+全量工作已完成；实际数字、失败及停止点只由 [CURRENT_MILESTONE](../CURRENT_MILESTONE.md) 与
+[固定全量结果](evidence/swe-full-20261014/README.md) 维护。本节保留授权/实施约束，不授权后续运行。
+用户已确认运行固定 25 SWE-bench Verified + 5 HumanEval，原六个观察保留，只运行余下24题。
+累计 API 等价预算 $20，含保留六题原估算；通过独立 token-only OTLP 收集器逐响应观察费用，
+达到阈值立即终止当前外部 CLI 并停止后续付费任务；无法确认用量也停止后续付费执行。CLI
+整题统计可能不含零输出启动预热，预算计入所有已报告响应；保留两套计数，不重写历史价格。
+环境最终失败的固定题计入分母，Agent NOT_RUN，不换题/剔除。分类沿用现有规则，不明为未知。
+
+外部原生 Codex / 既有导入 / 独立 Verifier 路径延续，产品 REAL_CODEX 关闭且代码不改。
+隐藏测试只在控制和 Verifier 中，全部原始材料存 Git 外。全量脚本按固定 TestSpec 适配剩余
+项目；Sphinx 保留文件顺序、Astropy 固定 required IDs、SymPy 物化启动 helper；仅压缩真实
+日志避免已有 64KB 输出截断，不删测试或变阈值。每题实际 baseline/gold 校准后才运行 Agent。
+
+完成/预算停止后更新 PR #21 的30行结果、总体及 SWE/HumanEval 分组率、差距、失败分布，
+选择最多两个确有自报PASS/验收FAIL的典型案例和证据位置（不足两个时如实说明），写明偏差、
+源文件与证据摘要、复现命令、费用与停止状态。仅 commit/push 更新原分支与 Draft PR；不合并、
+不部署，不触碰原工作区/服务/数据库。以下先前三题授权保留为历史范围。
+
 ## 当前授权：外部 Codex CLI 三题 SWE 试跑（2026-10-14 澄清）
 
 用户明确要求产品 REAL_CODEX 门禁保持关闭且不修改。本次被测 Agent 在 SameScale 外直接

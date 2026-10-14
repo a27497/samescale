@@ -1,5 +1,37 @@
 # SameScale Product — Current Milestone
 
+## Current state — fixed 30-task mixed campaign complete — 2026-10-14
+
+Fixed 25 SWE Verified + 5 HumanEval selection unchanged. Original six observations retained;
+19 new physical Agents completed once, 5 final pre-Agent environment failures remain selected.
+**All30: self PASS25/30 (83.33%), independent PASS23/30 (76.67%), gap6.67pp.**
+SWE25:20/25 self (80%),18/25 independent (72%), gap8pp,5 environment failures.
+HumanEval5:5/5 self and independent (100%), gap0. Two false completions: retained SymPy20916
+Unicode-digit subscript and new Sphinx7748 overloaded signature formatting. No inference of intent.
+Primary distribution23 NONE /2 HIDDEN_TEST_FAILURE /5 ENVIRONMENT_FAILURE; UNKNOWN0.
+
+API-equivalent **$3.772424/$20**, including original six $0.5103768; no budget stop, actual bill
+unknown. Agent3225.544s (53.76min), independent158.277s. New-stage pull-to-last-result wall
+UTC10:52:47–12:41:58 (~1h49m), including setup/corrections/engineering gaps; not Agent time.
+Original six turn-based fees preserved; new response-only numeric telemetry includes startup
+responses. 9 initially pre-Agent-failed cases recovered with digest-linked successors; no paid
+Agent rerun. First new SWE controls failed14/22; final5/22, retained SWE3 admitted. Raw evidence
+outside Git `/home/dev/.local/state/samescale-eval/swe-full-20261014`; archive387239882bytes,
+SHA256 `173003c2b56768c0c32a63be2cc4e8f7dad33687f098977379ad1734d08e8197`.
+
+23 focused tests, full Ruff/format/mypy pass. Existing receipts/exports and all30 raw projections
+replay exactly; relocated archive/content/mode/symlink checks reported with final artifact receipt.
+Known-credential scan67042files pass. Product gate still BLOCKED/403 and code unchanged;19 new
+Subject mount inspections exclude hidden/oracle assets. Original HumanEval3 keep standalone
+Verifier observations; new2 use existing admitted product route. Requests6028 uses existing
+code-only intake after stream privacy refusal; raw stream preserved. No import/privacy/resource
+limits relaxed. Current code consolidates pre-Agent path/reporting/offline dependency fixes;
+source snapshots and every failed control remain outside Git. Negative resume setup timing stays
+unknown in derived report, original kept. [Full results/reproduction/limitations](docs/evidence/swe-full-20261014/README.md).
+Only original authorized branch and Draft PR#21 updated; remote CI is reported separately.
+**STOP: paid campaign complete. No further execution, merge, deployment or database change.**
+Following entries are historical scopes/observations, superseded by the completed full result.
+
 ## Current state — external SWE pilot complete / full stage awaits confirmation — 2026-10-14
 
 User clarified that the campaign uses **external direct Codex CLI**, following the original HumanEval

@@ -1,3 +1,6 @@
+> Current authorized mixed full campaign: [FULL_PROTOCOL.md](FULL_PROTOCOL.md).
+> This original HumanEval-only protocol remains a historical record; its full entrypoint is not used.
+
 # Coding Agent self-report / independent acceptance pilot
 
 ## Mixed SWE-bench successor — 2026-10-14

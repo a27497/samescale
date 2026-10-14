@@ -24,10 +24,18 @@ from scripts.coding_agent_eval import (
     run_capture,
     save,
 )
+from scripts.swe_full_budget import ResponseMeter
 from scripts.swe_mixed_eval import check_inputs
 
 
-async def agents(root: Path, output: Path, vendor: Path, auth: Path) -> None:
+async def agents(
+    root: Path,
+    output: Path,
+    vendor: Path,
+    auth: Path,
+    task_ids: list[str] | None = None,
+    budget: tuple[float, float] | None = None,
+) -> None:
     check_inputs(root)
     mixed = load(root / "config.json")
     config = load(SPEC / "config.json")
@@ -45,15 +53,16 @@ async def agents(root: Path, output: Path, vendor: Path, auth: Path) -> None:
     save(
         output / "selection.json",
         {
-            "task_ids": mixed["pilot_task_ids"],
+            "task_ids": task_ids if task_ids is not None else mixed["pilot_task_ids"],
             "full_stage": "NOT_RUN",
             "execution_route": "EXTERNAL_CODEX_CLI",
             "product_REAL_CODEX": "UNCHANGED_CLOSED",
         },
     )
+    selected = task_ids if task_ids is not None else mixed["pilot_task_ids"]
     proxy_image = await EgressProxyRuntime().ensure_image()
     cli = _DockerCLI(environment=docker_environment(os.environ, {}))
-    for task_id in mixed["pilot_task_ids"]:
+    for task_id in selected:
         task = next(t for t in mixed["tasks"] if t["instance_id"] == task_id)
         row = load(root / "hidden" / (task_id + ".json"))
         case = output / task_id
@@ -144,6 +153,18 @@ async def agents(root: Path, output: Path, vendor: Path, auth: Path) -> None:
         name = "samescale-external-agent-" + uuid4().hex
         attestation = await boundary.provision(cli)
         save(case / "egress-attestation.json", attestation.model_dump(mode="json"))
+        meter = (
+            ResponseMeter(
+                case,
+                network=boundary.subject_network_mode,
+                image=config["python_image"],
+                initial=budget[0],
+                limit=budget[1],
+            )
+            if budget
+            else None
+        )
+        meter_result = None
         try:
             mounts = [
                 f"type=bind,src={workspace},dst=/workspace",
@@ -156,6 +177,11 @@ async def agents(root: Path, output: Path, vendor: Path, auth: Path) -> None:
             command.pop()
             for key, value in boundary.subject_proxy_environment().items():
                 command.extend(["--env", f"{key}={value}"])
+            arguments = native_arguments(config)
+            if meter:
+                arguments[-1:-1] = meter.arguments()
+                for key, value in meter.environment().items():
+                    command.extend(["--env", f"{key}={value}"])
             command.extend(
                 [
                     image,
@@ -165,13 +191,15 @@ async def agents(root: Path, output: Path, vendor: Path, auth: Path) -> None:
                     "p.mkdir(mode=0o700); "
                     "shutil.copyfile('/run/credential/auth.json',p/'auth.json'); "
                     "os.chmod(p/'auth.json',0o600); "
-                    "os.execv('/opt/codex/bin/codex'," + repr(native_arguments(config)) + ")",
+                    "os.execv('/opt/codex/bin/codex'," + repr(arguments) + ")",
                 ]
             )
             subprocess.run(
                 command, capture_output=True, check=True, env=docker_environment(os.environ, {})
             )
             save(case / "agent-container.json", json.loads(docker("inspect", name).stdout)[0])
+            if meter:
+                meter.watch(name)
             print("REAL EXTERNAL CLI START " + task_id, flush=True)
             status = run_capture(
                 ["docker", "start", "--attach", "--interactive", name],
@@ -181,8 +209,14 @@ async def agents(root: Path, output: Path, vendor: Path, auth: Path) -> None:
                 secrets=secrets,
                 jsonl=True,
             )
+            if meter:
+                meter_result = meter.finish()
+                status["budget_stopped"] = meter_result["stopped_budget"]
+                status["meter_error"] = meter_result["stopped_meter_error"]
             save(case / "agent-process.json", status)
         finally:
+            if meter and not meter.closed.is_set():
+                meter.finish()
             docker("rm", "--force", name)
             (case / "egress.jsonl").write_bytes(docker("logs", boundary.proxy_name).stdout)
             await boundary.cleanup(cli)
@@ -198,6 +232,30 @@ async def agents(root: Path, output: Path, vendor: Path, auth: Path) -> None:
             if e.get("type") == "item.completed"
             and e.get("item", {}).get("type") == "agent_message"
         ]
+        if meter_result:
+            observed = completed[-1].get("usage", {}) if completed else {}
+            if observed:
+                differences = {
+                    k: meter_result["usage"][k] - observed.get(k, 0)
+                    for k in ("input_tokens", "cached_input_tokens", "output_tokens")
+                }
+                if any(value < 0 for value in differences.values()):
+                    save(
+                        case / "meter-undercoverage.json",
+                        {"turn_usage": observed, "response_usage": meter_result["usage"]},
+                    )
+                    raise RuntimeError("live meter undercovers CLI usage; stop paid execution")
+                save(
+                    case / "meter-reconciliation.json",
+                    {
+                        "turn_usage": observed,
+                        "response_usage": meter_result["usage"],
+                        "extra_response_usage": differences,
+                        "budget_counts_all_responses_including_zero_output_startup": True,
+                    },
+                )
+            if not meter_result["response_count"] or meter_result["stopped_meter_error"]:
+                raise RuntimeError("no valid response telemetry; stop paid execution")
         print(
             json.dumps(
                 {

@@ -11,6 +11,7 @@ import shutil
 from pathlib import Path
 from uuid import uuid4
 
+from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.external_evidence import service
 from harnesslab.external_evidence.models import ApprovedSource, EvidencePolicy, HarnessIdentity
 from harnesslab.external_evidence.verification import verify_workspace
@@ -38,13 +39,21 @@ from scripts.coding_agent_eval import SPEC, docker, load, run_capture, save
 from scripts.swe_mixed_eval import check_inputs
 
 
-async def prepare(root: Path, trusted: Path, reuse_images: Path | None = None) -> None:
+async def prepare(
+    root: Path,
+    trusted: Path,
+    reuse_images: Path | None = None,
+    task_ids: list[str] | None = None,
+    full_adapter: bool = False,
+    no_build_isolation: bool = False,
+    skip_reinstall: bool = False,
+) -> None:
     check_inputs(root)
     mixed = load(root / "config.json")
     trusted.mkdir(parents=True, mode=0o700)
     admissions = []
     image_ids = {}
-    for identity in mixed["pilot_task_ids"]:
+    for identity in task_ids if task_ids is not None else mixed["pilot_task_ids"]:
         task = next(t for t in mixed["tasks"] if t["instance_id"] == identity)
         row = load(root / "hidden" / (identity + ".json"))
         case = trusted / identity
@@ -61,6 +70,12 @@ async def prepare(root: Path, trusted: Path, reuse_images: Path | None = None) -
                 if task["repo"] == "astropy/astropy"
                 else "python -m pip install -e ."
             )
+            if no_build_isolation:
+                install += " --no-build-isolation"
+            if skip_reinstall or (
+                full_adapter and task["repo"] == "astropy/astropy" and task["version"] == "5.1"
+            ):
+                install = "python -c 'import astropy; print(astropy.__version__)'"
             command = (
                 "source /opt/miniconda3/bin/activate && conda activate testbed && "
                 "cd /testbed && git reset --hard "
@@ -123,7 +138,10 @@ async def prepare(root: Path, trusted: Path, reuse_images: Path | None = None) -
             "Apply the supplied delivery to the fixed SWE baseline "
             "and check required hidden tests.\n"
         )
-        shutil.copyfile(SPEC / "swe_payload_verifier.py", package_path / "verifier/verify.py")
+        shutil.copyfile(
+            SPEC / ("swe_full_payload_verifier.py" if full_adapter else "swe_payload_verifier.py"),
+            package_path / "verifier/verify.py",
+        )
         (package_path / "verifier/test.patch").write_text(row["test_patch"])
         hidden_paths = re.findall(r"^\+\+\+ b/(.+)$", row["test_patch"], re.M)
         if task["repo"] == "astropy/astropy":
@@ -152,6 +170,10 @@ async def prepare(root: Path, trusted: Path, reuse_images: Path | None = None) -
                 "sympy/printing/tests/test_conventions.py",
                 "sympy/testing/quality_unicode.py",
             ]
+        if full_adapter:
+            from scripts.swe_full_commands import test_command_for
+
+            test_command = test_command_for(root, row)
         save(
             package_path / "verifier/acceptance.json",
             {
@@ -162,6 +184,7 @@ async def prepare(root: Path, trusted: Path, reuse_images: Path | None = None) -
                 "pass_to_pass": json.loads(row["PASS_TO_PASS"]),
                 "image_id": image,
                 "base_commit": task["base_commit"],
+                **({"log_encoding": "gzip-base64"} if full_adapter else {}),
             },
         )
         (package_path / "task.yaml").write_text(
@@ -290,11 +313,18 @@ async def prepare(root: Path, trusted: Path, reuse_images: Path | None = None) -
     (trusted / "task-policy.json").chmod(0o600)
 
 
-async def accept(root: Path, trusted: Path, output: Path) -> None:
+async def accept(
+    root: Path,
+    trusted: Path,
+    output: Path,
+    task_ids: list[str] | None = None,
+) -> None:
     policy = LocalTaskPolicy.model_validate_json((trusted / "task-policy.json").read_bytes())
     os.environ["HARNESSLAB_LOCAL_TASK_POLICY"] = str(trusted / "task-policy.json")
     images = load(trusted / "images.json")
-    for identity in load(root / "config.json")["pilot_task_ids"]:
+    for identity in (
+        task_ids if task_ids is not None else load(root / "config.json")["pilot_task_ids"]
+    ):
         case = output / identity
         inspection = import_task(
             policy,
@@ -336,7 +366,42 @@ async def accept(root: Path, trusted: Path, output: Path) -> None:
         (case / "evidence-policy.json").chmod(0o600)
         os.environ["HARNESSLAB_EXTERNAL_EVIDENCE_POLICY"] = str(case / "evidence-policy.json")
         evidence_policy = service.load_policy()
-        item = service.ingest(evidence_policy, source.source_id)
+        try:
+            item = service.ingest(evidence_policy, source.source_id)
+        except (WorkbenchAPIError, service.EvidenceInputError) as exc:
+            if exc.code != "EVIDENCE_SENSITIVE_INPUT":
+                raise
+            # Preserve the refused stream. Existing code-only intake independently checks
+            # the unchanged patch for sensitive content; no privacy rule is bypassed.
+            code_source = source.model_copy(
+                update={
+                    "source_id": source.source_id + "-code-only",
+                    "format": "code-only-v1",
+                    "harness": None,
+                    "path": None,
+                    "digest": None,
+                }
+            )
+            evidence_policy = evidence_policy.model_copy(update={"sources": (code_source,)})
+            code_policy = case / "evidence-code-only-policy.json"
+            save(code_policy, evidence_policy.model_dump(mode="json"))
+            code_policy.chmod(0o600)
+            os.environ["HARNESSLAB_EXTERNAL_EVIDENCE_POLICY"] = str(code_policy)
+            evidence_policy = service.load_policy()
+            item = service.ingest(evidence_policy, code_source.source_id)
+            save(
+                case / "intake-mode.json",
+                {
+                    "format": "code-only-v1",
+                    "native_log_imported": False,
+                    "reason": (
+                        "EVIDENCE_SENSITIVE_INPUT in saved stream; existing privacy gate preserved"
+                    ),
+                    "raw_cli_log_preserved_outside_git": True,
+                    "agent_reexecuted": False,
+                    "reviewed_patch_passes_existing_privacy_check": True,
+                },
+            )
         if not (case / "intake.json").exists():
             save(case / "intake.json", item)
         receipt = await verify_workspace(evidence_policy, item["identity"])
