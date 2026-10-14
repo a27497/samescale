@@ -34,7 +34,10 @@ and subsequent verifier result remain unchanged. CI routing10 PASS; pre-final-ad
 New tests join Fast CI and offline S3; legacy29 selectors retain their independent fingerprint.
 jsonschema plus4 transitive dependencies added without upgrading any existing locked package;
 exact installed MIT licenses retained. [Boundaries, categories, commands and limitations](docs/FAILURE_DIAGNOSIS.md).
-Publication must verify exact pushed SHA and all applicable CI separately. STOP after draft PR/CI
+Draft PR#22 created. First publication e1b0897 offline CI103 PASS with zero model/external calls;
+Fast CI workflow contracts caught the omitted new selector in the self-hosted configuration.
+Append that selector to preserve hosted/self-hosted inventory parity; no gate or trigger weakened.
+Publication must verify the corrected exact pushed SHA and all applicable CI separately. STOP after draft PR/CI
 handoff; no further model call, merge, deployment, website/settings or frozen-evidence change.
 
 ## Current state — PR20 synchronized with merged evaluation main — 2026-10-14
