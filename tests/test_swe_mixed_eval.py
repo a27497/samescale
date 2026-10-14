@@ -77,3 +77,36 @@ def test_zero_or_missing_checks_and_gold_failure_refuse(mixed: ModuleType) -> No
     assert not mixed.control_success({**base, "missing_required_tests": ["f"]}, gold, "x")
     assert not mixed.control_success(base, {**gold, "all_p2p_pass": False}, "x")
     assert not mixed.control_success({**base, "all_f2p_fail": False}, gold, "x")
+
+
+def test_cli_preserves_venv_interpreter_symlink(
+    mixed: ModuleType, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import sys
+
+    binary = tmp_path / "venv/bin/python"
+    binary.parent.mkdir(parents=True)
+    binary.symlink_to(sys.executable)
+    captured: list[Path] = []
+    monkeypatch.setattr(
+        mixed, "preflight", lambda root, python, label, instance_id: captured.append(python)
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["mixed", "preflight", "--root", str(tmp_path), "--upstream-python", str(binary)],
+    )
+    mixed.main()
+    assert captured == [binary]
+
+
+def test_upstream_stderr_markers_surround_stdout_tests(mixed: ModuleType, tmp_path: Path) -> None:
+    import shlex
+
+    producer = tmp_path / "upstream.sh"
+    producer.write_text("printf 'START\\n' >&2\nprintf 'PASSED test_one\\n'\nprintf 'END\\n' >&2\n")
+    command = mixed.merged_shell_command("bash " + shlex.quote(str(producer)))
+    result = mixed.run_capture(["bash", "-c", command], tmp_path / "control", timeout=5)
+    assert result["exit_code"] == 0
+    assert (tmp_path / "control.stdout").read_text() == "START\nPASSED test_one\nEND\n"
+    assert (tmp_path / "control.stderr").read_bytes() == b""

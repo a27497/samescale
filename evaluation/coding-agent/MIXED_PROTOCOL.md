@@ -109,3 +109,14 @@ Independent verification applies the frozen final patch in a separate no-network
 No such real dispatcher is implemented/admitted by this keyless preparation. Real pilot and full
 campaign remain separate permission boundaries; after three admitted SWE attempts, report actual
 per-task results/time/usage/cost and setup failures, then **STOP for user confirmation**.
+
+
+## Observed preflight and offline review
+
+[Successor receipts](../../docs/evidence/swe-mixed-preflight-20261014/README.md) retain all first
+failures and concrete corrections. `--preflight-label` writes another namespace without overwriting
+records; `--instance-id` may only select an already-fixed pilot identity for a documented correction,
+never introduce a replacement. Reporting-only `PYTEST_ADDOPTS=-rA --color=no` is supplied to control
+containers, but tox does not forward it for the observed Sphinx image, which remains not admitted.
+Model/hidden-test semantics and membership stay fixed. Saved `replay --preflight-label NAME` verifies
+inputs/case inventories and qualification without Docker/upstream tooling/models/credentials.

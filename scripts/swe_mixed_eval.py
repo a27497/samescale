@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import urllib.request
 from pathlib import Path
@@ -12,7 +13,15 @@ from uuid import uuid4
 
 from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.local_execution.subscription import deny_real_execution, real_execution_readiness
-from scripts.coding_agent_eval import digest, docker, freeze, load, run_capture, save
+from scripts.coding_agent_eval import (
+    check_inventory,
+    digest,
+    docker,
+    freeze,
+    load,
+    run_capture,
+    save,
+)
 
 REPO = Path(__file__).resolve().parents[1]
 SPEC = REPO / "evaluation" / "coding-agent"
@@ -169,15 +178,31 @@ def load_json_bytes(data: bytes) -> Json:
     return result
 
 
-def preflight(root: Path, upstream_python: Path) -> None:
+def merged_shell_command(command: str) -> str:
+    """Merge at the trusted command, retaining ordering between markers and test output."""
+    return command + " 2>&1"
+
+
+def preflight(
+    root: Path,
+    upstream_python: Path,
+    label: str = "preflight",
+    instance_id_filter: str | None = None,
+) -> None:
+    if not re.fullmatch(r"[a-zA-Z0-9_-]{1,60}", label):
+        raise ValueError("unsafe preflight receipt label")
     check_inputs(root)
     config = load(root / "config.json")
+    if instance_id_filter is not None and instance_id_filter not in config["pilot_task_ids"]:
+        raise ValueError("a correction may only recheck an already-fixed pilot identity")
     results = []
     for task in config["tasks"]:
         instance_id = task["instance_id"]
         if instance_id not in config["pilot_task_ids"]:
             continue
-        case = root / "preflight" / instance_id
+        if instance_id_filter is not None and instance_id != instance_id_filter:
+            continue
+        case = root / label / instance_id
         case.mkdir(parents=True)  # Never overwrite a first-attempt environment result.
         result: Json = {
             "instance_id": instance_id,
@@ -216,7 +241,9 @@ def preflight(root: Path, upstream_python: Path) -> None:
                 script = f"cd /testbed && git reset --hard {task['base_commit']} && "
                 if variant == "gold":
                     script += "git apply /evaluation/gold.patch && "
-                script += "bash /evaluation/eval.sh"
+                # Upstream xtrace emits start/end markers to stderr. Merge at the process,
+                # preserving actual order for its official parser; never synthesize markers.
+                script += merged_shell_command("bash /evaluation/eval.sh")
                 command = [
                     "create",
                     "--name",
@@ -235,6 +262,8 @@ def preflight(root: Path, upstream_python: Path) -> None:
                     "512",
                     "--env",
                     "PIP_NO_INDEX=1",
+                    "--env",
+                    "PYTEST_ADDOPTS=-rA --color=no",
                     "--mount",
                     f"type=bind,src={case},dst=/evaluation,readonly",
                     image,
@@ -273,6 +302,9 @@ def preflight(root: Path, upstream_python: Path) -> None:
             else:
                 result["reason"] = "BASELINE_OR_GOLD_CONTROL_FAILED"
         except (subprocess.SubprocessError, OSError, ValueError, RuntimeError) as exc:
+            if isinstance(exc, subprocess.CalledProcessError):
+                (case / "upstream-error.stdout").write_bytes(exc.stdout or b"")
+                (case / "upstream-error.stderr").write_bytes(exc.stderr or b"")
             result["reason"] = type(exc).__name__ + ":" + str(exc)[:200]
         save(case / "result.json", result)
         freeze(case)
@@ -280,7 +312,7 @@ def preflight(root: Path, upstream_python: Path) -> None:
         print(json.dumps(result), flush=True)
     failed = sum(r["environment"] != "PASS" for r in results)
     save(
-        root / "preflight-summary.json",
+        root / f"{label}-summary.json",
         {
             "planned_pilot_tasks": 3,
             "environment_attempts": len(results),
@@ -302,16 +334,25 @@ def preflight(root: Path, upstream_python: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("prepare", "preflight", "gate", "pilot", "full"))
+    parser.add_argument(
+        "command", choices=("prepare", "preflight", "replay", "gate", "pilot", "full")
+    )
     parser.add_argument("--root", type=Path)
     parser.add_argument("--upstream-python", type=Path)
     parser.add_argument("--retained-humaneval-summary", type=Path)
+    parser.add_argument("--preflight-label", default="preflight")
+    parser.add_argument("--instance-id")
     args = parser.parse_args()
     if args.command in {"pilot", "full"}:
         print(json.dumps(gate(), indent=2))
         raise SystemExit(3)
     if args.command == "gate":
         print(json.dumps(gate(), indent=2))
+        return
+    if args.command == "replay":
+        if not args.root:
+            parser.error("offline replay requires root, no tooling or credential")
+        print(json.dumps(replay(args.root.resolve(), args.preflight_label), indent=2))
         return
     if not args.root or not args.upstream_python:
         parser.error("keyless preparation requires root and isolated upstream Python")
@@ -321,11 +362,56 @@ def main() -> None:
         prepare(
             args.root.resolve(),
             load(SPEC / "mixed-config.json"),
-            args.upstream_python.resolve(),
+            args.upstream_python.absolute(),
             args.retained_humaneval_summary.resolve(),
         )
     else:
-        preflight(args.root.resolve(), args.upstream_python.resolve())
+        # Resolving a venv interpreter symlink bypasses its pyvenv.cfg and installed tooling.
+        preflight(
+            args.root.resolve(),
+            args.upstream_python.absolute(),
+            args.preflight_label,
+            args.instance_id,
+        )
+
+
+def replay(root: Path, label: str) -> Json:
+    if not re.fullmatch(r"[a-zA-Z0-9_-]{1,60}", label):
+        raise ValueError("unsafe replay label")
+    check_inputs(root)
+    config = load(root / "config.json")
+    summary = load(root / f"{label}-summary.json")
+    rows = []
+    for task in config["tasks"]:
+        if task["instance_id"] not in config["pilot_task_ids"]:
+            continue
+        case = root / label / task["instance_id"]
+        if not case.exists():
+            continue
+        check_inventory(case)
+        result = load(case / "result.json")
+        qualified = False
+        if (case / "baseline-grade.json").exists() and (case / "gold-grade.json").exists():
+            qualified = control_success(
+                load(case / "baseline-grade.json"),
+                load(case / "gold-grade.json"),
+                task["instance_id"],
+            )
+        if (
+            result["environment"] != ("PASS" if qualified else "FAIL")
+            or result["self_report"] != "NOT_RUN"
+            or result["model_calls"] != 0
+        ):
+            raise ValueError("saved result disagrees with keyless control evidence")
+        rows.append(result)
+    failed = sum(row["environment"] == "FAIL" for row in rows)
+    if (
+        summary["rows"] != rows
+        or summary["first_attempt_environment_failures"] != failed
+        or summary["first_attempt_environment_failure_rate"] != failed / len(rows)
+    ):
+        raise ValueError("saved summary disagrees with frozen controls")
+    return summary
 
 
 if __name__ == "__main__":

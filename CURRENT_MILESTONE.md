@@ -1,22 +1,33 @@
 # SameScale Product — Current Milestone
 
-## Current state — mixed SWE benchmark preparation / REAL_CODEX blocked — 2026-10-14
+## Current state — mixed SWE benchmark / environment partial / REAL_CODEX blocked — 2026-10-14
 
-User cancels the unexecuted HumanEval-only full stage and requests 25 SWE-bench Verified + five
-HumanEval controls, retaining the original three. Fixed hashed per-repository selection and three
-cross-repository pilot identities are bound in [mixed-config](evaluation/coding-agent/mixed-config.json)
-and [protocol](evaluation/coding-agent/MIXED_PROTOCOL.md), to be published before Docker controls.
-All 25 published Linux amd64 image manifests and base-commit license texts were acquired; local
-admission remains NOT_RUN until baseline/gold controls. Original three HumanEval observations
-and their archive remain unchanged; they do not establish product-gate compliance.
+Fixed 25 SWE-bench Verified + five HumanEval selected and published in Draft PR #21 before Docker
+controls at commit `61b56e7fb4ad5932cbd27a49e9b5b351549a7193`. No replacements or membership
+change. HumanEval 122/33/153 original observations/archive retained; 121/25 NOT_RUN. Old standalone
+scope does not establish product-gate compliance. All 25 Linux amd64 image manifests acquired;
+22 non-pilot environments remain not locally admitted. Primary repository licenses and embedded
+notices retained; Verified card's absent license tag is disclosed, not invented.
 
-Existing REAL_CODEX is unconditionally BLOCKED/403 (`REAL_EXECUTION_BLOCKED`). New mixed commands
-and the historical paid script enforce that exact gate before credential/root acquisition; enabling
-environment variables cannot override it. No product gate/runtime/admission/database or provider
-change is authorized. SWE real pilot and mixed full stage NOT_RUN; actual SWE Agent time/token/cost,
-pass rates/gap and full mixed estimates UNKNOWN. Keyless Docker environment preflight for the
-three fixed SWE identities is the independent authorized work; actual outcomes are recorded below
-when completed. Commit/push and update Draft PR #21 only; no merge/deployment/new paid call.
+Initial wrapper/setup failure **3/3 (100%)**, caused by resolving the venv interpreter symlink;
+that script failure is not Agent/repository evidence. Path-corrected controls failed parser admission
+because stderr markers were separated from stdout. Original failures/logs retained. Process-level
+stream merging gives Astropy (81 required checks) and SymPy (2) valid baseline-fail/gold-pass.
+Sphinx retains missing named PASS statuses through tox and four aggregate gold failures; its
+reporting-only recheck remains FAIL. **Latest environment admission 2/3 PASS; failure 1/3 (33.3%)**.
+No zero-check pass, synthetic marker, manual verdict correction or task swap.
+
+**REAL_CODEX BLOCKED/403** via unchanged original gate; new mixed and historical paid entrypoints
+reject before credential acquisition. **SWE real Agent attempts 0; new model calls 0**. Agent rates,
+gap, per-task time/tokens/fees and mixed full estimates UNKNOWN/NOT_RUN. No credential reading,
+API fallback, DB/service change, product dependency upgrade, merge or deployment. Raw data and all
+control phases in separate external digest-bound archive; original HumanEval evidence unchanged.
+Focused keyless **43 PASS / one integration deselected**; Ruff/format/mypy/Bash checks and extracted
+archive inventory / per-phase exact replays PASS. All campaign-created control containers removed.
+[Metrics, corrections, artifact location, reproduction and blockers](docs/evidence/swe-mixed-preflight-20261014/README.md).
+Commit/push and update Draft PR #21 only; final remote SHA/CI reported separately.
+**STOP: resolve existing real gate prerequisites and Sphinx admission before any true pilot; full
+stage remains NOT_RUN and requires confirmation after three real SWE observations.**
 
 ## Current state — real Coding Agent pilot — 2026-10-14 (Asia/Shanghai)
 

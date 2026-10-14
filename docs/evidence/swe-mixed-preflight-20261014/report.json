@@ -1,0 +1,131 @@
+{
+  "actual_swe_agent_attempts": 0,
+  "agent_pass_rates_and_gap": null,
+  "first_attempt_environment_failure_rate": 1.0,
+  "first_attempt_environment_failures": 3,
+  "first_docker_control_pull_at_utc": "2026-10-14T08:27:06.635120+00:00",
+  "gate": {
+    "code": "REAL_EXECUTION_BLOCKED",
+    "credential_access": "NONE",
+    "http_status": 403,
+    "live_gate_changed": false,
+    "model_calls": 0,
+    "readiness": {
+      "api_key_required": false,
+      "billing_mode": "CHATGPT_SUBSCRIPTION",
+      "blockers": [
+        "PHASE25_REAL_EXECUTION_CLOSED",
+        "TRUSTED_SUBSCRIPTION_CREDENTIAL_BOUNDARY_NOT_LIVE_VERIFIED",
+        "LIVE_ROUTE_AND_QUOTA_NOT_VERIFIED",
+        "LIVE_REQUEST_INTERCEPTION_AND_NO_RETRY_NOT_VERIFIED",
+        "SEPARATE_FIRST_REAL_AUTHORIZATION_REQUIRED",
+        "SIWC_ACCOUNT_WORKSPACE_ELIGIBILITY_NOT_CONFIRMED",
+        "SIWC_LOCAL_OR_SELF_HOSTED_INTEGRATION_NOT_CONFIRMED",
+        "SEPARATE_PRODUCT_OAUTH_NOT_AUTHORIZED",
+        "OPENAI_JWKS_AND_CREDENTIAL_LIFECYCLE_NOT_LIVE_VERIFIED"
+      ],
+      "credential_access": "NONE_PHASE25",
+      "project_source_license": {
+        "brand_rights": "SEPARATE_NOT_GRANTED",
+        "scope": "ORIGINAL_PROJECT_SOURCE_WITH_EXCEPTIONS",
+        "scope_document": "LICENSE_SCOPE.md",
+        "spdx_id": "Apache-2.0",
+        "status": "INTEGRATED",
+        "third_party_rights": "RETAIN_UPSTREAM_TERMS"
+      },
+      "quota": "NOT_READ",
+      "real_execution_enabled": false,
+      "siwc_applicability": "PENDING_ACCOUNT_AND_INTEGRATION_ELIGIBILITY",
+      "token_usage": "NOT_REPORTED",
+      "usd_hard_cap_required": false
+    },
+    "status": "BLOCKED"
+  },
+  "latest_environment_admitted": 2,
+  "latest_environment_failure_rate": 0.3333333333333333,
+  "latest_environment_failures": 1,
+  "local_checks": {
+    "focused_keyless_tests_passed": 43,
+    "integration_deselected": 1,
+    "original_gate_source_changed": false,
+    "ruff_format_mypy": "PASS"
+  },
+  "membership_changed": false,
+  "mixed_full_estimate": null,
+  "new_model_calls": 0,
+  "notes": [
+    "No Agent dispatch or model credential read in new stage.",
+    "Initial original helper stderr was not retained by the first bridge exception handler; bounded error receipt preserved; later handler saves subprocess logs.",
+    "Interpreter symlink corrected without overwriting first failures.",
+    "Official markers merged at the process without synthetic markers.",
+    "Sphinx reporting env is not forwarded by tox; named required passes remain missing; observed gold aggregate still has 4 failures.",
+    "No replacement or manual result edits; 22 non-pilot SWE images remain not locally admitted."
+  ],
+  "phase_failure_counts": {
+    "preflight": 3,
+    "preflight-corrected": 3,
+    "preflight-merged": 1,
+    "preflight-sphinx-reported": 1
+  },
+  "planned_swe_agent_pilot_tasks": 3,
+  "pr_selection_published_at_utc": "2026-10-14T08:26:37Z",
+  "retained_humaneval_original_attempts": 3,
+  "retained_humaneval_summary_sha256": "fe14209cb3760190da9119d2b9a66a27f0fe0a3ab3d2f97002e2be6183a992ee",
+  "retained_original_humaneval_summary_sha256": "fe14209cb3760190da9119d2b9a66a27f0fe0a3ab3d2f97002e2be6183a992ee",
+  "rows": [
+    {
+      "agent_cost_usd": null,
+      "agent_seconds": null,
+      "agent_self_report": "NOT_RUN",
+      "agent_tokens": null,
+      "baseline_expected_checks": 81,
+      "environment_admission": "PASS",
+      "gold_required_checks_evidenced": true,
+      "independent_agent_acceptance": "NOT_RUN",
+      "instance_id": "astropy__astropy-8872",
+      "latest_receipt": "preflight-merged",
+      "phase_seconds": {
+        "baseline": 90.594,
+        "gold": 90.886,
+        "pull": 1.218
+      }
+    },
+    {
+      "agent_cost_usd": null,
+      "agent_seconds": null,
+      "agent_self_report": "NOT_RUN",
+      "agent_tokens": null,
+      "baseline_expected_checks": 45,
+      "environment_admission": "FAIL",
+      "gold_required_checks_evidenced": false,
+      "independent_agent_acceptance": "NOT_RUN",
+      "instance_id": "sphinx-doc__sphinx-8120",
+      "latest_receipt": "preflight-sphinx-reported",
+      "phase_seconds": {
+        "baseline": 9.036,
+        "gold": 9.54,
+        "pull": 1.218
+      }
+    },
+    {
+      "agent_cost_usd": null,
+      "agent_seconds": null,
+      "agent_self_report": "NOT_RUN",
+      "agent_tokens": null,
+      "baseline_expected_checks": 2,
+      "environment_admission": "PASS",
+      "gold_required_checks_evidenced": true,
+      "independent_agent_acceptance": "NOT_RUN",
+      "instance_id": "sympy__sympy-20916",
+      "latest_receipt": "preflight-merged",
+      "phase_seconds": {
+        "baseline": 4.726,
+        "gold": 4.827,
+        "pull": 1.368
+      }
+    }
+  ],
+  "schema_version": 1,
+  "selection_commit": "61b56e7fb4ad5932cbd27a49e9b5b351549a7193",
+  "swe_agent_time_tokens_cost": null
+}
