@@ -1,5 +1,58 @@
 # SameScale Product — Current Milestone
 
+## Current state — PR20 synchronized with merged evaluation main — 2026-10-14
+
+User authorized merging main into `codex/readme-agent-evaluation-20261014`, updating repository
+metadata, and ordinary PR#20 merge only after all applicable exact-head CI succeeds. Incoming main
+is `b326e56c482813538e80adc28c8708d355d3e899` (PR#21 merge). Only CURRENT_MILESTONE.md conflicted:
+both sides added dated records at the top. Preserve every PR#20 README publication/positioning record
+and every PR#21 evaluation/pilot observation; new authorization supersedes earlier no-merge scope
+only for PR#20. README merged without conflict and retains effective25 metrics matching the report;
+remove the obsolete `main@50ac4cf` frozen-product statement.
+
+Repository description and the complete15-topic set now match the user's exact text, verified by
+`gh repo view`. Local documentation contract1 PASS; both milestone histories, metrics/links and
+unchanged code/evidence relative to main PASS. Exact-head CI must pass before ordinary PR merge.
+No product code, original evidence, screenshots, deployment, website or credential-file access is
+part of this follow-up. Incoming main history is retained by merge; resolution changes only README
+and this milestone. The dated entries below keep their original facts and authorizations.
+
+## Current state — README publishes effective-run evaluation — 2026-10-14
+
+User authorized PR#20 README first-screen metrics from the completed PR#21 report. Primary:
+25 effective runs, self25/25 (100%), independent23/25 (92%), false completion2/25 (8%).
+Only5 final pre-Agent environment failures excluded; the fixed30 selected view (25/30 self,
+23/30 independent) and failure detail remain linked. Conditions: UTC2026-10-14, external Codex
+CLI0.162.1, requested gpt-6.1-sol/high, fixed25 SWE Verified +5 HumanEval, effective20 SWE +5 HE.
+The report URL pins PR#21 publication head `6854e528769920a255ae3574095acf0c47f3baeb`.
+This condition-dependent small sample is not a general model ranking; false completion does not
+infer intent. Product REAL_CODEX stays closed; README distinguishes external execution from the
+product gate and corrects the prior blanket statement about untested new Codex runs.
+
+Documentation only: no new campaign, Agent/Verifier/model call, runtime, hidden-test exposure,
+frozen evidence edit, merge or deployment. Local existing documentation contract1 PASS; first-screen metrics, conditions, all relative links
+and diff whitespace PASS. Both PRs must pass all applicable exact-head CI before user handoff. Previous
+records below retain their original scope, including the original placeholder and CI observations.
+
+## Current state — recruiter-facing README positioning — 2026-10-14 (Asia/Shanghai)
+
+User-authorized documentation-only work on `codex/readme-agent-evaluation-20261014`, based on
+`origin/main@9f634dce7b39cec8eacc2d3ad646b4cb2d1f7efd`. README opens with “AI Coding Agent
+评测与验收平台” and explains the implemented evaluation framework, isolated execution, result
+validation, evidence traceability and offline replay with repository links. The first screen keeps
+real Codex execution closed by its current code gate, operator-only CLI verification, unsupported
+Cursor/DeepSeek native logs and evaluation-metric placeholders explicit. No code, frozen evidence,
+application UI, website, repository description or topics are changed.
+
+Local existing documentation contract **1 PASS**; all **24 README relative link targets PASS**;
+source/claim mapping and `git diff --check` **PASS**. Verification is documentation-scoped: no
+new benchmark, Agent/model/Verifier execution, database or deployment acceptance is established.
+The PR description carries full before/after first-screen copy, each capability's implementation
+mapping, and proposed repository description/topics. Feature-branch commit/push and PR creation
+are authorized; exact remote head and CI are checked separately at publication. The original dirty
+UI-2 worktree and other existing worktrees remain untouched. No technical blocker; stop after PR
+handoff without merge or deployment. Dated records below retain their original scope.
+
 ## Current state — fixed 30-task mixed campaign complete — 2026-10-14
 
 Fixed 25 SWE Verified + 5 HumanEval selection unchanged. Original six observations retained;

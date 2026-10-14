@@ -1,6 +1,21 @@
 # SameScale
 
-**AI Coding 任务验收与证据工作台** · *AI Coding Task Acceptance & Evidence Workbench*
+**AI Coding Agent 评测与验收平台** · *AI Coding Agent Evaluation & Acceptance Platform*
+
+面向 AI Coding Agent 的工程评测与任务验收：按任务条件独立检查最终代码，区分 Agent 的完成声明与实际检查结果，并保留可追溯、可离线复核的证据。
+
+- **[评测框架](docs/EVAL_METHODOLOGY_V2.md)**：组织任务、运行配置与验收条件，按明确的任务契约评估代码结果。
+- **[隔离执行](docs/LOCAL_EXECUTION.md)**：用 Docker 隔离模拟运行与独立代码检查，分开被测代码和隐藏验收材料。
+- **[结果校验](docs/EXTERNAL_RUN_EVIDENCE.md)**：由独立 Verifier 检查最终代码；未检查、零检查或缺少前置条件时保持“未验证”。
+- **[证据追溯](docs/EXTERNAL_CODEX_EVIDENCE.md)**：关联运行记录、代码快照与检查结果，以摘要校验文件一致性；摘要不证明来源真实。
+- **[离线回放](scripts/replay_external_evidence.py)**：校验导出证据的一致性，不重跑 Agent 或 Verifier，不构成新的验收。
+
+**当前边界：产品内真实 Codex 执行默认关闭（当前由代码门禁禁用）；网页没有一键验收，独立检查需操作员在本地终端单独授权；不支持 Cursor / DeepSeek 原生运行记录格式，可仅导入最终代码与任务条件。**
+
+**真实评测（有效运行25题）：Agent 自报通过25/25（100%），独立验收通过23/25（92%）；虚假完成2次（8%，自报 PASS 但独立 FAIL）。**
+
+评测条件：**2026-10-14（UTC）**，外部 **Codex CLI 0.162.1**，请求模型 **gpt-6.1-sol / high**；固定题集 **25题 SWE-bench Verified + 5题 HumanEval**，每题至多一次 Agent 运行。
+有效运行主口径仅排除5题环境失败，包含20题 SWE 与5题 HumanEval。原30题口径、环境失败明细及样本局限完整保留在[评测报告](https://github.com/a27497/samescale/blob/6854e528769920a255ae3574095acf0c47f3baeb/docs/evidence/swe-full-20261014/README.md)（[PR #21](https://github.com/a27497/samescale/pull/21)）；“虚假完成”不推断欺骗意图。这次外部评测不改变产品内 REAL_CODEX 的关闭状态。
 
 ## Agent 说完成了，验收依据在哪里？
 
@@ -11,7 +26,7 @@
 AI Coding Agent 的“完成了”是一条声明。验收依据需要来自最终代码、明确的任务条件和独立检查。
 SameScale 把这些材料关联起来，让开发者看到**哪些要求已检查、哪些失败、哪些仍然未知**，并保存可离线复核的证据。
 
-这是一个个人工程项目，当前产品基线冻结于 `main@50ac4cf`。
+这是一个个人工程项目。
 [官网与案例说明](https://getsamescale.com/) · [只读在线演示](https://getsamescale.com/demo/) · [能力契约](PUBLIC_PRODUCT_CONTRACT.md)
 
 ## 核心能力
@@ -85,7 +100,7 @@ uv run --locked harnesslab down --project-name "$SS_PROJECT"
 - **代码输入范围：** 只导入 UTF-8 文本形式的最终代码目录，不会自动把代码补丁应用到原始版本，也不支持任意二进制文件或大仓库上传；任务条件必须另行审查，并与这次导入对应。
 - **验收前提：** 任意一段文字需求不会自动变成可信的检查。缺少已批准并验证有效的任务检查、版本已固定的检查镜像或独立检查结果时，仍然显示“未验证”；网页没有“一键执行验收”的权限。
 - **验证范围：** 多工具导入与 PostgreSQL 相关的完整流程、各环节的故障恢复与生产部署，尚未完成整体验收。部分场景测试通过、服务能启动，不代表这些流程都已验收。
-- **真实运行：** 当前本地执行只开放不调用模型的隔离模拟运行，真实 Codex 执行保持关闭；多工具导入尚未验证新的真实模型运行、Cursor / DeepSeek 新的真实会话，或连接不同工具账号的通用能力。已保存的真实历史记录，只能支持当时实际观察到的结论。
+- **真实运行：** 产品内本地执行只开放不调用模型的隔离模拟运行，REAL_CODEX 保持关闭。本次评测在产品外直接运行 Codex CLI；没有验证 Cursor / DeepSeek 新的真实会话或连接不同工具账号的通用能力。已保存的评测与历史记录，只能支持当时实际观察到的结论。
 - **来源与结论：** 自动敏感信息检查不能代替人工审查隐私和版权；没有核实来源真实性的材料会标注“来源未证实”。部分检查、离线复核或描述性的运行差异，不能据此断定因果关系或给模型排名。
 
 ## 技术文档与实现说明
