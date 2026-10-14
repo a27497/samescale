@@ -1,5 +1,20 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：真实 Coding Agent 小评测试跑（2026-10-14，Asia/Shanghai）
+
+用户授权在新分支 / PR 上准备可复现的 20-40 题评测，并先跑 2-3 题 Codex。采用
+MIT 许可、固定上游版本的 HumanEval；按预先固定的哈希顺序选 30 题，前 3 题试跑。
+使用既有 Codex 原生 CLI 和 SameScale provider-scoped Docker egress；Agent 只接触题面，
+独立 Verifier 在无网络、无凭据容器中运行隐藏测试。固定配置、原始事件（隐去凭据和私有
+推理）、最终代码、验收日志、token、耗时与摘要均离线可复核；原始包存于仓库外，不进 Git。
+Claude Code 保留关闭的配置项，本轮不执行，也不声称已实现其评测执行器。
+
+先完成 Verifier 正反校准，再运行 3 个真实尝试，汇报每题自报、独立验收、明确规则分类、
+耗时、API 等价估算和 30 题外推。试跑完成必须 STOP，等待用户确认后才可运行其余 27 题。
+不得根据结果换题、重写原尝试、把未知费用当作零、推断欺骗意图，或把函数题外推到真实
+仓库修复能力。允许本分支 commit/push 和 draft PR；不 merge、deploy 或修改既有产品运行时、
+数据、历史模型配置与冻结 evidence。[固定评测协议与复现命令](../evaluation/coding-agent/README.md)。
+
 ## 当前授权：工作台中文展示与状态可读性（2026-10-13）
 
 基于 main@a0ab9e8，在独立分支完成所有前端路由的中文标题、导航、文案、空状态和

@@ -1,5 +1,32 @@
 # SameScale Product — Current Milestone
 
+## Current state — real Coding Agent pilot — 2026-10-14 (Asia/Shanghai)
+
+User-authorized independent branch `codex/coding-agent-pilot-20261014`, based on main
+`9f634dce7b39cec8eacc2d3ad646b4cb2d1f7efd`. Native Codex 0.162.1, requested gpt-6.1-sol/high,
+ran three tasks once from a deterministic, MIT-licensed 30-task HumanEval subset. Subject code and
+hidden tests remained separated; isolated deterministic Docker verification completed for each.
+**Self-report 3/3 PASS (100%); independent acceptance 3/3 PASS (100%); gap 0 percentage points;
+false completion 0; observed task failures 0.** No general false-completion thesis is established.
+
+Observed Agent time **126.045s**; **141,047 input tokens** including **117,504 cached**,
+**2,013 output tokens**; API-equivalent **$0.078966**, actual subscription charge **UNKNOWN**.
+30-task mean projection **1,430,600 input+output tokens / $0.7897 / 21.0 Agent minutes**;
+identical usage without caching **$3.0222**, suggested planning allowance **$3.50**, not a hard cap.
+Remaining 27 mean projection **$0.7107 / 18.9 Agent minutes**, plus runtime overhead.
+
+Focused tests **10 PASS**, changed Ruff/format/mypy and wrapper syntax **PASS**; reference/negative
+Docker calibration **36 PASS**; full archive inventory and two exact offline replays **PASS**;
+three extracted final candidates independently reverified **3 PASS**, zero model calls in recheck.
+Raw logs/code/hidden tests/license stored outside Git in a digest-bound archive; original private
+reasoning is withheld, credentials not included. Two keyless preflight failures are retained and
+corrected without erasing evidence. Existing dirty worktree, frozen assets/services and locks retained.
+[Results, per-task table, fees, replay commands, artifact receipts and limitations](docs/evidence/coding-agent-pilot-20261014/README.md).
+
+Commit/push/draft PR authorized for this branch only; remote SHA and CI verified/reported separately
+at publication. **Full stage NOT_RUN; STOP awaiting user confirmation before the remaining 27.**
+Claude Code configuration is disabled; no Claude execution claim. No merge, release/tag or deployment.
+
 ## Current state — Chinese workbench presentation — 2026-10-13 (Asia/Shanghai)
 
 User-authorized frontend polish on `codex/workbench-chinese-20261013`, based on

@@ -1,0 +1,43 @@
+{
+  "archive_sha256": "5c2a5bf9e417e0a0b72e36a0bda7c53d325ded22f466d962fab60e1d10255fec",
+  "audit_storage_path": "/home/dev/.local/state/samescale-eval/offline-review-20261014",
+  "candidate_reverification": [
+    {
+      "candidate_sha256": "2dc08af3f2b432c610a47187a7388a7393f536954f16673376e5ca487bad437e",
+      "stdout_sha256": "63769950f54d54c73551eccc9048282b22c76d18f1305148eec5b905e55cd8ac",
+      "task_id": "HumanEval/122",
+      "verdict": {
+        "check_completed": true,
+        "child_exit_code": 0,
+        "failure_type": "NONE",
+        "verdict": "PASS"
+      }
+    },
+    {
+      "candidate_sha256": "c3c5b76fcc434a7287bf0cbfb7e1b97a4a5335d1ac1de0c7e97b5b79d1edbabc",
+      "stdout_sha256": "63769950f54d54c73551eccc9048282b22c76d18f1305148eec5b905e55cd8ac",
+      "task_id": "HumanEval/33",
+      "verdict": {
+        "check_completed": true,
+        "child_exit_code": 0,
+        "failure_type": "NONE",
+        "verdict": "PASS"
+      }
+    },
+    {
+      "candidate_sha256": "3f87de746ac99461e2f5a7cb6bebda449691811df06848a9a14d5af4f3a9cc14",
+      "stdout_sha256": "63769950f54d54c73551eccc9048282b22c76d18f1305148eec5b905e55cd8ac",
+      "task_id": "HumanEval/153",
+      "verdict": {
+        "check_completed": true,
+        "child_exit_code": 0,
+        "failure_type": "NONE",
+        "verdict": "PASS"
+      }
+    }
+  ],
+  "checks_passed": 3,
+  "inventory_verified": true,
+  "two_replays_identical": true,
+  "zero_model_calls": true
+}
