@@ -1,5 +1,20 @@
 # SameScale Product — Current Milestone
 
+## Current state — README evidence closeout — 2026-10-15 UTC
+
+Documentation-only follow-up from main@9fda9d6 on `codex/readme-closeout-20261015`.
+README adds the observed Sphinx-7748 self-PASS / independent-FAIL case (12/14 required checks),
+relative links to existing reports/review/archive inventory, and explicit sample/Agent/hidden-test/
+advisory-diagnosis/operator-execution limitations. The first-screen summary uses observed counts,
+not a 92% capability claim. The cover references the website's existing image and links to its
+published 60-second film; no new media, raw evidence or hidden tests are committed.
+
+Local existing release-document contract 1 PASS; 29 relative documentation links resolve; case
+counts/verdicts match the 2026-10-14 saved report; website cover/video HEAD requests both 200.
+No runtime, REAL_CODEX gate, original evidence, product UI, models or deployment changed.
+User authorizes commit/push and one documentation PR only; exact-head CI is reported at handoff.
+No merge or deployment. Prior dated records retain their original scope.
+
 ## Current state — advisory LLM failure diagnosis — 2026-10-14 UTC
 
 User authorized new feature branch `codex/llm-failure-diagnosis-20261014` from main@3f0d0c6,

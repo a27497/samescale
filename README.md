@@ -1,5 +1,7 @@
 # SameScale
 
+[![Sphinx-7748 视频封面：Agent 自报 PASS，独立验收未通过，12/14 项检查通过](https://getsamescale.com/demo-film-20261015/poster.webp)](https://getsamescale.com/demo-film-20261015/samescale-demo.mp4)
+
 **AI Coding Agent 评测与验收平台** · *AI Coding Agent Evaluation & Acceptance Platform*
 
 面向 AI Coding Agent 的工程评测与任务验收：按任务条件独立检查最终代码，区分 Agent 的完成声明与实际检查结果，并保留可追溯、可离线复核的证据。
@@ -12,7 +14,7 @@
 
 **当前边界：产品内真实 Codex 执行默认关闭（当前由代码门禁禁用）；网页没有一键验收，独立检查需操作员在本地终端单独授权；不支持 Cursor / DeepSeek 原生运行记录格式，可仅导入最终代码与任务条件。**
 
-**真实评测（有效运行25题）：Agent 自报通过25/25（100%），独立验收通过23/25（92%）；虚假完成2次（8%，自报 PASS 但独立 FAIL）。**
+**2026-10-14 真实评测（有效运行25题）：Agent 自报通过25/25，独立验收通过23/25；虚假完成2次（自报 PASS 但独立 FAIL）。**
 
 评测条件：**2026-10-14（UTC）**，外部 **Codex CLI 0.162.1**，请求模型 **gpt-6.1-sol / high**；固定题集 **25题 SWE-bench Verified + 5题 HumanEval**，每题至多一次 Agent 运行。
 有效运行主口径仅排除5题环境失败，包含20题 SWE 与5题 HumanEval。原30题口径、环境失败明细及样本局限完整保留在[评测报告](https://github.com/a27497/samescale/blob/6854e528769920a255ae3574095acf0c47f3baeb/docs/evidence/swe-full-20261014/README.md)（[PR #21](https://github.com/a27497/samescale/pull/21)）；“虚假完成”不推断欺骗意图。这次外部评测不改变产品内 REAL_CODEX 的关闭状态。
@@ -45,6 +47,24 @@ SameScale 把这些材料关联起来，让开发者看到**哪些要求已检�
 导入成功、进程退出成功和 Agent 的完成声明，都不能代替任务验收通过。
 
 产品内不预置示例数据。案例 A 等历史证据复盘见[官网](https://getsamescale.com/)；官网演示使用单独的只读材料，不能当作新导入或新验收的结果。
+
+## 案例：Sphinx-7748 虚假完成
+
+在 **2026-10-14（UTC）** 的保存记录中，Sphinx-7748 的 Agent 最终自报 **PASS**，独立 Verifier 对最终代码的 **14 项必需检查通过12项，结论为 FAIL**。
+失败原因是输出的类签名行末比预期多出一个反斜杠，导致两项类文档签名检查失败。日志使用转义表示，不能把两个显示的转义符误认为两个实际反斜杠。
+这里的“虚假完成”只指自报与验收结论不一致，不推断欺骗意图；该输出差异不等于已证明完整的内部代码因果链。
+
+证据文件：[案例与失败说明](docs/evidence/swe-full-20261014/README.md#两个典型自报不符案例)、[逐题验收结果](docs/evidence/swe-full-20261014/report.json)、[逐题结果表](docs/evidence/swe-full-20261014/results.csv)、[离线复核记录](docs/evidence/swe-full-20261014/offline-review.json)与[原始证据归档清单](docs/evidence/swe-full-20261014/archive-receipt.json)。原始运行记录、验收收据、diff 与日志保留在 Git 外，具体文件位置见案例说明；不把隐藏测试源码放进 README。
+
+## 已知限制
+
+- **样本有限：** 2026-10-14 的评测集只有固定30题，其中5题在 Agent 启动前环境失败，有效运行25题；没有换题或把环境失败记成通过。这些结果只描述本次样本，不是通用能力指标或模型排名。
+- **被测 Agent 有限：** 本轮真实评测只测过 Codex CLI 一个 Agent。支持导入其他工具的记录，不等于已经真实评测过那些工具。
+- **隐藏测试的充分性未知：** 独立验收依赖题目自带的隐藏测试，只能判断这些必需检查是否通过；测试本身是否充分尚未验证，不能据此证明满足所有可能的需求。
+- **诊断没有验收权威：** LLM 失败诊断只作辅助说明，不参与 PASS/FAIL 判定；诊断失败、超时或输出不正确都不能改变独立验收结果。
+- **执行需要独立授权：** 网页没有一键验收，独立 Verifier 需操作员在本地终端单独授权。产品内真实 Codex 执行默认关闭，REAL_CODEX 门禁仍保持关闭；本次产品外 Codex CLI 评测不改变该边界。
+
+更多输入、来源与端到端验证限制见[边界与未覆盖项](#边界与未覆盖项)。
 
 ## 本地启动
 
