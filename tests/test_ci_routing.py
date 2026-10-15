@@ -152,7 +152,10 @@ class RoutingTests(unittest.TestCase):
 
     def test_original_bounded_inventory_is_unchanged(self) -> None:
         selectors = json.loads((ROOT / ".github/ci-core-selectors.json").read_text())
-        self.assertEqual(selectors[29:], ["tests/test_failure_diagnosis.py"])
+        self.assertEqual(
+            selectors[29:],
+            ["tests/test_failure_diagnosis.py", "tests/test_swe_verifier_canary.py"],
+        )
         canonical = json.dumps(selectors[:29], separators=(",", ":")).encode()
         # Independent fingerprint of all 29 selectors taken from main@5bfb674 before edits.
         self.assertEqual(

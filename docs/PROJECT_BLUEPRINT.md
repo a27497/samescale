@@ -1,5 +1,15 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：SWE 测试充分性 Canary（2026-10-16，Asia/Shanghai）
+
+从最新 main 建独立工作树，保留原工作区未提交 UI 工作。仅取现有有效运行中原独立验收
+PASS 的 SWE 题，预先固定单处修复回归注入；前5题试点，流程有效后扩到全部符合条件题目。
+在 Git 外临时副本复跑原 pinned Verifier，保留对照、注入、生命周期和原证据完整性清单。
+原先 FAIL/环境失败不补题，不重新跑 Agent、Judge 或付费 API，不改 REAL_CODEX、原归档或
+README 数字。交付方法、试点表、完整报告及脚本用法；允许本分支 commit/push 和 PR，
+合并前交用户审阅，不合并、不部署。方法见 [Canary 协议](VERIFIER_CANARY.md)；
+实际结果和停止点仅由 CURRENT_MILESTONE 维护。以下旧授权不启动新执行。
+
 ## 当前授权：独立 LLM 失败诊断
 
 从 main@3f0d0c6 新功能分支实现操作员 CLI 的独立辅助产物、可替换模型后端、schema/引用

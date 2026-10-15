@@ -1,5 +1,37 @@
 # SameScale Product — Current Milestone
 
+## Current state — SWE Verifier sufficiency Canary — 2026-10-16 (Asia/Shanghai)
+
+User-authorized feature branch `codex/swe-verifier-canary-20261016` from
+`origin/main@fd95ff61f528b93fb9238daee6442087ddb5739d`; original dirty UI worktree preserved.
+Fixed all 18 effective SWE independent PASS rows from the existing 30-task report, in original order.
+Preregistered one repair-related production-code regression per task; first 5 pilot controls 5/5 PASS,
+mutants 4 FAIL /1 PASS, procedural gate PASS, then remaining 13. Full controls 18/18 PASS;
+mutants **15 complete FAIL /2 complete PASS /1 INCONCLUSIVE**. Astropy7336 hit the original
+internal 27s subprocess timeout; no limit change or retry, and no detection/pass inferred.
+
+Separate public behavior probes confirm both survivors: Astropy8872 float16 Quantity copy becomes
+float64; Pytest8399 exposes generated module fixture names without `-v`. Both probes: control PASS,
+mutant FAIL. The Pytest module path is adjacent to, and broader than, the original unittest.setUpClass
+issue example; this does not establish that the original example escaped. Primary 36 physical
+Verifiers plus 4 secondary observations; Agent/Judge/paid API calls 0. Original images, hidden test
+sets, Verifier source/resources and all receipts remain unchanged. No product runtime, REAL_CODEX,
+README numbers, database, service, merge or deployment change.
+
+Three preparation blocks were corrected before any physical Verifier: missing parent, non-unique
+SymPy anchor, and copied package path missing required id/version. Incomplete v1/v2 directories
+and history retained; final v3 primary observations each ran once. All run artifacts and full18-row
+report remain outside Git at `/home/dev/.local/state/samescale-canary/20261016-v3/` (`REPORT.md`,
+`report.json`, `results.csv`, `validation.json`, source snapshots and raw sandbox artifacts).
+Original 95,829 file/link entries including .git, inventories and both original archives verify
+unchanged by SHA256/modes/link text. Primary offline replay PASS; secondary observation recheck PASS.
+Local focused 47 tests PASS, whole-tree Ruff/format 899 files PASS, mypy 464 files PASS, documentation
+links and whitespace PASS. New 17 synthetic script checks join existing CI inventories; no live
+Canary runs in CI. [Method, decision rules, commands and limits](docs/VERIFIER_CANARY.md).
+These descriptive condition-sample observations do not establish general coverage or model ability.
+Commit/push and review PR are authorized; exact pushed SHA and remote CI are checked separately
+at publication. Stop after PR handoff for human review; no merge or deployment.
+
 ## Current state — README evidence closeout — 2026-10-15 UTC
 
 Documentation-only follow-up from main@9fda9d6 on `codex/readme-closeout-20261015`.

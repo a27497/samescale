@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "family": "SINGLE_REPAIR_REGRESSION",
+  "selection": "report order; effective SWE-bench independent PASS only",
+  "pilot_size": 5,
+  "pilot_gate": "All five unchanged controls PASS; all five syntactically valid single-site mutants produce complete PASS or FAIL, originals unchanged. Survivors do not fail the procedural gate.",
+  "mutations": [
+    {
+      "task_id": "astropy__astropy-8872",
+      "path": "astropy/units/quantity.py",
+      "before": "np.can_cast(np.float16, value.dtype) or",
+      "after": "np.can_cast(np.float32, value.dtype) or",
+      "rationale": "撤回 Quantity 拷贝构造分支的 float16 dtype 保留修复"
+    },
+    {
+      "task_id": "sphinx-doc__sphinx-8120",
+      "path": "sphinx/application.py",
+      "before": "locale_dirs = list(repo.locale_dirs) + [None, path.join(package_dir, 'locale')]",
+      "after": "locale_dirs = [None, path.join(package_dir, 'locale')] + list(repo.locale_dirs)",
+      "rationale": "恢复内置翻译优先，覆盖项目自定义翻译"
+    },
+    {
+      "task_id": "sphinx-doc__sphinx-8638",
+      "path": "sphinx/domains/python.py",
+      "before": "PyTypedField('variable', label=_('Variables'),\n",
+      "after": "PyTypedField('variable', label=_('Variables'), rolename='obj',\n",
+      "rationale": "恢复变量名称的自动交叉引用"
+    },
+    {
+      "task_id": "astropy__astropy-13977",
+      "path": "astropy/units/quantity.py",
+      "before": "                return NotImplemented\n            else:\n                raise",
+      "after": "                raise\n            else:\n                raise",
+      "rationale": "撤回 ufunc 错误分支向另一类型分派的 NotImplemented 返回"
+    },
+    {
+      "task_id": "sympy__sympy-21612",
+      "path": "sympy/printing/str.py",
+      "before": "                    item.exp in (-S.One, -S.Half)):\n                return \"(%s)\" % self._print(item)",
+      "after": "                    item.exp in (-S.One, -S.Half)):\n                return self._print(item)",
+      "rationale": "移除倒数分母的必要括号，改变格式/表达式语义"
+    },
+    {
+      "task_id": "sphinx-doc__sphinx-9658",
+      "path": "sphinx/ext/autodoc/mock.py",
+      "before": "self.__qualname__ = self.__class__.__name__",
+      "after": "self.__qualname__ = ''",
+      "rationale": "清空 mock 对象限定名称"
+    },
+    {
+      "task_id": "sphinx-doc__sphinx-7910",
+      "path": "sphinx/ext/napoleon/__init__.py",
+      "before": "            obj = unwrap(obj)\n",
+      "after": "            # Canary: leave the decorated object wrapped.\n",
+      "rationale": "撤回 decorator unwrap，恢复错误的归属判断"
+    },
+    {
+      "task_id": "sympy__sympy-16766",
+      "path": "sympy/printing/pycode.py",
+      "before": "return \"{}[{}]\".format(str(expr.base), \", \".join(",
+      "after": "return \"{}({})\".format(str(expr.base), \", \".join(",
+      "rationale": "把索引方括号改成调用圆括号"
+    },
+    {
+      "task_id": "sympy__sympy-13757",
+      "path": "sympy/polys/polytools.py",
+      "before": "_op_priority = 10.001",
+      "after": "_op_priority = 10.0",
+      "rationale": "撤回 Poly 运算优先级提升"
+    },
+    {
+      "task_id": "astropy__astropy-7671",
+      "path": "astropy/utils/introspection.py",
+      "before": "return parse_version(have_version) >= parse_version(version)",
+      "after": "return LooseVersion(have_version) >= LooseVersion(version)",
+      "rationale": "撤回 inclusive 分支的版本解析修复"
+    },
+    {
+      "task_id": "astropy__astropy-7336",
+      "path": "astropy/units/decorators.py",
+      "before": "                    and wrapped_signature.return_annotation is not None):",
+      "after": "                    ):",
+      "rationale": "撤回 None 返回注解的豁免条件"
+    },
+    {
+      "task_id": "astropy__astropy-14309",
+      "path": "astropy/io/fits/connect.py",
+      "before": "    if args:\n        return isinstance(args[0], (HDUList, TableHDU, BinTableHDU, GroupsHDU))\n    return False",
+      "after": "    return isinstance(args[0], (HDUList, TableHDU, BinTableHDU, GroupsHDU))",
+      "rationale": "撤回空 args 的边界保护"
+    },
+    {
+      "task_id": "pytest-dev__pytest-5787",
+      "path": "src/_pytest/reports.py",
+      "before": "\"chain\": chain,",
+      "after": "\"chain\": None,",
+      "rationale": "丢弃序列化后的异常链"
+    },
+    {
+      "task_id": "pytest-dev__pytest-10081",
+      "path": "src/_pytest/unittest.py",
+      "before": "_is_skipped(self.obj) or _is_skipped(self._testcase)",
+      "after": "_is_skipped(self.obj)",
+      "rationale": "撤回 TestCase 类级别 skip 判定"
+    },
+    {
+      "task_id": "pytest-dev__pytest-7571",
+      "path": "src/_pytest/logging.py",
+      "before": "            self.handler.setLevel(self._initial_handler_level)",
+      "after": "            pass  # Canary: omit restoring the handler level.",
+      "rationale": "撤回 caplog handler level 恢复"
+    },
+    {
+      "task_id": "pytest-dev__pytest-8399",
+      "path": "src/_pytest/python.py",
+      "before": "name=f\"_xunit_setup_module_fixture_{self.obj.__name__}\",",
+      "after": "name=f\"xunit_setup_module_fixture_{self.obj.__name__}\",",
+      "rationale": "撤回 module fixture 名称的下划线格式修复"
+    },
+    {
+      "task_id": "pytest-dev__pytest-7236",
+      "path": "src/_pytest/unittest.py",
+      "before": "                if not skipped:\n",
+      "after": "                if True:\n",
+      "rationale": "撤回 skipped 测试的 tearDown 保护"
+    },
+    {
+      "task_id": "psf__requests-6028",
+      "path": "requests/utils.py",
+      "before": "        netloc = '@'.join([auth, netloc])",
+      "after": "        pass  # Canary: drop proxy authentication from netloc.",
+      "rationale": "撤回代理 URL 的认证信息保留"
+    }
+  ]
+}

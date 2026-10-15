@@ -93,6 +93,7 @@ jobs:
           tests/test_kb4_badcase_freeze.py
           tests/test_kb4_final_attribution.py
           tests/test_failure_diagnosis.py
+          tests/test_swe_verifier_canary.py
       - name: Remove job-owned PostgreSQL
         if: ${{ always() }}
         run: scripts/ci_job_postgres.sh cleanup-current
