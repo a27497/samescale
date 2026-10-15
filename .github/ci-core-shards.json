@@ -1,7 +1,8 @@
 [
   [
     "tests/test_kc_release_reconciliation.py",
-    "tests/test_failure_diagnosis.py"
+    "tests/test_failure_diagnosis.py",
+    "tests/test_swe_verifier_canary.py"
   ],
   [
     "tests/test_workbench_api.py::test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel",

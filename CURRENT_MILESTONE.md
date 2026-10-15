@@ -1,5 +1,54 @@
 # SameScale Product — Current Milestone
 
+## Current state — PR #24 README publication and merge authorization — 2026-10-16 (Asia/Shanghai)
+
+User explicitly approved publishing the existing Canary conclusion in README known limitations,
+marking PR #24 Ready and merging into main after all applicable checks pass. The README now states
+18 original independent-PASS SWE tasks, 15 detected regressions, 2 missed (including Astropy float16
+copy dtype), 1 timeout/inconclusive; scope is the injected error types, not overall coverage. It links
+to docs/VERIFIER_CANARY.md. That method document now reflects the separately authorized README
+publication. This supersedes this PR's earlier no-merge restriction only; historical receipts retain
+original scope. No new Canary/Agent/Judge/provider execution is part of this follow-up.
+
+Documentation-only delta from Canary head046b067: README, method boundary, blueprint authorization
+and this state entry. Local existing release contracts12 PASS; README31 relative links resolve;
+method/blueprint links and saved18-task/15-2-1 source mapping PASS. Runtime/REAL_CODEX code,
+original evidence, dependencies and deployment remain unchanged; Downloads credentials are neither
+accessed nor modified. Exact pushed-head CI precedes ordinary merge; actual Ready/merge receipt,
+remote main SHA and main CI are verified separately in the publication handoff. No website deploy.
+
+## Current state — SWE Verifier sufficiency Canary — 2026-10-16 (Asia/Shanghai)
+
+User-authorized feature branch `codex/swe-verifier-canary-20261016` from
+`origin/main@fd95ff61f528b93fb9238daee6442087ddb5739d`; original dirty UI worktree preserved.
+Fixed all 18 effective SWE independent PASS rows from the existing 30-task report, in original order.
+Preregistered one repair-related production-code regression per task; first 5 pilot controls 5/5 PASS,
+mutants 4 FAIL /1 PASS, procedural gate PASS, then remaining 13. Full controls 18/18 PASS;
+mutants **15 complete FAIL /2 complete PASS /1 INCONCLUSIVE**. Astropy7336 hit the original
+internal 27s subprocess timeout; no limit change or retry, and no detection/pass inferred.
+
+Separate public behavior probes confirm both survivors: Astropy8872 float16 Quantity copy becomes
+float64; Pytest8399 exposes generated module fixture names without `-v`. Both probes: control PASS,
+mutant FAIL. The Pytest module path is adjacent to, and broader than, the original unittest.setUpClass
+issue example; this does not establish that the original example escaped. Primary 36 physical
+Verifiers plus 4 secondary observations; Agent/Judge/paid API calls 0. Original images, hidden test
+sets, Verifier source/resources and all receipts remain unchanged. No product runtime, REAL_CODEX,
+README numbers, database, service, merge or deployment change.
+
+Three preparation blocks were corrected before any physical Verifier: missing parent, non-unique
+SymPy anchor, and copied package path missing required id/version. Incomplete v1/v2 directories
+and history retained; final v3 primary observations each ran once. All run artifacts and full18-row
+report remain outside Git at `/home/dev/.local/state/samescale-canary/20261016-v3/` (`REPORT.md`,
+`report.json`, `results.csv`, `validation.json`, source snapshots and raw sandbox artifacts).
+Original 95,829 file/link entries including .git, inventories and both original archives verify
+unchanged by SHA256/modes/link text. Primary offline replay PASS; secondary observation recheck PASS.
+Local focused 47 tests PASS, whole-tree Ruff/format 899 files PASS, mypy 464 files PASS, documentation
+links and whitespace PASS. New 17 synthetic script checks join existing CI inventories; no live
+Canary runs in CI. [Method, decision rules, commands and limits](docs/VERIFIER_CANARY.md).
+These descriptive condition-sample observations do not establish general coverage or model ability.
+Commit/push and review PR are authorized; exact pushed SHA and remote CI are checked separately
+at publication. Stop after PR handoff for human review; no merge or deployment.
+
 ## Current state — README evidence closeout — 2026-10-15 UTC
 
 Documentation-only follow-up from main@9fda9d6 on `codex/readme-closeout-20261015`.
