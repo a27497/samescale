@@ -2,7 +2,8 @@
 
 本脚本只在 Git 外的工作副本中变异已经通过独立验收的最终代码，并使用原有
 `PinnedVerifierSandbox` 重跑相同 Verifier。它不启动 Agent、Codex CLI、Judge 或付费 API，
-不接入产品运行流程，也不修改 REAL_CODEX 门禁或原收据。README 的已知限制和数字不变。
+不接入产品运行流程，也不修改 REAL_CODEX 门禁或原收据。README 的已知限制另行记录
+经用户授权发布的小样本 Canary 结论，不将其解释为总体覆盖率。
 
 ## 固定方法
 

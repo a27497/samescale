@@ -1,5 +1,22 @@
 # SameScale Product — Current Milestone
 
+## Current state — PR #24 README publication and merge authorization — 2026-10-16 (Asia/Shanghai)
+
+User explicitly approved publishing the existing Canary conclusion in README known limitations,
+marking PR #24 Ready and merging into main after all applicable checks pass. The README now states
+18 original independent-PASS SWE tasks, 15 detected regressions, 2 missed (including Astropy float16
+copy dtype), 1 timeout/inconclusive; scope is the injected error types, not overall coverage. It links
+to docs/VERIFIER_CANARY.md. That method document now reflects the separately authorized README
+publication. This supersedes this PR's earlier no-merge restriction only; historical receipts retain
+original scope. No new Canary/Agent/Judge/provider execution is part of this follow-up.
+
+Documentation-only delta from Canary head046b067: README, method boundary, blueprint authorization
+and this state entry. Local existing release contracts12 PASS; README31 relative links resolve;
+method/blueprint links and saved18-task/15-2-1 source mapping PASS. Runtime/REAL_CODEX code,
+original evidence, dependencies and deployment remain unchanged; Downloads credentials are neither
+accessed nor modified. Exact pushed-head CI precedes ordinary merge; actual Ready/merge receipt,
+remote main SHA and main CI are verified separately in the publication handoff. No website deploy.
+
 ## Current state — SWE Verifier sufficiency Canary — 2026-10-16 (Asia/Shanghai)
 
 User-authorized feature branch `codex/swe-verifier-canary-20261016` from

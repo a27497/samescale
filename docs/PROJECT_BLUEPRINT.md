@@ -1,5 +1,15 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：PR #24 README 结论发布与合并（2026-10-16，Asia/Shanghai）
+
+用户批准在 PR #24 原分支的 README「已知限制」加入已完成 Canary 的18题观察：
+15检出、2漏检（含 Astropy float16 拷贝 dtype）、1超时无法判定，明确仅针对注入类型，
+不是总体覆盖率，并链接方法文档。同步文档边界和本次状态，不重跑 Canary 或 Agent。
+检查文档契约、相对链接和证据口径，commit/push 后核对准确 head 的全部适用 CI；
+通过后将 Draft 标为 Ready，以普通 merge commit 合并 PR #24，核对远端 main 和合并后 CI。
+此次授权仅覆盖 #24；不改 REAL_CODEX、不碰原始证据、不部署官网、不访问或修改 Downloads
+凭证。实际状态由 CURRENT_MILESTONE 维护。此前本 PR 的不合并限制被本次授权取代。
+
 ## 当前授权：SWE 测试充分性 Canary（2026-10-16，Asia/Shanghai）
 
 从最新 main 建独立工作树，保留原工作区未提交 UI 工作。仅取现有有效运行中原独立验收
