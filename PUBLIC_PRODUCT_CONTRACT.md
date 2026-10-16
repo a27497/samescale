@@ -406,3 +406,15 @@ belongs to [Current Milestone](CURRENT_MILESTONE.md).
 上传 8,000,000 字节，扫描 10,000 条目 / 32,000,000 解压字节；最终仍限
 500 文件 / 4,000,000 字节。既有 ExternalRecord、Replay、导出、Verifier 和 REAL_CODEX
 保持原有契约。具体安全规则和独立存储见 [源码快照](docs/CODE_SNAPSHOTS.md)。
+
+
+## 私有 CLI 快照还原与人工来源批准
+
+操作员可通过 `harnesslab code-snapshots restore` 将完整性校验通过的快照还原到 store 和
+所有受保护根之外的全新工作目录，并得到 `code-only-v1` 来源片段。目标父目录须已存在且
+私有；拒绝现有目标、符号链接、重叠和覆盖，并发只允许一次原子发布。片段不自动进入 policy，
+也不自动 ingest 或执行。任务 reference/digest 必须由操作员显式提供并审核适配性。
+批准后沿用既有 ingest、TaskStore 准入和一次性独立 Verifier。没有新 HTTP 写路由，
+来源认证/收据/Replay/导出/ExternalRecord 身份和 REAL_CODEX 规则保持原样。
+未有适配可信任务的 FastAPI MiniShop 保持 NOT_VERIFIED，不能拿 WSGI 契约宣称验收。
+[操作流程、安全边界与失败处理](docs/CODE_SNAPSHOTS.md#cli-还原到待批准-code-only-v1-来源)。

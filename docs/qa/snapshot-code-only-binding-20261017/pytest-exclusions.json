@@ -1,0 +1,14 @@
+{
+  "ignored_files": [
+    "tests/test_codex_current_setup.py",
+    "tests/test_codex_harness.py",
+    "tests/test_multi_harness.py",
+    "tests/test_phase_f_claude_startup.py",
+    "tests/test_phase_f_deepseek_startup.py",
+    "tests/test_runtime_config_hygiene.py",
+    "tests/test_verifier_lifecycle_handoff.py",
+    "tests/test_cli.py"
+  ],
+  "deselected": [],
+  "reason": "Audited BEFORE FIRST full pytest: exclude every known file that can start real Codex/Claude/DeepSeek CLI, including runtime_config_hygiene and verifier_lifecycle_handoff. No existing assertions changed."
+}

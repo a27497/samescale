@@ -1,5 +1,18 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：CodeSnapshot → 人工批准 code-only-v1 → 原独立 Verifier（2026-10-17）
+
+从 fetch 后的 main `69e915315c0a53b5d5b3f05f19085bda240d5fab` 建新工作树和分支。
+CLI 完整校验并还原快照到全新、非重叠、无符号链接工作目录，输出待人工审核片段；
+不编辑 policy 或推断任务映射，不新增 HTTP 写路由，不执行/导入源码。
+既有 external_evidence/*、Verifier、收据、Replay/export、身份算法和 REAL_CODEX 零改动。
+还原/并发/失败清理与已批准来源 ingest 串联测试追加到已有 Fast CI 核心 ZIP 模块，保留全部旧断言
+及 CI 清单指纹。测试首次运行前排除所有真实 Agent CLI 文件，包括 runtime_config_hygiene。
+操作员另行允许固定脚本将已资格 WSGI oracle 工作区当不透明字节处理，不查看源码或隐藏测试；
+固定镜像可用时各跑一次 oracle/baseline，明确为参考 fixture，不宣称 Agent 产物。
+FastAPI MiniShop 无可信任务，不做 WSGI 映射。只允许本分支提交/推送和 Draft PR；不合并/部署。
+实际结果和停止点由 CURRENT_MILESTONE 维护。
+
 ## PR #26 合并前收尾授权（2026-10-17，Asia/Shanghai）
 
 在现有 `codex/code-snapshot-zip-20261016` 分支补充源码 ZIP 提示，并增加有上限的安全
