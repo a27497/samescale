@@ -1,0 +1,166 @@
+{
+  "archive_sha256": "sha256:b81d13eb30ddc217a33236447b382f3ae98e4376932a8a93be8e0e7a392082b6",
+  "content_digest": "sha256:2665fbe6ae797a8c075cb92894610fded920f0ebcbf63fadb39ef567661eb143",
+  "files": [
+    {
+      "path": "MiniShop/.gitignore",
+      "bytes": 302,
+      "sha256": "sha256:08f0aaa64072bf08fe662c8715abc19d872a2e57750396ac309810f608699565"
+    },
+    {
+      "path": "MiniShop/README.md",
+      "bytes": 15628,
+      "sha256": "sha256:c9ceeb28c0bb5cc44b17d774f2432422e2637a7cc2c3d93ae4f47eeb1a6c6d06"
+    },
+    {
+      "path": "MiniShop/docs/SELF_REPORT.md",
+      "bytes": 18493,
+      "sha256": "sha256:6465d8a1d95bd90c56059da391c9bf78613aab6fca3654c7d3dad01fdd7e65a0"
+    },
+    {
+      "path": "MiniShop/pytest.ini",
+      "bytes": 568,
+      "sha256": "sha256:f172969013fe82a56f21481ecf49a998325ae76704ad0fa99687fbed09e9db66"
+    },
+    {
+      "path": "MiniShop/requirements.txt",
+      "bytes": 334,
+      "sha256": "sha256:bc318fcf498fb8e23f2c0c3488a123f106fa5aad601c9bf6a5569cfbe3bcb8ab"
+    },
+    {
+      "path": "MiniShop/run.py",
+      "bytes": 1222,
+      "sha256": "sha256:d81bb5b4468b5c462358cc24ee6ad83104bef400d625c1e9a6531f98217073e4"
+    },
+    {
+      "path": "MiniShop/scripts/check_restart_persistence.ps1",
+      "bytes": 4518,
+      "sha256": "sha256:c75777537cb8bb5344a52c8acdb899cb747e8aa5bb004b787d09ede2e53e9410"
+    },
+    {
+      "path": "MiniShop/scripts/e2e_web_check.mjs",
+      "bytes": 25957,
+      "sha256": "sha256:c45f859509593daa9690c84725733a538967b9db894a51f45d6aaf4a092172f3"
+    },
+    {
+      "path": "MiniShop/scripts/inspect_db.py",
+      "bytes": 2647,
+      "sha256": "sha256:106706e73dfd4710599421162dbffede4b05f73283bd180ebbf8c41d926e115f"
+    },
+    {
+      "path": "MiniShop/scripts/run_verification.ps1",
+      "bytes": 2624,
+      "sha256": "sha256:a56df4f59824e37b844d5d4c654f88ddc77738dd9bd59713fce41f8431d6510a"
+    },
+    {
+      "path": "MiniShop/scripts/setup.ps1",
+      "bytes": 881,
+      "sha256": "sha256:20e1e91bb8b466287fe727ba3195fa42122aab533be0fa19701e1f5e29660d0b"
+    },
+    {
+      "path": "MiniShop/scripts/smoke_check.py",
+      "bytes": 8063,
+      "sha256": "sha256:06094713aad0fbb84a32ce22d5abacd1d5fc9aaec01a1eb5aedc64fe31e0adce"
+    },
+    {
+      "path": "MiniShop/scripts/start.ps1",
+      "bytes": 649,
+      "sha256": "sha256:2d745c1aab01f7925b7204df4e2424afc2577bbe3b6117bba19dce4d773438ff"
+    },
+    {
+      "path": "MiniShop/shop/__init__.py",
+      "bytes": 110,
+      "sha256": "sha256:6277d94bc7affadcb0f84de45cd9ef753b38c208cf3aa3dfd29caaa6f38dd209"
+    },
+    {
+      "path": "MiniShop/shop/__main__.py",
+      "bytes": 458,
+      "sha256": "sha256:7fd40dc76ff876391eaecfc2f2db1fe62c25e309877814cd405080cc3ac10fd9"
+    },
+    {
+      "path": "MiniShop/shop/app.py",
+      "bytes": 12270,
+      "sha256": "sha256:9ca9231ae612e3fb0f677b697412d1895de69ba43b8c37426120c5b0519055c9"
+    },
+    {
+      "path": "MiniShop/shop/config.py",
+      "bytes": 1535,
+      "sha256": "sha256:7bf4c854697bf21d97bde85611597daa657f855009aece45c622bba8bd7d4ddd"
+    },
+    {
+      "path": "MiniShop/shop/db.py",
+      "bytes": 16731,
+      "sha256": "sha256:2c5b68261c8df1849d8c41413b2668bea72d188342d32133a4b9d725da9a07f8"
+    },
+    {
+      "path": "MiniShop/shop/money.py",
+      "bytes": 2892,
+      "sha256": "sha256:ebb081fcc96344609a96e9f0456e0818ec973de05f07db105927d5eec6faeaa8"
+    },
+    {
+      "path": "MiniShop/shop/orders.py",
+      "bytes": 13053,
+      "sha256": "sha256:a52f675c22e96c8046bd9e4a2575a476d5d64554ce8571d35f410d0809a89321"
+    },
+    {
+      "path": "MiniShop/shop/products.py",
+      "bytes": 3897,
+      "sha256": "sha256:312410a878b4c177ec43fea5fd224538f0ca33ccec74a5185a36cdd1d4c141d1"
+    },
+    {
+      "path": "MiniShop/shop/static/app.js",
+      "bytes": 33587,
+      "sha256": "sha256:2e8f73f26cc03d8fdb6db1daac8ae57dfd0f09137c0af0b506f7a190f45b0e26"
+    },
+    {
+      "path": "MiniShop/shop/static/index.html",
+      "bytes": 6995,
+      "sha256": "sha256:6425329c80f7c617e948600bef530166dcd1f2f99c6f005ca185aa2b9b5fc6c2"
+    },
+    {
+      "path": "MiniShop/shop/static/styles.css",
+      "bytes": 15512,
+      "sha256": "sha256:6d1264b8af535eb4a40a5012c09290ef9f187c85416a1bd2b65114333bbb676d"
+    },
+    {
+      "path": "MiniShop/tests/conftest.py",
+      "bytes": 2623,
+      "sha256": "sha256:02a97d12fa4be9ebee996170698c6a290dda5f8e7bde5b55b7e692ce76f27bba"
+    },
+    {
+      "path": "MiniShop/tests/test_concurrency_db.py",
+      "bytes": 6853,
+      "sha256": "sha256:0a39caf2899814a1fcec2049cc841ec802545aed2fac29395ace9eec1cce3e11"
+    },
+    {
+      "path": "MiniShop/tests/test_concurrency_http.py",
+      "bytes": 8513,
+      "sha256": "sha256:b2ff720c1fd097a766eb3bee71133567692662fae5e492325352a46159c188ea"
+    },
+    {
+      "path": "MiniShop/tests/test_frontend_static.py",
+      "bytes": 3111,
+      "sha256": "sha256:e79743671a1b3d38c57a5f72749310e7f6dccebf6202bc472c5366210ea6a4cf"
+    },
+    {
+      "path": "MiniShop/tests/test_money.py",
+      "bytes": 1894,
+      "sha256": "sha256:eaab5b6868be5f728a4654f92ea4413d013907d95afaa1410e391f8a43a9e5e5"
+    },
+    {
+      "path": "MiniShop/tests/test_orders_api.py",
+      "bytes": 16574,
+      "sha256": "sha256:7afcaebe4f7ddedabf72d022f85aa00ef427e0f6c073fa6cd4c9859db4b3ba19"
+    },
+    {
+      "path": "MiniShop/tests/test_products_api.py",
+      "bytes": 4584,
+      "sha256": "sha256:8857b8c1f533d621e834ec8dc4473e931ca2e8f240a57cc5cdd49e8c141c3551"
+    },
+    {
+      "path": "MiniShop/tests/test_transactions.py",
+      "bytes": 4917,
+      "sha256": "sha256:cc36de2ff729a2b4ad3b39e189ec4ff9cbc5d706af548dc0152d0d8cb6d60738"
+    }
+  ]
+}

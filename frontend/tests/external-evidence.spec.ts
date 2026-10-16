@@ -269,3 +269,18 @@ describe('source filtering and honest harness attribution', () => {
     wrapper.unmount()
   })
 })
+
+describe('Snapshot panel alongside existing record rows', () => {
+  it('keeps one snapshot panel and preserves healthy versus corrupt record presentation', async () => {
+    vi.mocked(externalEvidenceApi.records).mockResolvedValue({ items: [
+      { identity: 'a'.repeat(64), status: 'AVAILABLE', source_id: 'healthy-original', source_kind: 'historical', acceptance: 'NOT_VERIFIED' },
+      { identity: 'b'.repeat(64), status: 'CORRUPT', error_code: 'EVIDENCE_RECORD_CORRUPT', reason: 'Fixed integrity reason' },
+    ] })
+    const { wrapper } = await unlocked()
+    expect(wrapper.findAll('[data-test=code-snapshot-panel]')).toHaveLength(1)
+    expect(wrapper.get('[data-test=healthy-record]').text()).toContain('healthy-original')
+    expect(wrapper.get('[data-test=healthy-record]').text()).not.toContain('损坏记录')
+    expect(wrapper.get('[data-test=corrupt-record]').text()).toContain('损坏记录')
+    wrapper.unmount()
+  })
+})

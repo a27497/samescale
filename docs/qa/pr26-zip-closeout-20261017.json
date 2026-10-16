@@ -1,0 +1,79 @@
+{
+  "baseline_head": "833cdc398d2f47c6f8573246b59833729f379a30",
+  "collected": 2258,
+  "eligible_passed": 2244,
+  "eligible_failed": 0,
+  "eligible_skipped": 0,
+  "first_pass_eligible": 1956,
+  "remaining_passed": 288,
+  "partition_complete": true,
+  "first_invocation_exit": 2,
+  "first_invocation_stop": "assistant SIGINT to correct CLI exclusions",
+  "first_invocation_passed_including_two_cli_probes": 1958,
+  "keyless_cli_probes_started_before_exclusion_correction": [
+    "tests/test_runtime_config_hygiene.py::test_pinned_codex_split_sandbox_executes_with_outer_filesystem_and_seccomp_network",
+    "tests/test_runtime_config_hygiene.py::test_pinned_codex_uses_generated_isolated_relay_profile_without_websockets"
+  ],
+  "remaining_invocation_exit": 0,
+  "excluded": [
+    "tests/test_cli.py::test_harness_codex_doctor_reports_pinned_runtime",
+    "tests/test_codex_current_setup.py::test_current_docker_strict_config_and_sandbox_without_provider",
+    "tests/test_codex_harness.py::test_codex_runtime_doctor_verifies_pinned_version_and_flags",
+    "tests/test_multi_harness.py::test_phase_f_runtime_doctors_verify_pins_flags_and_toolchains[claude]",
+    "tests/test_multi_harness.py::test_phase_f_runtime_doctors_verify_pins_flags_and_toolchains[deepseek]",
+    "tests/test_phase_f_claude_startup.py::test_pinned_claude_recognizes_hidden_max_turns_flag_keylessly",
+    "tests/test_phase_f_claude_startup.py::test_pinned_claude_bare_tool_profile_mismatch_is_reproduced",
+    "tests/test_phase_f_claude_startup.py::test_pinned_claude_original_empty_mcp_shape_reproduces_startup_failure",
+    "tests/test_phase_f_claude_startup.py::test_pinned_claude_non_bare_profile_denies_ambient_project_config",
+    "tests/test_phase_f_deepseek_startup.py::test_pinned_deepseek_profile_completes_against_keyless_local_transport",
+    "tests/test_runtime_config_hygiene.py::test_pinned_codex_split_sandbox_executes_with_outer_filesystem_and_seccomp_network",
+    "tests/test_runtime_config_hygiene.py::test_pinned_codex_uses_generated_isolated_relay_profile_without_websockets",
+    "tests/test_verifier_lifecycle_handoff.py::test_claude_keyless_provider_uses_exact_live_workspace_verifier_handoff",
+    "tests/test_verifier_lifecycle_handoff.py::test_claude_keyless_live_handoff_survives_recent_runtime_and_egress_teardown"
+  ],
+  "excluded_not_run": 12,
+  "excluded_initially_run_not_counted_as_passed": 2,
+  "real_models_invoked": false,
+  "real_credentials_inspected": false,
+  "offline_regression": {
+    "schema_version": 1,
+    "status": "PASS",
+    "network_namespace": {
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_routes": 0,
+      "loopback": "down"
+    },
+    "tests_passed": 200,
+    "archive_digest": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+    "inputs_digest": "sha256:d77d964fe60158da4e22ee7e60df0cfb54178a99c957298d861d977f925d0395",
+    "identical_outputs": {
+      "claude.json": "sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d",
+      "codex.json": "sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe",
+      "diagnosis.md": "sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1",
+      "offline-boundary.json": "sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097",
+      "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef"
+    },
+    "replayed_runs": 2,
+    "replay_passes": 2,
+    "external_calls": 0,
+    "provider_calls": 0,
+    "model_calls": 0,
+    "claude_calls": 0,
+    "judge_calls": 0,
+    "subject_executed": false,
+    "verifier_executed": false
+  },
+  "raw_evidence_directory": "/tmp/samescale-pr26-closeout-20261017",
+  "raw_sha256": {
+    "full.log": "5c67ca14e55f016a9d8cd01e2a3c7badab0f9832fcbd662c5c1b285fdea810b3",
+    "full.xml": "488cadf00c055c18275dac660b459b002d611def4a02554786b7af20ba74f350",
+    "remaining.log": "b3e45e9ed2cd80523bb33bf92902b70a6c7cc1f14096f59bf65dbc5bd7f914ad",
+    "remaining.xml": "4e84fe392ae98a261ef8a578fc95ba451ad1443fe15d4a1698829d2ed3a3f764",
+    "collection.log": "501746dc5be4e2d4f6af334be7cf623aeb50d1d8b5fb550042a5fc6250a57d55",
+    "split-inventory.json": "680790023967ea872bc066b1208fec6e34b54e93f21d75fa48d0e46a7f6aca28",
+    "frontend-test.log": "ce8d90eeec05b0c104d03a27b0f407dee8e10b500e59035a132a759c97fd82ef",
+    "frontend-build.log": "8ae09ea26cafb2414cebf5e47a15b342d0b2a49d2d572ed08f862bbcf249b62a"
+  }
+}

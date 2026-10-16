@@ -1,0 +1,17 @@
+{
+  "ignored": [],
+  "deselected": [
+    "tests/test_cli.py::test_harness_codex_doctor_reports_pinned_runtime",
+    "tests/test_codex_current_setup.py::test_current_docker_strict_config_and_sandbox_without_provider",
+    "tests/test_codex_harness.py::test_codex_runtime_doctor_verifies_pinned_version_and_flags",
+    "tests/test_multi_harness.py::test_phase_f_runtime_doctors_verify_pins_flags_and_toolchains[claude]",
+    "tests/test_multi_harness.py::test_phase_f_runtime_doctors_verify_pins_flags_and_toolchains[deepseek]",
+    "tests/test_phase_f_claude_startup.py::test_pinned_claude_recognizes_hidden_max_turns_flag_keylessly",
+    "tests/test_phase_f_claude_startup.py::test_pinned_claude_bare_tool_profile_mismatch_is_reproduced",
+    "tests/test_phase_f_claude_startup.py::test_pinned_claude_original_empty_mcp_shape_reproduces_startup_failure",
+    "tests/test_phase_f_claude_startup.py::test_pinned_claude_non_bare_profile_denies_ambient_project_config",
+    "tests/test_phase_f_deepseek_startup.py::test_pinned_deepseek_profile_completes_against_keyless_local_transport"
+  ],
+  "deselected_count": 10,
+  "not_counted_as_passed": true
+}

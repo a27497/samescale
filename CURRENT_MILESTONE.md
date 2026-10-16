@@ -1,5 +1,61 @@
 # SameScale Product — Current Milestone
 
+## Current state — PR #26 ZIP closeout — 2026-10-17 (Asia/Shanghai)
+
+User-authorized follow-up on `codex/code-snapshot-zip-20261016` from
+`833cdc398d2f47c6f8573246b59833729f379a30`; original unrelated dirty worktree preserved.
+UI and source-snapshot documentation now ask for source-only ZIPs and explain that dependency
+files may match credential rules and reject the archive. Optional P1-1 is deferred because the
+required unchanged assertions explicitly reject credentials inside `.venv` and `dist`; SECRET,
+PRIVATE_PARTS and all existing tests retain their rules. P1-2 adds safe-stage diagnostics capped
+at 50, with truncation metadata/UI; unsafe metadata prevents content reads, corruption stops
+further scanning while retaining prior reasons. No rejected content or partial snapshot is returned
+or written. Upload/scan/snapshot limits, external_evidence, verification, Replay/export and REAL_CODEX
+remain unchanged. No real models requested or real credentials inspected; no merge/deployment.
+The old exclusion list missed four real CLI integrations. Two keyless Codex sandbox/local-denial
+probes ran in the first pass; this is not a zero-CLI-start claim. The other two Claude handoff
+cases were stopped before execution. All four now join the final exclusion list.
+
+Local ZIP97 PASS (9 appended cases), frontend280 PASS (2 appended cases), build and independent
+vue-tsc PASS. uv0.12.5 Ruff/format908 and mypy470 PASS after correcting one new-test type annotation.
+Original Python test AST and frontend test bytes unchanged; 137 final documentation links resolve.
+Full pytest coverage completed in two exact-node partitions on a fresh disposable PostgreSQL18
+database with migrations and a clean environment:2258 collected,2244 eligible PASS,0 failed,0 skipped,
+14 final exclusions (12 NOT_RUN;2 initially run CLI probes excluded from PASS). Initial pass stopped
+after1958 PASS;1956 eligible passes retained,288 remaining PASS in403.06s; complete disjoint
+partition verified against collection and JUnit. Offline regression200 PASS
+in a network namespace; two replay passes and five golden digests unchanged, external calls0.
+Actual counts, exclusion deviation and NOT_RUN are recorded in
+[closeout verification](docs/qa/pr26-zip-closeout-20261017.md).
+Commit/push only this PR branch; verify exact remote head and Fast/Offline CI,
+then stop for human review. No merge/deploy authorization.
+
+## Current state — independent ZIP source snapshot — 2026-10-16 (Asia/Shanghai)
+
+New worktree/branch `codex/code-snapshot-zip-20261016` from fetched main
+`ffcf0876d4ec9e0ce4aa843bc7b87fbf847ad292`; original dirty worktree preserved.
+Private web ZIP preview/explicit subset confirmation creates immutable code-snapshot-v1 in a
+separate dot namespace. Default local_operator JSON dependency remains closed to query overrides;
+only the new archive route explicitly opts into application/zip with all existing auth/origin checks.
+Upload8MB / scan10,000 entries,32MB / final500 files,4MB; strict names/credentials and complete
+bounded deflate validation precede exclusion. No upload path parameters, execution, task binding,
+ExternalRecord/identity/Replay/export/Verifier/REAL_CODEX or old database changes.
+
+Real source ZIP:32 included /0 excluded,237,995 source bytes; independently verified archive/file/tree
+digests, explicit confirmation, immutable read and refreshed browser detail all PASS on Linux Chrome.
+Real original ZIP:13,839,456bytes,2,282files /2,611entries; HTTP413 ZIP_UPLOAD_LIMIT whole-archive
+refusal, no content scan or snapshot. Windows+WSL2 NOT_RUN. Source authenticity remains NOT_ATTESTED,
+coverage NO_RUN_RECORD, verification NOT_VERIFIED. 88 new offline checks PASS, frontend278 PASS,
+build/vue-tsc PASS, Ruff908/mypy470 PASS; offline namespace191 PASS with unchanged five goldens and
+zero calls. New suite + local-init join complete Fast CI inventories; original29 fingerprint preserved.
+Full pytest2249 collected /2239 PASS /0 failed /0 skipped /10 exact CLI deselected on a fresh
+disposable database; excluded cases are not passes. Final ZIP/compatibility checks additionally
+cover container encoding, shared-store capacity, Windows reparse attributes and byte-only tampering.
+Draft PR#26 open. Stable test IDs corrected the strict initial collection/execution mismatch;
+3e1d804 Fast/Offline CI PASS. Final pushed-head CI is verified separately at handoff.
+[Safety contract](docs/CODE_SNAPSHOTS.md), [actual results and NOT_RUN](docs/qa/code-snapshot-zip-20261016.md).
+User authorizes commit/push and Draft PR only. Stop after CI handoff for human review; no merge/deploy.
+
 ## Current state — PR #24 README publication and merge authorization — 2026-10-16 (Asia/Shanghai)
 
 User explicitly approved publishing the existing Canary conclusion in README known limitations,

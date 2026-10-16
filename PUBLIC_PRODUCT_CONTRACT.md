@@ -393,3 +393,16 @@ Future product changes must update this contract only after checking source, foc
 the evidence required by the claim. Historical contracts and immutable reports retain their own
 scope. Plans belong to [Project Blueprint](docs/PROJECT_BLUEPRINT.md), and current verification
 belongs to [Current Milestone](CURRENT_MILESTONE.md).
+
+## 私有网页 ZIP 源码快照
+
+请上传仅含源码的 ZIP；依赖目录中的文件可能触发凭据规则导致整包拒绝。
+拒绝原因按安全检查阶段汇总、最多 50 条；路径/元数据拒绝后不读取内容，损坏或解压异常时停止扫描，修正后需重新预检。
+
+`/external-runs` 可先上传 ZIP、查看纳入/排除/整包拒绝，再明确确认保存独立
+`code-snapshot-v1` 子集。详情固定 `NOT_ATTESTED / NO_RUN_RECORD / NOT_VERIFIED`，
+生成工具仅为声明；没有任务绑定或验收能力。原始归档与最终源码快照分别展示，
+保留归档 SHA256、全部排除原因及确认记录，不声称完整导入原始 ZIP。
+上传 8,000,000 字节，扫描 10,000 条目 / 32,000,000 解压字节；最终仍限
+500 文件 / 4,000,000 字节。既有 ExternalRecord、Replay、导出、Verifier 和 REAL_CODEX
+保持原有契约。具体安全规则和独立存储见 [源码快照](docs/CODE_SNAPSHOTS.md)。

@@ -1,5 +1,24 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## PR #26 合并前收尾授权（2026-10-17，Asia/Shanghai）
+
+在现有 `codex/code-snapshot-zip-20261016` 分支补充源码 ZIP 提示，并增加有上限的安全
+分阶段拒绝汇总。P1-1 可选规则与现有必须保留的凭据拒绝断言冲突，本轮保留严格规则。
+不改变凭据正则、私密路径、上传/扫描/快照限额或原有证据链；新测试追加，不修改旧断言。
+完成指定全量离线验收后普通提交/推送，核对准确 head 的 Fast/Offline CI，停止等待人工审查。
+不合并、不部署、不启动模型或 Agent。结果由 CURRENT_MILESTONE 维护。
+
+## 当前授权：网页 ZIP 独立源码快照（2026-10-16，Asia/Shanghai）
+
+在最新 main 的新 worktree/分支实现网页 ZIP 选择、安全预检、纳入/排除/整包拒绝、
+明确子集确认和不可变 code-snapshot-v1 详情。上传/扫描/最终快照限额分别执行，
+沿用凭据与私密路径规则；只在新 ZIP 路由显式接受 application/zip，保留同源和操作员检查。
+快照独立于 ExternalRecord；不实现任务绑定或验收，不修改原有身份/导出/Replay/Verifier/
+REAL_CODEX，不执行或 import 上传内容，不运行 Agent/付费模型，不碰旧数据库和脏工作区。
+补齐 adversarial/兼容测试，登记新测试和 local_init_script 到 Fast CI，验证真实两个 ZIP；
+不可用环境标 NOT_RUN。授权 commit/push 和 Draft PR，核对 CI 后停止等待人工审阅；
+不合并、不部署。规则见 [源码快照](CODE_SNAPSHOTS.md)，结果由 CURRENT_MILESTONE 维护。
+
 ## 当前授权：PR #24 README 结论发布与合并（2026-10-16，Asia/Shanghai）
 
 用户批准在 PR #24 原分支的 README「已知限制」加入已完成 Canary 的18题观察：
