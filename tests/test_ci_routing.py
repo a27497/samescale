@@ -154,7 +154,12 @@ class RoutingTests(unittest.TestCase):
         selectors = json.loads((ROOT / ".github/ci-core-selectors.json").read_text())
         self.assertEqual(
             selectors[29:],
-            ["tests/test_failure_diagnosis.py", "tests/test_swe_verifier_canary.py"],
+            [
+                "tests/test_failure_diagnosis.py",
+                "tests/test_swe_verifier_canary.py",
+                "tests/test_local_init_script.py",
+                "tests/test_code_snapshots.py",
+            ],
         )
         canonical = json.dumps(selectors[:29], separators=(",", ":")).encode()
         # Independent fingerprint of all 29 selectors taken from main@5bfb674 before edits.

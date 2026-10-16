@@ -59,7 +59,7 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           npm run type-check
-          npm run test -- tests/workbench.spec.ts tests/registry.spec.ts tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts tests/local-plans.spec.ts tests/local-execution.spec.ts tests/external-evidence.spec.ts
+          npm run test -- tests/workbench.spec.ts tests/registry.spec.ts tests/diagnosis.spec.ts tests/analyst.spec.ts tests/analyst-home.spec.ts tests/local-plans.spec.ts tests/local-execution.spec.ts tests/external-evidence.spec.ts tests/code-snapshots.spec.ts
       - name: Run bounded deterministic core regressions
         run: >-
           uv run --locked pytest -q
@@ -94,6 +94,8 @@ jobs:
           tests/test_kb4_final_attribution.py
           tests/test_failure_diagnosis.py
           tests/test_swe_verifier_canary.py
+          tests/test_local_init_script.py
+          tests/test_code_snapshots.py
       - name: Remove job-owned PostgreSQL
         if: ${{ always() }}
         run: scripts/ci_job_postgres.sh cleanup-current

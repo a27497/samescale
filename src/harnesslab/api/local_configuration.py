@@ -30,6 +30,11 @@ def configuration_enabled(request: Request) -> bool:
 
 
 async def local_operator(request: Request) -> None:
+    # Keep the dependency signature closed: media type cannot be a query override.
+    await check_local_operator(request)
+
+
+async def check_local_operator(request: Request, *, content_type: str = "application/json") -> None:
     if not configuration_enabled(request):
         raise WorkbenchAPIError(
             403, "LOCAL_CONFIGURATION_DISABLED", "Local editing is not enabled."
@@ -64,7 +69,7 @@ async def local_operator(request: Request) -> None:
         raise WorkbenchAPIError(403, "LOCAL_OPERATOR_REQUIRED", "Local operator token is required.")
     if (
         request.method != "GET"
-        and request.headers.get("content-type", "").split(";")[0] != "application/json"
+        and request.headers.get("content-type", "").split(";")[0] != content_type
     ):
         raise WorkbenchAPIError(415, "JSON_REQUIRED", "Use a JSON configuration request.")
 

@@ -1,5 +1,28 @@
 # SameScale Product — Current Milestone
 
+## Current state — independent ZIP source snapshot — 2026-10-16 (Asia/Shanghai)
+
+New worktree/branch `codex/code-snapshot-zip-20261016` from fetched main
+`ffcf0876d4ec9e0ce4aa843bc7b87fbf847ad292`; original dirty worktree preserved.
+Private web ZIP preview/explicit subset confirmation creates immutable code-snapshot-v1 in a
+separate dot namespace. Default local_operator JSON dependency remains closed to query overrides;
+only the new archive route explicitly opts into application/zip with all existing auth/origin checks.
+Upload8MB / scan10,000 entries,32MB / final500 files,4MB; strict names/credentials and complete
+bounded deflate validation precede exclusion. No upload path parameters, execution, task binding,
+ExternalRecord/identity/Replay/export/Verifier/REAL_CODEX or old database changes.
+
+Real source ZIP:32 included /0 excluded,237,995 source bytes; independently verified archive/file/tree
+digests, explicit confirmation, immutable read and refreshed browser detail all PASS on Linux Chrome.
+Real original ZIP:13,839,456bytes,2,282files /2,611entries; HTTP413 ZIP_UPLOAD_LIMIT whole-archive
+refusal, no content scan or snapshot. Windows+WSL2 NOT_RUN. Source authenticity remains NOT_ATTESTED,
+coverage NO_RUN_RECORD, verification NOT_VERIFIED. 88 new offline checks PASS, frontend278 PASS,
+build/vue-tsc PASS, Ruff906/mypy470 PASS; offline namespace191 PASS with unchanged five goldens and
+zero calls. New suite + local-init join complete Fast CI inventories; original29 fingerprint preserved.
+Final full pytest with exact CLI deselections is running on a fresh disposable database; excluded
+cases are not passes. Draft PR publication/CI and final counts follow.
+[Safety contract](docs/CODE_SNAPSHOTS.md), [actual results and NOT_RUN](docs/qa/code-snapshot-zip-20261016.md).
+User authorizes commit/push and Draft PR only. Stop after CI handoff for human review; no merge/deploy.
+
 ## Current state — PR #24 README publication and merge authorization — 2026-10-16 (Asia/Shanghai)
 
 User explicitly approved publishing the existing Canary conclusion in README known limitations,

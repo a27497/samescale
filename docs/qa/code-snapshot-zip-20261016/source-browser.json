@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "platform": "Linux GCP + headless Google Chrome",
+  "browser_version": "153.0.8010.52",
+  "windows_wsl2": "NOT_RUN",
+  "sample": "MiniShop_source_only.zip",
+  "archive_bytes": 81554,
+  "included": 32,
+  "excluded": 0,
+  "rejected": 0,
+  "source_bytes": 237995,
+  "archive_sha256": "sha256:b81d13eb30ddc217a33236447b382f3ae98e4376932a8a93be8e0e7a392082b6",
+  "content_digest": "sha256:2665fbe6ae797a8c075cb92894610fded920f0ebcbf63fadb39ef567661eb143",
+  "snapshot_identity": "9294fb55426b732b86eb2406f823bfe33146bf6e9a4374d548c6acd9f2ed14cc",
+  "statuses": [
+    "NOT_ATTESTED",
+    "NO_RUN_RECORD",
+    "NOT_VERIFIED"
+  ],
+  "independent_archive_digest": true,
+  "independent_stored_file_digests": true,
+  "independent_content_digest": true,
+  "reload_detail": true,
+  "console_errors": [],
+  "style": {
+    "font": "Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Noto Sans CJK SC\", \"Microsoft YaHei\", sans-serif",
+    "background": "rgb(255, 255, 255)",
+    "stylesheets": 3
+  }
+}

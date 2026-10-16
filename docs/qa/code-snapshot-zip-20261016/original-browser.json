@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "archive_outcome": "REJECTED",
+  "sample": "MiniShop.zip",
+  "archive_bytes": 13839456,
+  "archive_sha256": "sha256:f67a40d7a76accde120a959e87b07c3a8e171730a6babb06ab83d178cada4076",
+  "included": 0,
+  "excluded": 0,
+  "rejected_archives": 1,
+  "rejections": [
+    {
+      "reason": "ZIP_UPLOAD_LIMIT",
+      "message": "Archive upload exceeds 8,000,000 bytes."
+    }
+  ],
+  "snapshot_created": false,
+  "platform": "Linux GCP + headless Google Chrome",
+  "windows_wsl2": "NOT_RUN"
+}

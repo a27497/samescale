@@ -5,6 +5,7 @@ import { externalEvidenceApi, type ApprovedEvidenceSource, type EvidenceDetail, 
 import { statusLabel, metadataLabel } from '@/utils/statusLabels'
 import { copy as c } from '@/composables/visualLocale'
 import AcceptanceSummary from '@/components/AcceptanceSummary.vue'
+import CodeSnapshotPanel from '@/components/CodeSnapshotPanel.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { externalAcceptanceRows } from '@/utils/acceptanceSummary'
 import { matchesSourceFilter, sourceHarness } from '@/utils/evidencePresentation'
@@ -112,6 +113,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
   <section class="external-evidence-page">
     <div class="page-heading"><div><h2>{{ c('导入运行记录', 'Import run evidence') }}</h2><p>{{ c('提供最终代码 Workspace 与任务验收条件；运行记录可选。', 'Provide the final code workspace and task acceptance conditions; run records are optional.') }}</p></div></div>
     <p>{{ c('不会重新运行 Agent 或接管订阅登录。只接入操作员明确批准的脱敏来源；摘要验证完整性，不认证来源。', 'No Agent rerun or subscription login takeover. Only explicitly approved sanitized sources; hashes verify integrity, not origin.') }}</p>
+    <p>{{ c('也可先从网页上传 ZIP，仅保存未绑定任务的源码快照。', 'You can also upload a ZIP to save a source snapshot before binding a trusted task.') }}</p>
     <p>{{ c('支持多种 Coding Agent 的证据接入。本轮支持 Codex、Claude Code stream-json 和仅代码改动；没有运行记录也能验收，覆盖度标为“无运行记录”。', 'Intake supports multiple Coding Agents. This version supports Codex, Claude Code stream-json and code-only intake; acceptance without logs is labelled “No run record”.') }}</p>
     <div v-if="unlocked" class="panel builder-form" data-test="source-filter"><label>{{ c('1 · 按工具筛选来源', '1 · Filter sources by tool') }}<select v-model="tool" data-test="tool"><option value="all">{{ c('全部来源', 'All sources') }}</option><option value="codex">Codex</option><option value="claude-code">Claude Code</option><option value="code-only">{{ c('仅代码改动', 'Code changes only') }}</option></select></label><p>{{ c('此处只筛选已批准来源。auto-v1 在点击导入后由后端识别 Codex 或 Claude Code；未识别来源在这两种工具筛选下均保留。只解析主动提供的文件，不扫描会话目录。', 'This selector filters approved sources only. The backend identifies auto-v1 as Codex or Claude Code when you click Import; unidentified sources remain under both filters. Only supplied files are parsed; session directories are never scanned.') }}</p></div>
     <p v-if="error" class="error-state" role="alert" :title="failureCode">{{ error }}</p>
@@ -133,7 +135,8 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; detail.va
       <p>{{ c('凭据仅留在当前页面内存。公开 Demo 无权读取或导入。', 'Credential stays in page memory. Public Demo cannot read or import these records.') }}</p>
       <button class="primary-button" :disabled="busy || !token">{{ c('解锁并读取', 'Unlock and load') }}</button>
     </form>
-    <template v-else>
+    <CodeSnapshotPanel :token="token" />
+    <template v-if="unlocked">
       <p data-test="configuration-check">{{ c('只读配置检查', 'Read-only configuration check') }}：<StatusBadge :value="checkStatus" /> · {{ c('未读取来源内容、未验证摘要或执行任务。', 'Source contents/pins/task acceptance were not checked; no execution.') }}</p>
       <p v-if="configurationNotice" role="status">{{ configurationNotice }} {{ c('已保存的健康记录仍可读取。', 'Healthy saved records remain readable.') }}</p>
       <form class="panel builder-form" @submit.prevent="ingest">
