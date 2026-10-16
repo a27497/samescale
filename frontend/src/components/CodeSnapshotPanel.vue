@@ -71,6 +71,7 @@ onBeforeUnmount(() => { alive = false; generation++; file.value = null; review.v
   <section class="panel builder-form code-snapshot-panel" data-test="code-snapshot-panel" :aria-busy="busy">
     <h3>保存源码快照 · 从网页选择 ZIP</h3>
     <p>先保存代码，后续再绑定可信任务。仅安全解析，不执行上传内容；工具来源只是声明。</p>
+    <p data-test="snapshot-source-only">请上传仅含源码的 ZIP；依赖目录中的文件可能触发凭据规则导致整包拒绝。打包前请移除 .venv、venv、node_modules、缓存和构建产物。</p>
     <p>原始归档上传 ≤ 8,000,000 字节；扫描 ≤ 10,000 条目 / 32,000,000 解压字节，单条目 ≤ 8,000,000 字节、压缩比 ≤ 200；最终源码快照 ≤ 500 文件 / 4,000,000 字节。</p>
     <label>声明的生成工具<select v-model="tool" data-test="snapshot-tool" :disabled="busy"><option value="unknown">未声明</option><option value="deepseek-harness-desktop">DeepSeek Harness Desktop</option><option value="codex">Codex</option><option value="claude-code">Claude Code</option><option value="other">其他工具</option></select></label>
     <label>原始归档<input type="file" accept=".zip,application/zip" data-test="snapshot-file" :disabled="busy" @change="selectFile" /></label>
@@ -80,6 +81,8 @@ onBeforeUnmount(() => { alive = false; generation++; file.value = null; review.v
     <p v-if="error" role="alert" data-test="snapshot-error">{{ error }}</p>
     <div v-if="review?.status === 'REJECTED'" data-test="snapshot-rejected" role="alert">
       <h4>整包拒绝 · 未保存快照</h4>
+      <p v-if="review.rejections_truncated">拒绝原因超过 {{ review.rejection_limit }} 条，仅展示前 {{ review.rejection_limit }} 条；请修正后重新预检。</p>
+      <p>按安全检查阶段汇总；路径或元数据拒绝后不读取文件内容，归档损坏或解压异常时停止扫描。请修正后重新预检。</p>
       <ul><li v-for="(item, index) in review.rejections" :key="index">{{ item.path ?? (item.entry === null ? '原始归档' : `条目 #${item.entry + 1}`) }}：{{ reasons[item.reason] ?? item.reason }} <code>{{ item.reason }}</code></li></ul>
     </div>
     <div v-if="review?.status === 'REVIEW_REQUIRED'" data-test="snapshot-review">

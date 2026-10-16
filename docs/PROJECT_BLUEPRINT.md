@@ -1,5 +1,13 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## PR #26 合并前收尾授权（2026-10-17，Asia/Shanghai）
+
+在现有 `codex/code-snapshot-zip-20261016` 分支补充源码 ZIP 提示，并增加有上限的安全
+分阶段拒绝汇总。P1-1 可选规则与现有必须保留的凭据拒绝断言冲突，本轮保留严格规则。
+不改变凭据正则、私密路径、上传/扫描/快照限额或原有证据链；新测试追加，不修改旧断言。
+完成指定全量离线验收后普通提交/推送，核对准确 head 的 Fast/Offline CI，停止等待人工审查。
+不合并、不部署、不启动模型或 Agent。结果由 CURRENT_MILESTONE 维护。
+
 ## 当前授权：网页 ZIP 独立源码快照（2026-10-16，Asia/Shanghai）
 
 在最新 main 的新 worktree/分支实现网页 ZIP 选择、安全预检、纳入/排除/整包拒绝、

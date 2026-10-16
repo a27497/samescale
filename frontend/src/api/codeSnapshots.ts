@@ -7,7 +7,7 @@ export interface SnapshotManifest {
 }
 export type SnapshotReview =
   | { status: 'REVIEW_REQUIRED'; manifest: SnapshotManifest; manifest_sha256: string; review_signature: string }
-  | { status: 'REJECTED'; rejections: { reason: string; entry: number | null; path: string | null }[] }
+  | { status: 'REJECTED'; rejection_limit?: number; rejections_truncated?: boolean; rejections: { reason: string; entry: number | null; path: string | null }[] }
 export interface CodeSnapshot {
   identity: string; kind: 'code-snapshot-v1'; source_authenticity: 'NOT_ATTESTED'
   run_record: 'NO_RUN_RECORD'; verification: 'NOT_VERIFIED'; manifest: SnapshotManifest

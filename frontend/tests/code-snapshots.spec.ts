@@ -119,3 +119,23 @@ describe('independent source snapshot intake', () => {
     expect(wrapper.get('[data-test=snapshot-error]').text()).toContain('SNAPSHOT_INTEGRITY_ERROR'); wrapper.unmount()
   })
 })
+
+it('warns before selection to upload source only and remove dependency directories', async () => {
+  const { wrapper } = await setup()
+  expect(wrapper.get('[data-test=snapshot-source-only]').text()).toContain('请上传仅含源码的 ZIP；依赖目录中的文件可能触发凭据规则导致整包拒绝')
+  for (const name of ['.venv', 'venv', 'node_modules', '缓存', '构建产物']) expect(wrapper.text()).toContain(name)
+  wrapper.unmount()
+})
+
+it('renders multiple rejection reasons and the diagnostic cap without confirmation', async () => {
+  vi.mocked(codeSnapshotsApi.preview).mockResolvedValue({ status: 'REJECTED', rejection_limit: 50, rejections_truncated: true, rejections: [
+    { reason: 'CREDENTIAL_CONTENT', entry: 0, path: '.venv/dependency.py' },
+    { reason: 'NESTED_ARCHIVE', entry: 1, path: 'nested.zip' },
+  ] })
+  const { wrapper } = await setup(); await choose(wrapper)
+  await wrapper.get('[data-test=snapshot-preview]').trigger('click'); await flushPromises()
+  const text = wrapper.get('[data-test=snapshot-rejected]').text()
+  for (const value of ['.venv/dependency.py', '内容命中凭据规则', 'nested.zip', '嵌套归档', '仅展示前 50 条', '停止扫描']) expect(text).toContain(value)
+  expect(wrapper.find('[data-test=snapshot-confirm]').exists()).toBe(false)
+  expect(codeSnapshotsApi.confirm).not.toHaveBeenCalled(); wrapper.unmount()
+})

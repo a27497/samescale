@@ -19,6 +19,8 @@ import tempfile
 import unicodedata
 import zipfile
 import zlib
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Literal
 
@@ -38,6 +40,7 @@ MAX_ENTRIES = 10_000  # Includes directories and files excluded from the final s
 MAX_SCAN_BYTES = 32_000_000
 MAX_ENTRY_BYTES = 8_000_000
 MAX_RATIO = 200
+MAX_REJECTIONS = 50  # Bound diagnostics independently of upload/scan/snapshot limits.
 MAX_FILES = 500
 MAX_BYTES = 4_000_000
 MAX_STORED = 8_000_000  # Match the existing store validator's per-file ceiling.
@@ -101,6 +104,35 @@ class Rejected(ValueError):
         self.reason = reason
         self.entry = entry
         self.path = path
+        self.rejections = [{"reason": reason, "entry": entry, "path": path}]
+        self.truncated = False
+
+
+class RejectionCollector:
+    def __init__(self) -> None:
+        self.items: list[dict[str, Any]] = []
+        self.truncated = False
+
+    def add(self, exc: Rejected) -> None:
+        if len(self.items) < MAX_REJECTIONS:
+            self.items.extend(exc.rejections[: MAX_REJECTIONS - len(self.items)])
+        else:
+            self.truncated = True
+
+    @contextmanager
+    def capture(self) -> Iterator[None]:
+        try:
+            yield
+        except Rejected as exc:
+            self.add(exc)
+
+    def raise_if_any(self) -> None:
+        if self.items:
+            first = self.items[0]
+            exc = Rejected(first["reason"], first["entry"], first["path"])
+            exc.rejections = self.items
+            exc.truncated = self.truncated
+            raise exc
 
 
 def check(ok: bool, reason: str, entry: int | None = None, path: str | None = None) -> None:
@@ -153,6 +185,7 @@ def scan(
     included: list[dict[str, Any]] = []
     excluded: list[dict[str, Any]] = []
     directories: list[str] = []
+    rejections = RejectionCollector()
     try:
         with zipfile.ZipFile(io.BytesIO(data)) as archive:
             entries = archive.infolist()
@@ -162,34 +195,40 @@ def scan(
             compressed = 0
             # Check every name before any content, including excluded dependencies.
             for index, info in enumerate(entries):
-                name = entry_name(info, index)
-                key = unicodedata.normalize("NFC", name).casefold()
-                check(key not in names, "NAME_COLLISION", index, name)
-                names[key] = info.is_dir()
-                check(info.file_size <= MAX_ENTRY_BYTES, "SCAN_ENTRY_BYTE_LIMIT", index, name)
                 total += info.file_size
                 compressed += info.compress_size
-                check(total <= MAX_SCAN_BYTES, "SCAN_BYTE_LIMIT", index, name)
-                check(
-                    info.file_size <= MAX_RATIO * max(info.compress_size, 1),
-                    "COMPRESSION_RATIO_LIMIT",
-                    index,
-                    name,
-                )
-                check(
-                    info.compress_type in {zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED},
-                    "UNSUPPORTED_COMPRESSION",
-                    index,
-                    name,
-                )
-                if info.is_dir():
-                    check(info.file_size == 0, "DIRECTORY_CONTENT", index, name)
-            check(total <= MAX_RATIO * max(compressed, 1), "COMPRESSION_RATIO_LIMIT")
+                with rejections.capture():
+                    name = entry_name(info, index)
+                    key = unicodedata.normalize("NFC", name).casefold()
+                    check(key not in names, "NAME_COLLISION", index, name)
+                    names[key] = info.is_dir()
+                    check(info.file_size <= MAX_ENTRY_BYTES, "SCAN_ENTRY_BYTE_LIMIT", index, name)
+                    check(total <= MAX_SCAN_BYTES, "SCAN_BYTE_LIMIT", index, name)
+                    check(
+                        info.file_size <= MAX_RATIO * max(info.compress_size, 1),
+                        "COMPRESSION_RATIO_LIMIT",
+                        index,
+                        name,
+                    )
+                    check(
+                        info.compress_type in {zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED},
+                        "UNSUPPORTED_COMPRESSION",
+                        index,
+                        name,
+                    )
+                    if info.is_dir():
+                        check(info.file_size == 0, "DIRECTORY_CONTENT", index, name)
+            with rejections.capture():
+                check(total <= MAX_SCAN_BYTES, "SCAN_BYTE_LIMIT")
+            with rejections.capture():
+                check(total <= MAX_RATIO * max(compressed, 1), "COMPRESSION_RATIO_LIMIT")
             # Also reject a file occupying a directory's implicit prefix.
             for name in names:
                 parts = name.split("/")
                 for i in range(1, len(parts)):
-                    check(names.get("/".join(parts[:i]), True), "NAME_COLLISION")
+                    with rejections.capture():
+                        check(names.get("/".join(parts[:i]), True), "NAME_COLLISION")
+            rejections.raise_if_any()
             scanned = 0
             for index, info in enumerate(entries):
                 name = info.filename.rstrip("/")
@@ -252,14 +291,16 @@ def scan(
                     directories.append(name)
                     continue
                 # Credential detection precedes binary/UTF-8/exclusion classification.
-                check(not evidence.SECRET.search(content), "CREDENTIAL_CONTENT", index, name)
-                check(
-                    not content.startswith((b"PK\x03\x04", b"PK\x05\x06", b"PK\x07\x08"))
-                    and not name.lower().endswith((".zip", ".jar", ".whl")),
-                    "NESTED_ARCHIVE",
-                    index,
-                    name,
-                )
+                credential = bool(evidence.SECRET.search(content))
+                with rejections.capture():
+                    check(not credential, "CREDENTIAL_CONTENT", index, name)
+                nested = content.startswith(
+                    (b"PK\x03\x04", b"PK\x05\x06", b"PK\x07\x08")
+                ) or name.lower().endswith((".zip", ".jar", ".whl"))
+                with rejections.capture():
+                    check(not nested, "NESTED_ARCHIVE", index, name)
+                if credential or nested:
+                    continue
                 reason = next(
                     (
                         EXCLUDED_PARTS[p.lower()]
@@ -282,6 +323,8 @@ def scan(
                 else:
                     files[name] = content
                     included.append(item)
+            # Rejected entries never enter a review, signature or persisted subset.
+            rejections.raise_if_any()
             check(bool(files), "EMPTY_SOURCE_SUBSET")
             check(len(files) <= MAX_FILES, "SNAPSHOT_FILE_LIMIT")
             check(sum(map(len, files.values())) <= MAX_BYTES, "SNAPSHOT_BYTE_LIMIT")
@@ -295,9 +338,13 @@ def scan(
         OSError,
         ValueError,
     ) as exc:
-        if isinstance(exc, Rejected):
+        if isinstance(exc, Rejected) and exc.rejections is rejections.items:
             raise
-        raise Rejected("CORRUPT_ARCHIVE") from None
+        # A structural/decompression failure stops unsafe scanning. Keep prior
+        # diagnostics, without attempting further reads after this failure.
+        rejections.add(exc if isinstance(exc, Rejected) else Rejected("CORRUPT_ARCHIVE"))
+        rejections.raise_if_any()
+        raise AssertionError("unreachable") from None
     manifest = {
         "kind": "code-snapshot-review-v1",
         "archive_sha256": sha256_bytes(data),
@@ -331,7 +378,9 @@ def preview(data: bytes, tool: DeclaredTool) -> dict[str, Any]:
     except Rejected as exc:
         return {
             "status": "REJECTED",
-            "rejections": [{"reason": exc.reason, "entry": exc.entry, "path": exc.path}],
+            "rejections": exc.rejections,
+            "rejection_limit": MAX_REJECTIONS,
+            "rejections_truncated": exc.truncated,
             "limits": LIMITS,
         }
 

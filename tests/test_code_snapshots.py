@@ -658,3 +658,112 @@ async def test_media_type_override_cannot_escape_the_zip_route(
     for route in schema["paths"].values():
         for operation in route.values():
             assert all(p["name"] != "content_type" for p in operation.get("parameters", []))
+
+
+async def test_multiple_content_rejections_never_write_or_echo(
+    client: AsyncClient, policy: EvidencePolicy
+) -> None:
+    content = b"api_key='synthetic-value-for-rejection'"
+    data = zipped(
+        [
+            ("safe.py", b"source"),
+            (".venv/dependency.py", content),
+            ("app/config.py", content),
+            ("nested.zip", content),
+        ]
+    )
+    before = sorted(policy.store.parent.rglob("*"))
+    response = await client.post(PREFIX + "/archive", content=data)
+    result = response.json()
+    assert response.status_code == 200 and result["status"] == "REJECTED"
+    assert [(item["path"], item["reason"]) for item in result["rejections"]] == [
+        (".venv/dependency.py", "CREDENTIAL_CONTENT"),
+        ("app/config.py", "CREDENTIAL_CONTENT"),
+        ("nested.zip", "CREDENTIAL_CONTENT"),
+        ("nested.zip", "NESTED_ARCHIVE"),
+    ]
+    assert result["rejections_truncated"] is False
+    assert set(result) == {
+        "status",
+        "rejections",
+        "rejection_limit",
+        "rejections_truncated",
+        "limits",
+    }
+    assert "synthetic-value-for-rejection" not in response.text
+    denied = await client.post(PREFIX + "/archive?action=confirm", content=data)
+    assert denied.status_code == 409
+    assert denied.json()["error"]["code"] == "ZIP_CREDENTIAL_CONTENT"
+    assert sorted(policy.store.parent.rglob("*")) == before
+    assert not policy.store.exists()
+
+
+@pytest.mark.parametrize("count", [50, 51, 80])
+@pytest.mark.parametrize("stage", ["metadata", "content"])
+async def test_rejection_summary_is_bounded_without_writes(
+    client: AsyncClient, policy: EvidencePolicy, count: int, stage: str
+) -> None:
+    items: list[tuple[str | zipfile.ZipInfo, bytes]] = [
+        (f"../bad{i}.py", b"source")
+        if stage == "metadata"
+        else (f"app/file{i}.py", b"api_key='synthetic-rejection-value'")
+        for i in range(count)
+    ]
+    before = sorted(policy.store.parent.rglob("*"))
+    data = zipped(items)
+    result = (await client.post(PREFIX + "/archive", content=data)).json()
+    assert result["status"] == "REJECTED"
+    assert result["rejection_limit"] == service.MAX_REJECTIONS == 50
+    assert len(result["rejections"]) == min(count, 50)
+    assert result["rejections_truncated"] is (count > 50)
+    assert [item["entry"] for item in result["rejections"]] == list(range(min(count, 50)))
+    assert (
+        all(item["path"] is None for item in result["rejections"])
+        if stage == "metadata"
+        else all(item["reason"] == "CREDENTIAL_CONTENT" for item in result["rejections"])
+    )
+    assert (await client.post(PREFIX + "/archive?action=confirm", content=data)).status_code == 409
+    assert sorted(policy.store.parent.rglob("*")) == before
+    assert not policy.store.exists()
+
+
+def test_metadata_rejections_aggregate_without_reading_content(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    link = zipfile.ZipInfo("link.py")
+    link.create_system = 3
+    link.external_attr = (stat.S_IFLNK | 0o600) << 16
+    data = zipped([("../bad.py", b"source"), (".env", b"source"), (link, b"target")])
+
+    def forbidden(*args: object, **kwargs: object) -> None:
+        raise AssertionError("unsafe metadata must stop all content reads")
+
+    monkeypatch.setattr(zipfile.ZipFile, "open", forbidden)
+    result = service.preview(data, "unknown")
+    assert [item["reason"] for item in result["rejections"]] == [
+        "UNSAFE_PATH",
+        "PRIVATE_OR_UNSAFE_NAME",
+        "SYMLINK_OR_SPECIAL_FILE",
+    ]
+    assert result["rejections_truncated"] is False
+
+
+def test_corruption_stops_scan_and_retains_prior_rejections() -> None:
+    data = bytearray(
+        zipped(
+            [
+                ("config.py", b"api_key='synthetic-rejection-value'"),
+                ("broken.py", b"source"),
+                ("later.py", b"api_key='synthetic-rejection-value'"),
+            ]
+        )
+    )
+    # Change only the second local CRC. The central directory remains readable.
+    second = data.index(b"PK\x03\x04", 4)
+    struct.pack_into("<I", data, second + 14, 0)
+    result = service.preview(bytes(data), "unknown")
+    assert [item["reason"] for item in result["rejections"]] == [
+        "CREDENTIAL_CONTENT",
+        "CORRUPT_ARCHIVE",
+    ]
+    assert result["rejections_truncated"] is False
