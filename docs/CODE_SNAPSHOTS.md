@@ -97,3 +97,55 @@ store 的 20,000 文件 / 128,000,000 字节总包络，容量不足拒绝保存
 保留原 29 selectors 的独立 fingerprint，并在 inventory 契约里追加精确登记。
 新增 ZIP 测试还进入 Offline Regression。实测记录见
 [2026-10-16 验证报告](qa/code-snapshot-zip-20261016.md)。
+
+## CLI 还原到待批准 code-only-v1 来源
+
+`harnesslab code-snapshots restore` 在 Linux/WSL 将一个已有、完整性校验通过的快照还原为
+新目录，输出可人工审核的 `source_fragment`。不自动编辑 policy、ingest、绑定运行或执行
+Verifier；来源固定 `unverified`，结果仍为 `NOT_ATTESTED / NOT_VERIFIED`。
+
+先配置已有私有证据策略 `HARNESSLAB_EXTERNAL_EVIDENCE_POLICY`。目标必须为绝对、规范、
+尚不存在的路径（包括已有空目录也拒绝），父目录须已存在、归当前用户所有且组/其他用户不可写。
+目标不得与证据 store、仓库、TaskStore 源/managed store/准入记录、Verifier runtime/artifact、
+已批准 source workspace/path 或其他已配置执行存储重叠。父路径任一符号链接均拒绝。
+
+```bash
+umask 077
+mkdir -m 700 /absolute/private-restores
+uv run --locked harnesslab code-snapshots restore SNAPSHOT_ID \
+  --destination /absolute/private-restores/new-workspace \
+  --source-id reviewed-final-code \
+  --task-reference "$REVIEWED_TASK_REFERENCE" \
+  --task-digest "$REVIEWED_TASK_DIGEST" \
+  --confirm-source-restore > /absolute/private-restores/restore-review.json
+```
+
+任务引用与摘要是操作员的显式断言，并非从 ZIP 文件名、生成工具或代码内容推断。
+还原阶段不检查任务资格，也不证明该任务适合这份代码。输出包含纳入文件的路径/大小/sha256、
+源码树摘要和原排除清单；没有被排除内容。逐文件重新读回比对后，使用 fd 相对路径与
+`O_NOFOLLOW / O_EXCL` 写入独立暂存目录，通过 Linux `renameat2(RENAME_NOREPLACE)` 原子发布。
+不支持该原语的内核/文件系统拒绝，没有覆盖式降级。并发同一目标只允许一个发布者，其余拒绝；
+写入、校验或发布失败清理本次暂存，不清理或覆盖原有目标。突然断电/进程 SIGKILL 后的残留
+不属于正常异常清理保证，需人工检查；不要把还原目录视为不可变证据。
+
+人工核对任务适配性、来源片段、逐文件摘要及排除项，再把 `source_fragment` **手动**追加到
+policy 的 `sources`，保留旧来源及其 pin。之后使用现有接口和显式同意：
+
+```bash
+curl --fail-with-body http://127.0.0.1:8000/api/external-evidence/records \
+  -H 'Origin: http://127.0.0.1:8000' -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $HARNESSLAB_LOCAL_CONFIGURATION_TOKEN" \
+  --data '{"source_id":"reviewed-final-code","consent":"IMPORT_APPROVED_SAVED_EVIDENCE"}'
+# 读取返回的新 ExternalRecord identity；随后另行显式授权已有独立 Verifier：
+uv run --locked harnesslab external-evidence verify-workspace RECORD_ID \
+  --confirm-independent-verifier
+```
+
+物理验收仍要求原有 TaskStore 资格、确切 task_digest、固定镜像和隔离 runtime/artifact。
+一次物理尝试、无自动重试、默认基础设施失败、30秒上限、network none、零检查/矛盾证据不得
+PASS，以及原收据/导出/Replay/ExternalRecord 身份算法都不改变。二次调用复用已有收据，
+并不重跑。任何 task pin 或还原目录变化都需要重新审核，不能修改旧证据来取得通过。
+
+**FastAPI MiniShop 快照 `58c9ef0ce39b4f5d245cbc325adde1e5fc33b28cd0c16f413b05d8ccd04182f0`
+没有可信任务。不得将它映射到 `minishop-standard-library@1.0.0` 的 WSGI 契约后宣称验收。**
+CLI 不做语义适配认证；没有适配且已资格认证的任务时保持 NOT_VERIFIED。

@@ -11,6 +11,7 @@ import uvicorn
 
 from harnesslab import __version__
 from harnesslab.analyst.cli import analyst_app
+from harnesslab.code_snapshots.cli import code_snapshots_app
 from harnesslab.comparability.engine import ComparabilityEngine
 from harnesslab.comparability.manifest import ComparabilityInputError, load_manifest_facts
 from harnesslab.comparability.models import ComparabilityIntent
@@ -128,6 +129,7 @@ app.add_typer(compare_app, name="compare")
 app.add_typer(custom_eval_app, name="custom-eval")
 app.add_typer(episode_app, name="episode")
 app.add_typer(external_evidence_app, name="external-evidence")
+app.add_typer(code_snapshots_app, name="code-snapshots")
 app.add_typer(experiment_app, name="experiment")
 app.add_typer(run_app, name="run")
 app.add_typer(report_app, name="report")

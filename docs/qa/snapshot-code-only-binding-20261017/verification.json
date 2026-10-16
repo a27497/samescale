@@ -1,0 +1,50 @@
+{
+  "baseline": "69e915315c0a53b5d5b3f05f19085bda240d5fab",
+  "uv": "0.12.5",
+  "python": "3.12.14",
+  "ruff_check": "PASS",
+  "ruff_format": {
+    "status": "PASS",
+    "files": 911
+  },
+  "mypy": {
+    "status": "PASS",
+    "files": 472
+  },
+  "focused": {
+    "passed": 159,
+    "failed": 0
+  },
+  "pytest": {
+    "status": "PASS",
+    "collected": 2174,
+    "passed": 2174,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "deselected": 0,
+    "seconds": 1529.68,
+    "warnings": 1,
+    "ignore_files": [
+      "tests/test_codex_current_setup.py",
+      "tests/test_codex_harness.py",
+      "tests/test_multi_harness.py",
+      "tests/test_phase_f_claude_startup.py",
+      "tests/test_phase_f_deepseek_startup.py",
+      "tests/test_runtime_config_hygiene.py",
+      "tests/test_verifier_lifecycle_handoff.py",
+      "tests/test_cli.py"
+    ]
+  },
+  "raw_logs": "/tmp/samescale-snapshot-bind-20261017",
+  "sha256": {
+    "full.log": "9b67f77c656d02e6c1da0175abbe2922a6bab6a19984c23362de8ed74005ab7c",
+    "full.xml": "eb5a6926ca490264cdc39d1ccf1c1641c7bbdc7f38978d14bfb9fbcf430e8d1f",
+    "focused-final.log": "0434aa5bb17da66b6719b7a03f781b0284e1f3b2f9fed94c2f8ccb35c5799727",
+    "offline.log": "520ef1efa85895518316dd1736f10bc1bb3b553a57814cffefff0f6d90e63097"
+  },
+  "initial_database_startup_invocation": "ABORTED_NOT_A_PASS",
+  "original_test_assertions": "UNCHANGED",
+  "agent_cli_calls": 0,
+  "model_calls": 0
+}

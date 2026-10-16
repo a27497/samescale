@@ -26,6 +26,7 @@ from harnesslab.code_snapshots.api import upload
 from harnesslab.episodes.hooks import encode
 from harnesslab.external_evidence import service as evidence
 from harnesslab.external_evidence.models import EvidencePolicy
+from harnesslab.external_evidence.verification import verify_workspace as RESTORE_VERIFY_WORKSPACE
 from harnesslab.registry.models import canonical_digest
 from harnesslab.tasks.package import sha256_bytes
 from tests.local_plan_helpers import HEADERS, TOKEN
@@ -767,3 +768,516 @@ def test_corruption_stops_scan_and_retains_prior_rejections() -> None:
         "CORRUPT_ARCHIVE",
     ]
     assert result["rejections_truncated"] is False
+
+
+# Restore contracts are appended to this existing Fast CI core selector. All
+# pre-existing assertions above and the original CI inventory fingerprint stay intact.
+def restore_snapshot(policy: EvidencePolicy) -> tuple[str, dict[str, bytes]]:
+    files = {"main.py": b"VALUE = 42\n", "src/module.py": b"VALUE = 7\n"}
+    data = zipped([*files.items(), (".venv/excluded.py", b"UNUSED = True\n")])
+    review = service.preview(data, "unknown")
+    saved = service.confirm(
+        policy,
+        data,
+        "unknown",
+        consent=service.CONSENT,
+        archive_sha256=review["manifest"]["archive_sha256"],
+        manifest_sha256=review["manifest_sha256"],
+        signature=review["review_signature"],
+    )
+    return saved["identity"], files
+
+
+def restore_source(policy: EvidencePolicy, identity: str, target: Path) -> dict[str, Any]:
+    from harnesslab.code_snapshots.restore import restore
+
+    return restore(
+        policy,
+        identity,
+        target,
+        source_id="restored-code",
+        task_reference="synthetic-task@1.0.0",
+        task_digest="sha256:" + "a" * 64,
+    )
+
+
+def test_restore_cli_digest_inventory_consent_and_no_policy_write(
+    policy: EvidencePolicy, tmp_path: Path
+) -> None:
+    from typer.testing import CliRunner
+
+    from harnesslab.cli import app
+    from harnesslab.tasks.package import digest_tree
+
+    identity, files = restore_snapshot(policy)
+    target = tmp_path / "restored"
+    policy_path = tmp_path / "policy.json"
+    before = policy_path.read_bytes()
+    argv = [
+        "code-snapshots",
+        "restore",
+        identity,
+        "--destination",
+        str(target),
+        "--source-id",
+        "restored-code",
+        "--task-reference",
+        "synthetic-task@1.0.0",
+        "--task-digest",
+        "sha256:" + "a" * 64,
+    ]
+    denied = CliRunner().invoke(app, argv)
+    assert denied.exit_code != 0 and not target.exists()
+    result = CliRunner().invoke(app, [*argv, "--confirm-source-restore"])
+    assert result.exit_code == 0, result.output
+    restored = json.loads(result.stdout)
+    assert restored["approval"] == "MANUAL_POLICY_REVIEW_REQUIRED"
+    assert restored["task_mapping"] == "OPERATOR_ASSERTED_NOT_ATTESTED"
+    assert restored["verification"] == "NOT_VERIFIED"
+    assert restored["execution_authorized"] is False
+    assert restored["source_fragment"]["format"] == "code-only-v1"
+    assert restored["source_fragment"]["task_reference"] == "synthetic-task@1.0.0"
+    assert restored["content_digest"] == digest_tree(target) == evidence.content_digest(files)
+    assert evidence.workspace_files(target) == files
+    assert restored["included"] == [
+        {"path": name, "bytes": len(data), "sha256": sha256_bytes(data)}
+        for name, data in sorted(files.items())
+    ]
+    assert restored["excluded"][0]["path"] == ".venv/excluded.py"
+    assert not (target / ".venv").exists()
+    assert policy_path.read_bytes() == before
+    assert not list(tmp_path.glob(".code-snapshot-restore-*"))
+
+
+@pytest.mark.parametrize("damage", ["bytes", "identity", "mode", "symlink"])
+def test_restore_corrupt_snapshot_refuses_before_writes(
+    policy: EvidencePolicy, tmp_path: Path, damage: str
+) -> None:
+    identity, _ = restore_snapshot(policy)
+    snapshot = policy.store / service.STORE_NAME / identity / "snapshot.json"
+    if damage == "mode":
+        snapshot.chmod(0o600)
+    elif damage == "symlink":
+        moved = tmp_path / "moved"
+        snapshot.rename(moved)
+        snapshot.symlink_to(moved)
+    else:
+        snapshot.chmod(0o600)
+        if damage == "identity":
+            value = json.loads(snapshot.read_bytes())
+            value["contents_base64"]["main.py"] = base64.b64encode(b"CHANGED = 1\n").decode()
+            snapshot.write_bytes(encode(value))
+        else:
+            snapshot.write_bytes(snapshot.read_bytes() + b" ")
+        snapshot.chmod(0o400)
+    before = sorted(tmp_path.rglob("*"))
+    with pytest.raises((ValueError, WorkbenchAPIError)):
+        restore_source(policy, identity, tmp_path / "target")
+    assert sorted(tmp_path.rglob("*")) == before
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "store",
+        "ancestor",
+        "repository",
+        "runtime",
+        "artifact",
+        "existing",
+        "empty",
+        "link",
+        "parent-link",
+        "missing-parent",
+        "shared-parent",
+        "relative",
+    ],
+)
+def test_restore_unsafe_destinations_have_no_residue(
+    policy: EvidencePolicy, tmp_path: Path, case: str
+) -> None:
+    from harnesslab.productization.assets import distribution_root
+
+    identity, _ = restore_snapshot(policy)
+    runtime = tmp_path / "verifier-runtime"
+    artifact = tmp_path / "verifier-artifacts"
+    runtime.mkdir()
+    artifact.mkdir()
+    policy = policy.model_copy(update={"runtime_root": runtime, "artifact_root": artifact})
+    target = tmp_path / "target"
+    match case:
+        case "store":
+            target = policy.store / "target"
+        case "ancestor":
+            target = tmp_path
+        case "repository":
+            target = distribution_root() / "forbidden-restore"
+        case "runtime":
+            target = runtime / "target"
+        case "artifact":
+            target = artifact / "target"
+        case "existing":
+            target.mkdir()
+            (target / "keep.txt").write_text("KEEP")
+        case "empty":
+            target.mkdir()
+        case "link":
+            target.symlink_to(runtime, target_is_directory=True)
+        case "parent-link":
+            link = tmp_path / "link"
+            link.symlink_to(runtime, target_is_directory=True)
+            target = link / "target"
+        case "missing-parent":
+            target = tmp_path / "absent/target"
+        case "shared-parent":
+            parent = tmp_path / "shared"
+            parent.mkdir(mode=0o777)
+            parent.chmod(0o777)
+            target = parent / "target"
+        case "relative":
+            target = Path("relative-restore")
+    before = {
+        str(p): p.read_bytes() for p in tmp_path.rglob("*") if p.is_file() and not p.is_symlink()
+    }
+    paths = sorted(tmp_path.rglob("*"))
+    with pytest.raises((ValueError, OSError, WorkbenchAPIError)):
+        restore_source(policy, identity, target)
+    assert paths == sorted(tmp_path.rglob("*"))
+    assert before == {
+        str(p): p.read_bytes() for p in tmp_path.rglob("*") if p.is_file() and not p.is_symlink()
+    }
+
+
+@pytest.mark.parametrize("where", ["workspace", "stream", "managed", "task-source"])
+def test_restore_protects_sources_and_taskstore(
+    policy: EvidencePolicy, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, where: str
+) -> None:
+    from tests.test_external_evidence_generic import generic_source
+
+    source = generic_source(tmp_path / "approved", "claude-code")
+    policy = policy.model_copy(update={"sources": (source,)})
+    identity, _ = restore_snapshot(policy)
+    trusted = tmp_path / "trusted-tasks"
+    trusted.mkdir()
+    managed = tmp_path / "managed-tasks"
+    managed.mkdir()
+    task_policy = tmp_path / "task-policy.json"
+    task_policy.write_bytes(
+        encode({"source_roots": {"trusted": str(trusted)}, "managed_store": str(managed)})
+    )
+    task_policy.chmod(0o600)
+    monkeypatch.setenv("HARNESSLAB_LOCAL_TASK_POLICY", str(task_policy))
+    assert source.path is not None
+    targets = {
+        "workspace": source.workspace / "target",
+        "stream": source.path / "target",
+        "managed": managed / "target",
+        "task-source": trusted / "target",
+    }
+    with pytest.raises(ValueError):
+        restore_source(policy, identity, targets[where])
+    assert not targets[where].exists()
+    assert not list(tmp_path.rglob(".code-snapshot-restore-*"))
+
+
+@pytest.mark.parametrize("failure", ["write", "publish", "substitution", "unsupported"])
+def test_restore_failure_cleanup_and_parent_substitution(
+    policy: EvidencePolicy, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
+    from harnesslab.code_snapshots import restore as module
+
+    identity, _ = restore_snapshot(policy)
+    parent = tmp_path / "parent"
+    parent.mkdir(mode=0o700)
+    target = parent / "target"
+    write = module.write_file
+    publish = module.publish
+    moved = tmp_path / "moved-parent"
+    foreign = tmp_path / "foreign"
+    foreign.mkdir(mode=0o700)
+
+    def fail_write(root: int, name: str, data: bytes) -> None:
+        write(root, name, data)
+        if failure == "write":
+            raise OSError("synthetic write failure")
+        if failure == "substitution" and parent.exists() and not parent.is_symlink():
+            parent.rename(moved)
+            parent.symlink_to(foreign, target_is_directory=True)
+
+    def fail_publish(fd: int, stage: str, destination: str) -> None:
+        if failure in {"publish", "unsupported"}:
+            raise OSError("synthetic publication failure")
+        publish(fd, stage, destination)
+
+    monkeypatch.setattr(module, "write_file", fail_write)
+    monkeypatch.setattr(module, "publish", fail_publish)
+    with pytest.raises((OSError, ValueError, WorkbenchAPIError)):
+        restore_source(policy, identity, target)
+    assert not target.exists()
+    assert not list(foreign.iterdir())
+    assert not list(tmp_path.rglob(".code-snapshot-restore-*"))
+
+
+def test_concurrent_restore_one_atomic_winner_no_residue(
+    policy: EvidencePolicy, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    from harnesslab.code_snapshots import restore as module
+
+    identity, files = restore_snapshot(policy)
+    barrier = Barrier(2)
+    publish = module.publish
+
+    def simultaneous(parent: int, stage: str, destination: str) -> None:
+        barrier.wait(timeout=10)
+        publish(parent, stage, destination)
+
+    def attempt() -> str:
+        try:
+            restore_source(policy, identity, tmp_path / "target")
+        except FileExistsError:
+            return "REJECTED"
+        return "PUBLISHED"
+
+    monkeypatch.setattr(module, "publish", simultaneous)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        a, b = pool.submit(attempt), pool.submit(attempt)
+        assert sorted([a.result(), b.result()]) == ["PUBLISHED", "REJECTED"]
+    assert evidence.workspace_files(tmp_path / "target") == files
+    assert not list(tmp_path.glob(".code-snapshot-restore-*"))
+
+
+def test_restore_ingest_new_record_preserves_old_identity_export_and_policy(
+    policy: EvidencePolicy, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from harnesslab.external_evidence.models import ApprovedSource
+    from tests.test_external_evidence_generic import generic_source
+
+    old_source = generic_source(tmp_path / "old")
+    prior = policy.model_copy(update={"sources": (old_source,)})
+    old = restore_ingest(prior, old_source.source_id, monkeypatch)
+    old_export = evidence.export_record(prior, old["identity"])
+    old_bytes = {
+        p: p.read_bytes() for p in (prior.store / old["identity"]).rglob("*") if p.is_file()
+    }
+    identity, files = restore_snapshot(prior)
+    policy_before = (tmp_path / "policy.json").read_bytes()
+    restored = restore_source(prior, identity, tmp_path / "restored")
+    new_source = ApprovedSource.model_validate(restored["source_fragment"])
+    # Explicit operator review/approval, never performed by restore itself.
+    approved = prior.model_copy(update={"sources": (*prior.sources, new_source)})
+    new = restore_ingest(approved, new_source.source_id, monkeypatch)
+    assert new["identity"] != old["identity"]
+    assert new["record"]["workspace_digest"] == evidence.content_digest(files)
+    assert new["record"]["completeness"]["coverage"] == "NO_RUN_RECORD"
+    assert new["diagnosis"]["workspace_acceptance"] == "NOT_VERIFIED"
+    assert old_export == evidence.export_record(approved, old["identity"])
+    assert old_bytes == {p: p.read_bytes() for p in old_bytes}
+    assert (tmp_path / "policy.json").read_bytes() == policy_before
+    replayed = evidence.replay_export(old_export, sha256_bytes(old_export))
+    assert replayed["diagnosis"]["workspace_acceptance"] == "NOT_VERIFIED"
+    assert replayed["subject_executed"] is False
+
+
+@pytest.mark.parametrize(
+    "scenario,acceptance,checks",
+    [
+        ("pass", "VERIFIED_PASS", 1),
+        ("fail", "VERIFIED_FAIL", 1),
+        ("infra", "NOT_VERIFIED", 0),
+        ("zero", "NOT_VERIFIED", 0),
+    ],
+)
+async def test_restored_record_existing_verifier_once_fail_closed(
+    policy: EvidencePolicy,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    scenario: str,
+    acceptance: str,
+    checks: int,
+) -> None:
+    from types import SimpleNamespace
+
+    from harnesslab.external_evidence import verification
+    from harnesslab.external_evidence.models import ApprovedSource
+    from harnesslab.local_plans.tasks import LocalTaskPolicy
+
+    identity, _ = restore_snapshot(policy)
+    restored = restore_source(policy, identity, tmp_path / "restored")
+    source = ApprovedSource.model_validate(restored["source_fragment"])
+    policy = policy.model_copy(
+        update={
+            "sources": (source,),
+            "verifier_image_id": "sha256:" + "b" * 64,
+            "runtime_root": tmp_path / "runtime",
+            "artifact_root": tmp_path / "artifacts",
+        }
+    )
+    item = restore_ingest(policy, source.source_id, monkeypatch)
+    trusted = tmp_path / "trusted"
+    trusted.mkdir()
+    task_policy = LocalTaskPolicy(
+        source_roots={"trusted": trusted}, managed_store=tmp_path / "managed"
+    )
+    package = SimpleNamespace(
+        definition=SimpleNamespace(content_digest=source.task_digest),
+        verifier_digest="sha256:" + "c" * 64,
+        manifest=SimpleNamespace(verifier=SimpleNamespace(timeout_seconds=99)),
+        materialize=lambda path: SimpleNamespace(protected_digests=()),
+    )
+    monkeypatch.setattr(verification, "load_policy", lambda: task_policy)
+    monkeypatch.setattr(
+        verification,
+        "inspect_task",
+        lambda policy, ref: (
+            SimpleNamespace(
+                eligible_for_planning=True, qualification_identity="sha256:" + "d" * 64
+            ),
+            package,
+        ),
+    )
+    calls = []
+
+    class SyntheticSandbox:
+        def __init__(self, **kwargs: object) -> None:
+            calls.append(kwargs)
+
+        async def run_hidden_verifier_workspace(
+            self, package: object, workspace: Path, *, timeout_seconds: int
+        ) -> Any:
+            assert timeout_seconds == 30
+            assert evidence.workspace_files(workspace) == {
+                "main.py": b"VALUE = 42\n",
+                "src/module.py": b"VALUE = 7\n",
+            }
+            if scenario == "infra":
+                raise OSError("synthetic infrastructure failure")
+            rows = (
+                []
+                if scenario == "zero"
+                else [
+                    {
+                        "name": "synthetic-check",
+                        "passed": scenario == "pass",
+                        "score": 1.0 if scenario == "pass" else 0.0,
+                    }
+                ]
+            )
+            report = {
+                "schema_version": 1,
+                "passed": scenario != "fail",
+                "score": 0.0 if scenario == "fail" else 1.0,
+                "checks": rows,
+                "summary": "synthetic only",
+            }
+            manifest = SimpleNamespace(
+                workspace_input_digest=source.workspace_digest,
+                workspace_output_digest=source.workspace_digest,
+                stdout_truncated=False,
+                stderr_truncated=False,
+                cleanup_verified=True,
+                model_dump=lambda **kwargs: {"fixture": "synthetic-manifest"},
+            )
+            lifecycle = SimpleNamespace(
+                failure_subtype=None, model_dump=lambda **kwargs: {"fixture": "synthetic-lifecycle"}
+            )
+            return SimpleNamespace(
+                run=SimpleNamespace(stdout=json.dumps(report), manifest=manifest),
+                lifecycle=lifecycle,
+            )
+
+    monkeypatch.setattr(verification, "PinnedVerifierSandbox", SyntheticSandbox)
+    before = (policy.store / item["identity"] / "record.json").read_bytes()
+    receipt = await RESTORE_VERIFY_WORKSPACE(policy, item["identity"])
+    assert receipt["acceptance"] == acceptance and receipt["checks"] == checks
+    assert receipt["physical_attempts"] == 1 and receipt["automatic_retry"] is False
+    assert receipt["agent_reexecuted"] is False
+    assert await RESTORE_VERIFY_WORKSPACE(policy, item["identity"]) == receipt
+    assert len(calls) == 1
+    assert (policy.store / item["identity"] / "record.json").read_bytes() == before
+    if scenario in {"infra", "zero"}:
+        assert receipt["reason"] == "VERIFIER_INFRASTRUCTURE_FAILURE"
+
+
+def restore_ingest(
+    policy: EvidencePolicy, source_id: str, monkeypatch: pytest.MonkeyPatch
+) -> dict[str, Any]:
+    # Only the explicit operator ingest step may project a record. The old ZIP
+    # fixture's process/Provider/Agent guards remain active throughout.
+    with monkeypatch.context() as m:
+        m.setattr(evidence, "project", ORIGINAL_PROJECT)
+        return evidence.ingest(policy, source_id)
+
+
+@pytest.mark.parametrize("invalid", ["digest", "reference", "source-id", "collision"])
+def test_restore_mapping_rejected_before_write(
+    policy: EvidencePolicy, tmp_path: Path, invalid: str
+) -> None:
+    from harnesslab.code_snapshots.restore import restore
+    from tests.test_external_evidence_generic import generic_source
+
+    identity, _ = restore_snapshot(policy)
+    values = {
+        "source_id": "restored-code",
+        "task_reference": "synthetic-task@1.0.0",
+        "task_digest": "sha256:" + "a" * 64,
+    }
+    if invalid == "collision":
+        old = generic_source(tmp_path / "prior")
+        policy = policy.model_copy(update={"sources": (old,)})
+        values["source_id"] = old.source_id
+    else:
+        values[
+            {"digest": "task_digest", "reference": "task_reference", "source-id": "source_id"}[
+                invalid
+            ]
+        ] = ""
+    paths = sorted(tmp_path.rglob("*"))
+    with pytest.raises(ValueError):
+        restore(policy, identity, tmp_path / "target", **values)
+    assert sorted(tmp_path.rglob("*")) == paths
+
+
+def test_restore_rejects_snapshot_substitution_between_validation_and_capture(
+    policy: EvidencePolicy, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    identity, _ = restore_snapshot(policy)
+    read = service.read
+
+    def substituted(policy: EvidencePolicy, identity: str) -> dict[str, Any]:
+        reviewed = read(policy, identity)
+        path = policy.store / service.STORE_NAME / identity / "snapshot.json"
+        path.chmod(0o600)
+        value = json.loads(path.read_bytes())
+        value["contents_base64"]["main.py"] = base64.b64encode(b"CHANGED = 1\n").decode()
+        path.write_bytes(encode(value))
+        path.chmod(0o400)
+        return reviewed
+
+    monkeypatch.setattr(service, "read", substituted)
+    with pytest.raises(ValueError):
+        restore_source(policy, identity, tmp_path / "target")
+    assert not (tmp_path / "target").exists()
+    assert not list(tmp_path.glob(".code-snapshot-restore-*"))
+
+
+def test_atomic_publication_never_replaces_new_empty_target(
+    policy: EvidencePolicy, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from harnesslab.code_snapshots import restore as module
+
+    identity, _ = restore_snapshot(policy)
+    target = tmp_path / "target"
+    publish = module.publish
+
+    def raced(parent: int, stage: str, destination: str) -> None:
+        target.mkdir()
+        publish(parent, stage, destination)
+
+    monkeypatch.setattr(module, "publish", raced)
+    with pytest.raises(FileExistsError):
+        restore_source(policy, identity, target)
+    assert target.is_dir() and not list(target.iterdir())
+    assert not list(tmp_path.glob(".code-snapshot-restore-*"))

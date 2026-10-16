@@ -1,5 +1,35 @@
 # SameScale Product — Current Milestone
 
+## Current state — CLI snapshot → reviewed code-only binding — 2026-10-17 (Asia/Shanghai)
+
+Fetched main unchanged at `69e915315c0a53b5d5b3f05f19085bda240d5fab`; new worktree/branch
+`codex/snapshot-code-only-binding-20261017`, original dirty workspace preserved.
+Operator CLI validates a saved snapshot, restores only included bytes into a fresh external directory
+using fd-relative no-follow writes and atomic no-replace publication, and prints a manual-review
+code-only-v1 fragment. Explicit task reference/digest and restore consent required; no policy edit,
+auto-ingest, task suitability claim, HTTP write route or source execution. Existing empty targets
+also refuse. Source directories remain editable and require pin review before existing ingest.
+FastAPI snapshot58c9ef0 has no trusted task and was not mapped to the WSGI contract.
+
+37 new cases appended to existing Fast CI core ZIP selector; no existing function/class AST or
+assertion changed, original inventory fingerprint unchanged. Focused ZIP/CI159 PASS; Ruff/format911,
+mypy472 PASS. Offline237 PASS, dual Replay/goldens unchanged, external calls0. Full pytest2174
+collected/passed, failed0/skipped0/deselected0 in1529.68s; 8 real Agent CLI-capable files excluded
+before launch, including runtime_config_hygiene and
+verifier_lifecycle_handoff. A database startup race aborted the initial full invocation; migrations
+completed before the replacement run. No existing database or credentials used.
+
+Separately authorized fixed-script opaque handling of qualified WSGI reference workspace:
+new snapshot/CLI restore/manual approval/ingest/real pinned Verifier completed once per reference
+and baseline. Reference23/23 VERIFIED_PASS; baseline3/23 VERIFIED_FAIL. Each repeat returned the
+same receipt, physical_attempts1/automatic_retry=false; old record/export bytes and input digests
+unchanged. Image bfc964b6, original task3d59931/qualification9112ebda preserved. Initial preparation
+used a reserved target component and stopped before any physical verifier; retained separately.
+No Agent/Provider/model calls. Protected external_evidence/Verifier/receipts/Replay/export/REAL_CODEX
+and frozen evidence have zero diff. [Verification and exclusions](docs/qa/snapshot-code-only-binding-20261017.md).
+Commit/push and Draft PR only, exact-head Fast/Offline CI handoff then stop for human review.
+No merge or deployment.
+
 ## Current state — PR #26 ZIP closeout — 2026-10-17 (Asia/Shanghai)
 
 User-authorized follow-up on `codex/code-snapshot-zip-20261016` from
