@@ -270,6 +270,7 @@ def test_distinct_limits(case: str, reason: str) -> None:
         zipped([("nested.zip", zipped([("main.py", b"source")]))]),
         zipped([("renamed.py", zipped([("main.py", b"source")]))]),
     ],
+    ids=["invalid", "truncated", "nested_zip", "renamed_zip"],
 )
 def test_corrupt_truncated_and_nested_archives(data: bytes) -> None:
     assert service.preview(data, "unknown")["status"] == "REJECTED"
