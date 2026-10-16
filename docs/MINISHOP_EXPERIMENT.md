@@ -1,7 +1,8 @@
 # MiniShop：DeepSeek Harness → SameScale（方案 C）
 
-本交付只准备任务资格与本地代码快照配置。未运行 DeepSeek Harness、Agent、付费模型或
-真实开发实验；没有合并、部署或开启 REAL_CODEX。任务的 oracle 验收不能充当 Agent 成绩。
+本交付只准备任务资格与本地代码快照配置，未开展真实 DeepSeek 开发实验、调用付费模型、
+合并、部署或开启 REAL_CODEX。初始化脚本本身不启动 Agent；仓库回归测试中的首次越界与
+后续单项授权见末节，不能声称整个交付过程从未启动 CLI。Oracle 验收不能充当 Agent 成绩。
 SameScale 仅使用最终代码快照：`code-only-v1`、`source_kind=unverified`，不填写 Harness
 身份，不伪造运行记录、自报、用量或失败原因。后续运行与独立 Workspace 验收需要单独授权。
 
@@ -95,6 +96,24 @@ Verifier stdout 只输出严格 JSON：非空唯一名称 checks，`passed=all(c
 在 Git 外专用目录。实际体积与摘要以该目录的 `step-a-receipt.json` 和逐文件清单为准。
 这些记录没有提交到本 PR，隐藏 verifier/oracle 源码没有公开。
 
+只读分析已有 lifecycle 与 observation，可得到下列互不重叠的整次调用分组；没有重跑：
+
+| 区间 | baseline | oracle |
+| --- | ---: | ---: |
+| 镜像预检与容器创建 | 0.590 秒 | 0.316 秒 |
+| 挂载与隔离检查 | 0.041 秒 | 0.048 秒 |
+| `docker start --attach`：启动、verifier 执行、附加流返回 | 14.921 秒 | 15.765 秒 |
+| 容器清理 | 0.137 秒 | 0.115 秒 |
+| 其他：准备、退出码检查、记录持久化及计时舍入 | 0.046 秒 | 0.032 秒 |
+| 整次调用合计 | 15.735 秒 | 16.276 秒 |
+
+Oracle 的创建、挂载检查和清理共 0.479 秒；baseline 为 0.768 秒。`SANDBOX_START`、
+`PROCESS_START` 与 `PROCESS_WAIT` 包含同一次阻塞的 `docker start --attach`，计时重叠，
+不能相加，也不能把 15.765 秒称为纯容器启动或纯测试主体。没有保存 Docker StartedAt/
+FinishedAt 或 verifier 主体的起止时间，二者各占多少保持未测量。Verifier 顺序启动 23 个
+Python 子进程，但没有各子进程计时，不能量化其占比或证明主体低于 5 秒。
+Manifest 的 16.037 秒从镜像预检之后开始、清理之后结束，与整次调用的计时边界不同。
+
 资格记录按以下观察生成，而非复制测试夹具中的合成资格：
 
 - `TaskValidationResult` 精确绑定任务、verifier、baseline workspace 与 oracle overlay 后
@@ -174,3 +193,75 @@ replay: sha256:a9e055c405d1364437df5a7174674fdbae6d4893e27273d52ec396a7465c5766
 测试比对完整字节摘要和两次 Replay 字节相等，且旧存储字节保持不变；不重跑历史 Agent/Verifier。
 本 PR 仅新增脚本、测试和本文。既有 CI 使用固定 core selectors，不自动纳入新测试模块；
 新测试在本地完整 pytest 中执行，远端 core CI 和本地全量结果必须分别报告。
+
+## CLI 边界与排除后回归复核
+
+首次未筛选的全量运行启动了真实 Codex/Claude/DeepSeek CLI，使用测试凭据与本地测试端点，
+违反当时“不运行 Agent”的约束；不能用无付费模型调用来消除这一越界记录。该轮收集 2,161
+项，完成 1,733 PASS、1 FAIL、0 SKIP；观察到 DeepSeek 启动失败后发送 SIGINT，日志为
+`KeyboardInterrupt`。余下 427 项未执行，原因是中断，不是超时或被 pytest 跳过。
+
+随后用户只授权在干净的 main@`889f301238241c7684da44f4302200a31d913539` checkout
+单独运行以下测试一次，无密钥、内部本地假端点、不调用模型；没有重试：
+
+```text
+tests/test_phase_f_deepseek_startup.py::test_pinned_deepseek_profile_completes_against_keyless_local_transport
+```
+
+结果为 1 FAIL（pytest 4.56 秒，整次启动命令 7.394 秒）：同样在第 214 行断言 CLI exit 0，
+实际 exit 1，未超时、未取消，checkout 前后干净。证明该失败在指定 main 快照上也可复现；
+未确定启动失败根因，不把它当作本新增脚本独有的回归，也不当作 MiniShop 实验成绩。
+
+排除后回归使用实现提交 `361fcce898d8fa2195d5e2bc43ab2faf191a892c`、uv 0.12.5、
+锁定依赖和已迁移的独立一次性 PostgreSQL；清除继承的 provider/auth/service 配置，
+REAL_CODEX=false。既有 `integration` marker 也用于数据库检查，不能区分真实 CLI，
+所以显式使用下列 `--deselect`，其余测试全部保留：
+
+| 排除 selector（均位于 tests/） | 实际参数化项数 |
+| --- | ---: |
+| `test_phase_f_claude_startup.py` | 5 |
+| `test_phase_f_deepseek_startup.py` | 1 |
+| `test_verifier_lifecycle_handoff.py` | 2 |
+| `test_subscription_protocol_docker.py` | 22 |
+| `test_runtime_config_hygiene.py::test_pinned_codex_split_sandbox_executes_with_outer_filesystem_and_seccomp_network` | 1 |
+| `test_runtime_config_hygiene.py::test_pinned_codex_uses_generated_isolated_relay_profile_without_websockets` | 1 |
+| `test_codex_current_setup.py::test_current_docker_strict_config_and_sandbox_without_provider` | 1 |
+| `test_codex_harness.py::test_codex_runtime_doctor_verifies_pinned_version_and_flags` | 1 |
+| `test_multi_harness.py::test_phase_f_runtime_doctors_verify_pins_flags_and_toolchains` | 2 |
+| `test_cli.py::test_harness_codex_doctor_reports_pinned_runtime` | 1 |
+| 合计 | 37 |
+
+Protocol 模块虽然使用假 provider，实际仍通过 `os.execvp('codex', ...)` 启动真实 CLI，
+因此全部排除；只执行 Python fixture 的 Fake 后端与独立 verifier 保留。
+等价的 pytest 选择命令如下（本次通过 Git 外 runner 调用相同 pytest 参数并保存收据）：
+
+```bash
+uv run --locked pytest -q --maxfail=1 \
+  --deselect=tests/test_phase_f_claude_startup.py \
+  --deselect=tests/test_phase_f_deepseek_startup.py \
+  --deselect=tests/test_verifier_lifecycle_handoff.py \
+  --deselect=tests/test_subscription_protocol_docker.py \
+  --deselect=tests/test_runtime_config_hygiene.py::test_pinned_codex_split_sandbox_executes_with_outer_filesystem_and_seccomp_network \
+  --deselect=tests/test_runtime_config_hygiene.py::test_pinned_codex_uses_generated_isolated_relay_profile_without_websockets \
+  --deselect=tests/test_codex_current_setup.py::test_current_docker_strict_config_and_sandbox_without_provider \
+  --deselect=tests/test_codex_harness.py::test_codex_runtime_doctor_verifies_pinned_version_and_flags \
+  --deselect=tests/test_multi_harness.py::test_phase_f_runtime_doctors_verify_pins_flags_and_toolchains \
+  --deselect=tests/test_cli.py::test_harness_codex_doctor_reports_pinned_runtime
+```
+
+Runner 对真实 Agent CLI 子进程及未显式指定 Python fixture 的 Agent 镜像启动作阻止并报错，
+不把拦截替换成成功或 skip；最终运行拦截数为 0。收据目录 0700、收据文件 0600。
+测试进程采用正常 umask 022，避免改变测试刻意设置的权限。
+
+最终完整一轮：**2,124 PASS、37 DESELECTED、0 FAIL、0 SKIP，1269.44 秒（21:09）**。
+包含新增模块全部 38 项，含历史 export/Replay 的独立 pin 和字节一致性检查。
+冻结证据与 MiniShop 外部包/资格/store 共 472 项前后一致，且与首次全量之前的清单一致。
+一次性测试数据库已删除；没有再次运行 MiniShop baseline/oracle。
+此前整树 Ruff lint/format（902 文件）与 mypy（466 源文件）通过，实现与测试源码未再改动。
+本次后续提交仅补正文档；最终 head 的远端 CI 单独报告。
+
+保留两次未完成/失败的排除后运行记录，不与最终结果拼接：第一次主机重启后进程消失，
+记录到 828 项通过，无最终 JUnit/收据；第二次 1,087 PASS、1 FAIL、37 DESELECTED，
+runner 的全局 umask 077 将权限拒绝测试要求的 0755 目录变为 0700。修正启动环境为 022 后，
+该单项先通过，再得到上述完整一轮结果；没有修改断言或追加排除项。
+全部原日志、37 项精确 nodeid、JUnit、前后清单和分阶段耗时分析保留在 Git 外专用目录。
