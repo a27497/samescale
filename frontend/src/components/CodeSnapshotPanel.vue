@@ -16,6 +16,8 @@ const reasons: Record<string, string> = {
   NAME_COLLISION: '重复、大小写、NFC 或文件与目录名称冲突', CREDENTIAL_CONTENT: '内容命中凭据规则',
   NESTED_ARCHIVE: '嵌套归档', CORRUPT_ARCHIVE: '归档损坏或截断', EMPTY_SOURCE_SUBSET: '无可纳入的源码',
   SNAPSHOT_FILE_LIMIT: '最终快照超过 500 个文件', SNAPSHOT_BYTE_LIMIT: '最终快照超过 4,000,000 字节',
+  SNAPSHOT_STORAGE_CAPACITY: '私有存储容量不足，未写入快照；请由操作员准备独立存储',
+  SNAPSHOT_METADATA_LIMIT: '源码与完整清单的存储编码超过 8,000,000 字节',
   UPLOAD_LIMIT: '上传超过 8,000,000 字节', SCAN_ENTRY_LIMIT: '扫描超过 10,000 个条目',
   SCAN_ENTRY_BYTE_LIMIT: '单条目解压超过 8,000,000 字节', SCAN_BYTE_LIMIT: '扫描解压超过 32,000,000 字节',
   COMPRESSION_RATIO_LIMIT: '压缩比超过 200 倍', DECOMPRESSION_LIMIT: '条目解压大小异常',
@@ -25,7 +27,7 @@ function reset() { generation++; busy.value = false; review.value = null; consen
 function selectFile(event: Event) { reset(); file.value = (event.target as HTMLInputElement).files?.[0] ?? null }
 function report(e: unknown) {
   const code = (e as { response?: { data?: { error?: { code?: string } } } }).response?.data?.error?.code
-  error.value = `操作未完成：${code ?? 'NETWORK_ERROR'}。请检查本地操作员权限、归档或重新预检。`
+  error.value = `操作未完成：${(code?.startsWith('ZIP_') && reasons[code.slice(4)]) || code || 'NETWORK_ERROR'}。未保存新快照，请检查本地操作员权限、归档或重新预检。`
 }
 async function preview() {
   if (!file.value || !props.token || busy.value) return

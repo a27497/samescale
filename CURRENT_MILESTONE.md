@@ -16,10 +16,13 @@ digests, explicit confirmation, immutable read and refreshed browser detail all 
 Real original ZIP:13,839,456bytes,2,282files /2,611entries; HTTP413 ZIP_UPLOAD_LIMIT whole-archive
 refusal, no content scan or snapshot. Windows+WSL2 NOT_RUN. Source authenticity remains NOT_ATTESTED,
 coverage NO_RUN_RECORD, verification NOT_VERIFIED. 88 new offline checks PASS, frontend278 PASS,
-build/vue-tsc PASS, Ruff906/mypy470 PASS; offline namespace191 PASS with unchanged five goldens and
+build/vue-tsc PASS, Ruff908/mypy470 PASS; offline namespace191 PASS with unchanged five goldens and
 zero calls. New suite + local-init join complete Fast CI inventories; original29 fingerprint preserved.
-Final full pytest with exact CLI deselections is running on a fresh disposable database; excluded
-cases are not passes. Draft PR publication/CI and final counts follow.
+Full pytest2249 collected /2239 PASS /0 failed /0 skipped /10 exact CLI deselected on a fresh
+disposable database; excluded cases are not passes. Final ZIP/compatibility checks additionally
+cover container encoding, shared-store capacity, Windows reparse attributes and byte-only tampering.
+Draft PR#26 open. Stable test IDs corrected the strict initial collection/execution mismatch;
+3e1d804 Fast/Offline CI PASS. Final pushed-head CI is verified separately at handoff.
 [Safety contract](docs/CODE_SNAPSHOTS.md), [actual results and NOT_RUN](docs/qa/code-snapshot-zip-20261016.md).
 User authorizes commit/push and Draft PR only. Stop after CI handoff for human review; no merge/deploy.
 

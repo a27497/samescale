@@ -159,6 +159,10 @@ def test_symlink_special_external_attributes(kind: int) -> None:
         service.preview(zipped([(entry, b"source")]), "unknown")["rejections"][0]["reason"]
         == "SYMLINK_OR_SPECIAL_FILE"
     )
+    windows_link = zipfile.ZipInfo("windows-link.py")
+    windows_link.create_system = 0
+    windows_link.external_attr = 0x400
+    assert service.preview(zipped([(windows_link, b"target")]), "unknown")["status"] == "REJECTED"
 
 
 def test_encrypted_entry() -> None:
@@ -408,6 +412,24 @@ async def test_tampering_read_rejected_and_atomic_failure_cleans_stage(
 ) -> None:
     data = zipped([("main.py", b"source")])
     preview = (await client.post(PREFIX + "/archive", content=data)).json()
+    maximum_stored = service.MAX_STORED
+    monkeypatch.setattr(service, "MAX_STORED", 1)
+    oversized = await client.post(
+        PREFIX + "/archive?action=confirm", content=data, headers=confirmation(preview)
+    )
+    assert oversized.status_code == 409
+    assert oversized.json()["error"]["code"] == "ZIP_SNAPSHOT_METADATA_LIMIT"
+    assert not policy.store.exists()
+    monkeypatch.setattr(service, "MAX_STORED", maximum_stored)
+    maximum_store = service.STORE_MAX_BYTES
+    monkeypatch.setattr(service, "STORE_MAX_BYTES", 1)
+    capacity = await client.post(
+        PREFIX + "/archive?action=confirm", content=data, headers=confirmation(preview)
+    )
+    assert capacity.status_code == 409
+    assert capacity.json()["error"]["code"] == "ZIP_SNAPSHOT_STORAGE_CAPACITY"
+    assert (await client.get("/api/external-evidence/records")).json() == {"items": []}
+    monkeypatch.setattr(service, "STORE_MAX_BYTES", maximum_store)
     original_rename = os.rename
     stages: list[Path] = []
 
@@ -428,10 +450,19 @@ async def test_tampering_read_rejected_and_atomic_failure_cleans_stage(
         )
     ).json()
     path = policy.store / service.STORE_NAME / saved["identity"] / "snapshot.json"
-    value = json.loads(path.read_bytes())
+    original_payload = path.read_bytes()
+    value = json.loads(original_payload)
     value["manifest"]["excluded"] = [{"path": "forged"}]
     path.chmod(0o600)
     path.write_bytes(encode(value))
+    path.chmod(0o400)
+    result = await client.get(PREFIX + "/" + saved["identity"])
+    assert (
+        result.status_code == 409 and result.json()["error"]["code"] == "SNAPSHOT_INTEGRITY_ERROR"
+    )
+    # Byte-only edits must also fail, even when the decoded object is unchanged.
+    path.chmod(0o600)
+    path.write_bytes(original_payload + b" ")
     path.chmod(0o400)
     result = await client.get(PREFIX + "/" + saved["identity"])
     assert (

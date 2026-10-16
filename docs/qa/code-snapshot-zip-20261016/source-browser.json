@@ -11,7 +11,7 @@
   "source_bytes": 237995,
   "archive_sha256": "sha256:b81d13eb30ddc217a33236447b382f3ae98e4376932a8a93be8e0e7a392082b6",
   "content_digest": "sha256:2665fbe6ae797a8c075cb92894610fded920f0ebcbf63fadb39ef567661eb143",
-  "snapshot_identity": "9294fb55426b732b86eb2406f823bfe33146bf6e9a4374d548c6acd9f2ed14cc",
+  "snapshot_identity": "2fd1898f67aadfee85fdf40f924cccf68d64759443d125715bacec6e91d7ec68",
   "statuses": [
     "NOT_ATTESTED",
     "NO_RUN_RECORD",

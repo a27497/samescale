@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from harnesslab.analyst.offline_replay import decode, require
+from harnesslab.api.workbench_errors import WorkbenchAPIError
 from harnesslab.episodes.hooks import _write_once, encode
 from harnesslab.external_evidence import service as evidence
 from harnesslab.external_evidence.models import EvidencePolicy
@@ -39,7 +40,9 @@ MAX_ENTRY_BYTES = 8_000_000
 MAX_RATIO = 200
 MAX_FILES = 500
 MAX_BYTES = 4_000_000
-MAX_STORED = 10_000_000
+MAX_STORED = 8_000_000  # Match the existing store validator's per-file ceiling.
+STORE_MAX_BYTES = 128_000_000  # Existing evidence-store envelope, never expanded.
+STORE_MAX_FILES = 20_000
 STORE_NAME = ".code-snapshots-v1"  # Existing record discovery ignores dot namespaces.
 BINARY_SUFFIXES = {
     ".bin",
@@ -74,6 +77,7 @@ LIMITS = {
     "compression_ratio": MAX_RATIO,
     "snapshot_files": MAX_FILES,
     "snapshot_bytes": MAX_BYTES,
+    "stored_snapshot_bytes": MAX_STORED,
 }
 EXCLUDED_PARTS = {
     ".venv": "DEPENDENCY_DIRECTORY",
@@ -131,7 +135,7 @@ def entry_name(info: zipfile.ZipInfo, index: int) -> str:
         and (kind != stat.S_IFDIR or info.is_dir())
         and (kind != stat.S_IFREG or not info.is_dir())
         and (not info.external_attr & 0x10 or info.is_dir())
-        and not info.external_attr & 0x08,
+        and not info.external_attr & (0x08 | 0x400),
         "SYMLINK_OR_SPECIAL_FILE",
         index,
         name,
@@ -364,7 +368,9 @@ def read(policy: EvidencePolicy, identity: str) -> dict[str, Any]:
     path = root / "snapshot.json"
     info = path.stat()
     require(info.st_nlink == 1 and stat.S_IMODE(info.st_mode) == 0o400, "unsafe snapshot rights")
-    value = decode(path.read_bytes())
+    payload = path.read_bytes()
+    value = decode(payload)
+    require(payload == encode(value), "snapshot serialization drift")
     require(canonical_digest(value) == "sha256:" + identity, "snapshot identity drift")
     require(value["kind"] == "code-snapshot-v1", "snapshot kind drift")
     require(
@@ -443,6 +449,8 @@ def confirm(
             name: base64.b64encode(content).decode() for name, content in sorted(files.items())
         },
     }
+    payload = encode(value)
+    check(len(payload) <= MAX_STORED, "SNAPSHOT_METADATA_LIMIT")
     identity = canonical_digest(value)[7:]
     target = storage(policy)
     # Sibling staging keeps transient content outside records/snapshots/workspaces;
@@ -451,20 +459,38 @@ def confirm(
     roots = protected_roots(policy)
     evidence.safe_root(policy.store.parent)
     policy.store.mkdir(exist_ok=True, mode=0o700)
-    target.mkdir(exist_ok=True, mode=0o700)
-    with (target / ".lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
+    # Serialize against both existing record writers and other snapshots so a new
+    # snapshot cannot exceed the shared envelope and disable historical readers.
+    with (policy.store / ".lock").open("a") as store_lock:
+        fcntl.flock(store_lock, fcntl.LOCK_EX)
         destination = target / identity
         if not destination.exists():
-            with tempfile.TemporaryDirectory(
-                dir=policy.store.parent, prefix=".code-snapshot-staging-"
-            ) as temporary:
-                stage = Path(temporary)
-                evidence.safe_root(stage)
-                check(not any(evidence.overlap(stage, r) for r in roots), "STAGING_LOCATION_UNSAFE")
-                staged = stage / "snapshot"
-                staged.mkdir(mode=0o700)
-                _write_once(staged / "snapshot.json", encode(value))
-                (staged / "snapshot.json").chmod(0o400)
-                os.rename(staged, destination)
+            try:
+                tasks.bounded_files(
+                    policy.store,
+                    max_files=STORE_MAX_FILES - 2,
+                    max_bytes=STORE_MAX_BYTES - len(payload),
+                )
+            except WorkbenchAPIError as exc:
+                if exc.code != "TASK_SIZE_OR_LINK_LIMIT":
+                    raise
+                raise Rejected("SNAPSHOT_STORAGE_CAPACITY") from None
+        target.mkdir(exist_ok=True, mode=0o700)
+        with (target / ".lock").open("a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            if not destination.exists():
+                with tempfile.TemporaryDirectory(
+                    dir=policy.store.parent, prefix=".code-snapshot-staging-"
+                ) as temporary:
+                    stage = Path(temporary)
+                    evidence.safe_root(stage)
+                    check(
+                        not any(evidence.overlap(stage, r) for r in roots),
+                        "STAGING_LOCATION_UNSAFE",
+                    )
+                    staged = stage / "snapshot"
+                    staged.mkdir(mode=0o700)
+                    _write_once(staged / "snapshot.json", payload)
+                    (staged / "snapshot.json").chmod(0o400)
+                    os.rename(staged, destination)
     return read(policy, identity)

@@ -1,0 +1,11 @@
+{
+  "collected": 2249,
+  "passed": 2239,
+  "failed": 0,
+  "skipped": 0,
+  "deselected": 10,
+  "ignored": 0,
+  "duration_seconds": 1728.57,
+  "real_agent_cli_cases_not_counted_as_passed": true,
+  "isolated_database": "snapshot_final_test"
+}

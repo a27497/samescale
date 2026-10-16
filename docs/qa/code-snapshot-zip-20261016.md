@@ -41,14 +41,15 @@ loopback API 和生产构建。经过输入操作员凭据、选择真实 ZIP、
 uv 实际版本 0.12.5，Python 3.12.14，Node 24.18.1，Java 21。
 
 - `uv run --locked ruff check .`：PASS。
-- `uv run --locked ruff format --check .`：906 文件 PASS。
+- `uv run --locked ruff format --check .`：908 文件 PASS。
 - `uv run --locked mypy src tests scripts`：470 文件 PASS。
 - `uv run --locked pytest -q tests/test_code_snapshots.py`：88 collected / 88 passed / 0 failed / 0 skipped / 0 deselected。
 - 历史 ExternalRecord / P1 / generic、local-init 和 CI inventory 最终检查：141 collected / 141 passed / 0 failed / 0 skipped / 0 deselected。
+- 最终加强后的 ZIP / 历史 / local-init / CI 套件：229 collected / 229 passed / 0 failed / 0 skipped / 0 deselected。
 - Release、CI inventory 和新 ZIP 契约联合检查：125 collected / 125 passed / 0 failed / 0 skipped / 0 deselected。
 - `npm run test`：22 文件、278 测试 PASS。
 - `npm run build`：PASS；包含 `vue-tsc --noEmit`。另执行的 `npm run type-check` 也 PASS。
-- `bash scripts/ci_s3.sh /home/dev/.local/state/samescale-code-snapshot-20261016/offline-publication`：191 collected / 191 passed / 0 failed / 0 skipped / 0 deselected，独立网络 namespace，双 Replay 与原五项 golden 摘要逐字节一致；外部/Provider/模型/Judge/Agent/Verifier 调用 0。
+- `bash scripts/ci_s3.sh /home/dev/.local/state/samescale-code-snapshot-20261016/offline-final-guards`：191 collected / 191 passed / 0 failed / 0 skipped / 0 deselected，独立网络 namespace，双 Replay 与原五项 golden 摘要逐字节一致；外部/Provider/模型/Judge/Agent/Verifier 调用 0。
 
 [Offline 本地收据](code-snapshot-zip-20261016/offline-local.json)。
 新测试同时用 process/HTTP transport 和具名 Agent/Provider/Verifier 边界的拒绝哨兵，
@@ -56,10 +57,12 @@ uv 实际版本 0.12.5，Python 3.12.14，Node 24.18.1，Java 21。
 非空 synthetic NOT_VERIFIED 独立收据和记录目录全部字节；不将 synthetic 收据说成实际验收。
 现有真实历史 hook 兼容测试和 frozen-evidence guard 继续保留。
 
-完整 pytest 最终回归仍在独立 disposable PostgreSQL 数据库中运行。使用精确 deselect，
-无整个模块忽略，保留原有 pure argv/绑定测试；下列 9 个 selectors 对应 10 个实际 CLI 用例
-不执行，也不计入通过数。之前的进行中全量运行因最终守卫修正和精确排除登记而中止，
-保留日志但不作为完整通过证据。最终命令与计数在回归结束后登记。
+完整 pytest：**2249 collected / 2239 passed / 0 failed / 0 skipped / 10 deselected**，
+耗时 1728.57 秒。使用精确 deselect，无整个模块忽略，保留 pure argv/绑定测试；下列 9 个
+selectors 对应 10 个实际 CLI 用例不执行，不计入通过数。[实际计数](code-snapshot-zip-20261016/full-pytest.json)。
+全量结束前最后补强 ZIP 的存储容量/Windows 属性/JSON 字节完整性守卫；对应最终 ZIP、
+历史兼容与 CI 套件另行复核，不将被排除或未执行项算作通过。之前的进行中全量因最终
+守卫修正和精确排除登记而中止，保留日志但不作为完整通过证据。
 
 ```bash
 uv run --locked pytest -q \
@@ -88,7 +91,8 @@ CRC/本地头/完整 deflate 流伪造、上传/扫描/最终文件数与解压�
 错误/无 Origin、跨站 sec-fetch-site、非 loopback Host、公开 Demo 拒绝、其他路由非 JSON
 拒绝及查询参数不能覆盖 JSON 守卫，超大/错误 Content-Length、无长度超限、断开和超时，
 无明确确认、归档/清单/签名/工具不匹配、并发幂等且 inode 不重写、原子提交异常后的暂存
-清理、受保护根重叠拒绝、快照篡改拒读，以及上传阶段禁止全部执行边界。
+清理、受保护根重叠拒绝、快照语义及仅 JSON 空白的字节篡改拒读、容器编码超限在写入前拒绝、共享 store
+容量不足不损坏旧记录读取，以及上传阶段禁止全部执行边界。
 
 2,282 条目的可排除子集另有明确标为 synthetic 的扫描包络测试；它不替代真实原始版。
 
@@ -99,4 +103,42 @@ CRC/本地头/完整 deflate 流伪造、上传/扫描/最终文件数与解压�
 - 精确排除的 10 个真实 Agent CLI 启动/探测用例：NOT_RUN，不计入通过数。
 - 任务绑定、独立验收、Agent、付费模型、合并、部署：本轮范围外，未执行。
 
-Draft PR 和准确 head 的 Fast CI / Offline Regression 链接在发布后补充。
+[Draft PR #26](https://github.com/a27497/samescale/pull/26)。第一次发布的 Fast CI 发现 ZIP
+参数 ID 含动态时间戳，收集与执行 ID 不一致，0 tests ran 严格失败；只增加固定 ID，
+不修改断言或 CI 采集。修正提交 `3e1d80491b8c9a371a705273b88f4dd3a0c381b5`：
+[Fast CI](https://github.com/a27497/samescale/actions/runs/38899192589) 和
+[Offline Regression](https://github.com/a27497/samescale/actions/runs/38899192610) 均 PASS；
+本地同样两阶段的 core1 分片 133 PASS。后续补强后的最终准确 head、全部 CI 链接和
+停止点，以 PR 最终描述及交付消息核对；不拿较早提交的绿灯代表最终提交。
+
+## 改动文件清单
+
+- `.github/ci-core-selectors.json`
+- `.github/ci-core-shards.json`
+- `.github/workflows/self-hosted-ci.yml`
+- `CURRENT_MILESTONE.md`
+- `PUBLIC_PRODUCT_CONTRACT.md`
+- `docs/CODE_SNAPSHOTS.md`
+- `docs/PROJECT_BLUEPRINT.md`
+- `docs/qa/code-snapshot-zip-20261016.md`
+- `docs/qa/code-snapshot-zip-20261016/full-pytest.json`
+- `docs/qa/code-snapshot-zip-20261016/minishop-independent-manifest.json`
+- `docs/qa/code-snapshot-zip-20261016/offline-local.json`
+- `docs/qa/code-snapshot-zip-20261016/original-browser.json`
+- `docs/qa/code-snapshot-zip-20261016/pytest-exclusions.json`
+- `docs/qa/code-snapshot-zip-20261016/source-browser.json`
+- `frontend/src/api/codeSnapshots.ts`
+- `frontend/src/components/CodeSnapshotPanel.vue`
+- `frontend/src/router/index.ts`
+- `frontend/src/views/ExternalEvidenceView.vue`
+- `frontend/tests/code-snapshots.spec.ts`
+- `frontend/tests/external-evidence.spec.ts`
+- `scripts/verify_s3_regression.py`
+- `src/harnesslab/api/app.py`
+- `src/harnesslab/api/local_configuration.py`
+- `src/harnesslab/code_snapshots/__init__.py`
+- `src/harnesslab/code_snapshots/api.py`
+- `src/harnesslab/code_snapshots/service.py`
+- `tests/test_ci_routing.py`
+- `tests/test_ci_workflow_contracts.py`
+- `tests/test_code_snapshots.py`
