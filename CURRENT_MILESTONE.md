@@ -1,5 +1,21 @@
 # SameScale Product — Current Milestone
 
+## Current state — MiniShop 3b-1 adapter handoff blocked — 2026-10-17 (Asia/Shanghai)
+
+Latest main / merged PR #28 `38d9f029563b0a157ac5a0a2426f013bb8ea4654`; isolated
+`codex/minishop-3b1-adapter-20261017`, original dirty UI worktree untouched. User-authorized
+snapshot substitute `2fd1898` passes 32-file / 237,995-byte integrity with pinned `2665fbe6`
+content digest; no source file was opened for semantic review and no subject execution/receipt.
+Static preflight found the frozen Verifier reads only workspace-root interface.json, absent from
+the snapshot; the existing chain does not inject task metadata. Connecting the declaration needs
+a prohibited change, triggering the user-required STOP. No declaration/new task/new qualification
+created; old task `95f1b9ba` / verifier `cf3803e8` recompute unchanged. Ruff/format 914 and mypy 472 PASS;
+full pytest deliberately interrupted: 281 footer PASS, exit 2, remaining tests unverified; 439 frozen
+files unchanged. Local offline gate and all new qualifications/3b-2 NOT_RUN. Documentation-only
+Draft PR records the blocker; remote CI is reported separately at the exact pushed head.
+[Evidence and limitations](docs/qa/minishop-3b1-adapter-blocker-20261017.md).
+**STOP awaiting written user disposition of the adapter handoff; no merge/deploy.**
+
 ## Current state — MiniShop FastAPI / SQLite post-delivery audit qualification — 2026-10-17 (Asia/Shanghai)
 
 Fetched main `1432cb94fc22e110e49e733bab7b96dc7d360a09`; isolated branch

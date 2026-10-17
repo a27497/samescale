@@ -1,5 +1,16 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：MiniShop 3b-1 有条件停止（2026-10-17）
+
+用户授权从最新 main（包含 PR #28）建立独立分支与 Draft PR，仅以受限接口审阅
+冻结被测声明、新任务身份，并重新 baseline×3/oracle×3/三控制/兼容资格；完成即停。
+3b-2 须在书面确认声明与新 task_digest 后另行开始，且仅一次物理尝试。
+用户明确要求若需要修改 Verifier 则停止。本轮静态预检触发该条件：固定快照无
+workspace-root interface.json，现有零改动链路无法消费 metadata 声明。
+不扩大实现范围、不运行被测代码、不生成资格或收据；只记录阻塞并等待用户处置。
+后续对传入机制的变更需要新的明确授权；实际结果由 CURRENT_MILESTONE 和
+[阻塞记录](qa/minishop-3b1-adapter-blocker-20261017.md)维护。
+
 ## 当前授权：MiniShop FastAPI / SQLite 交付后审计任务资格（2026-10-17）
 
 从 fetch 后 main `1432cb94fc22e110e49e733bab7b96dc7d360a09` 独立新分支准备
