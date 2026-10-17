@@ -1,0 +1,1343 @@
+{
+  "audit_kind": "post-delivery",
+  "baseline_adapter_sha256": "sha256:3bbbf6e5ae731b7af577ff765b488d31a2fbb2e1fb42ce576b33e9af3e783f85",
+  "baseline_workspace_bytes": 6551,
+  "baseline_workspace_files": 7,
+  "control_attempt_count": 3,
+  "eligible_for_planning": true,
+  "image_id": "sha256:e8e919870821cd896510b4f29e073b37ac7a5b711f7edeea508606a2defb84a3",
+  "not_covered": [
+    "browser_cart",
+    "browser_checkout",
+    "visual_responsive",
+    "windows",
+    "original_agent_execution",
+    "all_concurrency_schedules",
+    "all_failure_points",
+    "request_normalization",
+    "subject_source_inventory",
+    "documentation_clarity"
+  ],
+  "oracle_adapter_sha256": "sha256:1d07ebd38a6119f2e03a7c25ef27b1bfeba94d31f651491278512e2cb376ec46",
+  "oracle_workspace_bytes": 9781,
+  "oracle_workspace_files": 7,
+  "preparation_attempt_count": 3,
+  "preparation_runs": {
+    "baseline-1": {
+      "checks": 26,
+      "passed": 7,
+      "whole_seconds": 10.056985
+    },
+    "frozen-baseline-1": {
+      "checks": 26,
+      "passed": 7,
+      "whole_seconds": 9.864582
+    },
+    "oracle-1": {
+      "checks": 26,
+      "passed": 26,
+      "whole_seconds": 11.992685
+    }
+  },
+  "protected_paths": [],
+  "qualification_attempt_count": 6,
+  "qualification_identity": "sha256:6893bb82af55b0527357b92e7b538abcd12152b7baa347efe967be77b593d958",
+  "requirement_sha256": "sha256:31c93f958b80472ada981cc30f210d41d313bc23a7d27acc2ad4fd15f3070bdc",
+  "runs": [
+    {
+      "body_seconds": {
+        "checks": 7.760626,
+        "other": 0.528316,
+        "server_start": 3.124903,
+        "shutdown": 0.428806,
+        "total": 11.84265
+      },
+      "category": "SUBJECT_RESULT",
+      "checks": [
+        {
+          "name": "C01_catalog_fields_and_minimum",
+          "passed": true
+        },
+        {
+          "name": "C02_sqlite_integer_prices",
+          "passed": true
+        },
+        {
+          "name": "C03_catalog_database_authority",
+          "passed": true
+        },
+        {
+          "name": "C04_create_and_query_order",
+          "passed": false
+        },
+        {
+          "name": "C05_server_repricing_ignores_amounts",
+          "passed": false
+        },
+        {
+          "name": "C06_sqlite_order_and_line_persistence",
+          "passed": false
+        },
+        {
+          "name": "C07_stock_decrement",
+          "passed": false
+        },
+        {
+          "name": "C08_insufficient_stock_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C09_unknown_product_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C10_zero_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C11_negative_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C12_fractional_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C13_boolean_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C14_null_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C15_missing_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C16_multiline_failure_rolls_back",
+          "passed": false
+        },
+        {
+          "name": "C17_injected_database_failure_rolls_back",
+          "passed": false
+        },
+        {
+          "name": "C18_same_key_retry_returns_original",
+          "passed": false
+        },
+        {
+          "name": "C19_same_key_changed_content_conflict",
+          "passed": false
+        },
+        {
+          "name": "C20_concurrent_same_key_single_order",
+          "passed": false
+        },
+        {
+          "name": "C21_concurrent_orders_do_not_oversell",
+          "passed": false
+        },
+        {
+          "name": "C22_restart_preserves_order_and_stock",
+          "passed": false
+        },
+        {
+          "name": "C23_frontend_html_loads",
+          "passed": true
+        },
+        {
+          "name": "C24_frontend_local_resources_load",
+          "passed": true
+        },
+        {
+          "name": "C25_page_and_api_http_scenario",
+          "passed": false
+        },
+        {
+          "name": "C26_local_start_and_test_documentation",
+          "passed": true
+        }
+      ],
+      "label": "release-baseline-1",
+      "passed_checks": 6,
+      "segments_seconds": {
+        "attach": 0.063,
+        "cleanup": 0.136,
+        "create_preflight": 0.321,
+        "other": 0.078629,
+        "start_attach": 12.415
+      },
+      "variant": "baseline",
+      "whole_seconds": 13.013629
+    },
+    {
+      "body_seconds": {
+        "checks": 7.78803,
+        "other": 0.517095,
+        "server_start": 3.19498,
+        "shutdown": 0.428289,
+        "total": 11.928394
+      },
+      "category": "SUBJECT_RESULT",
+      "checks": [
+        {
+          "name": "C01_catalog_fields_and_minimum",
+          "passed": true
+        },
+        {
+          "name": "C02_sqlite_integer_prices",
+          "passed": true
+        },
+        {
+          "name": "C03_catalog_database_authority",
+          "passed": true
+        },
+        {
+          "name": "C04_create_and_query_order",
+          "passed": false
+        },
+        {
+          "name": "C05_server_repricing_ignores_amounts",
+          "passed": false
+        },
+        {
+          "name": "C06_sqlite_order_and_line_persistence",
+          "passed": false
+        },
+        {
+          "name": "C07_stock_decrement",
+          "passed": false
+        },
+        {
+          "name": "C08_insufficient_stock_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C09_unknown_product_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C10_zero_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C11_negative_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C12_fractional_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C13_boolean_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C14_null_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C15_missing_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C16_multiline_failure_rolls_back",
+          "passed": false
+        },
+        {
+          "name": "C17_injected_database_failure_rolls_back",
+          "passed": false
+        },
+        {
+          "name": "C18_same_key_retry_returns_original",
+          "passed": false
+        },
+        {
+          "name": "C19_same_key_changed_content_conflict",
+          "passed": false
+        },
+        {
+          "name": "C20_concurrent_same_key_single_order",
+          "passed": false
+        },
+        {
+          "name": "C21_concurrent_orders_do_not_oversell",
+          "passed": false
+        },
+        {
+          "name": "C22_restart_preserves_order_and_stock",
+          "passed": false
+        },
+        {
+          "name": "C23_frontend_html_loads",
+          "passed": true
+        },
+        {
+          "name": "C24_frontend_local_resources_load",
+          "passed": true
+        },
+        {
+          "name": "C25_page_and_api_http_scenario",
+          "passed": false
+        },
+        {
+          "name": "C26_local_start_and_test_documentation",
+          "passed": true
+        }
+      ],
+      "label": "release-baseline-2",
+      "passed_checks": 6,
+      "segments_seconds": {
+        "attach": 0.068,
+        "cleanup": 0.123,
+        "create_preflight": 0.376,
+        "other": 0.072358,
+        "start_attach": 12.417
+      },
+      "variant": "baseline",
+      "whole_seconds": 13.056358
+    },
+    {
+      "body_seconds": {
+        "checks": 6.633245,
+        "other": 0.470593,
+        "server_start": 2.947198,
+        "shutdown": 0.379467,
+        "total": 10.430504
+      },
+      "category": "SUBJECT_RESULT",
+      "checks": [
+        {
+          "name": "C01_catalog_fields_and_minimum",
+          "passed": true
+        },
+        {
+          "name": "C02_sqlite_integer_prices",
+          "passed": true
+        },
+        {
+          "name": "C03_catalog_database_authority",
+          "passed": true
+        },
+        {
+          "name": "C04_create_and_query_order",
+          "passed": false
+        },
+        {
+          "name": "C05_server_repricing_ignores_amounts",
+          "passed": false
+        },
+        {
+          "name": "C06_sqlite_order_and_line_persistence",
+          "passed": false
+        },
+        {
+          "name": "C07_stock_decrement",
+          "passed": false
+        },
+        {
+          "name": "C08_insufficient_stock_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C09_unknown_product_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C10_zero_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C11_negative_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C12_fractional_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C13_boolean_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C14_null_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C15_missing_quantity_rejected_unchanged",
+          "passed": false
+        },
+        {
+          "name": "C16_multiline_failure_rolls_back",
+          "passed": false
+        },
+        {
+          "name": "C17_injected_database_failure_rolls_back",
+          "passed": false
+        },
+        {
+          "name": "C18_same_key_retry_returns_original",
+          "passed": false
+        },
+        {
+          "name": "C19_same_key_changed_content_conflict",
+          "passed": false
+        },
+        {
+          "name": "C20_concurrent_same_key_single_order",
+          "passed": false
+        },
+        {
+          "name": "C21_concurrent_orders_do_not_oversell",
+          "passed": false
+        },
+        {
+          "name": "C22_restart_preserves_order_and_stock",
+          "passed": false
+        },
+        {
+          "name": "C23_frontend_html_loads",
+          "passed": true
+        },
+        {
+          "name": "C24_frontend_local_resources_load",
+          "passed": true
+        },
+        {
+          "name": "C25_page_and_api_http_scenario",
+          "passed": false
+        },
+        {
+          "name": "C26_local_start_and_test_documentation",
+          "passed": true
+        }
+      ],
+      "label": "release-baseline-3",
+      "passed_checks": 6,
+      "segments_seconds": {
+        "attach": 0.052,
+        "cleanup": 0.132,
+        "create_preflight": 0.301,
+        "other": 0.059768,
+        "start_attach": 10.925
+      },
+      "variant": "baseline",
+      "whole_seconds": 11.469768
+    },
+    {
+      "body_seconds": {
+        "checks": 9.156014,
+        "other": 0.403364,
+        "server_start": 2.861821,
+        "shutdown": 0.230627,
+        "total": 12.651826
+      },
+      "category": "SUBJECT_RESULT",
+      "checks": [
+        {
+          "name": "C01_catalog_fields_and_minimum",
+          "passed": true
+        },
+        {
+          "name": "C02_sqlite_integer_prices",
+          "passed": true
+        },
+        {
+          "name": "C03_catalog_database_authority",
+          "passed": true
+        },
+        {
+          "name": "C04_create_and_query_order",
+          "passed": true
+        },
+        {
+          "name": "C05_server_repricing_ignores_amounts",
+          "passed": true
+        },
+        {
+          "name": "C06_sqlite_order_and_line_persistence",
+          "passed": true
+        },
+        {
+          "name": "C07_stock_decrement",
+          "passed": true
+        },
+        {
+          "name": "C08_insufficient_stock_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C09_unknown_product_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C10_zero_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C11_negative_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C12_fractional_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C13_boolean_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C14_null_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C15_missing_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C16_multiline_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C17_injected_database_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C18_same_key_retry_returns_original",
+          "passed": true
+        },
+        {
+          "name": "C19_same_key_changed_content_conflict",
+          "passed": true
+        },
+        {
+          "name": "C20_concurrent_same_key_single_order",
+          "passed": true
+        },
+        {
+          "name": "C21_concurrent_orders_do_not_oversell",
+          "passed": true
+        },
+        {
+          "name": "C22_restart_preserves_order_and_stock",
+          "passed": true
+        },
+        {
+          "name": "C23_frontend_html_loads",
+          "passed": true
+        },
+        {
+          "name": "C24_frontend_local_resources_load",
+          "passed": true
+        },
+        {
+          "name": "C25_page_and_api_http_scenario",
+          "passed": true
+        },
+        {
+          "name": "C26_local_start_and_test_documentation",
+          "passed": true
+        }
+      ],
+      "label": "release-oracle-1",
+      "passed_checks": 26,
+      "segments_seconds": {
+        "attach": 0.054,
+        "cleanup": 0.159,
+        "create_preflight": 0.293,
+        "other": 0.071437,
+        "start_attach": 13.132
+      },
+      "variant": "oracle",
+      "whole_seconds": 13.709437
+    },
+    {
+      "body_seconds": {
+        "checks": 9.638053,
+        "other": 0.414527,
+        "server_start": 3.116711,
+        "shutdown": 0.379673,
+        "total": 13.548963
+      },
+      "category": "SUBJECT_RESULT",
+      "checks": [
+        {
+          "name": "C01_catalog_fields_and_minimum",
+          "passed": true
+        },
+        {
+          "name": "C02_sqlite_integer_prices",
+          "passed": true
+        },
+        {
+          "name": "C03_catalog_database_authority",
+          "passed": true
+        },
+        {
+          "name": "C04_create_and_query_order",
+          "passed": true
+        },
+        {
+          "name": "C05_server_repricing_ignores_amounts",
+          "passed": true
+        },
+        {
+          "name": "C06_sqlite_order_and_line_persistence",
+          "passed": true
+        },
+        {
+          "name": "C07_stock_decrement",
+          "passed": true
+        },
+        {
+          "name": "C08_insufficient_stock_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C09_unknown_product_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C10_zero_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C11_negative_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C12_fractional_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C13_boolean_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C14_null_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C15_missing_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C16_multiline_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C17_injected_database_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C18_same_key_retry_returns_original",
+          "passed": true
+        },
+        {
+          "name": "C19_same_key_changed_content_conflict",
+          "passed": true
+        },
+        {
+          "name": "C20_concurrent_same_key_single_order",
+          "passed": true
+        },
+        {
+          "name": "C21_concurrent_orders_do_not_oversell",
+          "passed": true
+        },
+        {
+          "name": "C22_restart_preserves_order_and_stock",
+          "passed": true
+        },
+        {
+          "name": "C23_frontend_html_loads",
+          "passed": true
+        },
+        {
+          "name": "C24_frontend_local_resources_load",
+          "passed": true
+        },
+        {
+          "name": "C25_page_and_api_http_scenario",
+          "passed": true
+        },
+        {
+          "name": "C26_local_start_and_test_documentation",
+          "passed": true
+        }
+      ],
+      "label": "release-oracle-2",
+      "passed_checks": 26,
+      "segments_seconds": {
+        "attach": 0.05,
+        "cleanup": 0.252,
+        "create_preflight": 0.311,
+        "other": 0.078587,
+        "start_attach": 13.986
+      },
+      "variant": "oracle",
+      "whole_seconds": 14.677587
+    },
+    {
+      "body_seconds": {
+        "checks": 10.028987,
+        "other": 0.571278,
+        "server_start": 2.887942,
+        "shutdown": 0.329182,
+        "total": 13.81739
+      },
+      "category": "SUBJECT_RESULT",
+      "checks": [
+        {
+          "name": "C01_catalog_fields_and_minimum",
+          "passed": true
+        },
+        {
+          "name": "C02_sqlite_integer_prices",
+          "passed": true
+        },
+        {
+          "name": "C03_catalog_database_authority",
+          "passed": true
+        },
+        {
+          "name": "C04_create_and_query_order",
+          "passed": true
+        },
+        {
+          "name": "C05_server_repricing_ignores_amounts",
+          "passed": true
+        },
+        {
+          "name": "C06_sqlite_order_and_line_persistence",
+          "passed": true
+        },
+        {
+          "name": "C07_stock_decrement",
+          "passed": true
+        },
+        {
+          "name": "C08_insufficient_stock_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C09_unknown_product_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C10_zero_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C11_negative_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C12_fractional_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C13_boolean_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C14_null_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C15_missing_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C16_multiline_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C17_injected_database_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C18_same_key_retry_returns_original",
+          "passed": true
+        },
+        {
+          "name": "C19_same_key_changed_content_conflict",
+          "passed": true
+        },
+        {
+          "name": "C20_concurrent_same_key_single_order",
+          "passed": true
+        },
+        {
+          "name": "C21_concurrent_orders_do_not_oversell",
+          "passed": true
+        },
+        {
+          "name": "C22_restart_preserves_order_and_stock",
+          "passed": true
+        },
+        {
+          "name": "C23_frontend_html_loads",
+          "passed": true
+        },
+        {
+          "name": "C24_frontend_local_resources_load",
+          "passed": true
+        },
+        {
+          "name": "C25_page_and_api_http_scenario",
+          "passed": true
+        },
+        {
+          "name": "C26_local_start_and_test_documentation",
+          "passed": true
+        }
+      ],
+      "label": "release-oracle-3",
+      "passed_checks": 26,
+      "segments_seconds": {
+        "attach": 0.073,
+        "cleanup": 0.127,
+        "create_preflight": 0.438,
+        "other": 0.067928,
+        "start_attach": 14.293
+      },
+      "variant": "oracle",
+      "whole_seconds": 14.998928
+    },
+    {
+      "body_seconds": {
+        "checks": 9.177306,
+        "other": 0.466742,
+        "server_start": 2.746086,
+        "shutdown": 0.428145,
+        "total": 12.818279
+      },
+      "category": "SUBJECT_RESULT",
+      "checks": [
+        {
+          "name": "C01_catalog_fields_and_minimum",
+          "passed": true
+        },
+        {
+          "name": "C02_sqlite_integer_prices",
+          "passed": true
+        },
+        {
+          "name": "C03_catalog_database_authority",
+          "passed": true
+        },
+        {
+          "name": "C04_create_and_query_order",
+          "passed": true
+        },
+        {
+          "name": "C05_server_repricing_ignores_amounts",
+          "passed": false
+        },
+        {
+          "name": "C06_sqlite_order_and_line_persistence",
+          "passed": true
+        },
+        {
+          "name": "C07_stock_decrement",
+          "passed": true
+        },
+        {
+          "name": "C08_insufficient_stock_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C09_unknown_product_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C10_zero_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C11_negative_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C12_fractional_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C13_boolean_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C14_null_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C15_missing_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C16_multiline_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C17_injected_database_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C18_same_key_retry_returns_original",
+          "passed": true
+        },
+        {
+          "name": "C19_same_key_changed_content_conflict",
+          "passed": true
+        },
+        {
+          "name": "C20_concurrent_same_key_single_order",
+          "passed": true
+        },
+        {
+          "name": "C21_concurrent_orders_do_not_oversell",
+          "passed": true
+        },
+        {
+          "name": "C22_restart_preserves_order_and_stock",
+          "passed": true
+        },
+        {
+          "name": "C23_frontend_html_loads",
+          "passed": true
+        },
+        {
+          "name": "C24_frontend_local_resources_load",
+          "passed": true
+        },
+        {
+          "name": "C25_page_and_api_http_scenario",
+          "passed": true
+        },
+        {
+          "name": "C26_local_start_and_test_documentation",
+          "passed": true
+        }
+      ],
+      "label": "release-control-price",
+      "passed_checks": 25,
+      "segments_seconds": {
+        "attach": 0.046,
+        "cleanup": 0.153,
+        "create_preflight": 0.35,
+        "other": 0.06238,
+        "start_attach": 13.388
+      },
+      "single_edit_occurrences": 1,
+      "variant": "control-price",
+      "whole_seconds": 13.99938
+    },
+    {
+      "body_seconds": {
+        "checks": 8.980561,
+        "other": 0.489621,
+        "server_start": 2.637178,
+        "shutdown": 0.428584,
+        "total": 12.535943
+      },
+      "category": "SUBJECT_RESULT",
+      "checks": [
+        {
+          "name": "C01_catalog_fields_and_minimum",
+          "passed": true
+        },
+        {
+          "name": "C02_sqlite_integer_prices",
+          "passed": true
+        },
+        {
+          "name": "C03_catalog_database_authority",
+          "passed": true
+        },
+        {
+          "name": "C04_create_and_query_order",
+          "passed": true
+        },
+        {
+          "name": "C05_server_repricing_ignores_amounts",
+          "passed": true
+        },
+        {
+          "name": "C06_sqlite_order_and_line_persistence",
+          "passed": true
+        },
+        {
+          "name": "C07_stock_decrement",
+          "passed": true
+        },
+        {
+          "name": "C08_insufficient_stock_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C09_unknown_product_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C10_zero_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C11_negative_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C12_fractional_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C13_boolean_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C14_null_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C15_missing_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C16_multiline_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C17_injected_database_failure_rolls_back",
+          "passed": false
+        },
+        {
+          "name": "C18_same_key_retry_returns_original",
+          "passed": true
+        },
+        {
+          "name": "C19_same_key_changed_content_conflict",
+          "passed": true
+        },
+        {
+          "name": "C20_concurrent_same_key_single_order",
+          "passed": true
+        },
+        {
+          "name": "C21_concurrent_orders_do_not_oversell",
+          "passed": true
+        },
+        {
+          "name": "C22_restart_preserves_order_and_stock",
+          "passed": true
+        },
+        {
+          "name": "C23_frontend_html_loads",
+          "passed": true
+        },
+        {
+          "name": "C24_frontend_local_resources_load",
+          "passed": true
+        },
+        {
+          "name": "C25_page_and_api_http_scenario",
+          "passed": true
+        },
+        {
+          "name": "C26_local_start_and_test_documentation",
+          "passed": true
+        }
+      ],
+      "label": "release-control-partial",
+      "passed_checks": 25,
+      "segments_seconds": {
+        "attach": 0.048,
+        "cleanup": 0.125,
+        "create_preflight": 0.281,
+        "other": 0.071666,
+        "start_attach": 12.968
+      },
+      "single_edit_occurrences": 1,
+      "variant": "control-partial",
+      "whole_seconds": 13.493666
+    },
+    {
+      "body_seconds": {
+        "checks": 9.395738,
+        "other": 0.416543,
+        "server_start": 2.985109,
+        "shutdown": 0.428317,
+        "total": 13.225708
+      },
+      "category": "SUBJECT_RESULT",
+      "checks": [
+        {
+          "name": "C01_catalog_fields_and_minimum",
+          "passed": true
+        },
+        {
+          "name": "C02_sqlite_integer_prices",
+          "passed": true
+        },
+        {
+          "name": "C03_catalog_database_authority",
+          "passed": true
+        },
+        {
+          "name": "C04_create_and_query_order",
+          "passed": true
+        },
+        {
+          "name": "C05_server_repricing_ignores_amounts",
+          "passed": true
+        },
+        {
+          "name": "C06_sqlite_order_and_line_persistence",
+          "passed": true
+        },
+        {
+          "name": "C07_stock_decrement",
+          "passed": true
+        },
+        {
+          "name": "C08_insufficient_stock_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C09_unknown_product_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C10_zero_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C11_negative_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C12_fractional_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C13_boolean_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C14_null_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C15_missing_quantity_rejected_unchanged",
+          "passed": true
+        },
+        {
+          "name": "C16_multiline_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C17_injected_database_failure_rolls_back",
+          "passed": true
+        },
+        {
+          "name": "C18_same_key_retry_returns_original",
+          "passed": false
+        },
+        {
+          "name": "C19_same_key_changed_content_conflict",
+          "passed": true
+        },
+        {
+          "name": "C20_concurrent_same_key_single_order",
+          "passed": false
+        },
+        {
+          "name": "C21_concurrent_orders_do_not_oversell",
+          "passed": true
+        },
+        {
+          "name": "C22_restart_preserves_order_and_stock",
+          "passed": true
+        },
+        {
+          "name": "C23_frontend_html_loads",
+          "passed": true
+        },
+        {
+          "name": "C24_frontend_local_resources_load",
+          "passed": true
+        },
+        {
+          "name": "C25_page_and_api_http_scenario",
+          "passed": true
+        },
+        {
+          "name": "C26_local_start_and_test_documentation",
+          "passed": true
+        }
+      ],
+      "label": "release-control-retry",
+      "passed_checks": 24,
+      "segments_seconds": {
+        "attach": 0.057,
+        "cleanup": 0.132,
+        "create_preflight": 0.328,
+        "other": 0.073573,
+        "start_attach": 13.741
+      },
+      "single_edit_occurrences": 1,
+      "variant": "control-retry",
+      "whole_seconds": 14.331573
+    }
+  ],
+  "schema_version": 1,
+  "source_bytes": 59161,
+  "source_file_count": 19,
+  "subject_adapter": "NOT_WRITTEN",
+  "subject_snapshot": "NOT_ACCESSED_NOT_RUN",
+  "superseded_revision": {
+    "runs": [
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "qualified-baseline-1",
+        "passed_checks": 7,
+        "whole_seconds": 9.996009
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "qualified-baseline-2",
+        "passed_checks": 7,
+        "whole_seconds": 10.40074
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "qualified-baseline-3",
+        "passed_checks": 7,
+        "whole_seconds": 9.918164
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "qualified-oracle-1",
+        "passed_checks": 26,
+        "whole_seconds": 13.151316
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "qualified-oracle-2",
+        "passed_checks": 26,
+        "whole_seconds": 13.138685
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "qualified-oracle-3",
+        "passed_checks": 26,
+        "whole_seconds": 13.194733
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "qualified-control-price",
+        "passed_checks": 25,
+        "whole_seconds": 12.33416
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "qualified-control-partial",
+        "passed_checks": 25,
+        "whole_seconds": 11.719675
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "qualified-control-retry",
+        "passed_checks": 24,
+        "whole_seconds": 11.86213
+      }
+    ],
+    "task_digest": "sha256:0986a67d0e9a16e5845aa74ee5cefe2df5af437287986f74cec16525b0943e06",
+    "verifier_digest": "sha256:bfc505f957fd21164213e4aaf4b7f2025417716d882a3d9a8f3780db5efd4376"
+  },
+  "superseded_revision_2": {
+    "runs": [
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "final-baseline-1",
+        "passed_checks": 6,
+        "whole_seconds": 10.959189
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "final-baseline-2",
+        "passed_checks": 6,
+        "whole_seconds": 10.924029
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "final-baseline-3",
+        "passed_checks": 6,
+        "whole_seconds": 10.784497
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "final-oracle-1",
+        "passed_checks": 26,
+        "whole_seconds": 14.41696
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "final-oracle-2",
+        "passed_checks": 26,
+        "whole_seconds": 15.419289
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "final-oracle-3",
+        "passed_checks": 26,
+        "whole_seconds": 15.401342
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "final-control-price",
+        "passed_checks": 25,
+        "whole_seconds": 15.241662
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "final-control-partial",
+        "passed_checks": 25,
+        "whole_seconds": 15.356978
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "checks": 26,
+        "label": "final-control-retry",
+        "passed_checks": 24,
+        "whole_seconds": 15.199882
+      }
+    ],
+    "task_digest": "sha256:cb09ec5fa1fe490ee1af8f9dfa396f16d065d7662e68996d593c3c0904bfb4e1",
+    "verifier_digest": "sha256:b11fb379737b10a177e7829dcec0d1bdc04792124ba90d0169954cccba9c6504"
+  },
+  "superseded_revision_attempt_count": 18,
+  "superseded_revision_summary_sha256": "sha256:9d3fc1483c87ff950def463068f041adeb285dddf3f67a9b5190e81f0c1e747c",
+  "task_digest": "sha256:ad6abc0ce6bffc579afaa21bfa210bc076a4d58d978017b481c6b9eec3f283fc",
+  "task_reference": "minishop-fastapi-sqlite@1.0.0",
+  "total_task_verifier_attempts": 30,
+  "verifier_digest": "sha256:caeba3d8e989660a5dd9c95d3b7a1857496a137e73a30d9bdbc36ddcd159ccd2"
+}
