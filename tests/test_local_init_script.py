@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import stat
 from pathlib import Path
 from typing import Any
@@ -313,3 +314,95 @@ def test_script_size_and_legacy_export_replay_bytes_unchanged(tmp_path: Path) ->
         == "sha256:a9e055c405d1364437df5a7174674fdbae6d4893e27273d52ec396a7465c5766"
     )
     assert inventory(root) == before
+
+
+def test_fastapi_audit_public_identity_and_scope() -> None:
+    root = Path(__file__).resolve().parents[1]
+    summary = json.loads((root / "docs/qa/minishop-fastapi-sqlite-1.0.0.json").read_text())
+    assert summary["task_reference"] == "minishop-fastapi-sqlite@1.0.0"
+    assert summary["audit_kind"] == "post-delivery"
+    assert summary["protected_paths"] == []
+    assert summary["eligible_for_planning"] is True
+    assert summary["requirement_sha256"] == (
+        "sha256:31c93f958b80472ada981cc30f210d41d313bc23a7d27acc2ad4fd15f3070bdc"
+    )
+    for field in (
+        "task_digest",
+        "verifier_digest",
+        "qualification_identity",
+        "image_id",
+        "baseline_adapter_sha256",
+        "oracle_adapter_sha256",
+    ):
+        assert re.fullmatch(r"sha256:[0-9a-f]{64}", summary[field])
+    assert summary["baseline_adapter_sha256"] != summary["oracle_adapter_sha256"]
+    assert summary["subject_adapter"] == "NOT_WRITTEN"
+    assert summary["subject_snapshot"] == "NOT_ACCESSED_NOT_RUN"
+    for kind in ("baseline", "oracle"):
+        assert 0 < summary[f"{kind}_workspace_files"] <= 500
+        assert 0 < summary[f"{kind}_workspace_bytes"] <= 4_000_000
+    assert summary["source_file_count"] > summary["baseline_workspace_files"]
+    assert {"browser_cart", "browser_checkout", "visual_responsive", "windows"} <= set(
+        summary["not_covered"]
+    )
+
+
+@pytest.mark.parametrize("kind", ["baseline", "oracle"])
+def test_fastapi_audit_three_repeats_have_complete_consistent_results(kind: str) -> None:
+    root = Path(__file__).resolve().parents[1]
+    summary = json.loads((root / "docs/qa/minishop-fastapi-sqlite-1.0.0.json").read_text())
+    contract = (root / "docs/MINISHOP_FASTAPI_SQLITE.md").read_text()
+    mapped = re.findall(r"^\| (C\d{2}) \|", contract, re.MULTILINE)
+    assert len(mapped) == 26 and len(set(mapped)) == 26
+    rows = [row for row in summary["runs"] if row["variant"] == kind]
+    assert len(rows) == 3 and len({row["label"] for row in rows}) == 3
+    vectors = []
+    for row in rows:
+        assert row["category"] == "SUBJECT_RESULT"
+        assert 0 < row["whole_seconds"] <= 25
+        assert len(row["checks"]) == 26
+        assert [c["name"].split("_", 1)[0] for c in row["checks"]] == mapped
+        vector = [c["passed"] for c in row["checks"]]
+        assert all(type(value) is bool for value in vector)
+        assert all(vector) is (kind == "oracle")
+        assert row["passed_checks"] == sum(vector)
+        vectors.append(vector)
+    assert vectors[0] == vectors[1] == vectors[2]
+
+
+def test_fastapi_audit_timings_partition_whole_runs() -> None:
+    root = Path(__file__).resolve().parents[1]
+    summary = json.loads((root / "docs/qa/minishop-fastapi-sqlite-1.0.0.json").read_text())
+    for row in summary["runs"]:
+        assert 0 < row["whole_seconds"] <= 25
+        assert set(row["segments_seconds"]) == {
+            "create_preflight",
+            "attach",
+            "start_attach",
+            "cleanup",
+            "other",
+        }
+        assert all(value >= 0 for value in row["segments_seconds"].values())
+        assert abs(sum(row["segments_seconds"].values()) - row["whole_seconds"]) < 0.002
+        body = row["body_seconds"]
+        assert set(body) == {"server_start", "checks", "shutdown", "other", "total"}
+        assert all(value >= 0 for value in body.values())
+        assert abs(sum(v for k, v in body.items() if k != "total") - body["total"]) < 0.002
+        assert body["total"] <= row["whole_seconds"]
+
+
+def test_fastapi_audit_single_defect_controls_fail_as_business_results() -> None:
+    root = Path(__file__).resolve().parents[1]
+    summary = json.loads((root / "docs/qa/minishop-fastapi-sqlite-1.0.0.json").read_text())
+    rows = [row for row in summary["runs"] if row["variant"].startswith("control-")]
+    assert {row["variant"] for row in rows} == {
+        "control-price",
+        "control-partial",
+        "control-retry",
+    }
+    assert len(rows) == 3
+    for row in rows:
+        assert row["category"] == "SUBJECT_RESULT"
+        assert len(row["checks"]) == 26 and any(not c["passed"] for c in row["checks"])
+        assert row["passed_checks"] == sum(c["passed"] for c in row["checks"])
+        assert row["single_edit_occurrences"] == 1

@@ -1,5 +1,23 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：MiniShop FastAPI / SQLite 交付后审计任务资格（2026-10-17）
+
+从 fetch 后 main `1432cb94fc22e110e49e733bab7b96dc7d360a09` 独立新分支准备
+`minishop-fastapi-sqlite@1.0.0`；保持原有脏工作区不变。
+仅按操作员给出的权威 R 冻结原文和摘要，形成语义契约、条款映射、接口形状声明、
+独立 hidden Verifier、独立 oracle、可启动 baseline 和精确依赖/哈希的固定镜像。
+任务包及全部隐藏材料/资格工作区只保留在批准的 Git 外 task-snapshots 和独立 state/policy 根。
+使用现有 PinnedVerifierSandbox 完成三次 baseline 业务 FAIL / 三次 oracle 全项 PASS，
+至少三个单点缺陷控制和分段耗时；每次整次 ≤25 秒，超限即停止并提出拆包，不改 30 秒硬上限。
+确认 TaskStore 准入；公开仅契约、检查名称、摘要、耗时与计数，不公开隐藏代码或输入。
+本次为交付后审计，不是预注册盲测；不读取、复制、运行 DeepSeek 快照、源码、自测或自报，
+不编写被测适配声明，不启动 Agent CLI 或付费模型；实际浏览器交互和视觉保持 NOT_COVERED。
+现有 external_evidence、Verifier 核心、收据、Replay/export、身份算法及 REAL_CODEX 不变。
+原测试断言不动，新摘要检查追加到现有 Fast CI 核心模块；整文件排除全部真实 Agent CLI 路径。
+允许本分支提交/推送和 Draft PR，核对准确 head 的 Fast/Offline CI 后停止，等待人工审查与
+单独 3b 授权；不合并、不部署。实际结果见 CURRENT_MILESTONE 和
+[契约](MINISHOP_FASTAPI_SQLITE.md)、[资格摘要](qa/minishop-fastapi-sqlite-1.0.0.md)。
+
 ## 当前授权：CodeSnapshot → 人工批准 code-only-v1 → 原独立 Verifier（2026-10-17）
 
 从 fetch 后的 main `69e915315c0a53b5d5b3f05f19085bda240d5fab` 建新工作树和分支。
