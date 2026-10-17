@@ -1,5 +1,19 @@
 # SameScale Product — Public Product Contract
 
+## Private Acceptance Plan scope — 2026-10-18
+
+`/acceptance-plans` manages post-delivery acceptance scope from an existing integrity-checked
+CodeSnapshot and immutable original Prompt. Narrow deterministic extraction, template suggestions
+and manual review preserve EXPLICIT_IN_PROMPT / USER_APPROVED_ADDITION / SUGGESTED_ONLY /
+AMBIGUOUS provenance. Pending/rejected clauses are excluded from failure criteria. Private,
+versioned append-only review history supports explicit confirmation, immutable freeze and revision.
+This is separate from `/plans` and never registers admitted TaskStore tasks, authorizes Worker
+execution or emits independent receipts/business verdicts. Verifier binding remains
+NO_QUALIFIED_BOUND_VERIFIER and actual acceptance NOT_RUN. It is not preregistration or blind testing.
+Public Demo cannot read or mutate private scope; Prompt/token never enter browser persistence or URLs.
+Shared operator authentication is not individual human attribution. See [scope contract](docs/ACCEPTANCE_PLANS.md).
+
+
 
 ## MiniShop 首次验收与标准复核 — 2026-10-18
 

@@ -1,0 +1,45 @@
+{
+  "initial_cross_module": {
+    "tests": 250,
+    "passed": 247,
+    "failed": 2,
+    "errors": 1,
+    "skipped": 0
+  },
+  "acceptance_final": {
+    "tests": 31,
+    "passed": 31,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "isolated_database_and_ci": {
+    "tests": 103,
+    "passed": 103,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "frontend": {
+    "tests": 294,
+    "files": 23,
+    "failed": 0
+  },
+  "frontend_final_snapshot_copy": {
+    "tests": 10,
+    "failed": 0
+  },
+  "build": "PASS",
+  "ruff": {
+    "check": "PASS",
+    "format_files": 928
+  },
+  "mypy": {
+    "status": "PASS",
+    "files": 477
+  },
+  "frontend_final_scope": {
+    "tests": 14,
+    "failed": 0
+  }
+}

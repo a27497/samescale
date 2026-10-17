@@ -69,6 +69,17 @@ SameScale 把这些材料关联起来，让开发者看到**哪些要求已检�
 
 证据文件：[案例与失败说明](docs/evidence/swe-full-20261014/README.md#两个典型自报不符案例)、[逐题验收结果](docs/evidence/swe-full-20261014/report.json)、[逐题结果表](docs/evidence/swe-full-20261014/results.csv)、[离线复核记录](docs/evidence/swe-full-20261014/offline-review.json)与[原始证据归档清单](docs/evidence/swe-full-20261014/archive-receipt.json)。原始运行记录、验收收据、diff 与日志保留在 Git 外，具体文件位置见案例说明；不把隐藏测试源码放进 README。
 
+## 私有验收范围方案（P0-0 / P0-1）
+
+私有 PC 工作台的「验收范围方案」支持：已有 CodeSnapshot + 原始 Prompt → 逐项来源与歧义
+审查 → 用户修改 / 批准 / 拒绝 → 明确确认 → 不可变冻结 → 历史读取与新版本修订。
+可从源码快照详情进入；刷新后重新输入操作员凭据恢复。需要单独配置
+`HARNESSLAB_ACCEPTANCE_PLAN_STORE`，见 [配置、来源规则与状态契约](docs/ACCEPTANCE_PLANS.md)。
+
+本轮只管理范围，不运行 Agent、Verifier 或被测代码。有限规则不能可靠提取时由用户手工编写；
+模板建议未经确认不作为失败标准。批准条款不代表 Verifier 合格，冻结不授权执行或产生通过结果。
+基于已有交付快照的方案属于交付后审计，不是预注册或盲测；与 `/plans` 的可信任务执行计划分开。
+
 ## 已知限制
 
 - **样本有限：** 2026-10-14 的评测集只有固定30题，其中5题在 Agent 启动前环境失败，有效运行25题；没有换题或把环境失败记成通过。这些结果只描述本次样本，不是通用能力指标或模型排名。

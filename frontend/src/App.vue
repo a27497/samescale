@@ -43,6 +43,7 @@ const navigation = computed(() => [
   { label: c('工作台', 'Workbench'), items: [
     { to: '/runs', label: c('我的运行', 'My runs'), icon: House },
     { to: '/external-runs', label: c('导入运行记录', 'Import run evidence'), icon: Files },
+    { to: '/acceptance-plans', label: c('验收范围方案', 'Acceptance scope'), icon: Document },
     { to: '/plans', label: c('验收任务', 'Acceptance tasks'), icon: Document },
     { to: '/settings', label: c('设置', 'Settings'), icon: Setting },
   ] },
@@ -65,7 +66,7 @@ const advanced = computed(() => [
 ])
 watch(() => route.fullPath, () => {
   if (mobileNavOpen.value) closeNavigation()
-  advancedOpen.value = !coreRoute.value && !['local-plans', 'local-plan-detail'].includes(String(route.name))
+  advancedOpen.value = !coreRoute.value && !['local-plans', 'local-plan-detail', 'acceptance-plans', 'acceptance-plan-detail'].includes(String(route.name))
 }, { immediate: true })
 watch(title, value => { document.title = `${value} · SameScale — AI Coding 任务验收与证据工作台` }, { immediate: true })
 </script>

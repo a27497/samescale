@@ -1,0 +1,120 @@
+{
+  "fixture": "SYNTHETIC_ONLY",
+  "browser": "153.0.8010.52",
+  "checks": [
+    {
+      "name": "incorrect operator rejected",
+      "passed": true
+    },
+    {
+      "name": "eight source-review clauses displayed",
+      "passed": true
+    },
+    {
+      "name": "suggestions do not enable confirmation",
+      "passed": true
+    },
+    {
+      "name": "no authoritative verifier or result",
+      "passed": true
+    },
+    {
+      "name": "opaque URL without Prompt",
+      "passed": true
+    },
+    {
+      "name": "approved suggestion remains user addition",
+      "passed": true
+    },
+    {
+      "name": "suggestion origin preserved",
+      "passed": true
+    },
+    {
+      "name": "unconfirmed payment remains suggested",
+      "passed": true
+    },
+    {
+      "name": "explicit confirmed state",
+      "passed": true
+    },
+    {
+      "name": "confirmed text is not editable",
+      "passed": true
+    },
+    {
+      "name": "frozen state displayed",
+      "passed": true
+    },
+    {
+      "name": "reload restores same frozen event",
+      "passed": true
+    },
+    {
+      "name": "revision v2 created",
+      "passed": true
+    },
+    {
+      "name": "revised approvals reset",
+      "passed": true
+    },
+    {
+      "name": "historical frozen event read-only",
+      "passed": true
+    },
+    {
+      "name": "no Prompt/token in browser persistent storage",
+      "passed": true
+    },
+    {
+      "name": "execute endpoint refuses authorization",
+      "passed": true
+    },
+    {
+      "name": "stale writer fails closed",
+      "passed": true
+    },
+    {
+      "name": "snapshot identity mismatch rejected",
+      "passed": true
+    },
+    {
+      "name": "corrupt snapshot UI prevents binding",
+      "passed": true
+    },
+    {
+      "name": "no JS error or external request",
+      "passed": true
+    },
+    {
+      "name": "no runtime/provider/subject attempted",
+      "passed": true
+    },
+    {
+      "name": "no horizontal overflow at 1440px",
+      "passed": true
+    },
+    {
+      "name": "actual API process restart restores latest exact digest",
+      "passed": true
+    },
+    {
+      "name": "existing snapshot detail links to preselected scope creation",
+      "passed": true
+    },
+    {
+      "name": "ambiguous Prompt and manual candidate remain unapproved",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "planID": "ec4e25dc220577325f383962cd464967af9761ac608d7976513fbf8c569b28ea",
+  "frozenDigest": "sha256:d80fd93b0f943b2c3e730e728898e6e494cc137d5a766433a09f0e72bede52e7",
+  "latestDigest": "sha256:4a514905827255bdbdec8290e155b9a3e1a215349dfb0888be441a2a1d3b2634",
+  "counts": {
+    "provider_calls": 0,
+    "physical_verifiers": 0,
+    "subject_processes": 0,
+    "network_calls": 0
+  }
+}

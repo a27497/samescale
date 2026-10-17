@@ -32,6 +32,7 @@ GOLDEN = {
     "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef",
 }
 SUITES = (
+    "tests/test_acceptance_plans.py",
     "tests/test_code_snapshots.py",
     "tests/test_failure_diagnosis.py",
     "tests/test_s2_offline_replay.py",

@@ -159,6 +159,7 @@ class RoutingTests(unittest.TestCase):
                 "tests/test_swe_verifier_canary.py",
                 "tests/test_local_init_script.py",
                 "tests/test_code_snapshots.py",
+                "tests/test_acceptance_plans.py",
             ],
         )
         canonical = json.dumps(selectors[:29], separators=(",", ":")).encode()

@@ -98,8 +98,9 @@ onBeforeUnmount(() => { alive = false; generation++; file.value = null; review.v
     </div>
     <div v-if="saved" data-test="snapshot-detail">
       <h4>已保存 · 最终源码快照</h4>
+      <RouterLink class="primary-button" :to="{ path: '/acceptance-plans', query: { snapshot: saved.identity } }">从此快照创建验收范围方案 →</RouterLink>
       <p><code>{{ saved.source_authenticity }}</code> · <code>{{ saved.run_record }}</code> · <code>{{ saved.verification }}</code></p>
-      <p>此快照未绑定任务。后续需要另行审查并绑定可信任务及独立验收条件，获得有效验收收据后才能判断结果。本轮只保存快照。</p>
+      <p>此快照未绑定任务。后续需要另行审查并绑定可信任务及独立验收条件，获得有效验收收据后才能判断结果。验收范围方案只定义待审查的范围，不会改变此快照的未验收状态。</p>
       <p>原始归档：{{ saved.manifest.archive_bytes }} 字节 · <code>{{ saved.manifest.archive_sha256 }}</code></p>
       <p>最终源码快照：纳入 {{ saved.manifest.included.length }} 文件，排除 {{ saved.manifest.excluded.length }} 文件 · <code>{{ saved.manifest.content_digest }}</code></p>
       <RouterLink :to="`/code-snapshots/${saved.identity}`">快照详情链接</RouterLink>

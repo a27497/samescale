@@ -1,5 +1,39 @@
 # SameScale Product — Current Milestone
 
+## Current state — Acceptance Plan P0-0 / P0-1 — 2026-10-18 (Asia/Shanghai)
+
+Implemented in isolated `codex/acceptance-plan-p0-20261018`, based on fetched main
+`e491090b748bfab653466cf2e3fe8f03220bcc64`; original dirty UI worktree and PR #29 untouched.
+[P0 contract and eight scenarios](docs/ACCEPTANCE_PLANS.md): private existing CodeSnapshot +
+immutable original Prompt → finite deterministic draft / manual fallback → per-clause provenance,
+reason and decision → explicit confirmation → immutable freeze → revision with renewed review.
+Separate append-only store and `/acceptance-plans`; `/plans`, TaskStore, Worker and historical
+snapshot/receipt/Replay identities remain unchanged. Every version is POST_DELIVERY_AUDIT,
+NO_QUALIFIED_BOUND_VERIFIER, NOT_RUN, execution_authorized=false; no business verdict is produced.
+
+Local final acceptance tests **31 PASS**; snapshot/external compatibility **194 PASS**; isolated
+PostgreSQL + local-plan/health/DTO/CI-routing checks **103 PASS**; network-isolated S3 **276 PASS**,
+two byte-identical Replay outputs/five fixed digests unchanged. Full Vitest **294 PASS / 23 files**;
+final snapshot copy check **10 PASS**; production build/typecheck PASS. Ruff **928** files and mypy
+**477** files PASS. Chromium **26/26** browser checks, including actual process restart recovery,
+snapshot-detail entry, MiniShop full review/freeze/revision, manual fallback, permission refusal and
+corrupt binding; screenshots inspected. [QA evidence](docs/qa/acceptance-plans-20261018/README.md).
+
+Initial cross-module run: 247 PASS / 2 CI-shard registration failures / 1 missing disposable DB
+error. Shard inventory corrected; the failed checks and related contracts passed in the isolated
+DB run. Initial browser harness startup/selector/navigation timing failures and the corrected
+storage interruption/typecheck issues are documented, never counted as passes. Protected Git
+inventory **442 files unchanged**; legacy backend/evidence/task/receipt paths have no diff.
+**0 real model calls, 0 physical Verifiers, 0 subject-code executions**; synthetic failure snapshots
+are isolated from old evidence. No running service configuration, old DB, private Verifier/Oracle,
+MiniShop assets or qualification history modified. No new migration or dependency.
+
+Limits: finite grammar falls back to manual scope; shared local operator identity (not named human),
+POSIX single-host store and explicit caps; digest integrity is not privileged rollback resistance.
+Mobile/non-Chromium/full release and new real acceptance are NOT_RUN. Commit/push/Draft PR and
+exact base/head/CI are verified separately in the final handoff. No merge/deploy. Stop at P0-1.
+
+
 
 ## Current state — MiniShop first-real closeout — 2026-10-18 (Asia/Shanghai)
 

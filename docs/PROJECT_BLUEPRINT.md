@@ -1,5 +1,15 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前范围：Acceptance Plan P0-0 / P0-1 — 2026-10-18
+
+从最新 main e491090 独立 worktree 实现原始 Prompt + 已保存 CodeSnapshot 的验收范围审查。
+复用快照只读完整性检查与私有操作员边界；新增独立追加式 scope journal 和 Vue 页面，
+不复用 `/plans` 的 TaskStore 执行计划身份，不连接 Worker。确定性有限句式 + 模板 + 人工编辑；
+逐条来源审查、明确确认、不可变冻结及新版本修订。规则、状态和 8 个场景见
+[Acceptance Plan 契约](ACCEPTANCE_PLANS.md)。合成隔离测试、浏览器验证、普通 commit/push
+及独立 Draft PR 在本轮范围；不 merge/deploy，不运行模型、物理 Verifier 或被测代码。
+实际验证结果仅记录 CURRENT_MILESTONE。下方历史授权不扩大本轮范围。
+
 
 ## 当前授权：MiniShop 首次真实验收工程收口 — 2026-10-18
 
