@@ -1,5 +1,35 @@
 # SameScale Product — Current Milestone
 
+
+## Current state — MiniShop first-real closeout — 2026-10-18 (Asia/Shanghai)
+
+Historical `minishop-fastapi-sqlite@1.1.2` remains VERIFIED_FAIL / 24 of 26, one physical
+execution, zero retries, C05/C13 AssertionError. C05's 2xx-only requirement exceeds original R;
+safe rejection with unchanged state may comply. C13 has high-confidence static evidence of
+boolean coercion before business validation, but exact historical HTTP/state behavior is unproven.
+Original report copied byte-for-byte; separate review appendix and public projection/index added.
+README and website tell this bounded story, preserving self-report and Replay limitations.
+
+New private 1.2.0 task `d9a2e34c`, Verifier `4840af82`, qualification `61f78e0a`, registry `89772e2d`,
+unchanged image `5ad60dee` (Pydantic 2.14.1). Fresh baseline×3 valid FAIL 6/26; oracle×3 PASS 26/26;
+safe-rejection implementation PASS 26/26; all forged-price/reject-all/boolean/stale-price/side-effect
+and original partial-commit/retry controls detected. 17 synthetic physical observations, no retries,
+no runtime infrastructure failures; control-forged/control-price share one design. TaskStore eligible.
+Other suite AST unchanged; original MiniShop excluded from new registry and no old binding changed.
+
+3,585 protected file/diff entries unchanged; original 32 files, evidence and consumed markers intact.
+29 focused tests and 245 network-isolated regressions PASS. Website build and Chrome 320/390/768/1440px
+66/66 checks PASS, desktop/mobile viewport screenshots reviewed. Preparation permission error,
+initial offline collection failure (missing dependency in old env), and missing default browser are
+retained and corrected; no failed/skipped/zero-test result relabeled PASS. See
+[closeout QA](docs/qa/minishop-closeout-20261018.md), [public case](docs/evidence/minishop-first-real-20261017/README.md),
+[review appendix](docs/qa/minishop-first-real-review-20261018.md), and [new qualification](docs/qa/minishop-verifier-1.2.0-20261018.md).
+
+Private implementation/evidence remain outside Git. This worktree stacks on PR #30 exact head
+68fd2f1; its source and PR stay untouched. Authorized Draft PRs and exact pushed-SHA CI are checked
+separately in final handoff. No merge/deployment. **Real MiniShop physical executions this task: 0.**
+**STOP after Draft PR delivery; await review.** Earlier dated scope does not authorize more execution.
+
 ## Current state — MiniShop trusted interface and first-run authorization boundary — 2026-10-17 (Asia/Shanghai)
 
 Isolated worktree/branch `codex/minishop-trusted-interface-20261017` starts at fetched

@@ -1,5 +1,14 @@
 # SameScale Product — Public Product Contract
 
+
+## MiniShop 首次验收与标准复核 — 2026-10-18
+
+[公开案例](docs/evidence/minishop-first-real-20261017/README.md)保留一次独立 L0 的历史
+VERIFIED_FAIL / 24/26、C05/C13 AssertionError 与零重试。C05 的旧 2xx-only 条件过严；
+C13 有高置信静态证据，具体运行响应/状态未被原收据捕获。交付自测声明不认证为独立通过。
+公开投影支持摘要核验与来源关联，不能匿名完整 Replay 或认证原始模型来源。
+新私有任务资格仅来自独立合成样本，不修订历史，也不产生真实 MiniShop 新成绩。
+
 ## Advisory failure diagnosis — 2026-10-14
 
 Operator CLI only, opt-in and downstream of an existing independent VERIFIED_FAIL receipt.

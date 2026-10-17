@@ -1,0 +1,153 @@
+{
+  "projections": {
+    "../../qa/minishop-first-real-review-20261018.md": {
+      "derived_from": [
+        "requirement-1.1.2",
+        "delivery/shop/app.py",
+        "delivery/shop/orders.py",
+        "verifier-report.original.json"
+      ],
+      "sha256": "sha256:8a79eaf591aac25262bce0bc9816483add2719d4b75c3ef0944971392d895d5b",
+      "transformation": "review narrative; distinguishes frozen observation from interpretation; private source text excluded"
+    },
+    "../../qa/minishop-verifier-1.2.0-20261018.json": {
+      "derived_from": [
+        "new-private-task/build-proof.json",
+        "new-private-task/qualification.json",
+        "new-private-task/validation.json",
+        "new-private-task/runs"
+      ],
+      "sha256": "sha256:b2be1b06266ff1c658aeb9446236e042c79dc5c9ab7de088c6f850e2110aa28d",
+      "transformation": "allowlisted identities and result vectors only; independent synthetic samples, never original MiniShop"
+    },
+    "../../qa/minishop-verifier-1.2.0-20261018.md": {
+      "derived_from": [
+        "new-private-task/qualification.json",
+        "new-private-task/runs"
+      ],
+      "sha256": "sha256:a3248bc357f8c8388ce83bfe9b658485f73c1c1f678a7e6d32dc08c2d7ab9029",
+      "transformation": "review narrative; distinguishes frozen observation from interpretation; private source text excluded"
+    },
+    "README.md": {
+      "derived_from": [
+        "verification.original.json",
+        "verifier-report.original.json",
+        "REPORT.md"
+      ],
+      "sha256": "sha256:100a3d9ce8cda28f5be65a89a3f8adad4002eea9997f2b4a812432147fbda9b2",
+      "transformation": "review narrative; distinguishes frozen observation from interpretation; private source text excluded"
+    },
+    "public-result.json": {
+      "derived_from": [
+        "verification.original.json",
+        "verifier-report.original.json",
+        "replay-a.json",
+        "replay-b.json",
+        "delivery/docs/SELF_REPORT.md"
+      ],
+      "sha256": "sha256:484339a9c341415f08af468e63e77288d2319915c86154acdd2b2d421253ccbc",
+      "transformation": "explicit allowlist; omit raw code, paths, payloads, manifests and exports; review labels are later interpretation"
+    }
+  },
+  "record_identity": "sha256:5fe073a6d1999fabf61945917bd297ac784addf1809f078e75817764df0f7086",
+  "schema_version": 1,
+  "sources": {
+    "REPORT.md": {
+      "bytes": 12653,
+      "public": false,
+      "public_copy": "../../qa/minishop-first-real-20261017.md",
+      "sha256": "sha256:fd1c7f64d682dedca7e3f23a0c411b858711ea7a46efb7f41d63a1166b87217b"
+    },
+    "SHA256SUMS.json": {
+      "bytes": 4419,
+      "public": false,
+      "sha256": "sha256:0ac35f8533fed2aea9439cc414979f09338991d1a38e65bb036a8dd751eb083f"
+    },
+    "completion.json": {
+      "bytes": 1138,
+      "public": false,
+      "sha256": "sha256:724c9bf07e86faf7ea6ecfdea671e27dfa80d1334401505694508f8bde231f5a"
+    },
+    "delivery/docs/SELF_REPORT.md": {
+      "bytes": 18493,
+      "public": false,
+      "sha256": "sha256:6465d8a1d95bd90c56059da391c9bf78613aab6fca3654c7d3dad01fdd7e65a0"
+    },
+    "delivery/shop/app.py": {
+      "bytes": 12270,
+      "public": false,
+      "sha256": "sha256:9ca9231ae612e3fb0f677b697412d1895de69ba43b8c37426120c5b0519055c9"
+    },
+    "delivery/shop/orders.py": {
+      "bytes": 13053,
+      "public": false,
+      "sha256": "sha256:a52f675c22e96c8046bd9e4a2575a476d5d64554ce8571d35f410d0809a89321"
+    },
+    "evidence-export.json": {
+      "bytes": 327992,
+      "public": false,
+      "sha256": "sha256:5bebdcd4e581467070626880e419dc2a1eb1358a24cbf3a0f205782c41ea2191"
+    },
+    "new-private-task/build-proof.json": {
+      "bytes": 1859,
+      "public": false,
+      "sha256": "sha256:952c8082bc2698b9ec55a40cff3b7cf99e385baed1a5a5433b1ed7930160234b"
+    },
+    "new-private-task/qualification.json": {
+      "bytes": 1605,
+      "public": false,
+      "sha256": "sha256:7f73cda53bbb1af2da13a9611c1932a7d0128146365f3ce8e1436b5ae28dba2e"
+    },
+    "new-private-task/runs": {
+      "kind": "private qualification summary indexing all 17 run manifests/reports/lifecycles",
+      "public": false,
+      "sha256": "sha256:471f21bc0b4bf1c41298537faadc354690f36e8b6f6cef3c794f30133c79bb26"
+    },
+    "new-private-task/validation.json": {
+      "bytes": 11726,
+      "public": false,
+      "sha256": "sha256:78ca1ea1d5d50c7994c100c884b4e23c4ddd9da5a1e082c80fdce350a85ee344"
+    },
+    "replay-a.json": {
+      "bytes": 3103,
+      "public": false,
+      "sha256": "sha256:5fc6deb55fd7510d8cd182fcddf11845ef564829c1e31e33502cacbdd40f96ba"
+    },
+    "replay-b.json": {
+      "bytes": 3103,
+      "public": false,
+      "sha256": "sha256:5fc6deb55fd7510d8cd182fcddf11845ef564829c1e31e33502cacbdd40f96ba"
+    },
+    "requirement-1.1.2": {
+      "bytes": 5184,
+      "public": false,
+      "sha256": "sha256:31c93f958b80472ada981cc30f210d41d313bc23a7d27acc2ad4fd15f3070bdc"
+    },
+    "sandbox-manifest.original.json": {
+      "bytes": 1879,
+      "public": false,
+      "sha256": "sha256:0469cdb1a26709ca51ab56940aa092d041b46778b321ee59dae1d1b379d242da"
+    },
+    "verification-attempt.original.json": {
+      "bytes": 165,
+      "public": false,
+      "sha256": "sha256:47dee97d0c0ad6502cbaf9bcf1878955adfec2f506e15ff8a78dee08681680b0"
+    },
+    "verification.original.json": {
+      "bytes": 1961,
+      "public": false,
+      "sha256": "sha256:65d49578345d55556b32375061e311640fa860fa0e1e69e81be3e306a32f8daf"
+    },
+    "verifier-report.original.json": {
+      "bytes": 2533,
+      "public": false,
+      "sha256": "sha256:c706ddc0cfcb3f3275377d0dc0994826cb38b38cfac65712f034d728f5cb70b8"
+    },
+    "verifier-started.original.txt": {
+      "bytes": 21,
+      "public": false,
+      "sha256": "sha256:eaf5ec1eaf72fe9d97356b2b35651f11ecfb3989fc92c48dd28dcebccf2ddcbe"
+    }
+  },
+  "verification_boundary": "Public hashes verify public bytes and source association declarations, not private preimages, origin authenticity, anonymous full Replay, or new acceptance."
+}

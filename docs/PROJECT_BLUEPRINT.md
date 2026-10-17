@@ -1,5 +1,17 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+
+## 当前授权：MiniShop 首次真实验收工程收口 — 2026-10-18
+
+基于未合并 PR #30 精确 head 68fd2f1，独立 worktree；官网基于最新 main 的另一 worktree。
+归档原报告原样副本，追加 C05/C13 复核与脱敏公开投影/摘要来源索引；更新 README 和官网。
+私有新任务 1.2.0 固定 C05 双合法路径和正常订单当前数据库价格，保留 C13 与其余检查语义；
+有限诊断仅输出阶段、状态码及状态核对结果。独立 baseline×3 FAIL、oracle×3 PASS、双合法策略
+及伪造金额/拒绝全部/布尔/过期价格/副作用/原单点缺陷控制；固定新身份，不继承旧资格。
+验证冻结字节、脱敏与链接、相关回归、官网构建及桌面/移动浏览器。分别 commit/push/Draft PR
+并核对远端 SHA/CI。真实 MiniShop 执行 0 次；不改核心/依赖/预算，不改旧绑定，不合并/部署。
+结果只记 CURRENT_MILESTONE；完成后 STOP 等待审查。下方历史授权不扩大本轮范围。
+
 ## 当前授权：MiniShop 可信接口适配与首次真实验收准备（2026-10-17）
 
 从 `main@38d9f029563b0a157ac5a0a2426f013bb8ea4654` 创建独立 worktree；保留原脏工作区、
