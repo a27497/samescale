@@ -9,10 +9,10 @@ belongs to [CURRENT_MILESTONE](../../../CURRENT_MILESTONE.md); [product contract
 
 | Check | Actual result |
 | --- | --- |
-| `tests/test_acceptance_plans.py` | 31 passed, zero skipped: sources, manual fallback, edited provenance, confirmation/freeze/revision, duplicate/concurrent mutation, restart, snapshot/plan corruption, permissions, public Demo, input/storage caps, no execution, interrupted publication recovery |
+| `tests/test_acceptance_plans.py` | 32 passed, zero skipped: sources, manual fallback, edited provenance, confirmation/freeze/revision, duplicate/concurrent mutation, restart, snapshot/plan corruption, permissions, public Demo, input/storage caps, no execution, interrupted publication recovery |
 | CodeSnapshot + ExternalEvidence/P1 | 142 + 32 + 20 = 194 passed; synthetic sandbox mocks only |
 | Isolated PostgreSQL regressions | 103 passed: local plans 75, health 2, CI routing/workflow 25, DTO privacy 1; migrations applied only to the newly owned disposable test DB |
-| `scripts/ci_s3.sh` | 276 passed in a network namespace with loopback down; two offline Replay passes and all five frozen golden hashes unchanged; [result](offline-result.json) |
+| `scripts/ci_s3.sh` | 277 passed in a network namespace with loopback down; two offline Replay passes and all five frozen golden hashes unchanged; [result](offline-result.json) |
 | Full Vitest | 294 passed in 23 files, including 14 new scope UI tests; final snapshot wording check 10 passed; final scope error-state checks 14 passed |
 | Frontend production build | TypeScript and Vite passed; locked dependencies unchanged |
 | Python static checks | Ruff check/format 928 files; mypy 477 files passed |
@@ -32,7 +32,10 @@ only synthetic content; no credential value, private path, real code or historic
 
 Runtime guards rejected subprocess/subject, Provider/network and physical Verifier boundaries.
 All attempt counters stayed **0** in the scope browser service; acceptance tests also install named
-runtime/transport guards. No Agent/LLM/Provider/Judge/Verifier campaign or subject code was executed.
+runtime/transport guards. No Agent/LLM/Provider/Judge/Verifier campaign or real subject code was executed.
+These zero counters concern the scope feature and its guarded local tests. Remote standard Fast CI
+separately runs existing synthetic Tier-B baseline/oracle fixtures via `execute_verifier`; it is not
+a zero-process or zero-synthetic-fixture-execution run and does not touch real MiniShop assets.
 The PostgreSQL container was test infrastructure only, with a unique name and dynamically allocated
 loopback port. Only that newly owned container was removed after its checks.
 
@@ -69,3 +72,14 @@ runs, full release, mobile and non-Chromium checks were **NOT_RUN**. Public shar
 authenticated named-human review, privileged filesystem rollback resistance and distributed locking
 are not claimed. The shared-operator, 0700/0400 owned-file, bounded single-host POSIX journal reuses
 the existing private architecture. CI status and exact pushed PR head are separate remote observations.
+
+
+Remote push CI on `493852f451c9ec1e06258291db45de4fd7373051` found a real concurrency defect:
+[full shard 1](https://github.com/a27497/samescale/actions/runs/39067762931/job/117498893086)
+had 1 failed / 222 passed (`test_idempotency_and_concurrent_writers`); the same PR-triggered shard
+passed, exposing scheduling dependence. Store inventory scanned staging paths before acquiring the
+publication flock, so a concurrent rename/removal could produce a false integrity error. The fix
+moves the inventory scan inside that lock and adds a deterministic test that a competing descriptor
+cannot acquire the lock at scan time. The original assertion is preserved and failure diagnostics
+now report status/error codes. Final focused and offline verification are recorded above; initial
+CI failure is retained, not relabeled as a pass. UI/browser behavior is unchanged by this lock fix.

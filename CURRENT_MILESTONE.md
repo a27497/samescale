@@ -11,8 +11,8 @@ Separate append-only store and `/acceptance-plans`; `/plans`, TaskStore, Worker 
 snapshot/receipt/Replay identities remain unchanged. Every version is POST_DELIVERY_AUDIT,
 NO_QUALIFIED_BOUND_VERIFIER, NOT_RUN, execution_authorized=false; no business verdict is produced.
 
-Local final acceptance tests **31 PASS**; snapshot/external compatibility **194 PASS**; isolated
-PostgreSQL + local-plan/health/DTO/CI-routing checks **103 PASS**; network-isolated S3 **276 PASS**,
+Local final acceptance tests **32 PASS**; snapshot/external compatibility **194 PASS**; isolated
+PostgreSQL + local-plan/health/DTO/CI-routing checks **103 PASS**; network-isolated S3 **277 PASS**,
 two byte-identical Replay outputs/five fixed digests unchanged. Full Vitest **294 PASS / 23 files**;
 final snapshot copy check **10 PASS**; production build/typecheck PASS. Ruff **928** files and mypy
 **477** files PASS. Chromium **26/26** browser checks, including actual process restart recovery,
@@ -24,9 +24,12 @@ error. Shard inventory corrected; the failed checks and related contracts passed
 DB run. Initial browser harness startup/selector/navigation timing failures and the corrected
 storage interruption/typecheck issues are documented, never counted as passes. Protected Git
 inventory **442 files unchanged**; legacy backend/evidence/task/receipt paths have no diff.
-**0 real model calls, 0 physical Verifiers, 0 subject-code executions**; synthetic failure snapshots
+**New scope path: 0 real model calls, 0 physical Verifiers, 0 subject-code executions**; synthetic failure snapshots
 are isolated from old evidence. No running service configuration, old DB, private Verifier/Oracle,
-MiniShop assets or qualification history modified. No new migration or dependency.
+MiniShop assets or qualification history modified. No new migration or dependency. Existing remote Fast CI separately executes synthetic Tier-B
+fixtures; the zero-execution claim is scoped to Acceptance Plan and real/private assets, not every
+process in generic CI. Initial push CI on 493852f exposed a pre-lock inventory-scan race during
+concurrent creation; scanning now holds the publication lock, with a deterministic lock-order test.
 
 Limits: finite grammar falls back to manual scope; shared local operator identity (not named human),
 POSIX single-host store and explicit caps; digest integrity is not privileged rollback resistance.

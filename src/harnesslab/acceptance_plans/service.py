@@ -84,7 +84,6 @@ def root_path() -> Path:
         info.st_uid == os.getuid() and stat.S_IMODE(info.st_mode) == 0o700,
         "ACCEPTANCE_STORE_UNSAFE",
     )
-    bounded_files(root, max_files=MAX_PLANS * MAX_EVENTS + 1, max_bytes=MAX_STORE_BYTES)
     return root
 
 
@@ -98,6 +97,9 @@ def locked() -> Iterator[Path]:
         with os.fdopen(fd, "a") as lock:
             check(os.fstat(lock.fileno()).st_nlink == 1, "ACCEPTANCE_STORE_UNSAFE")
             fcntl.flock(lock, fcntl.LOCK_EX)
+            # Inventory scanning must share the publication lock: otherwise a
+            # concurrent rename/removal of staging files can look like corruption.
+            bounded_files(root, max_files=MAX_PLANS * MAX_EVENTS + 1, max_bytes=MAX_STORE_BYTES)
             yield root
     except (OSError, ValueError, KeyError, TypeError):
         raise fail(

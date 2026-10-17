@@ -7,8 +7,8 @@
     "skipped": 0
   },
   "acceptance_final": {
-    "tests": 31,
-    "passed": 31,
+    "tests": 32,
+    "passed": 32,
     "failed": 0,
     "errors": 0,
     "skipped": 0
@@ -41,5 +41,13 @@
   "frontend_final_scope": {
     "tests": 14,
     "failed": 0
+  },
+  "initial_push_ci": {
+    "head": "493852f451c9ec1e06258291db45de4fd7373051",
+    "failed": 1,
+    "passed": 222,
+    "test": "test_idempotency_and_concurrent_writers",
+    "cause": "Store inventory scan occurred before publication lock; concurrent staging rename could be misread as corruption.",
+    "fix": "Scan inside flock; deterministic lock-order regression added."
   }
 }

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import asyncio
+import fcntl
 import json
 import os
 from collections.abc import AsyncIterator
@@ -18,6 +19,7 @@ from harnesslab.acceptance_plans import service
 from harnesslab.api.app import create_app
 from harnesslab.code_snapshots import service as snapshots
 from harnesslab.external_evidence.models import EvidencePolicy
+from harnesslab.local_plans.tasks import bounded_files
 from tests.local_plan_helpers import HEADERS
 from tests.test_code_snapshots import policy as policy
 from tests.test_code_snapshots import zipped
@@ -214,7 +216,9 @@ async def test_idempotency_and_concurrent_writers(
 ) -> None:
     payload = creation(snapshot)
     responses = await asyncio.gather(*(client.post(PREFIX, json=payload) for _ in range(3)))
-    assert all(r.status_code == 200 for r in responses)
+    assert all(r.status_code == 200 for r in responses), [
+        (r.status_code, r.json().get("error")) for r in responses
+    ]
     assert responses[0].json() == responses[1].json() == responses[2].json()
     event = responses[0].json()
     conflict = await client.post(PREFIX, json={**payload, "original_prompt": "Different"})
@@ -223,7 +227,9 @@ async def test_idempotency_and_concurrent_writers(
     url = f"{PREFIX}/{event['state']['plan_id']}/changes"
     confirm = mutation(event, "CONFIRM", acknowledgement="SCOPE_ONLY_NO_EXECUTION")
     responses = await asyncio.gather(*(client.post(url, json=confirm) for _ in range(4)))
-    assert all(r.status_code == 200 for r in responses)
+    assert all(r.status_code == 200 for r in responses), [
+        (r.status_code, r.json().get("error")) for r in responses
+    ]
     assert all(r.json() == responses[0].json() for r in responses)
     assert (await client.post(url, json={**confirm, "reason": "changed"})).status_code == 409
     frozen = await change(
@@ -433,3 +439,27 @@ async def test_confirmation_and_client_source_forgery_refused(
             ),
         )
     ).status_code == 409
+
+
+async def test_store_inventory_is_scanned_only_under_publication_lock(
+    client: AsyncClient,
+    snapshot: dict[str, Any],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original = bounded_files
+    scans = []
+
+    def guarded_scan(path: Path, **kwargs: Any) -> None:
+        if path == tmp_path / "scopes":
+            with (path / ".lock").open("a") as contender, pytest.raises(BlockingIOError):
+                fcntl.flock(contender, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            scans.append(path)
+        original(path, **kwargs)
+
+    monkeypatch.setattr(service, "bounded_files", guarded_scan)
+    event = await create(client, snapshot)
+    await approve(client, event)
+    assert (await client.get(PREFIX)).status_code == 200
+    assert (await client.get(f"{PREFIX}/{event['state']['plan_id']}")).status_code == 200
+    assert len(scans) >= 6

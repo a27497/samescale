@@ -8,7 +8,7 @@
     "ipv4_routes": 0,
     "loopback": "down"
   },
-  "tests_passed": 276,
+  "tests_passed": 277,
   "archive_digest": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
   "inputs_digest": "sha256:d77d964fe60158da4e22ee7e60df0cfb54178a99c957298d861d977f925d0395",
   "identical_outputs": {
