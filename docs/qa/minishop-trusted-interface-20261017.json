@@ -1,0 +1,1852 @@
+{
+  "integration": {
+    "agent_calls": 0,
+    "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+    "physical_attempts": 5,
+    "provider_calls": 0,
+    "qualification_identity": "sha256:16c02a254dc7b296776f193cb89032ee67d8cfda5a48e1d4df9bc229cc08cd7e",
+    "results": [
+      {
+        "acceptance": "VERIFIED_FAIL",
+        "checks": 26,
+        "export_digest": "sha256:4af638c28d4344651627d50c9bb6a81a6a672fea182787a989527987a46669e5",
+        "lifecycle_digest": "sha256:1442a8a233cb21e37da3045dcab406ca7dfaed61f65d1e7d086bf0a42c7d0eee",
+        "original_acceptance": "NOT_VERIFIED",
+        "passed_checks": 6,
+        "physical_attempts": 1,
+        "receipt_digest": "sha256:0c1e9ccfbe874f0e59992fe0d0d1ab8d68c0a16bae4ab79ee8744798b06a9c5a",
+        "record_identity": "6cee6f5d09bd3622553f47d5443b67ab141b239b35658723c5ac0613ba844655",
+        "repeat_returned_same_receipt": true,
+        "report_digest": "sha256:2eda95271ecf51cb7b69ca0b0e95d2f83b118bf5994d648feedadbf2704eb53d",
+        "scenario": "baseline",
+        "snapshot_identity": "16b05dd8bb6e2186d7b48febffa662a98d93290a82a67154e686e66451bc4a93",
+        "source_unchanged": true,
+        "workspace_digest": "sha256:5a5c641374309fb0c987aed641fed26bd886abda24e95689cf9b512d2dfeaae1"
+      },
+      {
+        "acceptance": "VERIFIED_PASS",
+        "checks": 26,
+        "export_digest": "sha256:c5f77cc5ea3138cac35508dd3db2561626941fe0effea9cf7801ed9bd62f62dc",
+        "lifecycle_digest": "sha256:052f484d45ece2414302b577c6d16bf729b3b36a20543fdb3d3c6be7fce099e1",
+        "original_acceptance": "NOT_VERIFIED",
+        "passed_checks": 26,
+        "physical_attempts": 1,
+        "receipt_digest": "sha256:049641579be41e4cd3bfb2221766470d99855a30a84f471a7b741e5dcc1f90bb",
+        "record_identity": "72becac009596834ece5aa2cce168b7d4883c67742f64c6cb935606512608b26",
+        "repeat_returned_same_receipt": true,
+        "report_digest": "sha256:2754cff60e73bac17d0e79662ddeeec7e1b1ca729d20f33997d688d2817e5419",
+        "scenario": "shape",
+        "snapshot_identity": "898d259ff52e158a8a68ccf2f8d93bb518417f94ffa1c66fe43f41b915c78b73",
+        "source_unchanged": true,
+        "workspace_digest": "sha256:28762105b7b2f47935e552afc088db31b35f39ce60fcd9facef54e975444afbf"
+      },
+      {
+        "acceptance": "VERIFIED_PASS",
+        "checks": 26,
+        "export_digest": "sha256:158f20d1d87a791b57bd2a10565383391bb7d66a012ac4449c783ac9a2eb5ce9",
+        "lifecycle_digest": "sha256:edfe4d3b366510b23910c8c2bb4a7af9369083d5c8b29bcf6aa954b35b783d32",
+        "original_acceptance": "NOT_VERIFIED",
+        "passed_checks": 26,
+        "physical_attempts": 1,
+        "receipt_digest": "sha256:cb17d21f0314196e38ad063d158077e8caa077e0d17238a04ee4ea8650dd8350",
+        "record_identity": "2619bff27776e4cc64fd8aaf32278be5a7acba924bea56b2b3cd9e6fbef521a2",
+        "repeat_returned_same_receipt": true,
+        "report_digest": "sha256:cdc8d1bede856b903e748a17143444c55b5dc0d9d2cc9cc4e9b488ca68a6aff2",
+        "scenario": "isolation",
+        "snapshot_identity": "b454df8019bc0a0e1debe7c495fa8148e35a20acfe7d83bdf614c8d4d85a657a",
+        "source_unchanged": true,
+        "workspace_digest": "sha256:386f7f36eb674632d457b8fe2e13ed0b5131161f92f04125ed5b96866e46d13e"
+      },
+      {
+        "acceptance": "NOT_VERIFIED",
+        "checks": 0,
+        "export_digest": "sha256:cb8d61205b8c57ec07e002d3b547f3075cd3d23bc2e862aedd0d021ed9e520d4",
+        "lifecycle_digest": null,
+        "original_acceptance": "NOT_VERIFIED",
+        "passed_checks": 0,
+        "physical_attempts": 1,
+        "receipt_digest": "sha256:9c46b1d1deff861b393e10d8103f96e0edfd290ab5659f793f2eb145358690af",
+        "record_identity": "319fdc4c2cf7eb8107185b2ab32f36016912526dfc42acba04be224af3c08c2a",
+        "repeat_returned_same_receipt": true,
+        "report_digest": null,
+        "scenario": "interface",
+        "snapshot_identity": "6a3b532663866cb6beaaff84b2112f5853e7f995403fb3766ffc521e4fb0bb2f",
+        "source_unchanged": true,
+        "workspace_digest": "sha256:1fc51aceba0ce5650063ba517b0a729657fde00b94c4fedabf15589e018267bf"
+      },
+      {
+        "acceptance": "NOT_VERIFIED",
+        "checks": 0,
+        "export_digest": "sha256:0d155f0bf5120b686ed300706cc02ebb3815fe4b476f3d7d84ee9d7de6be44bd",
+        "lifecycle_digest": null,
+        "original_acceptance": "NOT_VERIFIED",
+        "passed_checks": 0,
+        "physical_attempts": 1,
+        "receipt_digest": "sha256:e05d3267b70fcbdb4cefbffe3d59607fe57d6a9bd4b171113155e324571e61c4",
+        "record_identity": "2fc68c3c0de0560386ea15e8d72a73bea76b0fc6f03473895e667148461a8055",
+        "repeat_returned_same_receipt": true,
+        "report_digest": null,
+        "scenario": "timeout",
+        "snapshot_identity": "36c47df946425b1e474e6d45d53179b9126817fe73457e88430ade382a459ef9",
+        "source_unchanged": true,
+        "workspace_digest": "sha256:06e3667f47d78bbf4c1000ca99a0bec3646de7c743f25961ef36743ee75a17b6"
+      },
+      {
+        "acceptance": "NOT_VERIFIED",
+        "burned_attempt_refused": true,
+        "physical_attempts": 0,
+        "record_identity": "97ac9e06d74f283a54b78ee97fec4e09a6d52fca13e9a06803fb737879642881",
+        "scenario": "interrupted",
+        "snapshot_identity": "cefc5cb737e96e4a917bfbd94a9fac7935c2890f8cd0f6d02274a07498d64309",
+        "source_unchanged": true,
+        "workspace_digest": "sha256:06e3667f47d78bbf4c1000ca99a0bec3646de7c743f25961ef36743ee75a17b6"
+      },
+      {
+        "acceptance": "NOT_VERIFIED",
+        "physical_attempts": 0,
+        "prelaunch_refused": true,
+        "record_identity": "5df9787102ace99711133ce3e5af5222920d4edfc835a5caf275dbff0e35ae37",
+        "scenario": "corrupt",
+        "snapshot_identity": "cefc5cb737e96e4a917bfbd94a9fac7935c2890f8cd0f6d02274a07498d64309",
+        "source_unchanged": true,
+        "workspace_digest": "sha256:06e3667f47d78bbf4c1000ca99a0bec3646de7c743f25961ef36743ee75a17b6"
+      }
+    ],
+    "subject_physical_attempts": 0,
+    "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+    "task_reference": "minishop-fastapi-sqlite@1.1.2",
+    "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9"
+  },
+  "offline": {
+    "archive_digest": "sha256:ee7748478fa7366d17454d1c5936a33466c580c2a3baf9ccdc5c302705345abd",
+    "claude_calls": 0,
+    "external_calls": 0,
+    "identical_outputs": {
+      "claude.json": "sha256:fee070ee5d18df386005e5a006fa6084c45504ba3c7c4a6345b24175f9b8fe1d",
+      "codex.json": "sha256:e7fefdfb5cf17de2c8f06220f9c66aabe498e5e52175f2401796d1ea200c2cfe",
+      "diagnosis.md": "sha256:cce662542d885d65de95771f1e3d3f75a0a5997bc162ed998a7c906c090f24d1",
+      "offline-boundary.json": "sha256:1e5b18de89bb1c586931174681538dcdb668a1f5453c36e3c6472070552dd097",
+      "trace-diff.json": "sha256:968a1b8409a496dd1693e9b80413f940fc196937053675c35a761aed2af7bbef"
+    },
+    "inputs_digest": "sha256:d77d964fe60158da4e22ee7e60df0cfb54178a99c957298d861d977f925d0395",
+    "judge_calls": 0,
+    "model_calls": 0,
+    "network_namespace": {
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_routes": 0,
+      "loopback": "down"
+    },
+    "provider_calls": 0,
+    "replay_passes": 2,
+    "replayed_runs": 2,
+    "schema_version": 1,
+    "status": "PASS",
+    "subject_executed": false,
+    "tests_passed": 245,
+    "verifier_executed": false
+  },
+  "preservation": {
+    "changed_files": [],
+    "old_private_assets_and_history_unchanged": true,
+    "original_dirty_diff_unchanged": true,
+    "protected_files": 2016
+  },
+  "private_adapter_tests": {
+    "failed": 0,
+    "log_digest": "sha256:7e5f5cbf6ec722c7e54009e7b286baf1121a57a1a5be23132a55a38bb8810bdb",
+    "passed": 10
+  },
+  "qualification": {
+    "accepted_attempts": 11,
+    "agent_calls": 0,
+    "audit_kind": "post-delivery",
+    "business_suite_ast_unchanged": true,
+    "compatibility_attempts": 2,
+    "core_runtime_changed": false,
+    "defect_control_attempts": 3,
+    "eligible_for_planning": true,
+    "fixture_digests": {
+      "baseline": "sha256:5a5c641374309fb0c987aed641fed26bd886abda24e95689cf9b512d2dfeaae1",
+      "compat-metadata": "sha256:386f7f36eb674632d457b8fe2e13ed0b5131161f92f04125ed5b96866e46d13e",
+      "compat-subject-shape": "sha256:28762105b7b2f47935e552afc088db31b35f39ce60fcd9facef54e975444afbf",
+      "control-partial": "sha256:7e167dd946003647169312654d82de11dd666439fd0bc8baa5f4c1d638dd4d08",
+      "control-price": "sha256:cd1e9819aa7a970e7cbbb3068bd89063c2d68c3d303b28241f0f2a25ed436a90",
+      "control-retry": "sha256:59af5aa1d942443a895c92eb3453da731fa388b61bf29a6ab15a5d705b1239b1",
+      "oracle": "sha256:06e3667f47d78bbf4c1000ca99a0bec3646de7c743f25961ef36743ee75a17b6"
+    },
+    "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+    "judge_calls": 0,
+    "not_covered": [
+      "browser_cart",
+      "browser_checkout",
+      "visual_responsive",
+      "windows",
+      "documentation_clarity",
+      "original_agent_execution",
+      "all_concurrency_schedules",
+      "all_failure_points"
+    ],
+    "package_files": 20,
+    "preparation_history": [
+      {
+        "category": "INFRASTRUCTURE_FAILURE",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "accepted-compat-subject-shape",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "compat-subject-shape",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 12.526549227000942
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:e8e919870821cd896510b4f29e073b37ac7a5b711f7edeea508606a2defb84a3",
+        "label": "baseline-1",
+        "task_digest": "sha256:dcb841e4336ec20716689f5d5463939bcf19fdea6e2ec483eae574818d5f0d86",
+        "variant": "baseline",
+        "verifier_digest": "sha256:73f448b56a36e5fe949270d59634a72f4efb69515588b298db9f4d489b3a393d",
+        "whole_seconds": 12.001442132999728
+      },
+      {
+        "category": "INFRASTRUCTURE_FAILURE",
+        "image_id": "sha256:e8e919870821cd896510b4f29e073b37ac7a5b711f7edeea508606a2defb84a3",
+        "label": "compat-1",
+        "task_digest": "sha256:dcb841e4336ec20716689f5d5463939bcf19fdea6e2ec483eae574818d5f0d86",
+        "variant": "compat-metadata",
+        "verifier_digest": "sha256:73f448b56a36e5fe949270d59634a72f4efb69515588b298db9f4d489b3a393d",
+        "whole_seconds": 2.789588134999576
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-baseline-1",
+        "task_digest": "sha256:16313297ab961e60bbc751fb5769aac6f0b8177741690e8fce2d8556a81846b6",
+        "variant": "baseline",
+        "verifier_digest": "sha256:325ec78b9f44e49b93f691f124588e8b2b3734fb0407d955f45e5dfe128cb9aa",
+        "whole_seconds": 9.470680680999067
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-baseline-2",
+        "task_digest": "sha256:16313297ab961e60bbc751fb5769aac6f0b8177741690e8fce2d8556a81846b6",
+        "variant": "baseline",
+        "verifier_digest": "sha256:325ec78b9f44e49b93f691f124588e8b2b3734fb0407d955f45e5dfe128cb9aa",
+        "whole_seconds": 9.159283901999515
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-baseline-3",
+        "task_digest": "sha256:16313297ab961e60bbc751fb5769aac6f0b8177741690e8fce2d8556a81846b6",
+        "variant": "baseline",
+        "verifier_digest": "sha256:325ec78b9f44e49b93f691f124588e8b2b3734fb0407d955f45e5dfe128cb9aa",
+        "whole_seconds": 9.349950519999766
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-compat",
+        "task_digest": "sha256:5bd9cd359bfc70d629a53eb68cd82e1daed3b7ac29e108528eeebebe129bddd1",
+        "variant": "compat-metadata",
+        "verifier_digest": "sha256:2edfcd127e6d465ef1e60c96dc4a6a93fb159ac78c3a73c1744dae88c3fa2f02",
+        "whole_seconds": 11.155509879001329
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-control-partial",
+        "task_digest": "sha256:16313297ab961e60bbc751fb5769aac6f0b8177741690e8fce2d8556a81846b6",
+        "variant": "control-partial",
+        "verifier_digest": "sha256:325ec78b9f44e49b93f691f124588e8b2b3734fb0407d955f45e5dfe128cb9aa",
+        "whole_seconds": 11.418207252001594
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-control-price",
+        "task_digest": "sha256:16313297ab961e60bbc751fb5769aac6f0b8177741690e8fce2d8556a81846b6",
+        "variant": "control-price",
+        "verifier_digest": "sha256:325ec78b9f44e49b93f691f124588e8b2b3734fb0407d955f45e5dfe128cb9aa",
+        "whole_seconds": 10.827812411000195
+      },
+      {
+        "category": "INFRASTRUCTURE_FAILURE",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-control-retry",
+        "task_digest": "sha256:16313297ab961e60bbc751fb5769aac6f0b8177741690e8fce2d8556a81846b6",
+        "variant": "control-retry",
+        "verifier_digest": "sha256:325ec78b9f44e49b93f691f124588e8b2b3734fb0407d955f45e5dfe128cb9aa",
+        "whole_seconds": 9.179075269999885
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-oracle-1",
+        "task_digest": "sha256:16313297ab961e60bbc751fb5769aac6f0b8177741690e8fce2d8556a81846b6",
+        "variant": "oracle",
+        "verifier_digest": "sha256:325ec78b9f44e49b93f691f124588e8b2b3734fb0407d955f45e5dfe128cb9aa",
+        "whole_seconds": 11.751481390001572
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-oracle-2",
+        "task_digest": "sha256:16313297ab961e60bbc751fb5769aac6f0b8177741690e8fce2d8556a81846b6",
+        "variant": "oracle",
+        "verifier_digest": "sha256:325ec78b9f44e49b93f691f124588e8b2b3734fb0407d955f45e5dfe128cb9aa",
+        "whole_seconds": 10.73705218700161
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "final-oracle-3",
+        "task_digest": "sha256:16313297ab961e60bbc751fb5769aac6f0b8177741690e8fce2d8556a81846b6",
+        "variant": "oracle",
+        "verifier_digest": "sha256:325ec78b9f44e49b93f691f124588e8b2b3734fb0407d955f45e5dfe128cb9aa",
+        "whole_seconds": 11.041445856999417
+      },
+      {
+        "category": "SUBJECT_RESULT",
+        "image_id": "sha256:e8e919870821cd896510b4f29e073b37ac7a5b711f7edeea508606a2defb84a3",
+        "label": "oracle-1",
+        "task_digest": "sha256:dcb841e4336ec20716689f5d5463939bcf19fdea6e2ec483eae574818d5f0d86",
+        "variant": "oracle",
+        "verifier_digest": "sha256:73f448b56a36e5fe949270d59634a72f4efb69515588b298db9f4d489b3a393d",
+        "whole_seconds": 13.90143592700042
+      },
+      {
+        "category": "INFRASTRUCTURE_FAILURE",
+        "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+        "label": "qualified-compat-subject-shape",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "compat-subject-shape",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 9.632012559999566
+      }
+    ],
+    "prior_attempts": 15,
+    "protected_paths": [],
+    "provider_calls": 0,
+    "qualification_attempts": 6,
+    "qualification_identity": "sha256:16c02a254dc7b296776f193cb89032ee67d8cfda5a48e1d4df9bc229cc08cd7e",
+    "registry_digest": "sha256:a06e5d7da92b8b73615a13688143e4f409c37e91c02e340c083fbe12992f7092",
+    "requirement_sha256": "sha256:31c93f958b80472ada981cc30f210d41d313bc23a7d27acc2ad4fd15f3070bdc",
+    "runs": [
+      {
+        "body_seconds": {
+          "checks": 6.232131610004217,
+          "other": 0.3194372499965539,
+          "server_start": 2.61042399300095,
+          "shutdown": 0.22750577599799726,
+          "total": 9.389498628999718
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": false
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": false
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": false
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": false
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": false
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": false
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": false
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": false
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": false
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": false
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": false
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": false
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-baseline-1",
+        "lifecycle_digest": "sha256:cd18ed4a4b88a4afb42802c000c2c3b10a0a102f221dedcb88a4f628697486a6",
+        "manifest_digest": "sha256:233d1368ba436504b4837c4fa619d9309ca1476cfa732a0e74aa03d8e79b6952",
+        "passed_checks": 6,
+        "report_digest": "sha256:efb418438e152ccbfde9ecab8ba6b70854acb304c5139acd86ee688d9650c636",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "baseline",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 10.360177435999503,
+        "workspace_digest": "sha256:5a5c641374309fb0c987aed641fed26bd886abda24e95689cf9b512d2dfeaae1"
+      },
+      {
+        "body_seconds": {
+          "checks": 5.416443801004789,
+          "other": 0.27880862299389264,
+          "server_start": 2.437606074001451,
+          "shutdown": 0.3776692659994296,
+          "total": 8.510527763999562
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": false
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": false
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": false
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": false
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": false
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": false
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": false
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": false
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": false
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": false
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": false
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": false
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-baseline-2",
+        "lifecycle_digest": "sha256:da97be5b4f7286a80ce0613e9bbb4cbe13759f706591e2ed6cfd7bc630228939",
+        "manifest_digest": "sha256:1a84ef660cd6cf0fc44ab9585048f0a6ea89dce66a6126c8f51cba52e3505219",
+        "passed_checks": 6,
+        "report_digest": "sha256:6b445c02a55739abf8c324cf739be4a2ee6a146a35cda02c3b25cc3e764a19c5",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "baseline",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 9.49903441099923,
+        "workspace_digest": "sha256:5a5c641374309fb0c987aed641fed26bd886abda24e95689cf9b512d2dfeaae1"
+      },
+      {
+        "body_seconds": {
+          "checks": 5.460915417996148,
+          "other": 0.2742808840030193,
+          "server_start": 2.128018224000698,
+          "shutdown": 0.37759737499982293,
+          "total": 8.240811900999688
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": false
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": false
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": false
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": false
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": false
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": false
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": false
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": false
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": false
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": false
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": false
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": false
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": false
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-baseline-3",
+        "lifecycle_digest": "sha256:6049e247bf01239706cc5f68e46feb3df35db016382cd1b6fda57e31a41ad029",
+        "manifest_digest": "sha256:0cad4dca8e8d867d3234fb6382f036049a9f48018dffb075870a8e6132a2d059",
+        "passed_checks": 6,
+        "report_digest": "sha256:03b28469ffe534eb96e49b91f30951b2fcacc9d12ba412a0e4eb97fdf344f8b1",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "baseline",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 9.018183501999374,
+        "workspace_digest": "sha256:5a5c641374309fb0c987aed641fed26bd886abda24e95689cf9b512d2dfeaae1"
+      },
+      {
+        "body_seconds": {
+          "checks": 7.180872099002954,
+          "other": 0.25150057499740797,
+          "server_start": 2.1495126919999166,
+          "shutdown": 0.42789641200033657,
+          "total": 10.009781778000615
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": true
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": true
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": true
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": true
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": true
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": true
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": true
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": true
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": true
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": true
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-oracle-1",
+        "lifecycle_digest": "sha256:141cb144b3003f8e25120d86bf6412b2874b029a0b65eb6a7415b91b01738a85",
+        "manifest_digest": "sha256:f719645e8c3b03dede05e2dd989b30c1684f18fb0c2e766d9387965556079f87",
+        "passed_checks": 26,
+        "report_digest": "sha256:f29ad0b3075a0e007464e57acf53f948930d304ab260fa7428f97e015f27c8f6",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "oracle",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 10.842394794999564,
+        "workspace_digest": "sha256:06e3667f47d78bbf4c1000ca99a0bec3646de7c743f25961ef36743ee75a17b6"
+      },
+      {
+        "body_seconds": {
+          "checks": 7.082126284005426,
+          "other": 0.21315389899609727,
+          "server_start": 2.2098386579982616,
+          "shutdown": 0.4280487619998894,
+          "total": 9.933167602999674
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": true
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": true
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": true
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": true
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": true
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": true
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": true
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": true
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": true
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": true
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-oracle-2",
+        "lifecycle_digest": "sha256:3cd4766fe74ecc6690e6a5abc125f903a5c1b57da74787dd162c89952a89e4d8",
+        "manifest_digest": "sha256:7e1dd3cde0124638a2141ce5d69237821dd10c0de3f46e338883b2e0e826d2e0",
+        "passed_checks": 26,
+        "report_digest": "sha256:9c89e2167325044f333a8b4c8fc3c37940dd28bcd2e5bb571d55c3b07e71bcb9",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "oracle",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 10.805767677999029,
+        "workspace_digest": "sha256:06e3667f47d78bbf4c1000ca99a0bec3646de7c743f25961ef36743ee75a17b6"
+      },
+      {
+        "body_seconds": {
+          "checks": 7.205063337005413,
+          "other": 0.23656908499287965,
+          "server_start": 2.0469194690012955,
+          "shutdown": 0.37767119700038165,
+          "total": 9.86622308799997
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": true
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": true
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": true
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": true
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": true
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": true
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": true
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": true
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": true
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": true
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-oracle-3",
+        "lifecycle_digest": "sha256:5cddf6dd13f36be59c6a9ef4d0106cbaca5d48b8fab239b7c016f5210cea8279",
+        "manifest_digest": "sha256:b74e86ff111ac8f852b58e92074033f472e8722aca13c2273c164a507a3e9725",
+        "passed_checks": 26,
+        "report_digest": "sha256:f218406fb3abf408997ed23b68c2a2415a5714751d28cc4988ff26a512971950",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "oracle",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 10.730878821999795,
+        "workspace_digest": "sha256:06e3667f47d78bbf4c1000ca99a0bec3646de7c743f25961ef36743ee75a17b6"
+      },
+      {
+        "body_seconds": {
+          "checks": 7.174076327997682,
+          "other": 0.21981631700327853,
+          "server_start": 2.227223468000375,
+          "shutdown": 0.42771282299872837,
+          "total": 10.048828936000064
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": true
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": false
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": true
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": true
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": true
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": true
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": true
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": true
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": true
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": true
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-control-price",
+        "lifecycle_digest": "sha256:844b907d2372a22c3079a1644c8e2b8729be0756988182dac270233b8abab7e3",
+        "manifest_digest": "sha256:3b6413c8264e24b1bbec92ad431a2145054cfb26c47a25c2785335372b38d98c",
+        "passed_checks": 25,
+        "report_digest": "sha256:53b9acf53e3495b50b7218f82492466b4bea7f17190bc436c45c2e73a6f2a0e9",
+        "single_edit_occurrences": 1,
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "control-price",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 10.961121627000466,
+        "workspace_digest": "sha256:cd1e9819aa7a970e7cbbb3068bd89063c2d68c3d303b28241f0f2a25ed436a90"
+      },
+      {
+        "body_seconds": {
+          "checks": 7.072006466009043,
+          "other": 0.2737958129928302,
+          "server_start": 2.320820790999278,
+          "shutdown": 0.2778126829980465,
+          "total": 9.944435752999198
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": true
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": true
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": true
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": true
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": false
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": true
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": true
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": true
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": true
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": true
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": true
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-control-partial",
+        "lifecycle_digest": "sha256:7cd3efd893bb2c75ee9ee8926808b066c5fcba9900d0d4686976a8b79b2e125f",
+        "manifest_digest": "sha256:45b094146c084145f96363f82139ca11322914a794b1594c07ff2a42368e3d33",
+        "passed_checks": 25,
+        "report_digest": "sha256:3c7c337539e20c795f6c9e65faf0df06d9a013694d2ec6acd0306e1b8cc16cfe",
+        "single_edit_occurrences": 1,
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "control-partial",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 10.879324392999479,
+        "workspace_digest": "sha256:7e167dd946003647169312654d82de11dd666439fd0bc8baa5f4c1d638dd4d08"
+      },
+      {
+        "body_seconds": {
+          "checks": 7.178655731002436,
+          "other": 0.20315610699981335,
+          "server_start": 2.291724352999154,
+          "shutdown": 0.3777804949986603,
+          "total": 10.051316686000064
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": true
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": true
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": true
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": true
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": false
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": true
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": false
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": true
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": true
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": true
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-control-retry",
+        "lifecycle_digest": "sha256:6192346d37aa63e70e9a6fa7d51ff473a5c321e996f256744480e53a91dcde43",
+        "manifest_digest": "sha256:5057b9590c9665ce11b2a0089f82a7e703dc01c53cf3d55267a1fd6bfa8cdc4d",
+        "passed_checks": 24,
+        "report_digest": "sha256:7f586190930322186521da03e7b38c0794e75ae9dc2a095fe81e37c20c2005d5",
+        "single_edit_occurrences": 1,
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "control-retry",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 10.925306729999647,
+        "workspace_digest": "sha256:59af5aa1d942443a895c92eb3453da731fa388b61bf29a6ab15a5d705b1239b1"
+      },
+      {
+        "body_seconds": {
+          "checks": 9.865430097997887,
+          "other": 0.31239241999719525,
+          "server_start": 2.658589780001421,
+          "shutdown": 0.37786058600249817,
+          "total": 13.214272883999001
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": true
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": true
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": true
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": true
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": true
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": true
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": true
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": true
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": true
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": true
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-compat-metadata",
+        "lifecycle_digest": "sha256:d04b8b181fcbadea8e2172622140b7e42ee6a4ad2800572ee4c8191c8d3cbfc0",
+        "manifest_digest": "sha256:db0d6f9773b4b6c7c6a25140f7c7bf23fa4b2ca3bf51d4f098401e2ae95c2ce0",
+        "passed_checks": 26,
+        "report_digest": "sha256:99cfa2e9978a3c8bbe1eeb35d5821dca8484fccf0c6c821dcd43e4416b28ac44",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "compat-metadata",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 14.277386734000174,
+        "workspace_digest": "sha256:386f7f36eb674632d457b8fe2e13ed0b5131161f92f04125ed5b96866e46d13e"
+      },
+      {
+        "body_seconds": {
+          "checks": 9.47326033000354,
+          "other": 0.2671953749977547,
+          "server_start": 2.7751925920001668,
+          "shutdown": 0.4287870739990467,
+          "total": 12.944435371000509
+        },
+        "category": "SUBJECT_RESULT",
+        "checks": [
+          {
+            "name": "C01_catalog_fields_and_minimum",
+            "passed": true
+          },
+          {
+            "name": "C02_sqlite_integer_prices",
+            "passed": true
+          },
+          {
+            "name": "C03_catalog_database_authority",
+            "passed": true
+          },
+          {
+            "name": "C04_create_and_query_order",
+            "passed": true
+          },
+          {
+            "name": "C05_server_repricing_ignores_amounts",
+            "passed": true
+          },
+          {
+            "name": "C06_sqlite_order_and_line_persistence",
+            "passed": true
+          },
+          {
+            "name": "C07_stock_decrement",
+            "passed": true
+          },
+          {
+            "name": "C08_insufficient_stock_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C09_unknown_product_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C10_zero_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C11_negative_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C12_fractional_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C13_boolean_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C14_null_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C15_missing_quantity_rejected_unchanged",
+            "passed": true
+          },
+          {
+            "name": "C16_multiline_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C17_injected_database_failure_rolls_back",
+            "passed": true
+          },
+          {
+            "name": "C18_same_key_retry_returns_original",
+            "passed": true
+          },
+          {
+            "name": "C19_same_key_changed_content_conflict",
+            "passed": true
+          },
+          {
+            "name": "C20_concurrent_same_key_single_order",
+            "passed": true
+          },
+          {
+            "name": "C21_concurrent_orders_do_not_oversell",
+            "passed": true
+          },
+          {
+            "name": "C22_restart_preserves_order_and_stock",
+            "passed": true
+          },
+          {
+            "name": "C23_frontend_html_loads",
+            "passed": true
+          },
+          {
+            "name": "C24_frontend_local_resources_load",
+            "passed": true
+          },
+          {
+            "name": "C25_page_and_api_http_scenario",
+            "passed": true
+          },
+          {
+            "name": "C26_local_start_and_test_documentation",
+            "passed": true
+          }
+        ],
+        "label": "ready-compat-subject-shape",
+        "lifecycle_digest": "sha256:623984c570f785c091877ee6c62045f118b23021e441a7c5ba5a23d4b52f4091",
+        "manifest_digest": "sha256:e08038a7cac021f3c4a2f44c770eadd15baeb823085478e821fd104c4d51c6ad",
+        "passed_checks": 26,
+        "report_digest": "sha256:1e3d96f5abc22dd1d312c4bf35d37584ce04c0931018889f99560cffa0a3ad91",
+        "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+        "variant": "compat-subject-shape",
+        "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+        "whole_seconds": 14.018083722001393,
+        "workspace_digest": "sha256:28762105b7b2f47935e552afc088db31b35f39ce60fcd9facef54e975444afbf"
+      }
+    ],
+    "runtime_lock_sha256": "sha256:75d9318e6ef390ba9f1fe1009ec7bcd395b8aa1ec02e0faa8790f211f8386585",
+    "schema_version": 1,
+    "subject_adapter_digest": "sha256:72f12eaa8ec62106f8bcc7def0b6685a6b2a40ab82c3b1360c5a5a7e127065ef",
+    "subject_physical_attempts": 0,
+    "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+    "task_reference": "minishop-fastapi-sqlite@1.1.2",
+    "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9"
+  },
+  "scope": {
+    "agent_calls": 0,
+    "ci": "SEPARATE_EXACT_HEAD_PUBLICATION",
+    "frontend": "NOT_RUN_UNCHANGED",
+    "full_pytest": "NOT_RUN_SCOPE_FOCUSED",
+    "judge_calls": 0,
+    "private_assets_in_git": false,
+    "provider_calls": 0,
+    "subject_physical_attempts": 0,
+    "windows_wsl2": "NOT_RUN"
+  },
+  "static_checks": {
+    "mypy": "PASS",
+    "mypy_source_files": 472,
+    "ruff_format_files": 914,
+    "ruff_lint": "PASS"
+  },
+  "subject_preflight": {
+    "acceptance": "NOT_VERIFIED",
+    "active_policy_can_execute": false,
+    "bytes": 237995,
+    "code_only_ingested": true,
+    "content_digest": "sha256:2665fbe6ae797a8c075cb92894610fded920f0ebcbf63fadb39ef567661eb143",
+    "coverage": "NO_RUN_RECORD",
+    "execution_authorized": false,
+    "export_sha256": "sha256:9a55eb6d3187ee360a8a5561b24df9b9cbf510825df5469c514db2514740b8ec",
+    "files": 32,
+    "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+    "interface_registry_digest": "sha256:a06e5d7da92b8b73615a13688143e4f409c37e91c02e340c083fbe12992f7092",
+    "kind": "static-data-only-preflight",
+    "original_acceptance": "NOT_VERIFIED",
+    "pending_execution_policy_sha256": "sha256:ac1f5e48eb919fd393bf6c0cb1a8d196081df12c859a7b503669b6b139f216e8",
+    "physical_verifier_attempts": 0,
+    "qualification_identity": "sha256:16c02a254dc7b296776f193cb89032ee67d8cfda5a48e1d4df9bc229cc08cd7e",
+    "record_identity": "5fe073a6d1999fabf61945917bd297ac784addf1809f078e75817764df0f7086",
+    "record_json_sha256": "sha256:0d122cec8a57595439aae242b0dcc6455bdce0e5d9eb4c00d8d679c4fe5bb92f",
+    "restored_exact_bytes": true,
+    "snapshot_identity": "2fd1898f67aadfee85fdf40f924cccf68d64759443d125715bacec6e91d7ec68",
+    "snapshot_serialized_sha256": "sha256:846222ebfc7a626bfe979ae580d49677f2a2368da7bdfbc5ef4c3047c38927a0",
+    "source_approved": true,
+    "source_authenticity": "NOT_ATTESTED",
+    "startup": {
+      "database_path": "{tmp}/subject/MiniShop/data/shop.sqlite3",
+      "db_environment": "MINISHOP_DB_PATH",
+      "module": "run:app",
+      "working_directory": "MiniShop"
+    },
+    "subject_adapter_digest": "sha256:72f12eaa8ec62106f8bcc7def0b6685a6b2a40ab82c3b1360c5a5a7e127065ef",
+    "subject_executed": false,
+    "subject_imported": false,
+    "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+    "task_reference": "minishop-fastapi-sqlite@1.1.2",
+    "trusted_shape_load": true,
+    "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9"
+  },
+  "verification": {
+    "final_checks": {
+      "broken_links": [],
+      "core_and_historical_git_diff": false,
+      "documentation_links": 129,
+      "original_test_function_class_asts_unchanged": 47,
+      "private_identifier_matches": 0,
+      "private_identifier_patterns": 9,
+      "protected_external_files_unchanged": 2016,
+      "requirement_sha256_matches": true,
+      "subject_physical_attempts": 0,
+      "subject_record_unchanged": true,
+      "task_and_verifier_digest_stable": true
+    },
+    "focused_initial": {
+      "clean_environment": true,
+      "counts": {
+        "collected": 425,
+        "errors": 0,
+        "failed": 10,
+        "passed": 415,
+        "skipped": 0
+      },
+      "disposable_database": true,
+      "exit_code": 1,
+      "full_suite": "NOT_RUN_SCOPE_FOCUSED",
+      "seconds": 125.41749596299996,
+      "test_files": [
+        "tests/test_code_snapshots.py",
+        "tests/test_external_evidence.py",
+        "tests/test_external_evidence_p1.py",
+        "tests/test_external_evidence_generic.py",
+        "tests/test_external_evidence_docker.py",
+        "tests/test_local_init_script.py",
+        "tests/test_local_plans.py",
+        "tests/test_local_planning_binding.py",
+        "tests/test_task_package.py",
+        "tests/test_task_quality_and_splits.py",
+        "tests/test_custom_task_qualification.py",
+        "tests/test_task_verifier.py",
+        "tests/test_sandbox.py",
+        "tests/test_ci_routing.py"
+      ]
+    },
+    "focused_recheck": {
+      "assertions_unchanged": true,
+      "collected": 10,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "initial_failure_history_retained": true,
+      "initial_passes_retained": 415,
+      "passed": 10,
+      "seconds": 24.72571676500047,
+      "serialized_after_task_execution": true,
+      "skipped": 0,
+      "unique_final_passes": 425
+    },
+    "frozen_before_after_equal": true,
+    "frozen_file_count": 439,
+    "unique_final_passes": 425
+  }
+}
