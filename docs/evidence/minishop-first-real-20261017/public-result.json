@@ -1,0 +1,199 @@
+{
+  "checks": [
+    {
+      "detail": null,
+      "id": "C01",
+      "name": "C01_catalog_fields_and_minimum",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C02",
+      "name": "C02_sqlite_integer_prices",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C03",
+      "name": "C03_catalog_database_authority",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C04",
+      "name": "C04_create_and_query_order",
+      "passed": true
+    },
+    {
+      "detail": "AssertionError",
+      "id": "C05",
+      "name": "C05_server_repricing_ignores_amounts",
+      "passed": false
+    },
+    {
+      "detail": null,
+      "id": "C06",
+      "name": "C06_sqlite_order_and_line_persistence",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C07",
+      "name": "C07_stock_decrement",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C08",
+      "name": "C08_insufficient_stock_rejected_unchanged",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C09",
+      "name": "C09_unknown_product_rejected_unchanged",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C10",
+      "name": "C10_zero_quantity_rejected_unchanged",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C11",
+      "name": "C11_negative_quantity_rejected_unchanged",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C12",
+      "name": "C12_fractional_quantity_rejected_unchanged",
+      "passed": true
+    },
+    {
+      "detail": "AssertionError",
+      "id": "C13",
+      "name": "C13_boolean_quantity_rejected_unchanged",
+      "passed": false
+    },
+    {
+      "detail": null,
+      "id": "C14",
+      "name": "C14_null_quantity_rejected_unchanged",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C15",
+      "name": "C15_missing_quantity_rejected_unchanged",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C16",
+      "name": "C16_multiline_failure_rolls_back",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C17",
+      "name": "C17_injected_database_failure_rolls_back",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C18",
+      "name": "C18_same_key_retry_returns_original",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C19",
+      "name": "C19_same_key_changed_content_conflict",
+      "passed": true
+    },
+    {
+      "detail": "0",
+      "id": "C20",
+      "name": "C20_concurrent_same_key_single_order",
+      "passed": true
+    },
+    {
+      "detail": "0",
+      "id": "C21",
+      "name": "C21_concurrent_orders_do_not_oversell",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C22",
+      "name": "C22_restart_preserves_order_and_stock",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C23",
+      "name": "C23_frontend_html_loads",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C24",
+      "name": "C24_frontend_local_resources_load",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C25",
+      "name": "C25_page_and_api_http_scenario",
+      "passed": true
+    },
+    {
+      "detail": null,
+      "id": "C26",
+      "name": "C26_local_start_and_test_documentation",
+      "passed": true
+    }
+  ],
+  "current_closeout_real_minishop_physical_attempts": 0,
+  "historical_acceptance": "VERIFIED_FAIL",
+  "identities": {
+    "image_id": "sha256:5ad60dee2fb2d11aa75f8ec7cb08bf4fb491a9463dd13261fb589e8d6e64b297",
+    "lifecycle_digest": "sha256:ff182ac6ed9af6ab7443bd8059624579dd65b42d4daf6960d8c6be6e486ed46b",
+    "manifest_digest": "sha256:0469cdb1a26709ca51ab56940aa092d041b46778b321ee59dae1d1b379d242da",
+    "qualification_identity": "sha256:16c02a254dc7b296776f193cb89032ee67d8cfda5a48e1d4df9bc229cc08cd7e",
+    "receipt_digest": "sha256:104b423188e049276c00ea019424443140af0695926a7a98196669e0a6af61ed",
+    "report_digest": "sha256:c706ddc0cfcb3f3275377d0dc0994826cb38b38cfac65712f034d728f5cb70b8",
+    "task_digest": "sha256:78e8c1945d0df60610923c1989960142f322419ee42f47354b00302ee0639b35",
+    "verifier_digest": "sha256:b8ee081681a71fc198dfe00cd84cf29f9441913cf718109f33e74825dbf9edf9",
+    "workspace_digest": "sha256:2665fbe6ae797a8c075cb92894610fded920f0ebcbf63fadb39ef567661eb143"
+  },
+  "passed_checks": 24,
+  "physical_attempts": 1,
+  "projection_kind": "REDACTED_SUMMARY_NOT_REPLAY_BUNDLE",
+  "record_identity": "sha256:5fe073a6d1999fabf61945917bd297ac784addf1809f078e75817764df0f7086",
+  "retries": 0,
+  "review": {
+    "C05": "OVERRESTRICTIVE_2XX_REQUIREMENT_NOT_PROVEN_CODE_DEFECT",
+    "C13": "HIGH_CONFIDENCE_STATIC_EVIDENCE_RUNTIME_DETAILS_NOT_CAPTURED"
+  },
+  "saved_replay": {
+    "byte_identical": true,
+    "count": 2,
+    "meaning": "saved evidence integrity only",
+    "subject_executed": false,
+    "verifier_executed": false
+  },
+  "schema_version": 1,
+  "self_report": {
+    "browser_claim": "30/30",
+    "http_claim": "22/22",
+    "independently_confirmed": false,
+    "pytest_claim": "91/91",
+    "source": "delivery_declaration_only"
+  },
+  "task_reference": "minishop-fastapi-sqlite@1.1.2",
+  "total_checks": 26
+}

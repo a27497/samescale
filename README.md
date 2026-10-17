@@ -48,6 +48,19 @@ SameScale 把这些材料关联起来，让开发者看到**哪些要求已检�
 
 产品内不预置示例数据。案例 A 等历史证据复盘见[官网](https://getsamescale.com/)；官网演示使用单独的只读材料，不能当作新导入或新验收的结果。
 
+## 案例：MiniShop，验收标准也需要复核
+
+**Agent 自报完成不等于独立验收通过；验收标准本身也需要复核。**
+首次独立 L0 验收（2026-10-17，Asia/Shanghai）历史结果为 **24/26 PASS · VERIFIED_FAIL**，
+一次物理执行、零重试，C05/C13 原详情均为 `AssertionError`。
+
+- **C05**：冻结检查强制额外金额字段请求返回 2xx，超出原始需求；安全拒绝且业务状态不变也可能合规，不能据此认定信任伪造金额。
+- **C13**：布尔数量应拒绝。Pydantic 转换绕过业务检查有高置信静态证据，但原收据未证明具体 HTTP 响应和状态变化。
+- **证据边界**：DeepSeek 自测全通过仍是交付方声明。两次 Replay 一致只证明保存证据完整，不代表重新验收通过；历史不改成 25/26，也不宣称发现两个确定 Bug。
+
+[阅读公开案例与证据链](docs/evidence/minishop-first-real-20261017/README.md) · [复核附录](docs/qa/minishop-first-real-review-20261018.md) · [新私有 Verifier 的独立资格](docs/qa/minishop-verifier-1.2.0-20261018.md)。
+公开投影保留独立摘要与来源关联，不能匿名完整 Replay；本轮真实 MiniShop **0 次执行**。
+
 ## 案例：Sphinx-7748 虚假完成
 
 在 **2026-10-14（UTC）** 的保存记录中，Sphinx-7748 的 Agent 最终自报 **PASS**，独立 Verifier 对最终代码的 **14 项必需检查通过12项，结论为 FAIL**。
