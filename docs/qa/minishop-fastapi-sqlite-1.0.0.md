@@ -10,15 +10,15 @@
 | requirement_sha256 | `sha256:31c93f958b80472ada981cc30f210d41d313bc23a7d27acc2ad4fd15f3070bdc` |
 | baseline_adapter_sha256 | `sha256:3bbbf6e5ae731b7af577ff765b488d31a2fbb2e1fb42ce576b33e9af3e783f85` |
 | oracle_adapter_sha256 | `sha256:1d07ebd38a6119f2e03a7c25ef27b1bfeba94d31f651491278512e2cb376ec46` |
-| task_digest | `sha256:ad6abc0ce6bffc579afaa21bfa210bc076a4d58d978017b481c6b9eec3f283fc` |
-| verifier_digest | `sha256:caeba3d8e989660a5dd9c95d3b7a1857496a137e73a30d9bdbc36ddcd159ccd2` |
-| qualification_identity | `sha256:6893bb82af55b0527357b92e7b538abcd12152b7baa347efe967be77b593d958` |
+| task_digest | `sha256:95f1b9baa8baee78753f53ec3882598d741f1c0efc8ffbdfc47831c8f0ffdadc` |
+| verifier_digest | `sha256:cf3803e8cbad714e53ed1745d8336c3f5a2a0d3627e9445fa4d9e6805214bf30` |
+| qualification_identity | `sha256:47c9b4b10d12ab90fce357a5754727013c257a77f33cbdf42fc1e5f1b8da1af8` |
 | image_id | `sha256:e8e919870821cd896510b4f29e073b37ac7a5b711f7edeea508606a2defb84a3` |
 | eligible_for_planning | `True` |
 
 fetch 后 `main=1432cb94fc22e110e49e733bab7b96dc7d360a09`；分支 `codex/minishop-fastapi-sqlite-1.0.0-audit`。原有脏工作区未修改；本阶段未读取、复制或运行 DeepSeek MiniShop 快照、源码、自测或自报。被测接口声明 NOT_WRITTEN，3b NOT_AUTHORIZED_NOT_RUN。
 
-完整包 19 文件 / 59,161 字节；baseline 工作区 7 文件 / 6,551 字节，oracle 覆盖后工作区 7 文件 / 9,781 字节。R 是 UTF-8 原始字节，5,184 字节，无末尾换行；未增删原文字符。两份适配声明和 R 的摘要均计入任务 manifest metadata 和整个包的 task_digest。
+完整包 19 文件 / 61,982 字节；baseline 工作区 7 文件 / 6,551 字节，oracle 覆盖后工作区 7 文件 / 9,781 字节。R 是 UTF-8 原始字节，5,184 字节，无末尾换行；未增删原文字符。两份适配声明和 R 的摘要均计入任务 manifest metadata 和整个包的 task_digest。
 
 ## 资格、缺陷控制与逐项结果
 
@@ -26,15 +26,16 @@ fetch 后 `main=1432cb94fc22e110e49e733bab7b96dc7d360a09`；分支 `codex/minish
 
 | 运行 | 分类 | 通过/检查数 | 整次秒数 |
 | --- | --- | ---: | ---: |
-| release-baseline-1 | SUBJECT_RESULT / FAIL | 6/26 | 13.013629 |
-| release-baseline-2 | SUBJECT_RESULT / FAIL | 6/26 | 13.056358 |
-| release-baseline-3 | SUBJECT_RESULT / FAIL | 6/26 | 11.469768 |
-| release-oracle-1 | SUBJECT_RESULT / PASS | 26/26 | 13.709437 |
-| release-oracle-2 | SUBJECT_RESULT / PASS | 26/26 | 14.677587 |
-| release-oracle-3 | SUBJECT_RESULT / PASS | 26/26 | 14.998928 |
-| release-control-price | SUBJECT_RESULT / FAIL | 25/26 | 13.999380 |
-| release-control-partial | SUBJECT_RESULT / FAIL | 25/26 | 13.493666 |
-| release-control-retry | SUBJECT_RESULT / FAIL | 24/26 | 14.331573 |
+| accepted-baseline-1 | SUBJECT_RESULT / FAIL | 6/26 | 10.179923 |
+| accepted-baseline-2 | SUBJECT_RESULT / FAIL | 6/26 | 10.095239 |
+| accepted-baseline-3 | SUBJECT_RESULT / FAIL | 6/26 | 10.040321 |
+| accepted-oracle-1 | SUBJECT_RESULT / PASS | 26/26 | 12.044928 |
+| accepted-oracle-2 | SUBJECT_RESULT / PASS | 26/26 | 11.716972 |
+| accepted-oracle-3 | SUBJECT_RESULT / PASS | 26/26 | 11.841092 |
+| accepted-control-price | SUBJECT_RESULT / FAIL | 25/26 | 11.924872 |
+| accepted-control-partial | SUBJECT_RESULT / FAIL | 25/26 | 11.934051 |
+| accepted-control-retry | SUBJECT_RESULT / FAIL | 24/26 | 11.844434 |
+| accepted-compat-metadata | SUBJECT_RESULT / PASS | 26/26 | 11.856999 |
 
 三个缺陷控制均从已通过的 oracle 副本开始，各只修改一个唯一代码位置，接口声明、隐藏检查和固定镜像不变。控制类型分别为信任客户端金额、库存提交早于订单插入、同键重试再次扣库存。它们分别命中 C05、C17、C18/C20，均为正常业务 FAIL。有限控制样本只证明能检出这些注入的缺陷，不证明总体覆盖率。
 
@@ -69,18 +70,11 @@ fetch 后 `main=1432cb94fc22e110e49e733bab7b96dc7d360a09`；分支 `codex/minish
 | C25_page_and_api_http_scenario | F/F/F | P/P/P | P | P | P |
 | C26_local_start_and_test_documentation | P/P/P | P/P/P | P | P | P |
 
-准备过程保留最初 3 次观察（baseline 7/26、oracle 26/26、另一次 baseline 7/26），
-以及随后两个被替代版本的各 9 次完整观察。复核发现“静态脚本出现 API 字符串”会误伤动态
-拼接 URL 的合法实现，因此最终 C25 改成网页/资源加载后的独立 HTTP API 场景，实际
-JavaScript 行为仍 NOT_COVERED；C26 同时去除固定文件名/命令关键词要求，只观察说明文档
-可读非空，说明是否清楚另列 NOT_COVERED。原版本包、资格、policy 和全部原始记录完整保留，
-旧 TaskStore 不用于最终准入；最终版本使用独立的 release-managed-store 与 final-task-policy.json。
-最后复核还发现顺序下单会消耗初始库存；因此在先检查原始目录后，通过临时测试数据库构造充足库存，不把 R 未固定的初始库存数值当作额外要求。
-表中是这些变更后重新冻结身份的六次资格及三次单点缺陷控制，并未混用旧结果。
-资格元数据复核修正了物化目录定位：使用实际随机创建的非空 workspace，重新核对两侧工作区摘要、文件清单与隐藏材料隔离，再从原始观察生成资格；原元数据留档，没有为此重跑 Verifier。总物理任务 Verifier 尝试为 30（最初准备 3、被替代版本 18、最终版本 9），没有自动重试，
-没有为保留某次结果而删除失败记录。所有 30 次均 ≤25 秒；最初三次分别为
-10.056985、11.992685、9.864582 秒；两个被替代版本的计数/耗时保留在公开 JSON 的
-superseded_revision / superseded_revision_2 中，不充当最终 task_digest 的重复证据。
+另有一个正确兼容副本 26/26 PASS：仅改变接口包装/响应元数据、相对数据库路径、初始化库存和业务无关的启动记录，并在并发时暂时拒绝请求；核心订单业务仍来自独立 oracle。同一次检查内的业务协议追索实际发生 C20=1 次、C21=2 次，均收敛且未重复扣库存；这些 HTTP 请求不是重新运行 Verifier。它验证适配及语义比较，不是缺陷样本、被测声明或 DeepSeek 结果。重启从冻结源码重新物化，只迁移 SQLite，运行目录内生成的旁路文件不参与恢复。
+
+开发准备和所有原始观察完整保留：最初准备 3 次，五个被替代版本分别 9、9、9、10、10 次，最终版本 10 次，总计 60 次物理任务 Verifier。被替代版本用于修正静态 API 字符串推断、文档关键词限制、初始库存依赖及完整 JSON/运行目录比较、并发必须立即全部 2xx 等 R 未固定的条件；没有自动重试或删除失败观察来挑选结果。各版本独立保管，旧资格不用于最终准入。原资格元数据的物化目录定位也已修正，重新核对实际非空工作区、摘要及隐藏材料隔离；原元数据留档。
+
+表中只有最终 task_digest 的六次资格、三次单点缺陷控制及一次正确兼容对照；前 50 次不混入最终重复证据。全部 60 次整次均 ≤25 秒；最初三次为 10.056985、11.992685、9.864582 秒，其余被替代版本的逐次计数/耗时见公开 JSON 的 superseded_revision、superseded_revision_2、superseded_revision_3、superseded_revision_4、superseded_revision_5。最终准入使用独立 accepted-managed-store 和 final-task-policy.json，FINAL_ADMISSION.json 指向已核对的最终文件。
 
 ## 不重叠的分段耗时
 
@@ -88,15 +82,16 @@ superseded_revision / superseded_revision_2 中，不充当最终 task_digest �
 
 | 运行 | 镜像预检/创建 | 挂载/隔离检查 | start --attach | 容器清理 | 准备/保存/其余 | 整次 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| release-baseline-1 | 0.281000 | 0.063000 | 12.415000 | 0.123000 | 0.078629 | 13.013629 |
-| release-baseline-2 | 0.376000 | 0.068000 | 12.417000 | 0.123000 | 0.072358 | 13.056358 |
-| release-baseline-3 | 0.301000 | 0.048000 | 10.925000 | 0.132000 | 0.059768 | 11.469768 |
-| release-oracle-1 | 0.293000 | 0.073000 | 13.132000 | 0.159000 | 0.071437 | 13.709437 |
-| release-oracle-2 | 0.311000 | 0.050000 | 13.986000 | 0.123000 | 0.078587 | 14.677587 |
-| release-oracle-3 | 0.438000 | 0.073000 | 14.293000 | 0.159000 | 0.067928 | 14.998928 |
-| release-control-price | 0.350000 | 0.046000 | 13.388000 | 0.153000 | 0.062380 | 13.999380 |
-| release-control-partial | 0.281000 | 0.048000 | 12.968000 | 0.125000 | 0.071666 | 13.493666 |
-| release-control-retry | 0.328000 | 0.057000 | 13.741000 | 0.153000 | 0.073573 | 14.331573 |
+| accepted-baseline-1 | 0.273000 | 0.059000 | 9.665000 | 0.120000 | 0.062923 | 10.179923 |
+| accepted-baseline-2 | 0.272000 | 0.049000 | 9.592000 | 0.112000 | 0.070239 | 10.095239 |
+| accepted-baseline-3 | 0.245000 | 0.042000 | 9.547000 | 0.145000 | 0.061321 | 10.040321 |
+| accepted-oracle-1 | 0.267000 | 0.044000 | 11.556000 | 0.109000 | 0.068928 | 12.044928 |
+| accepted-oracle-2 | 0.283000 | 0.047000 | 11.206000 | 0.111000 | 0.069972 | 11.716972 |
+| accepted-oracle-3 | 0.260000 | 0.047000 | 11.340000 | 0.121000 | 0.073092 | 11.841092 |
+| accepted-control-price | 0.280000 | 0.047000 | 11.371000 | 0.145000 | 0.081872 | 11.924872 |
+| accepted-control-partial | 0.293000 | 0.051000 | 11.400000 | 0.117000 | 0.073051 | 11.934051 |
+| accepted-control-retry | 0.263000 | 0.047000 | 11.340000 | 0.120000 | 0.074434 | 11.844434 |
+| accepted-compat-metadata | 0.268000 | 0.047000 | 11.345000 | 0.121000 | 0.075999 | 11.856999 |
 
 `SANDBOX_START`、`PROCESS_START`、`PROCESS_WAIT` 记录同一次附加执行的重叠阶段；上表只取 SANDBOX_START，其他重叠时长不相加。start --attach 包括容器启动、整个 Verifier 主体及附加流返回，不能称为纯启动耗时。
 
@@ -104,15 +99,16 @@ Verifier 主体另用单调时钟记录服务启动、业务检查、服务停�
 
 | 运行 | 服务启动 | 业务检查 | 服务停止 | 其余 | 主体合计 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| release-baseline-1 | 3.124903 | 7.760626 | 0.428806 | 0.528316 | 11.842650 |
-| release-baseline-2 | 3.194980 | 7.788030 | 0.428289 | 0.517095 | 11.928394 |
-| release-baseline-3 | 2.947198 | 6.633245 | 0.379467 | 0.470593 | 10.430504 |
-| release-oracle-1 | 2.861821 | 9.156014 | 0.230627 | 0.403364 | 12.651826 |
-| release-oracle-2 | 3.116711 | 9.638053 | 0.379673 | 0.414527 | 13.548963 |
-| release-oracle-3 | 2.887942 | 10.028987 | 0.329182 | 0.571278 | 13.817390 |
-| release-control-price | 2.746086 | 9.177306 | 0.428145 | 0.466742 | 12.818279 |
-| release-control-partial | 2.637178 | 8.980561 | 0.428584 | 0.489621 | 12.535943 |
-| release-control-retry | 2.985109 | 9.395738 | 0.428317 | 0.416543 | 13.225708 |
+| accepted-baseline-1 | 2.336360 | 6.193057 | 0.428120 | 0.272412 | 9.229949 |
+| accepted-baseline-2 | 2.380333 | 6.039600 | 0.428321 | 0.280875 | 9.129130 |
+| accepted-baseline-3 | 2.302136 | 6.129289 | 0.377925 | 0.340641 | 9.149992 |
+| accepted-oracle-1 | 2.508658 | 8.020901 | 0.377987 | 0.255800 | 11.163347 |
+| accepted-oracle-2 | 2.499187 | 7.656742 | 0.377960 | 0.257905 | 10.791794 |
+| accepted-oracle-3 | 2.449111 | 7.795265 | 0.378237 | 0.329348 | 10.951963 |
+| accepted-control-price | 2.448657 | 7.890551 | 0.327966 | 0.248283 | 10.915457 |
+| accepted-control-partial | 2.406952 | 7.839680 | 0.428061 | 0.272414 | 10.947108 |
+| accepted-control-retry | 2.709245 | 7.760033 | 0.227525 | 0.223332 | 10.920135 |
+| accepted-compat-metadata | 2.545734 | 7.954516 | 0.227649 | 0.198684 | 10.926583 |
 
 全部正式运行均 ≤25 秒，无需拆包；30 秒硬上限未改变。本次主机观测不保证另一主机相同耗时。
 
@@ -134,9 +130,9 @@ Dockerfile SHA-256 `sha256:b1d86b011ce4e9ab7157cb8e3cd8fc5757a8db1deaa402a2a0b75
 
 ## 回归验证、排除与公开泄露检查
 
-新增 5 个公开摘要一致性检查追加到已有 Fast CI 核心模块 `tests/test_local_init_script.py`，不执行隐藏源码。原 18 个函数/类 AST 不变，既有 CI selectors/shards 清单不变；不删除、放宽或跳过既有断言。最终 focused：5 passed / 38 deselected（4.58 秒）。
+新增 5 个公开摘要一致性检查追加到已有 Fast CI 核心模块 `tests/test_local_init_script.py`，不执行隐藏源码。原 18 个函数/类 AST 不变，既有 CI selectors/shards 清单不变；不删除、放宽或跳过既有断言。最终 focused：5 passed / 38 deselected（3.29 秒）。
 
-uv 0.12.5；`uv run --locked ruff check .`、`uv run --locked ruff format --check .`、`uv run --locked mypy src tests scripts` 已通过（mypy 472 文件；格式最终文件数另记）。全量 pytest 重跑完成后补入精确计数；离线命名空间回归已 237 PASS（47.42 秒），两次 Replay、五个固定摘要一致，外部/Provider/模型/Judge 调用为 0。
+uv 0.12.5；`uv run --locked ruff check .`、`uv run --locked ruff format --check .`、`uv run --locked mypy src tests scripts` 已通过（src/tests/scripts 的格式及 mypy 均为 472 文件）。全量 pytest 重跑完成：2157 collected / 2157 passed / 0 failed / 0 errors / 0 skipped / 0 deselected，pytest 页脚 1413.65 秒，含 uv/进程启动的整次调用 1417.58 秒；离线命名空间回归已 237 PASS（47.42 秒），两次 Replay、五个固定摘要一致，外部/Provider/模型/Judge 调用为 0。
 
 首次全量调用继承了保管私有产物用的 umask 077，导致既有
 `test_vault_rejects_missing_or_public_roots` 的 0755 目录前置条件实际成为 0700，
@@ -146,7 +142,7 @@ uv 0.12.5；`uv run --locked ruff check .`、`uv run --locked ruff format --chec
 相同九项整文件排除、常规 umask 022 从头重跑全量。资格任务的隐藏材料仍以 0600/0700 保管。
 
 提交前将仓库 diff 写到私有 state 根，只用私有标识清单检查，不把清单内容写入公开记录。
-命令与结果：7 个 oracle/Verifier 独有标识，0 命中（rg 无命中退出码 1）。
+命令与结果：9 个 oracle/Verifier 独有标识，0 命中（rg 无命中退出码 1）。
 
 ```bash
 SS_STATE=/home/dev/.local/state/samescale-minishop-fastapi-1.0.0-audit
@@ -156,8 +152,24 @@ rg --count-matches -F -f "$SS_STATE/private-leak-patterns.txt" \
   "$SS_STATE/leak-review/repository.diff"
 ```
 
-受保护的 src、Official tasks、CI selector/shard 清单与原有测试函数/类 AST 均无改动；
+受保护的 src、Official tasks、CI selector/shard 清单与原有测试函数/类 AST 均无改动；原冻结证据前后逐文件校验一致；
 新增内容只有本报告/契约/公开摘要、授权及状态文档，以及已有核心模块内的五项摘要检查。
+
+最终全量命令（DATABASE_URL 仅指向新建的一次性测试数据库，先执行 `uv run --locked alembic upgrade head`；子进程 umask 为 022）：
+
+```bash
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 uv run --locked pytest -p pytest_asyncio.plugin -q --durations=20 \
+  --junitxml="$SS_STATE/regression-022/pytest.xml" \
+  --ignore=tests/test_codex_current_setup.py \
+  --ignore=tests/test_codex_harness.py \
+  --ignore=tests/test_multi_harness.py \
+  --ignore=tests/test_phase_f_claude_startup.py \
+  --ignore=tests/test_phase_f_deepseek_startup.py \
+  --ignore=tests/test_runtime_config_hygiene.py \
+  --ignore=tests/test_verifier_lifecycle_handoff.py \
+  --ignore=tests/test_cli.py \
+  --ignore=tests/test_subscription_protocol_docker.py
+```
 
 全量 pytest 在独立一次性 PostgreSQL 18 测试数据库上运行，使用清理后的环境和隔离 HOME，无实际凭据。以下文件在收集前以 `--ignore` 整文件排除（排除不等于通过）：
 

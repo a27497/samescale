@@ -10,14 +10,14 @@ Verifier and a digest-pinned Python3.12.14 image with13 exact hash-locked runtim
 no Official task, external_evidence/Verifier core/receipt/Replay/export/identity/REAL_CODEX edits.
 No DeepSeek snapshot/source/self-tests/self-report access; no subject adapter or 3b execution.
 
-Final task `ad6abc0c`, verifier `caeba3d8`, qualification `6893bb82`, image `e8e91987`.
+Final task `95f1b9ba`, verifier `cf3803e8`, qualification `47c9b4b1`, image `e8e91987`.
 Existing PinnedVerifierSandbox, network none,128MB/0.5CPU/64PID, nonroot, readonly workspace/root.
 Three baseline repeats6/26 business FAIL; three oracle repeats26/26 PASS, identical per-side
 vectors; price/partial-commit/retry-decrement single-edit controls FAIL25/26,25/26,24/26.
-Final9 runs11.470–14.999s whole-call, disjoint lifecycle and verifier-body timings recorded.
+Final9 baseline/oracle/defect runs10.040–12.045s whole-call; correct interface-compatibility control26/26 in11.857s, disjoint lifecycle and verifier-body timings recorded.
 TaskStore re-inspect eligible_for_planning=true; actual nonempty workspaces and digest/isolation
-proof checked. Thirty total physical task Verifiers:3 initial preparation,18 superseded-revision,
-9 final; all retained, no automatic retry. Public only contract/check names/digests/counts/timings;
+proof checked. Sixty total physical task Verifiers:3 initial preparation,47 superseded-revision,
+10 final; all retained, no automatic retry. Public only contract/check names/digests/counts/timings;
 hidden source and qualification workspaces remain approved external0600/0700 assets.
 
 C25 uses an independent HTTP scenario after page/resource loading; browser interaction and full
@@ -26,11 +26,15 @@ NOT_COVERED. Controlled stock setup avoids extra initial-stock requirements. No 
 reused. Five new public consistency cases join the existing Fast CI core module; original18
 function/class ASTs and selector/shard inventories unchanged. Focused5 PASS; Ruff/mypy PASS;
 offline namespace237 PASS, dual replay/five goldens unchanged, external/model/Judge calls0.
-Full pytest is rerunning in a fresh disposable database with child umask022: initial private
-umask077 invalidated one existing public-directory fixture; initial interrupted logs retained,
-that unchanged test recheck1 PASS. Nine Agent CLI-capable files excluded before collection.
-Final counts, leak scan, exact-head Fast/Offline CI and Draft PR handoff follow in the
-[qualification and verification summary](docs/qa/minishop-fastapi-sqlite-1.0.0.md).
+Full pytest2157 collected/passed, failed/errors/skipped/deselected0 in1413.65s
+(1417.58s including bootstrap) on a fresh disposable database with child umask022.
+Initial private umask077 invalidated one existing public-directory fixture; interrupted logs
+retained, unchanged test recheck1 PASS, complete rerun PASS. Nine Agent CLI-capable files
+excluded before collection. Frozen evidence inventory remains identical. Final public consistency
+checks5 PASS; src/tests/scripts Ruff/format/mypy472 PASS. Precommit private-identifier scan9
+patterns/0 matches; no hidden source enters Git or CI. Draft PR#28 remains for review; initial
+published-head Fast/Offline CI PASS, final exact-head handoff is verified separately.
+[Qualification and verification summary](docs/qa/minishop-fastapi-sqlite-1.0.0.md).
 Stop after the authorized Draft PR for human review and separate3b authorization; no merge/deploy.
 
 ## Current state — CLI snapshot → reviewed code-only binding — 2026-10-17 (Asia/Shanghai)
