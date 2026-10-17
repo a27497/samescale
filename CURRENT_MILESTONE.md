@@ -1,5 +1,56 @@
 # SameScale Product — Current Milestone
 
+## Current state — MiniShop trusted interface and first-run authorization boundary — 2026-10-17 (Asia/Shanghai)
+
+Isolated worktree/branch `codex/minishop-trusted-interface-20261017` starts at fetched
+`main@38d9f029563b0a157ac5a0a2426f013bb8ea4654`. Original dirty diff and PR #29 untouched.
+New private `minishop-fastapi-sqlite@1.1.2` selects trusted shape declarations by complete
+workspace digest, supporting `MiniShop/`, `run:app`, `MINISHOP_DB_PATH` and temporary SQLite
+without source injection. Existing 1.0.0 task/Verifier/R/history preserved. Original 26-check
+suite and classification ASTs unchanged; no core verification/Sandbox/REAL_CODEX or dependency edits.
+Task-local fail-closed Landlock denies application reads of hidden checks; new exact/hash-locked
+runtime image matches declared FastAPI/Uvicorn. Private source and qualification assets stay outside Git.
+
+Final task `78e8c194`, Verifier `b8ee0816`, qualification `16c02a25`, image `5ad60dee`.
+Three baseline repeats valid business FAIL 6/26; three oracle repeats PASS 26/26; vectors consistent.
+Single-edit price/partial-commit/retry-decrement controls FAIL 25/26, 25/26, 24/26.
+Two correct compatibility samples PASS 26/26, including exact subject shape and hidden-read denial.
+All 11 final lifecycle results complete, under 25 seconds, input/output digests equal; TaskStore
+eligible_for_planning=true. Fifteen preparation physical observations, including all four infrastructure
+failures, bytecode identity drift and permission/cleanup corrections, remain separate and retained.
+
+Approved synthetic references actually completed ZIP CodeSnapshot → CLI restore → source approval →
+code-only-v1 → independent Verifier/export/Replay: baseline VERIFIED_FAIL 6/26, two references
+VERIFIED_PASS 26/26; interface mismatch and forced timeout NOT_VERIFIED/0 checks. Burned attempts
+and corrupted records refused before new physical starts; repeated completed calls reused receipts.
+Five integration physical Verifiers; 31 total MiniShop Verifiers including preparation/qualification,
+excluding unrelated generic regression fixtures. No Agent/model/Provider/Judge calls.
+
+Related 14-file regression: initial 415 PASS/10 FAIL; the ten global no-container assertions overlapped
+with owned MiniShop containers. After serializing, exact failed nodes 10/10 PASS; 425 unique final
+passes, no skipped checks or changed assertions. Initial logs preserved. Eight appended synthetic
+negative cases cover malformed/duplicate/contradictory/truncated/incomplete verifier evidence and
+no-retry behavior. Private adapter unittest 10 PASS; offline namespace 245 PASS with dual Replay/five
+goldens unchanged; Ruff lint/format 914 and mypy 472 PASS. Full suite/frontend/Windows+WSL2 NOT_RUN
+within focused scope. Frozen repository inventory 439 files unchanged; 2,016 pre-existing external
+asset/history hashes and original dirty diff unchanged. 129 documentation links resolve; all 47 original
+ZIP test ASTs unchanged and 9 private-identifier patterns have zero matches. No existing service/database configuration edit.
+
+Real snapshot `2fd1898f…` remains exactly 32 files/237,995 bytes, content `2665fbe6…`, original
+serialized SHA `846222eb…`. Only data restore, trusted-shape/AST preflight, data-only approval/ingest
+and offline export were done. Prepared record `5fe073a6…` remains NOT_VERIFIED/NO_RUN_RECORD/
+NOT_ATTESTED with **0 physical attempts**; data-only policy has no image/runtime/artifact. Exact pinned
+execution policy is prepared but inactive. Browser/cart/checkout, visual, documentation clarity and
+original development history remain outside this 26-check qualification.
+
+[Method and authorization boundary](docs/MINISHOP_TRUSTED_INTERFACE.md),
+[identities, results, failure history and exact authorization text](docs/qa/minishop-trusted-interface-20261017.md),
+[public-safe receipt](docs/qa/minishop-trusted-interface-20261017.json).
+This branch's authorized commit/push/Draft PR and exact-head CI are checked separately in final
+publication handoff. No merge/deploy, PR #29 changes, or real MiniShop Verifier execution.
+**STOP at first real MiniShop physical Verifier authorization.**
+
+
 ## Current state — MiniShop FastAPI / SQLite post-delivery audit qualification — 2026-10-17 (Asia/Shanghai)
 
 Fetched main `1432cb94fc22e110e49e733bab7b96dc7d360a09`; isolated branch

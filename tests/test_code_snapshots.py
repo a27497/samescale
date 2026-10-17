@@ -1281,3 +1281,92 @@ def test_atomic_publication_never_replaces_new_empty_target(
         restore_source(policy, identity, target)
     assert target.is_dir() and not list(target.iterdir())
     assert not list(tmp_path.glob(".code-snapshot-restore-*"))
+
+
+@pytest.mark.parametrize(
+    "damage",
+    ["malformed", "duplicate", "score", "passed", "stdout", "stderr", "cleanup", "lifecycle"],
+)
+async def test_restored_verifier_damaged_evidence_never_passes_or_retries(
+    policy: EvidencePolicy,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    damage: str,
+) -> None:
+    from types import SimpleNamespace
+
+    from harnesslab.external_evidence import verification
+    from harnesslab.external_evidence.models import ApprovedSource
+    from harnesslab.local_plans.tasks import LocalTaskPolicy
+
+    identity, _ = restore_snapshot(policy)
+    restored = restore_source(policy, identity, tmp_path / "restored")
+    source = ApprovedSource.model_validate(restored["source_fragment"])
+    policy = policy.model_copy(
+        update={
+            "sources": (source,),
+            "verifier_image_id": "sha256:" + "b" * 64,
+            "runtime_root": tmp_path / "runtime",
+            "artifact_root": tmp_path / "artifacts",
+        }
+    )
+    item = restore_ingest(policy, source.source_id, monkeypatch)
+    trusted = tmp_path / "trusted"
+    trusted.mkdir()
+    task_policy = LocalTaskPolicy(
+        source_roots={"trusted": trusted}, managed_store=tmp_path / "managed"
+    )
+    package = SimpleNamespace(
+        definition=SimpleNamespace(content_digest=source.task_digest),
+        verifier_digest="sha256:" + "c" * 64,
+        manifest=SimpleNamespace(verifier=SimpleNamespace(timeout_seconds=30)),
+        materialize=lambda path: SimpleNamespace(protected_digests=()),
+    )
+    monkeypatch.setattr(verification, "load_policy", lambda: task_policy)
+    monkeypatch.setattr(
+        verification,
+        "inspect_task",
+        lambda policy, reference: (
+            SimpleNamespace(
+                eligible_for_planning=True, qualification_identity="sha256:" + "d" * 64
+            ),
+            package,
+        ),
+    )
+    calls = []
+
+    class DamagedSandbox:
+        def __init__(self, **kwargs: object) -> None:
+            calls.append(kwargs)
+
+        async def run_hidden_verifier_workspace(self, *args: object, **kwargs: object) -> Any:
+            check = {"name": "synthetic-check", "passed": True, "score": 1.0}
+            report = {
+                "schema_version": 1,
+                "passed": damage != "passed",
+                "score": 0.5 if damage == "score" else 1.0,
+                "checks": [check, check] if damage == "duplicate" else [check],
+            }
+            manifest = SimpleNamespace(
+                workspace_input_digest=source.workspace_digest,
+                workspace_output_digest=source.workspace_digest,
+                stdout_truncated=damage == "stdout",
+                stderr_truncated=damage == "stderr",
+                cleanup_verified=damage != "cleanup",
+            )
+            return SimpleNamespace(
+                run=SimpleNamespace(
+                    stdout="{" if damage == "malformed" else json.dumps(report), manifest=manifest
+                ),
+                lifecycle=None if damage == "lifecycle" else SimpleNamespace(failure_subtype=None),
+            )
+
+    monkeypatch.setattr(verification, "PinnedVerifierSandbox", DamagedSandbox)
+    before = (policy.store / item["identity"] / "record.json").read_bytes()
+    receipt = await RESTORE_VERIFY_WORKSPACE(policy, item["identity"])
+    assert receipt["acceptance"] == "NOT_VERIFIED" and receipt["checks"] == 0
+    assert receipt["reason"] == "VERIFIER_INFRASTRUCTURE_FAILURE"
+    assert receipt["physical_attempts"] == 1 and receipt["automatic_retry"] is False
+    assert await RESTORE_VERIFY_WORKSPACE(policy, item["identity"]) == receipt
+    assert len(calls) == 1
+    assert (policy.store / item["identity"] / "record.json").read_bytes() == before

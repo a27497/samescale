@@ -1,5 +1,19 @@
 # SameScale Product Project Blueprint (HarnessLab-compatible)
 
+## 当前授权：MiniShop 可信接口适配与首次真实验收准备（2026-10-17）
+
+从 `main@38d9f029563b0a157ac5a0a2426f013bb8ea4654` 创建独立 worktree；保留原脏工作区、
+PR #29、旧任务/Verifier、R、32 文件快照、历史收据和 Replay。新增私有任务版本，可信 Verifier
+以 workspace digest 固定形状声明，适配 MiniShop 子目录、FastAPI 入口和临时 SQLite。
+不改核心 verification、Sandbox 或 REAL_CODEX，不根据被测缺陷放宽原 26 项语义。
+
+本轮允许 baseline/oracle 各三次、有限单点控制、正确兼容样本、无模型的集成/安全/离线回归，
+以及该分支 commit/push/Draft PR 和 exact-head CI 核对。隐藏资产保持 Git 外。使用参考样本
+完成整个接入链；真实 DeepSeek 仅数据恢复、来源绑定和静态兼容性预检。首次物理 Verifier
+仍未授权，准确身份交付后 STOP；不合并/部署，不推进其他 roadmap。
+[任务侧方法与授权边界](MINISHOP_TRUSTED_INTERFACE.md)。实际状态只更新 CURRENT_MILESTONE。
+
+
 ## 当前授权：MiniShop FastAPI / SQLite 交付后审计任务资格（2026-10-17）
 
 从 fetch 后 main `1432cb94fc22e110e49e733bab7b96dc7d360a09` 独立新分支准备

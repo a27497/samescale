@@ -149,3 +149,10 @@ PASS，以及原收据/导出/Replay/ExternalRecord 身份算法都不改变。�
 **FastAPI MiniShop 快照 `58c9ef0ce39b4f5d245cbc325adde1e5fc33b28cd0c16f413b05d8ccd04182f0`
 没有可信任务。不得将它映射到 `minishop-standard-library@1.0.0` 的 WSGI 契约后宣称验收。**
 CLI 不做语义适配认证；没有适配且已资格认证的任务时保持 NOT_VERIFIED。
+
+
+2026-10-17 的后续准备为另一确切快照 `2fd1898f67aadfee85fdf40f924cccf68d64759443d125715bacec6e91d7ec68`
+建立独立 FastAPI/SQLite 可信接口任务，不复用 WSGI 判定。旧快照 `58c9ef0…` 的上述历史交接
+不自动获得新映射；每个内容摘要仍须受审声明与新资格精确绑定。
+见 [MiniShop 可信接口与首次执行边界](MINISHOP_TRUSTED_INTERFACE.md)。真实快照仍为
+NOT_VERIFIED，首次物理 Verifier 需要单独授权。
