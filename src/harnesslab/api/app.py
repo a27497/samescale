@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.exc import DBAPIError
 
 from harnesslab import __version__
+from harnesslab.acceptance_plans.api import router as acceptance_plans_router
 from harnesslab.analyst.api import router as analyst_router
 from harnesslab.api.routes.health import router as health_router
 from harnesslab.api.routes.local_configuration import router as local_configuration_router
@@ -90,6 +91,14 @@ def create_app(*, workbench_dist: Path | None = None) -> FastAPI:
                     )
         return await call_next(request)
 
+    @application.middleware("http")
+    async def acceptance_privacy(request: Request, call_next):  # type: ignore[no-untyped-def]
+        response = await call_next(request)
+        if request.url.path.startswith("/api/acceptance-plans"):
+            response.headers["Cache-Control"] = "no-store"
+        return response
+
+    application.include_router(acceptance_plans_router, prefix="/api")
     application.include_router(local_configuration_router, prefix="/api")
     application.include_router(local_plans_router, prefix="/api")
     application.include_router(external_evidence_router, prefix="/api")

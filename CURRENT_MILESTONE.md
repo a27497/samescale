@@ -1,5 +1,60 @@
 # SameScale Product — Current Milestone
 
+## Current state — PR #32 revision provenance clarification — 2026-10-19 (Asia/Shanghai)
+
+Narrow follow-up on `d93b6b53e73039fec1ad8f19c538394e50a29c68`, same clean isolated PR branch.
+The UI distinguishes inherited USER_APPROVED_ADDITION provenance from approval in the selected
+version: pending revisions explicitly show “历史批准的新增范围（本版本未批准）”; renewed approval
+shows “本版本已批准的新增范围”. Original candidate source, version decision/count and review time
+are labeled separately, including when selecting historical events. Backend executable AST unchanged;
+storage, state machine, finite Prompt extraction, frozen events and original Prompt are preserved.
+
+Focused pytest **35 PASS** (three new origin variants), targeted Vitest **16 PASS**, full Vitest
+**296 PASS / 23 files**, production build/typecheck and focused Ruff/format/mypy PASS.
+The two new frontend cases first reproduced the old ambiguity (14 PASS / 2 FAIL), then passed.
+Regression covers approval → confirmation → freeze v1 → pending v2 → renewed approval, refusal to
+confirm unreviewed v2, byte-identical v1 events/digests/timestamps, reload and history selection.
+No new browser run or full backend suite claimed; previous browser evidence remains dated evidence.
+No model or physical Verifier invoked locally; no runtime/environment or historical evidence edits.
+Normal commit/push and the resulting head's CI are verified in PR handoff; keep Draft, no merge/deploy.
+
+## Current state — Acceptance Plan P0-0 / P0-1 — 2026-10-18 (Asia/Shanghai)
+
+Implemented in isolated `codex/acceptance-plan-p0-20261018`, based on fetched main
+`e491090b748bfab653466cf2e3fe8f03220bcc64`; original dirty UI worktree and PR #29 untouched.
+[P0 contract and eight scenarios](docs/ACCEPTANCE_PLANS.md): private existing CodeSnapshot +
+immutable original Prompt → finite deterministic draft / manual fallback → per-clause provenance,
+reason and decision → explicit confirmation → immutable freeze → revision with renewed review.
+Separate append-only store and `/acceptance-plans`; `/plans`, TaskStore, Worker and historical
+snapshot/receipt/Replay identities remain unchanged. Every version is POST_DELIVERY_AUDIT,
+NO_QUALIFIED_BOUND_VERIFIER, NOT_RUN, execution_authorized=false; no business verdict is produced.
+
+Local final acceptance tests **32 PASS**; snapshot/external compatibility **194 PASS**; isolated
+PostgreSQL + local-plan/health/DTO/CI-routing checks **103 PASS**; network-isolated S3 **277 PASS**,
+two byte-identical Replay outputs/five fixed digests unchanged. Full Vitest **294 PASS / 23 files**;
+final snapshot copy check **10 PASS**; production build/typecheck PASS. Ruff **928** files and mypy
+**477** files PASS. Chromium **26/26** browser checks, including actual process restart recovery,
+snapshot-detail entry, MiniShop full review/freeze/revision, manual fallback, permission refusal and
+corrupt binding; screenshots inspected. [QA evidence](docs/qa/acceptance-plans-20261018/README.md).
+
+Initial cross-module run: 247 PASS / 2 CI-shard registration failures / 1 missing disposable DB
+error. Shard inventory corrected; the failed checks and related contracts passed in the isolated
+DB run. Initial browser harness startup/selector/navigation timing failures and the corrected
+storage interruption/typecheck issues are documented, never counted as passes. Protected Git
+inventory **442 files unchanged**; legacy backend/evidence/task/receipt paths have no diff.
+**New scope path: 0 real model calls, 0 physical Verifiers, 0 subject-code executions**; synthetic failure snapshots
+are isolated from old evidence. No running service configuration, old DB, private Verifier/Oracle,
+MiniShop assets or qualification history modified. No new migration or dependency. Existing remote Fast CI separately executes synthetic Tier-B
+fixtures; the zero-execution claim is scoped to Acceptance Plan and real/private assets, not every
+process in generic CI. Initial push CI on 493852f exposed a pre-lock inventory-scan race during
+concurrent creation; scanning now holds the publication lock, with a deterministic lock-order test.
+
+Limits: finite grammar falls back to manual scope; shared local operator identity (not named human),
+POSIX single-host store and explicit caps; digest integrity is not privileged rollback resistance.
+Mobile/non-Chromium/full release and new real acceptance are NOT_RUN. Commit/push/Draft PR and
+exact base/head/CI are verified separately in the final handoff. No merge/deploy. Stop at P0-1.
+
+
 
 ## Current state — MiniShop first-real closeout — 2026-10-18 (Asia/Shanghai)
 

@@ -8,7 +8,8 @@
     "tests/test_workbench_api.py::test_frontend_dtos_contain_no_absolute_path_credential_or_private_sentinel",
     "tests/test_tier_b_repo_engineering.py",
     "tests/test_local_init_script.py",
-    "tests/test_code_snapshots.py"
+    "tests/test_code_snapshots.py",
+    "tests/test_acceptance_plans.py"
   ],
   [
     "tests/test_analyst_sessions.py",

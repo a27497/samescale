@@ -1,0 +1,53 @@
+{
+  "initial_cross_module": {
+    "tests": 250,
+    "passed": 247,
+    "failed": 2,
+    "errors": 1,
+    "skipped": 0
+  },
+  "acceptance_final": {
+    "tests": 32,
+    "passed": 32,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "isolated_database_and_ci": {
+    "tests": 103,
+    "passed": 103,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "frontend": {
+    "tests": 294,
+    "files": 23,
+    "failed": 0
+  },
+  "frontend_final_snapshot_copy": {
+    "tests": 10,
+    "failed": 0
+  },
+  "build": "PASS",
+  "ruff": {
+    "check": "PASS",
+    "format_files": 928
+  },
+  "mypy": {
+    "status": "PASS",
+    "files": 477
+  },
+  "frontend_final_scope": {
+    "tests": 14,
+    "failed": 0
+  },
+  "initial_push_ci": {
+    "head": "493852f451c9ec1e06258291db45de4fd7373051",
+    "failed": 1,
+    "passed": 222,
+    "test": "test_idempotency_and_concurrent_writers",
+    "cause": "Store inventory scan occurred before publication lock; concurrent staging rename could be misread as corruption.",
+    "fix": "Scan inside flock; deterministic lock-order regression added."
+  }
+}
