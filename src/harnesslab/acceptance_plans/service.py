@@ -405,6 +405,8 @@ def change(plan_id: str, request: ChangePlan) -> dict[str, Any]:
                     parent_frozen_digest=events[-1]["digest"],
                 )
                 for item in state["clauses"]:
+                    # Source records provenance, including past approval; only decision
+                    # establishes approval in this version. Prior review times stay in history.
                     item.update(decision="PENDING", reviewed_at=None, review_reason=None)
         return append(root, state, events, request, action)
 

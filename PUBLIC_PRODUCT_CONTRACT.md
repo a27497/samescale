@@ -7,6 +7,8 @@ CodeSnapshot and immutable original Prompt. Narrow deterministic extraction, tem
 and manual review preserve EXPLICIT_IN_PROMPT / USER_APPROVED_ADDITION / SUGGESTED_ONLY /
 AMBIGUOUS provenance. Pending/rejected clauses are excluded from failure criteria. Private,
 versioned append-only review history supports explicit confirmation, immutable freeze and revision.
+Inherited approval provenance is historical; each revision requires its own per-clause approval,
+shown separately from source history and the selected version's review time.
 This is separate from `/plans` and never registers admitted TaskStore tasks, authorizes Worker
 execution or emits independent receipts/business verdicts. Verifier binding remains
 NO_QUALIFIED_BOUND_VERIFIER and actual acceptance NOT_RUN. It is not preregistration or blind testing.

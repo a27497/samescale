@@ -1,5 +1,23 @@
 # SameScale Product — Current Milestone
 
+## Current state — PR #32 revision provenance clarification — 2026-10-19 (Asia/Shanghai)
+
+Narrow follow-up on `d93b6b53e73039fec1ad8f19c538394e50a29c68`, same clean isolated PR branch.
+The UI distinguishes inherited USER_APPROVED_ADDITION provenance from approval in the selected
+version: pending revisions explicitly show “历史批准的新增范围（本版本未批准）”; renewed approval
+shows “本版本已批准的新增范围”. Original candidate source, version decision/count and review time
+are labeled separately, including when selecting historical events. Backend executable AST unchanged;
+storage, state machine, finite Prompt extraction, frozen events and original Prompt are preserved.
+
+Focused pytest **35 PASS** (three new origin variants), targeted Vitest **16 PASS**, full Vitest
+**296 PASS / 23 files**, production build/typecheck and focused Ruff/format/mypy PASS.
+The two new frontend cases first reproduced the old ambiguity (14 PASS / 2 FAIL), then passed.
+Regression covers approval → confirmation → freeze v1 → pending v2 → renewed approval, refusal to
+confirm unreviewed v2, byte-identical v1 events/digests/timestamps, reload and history selection.
+No new browser run or full backend suite claimed; previous browser evidence remains dated evidence.
+No model or physical Verifier invoked locally; no runtime/environment or historical evidence edits.
+Normal commit/push and the resulting head's CI are verified in PR handoff; keep Draft, no merge/deploy.
+
 ## Current state — Acceptance Plan P0-0 / P0-1 — 2026-10-18 (Asia/Shanghai)
 
 Implemented in isolated `codex/acceptance-plan-p0-20261018`, based on fetched main

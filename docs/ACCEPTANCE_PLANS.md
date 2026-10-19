@@ -51,6 +51,15 @@ source labels. Decisions are PENDING / APPROVED / REJECTED. Every decision/chang
 server review times and event snapshots preserve confirmation history. An approved clause is scope,
 not a qualified check. Uncovered requirements remain explicit and are never inferred from source code.
 
+`source` records provenance, not approval in the selected version. REVISE preserves that provenance
+(including `USER_APPROVED_ADDITION`), resets every `decision` to PENDING and clears the new version's
+review time/reason. The UI labels inherited additions as “历史批准的新增范围（本版本未批准）” until
+renewed approval, and shows the original candidate source separately. Only `decision=APPROVED`
+labels an addition “本版本已批准的新增范围” and includes it in the version's approved count. Review
+times/reasons describe the selected event's version; earlier approvals remain in their original
+history events. Selecting v1 history shows v1's decision/time, never v2's. No event rewriting or
+extraction-rule expansion is involved; unsupported Prompts still require manual fallback.
+
 ## Persistence, privacy and limits
 
 Configure `HARNESSLAB_ACCEPTANCE_PLAN_STORE` as a new canonical, owned 0700 directory **outside**

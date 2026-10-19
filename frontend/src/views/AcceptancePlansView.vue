@@ -11,9 +11,13 @@ const prompt = ref(''); const detail = ref<PlanDetail | null>(null); const selec
 const edits = ref<Record<string, { text: string; decision: Clause['decision']; reason: string }>>({})
 const manual = ref(''); const manualReason = ref(''); const reason = ref(''); const acknowledged = ref(false)
 let generation = 0; let alive = true; let pending: { signature: string; id: string } | null = null
-const sourceLabels = { EXPLICIT_IN_PROMPT: '原文明确要求', USER_APPROVED_ADDITION: '用户批准的新增范围', SUGGESTED_ONLY: '仅建议', AMBIGUOUS: '待澄清' }
+const sourceLabels = { EXPLICIT_IN_PROMPT: '原文明确要求', USER_APPROVED_ADDITION: '曾获用户批准的新增范围', SUGGESTED_ONLY: '仅建议', AMBIGUOUS: '待澄清' }
+function clauseSourceLabel(clause: Clause) {
+  if (clause.source !== 'USER_APPROVED_ADDITION') return sourceLabels[clause.source]
+  return clause.decision === 'APPROVED' ? '本版本已批准的新增范围' : '历史批准的新增范围（本版本未批准）'
+}
 const statusLabels: Record<string, string> = { DRAFT: '草稿 · 待审查', CONFIRMED: '验收方案已确认', FROZEN: '验收方案已确认 · 已冻结' }
-const decisionLabels = { PENDING: '待澄清 / 暂不纳入', APPROVED: '确认纳入范围', REJECTED: '拒绝 / 不纳入' }
+const decisionLabels = { PENDING: '未批准 · 待澄清 / 暂不纳入', APPROVED: '确认纳入范围', REJECTED: '拒绝 / 不纳入' }
 const event = computed(() => detail.value?.history.find(e => e.digest === selectedEvent.value) ?? detail.value?.current)
 const state = computed(() => event.value?.state)
 const isCurrent = computed(() => event.value?.digest === detail.value?.current.digest)
@@ -139,7 +143,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; prompt.va
       <template v-else-if="state && detail">
         <div class="panel">
           <div class="panel-title"><h3>{{ statusLabels[state.status] }} · v{{ state.version }}</h3><button class="secondary-button" :disabled="busy" @click="refresh">刷新已保存状态</button></div>
-          <div class="scope-status"><div><strong>范围确认</strong><p>{{ statusLabels[state.status] }}</p><small>已批准 {{ approved }} 项；其余不作为失败标准</small></div><div><strong>Verifier 资格与绑定</strong><p>无合格且正确绑定的 Verifier</p><small>尚不能进行权威验收</small></div><div><strong>实际验收结果</strong><p>未执行 · NOT_RUN</p><small>没有业务 PASS/FAIL 或独立收据</small></div></div>
+          <div class="scope-status"><div><strong>范围确认</strong><p>{{ statusLabels[state.status] }}</p><small>本版本已批准 {{ approved }} 项；其余不作为失败标准</small></div><div><strong>Verifier 资格与绑定</strong><p>无合格且正确绑定的 Verifier</p><small>尚不能进行权威验收</small></div><div><strong>实际验收结果</strong><p>未执行 · NOT_RUN</p><small>没有业务 PASS/FAIL 或独立收据</small></div></div>
           <p v-if="detail.snapshot_binding !== 'INTACT'" role="alert" class="scope-warning">快照不可用或已变化：历史范围可读，修改与冻结被阻止。</p>
           <p>绑定快照：<RouterLink :to="`/code-snapshots/${state.snapshot.identity}`" class="technical">{{ state.snapshot.identity }}</RouterLink></p>
           <details open><summary>不可覆盖的原始 Prompt</summary><pre data-test="original-prompt">{{ state.original_prompt }}</pre></details>
@@ -148,10 +152,11 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; prompt.va
           <p class="technical">事件摘要：{{ event?.digest }}</p><p>记录人：{{ event?.actor }}（共享操作员身份） · {{ event?.at }}</p><p>修改 / 确认依据：{{ event?.reason }}</p>
           <p v-if="state.confirmed_at">确认时间：{{ state.confirmed_at }}</p><p v-if="state.frozen_at">冻结时间：{{ state.frozen_at }}</p>
         </div>
-        <div class="panel"><h3>逐项来源与歧义审查</h3><p>只有明确批准的条款纳入当前范围。修改原文提取条款后再批准，将标为用户新增范围；来源原文始终保留。</p>
+        <div class="panel"><h3>逐项来源与歧义审查</h3><p>只有本版本明确批准的条款纳入范围。历史批准来源不代表本版本已批准；修订后须重新逐项审查。修改原文提取条款后再批准，将标为用户新增范围；来源原文始终保留。读取历史事件时，“本版本”指所选事件所属版本。</p>
           <article v-for="c in state.clauses" :key="c.id" class="scope-clause" :data-clause="c.id">
-            <div class="panel-title"><strong>{{ c.id }} · {{ sourceLabels[c.source] }}</strong><span>{{ decisionLabels[c.decision] }}</span></div>
-            <p class="technical">{{ c.source }} · {{ c.origin.kind }}</p>
+            <div class="panel-title"><strong>{{ c.id }} · {{ clauseSourceLabel(c) }}</strong><span>本版本决定：{{ decisionLabels[c.decision] }}</span></div>
+            <p class="technical">来源记录：{{ c.source }} · {{ c.origin.kind }}</p>
+            <p>初始来源：{{ sourceLabels[c.origin.source] }}</p>
             <blockquote v-if="c.origin.quote">原文依据：{{ c.origin.quote }}</blockquote>
             <p>初始候选：{{ c.origin.text }}</p>
             <template v-if="editable && edits[c.id]">
@@ -159,7 +164,7 @@ onBeforeUnmount(() => { alive = false; generation++; token.value = ''; prompt.va
               <div class="scope-edit"><label>审查决定<select v-model="edits[c.id]!.decision" :disabled="busy"><option v-for="(label, key) in decisionLabels" :key="key" :value="key">{{ label }}</option></select></label><label>修改或决定依据<input v-model="edits[c.id]!.reason" maxlength="2000" :disabled="busy" /></label><button class="secondary-button" :disabled="busy || !edits[c.id]!.reason.trim() || !edits[c.id]!.text.trim()" @click="review(c)">保存本项审查</button></div>
             </template>
             <p v-else>{{ c.text }}</p>
-            <p v-if="c.reviewed_at">上次审查：{{ c.reviewed_at }} · {{ c.review_reason }}</p>
+            <p v-if="c.reviewed_at">本版本审查：{{ c.reviewed_at }} · {{ c.review_reason }}</p>
           </article>
           <form v-if="editable" class="builder-form manual-clause" @submit.prevent="change({ action: 'ADD', text: manual, reason: manualReason })"><h4>人工补充候选（默认仅建议）</h4><label>候选内容<textarea v-model="manual" maxlength="2000" rows="2" :disabled="busy" data-test="manual" /></label><label>补充依据<input v-model="manualReason" maxlength="2000" :disabled="busy" data-test="manual-reason" /></label><button class="secondary-button" :disabled="busy || !manual.trim() || !manualReason.trim()">添加待审查项</button></form>
         </div>

@@ -211,6 +211,61 @@ async def test_freeze_revision_restart_and_immutable_history(
     assert result.headers["cache-control"] == "no-store"
 
 
+@pytest.mark.parametrize("clause_id", ["c1", "c3", "c4"])
+async def test_revision_approval_provenance_requires_renewed_review(
+    client: AsyncClient, snapshot: dict[str, Any], clause_id: str
+) -> None:
+    first = await create(client, snapshot)
+    approved = await approve(client, first, clause_id, "用户决定增加的可检查范围")
+    original = next(c for c in approved["state"]["clauses"] if c["id"] == clause_id)
+    assert original["source"] == "USER_APPROVED_ADDITION"
+    assert original["decision"] == "APPROVED" and original["reviewed_at"]
+    confirmed = await change(client, approved, "CONFIRM", acknowledgement="SCOPE_ONLY_NO_EXECUTION")
+    frozen = await change(client, confirmed, "FREEZE", acknowledgement="SCOPE_ONLY_NO_EXECUTION")
+    url = f"{PREFIX}/{first['state']['plan_id']}"
+    old_history = (await client.get(url)).json()["history"]
+    root = service.root_path() / first["state"]["plan_id"]
+    old_bytes = {p.name: p.read_bytes() for p in root.iterdir()}
+
+    revised = await change(client, frozen, "REVISE", acknowledgement="SCOPE_ONLY_NO_EXECUTION")
+    pending = next(c for c in revised["state"]["clauses"] if c["id"] == clause_id)
+    assert pending == {
+        **original,
+        "decision": "PENDING",
+        "reviewed_at": None,
+        "review_reason": None,
+    }
+    assert revised["state"]["version"] == 2
+    assert revised["state"]["parent_frozen_digest"] == frozen["digest"]
+    refused = await client.post(
+        url + "/changes",
+        json=mutation(revised, "CONFIRM", acknowledgement="SCOPE_ONLY_NO_EXECUTION"),
+    )
+    assert refused.status_code == 409
+    assert refused.json()["error"]["code"] == "ACCEPTANCE_EMPTY_SCOPE"
+    assert (await client.get(url)).json()["current"] == revised
+
+    renewed = await change(
+        client,
+        revised,
+        "REVIEW",
+        clause_id=clause_id,
+        text=pending["text"],
+        decision="APPROVED",
+        reason="本版本重新审查并批准",
+    )
+    current = next(c for c in renewed["state"]["clauses"] if c["id"] == clause_id)
+    assert current["source"] == "USER_APPROVED_ADDITION" and current["decision"] == "APPROVED"
+    assert current["origin"] == original["origin"]
+    assert current["reviewed_at"] and current["review_reason"] == "本版本重新审查并批准"
+    detail = (await client.get(url)).json()
+    assert detail["current"] == renewed
+    assert detail["history"] == [*old_history, revised, renewed]
+    assert renewed["previous_digest"] == revised["digest"]
+    assert all((root / name).read_bytes() == data for name, data in old_bytes.items())
+    assert frozen["state"]["clauses"] == confirmed["state"]["clauses"]
+
+
 async def test_idempotency_and_concurrent_writers(
     client: AsyncClient, snapshot: dict[str, Any]
 ) -> None:
